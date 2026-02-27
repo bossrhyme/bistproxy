@@ -10,8 +10,17 @@ module.exports = async function(req, res) {
   }
 
   const payload = JSON.stringify({
-    columns: ['name', 'close', 'change'],
-    range: [0, 10],
+    columns: [
+      'name', 'close', 'change', 'volume',
+      'market_cap_basic', 'price_earnings_ttm',
+      'price_book_ratio', 'price_sales_current',
+      'return_on_equity', 'return_on_assets',
+      'net_income_to_total_revenue_ttm', 'gross_profit_to_revenue_ttm',
+      'total_revenue_change_ttm_yoy', 'earnings_per_share_change_ttm_yoy',
+      'dividends_yield_current', 'total_debt_to_equity',
+      'current_ratio', 'sector', 'High.1M', 'Low.1M'
+    ],
+    range: [0, 500],
     sort: { sortBy: 'market_cap_basic', sortOrder: 'desc' }
   });
 
@@ -33,7 +42,12 @@ module.exports = async function(req, res) {
       let data = '';
       response.on('data', chunk => data += chunk);
       response.on('end', () => {
-        res.status(200).json({ status: response.statusCode, body: data.slice(0, 1000) });
+        try {
+          const json = JSON.parse(data);
+          res.status(200).json(json);
+        } catch(e) {
+          res.status(200).json({ error: 'Parse error', raw: data.slice(0, 500) });
+        }
         resolve();
       });
     });
