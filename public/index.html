@@ -702,7 +702,7 @@ const BIST_SYMBOLS = [
 // ═══════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════
-const PROXY_URL = '/api/scan';
+const PROXY_URL = 'https://bistproxy-lom91ffoa-alis-projects-ae1af626.vercel.app/api/scan';
 let allData = [];
 let filtered = [];
 let searchQ = '';
@@ -779,7 +779,13 @@ async function runScan(){
     document.getElementById('prog').style.width = '70%';
 
     const text = await res.text();
-    throw new Error(`STATUS:${res.status} BODY:${text.slice(0, 300)}`);
+    if(!res.ok) throw new Error(`Proxy hatası: HTTP ${res.status} — ${text.slice(0,200)}`);
+
+    let json;
+    try { json = JSON.parse(text); } catch(e) { throw new Error('Parse hatası: ' + text.slice(0,200)); }
+
+    if(json.error) throw new Error('API: ' + json.error + ' | raw: ' + text.slice(0,200));
+    if(!json.data || json.data.length === 0) throw new Error('Veri yok — keys:' + Object.keys(json).join(',') + ' raw:' + text.slice(0,200));
 
     document.getElementById('prog').style.width = '100%';
 
@@ -796,7 +802,7 @@ async function runScan(){
       ] = d;
 
       // TradingView sembol formatı: "BIST:THYAO" → "THYAO"
-      const symbol = (row.s || '').split(':').pop();
+      const symbol = (row.s || '').replace('BIST:', '');
 
       if(!close || close === 0) continue;
 
