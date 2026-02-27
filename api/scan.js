@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  const payload = req.body || {
+  const payload = {
     columns: [
       'name', 'close', 'change', 'volume',
       'market_cap_basic', 'price_earnings_ttm',
@@ -19,7 +19,8 @@ export default async function handler(req, res) {
       'current_ratio', 'sector', 'High.1M', 'Low.1M'
     ],
     range: [0, 500],
-    sort: { sortBy: 'market_cap_basic', sortOrder: 'desc' }
+    sort: { sortBy: 'market_cap_basic', sortOrder: 'desc' },
+    markets: ['turkey']
   };
 
   try {
@@ -27,23 +28,25 @@ export default async function handler(req, res) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Origin': 'https://www.tradingview.com',
-        'Referer': 'https://www.tradingview.com/'
+        'Referer': 'https://www.tradingview.com/',
+        'Accept': 'application/json',
+        'Accept-Language': 'en-US,en;q=0.9'
       },
       body: JSON.stringify(payload)
     });
 
     const text = await response.text();
-    
+
     if (!response.ok) {
-      return res.status(response.status).json({ error: `TradingView: ${response.status}`, body: text });
+      return res.status(200).json({ error: `TradingView: ${response.status}`, raw: text.slice(0, 500) });
     }
 
     const data = JSON.parse(text);
     return res.status(200).json(data);
 
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+    return res.status(200).json({ error: err.message });
   }
 }
