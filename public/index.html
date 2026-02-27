@@ -785,7 +785,7 @@ async function runScan(){
    const json = await res.json();
 
 if(json.error) throw new Error(json.error);
-if(!json.data || json.data.length === 0) throw new Error('Veri gelmedi — toplam: ' + json.totalCount);
+throw new Error('DEBUG: ' + JSON.stringify(json).slice(0, 200));
 
 document.getElementById('loadtxt').textContent = `${json.totalCount} hisse işleniyor...`;
 
