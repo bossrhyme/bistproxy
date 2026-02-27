@@ -782,10 +782,12 @@ async function runScan(){
       throw new Error(`Proxy hatası: HTTP ${res.status}`);
     }
 
-    const json = await res.json();
+   const json = await res.json();
 
-    if(json.error) throw new Error(json.error);
-    if(!json.data || json.data.length === 0) throw new Error('Veri gelmedi');
+if(json.error) throw new Error(json.error);
+if(!json.data || json.data.length === 0) throw new Error('Veri gelmedi — toplam: ' + json.totalCount);
+
+document.getElementById('loadtxt').textContent = `${json.totalCount} hisse işleniyor...`;
 
     document.getElementById('prog').style.width = '100%';
 
