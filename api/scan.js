@@ -13,12 +13,11 @@ module.exports = async function(req, res) {
     columns: [
       'name', 'close', 'change', 'volume',
       'market_cap_basic', 'price_earnings_ttm',
-      'price_book_ratio', 'price_sales_current',
-      'return_on_equity', 'return_on_assets',
+      'price_book_fq', 'price_sales_current',
+      'return_on_equity_fq', 'return_on_assets_fq',
       'net_margin', 'gross_margin',
-      'revenue_growth_rate_5y', 'earnings_growth_rate_5y',
-      'dividends_yield', 'total_debt_to_equity',
-      'current_ratio', 'sector', 'High.1M', 'Low.1M'
+      'dividends_yield', 'debt_to_equity_fq',
+      'current_ratio_fq', 'sector', 'High.1M', 'Low.1M'
     ],
     range: [0, 500],
     sort: { sortBy: 'market_cap_basic', sortOrder: 'desc' }
