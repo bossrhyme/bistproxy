@@ -44,16 +44,17 @@ module.exports = async function(req, res) {
       response.on('end', () => {
         try {
           const json = JSON.parse(data);
-          res.status(200).json(json);
+          res.setHeader('Content-Type', 'application/json');
+          res.status(response.statusCode).end(data);
         } catch(e) {
-          res.status(200).json({ error: 'Parse error', raw: data.slice(0, 500) });
+          res.status(500).json({ error: 'Parse error', raw: data.slice(0, 200) });
         }
         resolve();
       });
     });
 
     request.on('error', (err) => {
-      res.status(200).json({ error: err.message });
+      res.status(500).json({ error: err.message });
       resolve();
     });
 
