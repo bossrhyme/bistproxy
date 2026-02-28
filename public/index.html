@@ -169,6 +169,7 @@ td:first-child,td:nth-child(2){text-align:left;}
 .dstitle{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:2px;color:var(--teal);margin-bottom:8px;}
 .drow{display:flex;justify-content:space-between;margin-bottom:5px;align-items:baseline;}
 .dkey{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);}
+.dkey tag{font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--border2);letter-spacing:.5px;text-transform:uppercase;margin-left:3px;vertical-align:middle;}
 .dval{font-family:'JetBrains Mono',monospace;font-size:10px;}
 .dfresh{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--teal);padding:4px 18px 8px;border-bottom:1px solid var(--border);}
 .chart-section{padding:12px 14px;border-bottom:1px solid var(--border);}
@@ -299,6 +300,7 @@ td:first-child,td:nth-child(2){text-align:left;}
           <div class="chip" data-preset="lowdebt">Az Borç</div>
           <div class="chip" data-preset="momentum">Momentum</div>
         </div>
+        <div class="goat-info" id="preset-info"></div>
       </div>
 
       <div class="filter-group">
@@ -878,10 +880,10 @@ async function runScan(){
         peNormalizedAnnual: pe || null,
         pbAnnual: pb || null,
         psTTM: ps || null,
-        roeTTM: roe ? roe * 100 : null,        // TradingView decimal → %
-        roaTTM: roa ? roa * 100 : null,
-        netProfitMarginTTM: netMargin ? netMargin * 100 : null,
-        grossMarginTTM: grossMargin ? grossMargin * 100 : null,
+        roeTTM: roe || null,        // TradingView zaten % olarak gönderiyor
+        roaTTM: roa || null,
+        netProfitMarginTTM: netMargin || null,
+        grossMarginTTM: grossMargin || null,
         revenueGrowthTTMYoy: null,
         epsGrowthTTMYoy: null,
         dividendYieldIndicatedAnnual: divYield || null,
@@ -912,12 +914,12 @@ async function runScan(){
 // PRESETS
 // ═══════════════════════════════════════════
 const PRESETS = {
-  value:    {pe_max:15, pb_max:2, div_min:2},
-  growth:   {earng_min:20, revg_min:15, roe_min:15},
-  dividend: {div_min:4, de_max:100},
-  quality:  {roe_min:20, margin_min:10, de_max:80, cr_min:1.5},
-  lowdebt:  {de_max:30, cr_min:2},
-  momentum: {revg_min:20, earng_min:20}
+  value:    { desc: 'Ucuz kalmış hisseler — düşük F/K (<15), düşük PD/DD (<2), temettü ödeyen (>%2)', filters: {pe_max:15, pb_max:2, div_min:2} },
+  growth:   { desc: 'Hızlı büyüyen şirketler — güçlü kazanç ve gelir artışı, yüksek ROE', filters: {earng_min:20, revg_min:15, roe_min:15} },
+  dividend: { desc: 'Yüksek temettü ödeyen, borç yükü makul hisseler (>%4 temettü)', filters: {div_min:4, de_max:100} },
+  quality:  { desc: 'Yüksek karlılık, güçlü marj, düşük borç ve iyi likidite — kaliteli şirket', filters: {roe_min:20, margin_min:10, de_max:80, cr_min:1.5} },
+  lowdebt:  { desc: 'Az borçla çalışan, nakit akışı güçlü, bilanço sağlıklı hisseler', filters: {de_max:30, cr_min:2} },
+  momentum: { desc: 'Hem gelir hem kazanç büyümesinde güçlü ivme yakalayan hisseler', filters: {revg_min:20, earng_min:20} }
 };
 
 // Guru stratejileri
@@ -973,19 +975,23 @@ document.getElementById('presets').addEventListener('click', e => {
   const chip = e.target.closest('.chip');
   if(!chip) return;
   const name = chip.dataset.preset;
+  const preset = PRESETS[name];
+  if(!preset) return;
   clearFilters(false);
   document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
   chip.classList.add('on');
-  for(const [k,v] of Object.entries(PRESETS[name])){
+  for(const [k,v] of Object.entries(preset.filters)){
     const el = document.getElementById(k);
     if(el) el.value = v;
   }
+  const infoEl = document.getElementById('preset-info');
+  if(infoEl){ infoEl.innerHTML = preset.desc; infoEl.style.display = 'block'; }
   if(allData.length) applyAndRender();
 });
 
 function clearFilters(resetChips=true){
   document.querySelectorAll('.finps input').forEach(i=>i.value='');
-  if(resetChips) { document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on')); const gi=document.getElementById('goat-info'); if(gi) gi.style.display='none'; }
+  if(resetChips) { document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on')); ['goat-info','preset-info'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';}); }
   if(allData.length) applyAndRender();
 }
 
@@ -1145,28 +1151,28 @@ function showDetail(sym){
 
   const G = [
     {t:'Değerleme', rows:[
-      ['F/K', s.peNormalizedAnnual, v=>v.toFixed(1)],
-      ['PD/DD', s.pbAnnual, v=>v.toFixed(2)],
-      ['F/S', s.psTTM, v=>v.toFixed(2)],
+      ['F/K <tag>TTM</tag>', s.peNormalizedAnnual, v=>v.toFixed(1)],
+      ['PD/DD <tag>FQ</tag>', s.pbAnnual, v=>v.toFixed(2)],
+      ['F/S <tag>TTM</tag>', s.psTTM, v=>v.toFixed(2)],
       ['Piyasa Değeri', s.marketCapitalization, v=>fmc(v)],
       ['Sektör', s.sector, v=>v],
       ['1A Yüksek', s['52WeekHigh'], v=>`${v.toFixed(2)} ₺`],
       ['1A Düşük', s['52WeekLow'], v=>`${v.toFixed(2)} ₺`],
     ]},
     {t:'Karlılık', rows:[
-      ['ROE', s.roeTTM, v=>`<span class="${v>=0?'up':'dn'}">${v.toFixed(1)}%</span>`],
-      ['ROA', s.roaTTM, v=>`<span class="${v>=0?'up':'dn'}">${v.toFixed(1)}%</span>`],
-      ['Net Kar Marjı', s.netProfitMarginTTM, v=>`<span class="${v>=0?'up':'dn'}">${v.toFixed(1)}%</span>`],
-      ['Brüt Marj', s.grossMarginTTM, v=>`<span class="${v>=0?'up':'dn'}">${v.toFixed(1)}%</span>`],
+      ['ROE <tag>FQ</tag>', s.roeTTM, v=>`<span class="${v>=0?'up':'dn'}">${v.toFixed(1)}%</span>`],
+      ['ROA <tag>FQ</tag>', s.roaTTM, v=>`<span class="${v>=0?'up':'dn'}">${v.toFixed(1)}%</span>`],
+      ['Net Kar Marjı <tag>TTM</tag>', s.netProfitMarginTTM, v=>`<span class="${v>=0?'up':'dn'}">${v.toFixed(1)}%</span>`],
+      ['Brüt Marj <tag>TTM</tag>', s.grossMarginTTM, v=>`<span class="${v>=0?'up':'dn'}">${v.toFixed(1)}%</span>`],
     ]},
     {t:'Büyüme', rows:[
-      ['Gelir Büy. (YoY)', s.revenueGrowthTTMYoy, v=>`<span class="${v>=0?'up':'dn'}">${v>=0?'+':''}${v.toFixed(1)}%</span>`],
-      ['EPS Büy. (YoY)', s.epsGrowthTTMYoy, v=>`<span class="${v>=0?'up':'dn'}">${v>=0?'+':''}${v.toFixed(1)}%</span>`],
+      ['Gelir Büy. <tag>YoY</tag>', s.revenueGrowthTTMYoy, v=>`<span class="${v>=0?'up':'dn'}">${v>=0?'+':''}${v.toFixed(1)}%</span>`],
+      ['EPS Büy. <tag>YoY</tag>', s.epsGrowthTTMYoy, v=>`<span class="${v>=0?'up':'dn'}">${v>=0?'+':''}${v.toFixed(1)}%</span>`],
     ]},
     {t:'Temettü & Sağlık', rows:[
-      ['Temettü Verimi', s.dividendYieldIndicatedAnnual, v=>`<span class="up">${v.toFixed(2)}%</span>`],
-      ['Borç/Özkaynak', s['totalDebt/totalEquityAnnual'], v=>v.toFixed(1)],
-      ['Cari Oran', s.currentRatioAnnual, v=>v.toFixed(2)],
+      ['Temettü <tag>yıllık</tag>', s.dividendYieldIndicatedAnnual, v=>`<span class="up">${v.toFixed(2)}%</span>`],
+      ['Borç/Özkaynak <tag>FQ</tag>', s['totalDebt/totalEquityAnnual'], v=>v.toFixed(1)],
+      ['Cari Oran <tag>FQ</tag>', s.currentRatioAnnual, v=>v.toFixed(2)],
     ]},
   ];
 
