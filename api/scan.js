@@ -15,7 +15,7 @@ module.exports = async function(req, res) {
       'market_cap_basic', 'price_earnings_ttm',
       'price_book_ratio', 'price_sales_current',
       'return_on_equity', 'return_on_assets',
-      'net_income_to_total_revenue_ttm', 'gross_profit_to_revenue_ttm',
+      'net_margin',
       'total_revenue_change_ttm_yoy', 'earnings_per_share_change_ttm_yoy',
       'dividends_yield_current', 'total_debt_to_equity',
       'current_ratio', 'sector', 'High.1M', 'Low.1M'
