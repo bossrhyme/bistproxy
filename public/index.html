@@ -961,16 +961,12 @@ async function runScan(){
   try {
     const exCfg = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
   if (exCfg.filters.length > 0) payload.filter = exCfg.filters;
-  // SP500: sadece S&P500 endeksindeki hisseler
+  // SP500: is_primary + common stock filtresi, piyasa değerine göre ilk 503
   if (currentExchange === 'sp500') {
-    payload.filter2 = {
-      operator: 'and',
-      operands: [
-        { expression: { left: 'is_primary', operation: 'equal', right: true } },
-        { expression: { left: 'typespecs', operation: 'has', right: ['common'] } },
-        { expression: { left: 'index', operation: 'equal', right: 'SPX500' } }
-      ]
-    };
+    payload.filter = [
+      { left: 'is_primary', operation: 'equal', right: true },
+      { left: 'typespecs', operation: 'has', right: ['common'] }
+    ];
     payload.range = [0, 503];
   }
   // NASDAQ: sadece NASDAQ exchange hisseleri
