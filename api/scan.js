@@ -152,21 +152,44 @@ module.exports = async function(req, res) {
 
     return new Promise(async (resolve) => {
       try {
-        // 1. Ticker → CIK
-        const tickerRes = await new Promise((res2, rej) => {
-          makeRequest('data.sec.gov', '/files/company_tickers.json', 'GET',
+        // 1. Ticker → CIK (EDGAR company search API — hafif endpoint)
+        const searchData = await new Promise((res2, rej) => {
+          makeRequest('efts.sec.gov',
+            '/LATEST/search-index?q=%22' + symbol + '%22&dateRange=custom&startdt=2020-01-01&forms=4&hits.hits.total.value=true&hits.hits._source=period_of_report',
+            'GET',
             { 'User-Agent': 'DeepFin info@deepfin.com', 'Accept': 'application/json' },
             null, (err, data) => err ? rej(err) : res2(data));
         });
-        const tickers = JSON.parse(tickerRes);
-        let cik = null;
-        for (const [, v] of Object.entries(tickers)) {
-          if (v.ticker.toUpperCase() === symbol) {
-            cik = String(v.cik_str).padStart(10, '0');
-            break;
-          }
+
+        // EDGAR ticker arama
+        const tickerSearch = await new Promise((res2, rej) => {
+          makeRequest('www.sec.gov',
+            '/cgi-bin/browse-edgar?company=&CIK=' + symbol + '&type=4&dateb=&owner=include&count=1&search_text=&action=getcompany&output=atom',
+            'GET',
+            { 'User-Agent': 'DeepFin info@deepfin.com', 'Accept': '*/*' },
+            null, (err, data) => err ? rej(err) : res2(data));
+        });
+
+        // CIK'yi atom XML'den çıkar
+        const cikMatch = tickerSearch.match(/CIK=(\d+)/i) || tickerSearch.match(/cik>(\d+)</i);
+        let cik = cikMatch ? String(parseInt(cikMatch[1])).padStart(10, '0') : null;
+
+        // Alternatif: EDGAR company_tickers_exchange.json (daha küçük)
+        if (!cik) {
+          const exData = await new Promise((res2, rej) => {
+            makeRequest('data.sec.gov', '/files/company_tickers_exchange.json', 'GET',
+              { 'User-Agent': 'DeepFin info@deepfin.com' },
+              null, (err, data) => err ? rej(err) : res2(data));
+          });
+          const exJson = JSON.parse(exData);
+          const fields = exJson.fields; // ['cik','name','ticker','exchange']
+          const tickerIdx = fields.indexOf('ticker');
+          const cikIdx = fields.indexOf('cik');
+          const found = exJson.data.find(row => row[tickerIdx] && row[tickerIdx].toUpperCase() === symbol);
+          if (found) cik = String(found[cikIdx]).padStart(10, '0');
         }
-        if (!cik) { res.status(404).json({ error: symbol + ' CIK bulunamadi' }); return resolve(); }
+
+        if (!cik) { res.status(404).json({ error: symbol + ' bulunamadi' }); return resolve(); }
 
         // 2. Form 4 listesi
         const subData = await new Promise((res2, rej) => {
@@ -247,45 +270,65 @@ module.exports = async function(req, res) {
     });
   }
 
-  // ── SHORT INTEREST — FINRA ──
+  // ── SHORT INTEREST — Nasdaq API ──
   if (action === 'short') {
     const symbol = (url.searchParams.get('symbol') || '').toUpperCase();
     if (!symbol) return res.status(400).json({ error: 'symbol required' });
 
     return new Promise(async (resolve) => {
       try {
-        // FINRA OTCM short interest
-        const filter = encodeURIComponent(JSON.stringify({
-          filters: [{ fieldName: 'symbolCode', fieldValue: symbol, compareType: 'EQUAL' }]
-        }));
-        const data = await new Promise((res2, rej) => {
-          makeRequest('api.finra.org',
-            '/data/group/OTCMarket/name/consolidatedShortInterest?limit=1&filter=' + filter, 'GET',
-            { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' },
-            null, (err, data, status) => err ? rej(err) : res2({ data, status }));
+        // Nasdaq short interest API — en guncel veri
+        const nasdaqData = await new Promise((res2, rej) => {
+          makeRequest('api.nasdaq.com',
+            '/api/quote/' + symbol + '/short-interest?assetClass=stocks',
+            'GET',
+            {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+              'Accept': 'application/json, text/plain, */*',
+              'Accept-Language': 'en-US,en;q=0.9',
+              'Origin': 'https://www.nasdaq.com',
+              'Referer': 'https://www.nasdaq.com/'
+            },
+            null, (err, data) => err ? rej(err) : res2(data));
         });
 
-        const parsed = JSON.parse(data.data);
-        if (!parsed || parsed.length === 0) {
-          // FINRA ikinci endpoint
-          const filter2 = encodeURIComponent(JSON.stringify({
-            filters: [{ fieldName: 'issueSymbolIdentifier', fieldValue: symbol, compareType: 'EQUAL' }]
-          }));
-          const data2 = await new Promise((res2, rej) => {
-            makeRequest('api.finra.org',
-              '/data/group/otcMarket/name/otcShortInterest?limit=2&filter=' + filter2, 'GET',
-              { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' },
+        const json = JSON.parse(nasdaqData);
+        if (!json.data || !json.data.shortInterestTable) {
+          throw new Error('Veri yok');
+        }
+
+        const rows = json.data.shortInterestTable.rows || [];
+        const summary = json.data.shortInterestColumns || [];
+
+        // En son satir en guncel veri
+        if (rows.length === 0) throw new Error('Short interest satiri yok');
+
+        // Float shares icin ayri endpoint
+        let floatShares = null;
+        try {
+          const summaryData = await new Promise((res2, rej) => {
+            makeRequest('api.nasdaq.com',
+              '/api/quote/' + symbol + '/summary?assetClass=stocks',
+              'GET',
+              {
+                'User-Agent': 'Mozilla/5.0',
+                'Accept': 'application/json',
+                'Origin': 'https://www.nasdaq.com',
+                'Referer': 'https://www.nasdaq.com/'
+              },
               null, (err, data) => err ? rej(err) : res2(data));
           });
-          const parsed2 = JSON.parse(data2);
-          if (!parsed2 || parsed2.length === 0) {
-            res.status(404).json({ error: 'Veri bulunamadi' });
-            return resolve();
-          }
-          res.status(200).json(parsed2[0]);
-          return resolve();
-        }
-        res.status(200).json(parsed[0]);
+          const sJson = JSON.parse(summaryData);
+          const shareFloat = sJson.data && sJson.data.summaryData && sJson.data.summaryData.ShareFloat;
+          if (shareFloat) floatShares = shareFloat.value;
+        } catch(e) {}
+
+        res.status(200).json({
+          source: 'nasdaq',
+          symbol: symbol,
+          rows: rows.slice(0, 10), // Son 10 donem
+          floatShares: floatShares
+        });
       } catch(e) {
         res.status(500).json({ error: e.message });
       }
