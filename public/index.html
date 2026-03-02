@@ -403,7 +403,7 @@ td:first-child,td:nth-child(2){text-align:left;}
 
       <div class="filter-group">
         <div class="filter-group-title">Piyasa</div>
-        <div class="frow"><div class="flbl">Piyasa Değeri (Milyon ₺)</div><div class="finps"><input type="number" id="mc_min" placeholder="—" oninput="liveFilter()"><input type="number" id="mc_max" placeholder="—" oninput="liveFilter()"></div></div>
+        <div class="frow"><div class="flbl">Piyasa Değeri (Milyon $)</div><div class="finps"><input type="number" id="mc_min" placeholder="—" oninput="liveFilter()"><input type="number" id="mc_max" placeholder="—" oninput="liveFilter()"></div></div>
       </div>
 
       <button class="clrbtn" onclick="clearFilters()">✕ Filtreleri Temizle</button>
@@ -455,7 +455,7 @@ td:first-child,td:nth-child(2){text-align:left;}
               <th onclick="colSort('name')">ŞİRKET</th>
               <th onclick="colSort('currentPrice')" id="th-price">FİYAT</th>
               <th onclick="colSort('changePercent')">DEĞ%</th>
-              <th onclick="colSort('marketCapitalization')">PD (Mn)</th>
+              <th onclick="colSort('marketCapitalization')">Piyasa Değeri (USD)</th>
               <th onclick="colSort('peNormalizedAnnual')">F/K</th>
               <th onclick="colSort('pbAnnual')">PD/DD</th>
               <th onclick="colSort('psTTM')">F/S</th>
@@ -879,7 +879,7 @@ let currentExchange = 'bist';
 const EXCHANGE_META = {
   bist:   { name: 'BIST',    currency: '₺', currencyCode: 'TRY', yahooSuffix: '.IS', flag: '🇹🇷', tvUrl: 'https://scanner.tradingview.com/turkey/scan',  filters: [] },
   nasdaq: { name: 'NASDAQ',  currency: '$',  currencyCode: 'USD', yahooSuffix: '',    flag: '🇺🇸', tvUrl: 'https://scanner.tradingview.com/america/scan', filters: [{ left: 'exchange', operation: 'equal', right: 'NASDAQ' }] },
-  sp500:  { name: 'S&P 500', currency: '$',  currencyCode: 'USD', yahooSuffix: '',    flag: '🇺🇸', tvUrl: 'https://scanner.tradingview.com/america/scan', filters: [{ left: 'is_primary', operation: 'equal', right: true }, { left: 'index', operation: 'equal', right: 'SP500' }] },
+  sp500:  { name: 'S&P 500', currency: '$',  currencyCode: 'USD', yahooSuffix: '',    flag: '🇺🇸', tvUrl: 'https://scanner.tradingview.com/america/scan', filters: [] },
   dax:    { name: 'DAX',     currency: '€',  currencyCode: 'EUR', yahooSuffix: '.DE', flag: '🇩🇪', tvUrl: 'https://scanner.tradingview.com/germany/scan', filters: [] },
   lse:    { name: 'LSE',     currency: '£',  currencyCode: 'GBP', yahooSuffix: '.L',  flag: '🇬🇧', tvUrl: 'https://scanner.tradingview.com/uk/scan',      filters: [] },
   nikkei: { name: 'Nikkei',  currency: '¥',  currencyCode: 'JPY', yahooSuffix: '.T',  flag: '🇯🇵', tvUrl: 'https://scanner.tradingview.com/japan/scan',   filters: [] },
@@ -953,7 +953,7 @@ async function runScan(){
   };
   const payload = {
     columns: COLUMNS_BY_EXCHANGE[currentExchange] || COLUMNS_BY_EXCHANGE.default,
-    range: [0, 500],
+    range: [0, 1500],
     sort: { sortBy: 'market_cap_basic', sortOrder: 'desc' },
     ignore_unknown_fields: true
   };
@@ -961,6 +961,29 @@ async function runScan(){
   try {
     const exCfg = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
   if (exCfg.filters.length > 0) payload.filter = exCfg.filters;
+  // SP500: sadece S&P500 endeksindeki hisseler
+  if (currentExchange === 'sp500') {
+    payload.filter2 = {
+      operator: 'and',
+      operands: [
+        { expression: { left: 'is_primary', operation: 'equal', right: true } },
+        { expression: { left: 'typespecs', operation: 'has', right: ['common'] } },
+        { expression: { left: 'index', operation: 'equal', right: 'SPX500' } }
+      ]
+    };
+    payload.range = [0, 503];
+  }
+  // NASDAQ: sadece NASDAQ exchange hisseleri
+  if (currentExchange === 'nasdaq') {
+    payload.filter = [{ left: 'exchange', operation: 'equal', right: 'NASDAQ' }];
+    payload.filter2 = {
+      operator: 'and',
+      operands: [
+        { expression: { left: 'is_primary', operation: 'equal', right: true } },
+        { expression: { left: 'typespecs', operation: 'has', right: ['common'] } }
+      ]
+    };
+  }
   // TradingView CORS: content-type header olmadan direkt fetch
   const res = await fetch(exCfg.tvUrl, {
       method: 'POST',
@@ -1003,7 +1026,12 @@ async function runScan(){
         throw new Error('API: ' + json.error);
       }
     }
-    if(!json.data || json.data.length === 0) throw new Error('Veri yok — keys:' + Object.keys(json).join(','));
+    if(!json.data || json.data.length === 0) {
+      const msg = json.totalCount > 0
+        ? `API yanıt verdi (${json.totalCount} hisse) ama data boş — filtre sorunu`
+        : 'Veri yok — ' + JSON.stringify(json).slice(0,150);
+      throw new Error(msg);
+    }
 
     document.getElementById('prog').style.width = '100%';
 
@@ -1050,7 +1078,7 @@ async function runScan(){
         previousClose: close / (1 + (change||0)/100),
         changePercent: change || null,
         volume: volume || null,
-        marketCapitalization: mcap ? mcap / 1e6 : null,
+        marketCapitalization: mcap ? mcap / 1e6 : null, // milyon USD
         exchangeId: currentExchange,
         peNormalizedAnnual: pe || null,
         pbAnnual: pb || null,
@@ -1265,9 +1293,10 @@ function fv(v, dec=2, pct=false){
 }
 function fmc(v){
   if(!v) return nil;
-  // Finnhub returns in millions USD, convert display
-  if(v>=1000) return `${(v/1000).toFixed(1)}B`;
-  return `${v.toFixed(0)}M`;
+  // TradingView market_cap_basic her zaman USD — milyon USD olarak saklıyoruz
+  if(v>=1000000) return `$${(v/1000000).toFixed(2)}T`;
+  if(v>=1000)    return `$${(v/1000).toFixed(1)}B`;
+  return `$${v.toFixed(0)}M`;
 }
 
 function renderTable(){
