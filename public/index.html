@@ -925,25 +925,30 @@ async function runScan(){
   const exMeta = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
   document.getElementById('loadsub').textContent = `${exMeta.flag} ${exMeta.name} hisseleri alınıyor...`;
 
-  const payload = {
-    columns: [
-      'name', 'close', 'change', 'volume',
-      'market_cap_basic',
-      'price_earnings_ttm',
-      'price_book_fq',
-      'price_sales_current',
-      'return_on_equity_fq',
-      'return_on_assets_fq',
-      'net_margin',
-      'gross_margin',
-      'total_revenue_change_ttm_yoy',
-      'earnings_per_share_change_ttm_yoy',
-      'dividends_yield',
-      'debt_to_equity_fq',
-      'current_ratio_fq',
-      'sector',
-      'High.1M', 'Low.1M'
+  // Field isimleri borsa bazlı farklı — exchange'e göre doğru set
+  const isBIST = (currentExchange === 'bist');
+  const COLUMNS_BY_EXCHANGE = {
+    bist: [
+      'name','close','change','volume','market_cap_basic',
+      'price_earnings_ttm','price_book_fq','price_sales_current',
+      'return_on_equity_fq','return_on_assets_fq',
+      'net_margin','gross_margin',
+      'total_revenue_change_ttm_yoy','earnings_per_share_change_ttm_yoy',
+      'dividends_yield','debt_to_equity_fq','current_ratio_fq',
+      'sector','High.1M','Low.1M'
     ],
+    default: [
+      'name','close','change','volume','market_cap_basic',
+      'price_earnings_ttm','price_book_ratio','price_sales_current',
+      'return_on_equity','return_on_assets',
+      'net_income_to_total_revenue_ttm','gross_profit_to_revenue_ttm',
+      'revenue_growth_ttm_yoy_percent_change_calc','earnings_per_share_diluted_ttm',
+      'dividends_yield_current','total_debt_to_equity','current_ratio',
+      'sector','High.1M','Low.1M'
+    ]
+  };
+  const payload = {
+    columns: COLUMNS_BY_EXCHANGE[currentExchange] || COLUMNS_BY_EXCHANGE.default,
     range: [0, 500],
     sort: { sortBy: 'market_cap_basic', sortOrder: 'desc' }
   };
@@ -975,22 +980,39 @@ async function runScan(){
 
     document.getElementById('prog').style.width = '100%';
 
-    // Parse TradingView response
+    // Parse TradingView response — index bazlı, sıra garantili
     const results = [];
+    const cols = (COLUMNS_BY_EXCHANGE[currentExchange] || COLUMNS_BY_EXCHANGE.default);
+    const ci = {}; cols.forEach((c,i) => ci[c]=i); // column → index map
+
     for(const row of json.data) {
       const d = row.d;
-      const [
-        name, close, change, volume, mcap,
-        pe, pb, ps, roe, roa,
-        netMargin, grossMargin,
-        revGrowth, epsGrowth,
-        divYield, deRatio, currentRatio, sector,
-        high1m, low1m, description
-      ] = d;
+      const g = (key) => d[ci[key]] ?? null; // güvenli getter
+
+      const close  = g('close');
+      const name   = g('name');
+      const change = g('change');
+      const volume = g('volume');
+      const mcap   = g('market_cap_basic');
+      const pe     = g('price_earnings_ttm');
+      const pb     = g('price_book_fq') ?? g('price_book_ratio');
+      const ps     = g('price_sales_current');
+      const roe    = g('return_on_equity_fq') ?? g('return_on_equity');
+      const roa    = g('return_on_assets_fq') ?? g('return_on_assets');
+      const nm     = g('net_margin') ?? g('net_income_to_total_revenue_ttm');
+      const gm     = g('gross_margin') ?? g('gross_profit_to_revenue_ttm');
+      const revG   = g('total_revenue_change_ttm_yoy') ?? g('revenue_growth_ttm_yoy_percent_change_calc');
+      const epsG   = g('earnings_per_share_change_ttm_yoy') ?? g('earnings_per_share_diluted_ttm');
+      const divY   = g('dividends_yield') ?? g('dividends_yield_current');
+      const de     = g('debt_to_equity_fq') ?? g('total_debt_to_equity');
+      const cr     = g('current_ratio_fq') ?? g('current_ratio');
+      const sector = g('sector');
+      const high1m = g('High.1M');
+      const low1m  = g('Low.1M');
 
       // TradingView sembol formatı: "BIST:THYAO" → "THYAO"
       const rawSym = row.s || '';
-      const symbol = rawSym.replace(/^[A-Z]+:/, ''); // BIST:THYAO → THYAO, NASDAQ:AAPL → AAPL
+      const symbol = rawSym.replace(/^[A-Z0-9]+:/, '');
 
       if(!close || close === 0) continue;
 
@@ -1002,20 +1024,19 @@ async function runScan(){
         changePercent: change || null,
         volume: volume || null,
         marketCapitalization: mcap ? mcap / 1e6 : null,
-        description: description || null,
         exchangeId: currentExchange,
         peNormalizedAnnual: pe || null,
         pbAnnual: pb || null,
         psTTM: ps || null,
-        roeTTM: roe || null,        // TradingView zaten % olarak gönderiyor
+        roeTTM: roe || null,
         roaTTM: roa || null,
-        netProfitMarginTTM: netMargin || null,
-        grossMarginTTM: grossMargin || null,
-        revenueGrowthTTMYoy: revGrowth || null,
-        epsGrowthTTMYoy: epsGrowth || null,
-        dividendYieldIndicatedAnnual: divYield || null,
-        'totalDebt/totalEquityAnnual': deRatio || null,
-        currentRatioAnnual: currentRatio || null,
+        netProfitMarginTTM: nm || null,
+        grossMarginTTM: gm || null,
+        revenueGrowthTTMYoy: revG || null,
+        epsGrowthTTMYoy: epsG || null,
+        dividendYieldIndicatedAnnual: divY || null,
+        'totalDebt/totalEquityAnnual': de || null,
+        currentRatioAnnual: cr || null,
         sector: sector || null,
         '52WeekHigh': high1m || null,
         '52WeekLow': low1m || null,
