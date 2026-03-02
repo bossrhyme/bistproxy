@@ -99,7 +99,7 @@ module.exports = async function(req, res) {
     const yhSym       = symbol + suffix;
 
     const fetchChart = (sym) => new Promise((resolve, reject) => {
-      const path = `/v8/finance/chart/${encodeURIComponent(sym)}?interval=${yhInterval}&range=${yhRange}&includePrePost=false`;
+      const path = '/v8/finance/chart/' + encodeURIComponent(sym) + '?interval=' + yhInterval + '&range=' + yhRange + '&includePrePost=false';
       const headers = { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' };
       makeRequest('query1.finance.yahoo.com', path, 'GET', headers, null, (err, data) => {
         if (err) reject(err); else resolve(data);
@@ -166,11 +166,11 @@ module.exports = async function(req, res) {
             break;
           }
         }
-        if (!cik) { res.status(404).json({ error: `${symbol} CIK bulunamadi` }); return resolve(); }
+        if (!cik) { res.status(404).json({ error: symbol + ' CIK bulunamadi' }); return resolve(); }
 
         // 2. Form 4 listesi
         const subData = await new Promise((res2, rej) => {
-          makeRequest('data.sec.gov', `/submissions/CIK${cik}.json`, 'GET',
+          makeRequest('data.sec.gov', '/submissions/CIK' + cik + '.json', 'GET',
             { 'User-Agent': 'DeepFin info@deepfin.com', 'Accept': 'application/json' },
             null, (err, data) => err ? rej(err) : res2(JSON.parse(data)));
         });
@@ -186,25 +186,31 @@ module.exports = async function(req, res) {
 
         // 3. Her Form 4 XML'ini çek ve parse et
         const results = [];
-        for (const i of form4Idx.slice(0, 10)) {
+        const topIndices = form4Idx.slice(0, 10);
+        for (let fi = 0; fi < topIndices.length; fi++) {
+          const i = topIndices[fi];
           try {
             const acc = filings.accessionNumber[i].replace(/-/g, '');
             const doc = filings.primaryDocument[i];
             const cikNum = parseInt(cik);
             const xmlData = await new Promise((res2, rej) => {
               makeRequest('www.sec.gov',
-                `/Archives/edgar/data/${cikNum}/${acc}/${doc}`, 'GET',
-                { 'User-Agent': 'DeepFin info@deepfin.com' },
+                '/Archives/edgar/data/' + cikNum + '/' + acc + '/' + doc, 'GET',
+                { 'User-Agent': 'DeepFin info@deepfin.com', 'Accept': 'text/xml,application/xml,*/*' },
                 null, (err, data) => err ? rej(err) : res2(data));
             });
+            // SEC bazen HTML hata sayfası döner
+            if (!xmlData || xmlData.trim().startsWith('<!DOCTYPE') || xmlData.trim().startsWith('<html')) {
+              continue;
+            }
 
             // Basit regex parse (XML parser yok Node'da)
             const get = (tag) => {
-              const m = xmlData.match(new RegExp(`<${tag}[^>]*>([^<]*)<`, 'i'));
+              const m = new RegExp('<' + tag + '[^>]*>([^<]*)<', 'i').exec(xmlData);
               return m ? m[1].trim() : '';
             };
             const getAll = (tag) => {
-              const matches = [...xmlData.matchAll(new RegExp(`<${tag}[^>]*>([^<]*)<`, 'gi'))];
+              const matches = (function(){ const r=new RegExp('<'+tag+'[^>]*>([^<]*)<','gi'),res2=[]; let mx; while((mx=r.exec(xmlData))!==null)res2.push(mx); return res2; })();
               return matches.map(m => m[1].trim());
             };
 
@@ -254,7 +260,7 @@ module.exports = async function(req, res) {
         }));
         const data = await new Promise((res2, rej) => {
           makeRequest('api.finra.org',
-            `/data/group/OTCMarket/name/consolidatedShortInterest?limit=1&filter=${filter}`, 'GET',
+            '/data/group/OTCMarket/name/consolidatedShortInterest?limit=1&filter=' + filter, 'GET',
             { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' },
             null, (err, data, status) => err ? rej(err) : res2({ data, status }));
         });
@@ -267,7 +273,7 @@ module.exports = async function(req, res) {
           }));
           const data2 = await new Promise((res2, rej) => {
             makeRequest('api.finra.org',
-              `/data/group/otcMarket/name/otcShortInterest?limit=2&filter=${filter2}`, 'GET',
+              '/data/group/otcMarket/name/otcShortInterest?limit=2&filter=' + filter2, 'GET',
               { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' },
               null, (err, data) => err ? rej(err) : res2(data));
           });
