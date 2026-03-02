@@ -872,7 +872,7 @@ const BIST_SYMBOLS = [
 // ═══════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════
-const PROXY_URL = '/api/scan';
+const PROXY_URL = '/api/scan'; // Sadece chart için (Yahoo Finance CORS kapalı)
 let allData = [];
 let filtered = [];
 let searchQ = '';
@@ -909,7 +909,7 @@ async function runScan(){
   showState('loading');
   document.getElementById('toolbar').style.display = 'none';
   document.getElementById('prog').style.width = '30%';
-  document.getElementById('loadtxt').textContent = 'TradingView\'den veri çekiliyor...';
+  document.getElementById('loadtxt').textContent = 'Taranıyor...';
   const exMeta = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
   document.getElementById('loadsub').textContent = `${exMeta.flag} ${exMeta.name} hisseleri alınıyor...`;
 
@@ -937,10 +937,16 @@ async function runScan(){
   };
 
   try {
-    const scanUrl = PROXY_URL + '?action=scan&exchange=' + currentExchange;
-  const res = await fetch(scanUrl, {
+    const exCfg = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
+  // Direkt TradingView Scanner — proxy yok, Vercel cold start yok
+  if (exCfg.filters.length > 0) payload.filter = exCfg.filters;
+  const res = await fetch(exCfg.tvUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Origin': 'https://www.tradingview.com',
+        'Referer': 'https://www.tradingview.com/'
+      },
       body: JSON.stringify(payload)
     });
 
