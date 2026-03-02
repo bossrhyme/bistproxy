@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>DeepFin- Hisse Tarama Aracı </title>
+<title>DeepFin — Hisse Tarama Aracı</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -68,8 +68,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .tbtn:disabled{opacity:.4;cursor:not-allowed;}
 .infobtn{background:transparent;border:1px solid var(--border2);color:var(--text2);}
 .infobtn:hover{border-color:var(--accent);color:var(--accent);background:rgba(59,130,246,.05);}
-.supportbtn{background:transparent;border:1px solid var(--border2);color:var(--text2);}
-.supportbtn:hover{border-color:var(--gold);color:var(--gold);}
+.supportbtn{background:rgba(246,70,93,.08);border:1px solid rgba(246,70,93,.25);color:#f6465d;}
+.supportbtn:hover{background:rgba(246,70,93,.15);border-color:#f6465d;color:#f6465d;}
 #scantime{font-size:11px;color:var(--muted2);}
 
 /* ── LAYOUT ── */
@@ -81,6 +81,19 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .sidebar::-webkit-scrollbar-thumb{background:var(--border2);}
 .stitle{font-size:10px;font-weight:600;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;}
 .filter-group{margin-bottom:14px;}
+.exchange-group{margin-bottom:14px;}
+.exchange-title{font-size:10px;font-weight:600;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px;display:flex;align-items:center;gap:6px;}
+.exchange-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.exchange-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
+.exbtn{display:flex;flex-direction:column;align-items:center;padding:7px 4px;border:1px solid var(--border);background:var(--s2);border-radius:6px;cursor:pointer;transition:all .12s;gap:2px;position:relative;}
+.exbtn:hover{border-color:var(--accent);background:rgba(59,130,246,.06);}
+.exbtn.on{border-color:var(--accent);background:rgba(59,130,246,.1);}
+.exbtn.on .exbtn-name{color:var(--accent);}
+.exbtn.disabled{opacity:.35;cursor:not-allowed;pointer-events:none;}
+.exbtn-flag{font-size:16px;line-height:1;}
+.exbtn-name{font-size:10px;font-weight:600;color:var(--text);}
+.exbtn-sub{font-size:9px;color:var(--muted2);}
+.exbtn-soon{position:absolute;top:3px;right:4px;font-size:7px;background:var(--border2);color:var(--muted2);padding:1px 4px;border-radius:3px;font-weight:600;letter-spacing:.3px;}
 .filter-group-title{font-size:10px;font-weight:600;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px;display:flex;align-items:center;gap:6px;}
 .filter-group-title::after{content:'';flex:1;height:1px;background:var(--border);}
 .chips{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:4px;}
@@ -218,24 +231,25 @@ td:first-child,td:nth-child(2){text-align:left;}
 .modal-body::-webkit-scrollbar-thumb{background:var(--border2);}
 .icat{background:var(--s2);border:1px solid var(--border);padding:16px 18px;border-radius:8px;}
 .icat-title{font-size:12px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;padding-bottom:7px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;}
-.iitem{margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid rgba(28,45,64,.5);}
+.iitem{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid rgba(30,39,51,.6);}
 .iitem:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none;}
 .iitem-top{display:flex;align-items:baseline;gap:8px;margin-bottom:4px;}
-.iitem-name{font-size:14px;font-weight:700;color:var(--text);letter-spacing:-.3px;}
-.iitem-eng{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
-.iitem-desc{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted2);line-height:1.65;}
-.iitem-tip{display:inline-block;margin-top:5px;font-family:'JetBrains Mono',monospace;font-size:8px;padding:2px 8px;}
-.tip-good{background:rgba(15,240,179,.08);color:var(--teal);border:1px solid rgba(15,240,179,.2);}
+.iitem-name{font-size:16px;font-weight:700;color:var(--text);letter-spacing:-.3px;}
+.iitem-eng{font-size:10px;color:var(--muted2);letter-spacing:.3px;font-weight:500;}
+.iitem-desc{font-size:12px;color:var(--muted2);line-height:1.7;}
+.iitem-tip{display:inline-block;margin-top:6px;font-size:10px;padding:3px 10px;border-radius:4px;font-weight:600;}
+.tip-good{background:var(--green-bg);color:var(--green);border:1px solid rgba(0,192,118,.2);}
 .tip-warn{background:rgba(240,192,64,.08);color:var(--gold);border:1px solid rgba(240,192,64,.2);}
 .tip-bad{background:rgba(255,77,109,.08);color:var(--red);border:1px solid rgba(255,77,109,.2);}
 .preset-info-wrap{grid-column:1/-1;}
-.preset-info-title{font-family:'Inter',sans-serif;font-weight:800;font-size:12px;letter-spacing:3px;color:var(--teal);margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid var(--border);}
-.preset-info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;}
-.picard{background:var(--s2);border:1px solid var(--border);padding:12px 14px;}
-.picard-name{font-family:'Inter',sans-serif;font-weight:800;font-size:12px;letter-spacing:2px;color:var(--gold);margin-bottom:5px;}
-.picard-desc{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted2);line-height:1.6;}
-.picard-rules{margin-top:7px;display:flex;flex-wrap:wrap;gap:3px;}
-.picard-rule{font-family:'JetBrains Mono',monospace;font-size:8px;padding:2px 6px;background:rgba(15,240,179,.06);color:var(--teal);border:1px solid rgba(15,240,179,.15);}
+.preset-info-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;}
+.preset-info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.picard{background:var(--s2);border:1px solid var(--border);padding:16px 18px;border-radius:8px;transition:border-color .15s;}
+.picard:hover{border-color:var(--accent);}
+.picard-name{font-size:14px;font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-.2px;}
+.picard-desc{font-size:12px;color:var(--text2);line-height:1.65;}
+.picard-rules{margin-top:12px;display:flex;flex-wrap:wrap;gap:5px;}
+.picard-rule{font-size:11px;font-weight:600;padding:3px 9px;background:rgba(59,130,246,.08);color:var(--accent);border:1px solid rgba(59,130,246,.2);border-radius:5px;}
 
 /* ── SUPPORT MODAL ── */
 .smodal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
@@ -276,8 +290,8 @@ td:first-child,td:nth-child(2){text-align:left;}
 <!-- ─── MAIN APP ─── -->
 <div id="app" class="on">
   <div class="topbar">
-    <div class="tlogo">DeepFin</span></div>
-    <span class="tlive">CANLI</span>
+    <div class="tlogo"><div class="tlogo-mark">D</div>DeepFin <span>Hisse Tarama Aracı</span></div>
+    <span class="tlive">Canlı</span>
     <div class="tsearch">
       <span class="tsearch-ico">⌕</span>
       <input type="text" id="searchbox" placeholder="Sembol veya şirket ara..." oninput="onSearch()"/>
@@ -286,8 +300,11 @@ td:first-child,td:nth-child(2){text-align:left;}
       <span id="scantime"></span>
       <button class="topbarbtn tbtn" id="scanbtn" onclick="runScan()">▶ TARA</button>
       <button class="topbarbtn" id="stopbtn" onclick="abortScan()" style="display:none;background:rgba(255,77,109,.15);border:1px solid rgba(255,77,109,.3);color:var(--red)">⏹ DURDUR</button>
-      <button class="topbarbtn infobtn" onclick="openInfo()">📚 Bilgi</button>
-      <button class="topbarbtn supportbtn" onclick="openSupport()">☕</button>
+      <button class="topbarbtn infobtn" onclick="openInfo()">📚 Bilgi Bankası</button>
+      <button class="topbarbtn supportbtn" onclick="openSupport()">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+  Destek Ol
+</button>
       
     </div>
   </div>
@@ -295,6 +312,47 @@ td:first-child,td:nth-child(2){text-align:left;}
   <div class="layout">
     <!-- SIDEBAR -->
     <div class="sidebar">
+
+      <div class="exchange-group">
+        <div class="exchange-title">Borsa</div>
+        <div class="exchange-grid">
+          <div class="exbtn on" data-exchange="bist" onclick="selectExchange(this)">
+            <span class="exbtn-flag">🇹🇷</span>
+            <span class="exbtn-name">BIST</span>
+            <span class="exbtn-sub">Borsa İstanbul</span>
+          </div>
+          <div class="exbtn disabled" data-exchange="nasdaq" onclick="selectExchange(this)">
+            <span class="exbtn-flag">🇺🇸</span>
+            <span class="exbtn-name">NASDAQ</span>
+            <span class="exbtn-sub">Tech Ağırlıklı</span>
+            <span class="exbtn-soon">YAKINDA</span>
+          </div>
+          <div class="exbtn disabled" data-exchange="sp500" onclick="selectExchange(this)">
+            <span class="exbtn-flag">🇺🇸</span>
+            <span class="exbtn-name">S&P 500</span>
+            <span class="exbtn-sub">ABD Endeksi</span>
+            <span class="exbtn-soon">YAKINDA</span>
+          </div>
+          <div class="exbtn disabled" data-exchange="dax" onclick="selectExchange(this)">
+            <span class="exbtn-flag">🇩🇪</span>
+            <span class="exbtn-name">DAX</span>
+            <span class="exbtn-sub">Frankfurt</span>
+            <span class="exbtn-soon">YAKINDA</span>
+          </div>
+          <div class="exbtn disabled" data-exchange="lse" onclick="selectExchange(this)">
+            <span class="exbtn-flag">🇬🇧</span>
+            <span class="exbtn-name">LSE</span>
+            <span class="exbtn-sub">Londra</span>
+            <span class="exbtn-soon">YAKINDA</span>
+          </div>
+          <div class="exbtn disabled" data-exchange="nikkei" onclick="selectExchange(this)">
+            <span class="exbtn-flag">🇯🇵</span>
+            <span class="exbtn-name">Nikkei</span>
+            <span class="exbtn-sub">Tokyo</span>
+            <span class="exbtn-soon">YAKINDA</span>
+          </div>
+        </div>
+      </div>
 
       <div class="filter-group">
         <div class="filter-group-title">🐐 GOAT Stratejileri</div>
@@ -323,34 +381,34 @@ td:first-child,td:nth-child(2){text-align:left;}
 
       <div class="filter-group">
         <div class="filter-group-title">Değerleme</div>
-        <div class="frow"><div class="flbl">F/K <small>min / max</small></div><div class="finps"><input type="number" id="pe_min" placeholder="—" oninput="liveFilter()"><input type="number" id="pe_max" placeholder="—" oninput="liveFilter()"></div></div>
-        <div class="frow"><div class="flbl">PD/DD</div><div class="finps"><input type="number" id="pb_min" placeholder="—" oninput="liveFilter()"><input type="number" id="pb_max" placeholder="—" oninput="liveFilter()"></div></div>
-        <div class="frow"><div class="flbl">F/S</div><div class="finps"><input type="number" id="ps_min" placeholder="—" oninput="liveFilter()"><input type="number" id="ps_max" placeholder="—" oninput="liveFilter()"></div></div>
+        <div class="frow"><div class="flbl">F/K — Fiyat / Kazanç <small>min / max</small></div><div class="finps"><input type="number" id="pe_min" placeholder="—" oninput="liveFilter()"><input type="number" id="pe_max" placeholder="—" oninput="liveFilter()"></div></div>
+        <div class="frow"><div class="flbl">PD/DD — Piyasa / Defter Değeri</div><div class="finps"><input type="number" id="pb_min" placeholder="—" oninput="liveFilter()"><input type="number" id="pb_max" placeholder="—" oninput="liveFilter()"></div></div>
+        <div class="frow"><div class="flbl">F/S — Fiyat / Satış</div><div class="finps"><input type="number" id="ps_min" placeholder="—" oninput="liveFilter()"><input type="number" id="ps_max" placeholder="—" oninput="liveFilter()"></div></div>
       </div>
 
       <div class="filter-group">
         <div class="filter-group-title">Karlılık</div>
-        <div class="frow"><div class="flbl">ROE %</div><div class="finps"><input type="number" id="roe_min" placeholder="—" oninput="liveFilter()"><input type="number" id="roe_max" placeholder="—" oninput="liveFilter()"></div></div>
-        <div class="frow"><div class="flbl">ROA %</div><div class="finps"><input type="number" id="roa_min" placeholder="—" oninput="liveFilter()"><input type="number" id="roa_max" placeholder="—" oninput="liveFilter()"></div></div>
-        <div class="frow"><div class="flbl">Net Marj %</div><div class="finps"><input type="number" id="margin_min" placeholder="—" oninput="liveFilter()"><input type="number" id="margin_max" placeholder="—" oninput="liveFilter()"></div></div>
+        <div class="frow"><div class="flbl">ROE — Özkaynak Kârlılığı %</div><div class="finps"><input type="number" id="roe_min" placeholder="—" oninput="liveFilter()"><input type="number" id="roe_max" placeholder="—" oninput="liveFilter()"></div></div>
+        <div class="frow"><div class="flbl">ROA — Varlık Kârlılığı %</div><div class="finps"><input type="number" id="roa_min" placeholder="—" oninput="liveFilter()"><input type="number" id="roa_max" placeholder="—" oninput="liveFilter()"></div></div>
+        <div class="frow"><div class="flbl">Net Kar Marjı %</div><div class="finps"><input type="number" id="margin_min" placeholder="—" oninput="liveFilter()"><input type="number" id="margin_max" placeholder="—" oninput="liveFilter()"></div></div>
       </div>
 
       <div class="filter-group">
         <div class="filter-group-title">Büyüme</div>
-        <div class="frow"><div class="flbl">Gelir Büy. %</div><div class="finps"><input type="number" id="revg_min" placeholder="—" oninput="liveFilter()"><input type="number" id="revg_max" placeholder="—" oninput="liveFilter()"></div></div>
-        <div class="frow"><div class="flbl">Kazanç Büy. %</div><div class="finps"><input type="number" id="earng_min" placeholder="—" oninput="liveFilter()"><input type="number" id="earng_max" placeholder="—" oninput="liveFilter()"></div></div>
+        <div class="frow"><div class="flbl">Gelir Büyümesi % YoY</div><div class="finps"><input type="number" id="revg_min" placeholder="—" oninput="liveFilter()"><input type="number" id="revg_max" placeholder="—" oninput="liveFilter()"></div></div>
+        <div class="frow"><div class="flbl">Kazanç Büyümesi % YoY</div><div class="finps"><input type="number" id="earng_min" placeholder="—" oninput="liveFilter()"><input type="number" id="earng_max" placeholder="—" oninput="liveFilter()"></div></div>
       </div>
 
       <div class="filter-group">
         <div class="filter-group-title">Temettü & Sağlık</div>
-        <div class="frow"><div class="flbl">Temettü %</div><div class="finps"><input type="number" id="div_min" placeholder="—" oninput="liveFilter()"><input type="number" id="div_max" placeholder="—" oninput="liveFilter()"></div></div>
-        <div class="frow"><div class="flbl">Borç/Özkaynak</div><div class="finps"><input type="number" id="de_min" placeholder="—" oninput="liveFilter()"><input type="number" id="de_max" placeholder="—" oninput="liveFilter()"></div></div>
-        <div class="frow"><div class="flbl">Cari Oran</div><div class="finps"><input type="number" id="cr_min" placeholder="—" oninput="liveFilter()"><input type="number" id="cr_max" placeholder="—" oninput="liveFilter()"></div></div>
+        <div class="frow"><div class="flbl">Temettü Verimi %</div><div class="finps"><input type="number" id="div_min" placeholder="—" oninput="liveFilter()"><input type="number" id="div_max" placeholder="—" oninput="liveFilter()"></div></div>
+        <div class="frow"><div class="flbl">Borç / Özkaynak Oranı</div><div class="finps"><input type="number" id="de_min" placeholder="—" oninput="liveFilter()"><input type="number" id="de_max" placeholder="—" oninput="liveFilter()"></div></div>
+        <div class="frow"><div class="flbl">Cari Oran (Likidite)</div><div class="finps"><input type="number" id="cr_min" placeholder="—" oninput="liveFilter()"><input type="number" id="cr_max" placeholder="—" oninput="liveFilter()"></div></div>
       </div>
 
       <div class="filter-group">
         <div class="filter-group-title">Piyasa</div>
-        <div class="frow"><div class="flbl">Piyasa Değeri (Mn)</div><div class="finps"><input type="number" id="mc_min" placeholder="—" oninput="liveFilter()"><input type="number" id="mc_max" placeholder="—" oninput="liveFilter()"></div></div>
+        <div class="frow"><div class="flbl">Piyasa Değeri (Milyon ₺)</div><div class="finps"><input type="number" id="mc_min" placeholder="—" oninput="liveFilter()"><input type="number" id="mc_max" placeholder="—" oninput="liveFilter()"></div></div>
       </div>
 
       <button class="clrbtn" onclick="clearFilters()">✕ Filtreleri Temizle</button>
@@ -379,7 +437,7 @@ td:first-child,td:nth-child(2){text-align:left;}
       </div>
 
       <div class="cstate" id="empty">
-        <div class="big">BIST</div>
+        <div class="big">DEEPFIN</div>
         <p>API bağlandı. Filtreleri ayarlayın ve <strong>▶ TARA</strong> butonuna tıklayın.</p>
         <small id="empty-sub">Finnhub'dan canlı veri çekilecek</small>
       </div>
@@ -1685,6 +1743,13 @@ window.redrawAll = function() {
   });
 };
 
+
+function selectExchange(el) {
+  if(el.classList.contains('disabled')) return;
+  document.querySelectorAll('.exbtn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  // İleride farklı borsa endpointleri burada yönetilecek
+}
 </script>
 </body>
 </html>
