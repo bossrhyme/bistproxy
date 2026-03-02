@@ -145,5 +145,147 @@ module.exports = async function(req, res) {
     });
   }
 
+  // ── INSIDER — SEC EDGAR Form 4 ──
+  if (action === 'insider') {
+    const symbol = (url.searchParams.get('symbol') || '').toUpperCase();
+    if (!symbol) return res.status(400).json({ error: 'symbol required' });
+
+    return new Promise(async (resolve) => {
+      try {
+        // 1. Ticker → CIK
+        const tickerRes = await new Promise((res2, rej) => {
+          makeRequest('data.sec.gov', '/files/company_tickers.json', 'GET',
+            { 'User-Agent': 'DeepFin info@deepfin.com', 'Accept': 'application/json' },
+            null, (err, data) => err ? rej(err) : res2(data));
+        });
+        const tickers = JSON.parse(tickerRes);
+        let cik = null;
+        for (const [, v] of Object.entries(tickers)) {
+          if (v.ticker.toUpperCase() === symbol) {
+            cik = String(v.cik_str).padStart(10, '0');
+            break;
+          }
+        }
+        if (!cik) { res.status(404).json({ error: `${symbol} CIK bulunamadi` }); return resolve(); }
+
+        // 2. Form 4 listesi
+        const subData = await new Promise((res2, rej) => {
+          makeRequest('data.sec.gov', `/submissions/CIK${cik}.json`, 'GET',
+            { 'User-Agent': 'DeepFin info@deepfin.com', 'Accept': 'application/json' },
+            null, (err, data) => err ? rej(err) : res2(JSON.parse(data)));
+        });
+
+        const filings = subData.filings?.recent;
+        if (!filings) { res.status(404).json({ error: 'Basvuru verisi yok' }); return resolve(); }
+
+        // Form 4 indislerini bul (son 15)
+        const form4Idx = [];
+        for (let i = 0; i < filings.form.length && form4Idx.length < 15; i++) {
+          if (filings.form[i] === '4') form4Idx.push(i);
+        }
+
+        // 3. Her Form 4 XML'ini çek ve parse et
+        const results = [];
+        for (const i of form4Idx.slice(0, 10)) {
+          try {
+            const acc = filings.accessionNumber[i].replace(/-/g, '');
+            const doc = filings.primaryDocument[i];
+            const cikNum = parseInt(cik);
+            const xmlData = await new Promise((res2, rej) => {
+              makeRequest('www.sec.gov',
+                `/Archives/edgar/data/${cikNum}/${acc}/${doc}`, 'GET',
+                { 'User-Agent': 'DeepFin info@deepfin.com' },
+                null, (err, data) => err ? rej(err) : res2(data));
+            });
+
+            // Basit regex parse (XML parser yok Node'da)
+            const get = (tag) => {
+              const m = xmlData.match(new RegExp(`<${tag}[^>]*>([^<]*)<`, 'i'));
+              return m ? m[1].trim() : '';
+            };
+            const getAll = (tag) => {
+              const matches = [...xmlData.matchAll(new RegExp(`<${tag}[^>]*>([^<]*)<`, 'gi'))];
+              return matches.map(m => m[1].trim());
+            };
+
+            const owner = get('rptOwnerName');
+            const title = get('officerTitle') || 'Director';
+            const txCodes = getAll('transactionCode');
+            const txShares = getAll('transactionShares');
+            const txPrices = getAll('transactionPricePerShare');
+            const txDates  = getAll('transactionDate');
+
+            for (let t = 0; t < txCodes.length; t++) {
+              const shares = parseFloat(txShares[t]) || 0;
+              const price  = parseFloat(txPrices[t]) || 0;
+              if (shares === 0) continue;
+              results.push({
+                date:   txDates[t]  || filings.reportDate[i] || filings.filingDate[i],
+                owner:  owner || 'Bilinmiyor',
+                title:  title,
+                type:   txCodes[t],
+                shares: shares,
+                price:  price,
+                value:  shares * price,
+              });
+            }
+          } catch(e) { /* bu Form 4'ü atla */ }
+        }
+
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200).json({ cik, results: results.slice(0, 20) });
+      } catch(e) {
+        res.status(500).json({ error: e.message });
+      }
+      resolve();
+    });
+  }
+
+  // ── SHORT INTEREST — FINRA ──
+  if (action === 'short') {
+    const symbol = (url.searchParams.get('symbol') || '').toUpperCase();
+    if (!symbol) return res.status(400).json({ error: 'symbol required' });
+
+    return new Promise(async (resolve) => {
+      try {
+        // FINRA OTCM short interest
+        const filter = encodeURIComponent(JSON.stringify({
+          filters: [{ fieldName: 'symbolCode', fieldValue: symbol, compareType: 'EQUAL' }]
+        }));
+        const data = await new Promise((res2, rej) => {
+          makeRequest('api.finra.org',
+            `/data/group/OTCMarket/name/consolidatedShortInterest?limit=1&filter=${filter}`, 'GET',
+            { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' },
+            null, (err, data, status) => err ? rej(err) : res2({ data, status }));
+        });
+
+        const parsed = JSON.parse(data.data);
+        if (!parsed || parsed.length === 0) {
+          // FINRA ikinci endpoint
+          const filter2 = encodeURIComponent(JSON.stringify({
+            filters: [{ fieldName: 'issueSymbolIdentifier', fieldValue: symbol, compareType: 'EQUAL' }]
+          }));
+          const data2 = await new Promise((res2, rej) => {
+            makeRequest('api.finra.org',
+              `/data/group/otcMarket/name/otcShortInterest?limit=2&filter=${filter2}`, 'GET',
+              { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' },
+              null, (err, data) => err ? rej(err) : res2(data));
+          });
+          const parsed2 = JSON.parse(data2);
+          if (!parsed2 || parsed2.length === 0) {
+            res.status(404).json({ error: 'Veri bulunamadi' });
+            return resolve();
+          }
+          res.status(200).json(parsed2[0]);
+          return resolve();
+        }
+        res.status(200).json(parsed[0]);
+      } catch(e) {
+        res.status(500).json({ error: e.message });
+      }
+      resolve();
+    });
+  }
+
   res.status(400).json({ error: 'Unknown action' });
 };
