@@ -1,80 +1,24 @@
 const https = require('https');
 
-function makeRequest(hostname, path, callback) {
-  const options = {
-    hostname,
-    path,
-    method: 'GET',
-    headers: {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-      'Accept': 'application/json',
-    }
-  };
+function makeRequest(hostname, path, method, headers, body, callback) {
+  const options = { hostname, path, method, headers };
   const req = https.request(options, (res) => {
     let data = '';
     res.on('data', chunk => data += chunk);
     res.on('end', () => callback(null, data, res.statusCode));
   });
   req.on('error', (err) => callback(err));
+  if (body) req.write(body);
   req.end();
 }
 
-// Exchange config
 const EXCHANGE_CONFIG = {
-  bist: {
-    tvPath: '/turkey/scan',
-    symbolPrefix: 'BIST:',
-    yahooSuffix: '.IS',
-    currency: 'TRY',
-    range: [0, 500],
-    extraFilters: []
-  },
-  nasdaq: {
-    tvPath: '/america/scan',
-    symbolPrefix: 'NASDAQ:',
-    yahooSuffix: '',
-    currency: 'USD',
-    range: [0, 500],
-    extraFilters: [
-      { left: 'exchange', operation: 'equal', right: 'NASDAQ' }
-    ]
-  },
-  sp500: {
-    tvPath: '/america/scan',
-    symbolPrefix: 'NYSE:',
-    yahooSuffix: '',
-    currency: 'USD',
-    range: [0, 503],
-    extraFilters: [
-      { left: 'is_primary', operation: 'equal', right: true },
-      { left: 'typespecs', operation: 'has', right: ['common'] },
-      { left: 'index', operation: 'equal', right: 'SP500' }
-    ]
-  },
-  dax: {
-    tvPath: '/germany/scan',
-    symbolPrefix: 'XETR:',
-    yahooSuffix: '.DE',
-    currency: 'EUR',
-    range: [0, 200],
-    extraFilters: []
-  },
-  lse: {
-    tvPath: '/uk/scan',
-    symbolPrefix: 'LSE:',
-    yahooSuffix: '.L',
-    currency: 'GBP',
-    range: [0, 300],
-    extraFilters: []
-  },
-  nikkei: {
-    tvPath: '/japan/scan',
-    symbolPrefix: 'TSE:',
-    yahooSuffix: '.T',
-    currency: 'JPY',
-    range: [0, 300],
-    extraFilters: []
-  }
+  bist:   { tvPath: '/turkey/scan',  symbolPrefix: 'BIST:',   yahooSuffix: '.IS', currency: 'TRY', extraFilters: [] },
+  nasdaq: { tvPath: '/america/scan', symbolPrefix: 'NASDAQ:', yahooSuffix: '',    currency: 'USD', extraFilters: [{ left: 'exchange', operation: 'equal', right: 'NASDAQ' }] },
+  sp500:  { tvPath: '/america/scan', symbolPrefix: '',        yahooSuffix: '',    currency: 'USD', extraFilters: [{ left: 'is_primary', operation: 'equal', right: true }, { left: 'index', operation: 'equal', right: 'SP500' }] },
+  dax:    { tvPath: '/germany/scan', symbolPrefix: 'XETR:',   yahooSuffix: '.DE', currency: 'EUR', extraFilters: [] },
+  lse:    { tvPath: '/uk/scan',      symbolPrefix: 'LSE:',    yahooSuffix: '.L',  currency: 'GBP', extraFilters: [] },
+  nikkei: { tvPath: '/japan/scan',   symbolPrefix: 'TSE:',    yahooSuffix: '.T',  currency: 'JPY', extraFilters: [] },
 };
 
 module.exports = async function(req, res) {
@@ -83,73 +27,61 @@ module.exports = async function(req, res) {
   res.setHeader('Access-Control-Allow-Headers', '*');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const url = new URL(req.url, 'http://localhost');
-  const action = url.searchParams.get('action') || 'scan';
+  const url      = new URL(req.url, 'http://localhost');
+  const action   = url.searchParams.get('action') || 'scan';
   const exchange = (url.searchParams.get('exchange') || 'bist').toLowerCase();
-  const cfg = EXCHANGE_CONFIG[exchange] || EXCHANGE_CONFIG.bist;
+  const cfg      = EXCHANGE_CONFIG[exchange] || EXCHANGE_CONFIG.bist;
 
   // ── SCAN ──
   if (action === 'scan') {
-    const payload = JSON.stringify({
-      columns: [
-        'name', 'close', 'change', 'volume',
-        'market_cap_basic',
-        'price_earnings_ttm',
-        'price_book_fq',
-        'price_sales_current',
-        'return_on_equity_fq',
-        'return_on_assets_fq',
-        'net_margin',
-        'gross_margin',
-        'total_revenue_change_ttm_yoy',
-        'earnings_per_share_change_ttm_yoy',
-        'dividends_yield',
-        'debt_to_equity_fq',
-        'current_ratio_fq',
-        'sector',
-        'High.1M', 'Low.1M',
-        'description'
-      ],
-      filter: cfg.extraFilters.length > 0 ? cfg.extraFilters : undefined,
-      range: cfg.range,
-      sort: { sortBy: 'market_cap_basic', sortOrder: 'desc' }
+    // Read body sent from client
+    const rawBody = await new Promise((resolve) => {
+      let body = '';
+      req.on('data', chunk => body += chunk);
+      req.on('end', () => resolve(body));
     });
 
+    let clientPayload = {};
+    try { clientPayload = JSON.parse(rawBody); } catch(e) {}
+
+    // Merge: keep client columns/sort/range, inject exchange filters
+    const merged = {
+      columns: clientPayload.columns || ['name','close','change','volume','market_cap_basic'],
+      range:   clientPayload.range   || [0, 500],
+      sort:    clientPayload.sort    || { sortBy: 'market_cap_basic', sortOrder: 'desc' },
+    };
+
+    // Only add filter if exchange needs it
+    if (cfg.extraFilters.length > 0) {
+      merged.filter = cfg.extraFilters;
+    }
+
+    const payload = JSON.stringify(merged);
+
     return new Promise((resolve) => {
-      const options = {
-        hostname: 'scanner.tradingview.com',
-        path: cfg.tvPath,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(payload),
-          'User-Agent': 'Mozilla/5.0',
-          'Origin': 'https://www.tradingview.com',
-          'Referer': 'https://www.tradingview.com/'
-        }
+      const headers = {
+        'Content-Type':   'application/json',
+        'Content-Length': Buffer.byteLength(payload),
+        'User-Agent':     'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+        'Origin':         'https://www.tradingview.com',
+        'Referer':        'https://www.tradingview.com/',
+        'Accept':         'application/json',
       };
-      const request = https.request(options, (response) => {
-        let data = '';
-        response.on('data', chunk => data += chunk);
-        response.on('end', () => {
-          res.setHeader('Content-Type', 'application/json');
-          // Inject exchange info into response for client
-          try {
-            const parsed = JSON.parse(data);
-            parsed._exchange = exchange;
-            parsed._currency = cfg.currency;
-            parsed._symbolPrefix = cfg.symbolPrefix;
-            parsed._yahooSuffix = cfg.yahooSuffix;
-            res.status(response.statusCode).end(JSON.stringify(parsed));
-          } catch(e) {
-            res.status(response.statusCode).end(data);
-          }
-          resolve();
-        });
+      makeRequest('scanner.tradingview.com', cfg.tvPath, 'POST', headers, payload, (err, data, statusCode) => {
+        if (err) { res.status(500).json({ error: err.message }); return resolve(); }
+        res.setHeader('Content-Type', 'application/json');
+        // Inject meta for client
+        try {
+          const parsed = JSON.parse(data);
+          parsed._exchange    = exchange;
+          parsed._currency    = cfg.currency;
+          parsed._yahooSuffix = cfg.yahooSuffix;
+          res.status(statusCode).end(JSON.stringify(parsed));
+        } catch(e) {
+          res.status(statusCode).end(data);
+        }
+        resolve();
       });
-      request.on('error', (err) => { res.status(500).json({ error: err.message }); resolve(); });
-      request.write(payload);
-      request.end();
     });
   }
 
@@ -158,87 +90,58 @@ module.exports = async function(req, res) {
     const symbol   = (url.searchParams.get('symbol') || 'TUPRS').toUpperCase();
     const interval = url.searchParams.get('interval') || '240';
     const currency = url.searchParams.get('currency') || 'TL';
-    const suffix   = url.searchParams.get('suffix') || '.IS'; // .IS for BIST, '' for US
+    const suffix   = url.searchParams.get('suffix') !== null ? url.searchParams.get('suffix') : '.IS';
 
     const intervalMap = { '240': '1h', 'D': '1d', 'W': '1wk' };
     const rangeMap    = { '240': '30d', 'D': '6mo', 'W': '2y' };
     const yhInterval  = intervalMap[interval] || '1h';
-    const yhRange     = rangeMap[interval] || '30d';
+    const yhRange     = rangeMap[interval]    || '30d';
     const yhSym       = symbol + suffix;
 
-    // USD mode with TRY conversion (only for BIST)
+    const fetchChart = (sym) => new Promise((resolve, reject) => {
+      const path = `/v8/finance/chart/${encodeURIComponent(sym)}?interval=${yhInterval}&range=${yhRange}&includePrePost=false`;
+      const headers = { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' };
+      makeRequest('query1.finance.yahoo.com', path, 'GET', headers, null, (err, data) => {
+        if (err) reject(err); else resolve(data);
+      });
+    });
+
+    // BIST USD mode — divide by USDTRY
     if (currency === 'USD' && suffix === '.IS') {
-      return new Promise((resolve) => {
-        let stockData = null, fxData = null, errors = 0;
-
-        function tryMerge() {
-          if (stockData === null || fxData === null) return;
-          try {
-            const sJson = JSON.parse(stockData);
-            const fJson = JSON.parse(fxData);
-            const sq = sJson.chart.result[0];
-            const fq = fJson.chart.result[0];
-            const timestamps = sq.timestamp;
-            const sClose = sq.indicators.quote[0].close;
-            const sOpen  = sq.indicators.quote[0].open;
-            const sHigh  = sq.indicators.quote[0].high;
-            const sLow   = sq.indicators.quote[0].low;
-            const fxTs   = fq.timestamp;
-            const fClose = fq.indicators.quote[0].close;
-            const fxMap  = {};
-            fxTs.forEach((t, i) => { fxMap[t] = fClose[i]; });
-            const candles = [];
-            timestamps.forEach((t, i) => {
-              let fx = fxMap[t];
-              if (!fx) {
-                const nearest = fxTs.reduce((a, b) => Math.abs(b-t) < Math.abs(a-t) ? b : a);
-                fx = fxMap[nearest];
-              }
-              if (!fx || fx === 0) return;
-              const o = sOpen[i], h = sHigh[i], l = sLow[i], c = sClose[i];
-              if (o==null||h==null||l==null||c==null) return;
-              candles.push({ t, o: o/fx, h: h/fx, l: l/fx, c: c/fx });
-            });
-            res.status(200).json({ s: 'ok', candles });
-          } catch(e) {
-            res.status(500).json({ error: 'Merge error: ' + e.message });
-          }
-          resolve();
-        }
-
-        const stockPath = `/v8/finance/chart/${encodeURIComponent(yhSym)}?interval=${yhInterval}&range=${yhRange}&includePrePost=false`;
-        const fxPath    = `/v8/finance/chart/USDTRY=X?interval=${yhInterval}&range=${yhRange}&includePrePost=false`;
-
-        makeRequest('query1.finance.yahoo.com', stockPath, (err, data) => {
-          if (err) { errors++; if(errors===1){ res.status(500).json({error:err.message}); resolve(); } return; }
-          stockData = data; tryMerge();
-        });
-        makeRequest('query1.finance.yahoo.com', fxPath, (err, data) => {
-          if (err) { errors++; if(errors===1){ res.status(500).json({error:err.message}); resolve(); } return; }
-          fxData = data; tryMerge();
-        });
+      return new Promise(async (resolve) => {
+        try {
+          const [stockRaw, fxRaw] = await Promise.all([fetchChart(yhSym), fetchChart('USDTRY=X')]);
+          const sq  = JSON.parse(stockRaw).chart.result[0];
+          const fq  = JSON.parse(fxRaw).chart.result[0];
+          const fxMap = {};
+          fq.timestamp.forEach((t, i) => { fxMap[t] = fq.indicators.quote[0].close[i]; });
+          const q = sq.indicators.quote[0];
+          const candles = sq.timestamp.map((t, i) => {
+            let fx = fxMap[t];
+            if (!fx) { const n = fq.timestamp.reduce((a,b) => Math.abs(b-t)<Math.abs(a-t)?b:a); fx = fxMap[n]; }
+            if (!fx) return null;
+            const [o,h,l,c] = [q.open[i],q.high[i],q.low[i],q.close[i]];
+            if (o==null||c==null) return null;
+            return { t, o: o/fx, h: h/fx, l: l/fx, c: c/fx, v: q.volume[i]||0 };
+          }).filter(Boolean);
+          res.status(200).json({ s: 'ok', candles });
+        } catch(e) { res.status(500).json({ error: e.message }); }
+        resolve();
       });
     }
 
-    // Direct mode (BIST TL or US stocks in USD)
-    return new Promise((resolve) => {
-      const path = `/v8/finance/chart/${encodeURIComponent(yhSym)}?interval=${yhInterval}&range=${yhRange}&includePrePost=false`;
-      makeRequest('query1.finance.yahoo.com', path, (err, data) => {
-        if (err) { res.status(500).json({ error: err.message }); return resolve(); }
-        try {
-          const json   = JSON.parse(data);
-          const result = json.chart.result[0];
-          const q      = result.indicators.quote[0];
-          const timestamps = result.timestamp;
-          const candles = timestamps.map((t, i) => ({
-            t, o: q.open[i], h: q.high[i], l: q.low[i], c: q.close[i], v: q.volume[i]
-          })).filter(c => c.o != null && c.c != null);
-          res.status(200).json({ s: 'ok', candles });
-        } catch(e) {
-          res.status(500).json({ error: 'Parse error: ' + e.message, raw: data.slice(0,200) });
-        }
-        resolve();
-      });
+    // Direct (TL or non-BIST USD)
+    return new Promise(async (resolve) => {
+      try {
+        const raw    = await fetchChart(yhSym);
+        const result = JSON.parse(raw).chart.result[0];
+        const q      = result.indicators.quote[0];
+        const candles = result.timestamp.map((t, i) => ({
+          t, o: q.open[i], h: q.high[i], l: q.low[i], c: q.close[i], v: q.volume[i]||0
+        })).filter(c => c.o != null && c.c != null);
+        res.status(200).json({ s: 'ok', candles });
+      } catch(e) { res.status(500).json({ error: e.message }); }
+      resolve();
     });
   }
 
