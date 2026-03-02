@@ -950,15 +950,10 @@ async function runScan(){
 
   try {
     const exCfg = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
-  // Direkt TradingView Scanner — proxy yok, Vercel cold start yok
   if (exCfg.filters.length > 0) payload.filter = exCfg.filters;
+  // TradingView CORS: content-type header olmadan direkt fetch
   const res = await fetch(exCfg.tvUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Origin': 'https://www.tradingview.com',
-        'Referer': 'https://www.tradingview.com/'
-      },
       body: JSON.stringify(payload)
     });
 
