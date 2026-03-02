@@ -927,6 +927,7 @@ async function runScan(){
 
   // Field isimleri borsa bazlı farklı — exchange'e göre doğru set
   const isBIST = (currentExchange === 'bist');
+  // TradingView field isimleri — borsa bazlı test edilmiş
   const COLUMNS_BY_EXCHANGE = {
     bist: [
       'name','close','change','volume','market_cap_basic',
@@ -937,12 +938,48 @@ async function runScan(){
       'dividends_yield','debt_to_equity_fq','current_ratio_fq',
       'sector','High.1M','Low.1M'
     ],
-    default: [
+    nasdaq: [
       'name','close','change','volume','market_cap_basic',
       'price_earnings_ttm','price_book_ratio','price_sales_current',
       'return_on_equity','return_on_assets',
-      'net_income_to_total_revenue_ttm','gross_profit_to_revenue_ttm',
-      'revenue_growth_ttm_yoy_percent_change_calc','earnings_per_share_diluted_ttm',
+      'net_margin','gross_margin',
+      'revenue_growth_ttm_yoy_percent_change','earnings_per_share_diluted_ttm',
+      'dividends_yield_current','total_debt_to_equity','current_ratio',
+      'sector','High.1M','Low.1M'
+    ],
+    sp500: [
+      'name','close','change','volume','market_cap_basic',
+      'price_earnings_ttm','price_book_ratio','price_sales_current',
+      'return_on_equity','return_on_assets',
+      'net_margin','gross_margin',
+      'revenue_growth_ttm_yoy_percent_change','earnings_per_share_diluted_ttm',
+      'dividends_yield_current','total_debt_to_equity','current_ratio',
+      'sector','High.1M','Low.1M'
+    ],
+    dax: [
+      'name','close','change','volume','market_cap_basic',
+      'price_earnings_ttm','price_book_ratio','price_sales_current',
+      'return_on_equity','return_on_assets',
+      'net_margin','gross_margin',
+      'revenue_growth_ttm_yoy_percent_change','earnings_per_share_diluted_ttm',
+      'dividends_yield_current','total_debt_to_equity','current_ratio',
+      'sector','High.1M','Low.1M'
+    ],
+    lse: [
+      'name','close','change','volume','market_cap_basic',
+      'price_earnings_ttm','price_book_ratio','price_sales_current',
+      'return_on_equity','return_on_assets',
+      'net_margin','gross_margin',
+      'revenue_growth_ttm_yoy_percent_change','earnings_per_share_diluted_ttm',
+      'dividends_yield_current','total_debt_to_equity','current_ratio',
+      'sector','High.1M','Low.1M'
+    ],
+    nikkei: [
+      'name','close','change','volume','market_cap_basic',
+      'price_earnings_ttm','price_book_ratio','price_sales_current',
+      'return_on_equity','return_on_assets',
+      'net_margin','gross_margin',
+      'revenue_growth_ttm_yoy_percent_change','earnings_per_share_diluted_ttm',
       'dividends_yield_current','total_debt_to_equity','current_ratio',
       'sector','High.1M','Low.1M'
     ]
@@ -975,7 +1012,29 @@ async function runScan(){
       try { json = JSON.parse(json.body); } catch(e) { throw new Error('Body parse hatası: ' + json.body.slice(0,200)); }
     }
 
-    if(json.error) throw new Error('API: ' + json.error);
+    if(json.error) {
+      // Hatalı field varsa otomatik kaldır ve tekrar dene
+      const badField = json.error.match(/"([^"]+)"/)?.[1];
+      if (badField) {
+        const cols = payload.columns;
+        const idx = cols.indexOf(badField);
+        if (idx > -1) {
+          cols.splice(idx, 1);
+          // Tekrar dene
+          const exCfg2 = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
+          if (exCfg2.filters.length > 0) payload.filter = exCfg2.filters;
+          const res2 = await fetch(exCfg2.tvUrl, { method:'POST', body: JSON.stringify(payload) });
+          const text2 = await res2.text();
+          const json2 = JSON.parse(text2);
+          if (json2.error) throw new Error('API (retry): ' + json2.error);
+          Object.assign(json, json2);
+        } else {
+          throw new Error('API: ' + json.error);
+        }
+      } else {
+        throw new Error('API: ' + json.error);
+      }
+    }
     if(!json.data || json.data.length === 0) throw new Error('Veri yok — keys:' + Object.keys(json).join(','));
 
     document.getElementById('prog').style.width = '100%';
@@ -995,17 +1054,17 @@ async function runScan(){
       const volume = g('volume');
       const mcap   = g('market_cap_basic');
       const pe     = g('price_earnings_ttm');
-      const pb     = g('price_book_fq') ?? g('price_book_ratio');
+      const pb     = g('price_book_fq')               ?? g('price_book_ratio');
       const ps     = g('price_sales_current');
-      const roe    = g('return_on_equity_fq') ?? g('return_on_equity');
-      const roa    = g('return_on_assets_fq') ?? g('return_on_assets');
-      const nm     = g('net_margin') ?? g('net_income_to_total_revenue_ttm');
-      const gm     = g('gross_margin') ?? g('gross_profit_to_revenue_ttm');
-      const revG   = g('total_revenue_change_ttm_yoy') ?? g('revenue_growth_ttm_yoy_percent_change_calc');
+      const roe    = g('return_on_equity_fq')           ?? g('return_on_equity');
+      const roa    = g('return_on_assets_fq')           ?? g('return_on_assets');
+      const nm     = g('net_margin');
+      const gm     = g('gross_margin');
+      const revG   = g('total_revenue_change_ttm_yoy')  ?? g('revenue_growth_ttm_yoy_percent_change');
       const epsG   = g('earnings_per_share_change_ttm_yoy') ?? g('earnings_per_share_diluted_ttm');
-      const divY   = g('dividends_yield') ?? g('dividends_yield_current');
-      const de     = g('debt_to_equity_fq') ?? g('total_debt_to_equity');
-      const cr     = g('current_ratio_fq') ?? g('current_ratio');
+      const divY   = g('dividends_yield')               ?? g('dividends_yield_current');
+      const de     = g('debt_to_equity_fq')             ?? g('total_debt_to_equity');
+      const cr     = g('current_ratio_fq')              ?? g('current_ratio');
       const sector = g('sector');
       const high1m = g('High.1M');
       const low1m  = g('Low.1M');
