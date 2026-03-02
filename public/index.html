@@ -177,7 +177,7 @@ td:first-child,td:nth-child(2){text-align:left;}
 .dsection{padding:10px 16px;border-bottom:1px solid var(--border);}
 .dstitle{font-size:10px;font-weight:700;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;}
 .drow{display:flex;justify-content:space-between;margin-bottom:5px;align-items:center;padding:2px 0;}
-.drow:hover{background:rgba(255,255,255,.02);margin:0 -4px 3px;padding:2px 4px;border-radius:4px;}
+.drow:hover{background:rgba(255,255,255,.03);border-radius:4px;}
 .dkey{font-size:11px;color:var(--muted2);font-weight:400;}
 .dkey tag{font-size:9px;color:var(--muted);background:var(--s2);padding:1px 4px;border-radius:3px;margin-left:4px;font-weight:500;}
 .dval{font-size:12px;font-weight:600;}
@@ -308,6 +308,82 @@ td:first-child,td:nth-child(2){text-align:left;}
 .dxloading{text-align:center;padding:20px;color:var(--muted2);font-size:11px;}
 .dxerror{text-align:center;padding:16px;color:#f6465d;font-size:10px;}
 .dxonly-us{text-align:center;padding:16px;color:var(--muted2);font-size:10px;line-height:1.6;}
+
+/* ══════════════════════════════════
+   MOBİLE RESPONSIVE
+══════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Topbar */
+  .topbar { padding: 0 10px; gap: 6px; }
+  .tlive-text { display: none; }
+  .tright .chip { display: none; }
+  .tright { gap: 4px; }
+
+  /* Layout — sidebar üstte, içerik altta */
+  .layout { flex-direction: column; overflow: visible; }
+
+  /* Sidebar — yatay kaydırmalı */
+  .sidebar {
+    width: 100% !important;
+    min-width: unset !important;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    overflow-y: visible;
+    padding: 10px;
+    max-height: none;
+  }
+
+  /* Exchange grid — küçük ekranda 3 kolon */
+  .exchange-grid { grid-template-columns: repeat(3, 1fr); }
+
+  /* GOAT chips — yatay scroll */
+  .chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
+  .chips::-webkit-scrollbar { height: 2px; }
+  .chips::-webkit-scrollbar-thumb { background: var(--border2); }
+
+  /* Ana içerik */
+  .main { flex: 1; min-width: 0; }
+
+  /* Tablo — yatay kaydırma */
+  .twrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { min-width: 700px; }
+  th, td { padding: 6px 8px; font-size: 10px; }
+
+  /* Detay paneli — tam ekran overlay */
+  .detail {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    min-width: unset !important;
+    max-width: 100% !important;
+    z-index: 50;
+    border-left: none !important;
+    overflow-y: auto;
+  }
+  .detail.open { width: 100% !important; }
+  .dhead { padding: 12px 14px; }
+  .dclose { font-size: 18px; padding: 4px 8px; }
+  #chart-wrap { height: 220px !important; }
+
+  /* Filtreler — 2 kolon */
+  .frow { flex-wrap: wrap; gap: 4px; }
+  .finps { flex-direction: column; gap: 4px; }
+
+  /* Tarama butonu */
+  #scan-btn { width: 100%; margin-top: 6px; }
+
+  /* Toolbar */
+  #toolbar { flex-wrap: wrap; gap: 4px; padding: 6px 10px; }
+  .ssel { font-size: 10px; padding: 3px 6px; }
+}
+
+@media (max-width: 480px) {
+  .exchange-grid { grid-template-columns: repeat(2, 1fr); }
+  .tlogo span:last-child { display: none; }
+  th:nth-child(n+5), td:nth-child(n+5) { display: none; }
+  th:nth-child(4), td:nth-child(4) { display: table-cell; }
+}
 </style>
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 </head>
@@ -1491,18 +1567,6 @@ function showDetail(sym){
         var color = v<1?'#00c076':v<2?'#f0b429':'#f6465d';
         var label = v<1?'Ucuz':v<2?'Makul':'Pahalı';
         return '<span style="color:'+color+';font-weight:700">'+v.toFixed(2)+'</span> <span style="color:'+color+';font-size:9px">'+label+'</span>';
-      }],
-    ]},
-    {t:'Kantitatif', rows:[
-      ['Piotroski F-Score', s.piotroski, function(v) {
-        var col = v>=8 ? '#00c076' : v>=6 ? '#f0b429' : '#f6465d';
-        var lbl = v>=8 ? 'Guclu' : v>=6 ? 'Orta' : 'Zayif';
-        return '<span style="color:'+col+';font-weight:700">'+v+'/9</span> <span style="font-size:9px;color:'+col+'">'+lbl+'</span>';
-      }],
-      ['PEG Orani', s.peg, function(v) {
-        var col = v<1 ? '#00c076' : v<2 ? '#f0b429' : '#f6465d';
-        var lbl = v<1 ? 'Ucuz' : v<2 ? 'Makul' : 'Pahali';
-        return '<span style="color:'+col+';font-weight:700">'+v.toFixed(2)+'</span> <span style="font-size:9px;color:'+col+'">'+lbl+'</span>';
       }],
     ]},
     {t:'Karlılık', rows:[
