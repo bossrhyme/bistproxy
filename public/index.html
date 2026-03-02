@@ -1965,35 +1965,88 @@ async function fetchShortInterest(symbol) {
 }
 
 function renderShortInterest(el, d, symbol) {
-  const shortVol    = parseFloat(d.shortInterestQuantity || d.shortParQuantity || 0);
-  const settleDate  = d.settlementDate || d.activityDate || '—';
-  const daysToCover = parseFloat(d.daysToCoverQuantity || d.averageDailyShareVolume || 0);
-  const shortPct    = parseFloat(d.shortInterestRatio || 0);
-  const pct         = Math.min(shortPct * 100, 100);
-  const barColor    = pct > 20 ? '#f6465d' : pct > 10 ? '#f0b429' : '#00c076';
-  const fmtNum = function(n) {
-    return n >= 1e6 ? (n/1e6).toFixed(1) + 'M' : n >= 1e3 ? (n/1e3).toFixed(0) + 'K' : String(n);
+  // Nasdaq API formatı — rows dizisi
+  const rows = d.rows || [];
+  if (rows.length === 0) {
+    el.innerHTML = '<div class="dxloading">Veri bulunamadi</div>';
+    return;
+  }
+
+  // En son satır = en güncel veri
+  const latest = rows[0];
+  // Nasdaq format: { settlementDate, shortInterest, avgDailyShareVolume, daysToCover, ... }
+  const parseNum = function(s) {
+    if (!s) return 0;
+    return parseFloat(String(s).replace(/,/g, '')) || 0;
   };
+
+  const settleDate  = latest.settlementDate || latest.date || '—';
+  const shortVol    = parseNum(latest.shortInterest);
+  const daysToCover = parseNum(latest.daysToCover);
+  const avgVol      = parseNum(latest.avgDailyShareVolume);
+
+  // Short % of float
+  const floatNum = parseNum(d.floatShares);
+  const shortPct = floatNum > 0 ? (shortVol / floatNum) * 100 : 0;
+  const pct      = Math.min(shortPct, 100);
+  const barColor = pct > 20 ? '#f6465d' : pct > 10 ? '#f0b429' : '#00c076';
+
+  const fmtNum = function(n) {
+    return n >= 1e9 ? (n/1e9).toFixed(2) + 'B'
+         : n >= 1e6 ? (n/1e6).toFixed(1) + 'M'
+         : n >= 1e3 ? (n/1e3).toFixed(0) + 'K'
+         : String(Math.round(n));
+  };
+
+  // Tablo satırları (son 6 dönem)
+  let tableRows = '';
+  rows.slice(0, 6).forEach(function(r) {
+    const si  = parseNum(r.shortInterest);
+    const dtc = parseNum(r.daysToCover);
+    const chg = parseNum(r.shortInterest) - parseNum((rows[rows.indexOf(r)+1] || {}).shortInterest);
+    const chgColor = chg >= 0 ? '#f6465d' : '#00c076';
+    const chgStr  = chg !== 0 ? (chg > 0 ? '+' : '') + fmtNum(chg) : '—';
+    tableRows +=
+      '<tr>' +
+      '<td style="color:var(--muted2)">' + r.settlementDate + '</td>' +
+      '<td style="font-weight:600;font-family:monospace">' + fmtNum(si) + '</td>' +
+      '<td style="color:' + chgColor + ';font-family:monospace">' + chgStr + '</td>' +
+      '<td style="color:' + (dtc > 5 ? '#f6465d' : dtc > 2 ? '#f0b429' : '#00c076') + '">' + dtc.toFixed(1) + 'g</td>' +
+      '</tr>';
+  });
+
   const nasdaqUrl = 'https://www.nasdaq.com/market-activity/stocks/' + symbol.toLowerCase() + '/short-interest';
+
   el.innerHTML =
-    '<div style="font-size:9px;color:var(--muted2);margin-bottom:8px;">Guncelleme: ' + settleDate + ' &middot; Kaynak: FINRA</div>' +
+    '<div style="font-size:9px;color:var(--muted2);margin-bottom:8px;">Son guncelleme: ' + settleDate + ' &middot; Kaynak: Nasdaq</div>' +
     '<div class="si-grid">' +
-    '<div class="si-card"><div class="si-card-title">Short Ilgi</div>' +
-    '<div class="si-card-val">' + fmtNum(shortVol) + '</div>' +
-    '<div class="si-card-sub">Aciga satilan hisse</div></div>' +
-    '<div class="si-card"><div class="si-card-title">Kapanma Gunu</div>' +
-    '<div class="si-card-val" style="color:' + (daysToCover > 5 ? '#f6465d' : daysToCover > 2 ? '#f0b429' : '#00c076') + '">' + daysToCover.toFixed(1) + '</div>' +
-    '<div class="si-card-sub">Days to cover</div></div>' +
+      '<div class="si-card">' +
+        '<div class="si-card-title">SHORT INTEREST</div>' +
+        '<div class="si-card-val">' + fmtNum(shortVol) + '</div>' +
+        '<div class="si-card-sub">Aciga satilan hisse</div>' +
+      '</div>' +
+      '<div class="si-card">' +
+        '<div class="si-card-title">DAYS TO COVER</div>' +
+        '<div class="si-card-val" style="color:' + (daysToCover > 5 ? '#f6465d' : daysToCover > 2 ? '#f0b429' : '#00c076') + '">' + daysToCover.toFixed(1) + '</div>' +
+        '<div class="si-card-sub">Ort. gunluk hacim: ' + fmtNum(avgVol) + '</div>' +
+      '</div>' +
     '</div>' +
-    '<div class="si-bar-wrap">' +
-    '<div class="si-bar-label"><span>Short Interest Orani</span>' +
-    '<span style="font-weight:700;color:' + barColor + '">' + pct.toFixed(1) + '%</span></div>' +
-    '<div class="si-bar-track"><div class="si-bar-fill" style="width:' + pct + '%;background:' + barColor + '"></div></div>' +
-    '<div style="display:flex;justify-content:space-between;font-size:8px;color:var(--muted2);margin-top:3px;">' +
-    '<span>Dusuk</span><span>%10</span><span>%20</span><span>Yuksek</span></div>' +
-    '</div>' +
-    '<div style="margin-top:8px;font-size:9px;color:var(--muted2);text-align:center;">' +
-    '<a href="' + nasdaqUrl + '" target="_blank" style="color:var(--accent);text-decoration:none;">Tarihsel grafik &rarr; Nasdaq.com &#8599;</a>' +
+    (floatNum > 0 ?
+      '<div class="si-bar-wrap" style="margin-bottom:8px;">' +
+        '<div class="si-bar-label"><span>Float Yuzdesi</span>' +
+          '<span style="font-weight:700;color:' + barColor + '">' + pct.toFixed(1) + '%</span>' +
+        '</div>' +
+        '<div class="si-bar-track"><div class="si-bar-fill" style="width:' + pct + '%;background:' + barColor + '"></div></div>' +
+        '<div style="display:flex;justify-content:space-between;font-size:8px;color:var(--muted2);margin-top:3px;">' +
+          '<span>Dusuk</span><span>10%</span><span>20%</span><span>Yuksek</span>' +
+        '</div>' +
+      '</div>' : '') +
+    '<table class="insider-table">' +
+      '<thead><tr><th>Tarih</th><th>Short Hacim</th><th>Degisim</th><th>DTC</th></tr></thead>' +
+      '<tbody>' + tableRows + '</tbody>' +
+    '</table>' +
+    '<div style="margin-top:8px;text-align:center;">' +
+      '<a href="' + nasdaqUrl + '" target="_blank" style="color:var(--accent);font-size:9px;text-decoration:none;">Tum gecmis &rarr; Nasdaq &#8599;</a>' +
     '</div>';
 }
 
