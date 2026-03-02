@@ -380,9 +380,10 @@ td:first-child,td:nth-child(2){text-align:left;}
         <div class="chips" id="goat-chips">
           <div class="chip goat-chip" data-goat="buffett">Buffett</div>
           <div class="chip goat-chip" data-goat="graham">Graham</div>
-          <div class="chip goat-chip" data-goat="lynch">Lynch</div>
+          <div class="chip goat-chip" data-goat="lynch">Lynch PEG</div>
           <div class="chip goat-chip" data-goat="ark">Ark/Wood</div>
           <div class="chip goat-chip" data-goat="minervini">Minervini</div>
+          <div class="chip goat-chip" data-goat="piotroski">Piotroski</div>
         </div>
         <div class="goat-info" id="goat-info"></div>
       </div>
@@ -482,6 +483,8 @@ td:first-child,td:nth-child(2){text-align:left;}
               <th onclick="colSort('currentPrice')" id="th-price">FİYAT</th>
               <th onclick="colSort('changePercent')">DEĞ%</th>
               <th onclick="colSort('marketCapitalization')">Piyasa Değeri (USD)</th>
+              <th onclick="colSort('piotroski')">F-Score</th>
+              <th onclick="colSort('peg')">PEG</th>
               <th onclick="colSort('peNormalizedAnnual')">F/K</th>
               <th onclick="colSort('pbAnnual')">PD/DD</th>
               <th onclick="colSort('psTTM')">F/S</th>
@@ -969,7 +972,7 @@ async function runScan(){
     'net_margin','gross_margin',
     'total_revenue_change_ttm_yoy','earnings_per_share_change_ttm_yoy',
     'dividends_yield','debt_to_equity_fq','current_ratio_fq',
-    'sector','High.1M','Low.1M'
+    'sector','High.1M','Low.1M','piotroski_f_score'
   ];
   const COLS_GLOBAL = [
     'name','close','change','volume','market_cap_basic',
@@ -978,7 +981,7 @@ async function runScan(){
     'net_margin','gross_margin',
     'earnings_per_share_diluted_yoy_growth_ttm','earnings_per_share_diluted_ttm',
     'dividends_yield_current','total_debt_to_equity','current_ratio',
-    'sector','High.1M','Low.1M'
+    'sector','High.1M','Low.1M','piotroski_f_score'
   ];
   const COLUMNS_BY_EXCHANGE = {
     bist: COLS_BIST,
@@ -1125,6 +1128,13 @@ async function runScan(){
         sector: sector || null,
         '52WeekHigh': high1m || null,
         '52WeekLow': low1m || null,
+        piotroski: g('piotroski_f_score') !== null ? Math.round(g('piotroski_f_score')) : null,
+        peg: (function() {
+          var pe = g('price_earnings_ttm') || g('price_book_fq');
+          var eg = g('total_revenue_change_ttm_yoy') || g('earnings_per_share_diluted_yoy_growth_ttm');
+          if (pe && eg && eg > 0) return pe / eg;
+          return null;
+        })(),
       });
     }
 
@@ -1169,9 +1179,10 @@ const GURUS = {
     filters: {pe_max:10, pb_max:1.2, de_max:50, cr_min:2, div_min:1}
   },
   lynch: {
-    label: 'Peter Lynch',
-    desc: 'Büyüme+Değer: iyi ROE, makul F/K, sağlıklı büyüme',
-    filters: {pe_min:5, pe_max:25, roe_min:12, margin_min:8, de_max:100, cr_min:1}
+    label: 'Peter Lynch — PEG',
+    desc: 'PEG < 1 = altın fırsat, PEG < 2 = makul. F/K büyüme hızına göre ucuz olmalı. Güçlü ROE, sağlıklı marj ve makul borç ile birlikte.',
+    filters: {pe_min:5, pe_max:30, roe_min:12, margin_min:8, de_max:100, cr_min:1},
+    special: 'peg'
   },
   ark: {
     label: 'Cathie Wood / ARK',
@@ -1182,6 +1193,12 @@ const GURUS = {
     label: 'Mark Minervini — SEPA',
     desc: 'SEPA: Güçlü kazanç büyümesi (>%25), yüksek ROE (>%17), sağlıklı marj (>%10), düşük borç. 52 hafta yükseğine yakın, güçlü momentum arayan büyüme traderı stratejisi.',
     filters: {earng_min:25, roe_min:17, margin_min:10, de_max:100, cr_min:1}
+  },
+  piotroski: {
+    label: 'Piotroski F-Score',
+    desc: 'F-Score 8-9 = çok güçlü bilanço. 9 kritere dayalı puanlama: karlılık (ROA, CFO, accrual), kaldıraç (borç, likidite, dilüsyon) ve verimlilik (marj, ciro). Graham niceliksel versiyonu.',
+    filters: {roe_min:5, cr_min:1, de_max:150},
+    special: 'piotroski'
   }
 };
 
@@ -1203,11 +1220,11 @@ document.getElementById('goat-chips').addEventListener('click', e => {
 
   const infoEl = document.getElementById('goat-info');
   if(infoEl){
-    infoEl.innerHTML = `<strong>${goat.label}:</strong> ${goat.desc}`;
+    infoEl.innerHTML = '<strong>' + goat.label + ':</strong> ' + goat.desc;
     infoEl.style.display = 'block';
   }
 
-  if(allData.length) applyAndRender();
+  if(allData.length) applyAndRender(goat.special || null);
 });
 
 document.getElementById('presets').addEventListener('click', e => {
@@ -1243,7 +1260,7 @@ function liveFilter(){
 // ═══════════════════════════════════════════
 function getN(id){ const v=parseFloat(document.getElementById(id)?.value); return isNaN(v)?null:v; }
 
-function applyAndRender(){
+function applyAndRender(special){
   // Filter rules: [dataField, minInputId, maxInputId, multiplier]
   const rules = [
     ['peNormalizedAnnual',             'pe_min',     'pe_max',     1],
@@ -1257,6 +1274,10 @@ function applyAndRender(){
     ['dividendYieldIndicatedAnnual',   'div_min',    'div_max',   1],
     ['totalDebt/totalEquityAnnual',    'de_min',     'de_max',    1],
     ['currentRatioAnnual',             'cr_min',     'cr_max',    1],
+    ['piotroski',                      'piotroski_min','piotroski_max', 1],
+    ['peg',                            'peg_min',    'peg_max',   1],
+    ['piotroski',                       'piotroski_min','piotroski_max', 1],
+    ['peg',                             'peg_min',    'peg_max',   1],
     ['marketCapitalization',           'mc_min',     'mc_max',    1],
   ];
 
@@ -1277,9 +1298,48 @@ function applyAndRender(){
     return true;
   });
 
+  // Special stratejiler — PEG ve Piotroski
+  if (special === 'peg') {
+    filtered = filtered.filter(function(s) {
+      if (s.peg === null || s.peg === undefined) return false;
+      return s.peg > 0 && s.peg < 2;
+    });
+  }
+  if (special === 'piotroski') {
+    filtered = filtered.filter(function(s) {
+      return s.piotroski !== null && s.piotroski >= 7;
+    });
+  }
+
+  // Special strateji filtreleri
+  if (special === 'peg') {
+    filtered = filtered.filter(function(s) {
+      return s.peg !== null && s.peg > 0 && s.peg < 1.5;
+    });
+    filtered.sort(function(a, b) { return (a.peg || 99) - (b.peg || 99); });
+  }
+  if (special === 'piotroski') {
+    filtered = filtered.filter(function(s) {
+      return s.piotroski !== null && s.piotroski >= 7;
+    });
+    filtered.sort(function(a, b) { return (b.piotroski || 0) - (a.piotroski || 0); });
+  }
+
   document.getElementById('toolbar').style.display = 'flex';
   document.getElementById('resn').textContent = filtered.length;
   document.getElementById('scann').textContent = allData.length;
+  // Special — PEG ve Piotroski
+  if (special === 'peg') {
+    filtered = filtered.filter(function(s) {
+      return s.peg !== null && s.peg > 0 && s.peg < 2;
+    });
+  }
+  if (special === 'piotroski') {
+    filtered = filtered.filter(function(s) {
+      return s.piotroski !== null && s.piotroski >= 7;
+    });
+  }
+
   showState('twrap');
   renderTable();
 }
@@ -1321,6 +1381,26 @@ function fv(v, dec=2, pct=false){
   const sign = pct && v>0 ? '+' : '';
   return `<span class="${cls}">${sign}${v.toFixed(dec)}${pct?'%':''}</span>`;
 }
+function fScore(v) {
+  if (v === null || v === undefined) return nil;
+  var color = v >= 8 ? '#00c076' : v >= 6 ? '#f0b429' : '#f6465d';
+  return '<span style="font-weight:700;color:' + color + '">' + v + '/9</span>';
+}
+function fPeg(v) {
+  if (v === null || v === undefined) return nil;
+  var color = v < 1 ? '#00c076' : v < 2 ? '#f0b429' : '#f6465d';
+  return '<span style="font-weight:700;color:' + color + '">' + v.toFixed(2) + '</span>';
+}
+function fScore(v) {
+  if (v === null || v === undefined) return nil;
+  var color = v >= 8 ? '#00c076' : v >= 6 ? '#f0b429' : '#f6465d';
+  return '<span style="font-weight:700;color:' + color + '">' + v + '/9</span>';
+}
+function fPeg(v) {
+  if (v === null || v === undefined) return nil;
+  var color = v < 1 ? '#00c076' : v < 2 ? '#f0b429' : '#f6465d';
+  return '<span style="font-weight:700;color:' + color + '">' + v.toFixed(2) + '</span>';
+}
 function fmc(v){
   if(!v) return nil;
   // TradingView market_cap_basic her zaman USD — milyon USD olarak saklıyoruz
@@ -1351,6 +1431,8 @@ function renderTable(){
       <td>${s.currentPrice!=null?(s.currentPrice.toFixed(2)+' '+(EXCHANGE_META[currentExchange]||EXCHANGE_META.bist).currency):nil}</td>
       <td><span class="${chgClass}">${chgTxt}</span></td>
       <td>${fmc(s.marketCapitalization)}</td>
+              <td>${s.piotroski !== null ? fScore(s.piotroski) : nil}</td>
+              <td>${s.peg !== null ? fPeg(s.peg) : nil}</td>
       <td>${fv(s.peNormalizedAnnual,1)}</td>
       <td>${fv(s.pbAnnual,2)}</td>
       <td>${fv(s.psTTM,2)}</td>
@@ -1398,6 +1480,30 @@ function showDetail(sym){
       ['Sektör', s.sector, v=>v],
       ['1A Yüksek', s['52WeekHigh'], v=>`${v.toFixed(2)} ₺`],
       ['1A Düşük', s['52WeekLow'], v=>`${v.toFixed(2)} ₺`],
+    ]},
+    {t:'Kantitatif', rows:[
+      ['Piotroski F-Score', s.piotroski, function(v) {
+        var color = v>=8?'#00c076':v>=6?'#f0b429':'#f6465d';
+        var label = v>=8?'Güçlü':v>=6?'Orta':'Zayıf';
+        return '<span style="color:'+color+';font-weight:700">'+v+'/9</span> <span style="color:'+color+';font-size:9px">'+label+'</span>';
+      }],
+      ['PEG Oranı', s.peg, function(v) {
+        var color = v<1?'#00c076':v<2?'#f0b429':'#f6465d';
+        var label = v<1?'Ucuz':v<2?'Makul':'Pahalı';
+        return '<span style="color:'+color+';font-weight:700">'+v.toFixed(2)+'</span> <span style="color:'+color+';font-size:9px">'+label+'</span>';
+      }],
+    ]},
+    {t:'Kantitatif', rows:[
+      ['Piotroski F-Score', s.piotroski, function(v) {
+        var col = v>=8 ? '#00c076' : v>=6 ? '#f0b429' : '#f6465d';
+        var lbl = v>=8 ? 'Guclu' : v>=6 ? 'Orta' : 'Zayif';
+        return '<span style="color:'+col+';font-weight:700">'+v+'/9</span> <span style="font-size:9px;color:'+col+'">'+lbl+'</span>';
+      }],
+      ['PEG Orani', s.peg, function(v) {
+        var col = v<1 ? '#00c076' : v<2 ? '#f0b429' : '#f6465d';
+        var lbl = v<1 ? 'Ucuz' : v<2 ? 'Makul' : 'Pahali';
+        return '<span style="color:'+col+';font-weight:700">'+v.toFixed(2)+'</span> <span style="font-size:9px;color:'+col+'">'+lbl+'</span>';
+      }],
     ]},
     {t:'Karlılık', rows:[
       ['ROE <tag>FQ</tag>', s.roeTTM, v=>`<span class="${v>=0?'up':'dn'}">${v.toFixed(1)}%</span>`],
