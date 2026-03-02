@@ -321,35 +321,30 @@ td:first-child,td:nth-child(2){text-align:left;}
             <span class="exbtn-name">BIST</span>
             <span class="exbtn-sub">Borsa İstanbul</span>
           </div>
-          <div class="exbtn disabled" data-exchange="nasdaq" onclick="selectExchange(this)">
+          <div class="exbtn" data-exchange="nasdaq" onclick="selectExchange(this)">
             <span class="exbtn-flag">🇺🇸</span>
             <span class="exbtn-name">NASDAQ</span>
             <span class="exbtn-sub">Tech Ağırlıklı</span>
-            <span class="exbtn-soon">YAKINDA</span>
           </div>
-          <div class="exbtn disabled" data-exchange="sp500" onclick="selectExchange(this)">
+          <div class="exbtn" data-exchange="sp500" onclick="selectExchange(this)">
             <span class="exbtn-flag">🇺🇸</span>
             <span class="exbtn-name">S&P 500</span>
             <span class="exbtn-sub">ABD Endeksi</span>
-            <span class="exbtn-soon">YAKINDA</span>
           </div>
-          <div class="exbtn disabled" data-exchange="dax" onclick="selectExchange(this)">
+          <div class="exbtn" data-exchange="dax" onclick="selectExchange(this)">
             <span class="exbtn-flag">🇩🇪</span>
             <span class="exbtn-name">DAX</span>
             <span class="exbtn-sub">Frankfurt</span>
-            <span class="exbtn-soon">YAKINDA</span>
           </div>
-          <div class="exbtn disabled" data-exchange="lse" onclick="selectExchange(this)">
+          <div class="exbtn" data-exchange="lse" onclick="selectExchange(this)">
             <span class="exbtn-flag">🇬🇧</span>
             <span class="exbtn-name">LSE</span>
             <span class="exbtn-sub">Londra</span>
-            <span class="exbtn-soon">YAKINDA</span>
           </div>
-          <div class="exbtn disabled" data-exchange="nikkei" onclick="selectExchange(this)">
+          <div class="exbtn" data-exchange="nikkei" onclick="selectExchange(this)">
             <span class="exbtn-flag">🇯🇵</span>
             <span class="exbtn-name">Nikkei</span>
             <span class="exbtn-sub">Tokyo</span>
-            <span class="exbtn-soon">YAKINDA</span>
           </div>
         </div>
       </div>
@@ -458,7 +453,7 @@ td:first-child,td:nth-child(2){text-align:left;}
             <tr>
               <th onclick="colSort('symbol')">SEMBOL</th>
               <th onclick="colSort('name')">ŞİRKET</th>
-              <th onclick="colSort('currentPrice')">FİYAT</th>
+              <th onclick="colSort('currentPrice')" id="th-price">FİYAT</th>
               <th onclick="colSort('changePercent')">DEĞ%</th>
               <th onclick="colSort('marketCapitalization')">PD (Mn)</th>
               <th onclick="colSort('peNormalizedAnnual')">F/K</th>
@@ -915,7 +910,8 @@ async function runScan(){
   document.getElementById('toolbar').style.display = 'none';
   document.getElementById('prog').style.width = '30%';
   document.getElementById('loadtxt').textContent = 'TradingView\'den veri çekiliyor...';
-  document.getElementById('loadsub').textContent = 'Tek istekte tüm BIST hisseleri alınıyor...';
+  const exMeta = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
+  document.getElementById('loadsub').textContent = `${exMeta.flag} ${exMeta.name} hisseleri alınıyor...`;
 
   const payload = {
     columns: [
@@ -945,7 +941,8 @@ async function runScan(){
   };
 
   try {
-    const res = await fetch(PROXY_URL, {
+    const scanUrl = PROXY_URL + '?action=scan&exchange=' + currentExchange;
+  const res = await fetch(scanUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -977,12 +974,14 @@ async function runScan(){
         name, close, change, volume, mcap,
         pe, pb, ps, roe, roa,
         netMargin, grossMargin,
+        revGrowth, epsGrowth,
         divYield, deRatio, currentRatio, sector,
-        high1m, low1m
+        high1m, low1m, description
       ] = d;
 
       // TradingView sembol formatı: "BIST:THYAO" → "THYAO"
-      const symbol = (row.s || '').replace('BIST:', '');
+      const rawSym = row.s || '';
+      const symbol = rawSym.replace(/^[A-Z]+:/, ''); // BIST:THYAO → THYAO, NASDAQ:AAPL → AAPL
 
       if(!close || close === 0) continue;
 
@@ -993,7 +992,9 @@ async function runScan(){
         previousClose: close / (1 + (change||0)/100),
         changePercent: change || null,
         volume: volume || null,
-        marketCapitalization: mcap ? mcap / 1e6 : null, // TradingView → milyon USD
+        marketCapitalization: mcap ? mcap / 1e6 : null,
+        description: description || null,
+        exchangeId: currentExchange,
         peNormalizedAnnual: pe || null,
         pbAnnual: pb || null,
         psTTM: ps || null,
@@ -1001,8 +1002,8 @@ async function runScan(){
         roaTTM: roa || null,
         netProfitMarginTTM: netMargin || null,
         grossMarginTTM: grossMargin || null,
-        revenueGrowthTTMYoy: null,
-        epsGrowthTTMYoy: null,
+        revenueGrowthTTMYoy: revGrowth || null,
+        epsGrowthTTMYoy: epsGrowth || null,
         dividendYieldIndicatedAnnual: divYield || null,
         'totalDebt/totalEquityAnnual': deRatio || null,
         currentRatioAnnual: currentRatio || null,
@@ -1015,7 +1016,8 @@ async function runScan(){
     if(results.length === 0) throw new Error('Hiç hisse verisi işlenemedi');
 
     allData = results;
-    document.getElementById('scantime').textContent = `↻ ${new Date().toLocaleTimeString('tr-TR')} · ${results.length} hisse`;
+    const _exm = EXCHANGE_META[currentExchange]||EXCHANGE_META.bist;
+    document.getElementById('scantime').textContent = `${_exm.flag} ${_exm.name} · ↻ ${new Date().toLocaleTimeString('tr-TR')} · ${results.length} hisse`;
     applyAndRender();
 
   } catch(err) {
@@ -1230,7 +1232,7 @@ function renderTable(){
     return `<tr onclick="showDetail('${s.symbol}')" class="${selSym===s.symbol?'selrow':''}">
       <td><span class="sym">${s.symbol}</span></td>
       <td class="nmc" title="${s.name}">${s.name}</td>
-      <td>${s.currentPrice!=null?s.currentPrice.toFixed(2)+' ₺':nil}</td>
+      <td>${s.currentPrice!=null?(s.currentPrice.toFixed(2)+' '+(EXCHANGE_META[currentExchange]||EXCHANGE_META.bist).currency):nil}</td>
       <td><span class="${chgClass}">${chgTxt}</span></td>
       <td>${fmc(s.marketCapitalization)}</td>
       <td>${fv(s.peNormalizedAnnual,1)}</td>
@@ -1259,7 +1261,7 @@ function showDetail(sym){
 
   document.getElementById('dsym').textContent = s.symbol;
   document.getElementById('dname').textContent = s.name;
-  document.getElementById('dprice').textContent = s.currentPrice!=null?`${s.currentPrice.toFixed(2)} ₺`:'—';
+  document.getElementById('dprice').textContent = s.currentPrice!=null?`${s.currentPrice.toFixed(2)} ${(EXCHANGE_META[currentExchange]||EXCHANGE_META.bist).currency}`:'—';
   
   if(s.changePercent!=null){
     const chg = s.currentPrice && s.previousClose ? s.currentPrice - s.previousClose : null;
@@ -1426,7 +1428,8 @@ function updateChart(sym) {
 
   initChart(container);
 
-  const url = '/api/scan?action=chart&symbol=' + sym + '&interval=' + interval + '&currency=' + currency;
+  const suffix = encodeURIComponent((EXCHANGE_META[currentExchange]||EXCHANGE_META.bist).yahooSuffix);
+  const url = PROXY_URL + '?action=chart&symbol=' + sym + '&interval=' + interval + '&currency=' + currency + '&suffix=' + suffix;
   fetch(url)
     .then(r => r.json())
     .then(data => {
@@ -1748,7 +1751,24 @@ function selectExchange(el) {
   if(el.classList.contains('disabled')) return;
   document.querySelectorAll('.exbtn').forEach(b => b.classList.remove('on'));
   el.classList.add('on');
-  // İleride farklı borsa endpointleri burada yönetilecek
+  currentExchange = el.dataset.exchange;
+  // Veri sıfırla
+  allData = []; filtered = []; selSym = null;
+  closeDetail();
+  showState('empty');
+  const meta = EXCHANGE_META[currentExchange];
+  if(meta) {
+    document.getElementById('scantime').textContent = `${meta.flag} ${meta.name} seçildi — Tara butonuna bas`;
+    // TL sekmesi sadece BIST'te görünür
+    const tlTab = document.querySelector('.ctab-cur[data-currency="TL"]');
+    const usdTab = document.querySelector('.ctab-cur[data-currency="USD"]');
+    if(meta.currencyCode !== 'TRY') {
+      if(tlTab) tlTab.style.display = 'none';
+      if(usdTab) { usdTab.classList.add('on'); if(tlTab) tlTab.classList.remove('on'); }
+    } else {
+      if(tlTab) tlTab.style.display = '';
+    }
+  }
 }
 </script>
 </body>
