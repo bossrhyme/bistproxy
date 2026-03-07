@@ -168,6 +168,13 @@ td:first-child,td:nth-child(2){text-align:left;}
 .detail::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 .dhead{padding:14px 16px;border-bottom:1px solid var(--border);position:relative;background:var(--s2);}
 .dsym{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.5px;line-height:1;}
+.dprofile{padding:10px 14px 0;border-bottom:1px solid var(--border);margin-bottom:0;}
+.dprofile-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.3;}
+.dprofile-meta{font-size:10px;color:var(--muted2);margin-bottom:8px;line-height:1.6;}
+.dprofile-links{display:flex;flex-wrap:wrap;gap:5px;padding-bottom:10px;}
+.dpl{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:600;padding:3px 8px;border-radius:4px;border:1px solid var(--border);color:var(--text2);text-decoration:none;background:var(--s2);transition:all .15s;white-space:nowrap;}
+.dpl:hover{border-color:var(--accent);color:var(--accent);}
+.dpl-icon{font-size:10px;}
 .dname{font-size:11px;color:var(--muted2);margin-top:2px;font-weight:400;}
 .dclose{position:absolute;top:12px;right:12px;background:var(--border);border:none;color:var(--text2);font-size:14px;cursor:pointer;width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;}
 .dclose:hover{background:var(--red-bg);color:var(--red);}
@@ -397,8 +404,8 @@ td:first-child,td:nth-child(2){text-align:left;}
 @media (max-width: 480px) {
   .exchange-grid { grid-template-columns: repeat(2, 1fr); }
   .tlogo span:last-child { display: none; }
-  th:nth-child(n+5), td:nth-child(n+5) { display: none; }
-  th:nth-child(4), td:nth-child(4) { display: table-cell; }
+  th:nth-child(n+4), td:nth-child(n+4) { display: none; }
+  th:nth-child(3), td:nth-child(3) { display: table-cell; }
 }
 </style>
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
@@ -574,11 +581,11 @@ td:first-child,td:nth-child(2){text-align:left;}
         <table>
           <thead>
             <tr>
+              <th onclick="colSort('name')">ŞİRKET ADI</th>
               <th onclick="colSort('symbol')">SEMBOL</th>
-              <th onclick="colSort('name')">ŞİRKET</th>
-              <th onclick="colSort('currentPrice')" id="th-price">FİYAT</th>
-              <th onclick="colSort('changePercent')">DEĞ%</th>
+              <th onclick="colSort('sector')">SEKTÖR</th>
               <th onclick="colSort('marketCapitalization')">Piyasa Değeri (USD)</th>
+              <th onclick="colSort('currentPrice')" id="th-price">FİYAT</th>
               <th onclick="colSort('piotroski')">F-Score</th>
               <th onclick="colSort('peg')">PEG</th>
               <th onclick="colSort('peNormalizedAnnual')">F/K</th>
@@ -610,6 +617,14 @@ td:first-child,td:nth-child(2){text-align:left;}
       <div class="dchg" id="dchg"></div>
       <div class="dfresh" id="dfresh"></div>
       <div class="dsec" id="dsec">—</div>
+
+      <!-- ŞİRKET PROFİLİ -->
+      <div class="dprofile" id="dprofile" style="display:none">
+        <div class="dprofile-name" id="dprofile-name"></div>
+        <div class="dprofile-meta" id="dprofile-meta"></div>
+        <div class="dprofile-links" id="dprofile-links"></div>
+      </div>
+
       <div class="chart-section">
         <div class="chart-tabs" id="chart-tabs">
           <div class="ctab on" data-interval="240">4S</div>
@@ -1181,6 +1196,18 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 // TRADINGVIEW SCANNER — tek istekte tüm BIST
 // ═══════════════════════════════════════════
 async function runScan(){
+  // Döviz kurları güncelleme (USD bazlı)
+  try {
+    const rateRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+    if(rateRes.ok) {
+      const rateJson = await rateRes.json();
+      const r = rateJson.rates || {};
+      if(r.TRY) fxRates.TRY = r.TRY;
+      if(r.EUR) fxRates.EUR = 1 / r.EUR; // EUR→USD
+      if(r.GBP) fxRates.GBP = 1 / r.GBP; // GBP→USD
+      if(r.JPY) fxRates.JPY = 1 / r.JPY; // JPY→USD
+    }
+  } catch(e) { /* fallback kurlar kullanılır */ }
   const btn = document.getElementById('scanbtn');
   btn.disabled = true;
   scanAborted = false;
@@ -1200,7 +1227,7 @@ async function runScan(){
   const isBIST = (currentExchange === 'bist');
   // TradingView field isimleri — konsoldan teyit edildi ✓
   const COLS_BIST = [
-    'name','close','change','volume','market_cap_basic',
+    'name','description','close','change','volume','market_cap_basic',
     'price_earnings_ttm','price_book_fq','price_sales_current',
     'return_on_equity_fq','return_on_assets_fq',
     'net_margin','gross_margin',
@@ -1209,7 +1236,7 @@ async function runScan(){
     'sector','High.1M','Low.1M','piotroski_f_score'
   ];
   const COLS_GLOBAL = [
-    'name','close','change','volume','market_cap_basic',
+    'name','description','close','change','volume','market_cap_basic',
     'price_earnings_ttm','price_book_ratio','price_sales_current',
     'return_on_equity','return_on_assets',
     'net_margin','gross_margin',
@@ -1313,6 +1340,7 @@ async function runScan(){
 
       const close  = g('close');
       const name   = g('name');
+      const description = g('description');
       const change = g('change');
       const volume = g('volume');
       const mcap   = g('market_cap_basic');
@@ -1340,12 +1368,30 @@ async function runScan(){
 
       results.push({
         symbol,
-        name: name || symbol,
+        name: (function() {
+          // BIST: önce yerel listeden bak (Türkçe tam ad)
+          if(currentExchange === 'bist') {
+            const local = BIST_SYMBOLS.find(function(x){ return x.symbol === symbol.replace('.IS',''); });
+            if(local) return local.name;
+          }
+          // Global: description field'ı tam adı veriyor (ör. "Apple Inc.")
+          if(description && description !== name) return description;
+          return name || symbol;
+        })(),
         currentPrice: close,
         previousClose: close / (1 + (change||0)/100),
         changePercent: change || null,
         volume: volume || null,
-        marketCapitalization: mcap ? mcap / 1e6 : null, // milyon USD
+        marketCapitalization: mcap ? (function() {
+          // market_cap_basic yerel para biriminde gelir → USD'ye çevir
+          var val = mcap;
+          if(currentExchange === 'bist')    val = val / fxRates.TRY;           // TRY → USD
+          else if(currentExchange === 'dax') val = val * fxRates.EUR;           // EUR → USD
+          else if(currentExchange === 'lse') val = val * fxRates.GBP / 100;     // GBX (pence) → USD
+          else if(currentExchange === 'nikkei') val = val * fxRates.JPY;        // JPY → USD
+          // nasdaq/sp500: zaten USD
+          return val / 1e6; // milyon USD olarak sakla
+        })() : null,
         exchangeId: currentExchange,
         peNormalizedAnnual: pe || null,
         pbAnnual: pb || null,
@@ -1359,7 +1405,61 @@ async function runScan(){
         dividendYieldIndicatedAnnual: divY || null,
         'totalDebt/totalEquityAnnual': de || null,
         currentRatioAnnual: cr || null,
-        sector: sector || null,
+        sector: (function() {
+          if(!sector) return null;
+          var SECTOR_TR = {
+            'Technology': 'Teknoloji',
+            'Finance': 'Finans',
+            'Financial': 'Finans',
+            'Financial Services': 'Finansal Hizmetler',
+            'Health Technology': 'Sağlık Teknolojisi',
+            'Healthcare': 'Sağlık',
+            'Health Services': 'Sağlık Hizmetleri',
+            'Consumer Durables': 'Dayanıklı Tüketim',
+            'Consumer Non-Durables': 'Dayanıksız Tüketim',
+            'Consumer Services': 'Tüketici Hizmetleri',
+            'Consumer Cyclicals': 'Döngüsel Tüketim',
+            'Consumer Defensive': 'Savunmacı Tüketim',
+            'Retail Trade': 'Perakende',
+            'Energy Minerals': 'Enerji & Maden',
+            'Energy': 'Enerji',
+            'Utilities': 'Kamu Hizmetleri',
+            'Industrials': 'Sanayi',
+            'Industrial Services': 'Endüstriyel Hizmetler',
+            'Producer Manufacturing': 'Üretim Sanayi',
+            'Process Industries': 'Proses Endüstrisi',
+            'Basic Materials': 'Temel Malzemeler',
+            'Materials': 'Malzemeler',
+            'Real Estate': 'Gayrimenkul',
+            'Transportation': 'Ulaşım',
+            'Communications': 'İletişim',
+            'Communication Services': 'İletişim Hizmetleri',
+            'Electronic Technology': 'Elektronik Teknoloji',
+            'Commercial Services': 'Ticari Hizmetler',
+            'Distribution Services': 'Dağıtım Hizmetleri',
+            'Miscellaneous': 'Diğer',
+            'Non-Energy Minerals': 'Enerji Dışı Madenler',
+            'Government': 'Kamu',
+            'Banks': 'Bankacılık',
+            'Insurance': 'Sigorta',
+            'Investment Trusts/Mutual Funds': 'Yatırım Fonu',
+            'Pharmaceuticals': 'İlaç',
+            'Biotechnology': 'Biyoteknoloji',
+            'Automobiles': 'Otomotiv',
+            'Software': 'Yazılım',
+            'Hardware': 'Donanım',
+            'Semiconductors': 'Yarı İletkenler',
+            'Aerospace & Defense': 'Havacılık & Savunma',
+            'Mining': 'Madencilik',
+            'Food & Beverage': 'Gıda & İçecek',
+            'Food Processing': 'Gıda İşleme',
+            'Chemicals': 'Kimya',
+            'Construction': 'İnşaat',
+            'Textiles': 'Tekstil',
+            'Holding Companies': 'Holding',
+          };
+          return SECTOR_TR[sector] || sector;
+        })(),
         '52WeekHigh': high1m || null,
         '52WeekLow': low1m || null,
         piotroski: g('piotroski_f_score') !== null ? Math.round(g('piotroski_f_score')) : null,
@@ -1742,11 +1842,11 @@ function renderTable(){
     const chgClass = chgPct===null ? '' : (chgPct>=0?'up':'dn');
     const chgTxt = chgPct===null ? '—' : `${chgPct>=0?'+':''}${chgPct.toFixed(2)}%`;
     return `<tr onclick="showDetail('${s.symbol}')" class="${selSym===s.symbol?'selrow':''}">
-      <td><span class="sym">${s.symbol}</span></td>
       <td class="nmc" title="${s.name}">${s.name}</td>
-      <td>${s.currentPrice!=null?(s.currentPrice.toFixed(2)+' '+(EXCHANGE_META[currentExchange]||EXCHANGE_META.bist).currency):nil}</td>
-      <td><span class="${chgClass}">${chgTxt}</span></td>
+      <td><span class="sym">${s.symbol}</span></td>
+      <td style="font-size:10px;color:var(--muted2)">${s.sector||'—'}</td>
       <td>${fmc(s.marketCapitalization)}</td>
+      <td>${s.currentPrice!=null?(s.currentPrice.toFixed(2)+' '+(EXCHANGE_META[currentExchange]||EXCHANGE_META.bist).currency):nil}</td>
               <td>${s.piotroski !== null ? fScore(s.piotroski) : nil}</td>
               <td>${s.peg !== null ? fPeg(s.peg) : nil}</td>
       <td>${fv(s.peNormalizedAnnual,1)}</td>
@@ -1767,14 +1867,66 @@ function renderTable(){
 // ═══════════════════════════════════════════
 // DETAIL PANEL
 // ═══════════════════════════════════════════
+
+function buildProfile(s) {
+  const profileEl = document.getElementById('dprofile');
+  const nameEl = document.getElementById('dprofile-name');
+  const metaEl = document.getElementById('dprofile-meta');
+  const linksEl = document.getElementById('dprofile-links');
+  if(!profileEl) return;
+
+  const sym = s.symbol;
+  const ex = currentExchange;
+  const isBist = ex === 'bist';
+  const isUS = ex === 'nasdaq' || ex === 'sp500';
+  const symClean = sym.replace('.IS','');
+
+  // Şirket adı
+  // Tam şirket adı — TradingView'dan gelen name field
+  nameEl.textContent = s.name || sym;
+  nameEl.title = s.name || sym;
+
+  // Meta — sektör + borsa
+  const exMeta = EXCHANGE_META[ex] || EXCHANGE_META.bist;
+  var metaParts = [];
+  if(s.sector) metaParts.push(s.sector);
+  metaParts.push(exMeta.flag + ' ' + exMeta.name);
+  metaEl.textContent = metaParts.join('  ·  ');
+
+  // Finansal linkler
+  var links = [];
+
+  // TradingView linki — borsa bazlı
+  var tvSym = '';
+  if(isBist) tvSym = 'https://tr.tradingview.com/symbols/BIST-'+symClean;
+  else if(ex === 'nasdaq') tvSym = 'https://www.tradingview.com/symbols/NASDAQ-'+sym;
+  else if(ex === 'sp500') tvSym = 'https://www.tradingview.com/symbols/NYSE-'+sym;
+  else if(ex === 'dax') tvSym = 'https://www.tradingview.com/symbols/XETR-'+sym;
+  else if(ex === 'lse') tvSym = 'https://www.tradingview.com/symbols/LSE-'+sym;
+  else if(ex === 'nikkei') tvSym = 'https://www.tradingview.com/symbols/TSE-'+sym;
+  else tvSym = 'https://www.tradingview.com/search/?q='+sym;
+
+  links.push({icon:'📉', label:'TradingView', url: tvSym});
+
+  // Şirket web sitesi — Google arama ile
+  links.push({icon:'🌐', label:'Web Sitesi', url:'https://www.google.com/search?q='+encodeURIComponent((s.name||sym)+' official site')});
+
+  linksEl.innerHTML = links.map(function(l) {
+    return '<a class="dpl" href="' + l.url + '" target="_blank" rel="noopener">' +
+      '<span class="dpl-icon">' + l.icon + '</span>' + l.label + '</a>';
+  }).join('');
+
+  profileEl.style.display = 'block';
+}
+
 function showDetail(sym){
   const s = allData.find(x=>x.symbol===sym);
   if(!s) return;
   selSym = sym;
   renderTable();
 
-  document.getElementById('dsym').textContent = s.symbol;
-  document.getElementById('dname').textContent = s.name;
+  document.getElementById('dsym').textContent = s.name || s.symbol;
+  document.getElementById('dname').textContent = s.symbol;
   document.getElementById('dprice').textContent = s.currentPrice!=null?`${s.currentPrice.toFixed(2)} ${(EXCHANGE_META[currentExchange]||EXCHANGE_META.bist).currency}`:'—';
   
   if(s.changePercent!=null){
@@ -1786,6 +1938,9 @@ function showDetail(sym){
   
   document.getElementById('dfresh').textContent = `↻ Finnhub · ${new Date().toLocaleTimeString('tr-TR')}`;
   document.getElementById('dsec').textContent = s.symbol + '.IS';
+
+  // Şirket Profili
+  buildProfile(s);
 
   const G = [
     {t:'Değerleme', rows:[
