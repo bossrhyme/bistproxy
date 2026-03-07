@@ -496,6 +496,8 @@ td:first-child,td:nth-child(2){text-align:left;}
         <div class="goat-info" id="preset-info"></div>
       </div>
 
+      <button class="clrbtn" onclick="clearFilters()" id="clrbtn" style="display:none;">✕ Filtreleri Temizle</button>
+
       <div class="filter-group">
         <div class="filter-group-title">Değerleme</div>
         <div class="frow"><div class="flbl">F/K — Fiyat / Kazanç <small>min / max</small></div><div class="finps"><input type="number" id="pe_min" placeholder="—" oninput="liveFilter()"><input type="number" id="pe_max" placeholder="—" oninput="liveFilter()"></div></div>
@@ -528,7 +530,6 @@ td:first-child,td:nth-child(2){text-align:left;}
         <div class="frow"><div class="flbl">Piyasa Değeri (Milyon $)</div><div class="finps"><input type="number" id="mc_min" placeholder="—" oninput="liveFilter()"><input type="number" id="mc_max" placeholder="—" oninput="liveFilter()"></div></div>
       </div>
 
-      <button class="clrbtn" onclick="clearFilters()">✕ Filtreleri Temizle</button>
     </div>
 
     <!-- CONTENT -->
@@ -1457,21 +1458,31 @@ document.getElementById('goat-chips').addEventListener('click', e => {
   const goat = GURUS[name];
   if(!goat) return;
 
+  // Toggle — zaten seçiliyse kaldır
+  const wasOn = chip.classList.contains('on');
   clearFilters(false);
   document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
-  chip.classList.add('on');
+  const goatInfo = document.getElementById('goat-info');
+  const presetInfo = document.getElementById('preset-info');
+  if(goatInfo) goatInfo.style.display = 'none';
+  if(presetInfo) presetInfo.style.display = 'none';
 
+  if(wasOn) {
+    updateClrBtn();
+    if(allData.length) applyAndRender(null);
+    return;
+  }
+
+  chip.classList.add('on');
   for(const [k,v] of Object.entries(goat.filters)){
     const el = document.getElementById(k);
     if(el) el.value = v;
   }
-
-  const infoEl = document.getElementById('goat-info');
-  if(infoEl){
-    infoEl.innerHTML = '<strong>' + goat.label + ':</strong> ' + goat.desc;
-    infoEl.style.display = 'block';
+  if(goatInfo){
+    goatInfo.innerHTML = '<strong>' + goat.label + ':</strong> ' + goat.desc;
+    goatInfo.style.display = 'block';
   }
-
+  updateClrBtn();
   if(allData.length) applyAndRender(goat.special || null);
 });
 
@@ -1481,25 +1492,82 @@ document.getElementById('presets').addEventListener('click', e => {
   const name = chip.dataset.preset;
   const preset = PRESETS[name];
   if(!preset) return;
-  clearFilters(false);
-  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
-  chip.classList.add('on');
-  for(const [k,v] of Object.entries(preset.filters)){
+
+  // Goat chip'lerini kapat
+  document.querySelectorAll('.goat-chip').forEach(c=>c.classList.remove('on'));
+  const goatInfo = document.getElementById('goat-info');
+  if(goatInfo) goatInfo.style.display = 'none';
+
+  // Toggle
+  const wasOn = chip.classList.contains('on');
+  chip.classList.toggle('on');
+
+  // Seçili preset sayısı max 3
+  const selected = document.querySelectorAll('#presets .chip.on');
+  if(selected.length > 3) {
+    chip.classList.remove('on');
+    return;
+  }
+
+  // Tüm seçili presetlerin filtrelerini birleştir (en büyük değer kazanır)
+  const mergedFilters = {};
+  document.querySelectorAll('#presets .chip.on').forEach(c => {
+    const p = PRESETS[c.dataset.preset];
+    if(!p) return;
+    Object.entries(p.filters).forEach(([k,v]) => {
+      if(!(k in mergedFilters)) mergedFilters[k] = v;
+      else {
+        // min değerler için büyüğü, max için küçüğü al
+        if(k.endsWith('_min')) mergedFilters[k] = Math.max(mergedFilters[k], v);
+        if(k.endsWith('_max')) mergedFilters[k] = Math.min(mergedFilters[k], v);
+      }
+    });
+  });
+
+  // Inputları temizle sonra doldur
+  document.querySelectorAll('.finps input').forEach(i=>i.value='');
+  Object.entries(mergedFilters).forEach(([k,v]) => {
     const el = document.getElementById(k);
     if(el) el.value = v;
-  }
+  });
+
+  // Açıklama — seçili preset varsa göster, yoksa gizle
   const infoEl = document.getElementById('preset-info');
-  if(infoEl){ infoEl.innerHTML = preset.desc; infoEl.style.display = 'block'; }
+  const activeChips = document.querySelectorAll('#presets .chip.on');
+  if(infoEl) {
+    if(activeChips.length > 0) {
+      const descs = Array.from(activeChips).map(c => {
+        const p = PRESETS[c.dataset.preset];
+        return p ? '<strong>' + c.textContent + ':</strong> ' + p.desc : '';
+      }).filter(Boolean).join('<br><br>');
+      infoEl.innerHTML = descs;
+      infoEl.style.display = 'block';
+    } else {
+      infoEl.style.display = 'none';
+    }
+  }
+
+  updateClrBtn();
   if(allData.length) applyAndRender();
 });
+
+function updateClrBtn() {
+  const btn = document.getElementById('clrbtn');
+  if(!btn) return;
+  const hasChip = document.querySelector('.chip.on');
+  const hasInput = Array.from(document.querySelectorAll('.finps input')).some(i => i.value !== '');
+  btn.style.display = (hasChip || hasInput) ? 'block' : 'none';
+}
 
 function clearFilters(resetChips=true){
   document.querySelectorAll('.finps input').forEach(i=>i.value='');
   if(resetChips) { document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on')); ['goat-info','preset-info'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';}); }
+  updateClrBtn();
   if(allData.length) applyAndRender();
 }
 
 function liveFilter(){
+  updateClrBtn();
   if(allData.length) applyAndRender();
 }
 
@@ -2403,7 +2471,6 @@ function selectExchange(el) {
   showState('empty');
   const meta = EXCHANGE_META[currentExchange];
   if(meta) {
-    document.getElementById('scantime').textContent = `${meta.flag} ${meta.name} seçildi — Tara butonuna bas`;
     // TL sekmesi sadece BIST'te görünür
     const tlTab = document.querySelector('.ctab-cur[data-currency="TL"]');
     const usdTab = document.querySelector('.ctab-cur[data-currency="USD"]');
@@ -2414,6 +2481,8 @@ function selectExchange(el) {
       if(tlTab) tlTab.style.display = '';
     }
   }
+  // Otomatik tarama
+  runScan();
 }
 </script>
 </body>
