@@ -1176,6 +1176,7 @@ let filtered = [];
 let searchQ = '';
 let selSym = null;
 let sortSt = {field:'marketCapitalization', dir:'desc'};
+let fxRates = {TRY:36.5, EUR:1.08, GBP:1.27, JPY:0.0067};
 let scanAborted = false;
 
 // ═══════════════════════════════════════════
@@ -1385,10 +1386,10 @@ async function runScan(){
         marketCapitalization: mcap ? (function() {
           // market_cap_basic yerel para biriminde gelir → USD'ye çevir
           var val = mcap;
-          if(currentExchange === 'bist')    val = val / fxRates.TRY;           // TRY → USD
-          else if(currentExchange === 'dax') val = val * fxRates.EUR;           // EUR → USD
-          else if(currentExchange === 'lse') val = val * fxRates.GBP / 100;     // GBX (pence) → USD
-          else if(currentExchange === 'nikkei') val = val * fxRates.JPY;        // JPY → USD
+          if(currentExchange === 'bist')    val = val / fxRates.TRY;        // TRY → USD
+          else if(currentExchange === 'dax') val = val * fxRates.EUR;        // EUR → USD
+          else if(currentExchange === 'lse') val = val * fxRates.GBP / 100;  // GBX (pence) → USD
+          else if(currentExchange === 'nikkei') val = val * fxRates.JPY;     // JPY → USD
           // nasdaq/sp500: zaten USD
           return val / 1e6; // milyon USD olarak sakla
         })() : null,
