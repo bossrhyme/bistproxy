@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>DeepFin — Hisse Tarama Aracı</title>
+<title>DeepFin — Gürültü yok,fırast var. </title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -421,6 +421,33 @@ td:first-child,td:nth-child(2){text-align:left;}
   /* Tablo — ilk 4 kolon */
   th:nth-child(n+5), td:nth-child(n+5) { display: none; }
 }
+
+/* ── TICKER TAPE ── */
+.ticker-wrap{width:100%;overflow:hidden;background:var(--s1);border-bottom:1px solid var(--border);height:32px;display:flex;align-items:center;flex-shrink:0;position:relative;}
+.ticker-wrap::before,.ticker-wrap::after{content:'';position:absolute;top:0;bottom:0;width:60px;z-index:2;pointer-events:none;}
+.ticker-wrap::before{left:0;background:linear-gradient(90deg,var(--s1),transparent);}
+.ticker-wrap::after{right:0;background:linear-gradient(-90deg,var(--s1),transparent);}
+.ticker-track{display:flex;gap:0;animation:ticker-scroll 80s linear infinite;white-space:nowrap;}
+.ticker-track:hover{animation-play-state:paused;}
+.ticker-item{display:inline-flex;align-items:center;gap:5px;padding:0 20px;font-size:11px;font-family:'JetBrains Mono',monospace;border-right:1px solid var(--border);}
+.ticker-sym{color:var(--text2);font-weight:500;}
+.ticker-px{color:var(--text);font-weight:600;}
+.ticker-chg.up{color:var(--green);}
+.ticker-chg.dn{color:var(--red);}
+.ticker-empty{font-size:11px;color:var(--muted2);padding:0 16px;font-family:'JetBrains Mono',monospace;}
+@keyframes ticker-scroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+
+/* ── STATS BAR ── */
+.stats-bar{display:none;align-items:center;gap:0;padding:0 16px;height:36px;background:var(--s2);border-bottom:1px solid var(--border);flex-shrink:0;font-size:11px;font-family:'JetBrains Mono',monospace;}
+.stats-bar.visible{display:flex;}
+.sb-item{display:flex;align-items:center;gap:6px;padding:0 14px;border-right:1px solid var(--border);}
+.sb-item:first-child{padding-left:0;}
+.sb-item:last-child{border-right:none;}
+.sb-label{color:var(--muted2);font-size:10px;letter-spacing:.4px;text-transform:uppercase;}
+.sb-val{font-weight:600;color:var(--text);}
+.sb-val.up{color:var(--green);}
+.sb-val.dn{color:var(--red);}
+
 </style>
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 </head>
@@ -429,7 +456,7 @@ td:first-child,td:nth-child(2){text-align:left;}
 <!-- ─── MAIN APP ─── -->
 <div id="app" class="on">
   <div class="topbar">
-    <div class="tlogo"><div class="tlogo-mark">D</div>DeepFin <span>Hisse Tarama Aracı</span></div>
+    <div class="tlogo"><div class="tlogo-mark">D</div>DeepFin </span></div>
     <span class="tlive">Canlı</span>
     <div class="tsearch">
       <span class="tsearch-ico">⌕</span>
@@ -614,6 +641,13 @@ td:first-child,td:nth-child(2){text-align:left;}
 
     <!-- CONTENT -->
     <div class="content">
+      <!-- TICKER TAPE -->
+      <div class="ticker-wrap" id="ticker-wrap">
+        <div class="ticker-track" id="ticker-track">
+          <span class="ticker-empty">▶ TARA butonuna basarak hisse taraması başlatın</span>
+        </div>
+      </div>
+
       <div class="toolbar" id="toolbar" style="display:none">
         <div class="rcount"><strong id="resn">0</strong><span> / <span id="scann">0</span> hisse</span></div>
         <button class="tbl-scroll-btn" id="scroll-left" onclick="tblScroll(-300)" title="Sola kaydır">&#8249;</button>
@@ -636,9 +670,18 @@ td:first-child,td:nth-child(2){text-align:left;}
         </select>
       </div>
 
+      <!-- STATS BAR -->
+      <div class="stats-bar" id="stats-bar">
+        <div class="sb-item"><span class="sb-label">TARAMA</span><span class="sb-val" id="sb-count">—</span></div>
+        <div class="sb-item"><span class="sb-label">YÜKSELİŞ</span><span class="sb-val up" id="sb-up">—</span></div>
+        <div class="sb-item"><span class="sb-label">DÜŞÜŞ</span><span class="sb-val dn" id="sb-dn">—</span></div>
+        <div class="sb-item"><span class="sb-label">BORSA</span><span class="sb-val" id="sb-ex">—</span></div>
+        <div class="sb-item"><span class="sb-label">GÜNCELLEME</span><span class="sb-val" id="sb-time">—</span></div>
+      </div>
+
       <div class="cstate" id="empty">
         <div class="big">DEEPFIN</div>
-        <p>API bağlandı. Filtreleri ayarlayın ve <strong>▶ TARA</strong> butonuna tıklayın.</p>
+        <p>Gürültüyü kes, fırsatı gör.</p>
         <small id="empty-sub">Finnhub'dan canlı veri çekilecek</small>
       </div>
       <div class="cstate" id="loading" style="display:none">
@@ -1006,6 +1049,196 @@ td:first-child,td:nth-child(2){text-align:left;}
           <div class="picard"><div class="picard-name">MOMENTUM</div><div class="picard-desc">Her iki büyüme metriğinde güçlü ivme yakalayan hisseler.</div><div class="picard-rules"><span class="picard-rule">Gelir &gt;20%</span><span class="picard-rule">K.Büy &gt;20%</span></div></div>
         </div>
       </div>
+      <!-- ══════ TERİMLER SÖZLÜĞÜ ══════ -->
+      <div class="preset-info-wrap" style="margin-top:0;">
+        <div class="preset-info-title">📖 Terimler Sözlüğü</div>
+        <p style="font-size:12px;color:var(--text2);margin:0 0 16px 0;line-height:1.6;">DeepFin'de kullanılan tüm filtre, metrik ve kavramların açıklamaları.</p>
+
+        <!-- DEĞERLEMİE -->
+        <div class="icat" style="margin-bottom:0;">
+          <div class="icat-title">📊 Değerleme Metrikleri</div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">F/K — Fiyat/Kazanç</span><span class="iitem-eng">P/E — Price to Earnings</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> Hisse Fiyatı ÷ Hisse Başına Kâr (EPS)<br><strong>Ne gösterir:</strong> Yatırımcının şirketin 1 liralık kârı için kaç lira ödediği. Düşük F/K ucuzluğa işaret edebilir; ancak düşük büyüme beklentisi de F/K'yı düşürür. Sektörler arası kıyaslamada dikkatli olunmalı — teknoloji şirketlerinin F/K'sı bankalardan çok daha yüksek olabilir.</div>
+            <span class="iitem-tip tip-good">✓ 5–15 değer yatırımcısı için cazip</span>
+            <span class="iitem-tip tip-warn">△ 15–25 orta değerli</span>
+            <span class="iitem-tip tip-bad">✕ 25+ büyüme beklentisi fiyatlanmış</span>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">PEG — Büyümeye Göre F/K</span><span class="iitem-eng">Price/Earnings to Growth</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> F/K ÷ Kazanç Büyüme Oranı (%)<br><strong>Ne gösterir:</strong> Peter Lynch'in geliştirdiği bu oran, büyümeyi F/K'ya dahil ederek "büyümeye göre ucuz mu pahalı mı?" sorusunu yanıtlar. PEG &lt;1 altın fırsat olarak kabul edilir — şirket büyümesine kıyasla ucuz demektir. PEG = 1 adil değerlenmiş, PEG &gt;2 büyüme fiyatlanmış anlamına gelir.</div>
+            <span class="iitem-tip tip-good">✓ &lt;1 büyümeye göre ucuz — Lynch'in altın bölgesi</span>
+            <span class="iitem-tip tip-warn">△ 1–2 arası adil değerlenmiş</span>
+            <span class="iitem-tip tip-bad">✕ 2+ büyüme aşırı fiyatlanmış</span>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">PD/DD — Piyasa Değeri / Defter Değeri</span><span class="iitem-eng">P/B — Price to Book Value</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> Hisse Fiyatı ÷ Hisse Başına Özkaynak (Defter Değeri)<br><strong>Ne gösterir:</strong> Şirketin muhasebe kayıtlarındaki net varlıklarına göre kaç katına işlem gördüğünü gösterir. PD/DD &lt;1 teorik olarak "defter değerinin altında" demektir — tasfiye değerinden ucuz. Benjamin Graham'ın favori metriğidir. Maddi varlıkları az olan teknoloji şirketleri için anlamlılığı sınırlıdır.</div>
+            <span class="iitem-tip tip-good">✓ &lt;1 defter değeri altında — Graham bölgesi</span>
+            <span class="iitem-tip tip-warn">△ 1–3 normal aralık</span>
+            <span class="iitem-tip tip-bad">✕ 5+ maddi varlık az veya aşırı değerleme</span>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">F/S — Fiyat / Satışlar</span><span class="iitem-eng">P/S — Price to Sales</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> Piyasa Değeri ÷ Yıllık Satış Geliri<br><strong>Ne gösterir:</strong> Şirketin her 1 dolarlık satışı için piyasanın kaç dolar ödediği. Henüz kâr etmeyen büyüme şirketlerini değerlemek için kullanılır. Çok düşük marjlı sektörlerde (perakende, gıda) doğal olarak düşük kalır.</div>
+            <span class="iitem-tip tip-good">✓ &lt;1 satışlara göre ucuz</span>
+            <span class="iitem-tip tip-warn">△ 1–5 sektöre göre normal</span>
+            <span class="iitem-tip tip-bad">✕ 10+ büyüme beklentisi yüksek fiyatlanmış</span>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">Piyasa Değeri</span><span class="iitem-eng">Market Capitalization</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> Hisse Fiyatı × Toplam Hisse Sayısı<br><strong>Ne gösterir:</strong> Piyasanın şirkete biçtiği toplam değer. DeepFin'de USD cinsinden gösterilir; BIST hisseleri TRY'den, DAX hisseleri EUR'dan otomatik çevrilir. Büyüklük sınıflaması: &lt;$300M mikro, $300M–$2B küçük, $2B–$10B orta, $10B+ büyük ölçekli.</div>
+            <span class="iitem-tip tip-warn">△ Küçük ölçekli hisseler daha volatil, daha yüksek getiri potansiyeli taşıyabilir</span>
+          </div>
+        </div>
+
+        <!-- KARLILIK -->
+        <div class="icat" style="margin-bottom:0;margin-top:16px;">
+          <div class="icat-title">💰 Karlılık Metrikleri</div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">ROE — Özkaynak Karlılığı</span><span class="iitem-eng">Return on Equity</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> Net Kâr ÷ Ortalama Özkaynak × 100<br><strong>Ne gösterir:</strong> Şirketin hissedarların parasını ne kadar verimli kullandığı. Buffett'ın en önem verdiği metriklerden biri. Yüksek ROE, güçlü rekabet avantajının göstergesidir. Ancak aşırı borçla da ROE şişirilebilir — borç/özkaynak ile birlikte değerlendirilmeli.</div>
+            <span class="iitem-tip tip-bad">✕ %10 altı zayıf</span>
+            <span class="iitem-tip tip-warn">△ %10–20 orta</span>
+            <span class="iitem-tip tip-good">✓ %20+ güçlü rekabet avantajı sinyali</span>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">ROA — Varlık Karlılığı</span><span class="iitem-eng">Return on Assets</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> Net Kâr ÷ Toplam Varlıklar × 100<br><strong>Ne gösterir:</strong> Şirketin elindeki tüm varlıkları (hem özkaynak hem borçla finanse edilenler) ne kadar verimli kullandığı. Borç seviyesinden etkilenmez, bu yüzden ROE'ye göre daha "temiz" bir karlılık ölçüsüdür. Bankalar düşük ROA ile çalışır (%1–2 normal kabul edilir).</div>
+            <span class="iitem-tip tip-good">✓ %5+ genel sanayi için iyi</span>
+            <span class="iitem-tip tip-warn">△ Bankalar için %1–2 normal</span>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">Net Kar Marjı</span><span class="iitem-eng">Net Profit Margin TTM</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> Net Kâr ÷ Toplam Gelir × 100<br><strong>Ne gösterir:</strong> 100 liralık satıştan kaç lira net kâr kaldığı. Yüksek marj, fiyatlandırma gücünü ve operasyonel verimliliği gösterir. "TTM" son 12 ayı (Trailing Twelve Months) ifade eder — mevsimsellik etkisini azaltır.</div>
+            <span class="iitem-tip tip-bad">✕ %5 altı zayıf (sektöre bağlı)</span>
+            <span class="iitem-tip tip-good">✓ %15+ güçlü marj — fiyatlandırma gücü var</span>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">Piotroski F-Score</span><span class="iitem-eng">Piotroski Financial Score</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> 9 kriterlik puanlama sistemi (her kriter 0 veya 1 puan):<br>
+            <em>Karlılık (4 puan):</em> ROA pozitif mi? Faaliyet nakit akışı pozitif mi? ROA arttı mı? Nakit akışı &gt; Net kâr mı?<br>
+            <em>Kaldıraç/Likidite (3 puan):</em> Uzun vadeli borç azaldı mı? Cari oran arttı mı? Yeni hisse ihracı olmadı mı?<br>
+            <em>Verimlilik (2 puan):</em> Brüt marj arttı mı? Varlık devir hızı arttı mı?<br>
+            <strong>Ne gösterir:</strong> Bilançonun genel sağlığını ve kötüleşip iyileşmediğini ölçer. 8-9 mükemmel, 0-2 zayıf bilanço.</div>
+            <span class="iitem-tip tip-bad">✕ 0–2 zayıf bilanço, kısa pozisyon adayı</span>
+            <span class="iitem-tip tip-warn">△ 3–6 orta, nötr</span>
+            <span class="iitem-tip tip-good">✓ 7–9 güçlü bilanço — Piotroski'nin alım bölgesi</span>
+          </div>
+        </div>
+
+        <!-- BÜYÜME -->
+        <div class="icat" style="margin-bottom:0;margin-top:16px;">
+          <div class="icat-title">📈 Büyüme Metrikleri</div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">Gelir Büyümesi</span><span class="iitem-eng">Revenue Growth TTM YoY</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> (Bu yılın geliri − Geçen yılın geliri) ÷ Geçen yılın geliri × 100<br><strong>Ne gösterir:</strong> Son 12 ayda satış gelirinin yıldan yıla yüzde kaç büyüdüğü. Yüksek enflasyon ortamında nominal büyüme yanıltıcı olabilir — reel büyümeye (enflasyon çıkarılmış) bakmak daha sağlıklıdır. "YoY" (Year over Year) yıllık karşılaştırma anlamına gelir.</div>
+            <span class="iitem-tip tip-bad">✕ Negatif — gelir küçülüyor</span>
+            <span class="iitem-tip tip-warn">△ 0–10% zayıf büyüme</span>
+            <span class="iitem-tip tip-good">✓ %20+ güçlü büyüme şirketi</span>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">Kazanç Büyümesi (EPS)</span><span class="iitem-eng">EPS Growth TTM YoY</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> (Bu yılın EPS'i − Geçen yılın EPS'i) ÷ Geçen yılın EPS'i × 100<br><strong>Ne gösterir:</strong> Hisse başına kârın yıllık büyümesi. Gelir büyümesinden daha önemli kabul edilir çünkü şirketin kârlılık verimliliğini ölçer. Lynch, Minervini ve büyüme yatırımcıları bu metriğe en çok ağırlık verir. Negatif EPS büyümesi kâr sıkışması sinyalidir.</div>
+            <span class="iitem-tip tip-good">✓ %25+ Minervini/Lynch kriterleri — büyüme hissesi</span>
+            <span class="iitem-tip tip-bad">✕ Negatif kâr sıkışması var</span>
+          </div>
+        </div>
+
+        <!-- FİNANSAL SAĞLIK -->
+        <div class="icat" style="margin-bottom:0;margin-top:16px;">
+          <div class="icat-title">🏦 Finansal Sağlık & Temettü</div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">Temettü Verimi</span><span class="iitem-eng">Dividend Yield Indicated Annual</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> Hisse Başına Yıllık Temettü ÷ Hisse Fiyatı × 100<br><strong>Ne gösterir:</strong> Şu anki fiyatla hisseyi alırsanız yıllık ne kadar temettü getirisi alacağınız. "Indicated" ifadesi yönetim kurulunun açıkladığı beklenen temettüyü esas aldığını gösterir. Sürdürülebilirlik için ödeme oranına (payout ratio) bakılmalı — çok yüksek temettü bazen finansal sıkıntı sinyali olabilir.</div>
+            <span class="iitem-tip tip-warn">△ %15+ sürdürülebilirlik riski kontrol edilmeli</span>
+            <span class="iitem-tip tip-good">✓ %4–8 temettü yatırımcısı için cazip ve sürdürülebilir</span>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">B/Ö — Borç / Özkaynak</span><span class="iitem-eng">Debt to Equity — Total Debt / Total Equity</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> Toplam Borç ÷ Toplam Özkaynak × 100<br><strong>Ne gösterir:</strong> Şirketin faaliyetlerini ne ölçüde borçla finanse ettiği. Yüksek B/Ö faiz yükü ve iflas riskini artırır, ancak bazı sektörler (bankacılık, gayrimenkul, enerji altyapısı) yapısal olarak yüksek borçla çalışır. Bu sektörlerde sektör ortalamasıyla karşılaştırın.</div>
+            <span class="iitem-tip tip-good">✓ &lt;50 düşük borç yükü — Graham güvenli bölgesi</span>
+            <span class="iitem-tip tip-warn">△ 50–150 orta, sektöre bağlı normal</span>
+            <span class="iitem-tip tip-bad">✕ 200+ yüksek kaldıraç — faiz yükü riski</span>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">Cari Oran</span><span class="iitem-eng">Current Ratio Annual</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> Dönen Varlıklar ÷ Kısa Vadeli Borçlar<br><strong>Ne gösterir:</strong> Şirketin kısa vadeli (1 yıl içinde ödenecek) borçlarını karşılayabilme kapasitesi. 1'in altı, mevcut varlıklarının kısa vadeli borçlarını karşılayamayacağı anlamına gelir — likidite sıkışması riski. Graham minimum 2 olmasını şart koşuyordu.</div>
+            <span class="iitem-tip tip-bad">✕ &lt;1 likidite sıkıntısı riski</span>
+            <span class="iitem-tip tip-warn">△ 1–1.5 dikkatli izlenmeli</span>
+            <span class="iitem-tip tip-good">✓ 1.5–3 sağlıklı likidite</span>
+          </div>
+        </div>
+
+        <!-- TEKNİK -->
+        <div class="icat" style="margin-bottom:0;margin-top:16px;">
+          <div class="icat-title">⚡ Teknik & Fiyat Metrikleri</div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">52 Hafta Yüksek/Düşük Yüzdesi</span><span class="iitem-eng">52-Week High / Low %</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> Mevcut Fiyat ÷ 52 Haftalık Yüksek × 100<br><strong>Ne gösterir:</strong> Hissenin son bir yıldaki en yüksek seviyesine göre nerede olduğu. %80–100 arası "52 hafta zirvesine yakın" anlamına gelir — Minervini'nin SEPA stratejisinde bu güç işareti olarak aranır. %30'un altı derin düzeltme bölgesidir.</div>
+            <span class="iitem-tip tip-good">✓ %80–100 güç — momentum stratejisi için ideal</span>
+            <span class="iitem-tip tip-warn">△ %50–80 orta bölge</span>
+            <span class="iitem-tip tip-bad">✕ %30 altı derin düzeltme</span>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">Hacim (Lot)</span><span class="iitem-eng">Volume — Milyon Lot</span></div>
+            <div class="iitem-desc"><strong>Ne gösterir:</strong> Belirli bir günde el değiştiren hisse miktarı. Yüksek hacim, güçlü alıcı/satıcı ilgisini gösterir ve fiyat hareketlerinin "gerçekli" olduğunu teyit eder. Çok düşük hacimli hisselerde giriş/çıkış zor olabilir — likidite riski. Minervini, breakout'larda hacimin artmasını şart koşar.</div>
+            <span class="iitem-tip tip-warn">△ Düşük hacimli hisselerde yüksek spread ve likidite riski olabilir</span>
+          </div>
+        </div>
+
+        <!-- GENEL KAVRAMLAR -->
+        <div class="icat" style="margin-bottom:0;margin-top:16px;">
+          <div class="icat-title">🔑 Genel Kavramlar</div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">TTM — Son 12 Ay</span><span class="iitem-eng">Trailing Twelve Months</span></div>
+            <div class="iitem-desc">Son 12 aylık kümülatif veriyi ifade eder. Yıllık raporlar yerine en güncel 4 çeyreği toplar. Mevsimsel dalgalanmaları bastırır ve en güncel performans görüntüsünü verir. DeepFin'deki ROE, ROA, Marj, EPS Büyümesi gibi metrikler TTM bazlıdır.</div>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">YoY — Yıldan Yıla</span><span class="iitem-eng">Year over Year</span></div>
+            <div class="iitem-desc">Bu yılın aynı dönemini geçen yılın aynı dönemiyle kıyaslar. Mevsimsel etkilerden arındırılmış büyüme oranı sunar. "Gelir Büyümesi TTM YoY" = Son 12 ayın geliri, bir önceki 12 ayla karşılaştırılmış büyüme.</div>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">EPS — Hisse Başına Kâr</span><span class="iitem-eng">Earnings Per Share</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> Net Kâr ÷ Toplam Hisse Sayısı<br>Şirketin her bir hisse için ürettiği kâr miktarı. F/K hesaplamasının temel bileşenidir. "Dilute edilmiş EPS" stok opsiyonları ve varantlar gibi hisse seyrettirici araçları da hesaba katar — daha muhafazakâr bir ölçüdür.</div>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">Güvenlik Marjı</span><span class="iitem-eng">Margin of Safety</span></div>
+            <div class="iitem-desc">Benjamin Graham'ın temel ilkesi: İçsel değeri (intrinsic value) hesapla, piyasa fiyatı bundan önemli ölçüde düşükse al. Fark ne kadar büyükse güvenlik marjı o kadar geniş, hata payın o kadar fazla demektir. Değer yatırımının temel taşı.</div>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">Moat — Rekabet Avantajı</span><span class="iitem-eng">Economic Moat</span></div>
+            <div class="iitem-desc">Warren Buffett'ın popülerleştirdiği kavram: Bir şirketi rakiplerden koruyan ve uzun vadeli kârlılığını güvence altına alan sürdürülebilir avantajlar bütünü. Marka gücü (Coca-Cola), network etkisi (Visa), maliyet avantajı (Amazon), değiştirme maliyeti (Microsoft Office) moat örnekleridir. Yüksek ROE uzun süre devam ediyorsa güçlü moat işaretidir.</div>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">Breakout — Kırılım</span><span class="iitem-eng">Breakout</span></div>
+            <div class="iitem-desc">Hisse fiyatının önemli bir direnç seviyesini (önceki zirve, konsolidasyon bölgesi) yüksek hacimle aşması. Minervini SEPA stratejisinde, breakout sonrası pozisyon alınır. Yeterli hacim olmadan gerçekleşen kırılımlar "sahte kırılım" (false breakout) riski taşır.</div>
+          </div>
+        </div>
+
+      </div>
     </div>
   </div>
 </div>
@@ -1262,7 +1495,7 @@ function init(){
 }
 
 function showApp(){
-  document.getElementById('empty-sub').textContent = `500+ hisse taranacak · TradingView`;
+  document.getElementById('empty-sub').textContent = '';
 }
 
 // Sleep helper
@@ -1327,7 +1560,7 @@ async function runScan(){
   };
   const payload = {
     columns: COLUMNS_BY_EXCHANGE[currentExchange] || COLUMNS_BY_EXCHANGE.default,
-    range: [0, 1500],
+    range: [0, 3000],
     sort: { sortBy: 'market_cap_basic', sortOrder: 'desc' },
     ignore_unknown_fields: true
   };
@@ -1343,8 +1576,9 @@ async function runScan(){
     ];
     payload.range = [0, 503];
   }
-  // NASDAQ: sadece NASDAQ exchange hisseleri
+  // NASDAQ: sadece NASDAQ exchange hisseleri, 4500 limit
   if (currentExchange === 'nasdaq') {
+    payload.range = [0, 4500];
     payload.filter = [{ left: 'exchange', operation: 'equal', right: 'NASDAQ' }];
     payload.filter2 = {
       operator: 'and',
@@ -1353,6 +1587,41 @@ async function runScan(){
         { expression: { left: 'typespecs', operation: 'has', right: ['common'] } }
       ]
     };
+  }
+  // DAX: Frankfurt Borsası Prime Standard — DAX40 + MDAX50 + SDAX70 + TecDAX30 ≈ 190
+  if (currentExchange === 'dax') {
+    payload.filter2 = {
+      operator: 'and',
+      operands: [
+        { expression: { left: 'is_primary', operation: 'equal', right: true } },
+        { expression: { left: 'typespecs', operation: 'has', right: ['common'] } },
+        { expression: { left: 'exchange', operation: 'in_range', right: ['XETR', 'XETR'] } }
+      ]
+    };
+    payload.range = [0, 500];
+  }
+  // LSE: Ana pazar (Main Market) — birincil listeleme, adi hisse ~1400
+  if (currentExchange === 'lse') {
+    payload.filter2 = {
+      operator: 'and',
+      operands: [
+        { expression: { left: 'is_primary', operation: 'equal', right: true } },
+        { expression: { left: 'typespecs', operation: 'has', right: ['common'] } }
+      ]
+    };
+    payload.range = [0, 2000];
+  }
+  // Nikkei: Tokyo Borsası — birincil listeleme, adi hisse, TSE exchange
+  if (currentExchange === 'nikkei') {
+    payload.filter = [{ left: 'exchange', operation: 'equal', right: 'TSE' }];
+    payload.filter2 = {
+      operator: 'and',
+      operands: [
+        { expression: { left: 'is_primary', operation: 'equal', right: true } },
+        { expression: { left: 'typespecs', operation: 'has', right: ['common'] } }
+      ]
+    };
+    payload.range = [0, 4000];
   }
   // TradingView CORS: content-type header olmadan direkt fetch
   const res = await fetch(exCfg.tvUrl, {
@@ -1552,7 +1821,19 @@ async function runScan(){
 
     if(results.length === 0) throw new Error('Hiç hisse verisi işlenemedi');
 
-    allData = results;
+    // Duplicate temizleme — aynı sembolden en yüksek piyasa değerini tut
+    const seen = new Map();
+    results.forEach(function(s) {
+      var key = s.symbol;
+      if (!seen.has(key)) { seen.set(key, s); return; }
+      var existing = seen.get(key);
+      var newMcap = s.marketCapitalization || 0;
+      var exMcap  = existing.marketCapitalization || 0;
+      if (newMcap > exMcap) seen.set(key, s);
+    });
+    const dedupedResults = Array.from(seen.values());
+
+    allData = dedupedResults;
     const _exm = EXCHANGE_META[currentExchange]||EXCHANGE_META.bist;
     document.getElementById('scantime').textContent = `${_exm.flag} ${_exm.name} · ↻ ${new Date().toLocaleTimeString('tr-TR')} · ${results.length} hisse`;
     applyAndRender();
@@ -1924,6 +2205,8 @@ function applyAndRender(special){
 
   showState('twrap');
   renderTable();
+  updateStatsBar();
+  updateTicker();
 }
 
 function onSearch(){
@@ -2805,6 +3088,39 @@ function selectExchange(el) {
   // Otomatik tarama
   runScan();
 }
+
+function updateStatsBar() {
+  var bar = document.getElementById('stats-bar');
+  bar.classList.add('visible');
+  var upCount = filtered.filter(function(s){ return s.changePercent > 0; }).length;
+  var dnCount = filtered.filter(function(s){ return s.changePercent < 0; }).length;
+  var ex = (typeof EXCHANGE_META !== 'undefined' ? EXCHANGE_META[currentExchange] : null) || {};
+  var now = new Date();
+  var hh = String(now.getHours()).padStart(2,'0');
+  var mm = String(now.getMinutes()).padStart(2,'0');
+  var ss = String(now.getSeconds()).padStart(2,'0');
+  document.getElementById('sb-count').textContent = filtered.length;
+  document.getElementById('sb-up').textContent = '▲ ' + upCount;
+  document.getElementById('sb-dn').textContent = '▼ ' + dnCount;
+  document.getElementById('sb-ex').textContent = ex.name || currentExchange.toUpperCase();
+  document.getElementById('sb-time').textContent = hh + ':' + mm + ':' + ss;
+}
+
+function updateTicker() {
+  var track = document.getElementById('ticker-track');
+  if (!filtered.length) return;
+  var top = filtered.slice(0, 20);
+  var items = top.concat(top);
+  track.innerHTML = items.map(function(s) {
+    var chg = s.changePercent;
+    var cls = chg > 0 ? 'up' : (chg < 0 ? 'dn' : '');
+    var arrow = chg > 0 ? '▲' : (chg < 0 ? '▼' : '');
+    var px = s.currentPrice != null ? s.currentPrice.toFixed(2) : '—';
+    var chgStr = chg != null ? arrow + ' ' + Math.abs(chg).toFixed(2) + '%' : '—';
+    return '<span class="ticker-item"><span class="ticker-sym">' + (s.symbol || s.name) + '</span><span class="ticker-px">' + px + '</span><span class="ticker-chg ' + cls + '">' + chgStr + '</span></span>';
+  }).join('');
+}
+
 </script>
 </body>
 </html>
