@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>DeepFin — Hisse Tarama Aracı</title>
+<title>DeepFin</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -152,9 +152,17 @@ thead th:hover{color:var(--text);}
 thead th.sorted{color:var(--accent);}
 thead th.sorted::after{content:' ↓';font-size:9px;}
 thead th.sorted.asc::after{content:' ↑';}
-tbody tr{transition:background .08s;cursor:pointer;}tbody tr:nth-child(even){background:rgba(255,255,255,.015);}
-tbody tr:hover{background:rgba(59,130,246,.04);}
-tbody tr.selrow{background:rgba(59,130,246,.07);border-left:2px solid var(--accent);}
+tbody tr{transition:background .12s;cursor:pointer;}tbody tr:nth-child(even){background:rgba(255,255,255,.015);}
+tbody tr:hover{background:rgba(59,130,246,.1);}
+tbody tr:hover td{border-top:1px solid rgba(59,130,246,.25);border-bottom:1px solid rgba(59,130,246,.25);}
+tbody tr:hover .row-num{font-size:10px;color:var(--muted2);font-family:'JetBrains Mono',monospace;min-width:20px;display:inline-block;text-align:right;margin-right:8px;}
+.row-arrow{opacity:1;color:#60a5fa;}
+tbody tr.selrow{background:rgba(59,130,246,.12);}
+tbody tr.selrow td{border-left:none;}
+tbody tr.selrow td:first-child{border-left:3px solid var(--accent);}
+.row-num{font-size:10px;color:var(--text);font-family:'JetBrains Mono',monospace;min-width:20px;display:inline-block;text-align:right;margin-right:8px;}
+.row-arrow{color:#2a2a2a;font-size:16px;font-weight:900;transition:color .15s,transform .15s;margin-right:5px;display:inline-block;}
+tbody tr:hover .row-arrow{color:#60a5fa;transform:translateX(3px);}
 td{padding:6px 10px;text-align:right;font-size:12px;white-space:nowrap;color:var(--text);border-bottom:1px solid rgba(30,39,51,.7);}
 td:first-child,td:nth-child(2){text-align:left;}
 .sym{font-size:12px;font-weight:700;color:var(--text);letter-spacing:0;}
@@ -448,9 +456,119 @@ td:first-child,td:nth-child(2){text-align:left;}
 .sb-val.up{color:var(--green);}
 .sb-val.dn{color:var(--red);}
 
-/* ── FOOTER ── */
-.site-footer{background:var(--s1);border-top:1px solid var(--border);padding:24px 32px 0;flex-shrink:0;opacity:0;transform:translateY(16px);transition:opacity .5s ease,transform .5s ease;pointer-events:none;}
-.site-footer.footer-visible{opacity:1;transform:translateY(0);pointer-events:all;}
+
+/* ── HOMEPAGE ── */
+#homepage{display:flex;flex-direction:column;overflow-y:auto;flex:1;background:var(--bg);}
+#homepage::-webkit-scrollbar{width:4px;}
+#homepage::-webkit-scrollbar-thumb{background:#222;border-radius:2px;}
+.hp-hero{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 40px 40px;text-align:center;border-bottom:1px solid var(--border);background:radial-gradient(ellipse at 50% 0%,rgba(0,201,81,.06) 0%,transparent 65%);}
+.hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
+.hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
+.hp-badge{font-size:10px;font-weight:600;color:var(--green);background:rgba(0,201,81,.1);border:1px solid rgba(0,201,81,.2);padding:4px 12px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:20px;display:inline-flex;align-items:center;gap:6px;}
+.hp-badge::before{content:'';width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s ease-in-out infinite;}
+.hp-title{font-size:52px;font-weight:800;color:var(--text);letter-spacing:-2px;line-height:1.1;margin-bottom:16px;}
+.hp-title span{color:var(--green);}
+.hp-sub{font-size:16px;color:var(--text2);max-width:480px;line-height:1.7;margin-bottom:32px;}
+.hp-cta{display:flex;gap:12px;align-items:center;}
+.hp-cta-primary{background:var(--text);color:#000;border:none;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;font-family:'Geist',sans-serif;}
+.hp-cta-primary:hover{background:#d4d4d4;transform:translateY(-1px);}
+.hp-cta-secondary{background:transparent;color:var(--text2);border:1px solid var(--border);padding:12px 22px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;font-family:'Geist',sans-serif;}
+.hp-cta-secondary:hover{border-color:#333;color:var(--text);}
+
+.hp-stats{display:flex;gap:0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.hp-stat{flex:1;padding:20px 24px;border-right:1px solid var(--border);text-align:center;}
+.hp-stat:last-child{border-right:none;}
+.hp-stat-val{font-size:28px;font-weight:800;color:var(--text);font-family:'JetBrains Mono',monospace;letter-spacing:-1px;}
+.hp-stat-val span{color:var(--green);font-size:16px;}
+.hp-stat-label{font-size:11px;color:var(--muted2);margin-top:4px;}
+
+.hp-body{display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid var(--border);}
+.hp-section{padding:32px 40px;border-right:1px solid var(--border);}
+.hp-section:last-child{border-right:none;}
+.hp-section-title{font-size:11px;font-weight:600;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:8px;}
+.hp-section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.hp-exchange-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.hp-excard{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:12px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:4px;}
+.hp-excard:hover{border-color:#333;background:#0a0a0a;transform:translateY(-1px);}
+.hp-excard-flag{font-size:20px;}
+.hp-excard-name{font-size:12px;font-weight:700;color:var(--text);}
+.hp-excard-desc{font-size:10px;color:var(--muted2);}
+.hp-excard-count{font-size:10px;color:var(--green);font-family:'JetBrains Mono',monospace;margin-top:2px;}
+
+.hp-strategy-list{display:flex;flex-direction:column;gap:8px;}
+.hp-strategy{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:12px 14px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:12px;}
+.hp-strategy:hover{border-color:#333;background:#0a0a0a;}
+.hp-strategy-emoji{font-size:20px;width:28px;text-align:center;}
+.hp-strategy-info{flex:1;}
+.hp-strategy-name{font-size:12px;font-weight:700;color:var(--text);}
+.hp-strategy-desc{font-size:10px;color:var(--muted2);margin-top:2px;}
+.hp-strategy-arrow{color:var(--muted);font-size:14px;}
+
+.hp-nav-btn{background:transparent;border:none;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;padding:6px 12px;border-radius:6px;transition:all .15s;font-family:'Geist',sans-serif;}
+.hp-nav-btn:hover{background:var(--s2);color:var(--text);}
+.hp-nav-btn.active{color:var(--text);}
+
+/* ── ADV EXCHANGE BAR ── */
+.adv-exchange-bar{padding:10px 10px 6px;border-bottom:1px solid var(--border);background:var(--s1);}
+.adv-ex-label{font-size:9px;font-weight:600;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;}
+.adv-ex-pills{display:flex;flex-wrap:wrap;gap:4px;}
+.adv-ex-pill{font-size:10px;font-weight:600;padding:4px 8px;border:1px solid var(--border);border-radius:4px;color:var(--text2);cursor:pointer;transition:all .12s;background:var(--s2);white-space:nowrap;}
+.adv-ex-pill:hover{border-color:#444;color:var(--text);}
+.adv-ex-pill.on{border-color:var(--accent);color:var(--accent);background:rgba(59,130,246,.08);}
+
+/* ── HP DISCLAIMER ── */
+.hp-disclaimer{display:flex;align-items:flex-start;gap:12px;margin-top:28px;padding:16px 20px;background:rgba(240,180,41,.04);border:1px solid rgba(240,180,41,.15);border-radius:8px;max-width:680px;margin-left:auto;margin-right:auto;}
+.hp-disclaimer-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.hp-disclaimer p{font-size:11px;color:var(--muted2);line-height:1.75;margin:0;text-align:left;}
+.hp-disclaimer strong{color:var(--text2);font-weight:600;}
+
+/* ── HP HOW TO ── */
+.hp-howto{padding:40px 40px 36px;border-bottom:1px solid var(--border);text-align:center;}
+.hp-howto-title{font-size:11px;font-weight:600;color:var(--muted2);letter-spacing:.6px;text-transform:uppercase;margin-bottom:28px;}
+.hp-howto-steps{display:flex;align-items:flex-start;justify-content:center;gap:0;}
+.hp-howto-step{display:flex;flex-direction:column;align-items:center;gap:10px;width:180px;padding:24px 18px;background:var(--s1);border:1px solid var(--border);border-radius:12px;position:relative;transition:border-color .2s;}
+.hp-howto-step:hover{border-color:#333;}
+.hp-howto-num{position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:24px;height:24px;background:var(--green);border-radius:50%;font-size:11px;font-weight:800;color:#000;display:flex;align-items:center;justify-content:center;}
+.hp-howto-icon{font-size:32px;margin-top:6px;}
+.hp-howto-label{font-size:14px;font-weight:700;color:var(--text);}
+.hp-howto-desc{font-size:11px;color:var(--muted2);line-height:1.65;text-align:center;}
+.hp-howto-arrow{font-size:22px;color:var(--border);margin:0 10px;align-self:center;padding-bottom:24px;}
+
+/* ── HOMEPAGE FOOTER ── */
+.hp-footer{background:var(--s1);border-top:1px solid var(--border);padding:32px 40px 0;flex-shrink:0;}
+.hp-footer-top{display:flex;align-items:flex-start;gap:48px;margin-bottom:20px;}
+.hp-footer-bottom{border-top:1px solid var(--border);padding:14px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+.hp-footer-bottom span:first-child{font-size:11px;color:var(--muted2);}
+
+/* ── SIDEBAR TABS ── */
+.sb-tabs{display:flex;gap:4px;padding:10px 10px 0;flex-shrink:0;}
+.sb-tab{flex:1;padding:7px 6px;font-size:11px;font-weight:600;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--muted2);cursor:pointer;transition:all .15s;font-family:'Geist',sans-serif;letter-spacing:.2px;}
+.sb-tab:hover{color:var(--text);border-color:#333;}
+.sb-tab.active{background:var(--s2);color:var(--text);border-color:#333;}
+.sb-advanced-hint{font-size:10px;color:var(--muted2);background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.15);border-radius:5px;padding:7px 10px;margin:10px 10px 4px;line-height:1.5;}
+
+/* ── ONBOARDING ── */
+.onboarding{margin-top:32px;text-align:center;}
+.onb-title{font-size:11px;font-weight:600;color:var(--muted2);letter-spacing:.6px;text-transform:uppercase;margin-bottom:20px;}
+.onb-steps{display:flex;align-items:flex-start;gap:0;justify-content:center;}
+.onb-step{display:flex;flex-direction:column;align-items:center;gap:8px;width:160px;padding:20px 16px;background:var(--s1);border:1px solid var(--border);border-radius:10px;position:relative;transition:border-color .2s;}
+.onb-step:hover{border-color:#333;}
+.onb-num{position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:20px;height:20px;background:var(--green);border-radius:50%;font-size:10px;font-weight:700;color:#000;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;}
+.onb-icon{font-size:28px;margin-top:4px;}
+.onb-label{font-size:13px;font-weight:700;color:var(--text);}
+.onb-desc{font-size:11px;color:var(--muted2);line-height:1.6;text-align:center;}
+.onb-arrow{font-size:20px;color:var(--border);margin:0 8px;align-self:center;padding-bottom:20px;}
+
+
+.ad-slot{display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px dashed var(--border);border-radius:6px;background:var(--s2);color:var(--muted);font-size:10px;letter-spacing:.4px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;gap:4px;position:relative;overflow:hidden;}
+.ad-slot-label{font-size:9px;color:var(--muted);letter-spacing:.5px;opacity:.5;}
+.ad-slot-sidebar{width:100%;height:120px;margin-top:12px;}
+.ad-slot-ticker{width:100%;height:90px;border-left:none;border-right:none;border-radius:0;background:var(--s1);}
+.ad-slot-detail{width:100%;height:100px;border-radius:0;border-left:none;border-right:none;border-top:none;}
+
+.site-footer{display:none;}
+
 .footer-top{display:flex;align-items:flex-start;gap:48px;margin-bottom:20px;}
 .footer-brand{flex:0 0 200px;}
 .footer-logo{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:6px;color:var(--text);}
@@ -474,9 +592,11 @@ td:first-child,td:nth-child(2){text-align:left;}
 <!-- ─── MAIN APP ─── -->
 <div id="app" class="on">
   <div class="topbar">
-    <div class="tlogo"><div class="tlogo-mark">D</div>DeepFin <span>Hisse Tarama Aracı</span></div>
+    <div class="tlogo"><div class="tlogo-mark">D</div>DeepFin</div>
     <span class="tlive">Canlı</span>
-    <div class="tsearch">
+    <button class="hp-nav-btn active" id="nav-home" onclick="showHomepage()">Anasayfa</button>
+    <button class="hp-nav-btn" id="nav-tarama" onclick="showScreener()">Tarayıcı</button>
+    <div class="tsearch" id="topbar-search" style="display:none;">
       <span class="tsearch-ico">⌕</span>
       <input type="text" id="searchbox" placeholder="Sembol veya şirket ara..." oninput="onSearch()"/>
     </div>
@@ -493,166 +613,438 @@ td:first-child,td:nth-child(2){text-align:left;}
     </div>
   </div>
 
-  <div class="layout">
+
+  <!-- ─── HOMEPAGE ─── -->
+  <div id="homepage" style="display:none;">
+    <!-- HERO -->
+    <div class="hp-hero">
+      <div class="hp-logo-lockup">
+        <div class="tlogo-mark" style="width:36px;height:36px;font-size:20px;border-radius:8px;">D</div>
+        <span class="hp-logo-name">DeepFin</span>
+      </div>
+      <div class="hp-title">Gürültü yok,<br><span>fırsat var.</span></div>
+      <div class="hp-sub">Dünya borsalarındaki binlerce hisseyi Warren Buffett, Peter Lynch ve diğer efsanelerin stratejileriyle saniyeler içinde tara.</div>
+      <div class="hp-cta">
+        <button class="hp-cta-primary" onclick="showScreener()">▶ Taramaya Başla</button>
+        <button class="hp-cta-secondary" onclick="showScreener();openInfo()">📚 Bilgi Bankası</button>
+      </div>
+    </div>
+
+    <!-- NASIL KULLANILIR -->
+    <div class="hp-howto">
+      <div class="hp-howto-title">Nasıl Kullanılır?</div>
+      <div class="hp-howto-steps">
+        <div class="hp-howto-step">
+          <div class="hp-howto-num">1</div>
+          <div class="hp-howto-icon">🌍</div>
+          <div class="hp-howto-label">Borsa Seç</div>
+          <div class="hp-howto-desc">Soldaki panelden BIST, NASDAQ, S&P 500, DAX, LSE veya Nikkei'yi seç</div>
+        </div>
+        <div class="hp-howto-arrow">→</div>
+        <div class="hp-howto-step">
+          <div class="hp-howto-num">2</div>
+          <div class="hp-howto-icon">🐐</div>
+          <div class="hp-howto-label">Strateji Seç</div>
+          <div class="hp-howto-desc">Buffett, Lynch, Graham gibi bir yatırımcı stratejisi veya hazır filtre seç</div>
+        </div>
+        <div class="hp-howto-arrow">→</div>
+        <div class="hp-howto-step">
+          <div class="hp-howto-num">3</div>
+          <div class="hp-howto-icon">▶</div>
+          <div class="hp-howto-label">TARA'ya Bas</div>
+          <div class="hp-howto-desc">Sağ üstteki TARA butonuna bas, binlerce hisse saniyeler içinde filtrelenir</div>
+        </div>
+      </div>
+
+      <!-- YASAL UYARI -->
+      <div class="hp-disclaimer">
+        <span class="hp-disclaimer-icon">⚖️</span>
+        <p>DeepFin'de sunulan tüm veriler, filtreler ve stratejiler yalnızca <strong>bilgilendirme amaçlıdır</strong>. Bu platform herhangi bir finansal araç için alım, satım veya elde tutma tavsiyesi vermez; yatırım danışmanlığı hizmeti sunmaz. Geçmiş performans gelecekteki sonuçların garantisi değildir. Yatırım kararlarınızı almadan önce lisanslı bir finansal danışmana başvurmanızı tavsiye ederiz. Tüm yatırım işlemleri kullanıcının kendi sorumluluğundadır.</p>
+      </div>
+
+    </div>
+
+    <!-- STATS -->
+    <div class="hp-stats">
+      <div class="hp-stat">
+        <div class="hp-stat-val">6 <span>borsa</span></div>
+        <div class="hp-stat-label">BIST · NASDAQ · S&P500 · DAX · LSE · Nikkei</div>
+      </div>
+      <div class="hp-stat">
+        <div class="hp-stat-val">10.000<span>+</span></div>
+        <div class="hp-stat-label">Taranan hisse senedi</div>
+      </div>
+      <div class="hp-stat">
+        <div class="hp-stat-val">9 <span>strateji</span></div>
+        <div class="hp-stat-label">Buffett · Lynch · Graham · Minervini ve daha fazlası</div>
+      </div>
+      <div class="hp-stat">
+        <div class="hp-stat-val">0 <span>₺</span></div>
+        <div class="hp-stat-label">Ücretsiz — kayıt gerekmez</div>
+      </div>
+    </div>
+
+    <!-- BODY -->
+    <div class="hp-body">
+      <!-- Borsalar -->
+      <div class="hp-section">
+        <div class="hp-section-title">Borsalar</div>
+        <div class="hp-exchange-grid">
+          <div class="hp-excard" onclick="selectExchangeAndGo('bist')">
+            <div class="hp-excard-flag">🇹🇷</div>
+            <div class="hp-excard-name">BIST</div>
+            <div class="hp-excard-desc">Borsa İstanbul</div>
+            <div class="hp-excard-count">~500 hisse</div>
+          </div>
+          <div class="hp-excard" onclick="selectExchangeAndGo('nasdaq')">
+            <div class="hp-excard-flag">🇺🇸</div>
+            <div class="hp-excard-name">NASDAQ</div>
+            <div class="hp-excard-desc">Teknoloji ağırlıklı</div>
+            <div class="hp-excard-count">~3000 hisse</div>
+          </div>
+          <div class="hp-excard" onclick="selectExchangeAndGo('sp500')">
+            <div class="hp-excard-flag">🇺🇸</div>
+            <div class="hp-excard-name">S&P 500</div>
+            <div class="hp-excard-desc">ABD endeksi</div>
+            <div class="hp-excard-count">503 hisse</div>
+          </div>
+          <div class="hp-excard" onclick="selectExchangeAndGo('dax')">
+            <div class="hp-excard-flag">🇩🇪</div>
+            <div class="hp-excard-name">DAX</div>
+            <div class="hp-excard-desc">Frankfurt</div>
+            <div class="hp-excard-count">~500 hisse</div>
+          </div>
+          <div class="hp-excard" onclick="selectExchangeAndGo('lse')">
+            <div class="hp-excard-flag">🇬🇧</div>
+            <div class="hp-excard-name">LSE</div>
+            <div class="hp-excard-desc">Londra</div>
+            <div class="hp-excard-count">~2000 hisse</div>
+          </div>
+          <div class="hp-excard" onclick="selectExchangeAndGo('nikkei')">
+            <div class="hp-excard-flag">🇯🇵</div>
+            <div class="hp-excard-name">Nikkei</div>
+            <div class="hp-excard-desc">Tokyo</div>
+            <div class="hp-excard-count">~4000 hisse</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stratejiler -->
+      <div class="hp-section">
+        <div class="hp-section-title">Popüler Stratejiler</div>
+        <div class="hp-strategy-list">
+          <div class="hp-strategy" onclick="applyStrategyAndGo('buffett')">
+            <div class="hp-strategy-emoji">🎯</div>
+            <div class="hp-strategy-info">
+              <div class="hp-strategy-name">Warren Buffett</div>
+              <div class="hp-strategy-desc">Değer yatırımı · Güçlü marka · Düşük borç · Yüksek ROE</div>
+            </div>
+            <div class="hp-strategy-arrow">›</div>
+          </div>
+          <div class="hp-strategy" onclick="applyStrategyAndGo('lynch')">
+            <div class="hp-strategy-emoji">📈</div>
+            <div class="hp-strategy-info">
+              <div class="hp-strategy-name">Peter Lynch — PEG</div>
+              <div class="hp-strategy-desc">Büyüme + değer · PEG &lt; 1 · Anlaşılır şirketler</div>
+            </div>
+            <div class="hp-strategy-arrow">›</div>
+          </div>
+          <div class="hp-strategy" onclick="applyStrategyAndGo('graham')">
+            <div class="hp-strategy-emoji">📚</div>
+            <div class="hp-strategy-info">
+              <div class="hp-strategy-name">Benjamin Graham</div>
+              <div class="hp-strategy-desc">Derin değer · Güvenlik marjı · F/K &lt; 10</div>
+            </div>
+            <div class="hp-strategy-arrow">›</div>
+          </div>
+          <div class="hp-strategy" onclick="applyStrategyAndGo('minervini')">
+            <div class="hp-strategy-emoji">⚡</div>
+            <div class="hp-strategy-info">
+              <div class="hp-strategy-name">Mark Minervini — SEPA</div>
+              <div class="hp-strategy-desc">Momentum · EPS büyümesi · 52H zirvesine yakın</div>
+            </div>
+            <div class="hp-strategy-arrow">›</div>
+          </div>
+          <div class="hp-strategy" onclick="applyStrategyAndGo('piotroski')">
+            <div class="hp-strategy-emoji">🏆</div>
+            <div class="hp-strategy-info">
+              <div class="hp-strategy-name">Piotroski F-Score</div>
+              <div class="hp-strategy-desc">Bilanço sağlığı · 9 kriter · F-Score 7–9</div>
+            </div>
+            <div class="hp-strategy-arrow">›</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SPACER — scroll için boşluk -->
+    <div style="height:120px; flex-shrink:0;"></div>
+
+    <!-- HOMEPAGE FOOTER -->
+    <footer class="hp-footer">
+      <div class="hp-footer-top">
+        <div class="footer-brand">
+          <div class="footer-logo"><div class="tlogo-mark">D</div>DeepFin</div>
+          <p class="footer-tagline">Gürültü yok, fırsat var.</p>
+          <p class="footer-desc">Dünya borsaları için gerçek zamanlı veri.</p>
+        </div>
+        <div class="footer-links-group">
+          <div class="footer-col">
+            <div class="footer-col-title">Platform</div>
+            <a class="footer-link" onclick="showScreener();openInfo()">Bilgi Bankası</a>
+            <a class="footer-link" onclick="showScreener();openInfo()">GOAT Stratejileri</a>
+            <a class="footer-link" onclick="showScreener();openInfo()">Terimler Sözlüğü</a>
+            <a class="footer-link" onclick="showScreener();openInfo()">Filtre Presetleri</a>
+          </div>
+          <div class="footer-col">
+            <div class="footer-col-title">Hakkımızda</div>
+            <a class="footer-link" onclick="showFooterModal('about')">Hakkımızda</a>
+            <a class="footer-link" onclick="showFooterModal('mission')">Misyon &amp; Vizyon</a>
+            <a class="footer-link" onclick="showFooterModal('contact')">İletişim</a>
+            <a class="footer-link" onclick="openSupport()">Destek Ol ❤️</a>
+          </div>
+          <div class="footer-col">
+            <div class="footer-col-title">Yasal</div>
+            <a class="footer-link" onclick="showFooterModal('disclaimer')">Yasal Uyarı</a>
+            <a class="footer-link" onclick="showFooterModal('privacy')">Gizlilik Politikası</a>
+            <a class="footer-link" onclick="showFooterModal('terms')">Kullanım Koşulları</a>
+            <a class="footer-link" onclick="showFooterModal('cookies')">Çerez Politikası</a>
+          </div>
+        </div>
+      </div>
+      <div class="hp-footer-bottom">
+        <span>© 2026 DeepFin. Tüm hakları saklıdır.</span>
+        <span class="footer-disclaimer-short">Bu platform yatırım tavsiyesi vermez. Tüm veriler bilgi amaçlıdır.</span>
+      </div>
+    </footer>
+
+  </div>
+
+  <div class="layout" id="screener-layout" style="display:none;">
     <!-- SIDEBAR -->
     <div class="sidebar">
 
-      <div class="exchange-group">
-        <div class="exchange-title">Borsa</div>
-        <div class="exchange-grid">
-          <div class="exbtn on" data-exchange="bist" onclick="selectExchange(this)">
-            <span class="exbtn-flag">🇹🇷</span>
-            <span class="exbtn-name">BIST</span>
-            <span class="exbtn-sub">Borsa İstanbul</span>
-          </div>
-          <div class="exbtn" data-exchange="nasdaq" onclick="selectExchange(this)">
-            <span class="exbtn-flag">🇺🇸</span>
-            <span class="exbtn-name">NASDAQ</span>
-            <span class="exbtn-sub">Tech Ağırlıklı</span>
-          </div>
-          <div class="exbtn" data-exchange="sp500" onclick="selectExchange(this)">
-            <span class="exbtn-flag">🇺🇸</span>
-            <span class="exbtn-name">S&P 500</span>
-            <span class="exbtn-sub">ABD Endeksi</span>
-          </div>
-          <div class="exbtn" data-exchange="dax" onclick="selectExchange(this)">
-            <span class="exbtn-flag">🇩🇪</span>
-            <span class="exbtn-name">DAX</span>
-            <span class="exbtn-sub">Frankfurt</span>
-          </div>
-          <div class="exbtn" data-exchange="lse" onclick="selectExchange(this)">
-            <span class="exbtn-flag">🇬🇧</span>
-            <span class="exbtn-name">LSE</span>
-            <span class="exbtn-sub">Londra</span>
-          </div>
-          <div class="exbtn" data-exchange="nikkei" onclick="selectExchange(this)">
-            <span class="exbtn-flag">🇯🇵</span>
-            <span class="exbtn-name">Nikkei</span>
-            <span class="exbtn-sub">Tokyo</span>
+      <!-- SIDEBAR TABS -->
+      <div class="sb-tabs">
+        <button class="sb-tab active" id="sb-tab-basic" onclick="switchSbTab('basic')">⚡ Başlangıç</button>
+        <button class="sb-tab" id="sb-tab-advanced" onclick="switchSbTab('advanced')">🔬 Gelişmiş</button>
+      </div>
+
+      <!-- ── TAB 1: BAŞLANGIÇ ── -->
+      <div id="sb-panel-basic">
+
+        <div class="exchange-group">
+          <div class="exchange-title">Borsa</div>
+          <div class="exchange-grid">
+            <div class="exbtn on" data-exchange="bist" onclick="selectExchange(this)">
+              <span class="exbtn-flag">🇹🇷</span><span class="exbtn-name">BIST</span><span class="exbtn-sub">Borsa İstanbul</span>
+            </div>
+            <div class="exbtn" data-exchange="nasdaq" onclick="selectExchange(this)">
+              <span class="exbtn-flag">🇺🇸</span><span class="exbtn-name">NASDAQ</span><span class="exbtn-sub">Tech Ağırlıklı</span>
+            </div>
+            <div class="exbtn" data-exchange="sp500" onclick="selectExchange(this)">
+              <span class="exbtn-flag">🇺🇸</span><span class="exbtn-name">S&P 500</span><span class="exbtn-sub">ABD Endeksi</span>
+            </div>
+            <div class="exbtn" data-exchange="dax" onclick="selectExchange(this)">
+              <span class="exbtn-flag">🇩🇪</span><span class="exbtn-name">DAX</span><span class="exbtn-sub">Frankfurt</span>
+            </div>
+            <div class="exbtn" data-exchange="lse" onclick="selectExchange(this)">
+              <span class="exbtn-flag">🇬🇧</span><span class="exbtn-name">LSE</span><span class="exbtn-sub">Londra</span>
+            </div>
+            <div class="exbtn" data-exchange="nikkei" onclick="selectExchange(this)">
+              <span class="exbtn-flag">🇯🇵</span><span class="exbtn-name">Nikkei</span><span class="exbtn-sub">Tokyo</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="filter-group">
-        <div class="filter-group-title">🐐 GOAT Yatırımcı ve Traderlar</div>
-        <div class="chips" id="goat-chips">
-          <div class="chip goat-chip" data-goat="buffett">Buffett</div>
-          <div class="chip goat-chip" data-goat="graham">Graham</div>
-          <div class="chip goat-chip" data-goat="lynch">Lynch PEG</div>
-          <div class="chip goat-chip" data-goat="ark">Ark/Wood</div>
-          <div class="chip goat-chip" data-goat="minervini">Minervini</div>
-          <div class="chip goat-chip" data-goat="piotroski">Piotroski</div>
+        <button class="clrbtn" onclick="clearFilters()" id="clrbtn" style="display:none;">✕ Filtreleri Temizle</button>
+
+        <div class="filter-group">
+          <div class="filter-group-title">🏭 Sektör</div>
+          <select id="sector_filter" onchange="syncSectorAndFilter('basic')" style="width:100%;background:var(--s2);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:5px 8px;font-size:11px;cursor:pointer;">
+            <option value="">— Tümü —</option>
+            <option value="Teknoloji">Teknoloji</option>
+            <option value="Finans">Finans</option>
+            <option value="Finansal Hizmetler">Finansal Hizmetler</option>
+            <option value="Sağlık">Sağlık</option>
+            <option value="Sağlık Teknolojisi">Sağlık Teknolojisi</option>
+            <option value="Enerji">Enerji</option>
+            <option value="Enerji &amp; Maden">Enerji &amp; Maden</option>
+            <option value="Sanayi">Sanayi</option>
+            <option value="Üretim Sanayi">Üretim Sanayi</option>
+            <option value="Döngüsel Tüketim">Döngüsel Tüketim</option>
+            <option value="Savunmacı Tüketim">Savunmacı Tüketim</option>
+            <option value="Gayrimenkul">Gayrimenkul</option>
+            <option value="Temel Malzemeler">Temel Malzemeler</option>
+            <option value="İletişim Hizmetleri">İletişim Hizmetleri</option>
+            <option value="Kamu Hizmetleri">Kamu Hizmetleri</option>
+            <option value="Ulaşım">Ulaşım</option>
+            <option value="Holding">Holding</option>
+            <option value="Bankacılık">Bankacılık</option>
+            <option value="Sigorta">Sigorta</option>
+            <option value="İlaç">İlaç</option>
+            <option value="Kimya">Kimya</option>
+            <option value="İnşaat">İnşaat</option>
+            <option value="Tekstil">Tekstil</option>
+            <option value="Gıda &amp; İçecek">Gıda &amp; İçecek</option>
+            <option value="Perakende">Perakende</option>
+          </select>
         </div>
-        <div class="goat-info" id="goat-info"></div>
-        <div class="filter-group-title" style="margin-top:10px;">🏦 GOAT Fonlar</div>
-        <div class="chips" id="goat-fund-chips">
-          <div class="chip goat-chip goat-fund-chip" data-goat="citadel">Citadel</div>
-          <div class="chip goat-chip goat-fund-chip" data-goat="deshaw">D.E. Shaw</div>
-          <div class="chip goat-chip goat-fund-chip" data-goat="millennium">Millennium</div>
+
+        <div class="filter-group">
+          <div class="filter-group-title">🐐 GOAT Yatırımcı ve Traderlar</div>
+          <div class="chips" id="goat-chips">
+            <div class="chip goat-chip" data-goat="buffett">Buffett</div>
+            <div class="chip goat-chip" data-goat="graham">Graham</div>
+            <div class="chip goat-chip" data-goat="lynch">Lynch PEG</div>
+            <div class="chip goat-chip" data-goat="ark">Ark/Wood</div>
+            <div class="chip goat-chip" data-goat="minervini">Minervini</div>
+            <div class="chip goat-chip" data-goat="piotroski">Piotroski</div>
+          </div>
+          <div class="goat-info" id="goat-info"></div>
+          <div class="filter-group-title" style="margin-top:10px;">🏦 GOAT Fonlar</div>
+          <div class="chips" id="goat-fund-chips">
+            <div class="chip goat-chip goat-fund-chip" data-goat="citadel">Citadel</div>
+            <div class="chip goat-chip goat-fund-chip" data-goat="deshaw">D.E. Shaw</div>
+            <div class="chip goat-chip goat-fund-chip" data-goat="millennium">Millennium</div>
+          </div>
+          <div class="goat-info" id="goat-fund-info"></div>
         </div>
-        <div class="goat-info" id="goat-fund-info"></div>
-      </div>
 
-      <div class="filter-group">
-        <div class="filter-group-title">📊 Hazır Temel Analiz</div>
-        <div class="presets chips" id="presets">
-          <div class="chip" data-preset="value">Değer</div>
-          <div class="chip" data-preset="growth">Büyüme</div>
-          <div class="chip" data-preset="dividend">Temettü</div>
-          <div class="chip" data-preset="quality">Kaliteli</div>
-          <div class="chip" data-preset="lowdebt">Az Borç</div>
-          <div class="chip" data-preset="momentum">Momentum</div>
+        <div class="filter-group">
+          <div class="filter-group-title">📊 Hazır Temel Analiz</div>
+          <div class="presets chips" id="presets">
+            <div class="chip" data-preset="value">Değer</div>
+            <div class="chip" data-preset="growth">Büyüme</div>
+            <div class="chip" data-preset="dividend">Temettü</div>
+            <div class="chip" data-preset="quality">Kaliteli</div>
+            <div class="chip" data-preset="lowdebt">Az Borç</div>
+            <div class="chip" data-preset="momentum">Momentum</div>
+          </div>
+          <div class="goat-info" id="preset-info"></div>
+          <div class="filter-group-title" style="margin-top:10px;">📈 Hazır Teknik Analiz</div>
+          <div class="presets chips" id="tech-presets">
+            <div class="chip tech-chip" data-tech="breakout">Breakout</div>
+            <div class="chip tech-chip" data-tech="oversold">Aşırı Satım</div>
+            <div class="chip tech-chip" data-tech="nearHigh">Zirveye Yakın</div>
+            <div class="chip tech-chip" data-tech="pullback">Geri Çekilme</div>
+            <div class="chip tech-chip" data-tech="strongDay">Güçlü Gün</div>
+            <div class="chip tech-chip" data-tech="highVolume">Yüksek Hacim</div>
+          </div>
+          <div class="goat-info" id="tech-preset-info"></div>
         </div>
-        <div class="goat-info" id="preset-info"></div>
-        <div class="filter-group-title" style="margin-top:10px;">📈 Hazır Teknik Analiz</div>
-        <div class="presets chips" id="tech-presets">
-          <div class="chip tech-chip" data-tech="breakout">Breakout</div>
-          <div class="chip tech-chip" data-tech="oversold">Aşırı Satım</div>
-          <div class="chip tech-chip" data-tech="nearHigh">Zirveye Yakın</div>
-          <div class="chip tech-chip" data-tech="pullback">Geri Çekilme</div>
-          <div class="chip tech-chip" data-tech="strongDay">Güçlü Gün</div>
-          <div class="chip tech-chip" data-tech="highVolume">Yüksek Hacim</div>
+
+        <!-- AD SLOT 1: Sidebar alt -->
+        <div class="ad-slot ad-slot-sidebar" id="ad-sidebar">
+          <span>Reklam</span>
+          <span class="ad-slot-label">300 × 120 · Carbon Ads / AdSense</span>
         </div>
-        <div class="goat-info" id="tech-preset-info"></div>
+
       </div>
 
-      <div class="filter-group">
-        <div class="filter-group-title">🏭 Sektör</div>
-        <select id="sector_filter" onchange="liveFilter()" style="width:100%;background:var(--s2);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:5px 8px;font-size:11px;cursor:pointer;">
-          <option value="">— Tümü —</option>
-          <option value="Teknoloji">Teknoloji</option>
-          <option value="Finans">Finans</option>
-          <option value="Finansal Hizmetler">Finansal Hizmetler</option>
-          <option value="Sağlık">Sağlık</option>
-          <option value="Sağlık Teknolojisi">Sağlık Teknolojisi</option>
-          <option value="Enerji">Enerji</option>
-          <option value="Enerji &amp; Maden">Enerji &amp; Maden</option>
-          <option value="Sanayi">Sanayi</option>
-          <option value="Üretim Sanayi">Üretim Sanayi</option>
-          <option value="Döngüsel Tüketim">Döngüsel Tüketim</option>
-          <option value="Savunmacı Tüketim">Savunmacı Tüketim</option>
-          <option value="Gayrimenkul">Gayrimenkul</option>
-          <option value="Temel Malzemeler">Temel Malzemeler</option>
-          <option value="İletişim Hizmetleri">İletişim Hizmetleri</option>
-          <option value="Kamu Hizmetleri">Kamu Hizmetleri</option>
-          <option value="Ulaşım">Ulaşım</option>
-          <option value="Holding">Holding</option>
-          <option value="Bankacılık">Bankacılık</option>
-          <option value="Sigorta">Sigorta</option>
-          <option value="İlaç">İlaç</option>
-          <option value="Kimya">Kimya</option>
-          <option value="İnşaat">İnşaat</option>
-          <option value="Tekstil">Tekstil</option>
-          <option value="Gıda &amp; İçecek">Gıda &amp; İçecek</option>
-          <option value="Perakende">Perakende</option>
-        </select>
-      </div>
+      <!-- ── TAB 2: GELİŞMİŞ ── -->
+      <div id="sb-panel-advanced" style="display:none;">
 
-      <button class="clrbtn" onclick="clearFilters()" id="clrbtn" style="display:none;">✕ Filtreleri Temizle</button>
+        <!-- Borsa seçici — aynı grid tasarımı -->
+        <div class="exchange-group">
+          <div class="exchange-title">Borsa</div>
+          <div class="exchange-grid" id="adv-ex-grid">
+            <div class="exbtn on" data-exchange="bist"   onclick="advSelectExchange(this)"><span class="exbtn-flag">🇹🇷</span><span class="exbtn-name">BIST</span><span class="exbtn-sub">Borsa İstanbul</span></div>
+            <div class="exbtn"    data-exchange="nasdaq" onclick="advSelectExchange(this)"><span class="exbtn-flag">🇺🇸</span><span class="exbtn-name">NASDAQ</span><span class="exbtn-sub">Tech Ağırlıklı</span></div>
+            <div class="exbtn"    data-exchange="sp500"  onclick="advSelectExchange(this)"><span class="exbtn-flag">🇺🇸</span><span class="exbtn-name">S&P 500</span><span class="exbtn-sub">ABD Endeksi</span></div>
+            <div class="exbtn"    data-exchange="dax"    onclick="advSelectExchange(this)"><span class="exbtn-flag">🇩🇪</span><span class="exbtn-name">DAX</span><span class="exbtn-sub">Frankfurt</span></div>
+            <div class="exbtn"    data-exchange="lse"    onclick="advSelectExchange(this)"><span class="exbtn-flag">🇬🇧</span><span class="exbtn-name">LSE</span><span class="exbtn-sub">Londra</span></div>
+            <div class="exbtn"    data-exchange="nikkei" onclick="advSelectExchange(this)"><span class="exbtn-flag">🇯🇵</span><span class="exbtn-name">Nikkei</span><span class="exbtn-sub">Tokyo</span></div>
+          </div>
+        </div>
 
-      <div class="filter-group">
-        <div class="filter-group-title">Değerleme</div>
-        <div class="frow"><div class="flbl">F/K — Fiyat / Kazanç <small>min / max</small></div><div class="finps"><input type="number" id="pe_min" placeholder="—" oninput="liveFilter()"><input type="number" id="pe_max" placeholder="—" oninput="liveFilter()"></div></div>
-        <div class="frow"><div class="flbl">PD/DD — Piyasa / Defter Değeri</div><div class="finps"><input type="number" id="pb_min" placeholder="—" oninput="liveFilter()"><input type="number" id="pb_max" placeholder="—" oninput="liveFilter()"></div></div>
-        <div class="frow"><div class="flbl">F/S — Fiyat / Satış</div><div class="finps"><input type="number" id="ps_min" placeholder="—" oninput="liveFilter()"><input type="number" id="ps_max" placeholder="—" oninput="liveFilter()"></div></div>
-      </div>
+        <div class="sb-advanced-hint">Manuel filtreler tarama sonrası anlık çalışır. Önce ▶ TARA'ya bas.</div>
 
-      <div class="filter-group">
-        <div class="filter-group-title">Karlılık</div>
-        <div class="frow"><div class="flbl">ROE — Özkaynak Kârlılığı %</div><div class="finps"><input type="number" id="roe_min" placeholder="—" oninput="liveFilter()"><input type="number" id="roe_max" placeholder="—" oninput="liveFilter()"></div></div>
-        <div class="frow"><div class="flbl">ROA — Varlık Kârlılığı %</div><div class="finps"><input type="number" id="roa_min" placeholder="—" oninput="liveFilter()"><input type="number" id="roa_max" placeholder="—" oninput="liveFilter()"></div></div>
-        <div class="frow"><div class="flbl">Net Kar Marjı %</div><div class="finps"><input type="number" id="margin_min" placeholder="—" oninput="liveFilter()"><input type="number" id="margin_max" placeholder="—" oninput="liveFilter()"></div></div>
-      </div>
+        <button class="clrbtn" onclick="clearFilters()" id="clrbtn-adv" style="display:none;">✕ Filtreleri Temizle</button>
 
-      <div class="filter-group">
-        <div class="filter-group-title">Büyüme</div>
-        <div class="frow"><div class="flbl">Gelir Büyümesi % YoY</div><div class="finps"><input type="number" id="revg_min" placeholder="—" oninput="liveFilter()"><input type="number" id="revg_max" placeholder="—" oninput="liveFilter()"></div></div>
-        <div class="frow"><div class="flbl">Kazanç Büyümesi % YoY</div><div class="finps"><input type="number" id="earng_min" placeholder="—" oninput="liveFilter()"><input type="number" id="earng_max" placeholder="—" oninput="liveFilter()"></div></div>
-      </div>
+        <div class="filter-group">
+          <div class="filter-group-title">🏭 Sektör</div>
+          <select id="sector_filter_adv" onchange="syncSectorAndFilter('adv')" style="width:100%;background:var(--s2);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:5px 8px;font-size:11px;cursor:pointer;">
+            <option value="">— Tümü —</option>
+            <option value="Teknoloji">Teknoloji</option>
+            <option value="Finans">Finans</option>
+            <option value="Finansal Hizmetler">Finansal Hizmetler</option>
+            <option value="Sağlık">Sağlık</option>
+            <option value="Sağlık Teknolojisi">Sağlık Teknolojisi</option>
+            <option value="Enerji">Enerji</option>
+            <option value="Enerji &amp; Maden">Enerji &amp; Maden</option>
+            <option value="Sanayi">Sanayi</option>
+            <option value="Üretim Sanayi">Üretim Sanayi</option>
+            <option value="Döngüsel Tüketim">Döngüsel Tüketim</option>
+            <option value="Savunmacı Tüketim">Savunmacı Tüketim</option>
+            <option value="Gayrimenkul">Gayrimenkul</option>
+            <option value="Temel Malzemeler">Temel Malzemeler</option>
+            <option value="İletişim Hizmetleri">İletişim Hizmetleri</option>
+            <option value="Kamu Hizmetleri">Kamu Hizmetleri</option>
+            <option value="Ulaşım">Ulaşım</option>
+            <option value="Holding">Holding</option>
+            <option value="Bankacılık">Bankacılık</option>
+            <option value="Sigorta">Sigorta</option>
+            <option value="İlaç">İlaç</option>
+            <option value="Kimya">Kimya</option>
+            <option value="İnşaat">İnşaat</option>
+            <option value="Tekstil">Tekstil</option>
+            <option value="Gıda &amp; İçecek">Gıda &amp; İçecek</option>
+            <option value="Perakende">Perakende</option>
+          </select>
+        </div>
 
-      <div class="filter-group">
-        <div class="filter-group-title">Temettü & Sağlık</div>
-        <div class="frow"><div class="flbl">Temettü Verimi %</div><div class="finps"><input type="number" id="div_min" placeholder="—" oninput="liveFilter()"><input type="number" id="div_max" placeholder="—" oninput="liveFilter()"></div></div>
-        <div class="frow"><div class="flbl">Borç / Özkaynak Oranı</div><div class="finps"><input type="number" id="de_min" placeholder="—" oninput="liveFilter()"><input type="number" id="de_max" placeholder="—" oninput="liveFilter()"></div></div>
-        <div class="frow"><div class="flbl">Cari Oran (Likidite)</div><div class="finps"><input type="number" id="cr_min" placeholder="—" oninput="liveFilter()"><input type="number" id="cr_max" placeholder="—" oninput="liveFilter()"></div></div>
-      </div>
+        <div class="filter-group">
+          <div class="filter-group-title">Değerleme</div>
+          <div class="frow"><div class="flbl">F/K — Fiyat / Kazanç <small>min / max</small></div><div class="finps"><input type="number" id="pe_min" placeholder="—" oninput="liveFilter()"><input type="number" id="pe_max" placeholder="—" oninput="liveFilter()"></div></div>
+          <div class="frow"><div class="flbl">PD/DD — Piyasa / Defter Değeri</div><div class="finps"><input type="number" id="pb_min" placeholder="—" oninput="liveFilter()"><input type="number" id="pb_max" placeholder="—" oninput="liveFilter()"></div></div>
+          <div class="frow"><div class="flbl">F/S — Fiyat / Satış</div><div class="finps"><input type="number" id="ps_min" placeholder="—" oninput="liveFilter()"><input type="number" id="ps_max" placeholder="—" oninput="liveFilter()"></div></div>
+        </div>
 
-      <div class="filter-group">
-        <div class="filter-group-title">Piyasa</div>
-        <div class="frow"><div class="flbl">Piyasa Değeri (Milyon $)</div><div class="finps"><input type="number" id="mc_min" placeholder="—" oninput="liveFilter()"><input type="number" id="mc_max" placeholder="—" oninput="liveFilter()"></div></div>
-      </div>
+        <div class="filter-group">
+          <div class="filter-group-title">Karlılık</div>
+          <div class="frow"><div class="flbl">ROE — Özkaynak Kârlılığı %</div><div class="finps"><input type="number" id="roe_min" placeholder="—" oninput="liveFilter()"><input type="number" id="roe_max" placeholder="—" oninput="liveFilter()"></div></div>
+          <div class="frow"><div class="flbl">ROA — Varlık Kârlılığı %</div><div class="finps"><input type="number" id="roa_min" placeholder="—" oninput="liveFilter()"><input type="number" id="roa_max" placeholder="—" oninput="liveFilter()"></div></div>
+          <div class="frow"><div class="flbl">Net Kar Marjı %</div><div class="finps"><input type="number" id="margin_min" placeholder="—" oninput="liveFilter()"><input type="number" id="margin_max" placeholder="—" oninput="liveFilter()"></div></div>
+        </div>
 
-      <div class="filter-group">
-        <div class="filter-group-title">📈 Teknik Analiz</div>
-        <div class="frow"><div class="flbl">Günlük Değişim %<small> (min / max)</small></div><div class="finps"><input type="number" id="chg_min" placeholder="—" oninput="liveFilter()"><input type="number" id="chg_max" placeholder="—" oninput="liveFilter()"></div></div>
-        <div class="frow"><div class="flbl">1A Yüksekten Uzaklık % <small>(max)</small></div><div class="finps"><input type="number" id="from_high_max" placeholder="örn. -10" oninput="liveFilter()"><div style="width:70px"></div></div></div>
-        <div class="frow"><div class="flbl">1A Düşükten Uzaklık % <small>(min)</small></div><div class="finps"><input type="number" id="from_low_min" placeholder="örn. 10" oninput="liveFilter()"><div style="width:70px"></div></div></div>
-      </div>
+        <div class="filter-group">
+          <div class="filter-group-title">Büyüme</div>
+          <div class="frow"><div class="flbl">Gelir Büyümesi % YoY</div><div class="finps"><input type="number" id="revg_min" placeholder="—" oninput="liveFilter()"><input type="number" id="revg_max" placeholder="—" oninput="liveFilter()"></div></div>
+          <div class="frow"><div class="flbl">Kazanç Büyümesi % YoY</div><div class="finps"><input type="number" id="earng_min" placeholder="—" oninput="liveFilter()"><input type="number" id="earng_max" placeholder="—" oninput="liveFilter()"></div></div>
+        </div>
 
-      <div class="filter-group">
-        <div class="filter-group-title">💰 Fiyat & Hacim</div>
-        <div class="frow"><div class="flbl">Fiyat (yerel para birimi)</div><div class="finps"><input type="number" id="price_min" placeholder="—" oninput="liveFilter()"><input type="number" id="price_max" placeholder="—" oninput="liveFilter()"></div></div>
-        <div class="frow"><div class="flbl">Hacim (Milyon lot)</div><div class="finps"><input type="number" id="vol_min" placeholder="—" oninput="liveFilter()"><input type="number" id="vol_max" placeholder="—" oninput="liveFilter()"></div></div>
+        <div class="filter-group">
+          <div class="filter-group-title">Temettü & Sağlık</div>
+          <div class="frow"><div class="flbl">Temettü Verimi %</div><div class="finps"><input type="number" id="div_min" placeholder="—" oninput="liveFilter()"><input type="number" id="div_max" placeholder="—" oninput="liveFilter()"></div></div>
+          <div class="frow"><div class="flbl">Borç / Özkaynak Oranı</div><div class="finps"><input type="number" id="de_min" placeholder="—" oninput="liveFilter()"><input type="number" id="de_max" placeholder="—" oninput="liveFilter()"></div></div>
+          <div class="frow"><div class="flbl">Cari Oran (Likidite)</div><div class="finps"><input type="number" id="cr_min" placeholder="—" oninput="liveFilter()"><input type="number" id="cr_max" placeholder="—" oninput="liveFilter()"></div></div>
+        </div>
+
+        <div class="filter-group">
+          <div class="filter-group-title">Piyasa</div>
+          <div class="frow"><div class="flbl">Piyasa Değeri (Milyon $)</div><div class="finps"><input type="number" id="mc_min" placeholder="—" oninput="liveFilter()"><input type="number" id="mc_max" placeholder="—" oninput="liveFilter()"></div></div>
+        </div>
+
+        <div class="filter-group">
+          <div class="filter-group-title">📈 Teknik Analiz</div>
+          <div class="frow"><div class="flbl">Günlük Değişim %<small> (min / max)</small></div><div class="finps"><input type="number" id="chg_min" placeholder="—" oninput="liveFilter()"><input type="number" id="chg_max" placeholder="—" oninput="liveFilter()"></div></div>
+          <div class="frow"><div class="flbl">1A Yüksekten Uzaklık % <small>(max)</small></div><div class="finps"><input type="number" id="from_high_max" placeholder="örn. -10" oninput="liveFilter()"><div style="width:70px"></div></div></div>
+          <div class="frow"><div class="flbl">1A Düşükten Uzaklık % <small>(min)</small></div><div class="finps"><input type="number" id="from_low_min" placeholder="örn. 10" oninput="liveFilter()"><div style="width:70px"></div></div></div>
+        </div>
+
+        <div class="filter-group">
+          <div class="filter-group-title">💰 Fiyat & Hacim</div>
+          <div class="frow"><div class="flbl">Fiyat (yerel para birimi)</div><div class="finps"><input type="number" id="price_min" placeholder="—" oninput="liveFilter()"><input type="number" id="price_max" placeholder="—" oninput="liveFilter()"></div></div>
+          <div class="frow"><div class="flbl">Hacim (Milyon lot)</div><div class="finps"><input type="number" id="vol_min" placeholder="—" oninput="liveFilter()"><input type="number" id="vol_max" placeholder="—" oninput="liveFilter()"></div></div>
+        </div>
+
+        <!-- AD SLOT: Gelişmiş sidebar alt -->
+        <div class="ad-slot ad-slot-sidebar" id="ad-sidebar-adv">
+          <span>Reklam</span>
+          <span class="ad-slot-label">300 × 120 · Carbon Ads / AdSense</span>
+        </div>
+
       </div>
 
     </div>
@@ -662,8 +1054,14 @@ td:first-child,td:nth-child(2){text-align:left;}
       <!-- TICKER TAPE -->
       <div class="ticker-wrap" id="ticker-wrap">
         <div class="ticker-track" id="ticker-track">
-          <span class="ticker-empty">▶ TARA butonuna basarak hisse taraması başlatın</span>
+          <span class="ticker-empty">Gürültü yok, fırsat var.</span>
         </div>
+      </div>
+
+      <!-- AD SLOT 2: Ticker ile toolbar arası -->
+      <div class="ad-slot ad-slot-ticker" id="ad-ticker">
+        <span>Reklam</span>
+        <span class="ad-slot-label">728 × 90 · Leaderboard · Carbon Ads / AdSense</span>
       </div>
 
       <div class="toolbar" id="toolbar" style="display:none">
@@ -700,7 +1098,33 @@ td:first-child,td:nth-child(2){text-align:left;}
       <div class="cstate" id="empty">
         <div class="big">DEEPFIN</div>
         <p>Gürültü yok, fırsat var.</p>
-        <small id="empty-sub">Finnhub'dan canlı veri çekilecek</small>
+        <small id="empty-sub"></small>
+
+        <div class="onboarding">
+          <div class="onb-title">Nasıl Kullanılır?</div>
+          <div class="onb-steps">
+            <div class="onb-step">
+              <div class="onb-num">1</div>
+              <div class="onb-icon">🌍</div>
+              <div class="onb-label">Borsa Seç</div>
+              <div class="onb-desc">Soldaki panelden BIST, NASDAQ, S&P 500, DAX, LSE veya Nikkei'yi seç</div>
+            </div>
+            <div class="onb-arrow">→</div>
+            <div class="onb-step">
+              <div class="onb-num">2</div>
+              <div class="onb-icon">🐐</div>
+              <div class="onb-label">Strateji Seç</div>
+              <div class="onb-desc">Buffett, Lynch, Graham gibi bir yatırımcı stratejisi veya hazır filtre seç</div>
+            </div>
+            <div class="onb-arrow">→</div>
+            <div class="onb-step">
+              <div class="onb-num">3</div>
+              <div class="onb-icon">▶</div>
+              <div class="onb-label">TARA'ya Bas</div>
+              <div class="onb-desc">Sağ üstteki TARA butonuna bas, binlerce hisse saniyeler içinde filtrelenir</div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="cstate" id="loading" style="display:none">
         <div class="spinner"></div>
@@ -759,6 +1183,12 @@ td:first-child,td:nth-child(2){text-align:left;}
         <div class="dprofile-name" id="dprofile-name"></div>
         <div class="dprofile-meta" id="dprofile-meta"></div>
         <div class="dprofile-links" id="dprofile-links"></div>
+      </div>
+
+      <!-- AD SLOT 3: Hisse detay paneli altı -->
+      <div class="ad-slot ad-slot-detail" id="ad-detail" style="display:none">
+        <span>Reklam</span>
+        <span class="ad-slot-label">728 × 100 · Broker Affiliate / Carbon Ads</span>
       </div>
 
       <div class="chart-section">
@@ -832,48 +1262,6 @@ td:first-child,td:nth-child(2){text-align:left;}
       <div id="dxpanel-short"         class="dxpanel"><div id="short-body"><div class="dxloading">Yükleniyor...</div></div></div>
     </div>
   </div>
-
-  <!-- ─── FOOTER ─── -->
-  <footer class="site-footer">
-    <div class="footer-top">
-      <div class="footer-brand">
-        <div class="footer-logo"><div class="tlogo-mark">D</div>DeepFin</div>
-        <p class="footer-tagline">Gürültü yok, fırsat var.</p>
-        <p class="footer-desc">Dünya borsaları için gerçek zamanlı veri.</p>
-      </div>
-      <div class="footer-links-group">
-        <div class="footer-col">
-          <div class="footer-col-title">Platform</div>
-          <a class="footer-link" onclick="openInfo()">Bilgi Bankası</a>
-          <a class="footer-link" onclick="openInfo()">GOAT Stratejileri</a>
-          <a class="footer-link" onclick="openInfo()">Terimler Sözlüğü</a>
-          <a class="footer-link" onclick="openInfo()">Filtre Presetleri</a>
-        </div>
-        <div class="footer-col">
-          <div class="footer-col-title">Hakkımızda</div>
-          <a class="footer-link" onclick="showFooterModal('about')">Hakkımızda</a>
-          <a class="footer-link" onclick="showFooterModal('mission')">Misyon & Vizyon</a>
-          <a class="footer-link" onclick="showFooterModal('contact')">İletişim</a>
-          <a class="footer-link" onclick="openSupport()">Destek Ol ❤️</a>
-        </div>
-        <div class="footer-col">
-          <div class="footer-col-title">Yasal</div>
-          <a class="footer-link" onclick="showFooterModal('disclaimer')">Yasal Uyarı</a>
-          <a class="footer-link" onclick="showFooterModal('privacy')">Gizlilik Politikası</a>
-          <a class="footer-link" onclick="showFooterModal('terms')">Kullanım Koşulları</a>
-          <a class="footer-link" onclick="showFooterModal('cookies')">Çerez Politikası</a>
-        </div>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <div class="footer-bottom-left">
-        <span>© 2026 DeepFin. Tüm hakları saklıdır.</span>
-      </div>
-      <div class="footer-bottom-right">
-        <span class="footer-disclaimer-short">Bu platform yatırım tavsiyesi vermez. Tüm veriler bilgi amaçlıdır.</span>
-      </div>
-    </div>
-  </footer>
 </div>
 
 <!-- ─── FOOTER MODAL ─── -->
@@ -1576,6 +1964,11 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 // TRADINGVIEW SCANNER — tek istekte tüm BIST
 // ═══════════════════════════════════════════
 async function runScan(){
+  // Disclaimer kontrolü
+  if (!disclaimerAccepted && !sessionStorage.getItem('df_disclaimer')) {
+    showDisclaimerModal();
+    return;
+  }
   // Döviz kurları güncelleme (USD bazlı)
   try {
     const rateRes = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
@@ -2151,6 +2544,7 @@ document.getElementById('tech-presets').addEventListener('click', function(e) {
 
 function updateClrBtn() {
   const btn = document.getElementById('clrbtn');
+  const btnAdv = document.getElementById('clrbtn-adv');
   if(!btn) return;
   const hasChip = document.querySelector('.chip.on');
   const sectorSel = (document.getElementById('sector_filter') || {}).value || '';
@@ -2161,6 +2555,7 @@ function updateClrBtn() {
 function clearFilters(resetChips=true){
   document.querySelectorAll('.finps input').forEach(i=>i.value='');
   const sf = document.getElementById('sector_filter'); if(sf) sf.value = '';
+  const sfAdv = document.getElementById('sector_filter_adv'); if(sfAdv) sfAdv.value = '';
   if(resetChips) { document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on')); ['goat-info','goat-fund-info','preset-info','tech-preset-info'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.display='none';el.innerHTML='';}});}  
   updateClrBtn();
   if(allData.length) applyAndRender();
@@ -2357,12 +2752,12 @@ function renderTable(){
     }
   });
 
-  document.getElementById('tbody').innerHTML = data.map(s=>{
+  document.getElementById('tbody').innerHTML = data.map((s, idx)=>{
     const chgPct = s.changePercent;
     const chgClass = chgPct===null ? '' : (chgPct>=0?'up':'dn');
     const chgTxt = chgPct===null ? '—' : `${chgPct>=0?'+':''}${chgPct.toFixed(2)}%`;
     return `<tr onclick="showDetail('${s.symbol}')" class="${selSym===s.symbol?'selrow':''}">
-      <td class="nmc" title="${s.name}">${s.name}</td>
+      <td class="nmc" title="${s.name}"><span class="row-num">${idx+1}</span><span class="row-arrow">›</span>${s.name}</td>
       <td><span class="sym">${s.symbol}</span></td>
       <td style="font-size:10px;color:var(--muted2)">${s.sector||'—'}</td>
       <td>${fmc(s.marketCapitalization)}</td>
@@ -2437,6 +2832,8 @@ function buildProfile(s) {
   }).join('');
 
   profileEl.style.display = 'block';
+  var adDetail = document.getElementById('ad-detail');
+  if(adDetail) adDetail.style.display = 'flex';
 }
 
 function showDetail(sym){
@@ -3140,6 +3537,10 @@ function selectExchange(el) {
   document.querySelectorAll('.exbtn').forEach(b => b.classList.remove('on'));
   el.classList.add('on');
   currentExchange = el.dataset.exchange;
+  // Adv panel grid sync
+  document.querySelectorAll('#adv-ex-grid .exbtn').forEach(p => {
+    p.classList.toggle('on', p.dataset.exchange === currentExchange);
+  });
   // Veri sıfırla
   allData = []; filtered = []; selSym = null;
   closeDetail();
@@ -3273,33 +3674,186 @@ function showFooterModal(type) {
 function closeFooterModal() {
   document.getElementById('footerModal').classList.remove('open');
 }
-// Footer scroll reveal — triggered by twrap scroll
-(function(){
-  var footer = document.querySelector('.site-footer');
-  if(!footer) return;
-  function checkScroll(){
-    var twrap = document.getElementById('twrap');
-    if(!twrap) return;
-    var scrolled = twrap.scrollTop + twrap.clientHeight;
-    var total = twrap.scrollHeight;
-    if(total - scrolled < 120){
-      footer.classList.add('footer-visible');
-    } else {
-      footer.classList.remove('footer-visible');
+// Footer scroll reveal — kaldırıldı
+
+// ── ADV EXCHANGE SYNC ──
+function advSelectExchange(el) {
+  // Update adv grid UI
+  document.querySelectorAll('#adv-ex-grid .exbtn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  // Sync with Başlangıç tab exchange buttons
+  const exKey = el.dataset.exchange;
+  const mainBtn = document.querySelector('#sb-panel-basic .exbtn[data-exchange="' + exKey + '"]');
+  if (mainBtn) selectExchange(mainBtn);
+}
+
+// Keep adv pills in sync when main exchange changes
+const _origSelectExchange = typeof selectExchange === 'function' ? selectExchange : null;
+
+// ── SIDEBAR TABS ──
+function switchSbTab(tab) {
+  // Sync adv exchange pill to current exchange on tab switch
+  if (tab === 'advanced') {
+    const cur = document.querySelector('.exbtn.on');
+    if (cur) {
+      const exKey = cur.dataset.exchange;
+      document.querySelectorAll('#adv-ex-grid .exbtn').forEach(p => {
+        p.classList.toggle('on', p.dataset.exchange === exKey);
+      });
     }
   }
-  // attach on twrap when it becomes visible
-  var twrap = document.getElementById('twrap');
-  if(twrap) twrap.addEventListener('scroll', checkScroll);
-  // re-attach after scan in case twrap was hidden
-  document.addEventListener('click', function(){
-    setTimeout(function(){
-      var tw = document.getElementById('twrap');
-      if(tw && !tw._footerBound){ tw.addEventListener('scroll', checkScroll); tw._footerBound=true; }
-    }, 500);
-  });
-})();
+  document.getElementById('sb-panel-basic').style.display    = tab === 'basic'    ? '' : 'none';
+  document.getElementById('sb-panel-advanced').style.display = tab === 'advanced' ? '' : 'none';
+  document.getElementById('sb-tab-basic').classList.toggle('active',    tab === 'basic');
+  document.getElementById('sb-tab-advanced').classList.toggle('active', tab === 'advanced');
+}
+
+
+// ── SECTOR SYNC ──
+function syncSectorAndFilter(source) {
+  const basic = document.getElementById('sector_filter');
+  const adv   = document.getElementById('sector_filter_adv');
+  if (!basic || !adv) return;
+  if (source === 'adv') { basic.value = adv.value; }
+  else                  { adv.value = basic.value; }
+  liveFilter();
+}
+
+// Patch basic sector select to also sync
+// ── HOMEPAGE / SCREENER NAV ──
+function showHomepage() {
+  document.getElementById('homepage').style.display = 'flex';
+  document.getElementById('screener-layout').style.display = 'none';
+  document.getElementById('nav-home').classList.add('active');
+  document.getElementById('nav-tarama').classList.remove('active');
+  var ts = document.querySelector('.tsearch');
+  if(ts) ts.style.display = 'none';
+  // Tüm chip seçimlerini temizle
+  clearFilters();
+}
+
+// ── DISCLAIMER POPUP ──
+let disclaimerAccepted = false;
+let disclaimerTimer = null;
+
+function showDisclaimerModal() {
+  const modal = document.getElementById('disclaimerModal');
+  modal.classList.add('open');
+  // Countdown
+  let secs = 5;
+  const btn = document.getElementById('disclaimerBtn');
+  const cdEl = document.getElementById('disclaimerCountdown');
+  btn.disabled = true;
+  btn.style.cursor = 'not-allowed';
+  btn.style.background = '#1a1a1a';
+  btn.style.color = '#555';
+  btn.style.borderColor = '#333';
+
+  disclaimerTimer = setInterval(function() {
+    secs--;
+    if (secs > 0) {
+      cdEl.textContent = '(' + secs + ')';
+    } else {
+      clearInterval(disclaimerTimer);
+      cdEl.textContent = '';
+      btn.disabled = false;
+      btn.style.cursor = 'pointer';
+      btn.style.background = '#ededed';
+      btn.style.color = '#000';
+      btn.style.borderColor = '#ededed';
+    }
+  }, 1000);
+}
+
+function acceptDisclaimer() {
+  disclaimerAccepted = true;
+  sessionStorage.setItem('df_disclaimer', '1');
+  document.getElementById('disclaimerModal').classList.remove('open');
+  clearInterval(disclaimerTimer);
+}
+
+function showScreener() {
+  // Disclaimer kontrolü
+  if (!disclaimerAccepted && !sessionStorage.getItem('df_disclaimer')) {
+    showDisclaimerModal();
+    // Screener'ı göster ama taramayı engelle
+    document.getElementById('homepage').style.display = 'none';
+    document.getElementById('screener-layout').style.display = 'flex';
+    document.getElementById('nav-home').classList.remove('active');
+    document.getElementById('nav-tarama').classList.add('active');
+    var ts = document.querySelector('.tsearch');
+    if(ts) ts.style.display = '';
+    return;
+  }
+  document.getElementById('homepage').style.display = 'none';
+  document.getElementById('screener-layout').style.display = 'flex';
+  document.getElementById('nav-home').classList.remove('active');
+  document.getElementById('nav-tarama').classList.add('active');
+  var ts = document.querySelector('.tsearch');
+  if(ts) ts.style.display = '';
+}
+
+function selectExchangeAndGo(exKey) {
+  showScreener();
+  var btn = document.querySelector('.exbtn[data-exchange="' + exKey + '"]');
+  if(btn) selectExchange(btn);
+}
+
+function applyStrategyAndGo(goatKey) {
+  // Önce temizle, sonra strateji seç
+  clearFilters();
+  showScreener();
+  setTimeout(function(){
+    var chip = document.querySelector('.goat-chip[data-goat="' + goatKey + '"]');
+    if(chip) { chip.click(); }
+    runScan();
+  }, 100);
+}
+
+// Start on homepage
+document.addEventListener('DOMContentLoaded', function(){ showHomepage(); });
 
 </script>
+
+<!-- ─── YASAL UYARI POPUP ─── -->
+<div class="modal-overlay" id="disclaimerModal" style="z-index:500;">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:520px;padding:0;overflow:hidden;">
+
+    <!-- Header -->
+    <div style="background:#0a0a0a;border-bottom:1px solid #1a1a1a;padding:20px 24px;display:flex;align-items:center;gap:10px;">
+      <span style="font-size:20px;">⚖️</span>
+      <div>
+        <div style="font-size:14px;font-weight:700;color:#ededed;">Yasal Uyarı</div>
+        <div style="font-size:11px;color:#666;margin-top:2px;">Devam etmeden önce lütfen okuyun</div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div style="padding:24px;background:#0d0d0d;">
+      <p style="font-size:12px;color:#888;line-height:1.85;margin:0 0 16px;">
+        DeepFin'de sunulan tüm veriler, filtreler ve stratejiler yalnızca <strong style="color:#ccc;">bilgilendirme amaçlıdır.</strong>
+      </p>
+      <p style="font-size:12px;color:#888;line-height:1.85;margin:0 0 16px;">
+        Bu platform; herhangi bir finansal araç için <strong style="color:#ccc;">alım, satım veya elde tutma tavsiyesi vermez</strong> ve yatırım danışmanlığı hizmeti sunmaz. Geçmiş performans, gelecekteki sonuçların garantisi değildir.
+      </p>
+      <p style="font-size:12px;color:#888;line-height:1.85;margin:0;">
+        Yatırım kararlarınızı almadan önce lisanslı bir finansal danışmana başvurmanızı tavsiye ederiz. <strong style="color:#ccc;">Tüm yatırım işlemleri kullanıcının kendi sorumluluğundadır.</strong>
+      </p>
+
+      <!-- Countdown + Button -->
+      <div style="margin-top:24px;border-top:1px solid #1a1a1a;padding-top:20px;">
+        <button id="disclaimerBtn" onclick="acceptDisclaimer()" disabled
+          style="width:100%;padding:13px;border-radius:8px;font-size:13px;font-weight:700;font-family:'Geist',sans-serif;cursor:not-allowed;transition:all .3s;background:#1a1a1a;border:1px solid #333;color:#555;">
+          Okudum, Anladım &amp; Devam Et <span id="disclaimerCountdown">(5)</span>
+        </button>
+        <p style="text-align:center;font-size:10px;color:#444;margin:10px 0 0;">
+          Bu uyarı oturum başına bir kez gösterilir.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 </body>
 </html>
