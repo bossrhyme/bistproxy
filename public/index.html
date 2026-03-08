@@ -100,9 +100,13 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .chip{font-size:11px;font-weight:500;padding:3px 9px;border:1px solid var(--border2);color:var(--text2);cursor:pointer;transition:all .12s;user-select:none;border-radius:4px;background:var(--s2);}
 .chip:hover{border-color:var(--accent);color:var(--accent);background:rgba(59,130,246,.06);}
 .chip.on{border-color:var(--accent);color:#fff;background:var(--accent);}
-.goat-chip{border-color:rgba(240,180,41,.3);color:var(--gold);background:rgba(240,180,41,.06);border-radius:4px;}
-.goat-chip:hover{border-color:var(--gold);background:rgba(240,180,41,.12);}
-.goat-chip.on{border-color:var(--gold);color:#000;background:var(--gold);}
+
+
+#goat-fund-chips .goat-chip:hover{border-color:#6ab4ff;background:rgba(100,180,255,.12);}
+
+
+
+
 .goat-info{display:none;margin-top:7px;font-size:10px;color:var(--text2);line-height:1.6;padding:8px 10px;background:rgba(240,180,41,.06);border-left:2px solid var(--gold);border-radius:0 4px 4px 0;}
 .presets{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:4px;}
 .fblock{margin-bottom:12px;}
@@ -136,6 +140,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 
 /* ── TABLE ── */
 .twrap{flex:1;overflow:auto;}
+.tbl-scroll-btn{background:var(--s2);border:1px solid var(--border);color:var(--text2);width:24px;height:24px;border-radius:4px;cursor:pointer;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;transition:background .15s,color .15s;}
+.tbl-scroll-btn:hover{background:var(--border2);color:var(--text);}
 .twrap::-webkit-scrollbar{width:5px;height:5px;}
 .twrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
 table{width:100%;border-collapse:collapse;font-size:12px;}
@@ -336,44 +342,58 @@ td:first-child,td:nth-child(2){text-align:left;}
    MOBİLE RESPONSIVE
 ══════════════════════════════════ */
 @media (max-width: 768px) {
-  /* Topbar */
-  .topbar { padding: 0 10px; gap: 6px; }
-  .tlive-text { display: none; }
-  .tright .chip { display: none; }
-  .tright { gap: 4px; }
 
-  /* Layout — sidebar üstte, içerik altta */
-  .layout { flex-direction: column; overflow: visible; }
+  /* ── TOPBAR ── */
+  .topbar { padding: 0 8px; gap: 5px; }
+  .tlive { display: none; }
+  .tlogo span:not(.tlogo-mark) { display: none; }
+  .tsearch { max-width: 150px; }
+  .tright { gap: 3px; }
+  .tright #scantime { display: none; }
+  .infobtn { font-size: 11px; padding: 5px 8px; }
+  .supportbtn { display: none; }
+  .topbarbtn { padding: 5px 8px; font-size: 11px; }
 
-  /* Sidebar — yatay kaydırmalı */
+  /* ── LAYOUT — sidebar üstte, içerik altta ── */
+  .layout { flex-direction: column; height: auto; overflow: visible; }
+
+  /* ── SIDEBAR — full width, kaydırmalı ── */
   .sidebar {
     width: 100% !important;
     min-width: unset !important;
+    max-height: 50vh;
+    overflow-y: auto;
+    overflow-x: hidden;
     border-right: none;
     border-bottom: 1px solid var(--border);
-    overflow-x: auto;
-    overflow-y: visible;
-    padding: 10px;
-    max-height: none;
+    padding: 10px 12px;
   }
 
-  /* Exchange grid — küçük ekranda 3 kolon */
-  .exchange-grid { grid-template-columns: repeat(3, 1fr); }
+  /* ── EXCHANGE GRID — 3 kolon ── */
+  .exchange-grid { grid-template-columns: repeat(3, 1fr); gap: 3px; }
+  .exbtn { padding: 6px 4px; }
+  .exbtn-sub { display: none; }
 
-  /* GOAT chips — yatay scroll */
+  /* ── CHIPS — yatay scroll ── */
   .chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
   .chips::-webkit-scrollbar { height: 2px; }
   .chips::-webkit-scrollbar-thumb { background: var(--border2); }
 
-  /* Ana içerik */
+  /* ── MAIN / CONTENT ── */
   .main { flex: 1; min-width: 0; }
+  .content { min-height: 50vh; }
 
-  /* Tablo — yatay kaydırma */
+  /* ── TOOLBAR ── */
+  #toolbar { flex-wrap: wrap; gap: 4px; padding: 6px 8px; }
+  .ssel { font-size: 10px; padding: 3px 6px; }
+  .tbl-scroll-btn { display: none; }
+
+  /* ── TABLO ── */
   .twrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   table { min-width: 700px; }
-  th, td { padding: 6px 8px; font-size: 10px; }
+  th, td { padding: 6px 8px; font-size: 10px; white-space: nowrap; }
 
-  /* Detay paneli — tam ekran overlay */
+  /* ── DETAY PANELİ — tam ekran ── */
   .detail {
     position: fixed !important;
     inset: 0 !important;
@@ -385,27 +405,21 @@ td:first-child,td:nth-child(2){text-align:left;}
     overflow-y: auto;
   }
   .detail.open { width: 100% !important; }
-  .dhead { padding: 12px 14px; }
+  .dhead { padding: 12px 14px; position: sticky; top: 0; background: var(--s1); z-index: 2; }
   .dclose { font-size: 18px; padding: 4px 8px; }
   #chart-wrap { height: 220px !important; }
 
-  /* Filtreler — 2 kolon */
+  /* ── FİLTRELER ── */
   .frow { flex-wrap: wrap; gap: 4px; }
   .finps { flex-direction: column; gap: 4px; }
-
-  /* Tarama butonu */
-  #scan-btn { width: 100%; margin-top: 6px; }
-
-  /* Toolbar */
-  #toolbar { flex-wrap: wrap; gap: 4px; padding: 6px 10px; }
-  .ssel { font-size: 10px; padding: 3px 6px; }
+  .filter-group-title { font-size: 10px; }
 }
 
 @media (max-width: 480px) {
+  /* Daha küçük ekranlarda borsa butonları 2 kolon */
   .exchange-grid { grid-template-columns: repeat(2, 1fr); }
-  .tlogo span:last-child { display: none; }
-  th:nth-child(n+4), td:nth-child(n+4) { display: none; }
-  th:nth-child(3), td:nth-child(3) { display: table-cell; }
+  /* Tablo — ilk 4 kolon */
+  th:nth-child(n+5), td:nth-child(n+5) { display: none; }
 }
 </style>
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
@@ -475,7 +489,7 @@ td:first-child,td:nth-child(2){text-align:left;}
       </div>
 
       <div class="filter-group">
-        <div class="filter-group-title">🐐 GOAT Stratejileri</div>
+        <div class="filter-group-title">🐐 GOAT Yatırımcı ve Traderlar</div>
         <div class="chips" id="goat-chips">
           <div class="chip goat-chip" data-goat="buffett">Buffett</div>
           <div class="chip goat-chip" data-goat="graham">Graham</div>
@@ -483,15 +497,19 @@ td:first-child,td:nth-child(2){text-align:left;}
           <div class="chip goat-chip" data-goat="ark">Ark/Wood</div>
           <div class="chip goat-chip" data-goat="minervini">Minervini</div>
           <div class="chip goat-chip" data-goat="piotroski">Piotroski</div>
-          <div class="chip goat-chip" data-goat="citadel">Citadel</div>
-          <div class="chip goat-chip" data-goat="deshaw">D.E. Shaw</div>
-          <div class="chip goat-chip" data-goat="millennium">Millennium</div>
         </div>
         <div class="goat-info" id="goat-info"></div>
+        <div class="filter-group-title" style="margin-top:10px;">🏦 GOAT Fonlar</div>
+        <div class="chips" id="goat-fund-chips">
+          <div class="chip goat-chip goat-fund-chip" data-goat="citadel">Citadel</div>
+          <div class="chip goat-chip goat-fund-chip" data-goat="deshaw">D.E. Shaw</div>
+          <div class="chip goat-chip goat-fund-chip" data-goat="millennium">Millennium</div>
+        </div>
+        <div class="goat-info" id="goat-fund-info"></div>
       </div>
 
       <div class="filter-group">
-        <div class="filter-group-title">Hazır Filtreler</div>
+        <div class="filter-group-title">📊 Hazır Temel Analiz</div>
         <div class="presets chips" id="presets">
           <div class="chip" data-preset="value">Değer</div>
           <div class="chip" data-preset="growth">Büyüme</div>
@@ -501,6 +519,48 @@ td:first-child,td:nth-child(2){text-align:left;}
           <div class="chip" data-preset="momentum">Momentum</div>
         </div>
         <div class="goat-info" id="preset-info"></div>
+        <div class="filter-group-title" style="margin-top:10px;">📈 Hazır Teknik Analiz</div>
+        <div class="presets chips" id="tech-presets">
+          <div class="chip tech-chip" data-tech="breakout">Breakout</div>
+          <div class="chip tech-chip" data-tech="oversold">Aşırı Satım</div>
+          <div class="chip tech-chip" data-tech="nearHigh">Zirveye Yakın</div>
+          <div class="chip tech-chip" data-tech="pullback">Geri Çekilme</div>
+          <div class="chip tech-chip" data-tech="strongDay">Güçlü Gün</div>
+          <div class="chip tech-chip" data-tech="highVolume">Yüksek Hacim</div>
+        </div>
+        <div class="goat-info" id="tech-preset-info"></div>
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-group-title">🏭 Sektör</div>
+        <select id="sector_filter" onchange="liveFilter()" style="width:100%;background:var(--s2);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:5px 8px;font-size:11px;cursor:pointer;">
+          <option value="">— Tümü —</option>
+          <option value="Teknoloji">Teknoloji</option>
+          <option value="Finans">Finans</option>
+          <option value="Finansal Hizmetler">Finansal Hizmetler</option>
+          <option value="Sağlık">Sağlık</option>
+          <option value="Sağlık Teknolojisi">Sağlık Teknolojisi</option>
+          <option value="Enerji">Enerji</option>
+          <option value="Enerji &amp; Maden">Enerji &amp; Maden</option>
+          <option value="Sanayi">Sanayi</option>
+          <option value="Üretim Sanayi">Üretim Sanayi</option>
+          <option value="Döngüsel Tüketim">Döngüsel Tüketim</option>
+          <option value="Savunmacı Tüketim">Savunmacı Tüketim</option>
+          <option value="Gayrimenkul">Gayrimenkul</option>
+          <option value="Temel Malzemeler">Temel Malzemeler</option>
+          <option value="İletişim Hizmetleri">İletişim Hizmetleri</option>
+          <option value="Kamu Hizmetleri">Kamu Hizmetleri</option>
+          <option value="Ulaşım">Ulaşım</option>
+          <option value="Holding">Holding</option>
+          <option value="Bankacılık">Bankacılık</option>
+          <option value="Sigorta">Sigorta</option>
+          <option value="İlaç">İlaç</option>
+          <option value="Kimya">Kimya</option>
+          <option value="İnşaat">İnşaat</option>
+          <option value="Tekstil">Tekstil</option>
+          <option value="Gıda &amp; İçecek">Gıda &amp; İçecek</option>
+          <option value="Perakende">Perakende</option>
+        </select>
       </div>
 
       <button class="clrbtn" onclick="clearFilters()" id="clrbtn" style="display:none;">✕ Filtreleri Temizle</button>
@@ -537,12 +597,27 @@ td:first-child,td:nth-child(2){text-align:left;}
         <div class="frow"><div class="flbl">Piyasa Değeri (Milyon $)</div><div class="finps"><input type="number" id="mc_min" placeholder="—" oninput="liveFilter()"><input type="number" id="mc_max" placeholder="—" oninput="liveFilter()"></div></div>
       </div>
 
+      <div class="filter-group">
+        <div class="filter-group-title">📈 Teknik Analiz</div>
+        <div class="frow"><div class="flbl">Günlük Değişim %<small> (min / max)</small></div><div class="finps"><input type="number" id="chg_min" placeholder="—" oninput="liveFilter()"><input type="number" id="chg_max" placeholder="—" oninput="liveFilter()"></div></div>
+        <div class="frow"><div class="flbl">1A Yüksekten Uzaklık % <small>(max)</small></div><div class="finps"><input type="number" id="from_high_max" placeholder="örn. -10" oninput="liveFilter()"><div style="width:70px"></div></div></div>
+        <div class="frow"><div class="flbl">1A Düşükten Uzaklık % <small>(min)</small></div><div class="finps"><input type="number" id="from_low_min" placeholder="örn. 10" oninput="liveFilter()"><div style="width:70px"></div></div></div>
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-group-title">💰 Fiyat & Hacim</div>
+        <div class="frow"><div class="flbl">Fiyat (yerel para birimi)</div><div class="finps"><input type="number" id="price_min" placeholder="—" oninput="liveFilter()"><input type="number" id="price_max" placeholder="—" oninput="liveFilter()"></div></div>
+        <div class="frow"><div class="flbl">Hacim (Milyon lot)</div><div class="finps"><input type="number" id="vol_min" placeholder="—" oninput="liveFilter()"><input type="number" id="vol_max" placeholder="—" oninput="liveFilter()"></div></div>
+      </div>
+
     </div>
 
     <!-- CONTENT -->
     <div class="content">
       <div class="toolbar" id="toolbar" style="display:none">
         <div class="rcount"><strong id="resn">0</strong><span> / <span id="scann">0</span> hisse</span></div>
+        <button class="tbl-scroll-btn" id="scroll-left" onclick="tblScroll(-300)" title="Sola kaydır">&#8249;</button>
+        <button class="tbl-scroll-btn" id="scroll-right" onclick="tblScroll(300)" title="Sağa kaydır">&#8250;</button>
         <div class="pbar"><div class="pbarfill" id="prog"></div></div>
         <select class="ssel" id="sortf" onchange="onSortChange()">
           <option value="marketCapitalization">Piyasa Değeri</option>
@@ -784,10 +859,10 @@ td:first-child,td:nth-child(2){text-align:left;}
       </div>
       <!-- ══════ GOAT STRATEJİLERİ BİLGİ BANKASI ══════ -->
       <div class="preset-info-wrap goat-bank-section">
-        <div class="preset-info-title">🐐 GOAT Stratejileri — Detaylı Rehber</div>
+        <div class="preset-info-title">🐐 GOAT Yatırımcı & 🏦 GOAT Fonlar — Detaylı Rehber</div>
 
-        <!-- KLASİK EFSANELER -->
-        <div style="font-size:10px;font-weight:700;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;">Klasik Yatırım Efsaneleri</div>
+        <!-- GOAT YATIRIMCILAR -->
+        <div style="font-size:10px;font-weight:700;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;">🐐 GOAT Yatırımcı ve Traderlar</div>
         <div class="goat-bank-grid">
 
           <div class="goat-card">
@@ -854,8 +929,8 @@ td:first-child,td:nth-child(2){text-align:left;}
 
         <hr class="goat-divider">
 
-        <!-- HEDGE FUND ELİTLERİ -->
-        <div style="font-size:10px;font-weight:700;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;">Hedge Fund Eflitleri — Son 5 Yilin Zirvesi</div>
+        <!-- GOAT FONLAR -->
+        <div style="font-size:10px;font-weight:700;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;">🏦 GOAT Fonlar — Son 5 Yilin Zirvesi</div>
         <div class="goat-bank-grid">
 
           <div class="goat-card">
@@ -1464,6 +1539,8 @@ async function runScan(){
         '52WeekHigh': high1m || null,
         '52WeekLow': low1m || null,
         piotroski: g('piotroski_f_score') !== null ? Math.round(g('piotroski_f_score')) : null,
+        fromHigh: (high1m && close && high1m > 0) ? ((close - high1m) / high1m * 100) : null,
+        fromLow:  (low1m  && close && low1m  > 0) ? ((close - low1m)  / low1m  * 100) : null,
         peg: (function() {
           var pe = g('price_earnings_ttm') || g('price_book_fq');
           var eg = g('total_revenue_change_ttm_yoy') || g('earnings_per_share_diluted_yoy_growth_ttm');
@@ -1499,6 +1576,42 @@ const PRESETS = {
   quality:  { desc: 'Yüksek karlılık, güçlü marj, düşük borç ve iyi likidite — kaliteli şirket', filters: {roe_min:20, margin_min:10, de_max:80, cr_min:1.5} },
   lowdebt:  { desc: 'Az borçla çalışan, nakit akışı güçlü, bilanço sağlıklı hisseler', filters: {de_max:30, cr_min:2} },
   momentum: { desc: 'Hem gelir hem kazanç büyümesinde güçlü ivme yakalayan hisseler', filters: {revg_min:20, earng_min:20} }
+};
+
+// Teknik Analiz Presetleri
+// Teknik Analiz Presetleri
+// Teknik Analiz Presetleri
+const TECH_PRESETS = {
+  breakout: {
+    label: 'Breakout — Kırılım',
+    desc: 'Zirvesine yakın, güçlü artışla gün kapatan ve hacim desteği olan hisseler. Minervini SEPA modelinin tetikleyici koşulu.',
+    filters: { from_high_max: -5, chg_min: 1.5, vol_min: 0.5 }
+  },
+  oversold: {
+    label: 'Aşırı Satım — Dip Fırsatı',
+    desc: 'Son 1 ayda sert düşen, dibine yakın seyreden ve gün içi toparlanma gösteren hisseler. Kontrarian yaklaşım.',
+    filters: { from_low_min: 0, from_high_max: -20, chg_min: 0 }
+  },
+  nearHigh: {
+    label: 'Zirveye Yakın — Güç Teyidi',
+    desc: '1 aylık zirvesinin %3 yakınında işlem gören hisseler. Güçlü trend devam sinyali.',
+    filters: { from_high_max: -3 }
+  },
+  pullback: {
+    label: 'Geri Çekilme — Alım Fırsatı',
+    desc: 'Zirvesinden %10-25 geri çekilmiş, düşükten ise %10+ yukarıda hisseler. Sağlıklı konsolidasyon.',
+    filters: { from_high_max: -10, from_low_min: 10 }
+  },
+  strongDay: {
+    label: 'Güçlü Gün — Momentum',
+    desc: 'Bugün %2+ yükselen hisseler. Katalizör: haber, kırılım veya sektör rotasyonu.',
+    filters: { chg_min: 2 }
+  },
+  highVolume: {
+    label: 'Yüksek Hacim — Kurumsal İlgi',
+    desc: 'Normalin çok üzerinde hacimle işlem gören hisseler. Büyük oyuncuların hareketi.',
+    filters: { vol_min: 5 }
+  }
 };
 
 // Guru stratejileri
@@ -1552,117 +1665,151 @@ const GURUS = {
   }
 };
 
-document.getElementById('goat-chips').addEventListener('click', e => {
-  const chip = e.target.closest('.goat-chip');
-  if(!chip) return;
-  const name = chip.dataset.goat;
-  const goat = GURUS[name];
-  if(!goat) return;
+function tblScroll(px){
+  var w = document.getElementById('twrap');
+  if(w) w.scrollBy({left:px, behavior:'smooth'});
+}
 
-  // Toggle — zaten seçiliyse kaldır
-  const wasOn = chip.classList.contains('on');
-  clearFilters(false);
-  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
-  const goatInfo = document.getElementById('goat-info');
-  const presetInfo = document.getElementById('preset-info');
-  if(goatInfo) goatInfo.style.display = 'none';
-  if(presetInfo) presetInfo.style.display = 'none';
+// ── UNİFİED CHİP SİSTEMİ — tüm gruplardan toplam max 3 seçim ──
 
-  if(wasOn) {
-    updateClrBtn();
-    if(allData.length) applyAndRender(null);
-    return;
-  }
+// Tüm seçili chip'lerin filtrelerini merge edip uygula
+function applyAllChips() {
+  var merged = {};
+  var specials = [];
 
-  chip.classList.add('on');
-  for(const [k,v] of Object.entries(goat.filters)){
-    const el = document.getElementById(k);
-    if(el) el.value = v;
-  }
-  if(goatInfo){
-    goatInfo.innerHTML = '<strong>' + goat.label + ':</strong> ' + goat.desc;
-    goatInfo.style.display = 'block';
-  }
-  updateClrBtn();
-  if(allData.length) applyAndRender(goat.special || null);
-});
-
-document.getElementById('presets').addEventListener('click', e => {
-  const chip = e.target.closest('.chip');
-  if(!chip) return;
-  const name = chip.dataset.preset;
-  const preset = PRESETS[name];
-  if(!preset) return;
-
-  // Goat chip'lerini kapat
-  document.querySelectorAll('.goat-chip').forEach(c=>c.classList.remove('on'));
-  const goatInfo = document.getElementById('goat-info');
-  if(goatInfo) goatInfo.style.display = 'none';
-
-  // Toggle
-  const wasOn = chip.classList.contains('on');
-  chip.classList.toggle('on');
-
-  // Seçili preset sayısı max 3
-  const selected = document.querySelectorAll('#presets .chip.on');
-  if(selected.length > 3) {
-    chip.classList.remove('on');
-    return;
-  }
-
-  // Tüm seçili presetlerin filtrelerini birleştir (en büyük değer kazanır)
-  const mergedFilters = {};
-  document.querySelectorAll('#presets .chip.on').forEach(c => {
-    const p = PRESETS[c.dataset.preset];
-    if(!p) return;
-    Object.entries(p.filters).forEach(([k,v]) => {
-      if(!(k in mergedFilters)) mergedFilters[k] = v;
-      else {
-        // min değerler için büyüğü, max için küçüğü al
-        if(k.endsWith('_min')) mergedFilters[k] = Math.max(mergedFilters[k], v);
-        if(k.endsWith('_max')) mergedFilters[k] = Math.min(mergedFilters[k], v);
-      }
+  // GOAT chip'leri
+  document.querySelectorAll('.goat-chip.on').forEach(function(c) {
+    var g = GURUS[c.dataset.goat];
+    if (!g) return;
+    if (g.special) specials.push(g.special);
+    Object.keys(g.filters).forEach(function(k) {
+      var v = g.filters[k];
+      if (!(k in merged)) { merged[k] = v; return; }
+      if (k.endsWith('_min')) merged[k] = Math.max(merged[k], v);
+      if (k.endsWith('_max')) merged[k] = Math.min(merged[k], v);
     });
   });
 
-  // Inputları temizle sonra doldur
-  document.querySelectorAll('.finps input').forEach(i=>i.value='');
-  Object.entries(mergedFilters).forEach(([k,v]) => {
-    const el = document.getElementById(k);
-    if(el) el.value = v;
+  // Temel analiz preset'leri
+  document.querySelectorAll('#presets .chip.on').forEach(function(c) {
+    var p = PRESETS[c.dataset.preset];
+    if (!p) return;
+    Object.keys(p.filters).forEach(function(k) {
+      var v = p.filters[k];
+      if (!(k in merged)) { merged[k] = v; return; }
+      if (k.endsWith('_min')) merged[k] = Math.max(merged[k], v);
+      if (k.endsWith('_max')) merged[k] = Math.min(merged[k], v);
+    });
   });
 
-  // Açıklama — seçili preset varsa göster, yoksa gizle
-  const infoEl = document.getElementById('preset-info');
-  const activeChips = document.querySelectorAll('#presets .chip.on');
-  if(infoEl) {
-    if(activeChips.length > 0) {
-      const descs = Array.from(activeChips).map(c => {
-        const p = PRESETS[c.dataset.preset];
-        return p ? '<strong>' + c.textContent + ':</strong> ' + p.desc : '';
-      }).filter(Boolean).join('<br><br>');
-      infoEl.innerHTML = descs;
-      infoEl.style.display = 'block';
-    } else {
-      infoEl.style.display = 'none';
-    }
-  }
+  // Teknik analiz preset'leri
+  document.querySelectorAll('#tech-presets .chip.on').forEach(function(c) {
+    var p = TECH_PRESETS[c.dataset.tech];
+    if (!p) return;
+    Object.keys(p.filters).forEach(function(k) {
+      var v = p.filters[k];
+      if (!(k in merged)) { merged[k] = v; return; }
+      if (k.endsWith('_min')) merged[k] = Math.max(merged[k], v);
+      if (k.endsWith('_max')) merged[k] = Math.min(merged[k], v);
+    });
+  });
+
+  // Inputları temizle ve merged değerleri uygula
+  document.querySelectorAll('.finps input').forEach(function(i){ i.value = ''; });
+  Object.keys(merged).forEach(function(k) {
+    var el = document.getElementById(k); if (el) el.value = merged[k];
+  });
+
+  // Açıklama metinleri — tüm aktif chip'lerden
+  var allInfos = [];
+  document.querySelectorAll('.goat-chip.on').forEach(function(c) {
+    var g = GURUS[c.dataset.goat];
+    if (g) allInfos.push({ label: g.label, desc: g.desc, infoId: c.closest('[id]') ? c.closest('[id]').id === 'goat-chips' ? 'goat-info' : 'goat-fund-info' : 'goat-info' });
+  });
+  document.querySelectorAll('#presets .chip.on').forEach(function(c) {
+    var p = PRESETS[c.dataset.preset];
+    if (p) allInfos.push({ label: c.textContent, desc: p.desc, infoId: 'preset-info' });
+  });
+  document.querySelectorAll('#tech-presets .chip.on').forEach(function(c) {
+    var p = TECH_PRESETS[c.dataset.tech];
+    if (p) allInfos.push({ label: p.label, desc: p.desc, infoId: 'tech-preset-info' });
+  });
+
+  // Tüm info div'leri gizle
+  ['goat-info','goat-fund-info','preset-info','tech-preset-info'].forEach(function(id){
+    var el = document.getElementById(id); if (el) el.style.display = 'none'; el && (el.innerHTML = '');
+  });
+
+  // Bilgileri gruplarına göre dağıt
+  var byGroup = {};
+  allInfos.forEach(function(info) {
+    if (!byGroup[info.infoId]) byGroup[info.infoId] = [];
+    byGroup[info.infoId].push('<strong>' + info.label + ':</strong> ' + info.desc);
+  });
+  Object.keys(byGroup).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) { el.innerHTML = byGroup[id].join('<br><br>'); el.style.display = 'block'; }
+  });
 
   updateClrBtn();
-  if(allData.length) applyAndRender();
+  var special = specials.length > 0 ? specials[0] : null;
+  if (allData.length) applyAndRender(special);
+}
+
+// Toplam seçili chip sayısı
+function countSelectedChips() {
+  return document.querySelectorAll('.goat-chip.on, #presets .chip.on, #tech-presets .chip.on').length;
+}
+
+// GOAT chip'leri
+document.getElementById('goat-chips').addEventListener('click', function(e) {
+  var chip = e.target.closest('.goat-chip'); if (!chip) return;
+  var wasOn = chip.classList.contains('on');
+  if (!wasOn && countSelectedChips() >= 3) return; // max 3
+  chip.classList.toggle('on');
+  applyAllChips();
+});
+document.getElementById('goat-fund-chips').addEventListener('click', function(e) {
+  var chip = e.target.closest('.goat-chip'); if (!chip) return;
+  var wasOn = chip.classList.contains('on');
+  if (!wasOn && countSelectedChips() >= 3) return;
+  chip.classList.toggle('on');
+  applyAllChips();
+});
+
+// Temel analiz preset'leri
+document.getElementById('presets').addEventListener('click', function(e) {
+  var chip = e.target.closest('.chip'); if (!chip) return;
+  if (!PRESETS[chip.dataset.preset]) return;
+  var wasOn = chip.classList.contains('on');
+  if (!wasOn && countSelectedChips() >= 3) return;
+  chip.classList.toggle('on');
+  applyAllChips();
+});
+
+// Teknik analiz preset'leri
+document.getElementById('tech-presets').addEventListener('click', function(e) {
+  var chip = e.target.closest('.tech-chip'); if (!chip) return;
+  if (!TECH_PRESETS[chip.dataset.tech]) return;
+  var wasOn = chip.classList.contains('on');
+  if (!wasOn && countSelectedChips() >= 3) return;
+  chip.classList.toggle('on');
+  applyAllChips();
 });
 
 function updateClrBtn() {
   const btn = document.getElementById('clrbtn');
   if(!btn) return;
   const hasChip = document.querySelector('.chip.on');
-  const hasInput = Array.from(document.querySelectorAll('.finps input')).some(i => i.value !== '');
+  const sectorSel = (document.getElementById('sector_filter') || {}).value || '';
+  const hasInput = sectorSel !== '' || Array.from(document.querySelectorAll('.finps input')).some(i => i.value !== '');
   btn.style.display = (hasChip || hasInput) ? 'block' : 'none';
 }
 
 function clearFilters(resetChips=true){
   document.querySelectorAll('.finps input').forEach(i=>i.value='');
-  if(resetChips) { document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on')); ['goat-info','preset-info'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';}); }
+  const sf = document.getElementById('sector_filter'); if(sf) sf.value = '';
+  if(resetChips) { document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on')); ['goat-info','goat-fund-info','preset-info','tech-preset-info'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.display='none';el.innerHTML='';}});}  
   updateClrBtn();
   if(allData.length) applyAndRender();
 }
@@ -1696,7 +1843,15 @@ function applyAndRender(special){
     ['piotroski',                       'piotroski_min','piotroski_max', 1],
     ['peg',                             'peg_min',    'peg_max',   1],
     ['marketCapitalization',           'mc_min',     'mc_max',    1],
+    ['changePercent',                  'chg_min',    'chg_max',   1],
+    ['fromHigh',                       null,         'from_high_max', 1],
+    ['fromLow',                        'from_low_min', null,      1],
+    ['currentPrice',                   'price_min',  'price_max', 1],
   ];
+  // Hacim ayrı — Milyon lot
+  const volMin = getN('vol_min'), volMax = getN('vol_max');
+  // Sektör filtresi
+  const sectorFilter = (document.getElementById('sector_filter') || {}).value || '';
 
   filtered = allData.filter(s => {
     if(searchQ){
@@ -1712,6 +1867,16 @@ function applyAndRender(special){
       if(mn!==null && val<mn) return false;
       if(mx!==null && val>mx) return false;
     }
+    // Hacim filtresi (Milyon lot)
+    if(volMin !== null || volMax !== null){
+      const vol = s.volume;
+      if(vol === null || vol === undefined) return false;
+      const volM = vol / 1e6;
+      if(volMin !== null && volM < volMin) return false;
+      if(volMax !== null && volM > volMax) return false;
+    }
+    // Sektör filtresi
+    if(sectorFilter && s.sector !== sectorFilter) return false;
     return true;
   });
 
