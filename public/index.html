@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>DeepFin — Gürültü yok,fırast var. </title>
+<title>DeepFin — Gürültü yok, fırsat var.</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -448,6 +448,24 @@ td:first-child,td:nth-child(2){text-align:left;}
 .sb-val.up{color:var(--green);}
 .sb-val.dn{color:var(--red);}
 
+/* ── FOOTER ── */
+.site-footer{background:var(--s1);border-top:1px solid var(--border);padding:24px 32px 0;flex-shrink:0;opacity:0;transform:translateY(16px);transition:opacity .5s ease,transform .5s ease;pointer-events:none;}
+.site-footer.footer-visible{opacity:1;transform:translateY(0);pointer-events:all;}
+.footer-top{display:flex;align-items:flex-start;gap:48px;margin-bottom:20px;}
+.footer-brand{flex:0 0 200px;}
+.footer-logo{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:6px;color:var(--text);}
+.footer-tagline{font-size:11px;color:var(--text2);margin:0 0 3px 0;font-style:italic;}
+.footer-desc{font-size:11px;color:var(--muted2);line-height:1.5;margin:0;}
+.footer-links-group{display:flex;flex:1;gap:32px;}
+.footer-col{display:flex;flex-direction:column;gap:7px;flex:1;}
+.footer-col-title{font-size:10px;font-weight:600;color:var(--text);letter-spacing:.4px;text-transform:uppercase;margin-bottom:2px;}
+.footer-link{font-size:12px;color:var(--muted2);cursor:pointer;text-decoration:none;transition:color .15s;background:none;border:none;padding:0;text-align:left;}
+.footer-link:hover{color:var(--text);}
+.footer-bottom{border-top:1px solid var(--border);padding:10px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+.footer-bottom-left{font-size:11px;color:var(--muted2);}
+.footer-disclaimer-short{font-size:10px;color:var(--muted);font-style:italic;}
+@media(max-width:768px){.footer-top{flex-direction:column;gap:20px;}.footer-brand{flex:none;}.footer-links-group{flex-wrap:wrap;}.footer-bottom{flex-direction:column;text-align:center;}}
+
 </style>
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 </head>
@@ -813,6 +831,59 @@ td:first-child,td:nth-child(2){text-align:left;}
       <div id="dxpanel-insider"       class="dxpanel"><div id="insider-body"><div class="dxloading">Yükleniyor...</div></div></div>
       <div id="dxpanel-short"         class="dxpanel"><div id="short-body"><div class="dxloading">Yükleniyor...</div></div></div>
     </div>
+  </div>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="site-footer">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-logo"><div class="tlogo-mark">D</div>DeepFin</div>
+        <p class="footer-tagline">Gürültü yok, fırsat var.</p>
+        <p class="footer-desc">Dünya borsaları için gerçek zamanlı veri.</p>
+      </div>
+      <div class="footer-links-group">
+        <div class="footer-col">
+          <div class="footer-col-title">Platform</div>
+          <a class="footer-link" onclick="openInfo()">Bilgi Bankası</a>
+          <a class="footer-link" onclick="openInfo()">GOAT Stratejileri</a>
+          <a class="footer-link" onclick="openInfo()">Terimler Sözlüğü</a>
+          <a class="footer-link" onclick="openInfo()">Filtre Presetleri</a>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title">Hakkımızda</div>
+          <a class="footer-link" onclick="showFooterModal('about')">Hakkımızda</a>
+          <a class="footer-link" onclick="showFooterModal('mission')">Misyon & Vizyon</a>
+          <a class="footer-link" onclick="showFooterModal('contact')">İletişim</a>
+          <a class="footer-link" onclick="openSupport()">Destek Ol ❤️</a>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title">Yasal</div>
+          <a class="footer-link" onclick="showFooterModal('disclaimer')">Yasal Uyarı</a>
+          <a class="footer-link" onclick="showFooterModal('privacy')">Gizlilik Politikası</a>
+          <a class="footer-link" onclick="showFooterModal('terms')">Kullanım Koşulları</a>
+          <a class="footer-link" onclick="showFooterModal('cookies')">Çerez Politikası</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-bottom-left">
+        <span>© 2026 DeepFin. Tüm hakları saklıdır.</span>
+      </div>
+      <div class="footer-bottom-right">
+        <span class="footer-disclaimer-short">Bu platform yatırım tavsiyesi vermez. Tüm veriler bilgi amaçlıdır.</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ─── FOOTER MODAL ─── -->
+<div class="modal-overlay" id="footerModal" onclick="closeFooterModal()">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:560px;">
+    <div class="modal-head">
+      <div class="modal-title" id="footer-modal-title">BAŞLIK</div>
+      <button class="modal-close" onclick="closeFooterModal()">✕</button>
+    </div>
+    <div class="modal-body" id="footer-modal-body" style="padding:20px 24px;font-size:13px;line-height:1.8;color:var(--text2);"></div>
   </div>
 </div>
 
@@ -3120,6 +3191,97 @@ function updateTicker() {
     return '<span class="ticker-item"><span class="ticker-sym">' + (s.symbol || s.name) + '</span><span class="ticker-px">' + px + '</span><span class="ticker-chg ' + cls + '">' + chgStr + '</span></span>';
   }).join('');
 }
+
+function showFooterModal(type) {
+  var titles = {
+    about:      'HAKKIMIZDA',
+    mission:    'MİSYON & VİZYON',
+    contact:    'İLETİŞİM',
+    disclaimer: 'YASAL UYARI',
+    privacy:    'GİZLİLİK POLİTİKASI',
+    terms:      'KULLANIM KOŞULLARI',
+    cookies:    'ÇEREZ POLİTİKASI'
+  };
+  var contents = {
+    about: `<p><strong style="color:var(--text)">DeepFin</strong>, Türkiye ve küresel piyasalarda yatırım yapan bireysel yatırımcılar için geliştirilmiş profesyonel bir hisse tarama ve finansal analiz platformudur.</p>
+<p>Platform; BIST, NASDAQ, S&P 500, DAX, LSE ve Nikkei borsalarındaki binlerce hisseyi gerçek zamanlı verilerle tarayarak, Warren Buffett, Benjamin Graham, Peter Lynch, Mark Minervini gibi efsanevi yatırımcıların stratejilerini otomatik olarak uygular.</p>
+<p>DeepFin, karmaşık finansal analizleri herkesin kolayca kullanabileceği bir arayüze dönüştürmeyi hedefler. Kurumsal yatırımcıların kullandığı araçları bireysel yatırımcıya ulaştırmak temel amacımızdır.</p>
+<p style="color:var(--muted2);font-size:11px;margin-top:16px;">Geliştirici iletişim için destek butonunu kullanabilirsiniz.</p>`,
+
+    mission: `<p><strong style="color:var(--text)">Misyonumuz:</strong> Finansal piyasalardaki bilgi asimetrisini ortadan kaldırmak. Kurumsal yatırımcıların yıllardır kullandığı tarama ve analiz araçlarını, bireysel yatırımcıya ücretsiz ve erişilebilir biçimde sunmak.</p>
+<p><strong style="color:var(--text)">Vizyonumuz:</strong> Türkiye'nin ve dünyanın en kapsamlı bireysel yatırımcı platformu olmak. Her yatırım kararının veriye dayalı, şeffaf ve bilinçli alınmasına katkı sağlamak.</p>
+<p><strong style="color:var(--text)">Değerlerimiz:</strong></p>
+<ul style="padding-left:16px;line-height:2;">
+  <li>Şeffaflık — Veri kaynakları ve metodoloji açık</li>
+  <li>Erişilebilirlik — Ücretsiz temel özellikler</li>
+  <li>Doğruluk — Gerçek zamanlı, güvenilir veri</li>
+  <li>Eğitim — Kullanıcıyı bilinçli yatırımcıya dönüştürme</li>
+</ul>`,
+
+    contact: `<p><strong style="color:var(--text)">İletişim</strong></p>
+<p>Öneri, hata bildirimi veya iş birliği talepleriniz için:</p>
+<div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:16px;margin:12px 0;line-height:2;">
+  <div>📧 <strong style="color:var(--text)">E-posta:</strong> destek@deepfin.app</div>
+  <div>🐦 <strong style="color:var(--text)">Twitter/X:</strong> @deepfinapp</div>
+  <div>💬 <strong style="color:var(--text)">Discord:</strong> discord.gg/deepfin</div>
+</div>
+<p style="font-size:11px;color:var(--muted2);">Yanıt süresi genellikle 24–48 saattir. Platform içindeki "Destek Ol" butonu üzerinden de ulaşabilirsiniz.</p>`,
+
+    disclaimer: `<p><strong style="color:var(--red)">⚠️ Önemli Yasal Uyarı</strong></p>
+<p>DeepFin platformunda sunulan tüm bilgi, veri, analiz ve içerikler <strong style="color:var(--text)">yalnızca bilgilendirme amaçlıdır</strong> ve yatırım tavsiyesi niteliği taşımaz.</p>
+<p>Platform üzerindeki hiçbir içerik; herhangi bir menkul kıymetin alım, satım veya elde tutulmasına yönelik tavsiye, öneri veya teşvik olarak yorumlanamaz.</p>
+<p>Yatırım kararları kişisel mali durumunuza, risk toleransınıza ve yatırım hedeflerinize göre değişir. Her türlü yatırım kararından önce lisanslı bir yatırım danışmanına başvurmanız tavsiye edilir.</p>
+<p>Geçmiş performans gelecekteki sonuçları garanti etmez. Tüm yatırımlar risk içerir ve yatırılan tutarın tamamı kaybedilebilir.</p>
+<p style="font-size:11px;color:var(--muted2);margin-top:16px;">Veri sağlayıcıların (TradingView, Yahoo Finance vb.) hizmet kesintileri veya veri hataları nedeniyle oluşabilecek zararlardan DeepFin sorumlu tutulamaz.</p>`,
+
+    privacy: `<p><strong style="color:var(--text)">Gizlilik Politikası</strong></p>
+<p>DeepFin olarak kullanıcı gizliliğine büyük önem veriyoruz.</p>
+<p><strong style="color:var(--text)">Topladığımız veriler:</strong> Platform tamamen istemci taraflı çalışır. Kişisel veri toplamaz, üye kaydı gerektirmez. Kullanım istatistikleri (sayfa görüntüleme, anonim) analitik amaçlı toplanabilir.</p>
+<p><strong style="color:var(--text)">Üçüncü taraf servisleri:</strong> TradingView Scanner API, Yahoo Finance ve SEC EDGAR'dan veri çekilir. Bu servislerin kendi gizlilik politikaları geçerlidir.</p>
+<p><strong style="color:var(--text)">Çerezler:</strong> Oturum ve tercih bilgilerini saklamak için minimal çerez kullanılabilir. Reklam amaçlı çerez kullanılmaz.</p>
+<p style="font-size:11px;color:var(--muted2);margin-top:16px;">Son güncelleme: Ocak 2026</p>`,
+
+    terms: `<p><strong style="color:var(--text)">Kullanım Koşulları</strong></p>
+<p>DeepFin'i kullanarak aşağıdaki koşulları kabul etmiş sayılırsınız:</p>
+<ul style="padding-left:16px;line-height:2.2;font-size:12px;">
+  <li>Platform yalnızca kişisel, ticari olmayan amaçlarla kullanılabilir.</li>
+  <li>Platform verilerini otomatik araçlarla toplamak (scraping) yasaktır.</li>
+  <li>DeepFin içerikleri kaynak gösterilmeden kopyalanamaz veya dağıtılamaz.</li>
+  <li>Platform üzerinden sunulan bilgiler yatırım tavsiyesi değildir.</li>
+  <li>Servis kesintisi veya veri hataları nedeniyle oluşacak kayıplardan DeepFin sorumlu değildir.</li>
+  <li>Koşullar önceden bildirimde bulunmaksızın değiştirilebilir.</li>
+</ul>
+<p style="font-size:11px;color:var(--muted2);margin-top:12px;">Son güncelleme: Ocak 2026</p>`,
+
+    cookies: `<p><strong style="color:var(--text)">Çerez Politikası</strong></p>
+<p>DeepFin minimal çerez kullanır. Reklam veya izleme amaçlı çerez kullanılmaz.</p>
+<div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:16px;margin:12px 0;font-size:12px;line-height:2;">
+  <div><strong style="color:var(--text)">Zorunlu Çerezler:</strong> Oturum yönetimi ve tercih kaydetme</div>
+  <div><strong style="color:var(--text)">Analitik Çerezler:</strong> Anonim kullanım istatistikleri (opsiyonel)</div>
+  <div><strong style="color:var(--text)">Reklam Çerezleri:</strong> Kullanılmaz ✓</div>
+  <div><strong style="color:var(--text)">3. Taraf İzleme:</strong> Kullanılmaz ✓</div>
+</div>
+<p>Tarayıcı ayarlarından çerezleri devre dışı bırakabilirsiniz. Bu durumda bazı tercihler kaydedilemeyebilir.</p>
+<p style="font-size:11px;color:var(--muted2);">Son güncelleme: Ocak 2026</p>`
+  };
+
+  document.getElementById('footer-modal-title').textContent = titles[type] || '';
+  document.getElementById('footer-modal-body').innerHTML = contents[type] || '';
+  document.getElementById('footerModal').classList.add('open');
+}
+
+function closeFooterModal() {
+  document.getElementById('footerModal').classList.remove('open');
+}
+// Footer scroll reveal
+(function(){
+  var footer = document.querySelector('.site-footer');
+  if(!footer) return;
+  var obs = new IntersectionObserver(function(entries){
+    if(entries[0].isIntersecting) footer.classList.add('footer-visible');
+  }, { threshold: 0.05 });
+  obs.observe(footer);
+})();
 
 </script>
 </body>
