@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>DeepFin — Gürültü yok, fırsat var.</title>
+<title>DeepFin — Hisse Tarama Aracı</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -474,7 +474,7 @@ td:first-child,td:nth-child(2){text-align:left;}
 <!-- ─── MAIN APP ─── -->
 <div id="app" class="on">
   <div class="topbar">
-    <div class="tlogo"><div class="tlogo-mark">D</div>DeepFin </span></div>
+    <div class="tlogo"><div class="tlogo-mark">D</div>DeepFin <span>Hisse Tarama Aracı</span></div>
     <span class="tlive">Canlı</span>
     <div class="tsearch">
       <span class="tsearch-ico">⌕</span>
@@ -3273,14 +3273,31 @@ function showFooterModal(type) {
 function closeFooterModal() {
   document.getElementById('footerModal').classList.remove('open');
 }
-// Footer scroll reveal
+// Footer scroll reveal — triggered by twrap scroll
 (function(){
   var footer = document.querySelector('.site-footer');
   if(!footer) return;
-  var obs = new IntersectionObserver(function(entries){
-    if(entries[0].isIntersecting) footer.classList.add('footer-visible');
-  }, { threshold: 0.05 });
-  obs.observe(footer);
+  function checkScroll(){
+    var twrap = document.getElementById('twrap');
+    if(!twrap) return;
+    var scrolled = twrap.scrollTop + twrap.clientHeight;
+    var total = twrap.scrollHeight;
+    if(total - scrolled < 120){
+      footer.classList.add('footer-visible');
+    } else {
+      footer.classList.remove('footer-visible');
+    }
+  }
+  // attach on twrap when it becomes visible
+  var twrap = document.getElementById('twrap');
+  if(twrap) twrap.addEventListener('scroll', checkScroll);
+  // re-attach after scan in case twrap was hidden
+  document.addEventListener('click', function(){
+    setTimeout(function(){
+      var tw = document.getElementById('twrap');
+      if(tw && !tw._footerBound){ tw.addEventListener('scroll', checkScroll); tw._footerBound=true; }
+    }, 500);
+  });
 })();
 
 </script>
