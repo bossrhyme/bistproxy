@@ -1,7 +1,6 @@
 {
-  "routes": [
-    { "src": "/analiz/(.*)", "dest": "/analiz/index.html" },
-    { "src": "/analiz", "dest": "/analiz/index.html" },
-    { "src": "/(.*)", "dest": "/public/$1" }
+  "rewrites": [
+    { "source": "/analiz/:path*", "destination": "/analiz/index.html" },
+    { "source": "/(.*)", "destination": "/public/$1" }
   ]
 }
