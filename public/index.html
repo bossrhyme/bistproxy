@@ -861,8 +861,8 @@ td:first-child,td:nth-child(2){text-align:left;}
         <div class="hp-stat-label">Taranan hisse senedi</div>
       </div>
       <div class="hp-stat">
-        <div class="hp-stat-val">9 <span>strateji</span></div>
-        <div class="hp-stat-label">Buffett · Lynch · Graham · Minervini ve daha fazlası</div>
+        <div class="hp-stat-val" data-strat-count>31 <span>strateji</span></div>
+        <div class="hp-stat-label">Buffett · Munger · Graham · Klarman · Greenblatt · Lynch ve daha fazlası</div>
       </div>
       <div class="hp-stat">
         <div class="hp-stat-val">0 <span>₺</span></div>
@@ -1104,12 +1104,22 @@ td:first-child,td:nth-child(2){text-align:left;}
         <div class="filter-group">
           <div class="filter-group-title">🐐 GOAT Yatırımcı ve Traderlar</div>
           <div class="chips" id="goat-chips">
+            <div class="chip goat-chip" data-goat="ackman">Ackman</div>
+            <div class="chip goat-chip" data-goat="ark">ARK/Wood</div>
             <div class="chip goat-chip" data-goat="buffett">Buffett</div>
+            <div class="chip goat-chip" data-goat="einhorn">Einhorn</div>
+            <div class="chip goat-chip" data-goat="fisher">Fisher</div>
             <div class="chip goat-chip" data-goat="graham">Graham</div>
-            <div class="chip goat-chip" data-goat="lynch">Lynch PEG</div>
-            <div class="chip goat-chip" data-goat="ark">Ark/Wood</div>
+            <div class="chip goat-chip" data-goat="greenblatt">Greenblatt</div>
+            <div class="chip goat-chip" data-goat="icahn">Icahn</div>
+            <div class="chip goat-chip" data-goat="klarman">Klarman</div>
+            <div class="chip goat-chip" data-goat="lynch">Lynch</div>
             <div class="chip goat-chip" data-goat="minervini">Minervini</div>
+            <div class="chip goat-chip" data-goat="munger">Munger</div>
+            <div class="chip goat-chip" data-goat="oneil">O'Neil</div>
+            <div class="chip goat-chip" data-goat="oshaughnessy">O'Shaughnessy</div>
             <div class="chip goat-chip" data-goat="piotroski">Piotroski</div>
+            <div class="chip goat-chip" data-goat="schloss">Schloss</div>
           </div>
           <div class="goat-info" id="goat-info"></div>
           <div class="filter-group-title" style="margin-top:10px;">🏦 GOAT Fonlar</div>
@@ -1124,12 +1134,12 @@ td:first-child,td:nth-child(2){text-align:left;}
         <div class="filter-group">
           <div class="filter-group-title">📊 Hazır Temel Analiz</div>
           <div class="presets chips" id="presets">
-            <div class="chip" data-preset="value">Değer</div>
-            <div class="chip" data-preset="growth">Büyüme</div>
-            <div class="chip" data-preset="dividend">Temettü</div>
-            <div class="chip" data-preset="quality">Kaliteli</div>
             <div class="chip" data-preset="lowdebt">Az Borç</div>
+            <div class="chip" data-preset="growth">Büyüme</div>
+            <div class="chip" data-preset="value">Değer</div>
+            <div class="chip" data-preset="quality">Kaliteli</div>
             <div class="chip" data-preset="momentum">Momentum</div>
+            <div class="chip" data-preset="dividend">Temettü</div>
           </div>
           <div class="goat-info" id="preset-info"></div>
           <div class="filter-group-title" style="margin-top:10px;">📈 Hazır Teknik Analiz</div>
@@ -1580,136 +1590,186 @@ td:first-child,td:nth-child(2){text-align:left;}
       </div>
       <!-- ══════ GOAT STRATEJİLERİ BİLGİ BANKASI ══════ -->
       <div class="preset-info-wrap goat-bank-section">
-        <div class="preset-info-title">🐐 GOAT Yatırımcı & 🏦 GOAT Fonlar — Detaylı Rehber</div>
+        <div class="preset-info-title">🐐 GOAT Yatırımcı &amp; 🏦 GOAT Fonlar — Detaylı Rehber</div>
 
-        <!-- GOAT YATIRIMCILAR -->
         <div style="font-size:10px;font-weight:700;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;">🐐 GOAT Yatırımcı ve Traderlar</div>
         <div class="goat-bank-grid">
 
+          <!-- ACKMAN -->
           <div class="goat-card">
-            <div class="goat-card-head">
-              <div class="goat-card-emoji">🎯</div>
-              <div><div class="goat-card-title">Warren Buffett</div><div class="goat-card-subtitle">Değer Yatırimi — Berkshire Hathaway</div></div>
-            </div>
-            <div class="goat-card-perf"><span class="goat-perf-badge">ROE &gt;15%</span><span class="goat-perf-badge">F/K 5-20</span><span class="goat-perf-badge">Düsük Borc</span></div>
-            <div class="goat-card-body">Güçlü marka ve rekabet avantajı (moat) olan, yüksek özkaynak karlılığına sahip, düşük borçlu şirketleri makul fiyattan satın al ve uzun vadede tut. "Harika bir şirketi adil fiyattan almak, adil bir şirketi harika fiyattan almaktan iyidir."</div>
-            <div class="goat-card-criteria"><span class="goat-criterion">F/K: 5-20</span><span class="goat-criterion">PD/DD &lt;3</span><span class="goat-criterion">ROE &gt;15%</span><span class="goat-criterion">Marj &gt;10%</span><span class="goat-criterion">B/Ö &lt;80</span></div>
+            <div class="goat-card-head"><div class="goat-card-emoji">⚔️</div>
+              <div><div class="goat-card-title">Bill Ackman — Pershing Square</div><div class="goat-card-subtitle">Aktivist Değer — Pershing Square Capital</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">ROE &gt;15%</span><span class="goat-perf-badge">F/K &lt;20</span><span class="goat-perf-badge">Katalizör Arayan</span></div>
+            <div class="goat-card-body">Aktivist yatırım: güçlü iş modeli olan ama yanlış yönetilen şirketleri tespit et, hissedar baskısıyla değer aç. Yüksek ROE, güçlü marj, makul borç. "Yönetimi değiştir, değeri aç." Pershing Square'de 20Y+ ~%20/yıl.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">ROE &gt;15%</span><span class="goat-criterion">Marj &gt;10%</span><span class="goat-criterion">B/Ö &lt;80</span><span class="goat-criterion">Cari &gt;1.2</span><span class="goat-criterion">F/K &lt;20</span></div>
           </div>
 
+          <!-- ARK -->
           <div class="goat-card">
-            <div class="goat-card-head">
-              <div class="goat-card-emoji">📚</div>
-              <div><div class="goat-card-title">Benjamin Graham</div><div class="goat-card-subtitle">Derin Deger — "Akıllı Yatırımcı"</div></div>
-            </div>
-            <div class="goat-card-perf"><span class="goat-perf-badge">F/K &lt;10</span><span class="goat-perf-badge">PD/DD &lt;1.2</span><span class="goat-perf-badge">Temettü</span></div>
-            <div class="goat-card-body">Güvenlik marjı (margin of safety) ilkesiyle, gerçek degerinin çok altında işlem gören şirketleri bul. Net likit varlık degeri (NCAV) hesapla. Zayıf bilanço, yüksek borç, spekülatif hisselerden kaçın. En muhafazakâr yatırım felsefesi.</div>
-            <div class="goat-card-criteria"><span class="goat-criterion">F/K &lt;10</span><span class="goat-criterion">PD/DD &lt;1.2</span><span class="goat-criterion">B/Ö &lt;50</span><span class="goat-criterion">Cari &gt;2</span><span class="goat-criterion">Temettü &gt;1%</span></div>
+            <div class="goat-card-head"><div class="goat-card-emoji">🚀</div>
+              <div><div class="goat-card-title">Cathie Wood / ARK</div><div class="goat-card-subtitle">Disruptif Teknoloji — ARK Invest</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">Gelir &gt;30%</span><span class="goat-perf-badge">EPS &gt;20%</span><span class="goat-perf-badge">5Y Vizyon</span></div>
+            <div class="goat-card-body">AI, genomik, enerji depolama, fintech, uzay gibi disruptif sektörlere odaklan. Gelir büyümesi &gt;%30, kazanç ivmesi güçlü. Kısa vadeli kârsızlık kabul — uzun vadeli pazar liderliği önce. Yüksek volatilite, yüksek potansiyel.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">Gelir &gt;30%</span><span class="goat-criterion">EPS &gt;20%</span><span class="goat-criterion">Cari &gt;1</span></div>
           </div>
 
+          <!-- BUFFETT -->
           <div class="goat-card">
-            <div class="goat-card-head">
-              <div class="goat-card-emoji">📈</div>
-              <div><div class="goat-card-title">Peter Lynch — PEG</div><div class="goat-card-subtitle">Büyüme+Deger — Fidelity Magellan</div></div>
-            </div>
-            <div class="goat-card-perf"><span class="goat-perf-badge">PEG &lt;1</span><span class="goat-perf-badge">ROE &gt;12%</span><span class="goat-perf-badge">Anlasilan Sirket</span></div>
-            <div class="goat-card-body">PEG = F/K ÷ Büyüme. PEG &lt;1 altin fırsat, PEG &lt;2 makul. "Anlayabildigin şirketlere yatırım yap." Büyüme potansiyeli yüksek ama fiyatı henüz buna göre şekillenmemiş şirketleri avla. 13 yılda %29 yıllık getiri.</div>
-            <div class="goat-card-criteria"><span class="goat-criterion">PEG &lt;2</span><span class="goat-criterion">F/K: 5-30</span><span class="goat-criterion">ROE &gt;12%</span><span class="goat-criterion">Marj &gt;8%</span><span class="goat-criterion">B/Ö &lt;100</span></div>
+            <div class="goat-card-head"><div class="goat-card-emoji">🎯</div>
+              <div><div class="goat-card-title">Warren Buffett</div><div class="goat-card-subtitle">Değer Yatırımı — Berkshire Hathaway</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">ROE &gt;20%</span><span class="goat-perf-badge">Brüt &gt;40%</span><span class="goat-perf-badge">F/K 5-25</span></div>
+            <div class="goat-card-body">Güçlü marka ve rekabet avantajı (moat): ROE&gt;%20, brüt marj&gt;%40, net marj&gt;%20, D/E&lt;%50. Makul fiyattan al, uzun vadede tut. "Harika bir şirketi adil fiyattan almak, adil bir şirketi harika fiyattan almaktan iyidir." ~%20/yıl — 60 yıldır.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">F/K: 5-25</span><span class="goat-criterion">ROE &gt;20%</span><span class="goat-criterion">Brüt &gt;40%</span><span class="goat-criterion">Marj &gt;20%</span><span class="goat-criterion">B/Ö &lt;50</span></div>
           </div>
 
+          <!-- EINHORN -->
           <div class="goat-card">
-            <div class="goat-card-head">
-              <div class="goat-card-emoji">⚡</div>
-              <div><div class="goat-card-title">Mark Minervini — SEPA</div><div class="goat-card-subtitle">Momentum — US Investing Champ.</div></div>
-            </div>
-            <div class="goat-card-perf"><span class="goat-perf-badge">EPS &gt;25%</span><span class="goat-perf-badge">ROE &gt;17%</span><span class="goat-perf-badge">52H Yakini</span></div>
-            <div class="goat-card-body">Specific Entry Point Analysis (SEPA): güçlü kazanç büyümesi, yüksek ROE, sağlıklı marj ve 52 hafta yükseğine yakın fiyat. Trend takipçisi — yükselen hisseleri al, zayıflayanları sat. ABD şampiyonluk kazanan disiplinli teknik+temel hibrit strateji.</div>
+            <div class="goat-card-head"><div class="goat-card-emoji">🔍</div>
+              <div><div class="goat-card-title">David Einhorn — Greenlight</div><div class="goat-card-subtitle">Derin Değer — Greenlight Capital</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">F/K &lt;15</span><span class="goat-perf-badge">Cari &gt;1.5</span><span class="goat-perf-badge">Marj &gt;8%</span></div>
+            <div class="goat-card-body">Derin değer + kısa satış: Long taraf — düşük F/K, güçlü nakit, düşük borç, kârlı ama gözden kaçmış şirketler. "Piyasa geçici olarak yanılıyor, temel değer kazanır." Analitik derinlik ve karşı görüş güçlü.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">F/K &lt;15</span><span class="goat-criterion">B/Ö &lt;50</span><span class="goat-criterion">Cari &gt;1.5</span><span class="goat-criterion">Marj &gt;8%</span><span class="goat-criterion">ROE &gt;10%</span></div>
+          </div>
+
+          <!-- FISHER -->
+          <div class="goat-card">
+            <div class="goat-card-head"><div class="goat-card-emoji">🌱</div>
+              <div><div class="goat-card-title">Philip Fisher — Scuttlebutt</div><div class="goat-card-subtitle">Büyüme Yatırımı — "Common Stocks"</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">Gelir &gt;15%</span><span class="goat-perf-badge">Brüt &gt;35%</span><span class="goat-perf-badge">Uzun Vade</span></div>
+            <div class="goat-card-body">Uzun vadeli büyüme: gelir &gt;%15, kazanç &gt;%15, brüt marj &gt;%35, net marj &gt;%12. Güçlü Ar-Ge ve satış ekibi. "Harika şirketi asla satma." Buffett ve Lynch'in ilham kaynağı. "Common Stocks and Uncommon Profits."</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">Gelir &gt;15%</span><span class="goat-criterion">EPS &gt;15%</span><span class="goat-criterion">Brüt &gt;35%</span><span class="goat-criterion">Marj &gt;12%</span><span class="goat-criterion">B/Ö &lt;60</span></div>
+          </div>
+
+          <!-- GRAHAM -->
+          <div class="goat-card">
+            <div class="goat-card-head"><div class="goat-card-emoji">📚</div>
+              <div><div class="goat-card-title">Benjamin Graham</div><div class="goat-card-subtitle">Derin Değer — "Akıllı Yatırımcı"</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">F/K &lt;10</span><span class="goat-perf-badge">PD/DD &lt;1.5</span><span class="goat-perf-badge">Temettü</span></div>
+            <div class="goat-card-body">Güvenlik marjı: gerçek değerinin çok altında işlem gören şirketleri bul. F/K&lt;10, PD/DD&lt;1.5, cari oran&gt;2, B/Ö&lt;%50, temettü geçmişi. Spekülatif olmayan, muhafazakâr bilanço. En klasik değer yatırımı felsefesi.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">F/K &lt;10</span><span class="goat-criterion">PD/DD &lt;1.5</span><span class="goat-criterion">B/Ö &lt;50</span><span class="goat-criterion">Cari &gt;2</span><span class="goat-criterion">Temettü &gt;1%</span></div>
+          </div>
+
+          <!-- GREENBLATT -->
+          <div class="goat-card">
+            <div class="goat-card-head"><div class="goat-card-emoji">🪄</div>
+              <div><div class="goat-card-title">Joel Greenblatt — Magic Formula</div><div class="goat-card-subtitle">Sistematik Değer — Gotham Capital</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">ROE &gt;25%</span><span class="goat-perf-badge">F/K &lt;15</span><span class="goat-perf-badge">17Y %30.8/yıl</span></div>
+            <div class="goat-card-body">Magic Formula: yüksek ROIC (iyi şirket) + yüksek kazanç verimi (ucuz fiyat). ROE&gt;%25, F/K&lt;15. 17 yılda S&amp;P'yi yıllık %18 geçti. "İki kural yeterli: iyi şirketi ucuza al." Duygu yok, sistematik tarama. "The Little Book That Beats the Market."</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">ROE &gt;25%</span><span class="goat-criterion">F/K &lt;15</span><span class="goat-criterion">B/Ö &lt;80</span><span class="goat-criterion">Cari &gt;1</span></div>
+          </div>
+
+          <!-- ICAHN -->
+          <div class="goat-card">
+            <div class="goat-card-head"><div class="goat-card-emoji">🦁</div>
+              <div><div class="goat-card-title">Carl Icahn — Activist Value</div><div class="goat-card-subtitle">Aktivist — Icahn Enterprises</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">PD/DD &lt;1.5</span><span class="goat-perf-badge">F/K &lt;12</span><span class="goat-perf-badge">Temettü</span></div>
+            <div class="goat-card-body">Nakit zengini, düşük borçlu, düşük F/K ama değer açıkta. Hissedar aktivizmi: geri alım, temettü artışı, şirket satışı. Yönetim değişikliğiyle değer açığa çıkar. "Wall Street'in savaşçı yatırımcısı." 40Y+ piyasa üstü getiri.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">PD/DD &lt;1.5</span><span class="goat-criterion">F/K &lt;12</span><span class="goat-criterion">B/Ö &lt;60</span><span class="goat-criterion">Cari &gt;1.5</span><span class="goat-criterion">Temettü &gt;1%</span></div>
+          </div>
+
+          <!-- KLARMAN -->
+          <div class="goat-card">
+            <div class="goat-card-head"><div class="goat-card-emoji">🛡️</div>
+              <div><div class="goat-card-title">Seth Klarman — Margin of Safety</div><div class="goat-card-subtitle">Ultra Değer — Baupost Group</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">F/K &lt;10</span><span class="goat-perf-badge">PD/DD &lt;1.2</span><span class="goat-perf-badge">40Y %20/yıl</span></div>
+            <div class="goat-card-body">Güvenlik marjı — Graham'ın en katı versiyonu: F/K&lt;10, PD/DD&lt;1.2, B/Ö&lt;%40, güçlü nakit. "Ucuzu al, bilanço yanlış fiyatlanmışsa bekle." 1982'den beri ~%20/yıl. "Margin of Safety" kitabı ikinci elde $1,000+'a satılıyor.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">F/K &lt;10</span><span class="goat-criterion">PD/DD &lt;1.2</span><span class="goat-criterion">B/Ö &lt;40</span><span class="goat-criterion">Cari &gt;2</span><span class="goat-criterion">Marj &gt;5%</span></div>
+          </div>
+
+          <!-- LYNCH -->
+          <div class="goat-card">
+            <div class="goat-card-head"><div class="goat-card-emoji">📈</div>
+              <div><div class="goat-card-title">Peter Lynch — GARP</div><div class="goat-card-subtitle">Büyüme+Değer — Fidelity Magellan</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">PEG &lt;1</span><span class="goat-perf-badge">EPS &gt;15%</span><span class="goat-perf-badge">13Y %29/yıl</span></div>
+            <div class="goat-card-body">PEG = F/K ÷ Büyüme. PEG&lt;1 altın fırsat, PEG&lt;2 makul. "Anlayabildiğin şirkete yatırım yap, sayıları kontrol et." Büyüme hızına göre ucuz şirketleri avla. 13 yılda %29/yıl, Magellan Fonu'nu $18M'dan $14B'ye taşıdı.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">PEG &lt;2</span><span class="goat-criterion">F/K: 5-35</span><span class="goat-criterion">EPS &gt;15%</span><span class="goat-criterion">B/Ö &lt;80</span><span class="goat-criterion">Cari &gt;1</span></div>
+          </div>
+
+          <!-- MINERVINI -->
+          <div class="goat-card">
+            <div class="goat-card-head"><div class="goat-card-emoji">⚡</div>
+              <div><div class="goat-card-title">Mark Minervini — SEPA</div><div class="goat-card-subtitle">Momentum — US Investing Champ.</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">EPS &gt;25%</span><span class="goat-perf-badge">ROE &gt;17%</span><span class="goat-perf-badge">52H Yakını</span></div>
+            <div class="goat-card-body">Specific Entry Point Analysis (SEPA): kazanç büyümesi &gt;%25, ROE &gt;%17, marj &gt;%10, 52 hafta yükseğine yakın fiyat. Trend takipçisi — yükselen hisseleri al, zayıflayanları sat. ABD yatırım şampiyonu, disiplinli teknik+temel hibrit strateji.</div>
             <div class="goat-card-criteria"><span class="goat-criterion">EPS &gt;25%</span><span class="goat-criterion">ROE &gt;17%</span><span class="goat-criterion">Marj &gt;10%</span><span class="goat-criterion">B/Ö &lt;100</span><span class="goat-criterion">Cari &gt;1</span></div>
           </div>
 
+          <!-- MUNGER -->
           <div class="goat-card">
-            <div class="goat-card-head">
-              <div class="goat-card-emoji">🚀</div>
-              <div><div class="goat-card-title">Cathie Wood / ARK</div><div class="goat-card-subtitle">Disruptif Teknoloji — ARK Invest</div></div>
-            </div>
-            <div class="goat-card-perf"><span class="goat-perf-badge">Yüksek Büyüme</span><span class="goat-perf-badge">Teknoloji</span><span class="goat-perf-badge">5Y Vizyon</span></div>
-            <div class="goat-card-body">Yapay zeka, genomik, enerji depolama, fintech, uzay gibi disruptif sektörlere odaklan. Kısa vadeli kârsızlık kabul edilebilir — uzun vadeli pazar liderliği potansiyeli ara. Yüksek volatilite, yüksek potansiyel. Getiri odaklı büyüme.</div>
-            <div class="goat-card-criteria"><span class="goat-criterion">ROE &gt;10%</span><span class="goat-criterion">EPS &gt;15%</span><span class="goat-criterion">Teknoloji Sektörü</span></div>
+            <div class="goat-card-head"><div class="goat-card-emoji">🧠</div>
+              <div><div class="goat-card-title">Charlie Munger — Quality Compounder</div><div class="goat-card-subtitle">Kalite Odaklı — Berkshire / Wesco</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">Brüt &gt;50%</span><span class="goat-perf-badge">ROE &gt;20%</span><span class="goat-perf-badge">Neredeyse Borçsuz</span></div>
+            <div class="goat-card-body">Buffett'ın ortağı, kaliteyi daha da katı filtreler: brüt marj &gt;%50, ROE &gt;%20, borç neredeyse yok, sektör lideri. "Harika şirketi adil fiyata al, adil şirketi harika fiyata asla." Marka gücü ve bileşik büyüme odaklı.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">Brüt &gt;50%</span><span class="goat-criterion">ROE &gt;20%</span><span class="goat-criterion">Marj &gt;20%</span><span class="goat-criterion">B/Ö &lt;30</span><span class="goat-criterion">Cari &gt;1.5</span></div>
           </div>
 
+          <!-- O'NEIL -->
           <div class="goat-card">
-            <div class="goat-card-head">
-              <div class="goat-card-emoji">🏆</div>
-              <div><div class="goat-card-title">Piotroski F-Score</div><div class="goat-card-subtitle">Nicel Bilanço Puanlamasi</div></div>
-            </div>
-            <div class="goat-card-perf"><span class="goat-perf-badge">8-9 = Güçlü</span><span class="goat-perf-badge">9 Kriter</span><span class="goat-perf-badge">Bilanço Sagligi</span></div>
-            <div class="goat-card-body">9 kriterlik puanlama: Karlılık (ROA pozitif, nakit akısı güçlü, ROA artısı, tahakkuk düsük), Kaldıraç (borc azalısı, likidite artısı, hisse dilüsyonu yok), Verimlilik (marj artısı, varlık devir hızı artısı). 8-9 = mükemmel bilanço.</div>
-            <div class="goat-card-criteria"><span class="goat-criterion">F-Score 7-9</span><span class="goat-criterion">ROE &gt;5%</span><span class="goat-criterion">Cari &gt;1</span><span class="goat-criterion">B/Ö &lt;150</span></div>
+            <div class="goat-card-head"><div class="goat-card-emoji">📊</div>
+              <div><div class="goat-card-title">William O'Neil — CAN SLIM</div><div class="goat-card-subtitle">Büyüme Traderı — Investor's Business Daily</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">EPS &gt;25%</span><span class="goat-perf-badge">Gelir &gt;15%</span><span class="goat-perf-badge">ROE &gt;17%</span></div>
+            <div class="goat-card-body">CAN SLIM — 7 kriter: C (kazanç &gt;%25), A (yıllık büyüme), N (yeni ürün/kırılım), S (arz-talep), L (sektör lideri), I (kurumsal alım), M (piyasa yönü). Temel+teknik hibrit. 52H zirvesine yakın hisseler. IBD kurucusu, büyüme traderının klasiği.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">EPS &gt;25%</span><span class="goat-criterion">Gelir &gt;15%</span><span class="goat-criterion">ROE &gt;17%</span><span class="goat-criterion">B/Ö &lt;100</span><span class="goat-criterion">Cari &gt;1</span></div>
+          </div>
+
+          <!-- O'SHAUGHNESSY -->
+          <div class="goat-card">
+            <div class="goat-card-head"><div class="goat-card-emoji">📉</div>
+              <div><div class="goat-card-title">O'Shaughnessy — What Works on Wall St.</div><div class="goat-card-subtitle">Kantitatif Değer — Osprey Funds</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">F/S &lt;1.5</span><span class="goat-perf-badge">Temettü &gt;1%</span><span class="goat-perf-badge">50Y Backtest</span></div>
+            <div class="goat-card-body">50 yıllık ABD borsası backtest kazananı: F/S&lt;1.5, temettü &gt;%1, gelir büyümesi &gt;%10. Ucuz + istikrarlı + büyüyen şirketler uzun vadede piyasayı sistematik geçer. "What Works on Wall Street" — duygu yok, veri konuşur.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">F/S &lt;1.5</span><span class="goat-criterion">Temettü &gt;1%</span><span class="goat-criterion">Gelir &gt;10%</span><span class="goat-criterion">ROE &gt;10%</span></div>
+          </div>
+
+          <!-- PIOTROSKI -->
+          <div class="goat-card">
+            <div class="goat-card-head"><div class="goat-card-emoji">🏆</div>
+              <div><div class="goat-card-title">Piotroski F-Score</div><div class="goat-card-subtitle">Nicel Bilanço Puanlaması</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">8-9 = Güçlü</span><span class="goat-perf-badge">9 Kriter</span><span class="goat-perf-badge">Bilanço Sağlığı</span></div>
+            <div class="goat-card-body">9 kriterlik puanlama: Karlılık (ROA pozitif, nakit akışı güçlü, ROA artışı, tahakkuk düşük), Kaldıraç (borç azalışı, likidite artışı, hisse dilüsyonu yok), Verimlilik (marj artışı, varlık devir hızı artışı). 8-9 = mükemmel bilanço.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">F-Score 7-9</span><span class="goat-criterion">ROE &gt;3%</span><span class="goat-criterion">Cari &gt;1</span><span class="goat-criterion">B/Ö &lt;120</span></div>
+          </div>
+
+          <!-- SCHLOSS -->
+          <div class="goat-card">
+            <div class="goat-card-head"><div class="goat-card-emoji">💎</div>
+              <div><div class="goat-card-title">Walter Schloss — Deep Value</div><div class="goat-card-subtitle">Mutlak Değer — Walter &amp; Edwin Schloss</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">PD/DD &lt;1</span><span class="goat-perf-badge">F/K &lt;12</span><span class="goat-perf-badge">45Y %15.3/yıl</span></div>
+            <div class="goat-card-body">Graham'ın en sadık öğrencisi: 45 yılda %15.3/yıl. Sadece PD/DD&lt;1, az borç, temettü ödeyen, gözden düşmüş hisseler. Portföy 100+ hisse, maksimum çeşitlendirme. "Ucuz al, sabırla bekle." Greenblatt'ın "süper yatırımcı" listesinde.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">PD/DD &lt;1</span><span class="goat-criterion">F/K &lt;12</span><span class="goat-criterion">B/Ö &lt;30</span><span class="goat-criterion">Temettü &gt;1%</span><span class="goat-criterion">Cari &gt;1.5</span></div>
           </div>
 
         </div>
 
         <hr class="goat-divider">
 
-        <!-- GOAT FONLAR -->
-        <div style="font-size:10px;font-weight:700;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;">🏦 GOAT Fonlar — Son 5 Yilin Zirvesi</div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;">🏦 GOAT Fonlar — Son 5 Yılın Zirvesi</div>
         <div class="goat-bank-grid">
 
+          <!-- CITADEL -->
           <div class="goat-card">
-            <div class="goat-card-head">
-              <div class="goat-card-emoji">🏦</div>
-              <div>
-                <div class="goat-card-title">Citadel — Wellington <span class="goat-fund-tag">FON</span></div>
-                <div class="goat-card-subtitle">Ken Griffin · Multi-Strategy · $67B AUM</div>
-              </div>
-            </div>
-            <div class="goat-card-perf">
-              <span class="goat-perf-badge">2020: +24%</span>
-              <span class="goat-perf-badge">2021: +26%</span>
-              <span class="goat-perf-badge">2022: +38%</span>
-              <span class="goat-perf-badge">2023: +15%</span>
-              <span class="goat-perf-badge">2024: +15%</span>
-              <span class="goat-perf-badge neutral">Ortalama: ~19%/yil</span>
-            </div>
-            <div class="goat-card-body">1990'dan bu yana yillik net %19.2 getiri — tarihin en karlı hedge fonu. Strateji: Yüzlerce bagimsiz ekip, farkli varlık sınıflarında uzun/kısa pozisyon. Yüksek teknoloji altyapısı + risk yönetimi. Hisse seçiminde: yüksek ROE, güçlü karlılık, düsük borc, kazanç büyümesi. Volatiliteden faydalanma ve sektör rotasyonu.</div>
-            <div class="goat-card-criteria"><span class="goat-criterion">ROE &gt;15%</span><span class="goat-criterion">Marj &gt;12%</span><span class="goat-criterion">B/Ö &lt;80</span><span class="goat-criterion">Cari &gt;1.2</span><span class="goat-criterion">EPS &gt;10%</span></div>
+            <div class="goat-card-head"><div class="goat-card-emoji">🏦</div>
+              <div><div class="goat-card-title">Citadel — Wellington <span class="goat-fund-tag">FON</span></div><div class="goat-card-subtitle">Ken Griffin · Multi-Strategy · $67B AUM</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">2020: +24%</span><span class="goat-perf-badge">2021: +26%</span><span class="goat-perf-badge">2022: +38%</span><span class="goat-perf-badge">2023: +15%</span><span class="goat-perf-badge">2024: +15%</span><span class="goat-perf-badge neutral">Ort: ~19%/yıl</span></div>
+            <div class="goat-card-body">1990'dan beri net %19.2/yıl — tarihin en karlı hedge fonu. Yüzlerce bağımsız ekip, farklı varlık sınıflarında uzun/kısa pozisyon. Yüksek ROE, güçlü karlılık, düşük borç, kazanç büyümesi. Volatiliteden faydalanma + sektör rotasyonu.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">ROE &gt;15%</span><span class="goat-criterion">Marj &gt;12%</span><span class="goat-criterion">B/Ö &lt;70</span><span class="goat-criterion">Cari &gt;1.2</span><span class="goat-criterion">EPS &gt;10%</span></div>
           </div>
 
+          <!-- D.E. SHAW -->
           <div class="goat-card">
-            <div class="goat-card-head">
-              <div class="goat-card-emoji">🤖</div>
-              <div>
-                <div class="goat-card-title">D.E. Shaw — Oculus <span class="goat-fund-tag">FON</span></div>
-                <div class="goat-card-subtitle">Quant + Makro · $85B AUM · Sifir Kayip Yili</div>
-              </div>
-            </div>
-            <div class="goat-card-perf">
-              <span class="goat-perf-badge">2021: +19%</span>
-              <span class="goat-perf-badge">2023: +22%</span>
-              <span class="goat-perf-badge">2024: +36%</span>
-              <span class="goat-perf-badge">2025: +28%</span>
-              <span class="goat-perf-badge neutral">5Y Ort: ~20%/yil</span>
-            </div>
-            <div class="goat-card-body">2004'ten beri HIC kayip yili yok. Strateji: Sistematik algoritmalar + discretionary makro. Volatilite rejimleri, faiz geçisleri, çapraz varlık momentum. Hisse tarafında: yüksek büyüme + güçlü karlılık + güçlü momentum kombinasyonu. AI ve teknoloji ağırlıklı, sektör liderlerini tercih eder.</div>
+            <div class="goat-card-head"><div class="goat-card-emoji">🤖</div>
+              <div><div class="goat-card-title">D.E. Shaw — Oculus <span class="goat-fund-tag">FON</span></div><div class="goat-card-subtitle">Quant + Makro · $85B AUM · Sıfır Kayıp Yılı</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">2021: +19%</span><span class="goat-perf-badge">2023: +22%</span><span class="goat-perf-badge">2024: +36%</span><span class="goat-perf-badge">2025: +28%</span><span class="goat-perf-badge neutral">5Y Ort: ~20%/yıl</span></div>
+            <div class="goat-card-body">2004'ten beri hiç kayıp yılı yok. Sistematik algoritmalar + discretionary makro. Volatilite rejimleri, faiz geçişleri, çapraz varlık momentum. Hisse tarafı: yüksek büyüme + güçlü karlılık + momentum. AI ve teknoloji ağırlıklı, $85B AUM.</div>
             <div class="goat-card-criteria"><span class="goat-criterion">EPS &gt;20%</span><span class="goat-criterion">ROE &gt;18%</span><span class="goat-criterion">Marj &gt;15%</span><span class="goat-criterion">Gelir &gt;15%</span><span class="goat-criterion">Cari &gt;1</span></div>
           </div>
 
+          <!-- MILLENNIUM -->
           <div class="goat-card">
-            <div class="goat-card-head">
-              <div class="goat-card-emoji">🌐</div>
-              <div>
-                <div class="goat-card-title">Millennium Management <span class="goat-fund-tag">FON</span></div>
-                <div class="goat-card-subtitle">Israel Englander · Multi-Strategy · $83B AUM</div>
-              </div>
-            </div>
-            <div class="goat-card-perf">
-              <span class="goat-perf-badge">2021: +14%</span>
-              <span class="goat-perf-badge">2022: +12%</span>
-              <span class="goat-perf-badge">2023: +10%</span>
-              <span class="goat-perf-badge">2024: +15%</span>
-              <span class="goat-perf-badge">2025: +10.5%</span>
-              <span class="goat-perf-badge neutral">Tutarli Çift Hane</span>
-            </div>
-            <div class="goat-card-body">1989'dan beri sürekli pozitif getiri. Strateji: 300+ bagimsiz portföy yöneticisi, çok varlık çok strateji. Risk-adjusted getiri öncelikli — volatilite minimizasyonu. Hisse seçiminde: kalite odaklı, güçlü marj ve likidite, düsük borc, istikrarlı büyüme. Hem bull hem bear piyasada çalısır.</div>
+            <div class="goat-card-head"><div class="goat-card-emoji">🌐</div>
+              <div><div class="goat-card-title">Millennium Management <span class="goat-fund-tag">FON</span></div><div class="goat-card-subtitle">Israel Englander · Multi-Strategy · $83B AUM</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">2021: +14%</span><span class="goat-perf-badge">2022: +12%</span><span class="goat-perf-badge">2023: +10%</span><span class="goat-perf-badge">2024: +15%</span><span class="goat-perf-badge">2025: +10.5%</span><span class="goat-perf-badge neutral">Tutarlı Çift Hane</span></div>
+            <div class="goat-card-body">1989'dan beri sürekli pozitif getiri. 300+ bağımsız portföy yöneticisi, çok varlık çok strateji. Risk-adjusted getiri öncelikli — volatilite minimizasyonu. Kalite odaklı: güçlü marj, düşük borç, istikrarlı büyüme. Hem bull hem bear piyasada çalışır.</div>
             <div class="goat-card-criteria"><span class="goat-criterion">ROE &gt;12%</span><span class="goat-criterion">Marj &gt;10%</span><span class="goat-criterion">B/Ö &lt;60</span><span class="goat-criterion">Cari &gt;1.5</span><span class="goat-criterion">EPS &gt;8%</span></div>
           </div>
 
@@ -1719,12 +1779,12 @@ td:first-child,td:nth-child(2){text-align:left;}
       <div class="preset-info-wrap">
         <div class="preset-info-title">⚡ Hazır Filtre Presetleri</div>
         <div class="preset-info-grid">
-          <div class="picard"><div class="picard-name">DEĞER</div><div class="picard-desc">Ucuz kalmış, düşük F/K ve PD/DD ile işlem gören hisseler.</div><div class="picard-rules"><span class="picard-rule">F/K &lt;15</span><span class="picard-rule">PD/DD &lt;2</span><span class="picard-rule">Temettü &gt;2%</span></div></div>
+          <div class="picard"><div class="picard-name">AZ BORÇ</div><div class="picard-desc">Az borçla çalışan ve güçlü likiditeye sahip hisseler.</div><div class="picard-rules"><span class="picard-rule">B/Ö &lt;30</span><span class="picard-rule">Cari &gt;2</span></div></div>
           <div class="picard"><div class="picard-name">BÜYÜME</div><div class="picard-desc">Hızlı büyüyen, güçlü kâr ve gelir artışı gösteren hisseler.</div><div class="picard-rules"><span class="picard-rule">K.Büy &gt;20%</span><span class="picard-rule">Gelir &gt;15%</span><span class="picard-rule">ROE &gt;15%</span></div></div>
-          <div class="picard"><div class="picard-name">TEMETTÜ</div><div class="picard-desc">Yüksek temettü ödeyen, borç yükü makul hisseler.</div><div class="picard-rules"><span class="picard-rule">Temettü &gt;4%</span><span class="picard-rule">B/Ö &lt;100</span></div></div>
+          <div class="picard"><div class="picard-name">DEĞER</div><div class="picard-desc">Ucuz kalmış, düşük F/K ve PD/DD ile işlem gören hisseler.</div><div class="picard-rules"><span class="picard-rule">F/K &lt;15</span><span class="picard-rule">PD/DD &lt;2</span><span class="picard-rule">Temettü &gt;2%</span></div></div>
           <div class="picard"><div class="picard-name">KALİTELİ</div><div class="picard-desc">Yüksek karlılık, güçlü marj, düşük borç ve iyi likidite.</div><div class="picard-rules"><span class="picard-rule">ROE &gt;20%</span><span class="picard-rule">Marj &gt;10%</span><span class="picard-rule">B/Ö &lt;80</span><span class="picard-rule">Cari &gt;1.5</span></div></div>
-          <div class="picard"><div class="picard-name">DÜŞÜK BORÇ</div><div class="picard-desc">Az borçla çalışan ve güçlü likiditeye sahip hisseler.</div><div class="picard-rules"><span class="picard-rule">B/Ö &lt;30</span><span class="picard-rule">Cari &gt;2</span></div></div>
           <div class="picard"><div class="picard-name">MOMENTUM</div><div class="picard-desc">Her iki büyüme metriğinde güçlü ivme yakalayan hisseler.</div><div class="picard-rules"><span class="picard-rule">Gelir &gt;20%</span><span class="picard-rule">K.Büy &gt;20%</span></div></div>
+          <div class="picard"><div class="picard-name">TEMETTÜ</div><div class="picard-desc">Yüksek temettü ödeyen, borç yükü makul hisseler.</div><div class="picard-rules"><span class="picard-rule">Temettü &gt;4%</span><span class="picard-rule">B/Ö &lt;100</span></div></div>
         </div>
       </div>
       <!-- ══════ TERİMLER SÖZLÜĞÜ ══════ -->
@@ -2614,66 +2674,106 @@ const TECH_PRESETS = {
 // ──────────────────────────────────────────────────────────────
 const GURUS = {
 
-  // ── BUFFETT ────────────────────────────────────────────────
-  // Gerçek kriterler: ROE 10 yıl ort. >%20 (min yıl >%15),
-  // Gross margin >%40, Net margin >%20, D/E <0.5 (toplam borç/özkaynak),
-  // Current ratio >1.5, F/K makul (kalite için esneklik var).
-  // Kaynak: 1987 shareholder letter + "The New Buffettology"
-  buffett: {
-    label: 'Warren Buffett',
-    desc: 'Sürdürülebilir rekabet avantajı: %20+ ROE, %40+ brüt marj, %20+ net marj, D/E<%50, güçlü nakit üretimi. Makul fiyat — kalite önce gelir.',
-    filters: {pe_min:5, pe_max:25, roe_min:20, margin_min:20, gross_min:40, de_max:50, cr_min:1.5}
+  // ── ACKMAN ────────────────────────────────────────
+  ackman: {
+    label: 'Bill Ackman — Activist',
+    desc: 'Aktivist değer: yüksek ROE, güçlü marj, makul borç. Piyasanın gözden kaçırdığı, katalizör bekleyen kaliteli şirketler. "Yönetimi değiştir, değeri aç." 20Y+ ~%20/yıl.',
+    filters: {roe_min:15, margin_min:10, de_max:80, cr_min:1.2, pe_max:20}
   },
 
-  // ── GRAHAM ─────────────────────────────────────────────────
-  // "Intelligent Investor" net-net değer: F/K<10, PD/DD<1.5,
-  // current ratio >2, D/E <50%, temettü ödeme geçmişi var.
-  // Güvenlik marjı = ucuzun da ucuzu.
-  graham: {
-    label: 'Benjamin Graham',
-    desc: 'Derin değer & güvenlik marjı: F/K<10, PD/DD<1.5, current ratio>2, borç/özkaynak<%50, temettü geçmişi. Ucuzun da ucuzu.',
-    filters: {pe_max:10, pb_max:1.5, de_max:50, cr_min:2, div_min:1}
-  },
-
-  // ── LYNCH ──────────────────────────────────────────────────
-  // GARP (Growth at a Reasonable Price): PEG <1 ideal, <2 kabul.
-  // Lynch asıl olarak dividend-adjusted PEG (PEGY) kullanır.
-  // EPS büyümesi tutarlı olmalı (fast-grower: >%20, stalwart: >%10).
-  // Küçük/orta ölçekli, kurumların az ilgisini çeken şirketler tercih.
-  // Kaynak: "One Up On Wall Street", AAII Lynch screen
-  lynch: {
-    label: 'Peter Lynch — GARP',
-    desc: 'PEG<1 altın fırsat: büyüme hızına göre ucuz. Kazanç büyümesi >%15, makul borç, pozitif nakit akışı. "Tanıdığın şirketi al, ama sayıları kontrol et."',
-    filters: {pe_min:5, pe_max:35, earng_min:15, de_max:80, cr_min:1},
-    special: 'peg'
-  },
-
-  // ── ARK / CATHIE WOOD ──────────────────────────────────────
-  // ARK disruptive teknolojiye yatırır: AI, genomik, fintech, kripto.
-  // Portföyün büyük kısmı zarar eden şirketler — ROE filtresi yanlış.
-  // Asıl kriter: çok yüksek gelir büyümesi, büyük adreslenebilir pazar.
-  // ROE filtresi kaldırıldı — ARK ruhuna aykırı.
+  // ── ARK / CATHIE WOOD ─────────────────────────────
   ark: {
     label: 'Cathie Wood / ARK',
     desc: 'Disruptive büyüme: yıkıcı teknoloji, genomik, AI, fintech. Gelir büyümesi >%30, güçlü kazanç ivmesi. Kârlılık ikincil — pazar liderliği önce gelir.',
     filters: {revg_min:30, earng_min:20, cr_min:1}
   },
 
-  // ── MINERVİNİ SEPA ─────────────────────────────────────────
-  // Specific Entry Point Analysis: EPS büyümesi >%25 (son 2 çeyrek),
-  // ROE >%17, net marj >%10, 52H zirvesine yakın, hareketli ort. üstünde.
-  // Teknik filtreler (from_high_max) ile tamamlanmalı.
+  // ── BUFFETT ───────────────────────────────────────
+  buffett: {
+    label: 'Warren Buffett',
+    desc: 'Sürdürülebilir rekabet avantajı (moat): ROE>%20, brüt marj>%40, net marj>%20, D/E<%50. Makul fiyat, uzun vadeli tutuş. "Harika şirketi adil fiyata al."',
+    filters: {pe_min:5, pe_max:25, roe_min:20, margin_min:20, gross_min:40, de_max:50, cr_min:1.5}
+  },
+
+  // ── EINHORN ───────────────────────────────────────
+  einhorn: {
+    label: 'David Einhorn — Deep Value',
+    desc: 'Derin değer + kısa satış: düşük F/K, güçlü nakit, düşük borç, kârlı ama gözden kaçmış şirketler. "Piyasa geçici yanılıyor." Greenlight Capital.',
+    filters: {pe_max:15, de_max:50, cr_min:1.5, margin_min:8, roe_min:10}
+  },
+
+  // ── FISHER ────────────────────────────────────────
+  fisher: {
+    label: 'Philip Fisher — Scuttlebutt',
+    desc: "Uzun vadeli büyüme: gelir>%15, kazanç>%15, brüt marj>%35, net marj>%12. \"Harika şirketi asla satma.\" Buffett ve Lynch'in ilham kaynağı.",
+    filters: {revg_min:15, earng_min:15, gross_min:35, margin_min:12, de_max:60}
+  },
+
+  // ── GRAHAM ────────────────────────────────────────
+  graham: {
+    label: 'Benjamin Graham',
+    desc: 'Derin değer & güvenlik marjı: F/K<10, PD/DD<1.5, cari>2, B/Ö<%50, temettü geçmişi. En muhafazakâr yatırım felsefesi. "Akıllı Yatırımcı."',
+    filters: {pe_max:10, pb_max:1.5, de_max:50, cr_min:2, div_min:1}
+  },
+
+  // ── GREENBLATT ────────────────────────────────────
+  greenblatt: {
+    label: 'Joel Greenblatt — Magic Formula',
+    desc: "Magic Formula: iyi şirketi (yüksek ROIC) ucuza al (yüksek kazanç verimi). ROE>%25, F/K<15. 17 yılda S&P'yi yıllık %18 geçti. \"İki kural yeterli.\"",
+    filters: {roe_min:25, pe_max:15, de_max:80, cr_min:1}
+  },
+
+  // ── ICAHN ─────────────────────────────────────────
+  icahn: {
+    label: 'Carl Icahn — Activist Value',
+    desc: 'Nakit zengini, düşük borç, düşük F/K — yönetim baskısıyla değer açığa çıkar. Hissedar dostu adımlar: geri alım, temettü, satış. "Savaşçı yatırımcı."',
+    filters: {pb_max:1.5, pe_max:12, de_max:60, cr_min:1.5, div_min:1}
+  },
+
+  // ── KLARMAN ───────────────────────────────────────
+  klarman: {
+    label: 'Seth Klarman — Margin of Safety',
+    desc: "Güvenlik marjı: piyasanın görmezden geldiği hisseler. F/K<10, PD/DD<1.2, B/Ö<%40, nakit güçlü. \"Ucuzu al, bilanço yanlış fiyatlanmışsa bekle.\" 40Y ~%20/yıl.",
+    filters: {pe_max:10, pb_max:1.2, de_max:40, cr_min:2, margin_min:5}
+  },
+
+  // ── LYNCH ─────────────────────────────────────────
+  lynch: {
+    label: 'Peter Lynch — GARP',
+    desc: "PEG<1 altın fırsat: büyüme hızına göre ucuz. Kazanç büyümesi>%15, makul borç. \"Anlayabildiğin şirketi al, sayıları kontrol et.\" 13Y %29/yıl.",
+    filters: {pe_min:5, pe_max:35, earng_min:15, de_max:80, cr_min:1},
+    special: 'peg'
+  },
+
+  // ── MİNERVİNİ ─────────────────────────────────────
   minervini: {
     label: 'Mark Minervini — SEPA',
-    desc: 'SEPA büyüme traderı: kazanç büyümesi >%25, ROE >%17, marj >%10, borç makul. Zirveye yakın + hacim patlamasıyla birleştirin.',
+    desc: 'SEPA büyüme traderı: kazanç büyümesi>%25, ROE>%17, marj>%10, borç makul. Zirveye yakın + hacim patlamasıyla tamamlanır. ABD şampiyonu.',
     filters: {earng_min:25, roe_min:17, margin_min:10, de_max:100, cr_min:1}
   },
 
-  // ── PİOTROSKİ F-SCORE ──────────────────────────────────────
-  // Joseph Piotroski 2000: 9 kriterlik bilanço sağlığı skoru.
-  // 8-9 = çok güçlü. Karlılık (ROA+, CFO+, ΔROA+, accrual),
-  // kaldıraç (ΔD/E-, Δcurrent+, dilüsyon yok), verimlilik (Δmarj+, Δciro+).
-  // Minimum ROA pozitif olmalı → roe_min:3 proxy olarak.
+  // ── MUNGER ────────────────────────────────────────
+  munger: {
+    label: 'Charlie Munger — Quality Compounder',
+    desc: '"Harika şirketi adil fiyata al." Brüt marj>%50, ROE>%20, neredeyse borçsuz, sektör lideri. Buffett\'ın ortağı — kaliteyi daha da katı filtreler.',
+    filters: {gross_min:50, roe_min:20, de_max:30, margin_min:20, cr_min:1.5}
+  },
+
+  // ── O'NEİL ────────────────────────────────────────
+  oneil: {
+    label: "William O'Neil — CAN SLIM",
+    desc: "CAN SLIM: EPS büyümesi>%25, gelir ivmesi>%15, ROE>%17. 52H zirvesine yakın hisseler. Temel+teknik hibrit — büyüme traderının klasiği. IBD kurucusu.",
+    filters: {earng_min:25, revg_min:15, roe_min:17, de_max:100, cr_min:1}
+  },
+
+  // ── O'SHAUGHNESSY ─────────────────────────────────
+  oshaughnessy: {
+    label: "O'Shaughnessy — What Works on Wall St.",
+    desc: "50 yıllık backtest kazananı: F/S<1.5, temettü>%1, gelir büyümesi>%10. Ucuz+istikrarlı+büyüyen = uzun vadede piyasayı geçer. Sistematik değer+momentum.",
+    filters: {ps_max:1.5, div_min:1, revg_min:10, roe_min:10}
+  },
+
+  // ── PİOTROSKİ ─────────────────────────────────────
   piotroski: {
     label: 'Piotroski F-Score',
     desc: 'F-Score 8-9: bilanço güçlü, karlılık artıyor, borç azalıyor, verimlilik yükseliyor. 9 kriterli sistematik kalite taraması.',
@@ -2681,35 +2781,34 @@ const GURUS = {
     special: 'piotroski'
   },
 
-  // ── CİTADEL ────────────────────────────────────────────────
-  // Ken Griffin multi-strategy: kalite + momentum kombinasyonu.
-  // 13-F analizlerine göre yüksek ROE, güçlü marj, makul borç,
-  // kazanç ivmesi olan büyüme+değer karışımı hisseler.
+  // ── SCHLOSS ───────────────────────────────────────
+  schloss: {
+    label: 'Walter Schloss — Deep Value',
+    desc: "Graham'ın öğrencisi, 45 yılda %15+/yıl. Sadece PD/DD<1, çok az borç, temettü ödeyen, gözden düşmüş hisseler. \"Ucuz al, sabırla bekle.\"",
+    filters: {pb_max:1, pe_max:12, de_max:30, div_min:1, cr_min:1.5}
+  },
+
+  // ── CİTADEL ───────────────────────────────────────
   citadel: {
-    label: 'Citadel — Multi-Strategy',
-    desc: 'Ken Griffin kalite+momentum: ROE >%15, net marj >%12, kazanç büyümesi >%10, düşük borç. Büyüme ve değer dengesinde kurumsal kalite.',
+    label: 'Citadel — Wellington',
+    desc: "1990'dan beri net %19.2/yıl — tarihin en karlı hedge fonu. Yüksek ROE, güçlü karlılık, düşük borç, kazanç büyümesi. Sektör rotasyonu + volatilite avantajı.",
     filters: {roe_min:15, margin_min:12, de_max:70, cr_min:1.2, earng_min:10}
   },
 
-  // ── D.E. SHAW ──────────────────────────────────────────────
-  // Oculus quant modeli: sistematik kalite + yüksek büyüme.
-  // 13-F ve performans analizlerine göre yüksek büyüme ivmesi,
-  // güçlü karlılık, gelir+kazanç büyümesi birlikte.
+  // ── D.E. SHAW ─────────────────────────────────────
   deshaw: {
-    label: 'D.E. Shaw — Quant',
-    desc: 'Sistematik kalite+büyüme: kazanç >%20, gelir >%15, ROE >%18, marj >%15. Sektör bağımsız yüksek kalite + momentum kombinasyonu.',
+    label: 'D.E. Shaw — Oculus',
+    desc: "2004'ten beri hiç kayıp yılı yok. Sistematik algoritmalar + makro. Hisse tarafı: yüksek büyüme + güçlü karlılık + momentum kombinasyonu. $85B AUM.",
     filters: {earng_min:20, roe_min:18, margin_min:15, revg_min:15, cr_min:1}
   },
 
-  // ── MİLLENNİUM ─────────────────────────────────────────────
-  // Israel Englander risk-adjusted getiri: çok strateji, düşük korelasyon.
-  // 13-F analizine göre: orta kaliteli karlılık + büyüme + düşük borç +
-  // yüksek likidite. Aşırı konsantrasyon yok, dengeli seçim.
+  // ── MİLLENNİUM ────────────────────────────────────
   millennium: {
-    label: 'Millennium — Multi-Strat',
-    desc: 'Risk-adjusted kalite: ROE >%12, marj >%10, borç/özkaynak <%60, current ratio >1.5, kazanç büyümesi >%8. Dengeli ve düşük riskli portföy.',
+    label: 'Millennium Management',
+    desc: "1989'dan beri sürekli pozitif getiri. 300+ portföy yöneticisi, risk-adjusted öncelikli. Kalite odaklı: güçlü marj, düşük borç, istikrarlı büyüme. $83B AUM.",
     filters: {roe_min:12, margin_min:10, de_max:60, cr_min:1.5, earng_min:8}
   }
+
 };
 
 function tblScroll(px){
@@ -4443,6 +4542,10 @@ function applyStrategyAndGo(goatKey) {
 // Start on homepage
 document.addEventListener('DOMContentLoaded', function(){
   showHomepage();
+  // Strateji sayısını otomatik hesapla
+  var total = document.querySelectorAll('[data-goat],[data-preset],[data-tech]').length;
+  var el = document.querySelector('.hp-stat-val[data-strat-count]');
+  if(el) el.innerHTML = total + ' <span>strateji</span>';
 });
 
 </script>
