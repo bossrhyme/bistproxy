@@ -32,7 +32,7 @@ const COLS = {
     'return_on_equity','return_on_equity_fq','return_on_assets','return_on_assets_fq',
     'net_margin','gross_margin',
     'earnings_per_share_diluted_yoy_growth_ttm',
-    'earnings_per_share_change_ttm_yoy','earnings_per_share_diluted_ttm',
+    'earnings_per_share_diluted_ttm',
     'dividends_yield_current','dividends_yield',
     'total_debt_to_equity','debt_to_equity_fq','current_ratio','current_ratio_fq',
     'sector','High.1M','Low.1M','piotroski_f_score',
