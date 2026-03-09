@@ -792,8 +792,8 @@ td:first-child,td:nth-child(2){text-align:left;}
 .prf-qval{font-family:"JetBrains Mono",monospace;font-weight:600;color:var(--text);}
 .prf-qval.g{color:var(--green);}
 .prf-qval.r{color:var(--red);}
-.prf-buy-btn{width:100%;height:38px;background:var(--green);color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;margin-bottom:8px;font-family:Inter,sans-serif;}
-.prf-buy-btn:hover{background:var(--green2);transform:translateY(-1px);}
+.prf-buy-btn{width:100%;height:38px;background:var(--accent);color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;margin-bottom:8px;font-family:Inter,sans-serif;}
+.prf-buy-btn:hover{background:#2563eb;transform:translateY(-1px);}
 .prf-news-item{padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04);}
 .prf-news-item:last-child{border-bottom:none;}
 .prf-news-src{font-size:9px;font-weight:700;color:var(--accent);margin-bottom:3px;}
@@ -819,7 +819,13 @@ td:first-child,td:nth-child(2){text-align:left;}
 html,body{height:100%;overflow:hidden;}
 #app{display:flex;flex-direction:column;height:100dvh;}
 
-/* ── FİNANSALLAR ── */
+.prf-main::-webkit-scrollbar{width:3px;}
+.prf-main::-webkit-scrollbar-track{background:transparent;}
+.prf-main::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.prf-side::-webkit-scrollbar{width:3px;}
+.prf-side::-webkit-scrollbar-track{background:transparent;}
+.prf-side::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
 .fin-cell{background:var(--s1);padding:12px 14px;transition:background .15s;}
 .fin-cell:hover{background:var(--s2);}
 .fin-cell-label{font-size:9px;color:var(--text2);margin-bottom:5px;letter-spacing:.3px;text-transform:uppercase;}
@@ -937,6 +943,14 @@ html,body{height:100%;overflow:hidden;}
             </div>
           </div>
 
+          <!-- AD M1: 728×90 -->
+          <div style="padding:12px 24px;border-bottom:1px solid var(--border);background:var(--s1);">
+            <div class="ad-slot" style="width:100%;height:90px;border-radius:6px;">
+              <span style="font-size:14px;">📢</span>
+              <span class="ad-slot-label">728 × 90 — Reklam</span>
+            </div>
+          </div>
+
           <div class="prf-section">
             <div class="prf-sec-title">Temel Metrikler</div>
             <div class="prf-mgrid" id="prf-metrics"><div style="padding:20px;color:var(--muted);font-size:12px;grid-column:span 4">Tarama yapıp Detaylı Analiz'e tıklayın</div></div>
@@ -1025,6 +1039,10 @@ html,body{height:100%;overflow:hidden;}
       <div class="prf-side">
         <div class="prf-sside">
           <button class="prf-buy-btn" id="prf-buy-btn" onclick="onHemenAl('','')">🛒 Hemen Al</button>
+          <div class="ad-slot" style="width:100%;height:250px;margin-top:10px;border-radius:8px;">
+            <span style="font-size:16px;">📢</span>
+            <span class="ad-slot-label">300 × 250 — Reklam</span>
+          </div>
         </div>
         <div class="prf-sside">
           <div class="prf-stitle">Fiyat Bilgileri</div>
