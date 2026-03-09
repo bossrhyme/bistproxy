@@ -1,4 +1,37 @@
-// api/quote.js — Twelve Data proxy v3 (only /quote + /profile + /news)
+// api/quote.js — Yahoo Finance (crumb auth) proxy
+let _crumb = null;
+let _cookie = null;
+let _crumbFetched = 0;
+
+async function getYahooCrumb() {
+  const now = Date.now();
+  // 1 saatte bir yenile
+  if (_crumb && _cookie && (now - _crumbFetched) < 3600000) {
+    return { crumb: _crumb, cookie: _cookie };
+  }
+
+  // 1. Cookie al
+  const r1 = await fetch('https://fc.yahoo.com', {
+    headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
+    redirect: 'follow',
+  });
+  const setCookie = r1.headers.get('set-cookie') || '';
+  const cookieMatch = setCookie.match(/A1=([^;]+)/);
+  if (!cookieMatch) throw new Error('Yahoo cookie alınamadı');
+  _cookie = 'A1=' + cookieMatch[1];
+
+  // 2. Crumb al
+  const r2 = await fetch('https://query1.finance.yahoo.com/v1/test/getcrumb', {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+      'Cookie': _cookie,
+    },
+  });
+  _crumb = await r2.text();
+  _crumbFetched = now;
+  return { crumb: _crumb, cookie: _cookie };
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
@@ -6,102 +39,96 @@ export default async function handler(req, res) {
   const { sym, ex, type } = req.query;
   if (!sym) return res.status(400).json({ error: 'sym required' });
 
-  const KEY = '40e35e9a3ec345adacbd3f8fc0d9246d';
-  const BASE = 'https://api.twelvedata.com';
+  // Exchange → Yahoo sembol suffix
+  const suffixMap = { bist: '.IS', nasdaq: '', sp500: '', dax: '.DE', lse: '.L', nikkei: '.T' };
+  const suffix = suffixMap[ex] ?? '';
+  const ySym = sym.toUpperCase().endsWith(suffix.toUpperCase()) ? sym : sym + suffix;
 
-  const exMap = { bist:'BIST', nasdaq:'NASDAQ', sp500:'NYSE', dax:'XETR', lse:'LSE', nikkei:'TSE' };
-  const exParam = exMap[ex] ? `&exchange=${exMap[ex]}` : '';
-  const s = encodeURIComponent(sym);
-
-  async function td(endpoint) {
-    try {
-      const r = await fetch(`${BASE}${endpoint}&apikey=${KEY}`);
-      if (!r.ok) return null;
-      const j = await r.json();
-      return (j.status === 'error' || j.code) ? null : j;
-    } catch(e) { return null; }
-  }
-
-  const p = (v) => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+  const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36';
 
   try {
+    const { crumb, cookie } = await getYahooCrumb();
+    const headers = { 'User-Agent': UA, 'Cookie': cookie, 'Accept': 'application/json' };
+
     if (type === 'news') {
-      const data = await td(`/news?symbol=${s}${exParam}&outputsize=5`);
-      return res.json({ news: Array.isArray(data) ? data : [] });
+      const r = await fetch(
+        `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(ySym)}&newsCount=5&quotesCount=0&crumb=${encodeURIComponent(crumb)}`,
+        { headers }
+      );
+      const j = await r.json();
+      return res.json({ news: j.news || [] });
     }
 
-    if (type === 'raw') {
-      // Debug: ham quote verisini göster
-      const q = await td(`/quote?symbol=${s}${exParam}`);
-      return res.json(q || {});
+    // quoteSummary — tüm fundamental veriler
+    const modules = 'price,summaryDetail,defaultKeyStatistics,financialData,assetProfile';
+    const url = `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(ySym)}?modules=${encodeURIComponent(modules)}&crumb=${encodeURIComponent(crumb)}`;
+    const r = await fetch(url, { headers });
+
+    if (!r.ok) {
+      return res.status(r.status).json({ error: `Yahoo ${r.status}: ${ySym}` });
     }
 
-    const [quote, profile] = await Promise.all([
-      td(`/quote?symbol=${s}${exParam}`),
-      td(`/profile?symbol=${s}${exParam}`),
-    ]);
+    const json = await r.json();
+    const result = json?.quoteSummary?.result?.[0];
+    if (!result) return res.status(404).json({ error: 'Veri bulunamadı: ' + ySym });
 
-    if (!quote) return res.status(404).json({ error: 'No data for ' + sym });
+    const price   = result.price            || {};
+    const summary = result.summaryDetail    || {};
+    const stats   = result.defaultKeyStatistics || {};
+    const fin     = result.financialData    || {};
+    const profile = result.assetProfile     || {};
 
-    // /quote endpoint field'larını direkt kullan
-    const fw = quote.fifty_two_week || {};
+    const g = (obj, key) => { const v = obj[key]?.raw; return (v !== undefined && !isNaN(v)) ? v : 0; };
 
     return res.json({
       symbol:        sym,
-      name:          quote.name || sym,
-      price:         p(quote.close),
-      change:        p(quote.change),
-      changePct:     p(quote.percent_change),
-      currency:      quote.currency || '',
-      marketCap:     p(quote.market_cap),
-      volume:        p(quote.volume),
-      avgVolume:     p(quote.average_volume),
+      name:          price.longName || price.shortName || sym,
+      price:         g(price, 'regularMarketPrice'),
+      change:        g(price, 'regularMarketChange'),
+      changePct:     g(price, 'regularMarketChangePercent'),
+      currency:      price.currency || '',
+      marketCap:     g(price, 'marketCap'),
+      volume:        g(price, 'regularMarketVolume'),
+      avgVolume:     g(summary, 'averageVolume'),
 
-      // Değerleme — quote'dan
-      pe:            p(quote.pe),
-      forwardPE:     p(quote.forward_pe),
-      pb:            p(quote.pb),
-      ps:            p(quote.ps),
-      peg:           p(quote.peg),
-      evEbitda:      p(quote.ev_to_ebitda) || p(quote.enterprise_to_ebitda) || 0,
+      pe:            g(summary, 'trailingPE')  || g(stats, 'trailingPE'),
+      forwardPE:     g(summary, 'forwardPE')   || g(stats, 'forwardPE'),
+      pb:            g(stats, 'priceToBook'),
+      ps:            g(stats, 'priceToSalesTrailing12Months'),
+      peg:           g(stats, 'pegRatio'),
+      evEbitda:      g(stats, 'enterpriseToEbitda'),
 
-      // Karlılık — quote'dan
-      roe:           p(quote.roe) / 100,
-      roa:           p(quote.roa) / 100,
-      netMargin:     p(quote.net_margin) / 100,
-      grossMargin:   p(quote.gross_margin) / 100,
-      opMargin:      p(quote.operating_margin) / 100,
+      roe:           g(fin, 'returnOnEquity'),
+      roa:           g(fin, 'returnOnAssets'),
+      netMargin:     g(fin, 'profitMargins'),
+      grossMargin:   g(fin, 'grossMargins'),
+      opMargin:      g(fin, 'operatingMargins'),
 
-      // Bilanço
-      currentRatio:  p(quote.current_ratio),
-      debtToEquity:  p(quote.debt_to_equity) / 100,
-      totalCash:     p(quote.total_cash),
-      totalDebt:     p(quote.total_debt),
-      freeCashFlow:  p(quote.free_cash_flow),
+      currentRatio:  g(fin, 'currentRatio'),
+      debtToEquity:  g(fin, 'debtToEquity') ? g(fin, 'debtToEquity') / 100 : 0,
+      totalCash:     g(fin, 'totalCash'),
+      totalDebt:     g(fin, 'totalDebt'),
+      freeCashFlow:  g(fin, 'freeCashflow'),
 
-      // Büyüme
-      revenueGrowth:  p(quote.revenue_growth) / 100,
-      earningsGrowth: p(quote.earnings_growth) / 100,
+      revenueGrowth:  g(fin, 'revenueGrowth'),
+      earningsGrowth: g(fin, 'earningsGrowth'),
 
-      // 52H, beta, dividend — fifty_two_week objesinden
-      high52:        p(fw.high) || p(quote.fifty_two_week_high) || 0,
-      low52:         p(fw.low)  || p(quote.fifty_two_week_low)  || 0,
-      beta:          p(quote.beta),
-      dividendYield: p(quote.dividend_yield) / 100,
+      high52:        g(summary, 'fiftyTwoWeekHigh') || g(stats, 'fiftyTwoWeekHigh'),
+      low52:         g(summary, 'fiftyTwoWeekLow')  || g(stats, 'fiftyTwoWeekLow'),
+      beta:          g(summary, 'beta') || g(stats, 'beta'),
+      dividendYield: g(summary, 'dividendYield') || g(summary, 'trailingAnnualDividendYield'),
 
-      // Şirket
-      sector:      profile?.sector      || quote.sector      || '',
-      industry:    profile?.industry    || quote.industry    || '',
-      description: profile?.description || '',
-      employees:   p(profile?.employees || quote.employees),
-      website:     profile?.website     || quote.website     || '',
-      country:     profile?.country     || quote.country     || '',
-
-      // Debug
-      _quoteKeys: Object.keys(quote),
+      sector:      profile.sector   || '',
+      industry:    profile.industry || '',
+      description: profile.longBusinessSummary || '',
+      employees:   profile.fullTimeEmployees   || 0,
+      website:     profile.website || '',
+      country:     profile.country || '',
     });
 
-  } catch(e) {
+  } catch (e) {
+    // Crumb expire olduysa sıfırla
+    _crumb = null; _cookie = null;
     return res.status(500).json({ error: e.message });
   }
 }
