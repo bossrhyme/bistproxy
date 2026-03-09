@@ -1,99 +1,107 @@
-// api/quote.js — Yahoo Finance proxy v2
+// api/quote.js — Twelve Data proxy
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
 
-  const { sym, type } = req.query;
+  const { sym, ex, type } = req.query;
   if (!sym) return res.status(400).json({ error: 'sym required' });
 
-  const headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    'Accept': 'application/json, text/plain, */*',
-    'Accept-Language': 'en-US,en;q=0.9',
-    'Accept-Encoding': 'gzip, deflate, br',
-    'Origin': 'https://finance.yahoo.com',
-    'Referer': 'https://finance.yahoo.com/',
-    'Cache-Control': 'no-cache',
+  const KEY = '40e35e9a3ec345adacbd3f8fc0d9246d';
+  const BASE = 'https://api.twelvedata.com';
+
+  // Exchange mapping
+  const exMap = {
+    bist: 'BIST', nasdaq: 'NASDAQ', sp500: 'NYSE',
+    dax: 'XETR', lse: 'LSE', nikkei: 'TSE'
   };
+  const exchange = exMap[ex] || '';
+  const exParam = exchange ? `&exchange=${exchange}` : '';
+
+  async function td(endpoint) {
+    try {
+      const r = await fetch(`${BASE}${endpoint}&apikey=${KEY}`);
+      if (!r.ok) return null;
+      const j = await r.json();
+      return j.status === 'error' ? null : j;
+    } catch(e) { return null; }
+  }
 
   try {
     if (type === 'news') {
-      const url = `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(sym)}&newsCount=5&quotesCount=0&enableFuzzyQuery=false`;
-      const r = await fetch(url, { headers });
-      if (!r.ok) return res.json({ news: [] });
-      const json = await r.json();
-      return res.json({ news: json.news || [] });
+      const data = await td(`/news?symbol=${encodeURIComponent(sym)}${exParam}&outputsize=5`);
+      return res.json({ news: data || [] });
     }
 
-    // v11/finance/quoteSummary — daha güncel endpoint
-    const modules = 'price,summaryDetail,defaultKeyStatistics,financialData,assetProfile';
-    const url = `https://query2.finance.yahoo.com/v11/finance/quoteSummary/${encodeURIComponent(sym)}?modules=${encodeURIComponent(modules)}&corsDomain=finance.yahoo.com&crumb=`;
+    // Paralel: quote + statistics + profile
+    const [quote, stats, profile] = await Promise.all([
+      td(`/quote?symbol=${encodeURIComponent(sym)}${exParam}`),
+      td(`/statistics?symbol=${encodeURIComponent(sym)}${exParam}`),
+      td(`/profile?symbol=${encodeURIComponent(sym)}${exParam}`),
+    ]);
 
-    const r = await fetch(url, { headers });
+    if (!quote) return res.status(404).json({ error: 'No data for ' + sym });
 
-    if (!r.ok) {
-      // Fallback: v10
-      const url2 = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(sym)}?modules=${encodeURIComponent(modules)}`;
-      const r2 = await fetch(url2, { headers });
-      if (!r2.ok) return res.status(r2.status).json({ error: `Yahoo returned ${r2.status}` });
-      const json2 = await r2.json();
-      return res.json(parseYahoo(json2, sym));
-    }
+    const s = stats?.statistics || {};
+    const val = s.valuations_metrics || {};
+    const fin = s.financials || {};
+    const inc = fin.income_statement || {};
+    const bal = fin.balance_sheet || {};
+    const cf  = fin.cash_flow || {};
+    const st  = s.stock_statistics || {};
 
-    const json = await r.json();
-    return res.json(parseYahoo(json, sym));
+    return res.json({
+      symbol:        sym,
+      name:          quote.name || sym,
+      price:         parseFloat(quote.close) || 0,
+      change:        parseFloat(quote.change) || 0,
+      changePct:     parseFloat(quote.percent_change) || 0,
+      currency:      quote.currency || '',
+      marketCap:     parseFloat(st.market_capitalization) || 0,
+      volume:        parseFloat(quote.volume) || 0,
+      avgVolume:     parseFloat(st.average_volume) || 0,
 
-  } catch (e) {
+      // Değerleme
+      pe:            parseFloat(val.trailing_pe) || 0,
+      forwardPE:     parseFloat(val.forward_pe) || 0,
+      pb:            parseFloat(val.price_to_book_mrq) || 0,
+      ps:            parseFloat(val.price_to_sales_ttm) || 0,
+      peg:           parseFloat(val.peg_ratio) || 0,
+      evEbitda:      parseFloat(val.enterprise_to_ebitda) || 0,
+
+      // Karlılık
+      roe:           parseFloat(inc.return_on_equity_ttm) / 100 || 0,
+      roa:           parseFloat(inc.return_on_assets_ttm) / 100 || 0,
+      netMargin:     parseFloat(inc.net_profit_margin_ttm) / 100 || 0,
+      grossMargin:   parseFloat(inc.gross_profit_margin_ttm) / 100 || 0,
+      opMargin:      parseFloat(inc.operating_margin_ttm) / 100 || 0,
+
+      // Bilanço
+      currentRatio:  parseFloat(bal.current_ratio_mrq) || 0,
+      debtToEquity:  parseFloat(bal.total_debt_to_equity_mrq) / 100 || 0,
+      totalCash:     parseFloat(bal.total_cash_mrq) || 0,
+      totalDebt:     parseFloat(bal.total_debt_mrq) || 0,
+      freeCashFlow:  parseFloat(cf.levered_free_cash_flow_ttm) || 0,
+
+      // Büyüme
+      revenueGrowth:  parseFloat(inc.quarterly_revenue_growth_yoy) / 100 || 0,
+      earningsGrowth: parseFloat(inc.quarterly_earnings_growth_yoy) / 100 || 0,
+
+      // Fiyat aralığı
+      high52:        parseFloat(st['52_week_high']) || 0,
+      low52:         parseFloat(st['52_week_low'])  || 0,
+      beta:          parseFloat(st.beta) || 0,
+      dividendYield: parseFloat(st.forward_annual_dividend_yield) / 100 || 0,
+
+      // Şirket
+      sector:      profile?.sector || '',
+      industry:    profile?.industry || '',
+      description: profile?.description || '',
+      employees:   profile?.employees || 0,
+      website:     profile?.website || '',
+      country:     profile?.country || '',
+    });
+
+  } catch(e) {
     return res.status(500).json({ error: e.message });
   }
-}
-
-function parseYahoo(json, sym) {
-  const result = json?.quoteSummary?.result?.[0];
-  if (!result) return { error: 'No data', raw: json };
-
-  const price   = result.price || {};
-  const summary = result.summaryDetail || {};
-  const stats   = result.defaultKeyStatistics || {};
-  const fin     = result.financialData || {};
-  const profile = result.assetProfile || {};
-
-  return {
-    symbol:        sym,
-    name:          price.longName || price.shortName || sym,
-    price:         price.regularMarketPrice?.raw || 0,
-    change:        price.regularMarketChange?.raw || 0,
-    changePct:     price.regularMarketChangePercent?.raw || 0,
-    currency:      price.currency || '',
-    marketCap:     price.marketCap?.raw || 0,
-    volume:        price.regularMarketVolume?.raw || 0,
-    avgVolume:     summary.averageVolume?.raw || 0,
-    pe:            summary.trailingPE?.raw || stats.trailingPE?.raw || 0,
-    forwardPE:     summary.forwardPE?.raw || stats.forwardPE?.raw || 0,
-    pb:            stats.priceToBook?.raw || 0,
-    ps:            stats.priceToSalesTrailing12Months?.raw || 0,
-    peg:           stats.pegRatio?.raw || 0,
-    roe:           fin.returnOnEquity?.raw || 0,
-    roa:           fin.returnOnAssets?.raw || 0,
-    netMargin:     fin.profitMargins?.raw || 0,
-    grossMargin:   fin.grossMargins?.raw || 0,
-    opMargin:      fin.operatingMargins?.raw || 0,
-    currentRatio:  fin.currentRatio?.raw || 0,
-    debtToEquity:  fin.debtToEquity?.raw ? fin.debtToEquity.raw / 100 : 0,
-    totalCash:     fin.totalCash?.raw || 0,
-    totalDebt:     fin.totalDebt?.raw || 0,
-    freeCashFlow:  fin.freeCashflow?.raw || 0,
-    revenueGrowth: fin.revenueGrowth?.raw || 0,
-    earningsGrowth:fin.earningsGrowth?.raw || 0,
-    high52:        summary.fiftyTwoWeekHigh?.raw || stats.fiftyTwoWeekHigh?.raw || 0,
-    low52:         summary.fiftyTwoWeekLow?.raw  || stats.fiftyTwoWeekLow?.raw  || 0,
-    beta:          summary.beta?.raw || stats.beta?.raw || 0,
-    dividendYield: summary.dividendYield?.raw || summary.trailingAnnualDividendYield?.raw || 0,
-    sector:        profile.sector || '',
-    industry:      profile.industry || '',
-    description:   profile.longBusinessSummary || '',
-    employees:     profile.fullTimeEmployees || 0,
-    website:       profile.website || '',
-    country:       profile.country || '',
-  };
 }
