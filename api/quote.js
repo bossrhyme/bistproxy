@@ -1,4 +1,4 @@
-// api/quote.js — Twelve Data proxy v2
+// api/quote.js — Twelve Data proxy v3 (only /quote + /profile + /news)
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
@@ -9,12 +9,9 @@ export default async function handler(req, res) {
   const KEY = '40e35e9a3ec345adacbd3f8fc0d9246d';
   const BASE = 'https://api.twelvedata.com';
 
-  const exMap = {
-    bist: 'BIST', nasdaq: 'NASDAQ', sp500: 'NYSE',
-    dax: 'XETR', lse: 'LSE', nikkei: 'TSE'
-  };
-  const exchange = exMap[ex] || '';
-  const exParam = exchange ? `&exchange=${exchange}` : '';
+  const exMap = { bist:'BIST', nasdaq:'NASDAQ', sp500:'NYSE', dax:'XETR', lse:'LSE', nikkei:'TSE' };
+  const exParam = exMap[ex] ? `&exchange=${exMap[ex]}` : '';
+  const s = encodeURIComponent(sym);
 
   async function td(endpoint) {
     try {
@@ -25,7 +22,7 @@ export default async function handler(req, res) {
     } catch(e) { return null; }
   }
 
-  const s = encodeURIComponent(sym);
+  const p = (v) => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
 
   try {
     if (type === 'news') {
@@ -33,38 +30,21 @@ export default async function handler(req, res) {
       return res.json({ news: Array.isArray(data) ? data : [] });
     }
 
-    // Paralel: quote + statistics + profile
-    const [quote, stats, profile] = await Promise.all([
+    if (type === 'raw') {
+      // Debug: ham quote verisini göster
+      const q = await td(`/quote?symbol=${s}${exParam}`);
+      return res.json(q || {});
+    }
+
+    const [quote, profile] = await Promise.all([
       td(`/quote?symbol=${s}${exParam}`),
-      td(`/statistics?symbol=${s}${exParam}`),
       td(`/profile?symbol=${s}${exParam}`),
     ]);
 
     if (!quote) return res.status(404).json({ error: 'No data for ' + sym });
 
-    // Statistics field mapping — Twelve Data dökümanı
-    const sv  = stats?.statistics?.valuations_metrics || {};
-    const sf  = stats?.statistics?.financials || {};
-    const sinc = sf.income_statement || {};
-    const sbal = sf.balance_sheet || {};
-    const scf  = sf.cash_flow || {};
-    const sst  = stats?.statistics?.stock_statistics || {};
-
-    const p = (v) => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
-
-    // ROE, ROA, margins — hem statistics'ten hem quote'dan dene
-    const roe = p(sinc.return_on_equity_ttm) / 100 || p(quote.fifty_two_week?.return_on_equity) / 100 || 0;
-    const roa = p(sinc.return_on_assets_ttm) / 100 || 0;
-    const netMargin   = p(sinc.net_profit_margin_ttm)   / 100 || 0;
-    const grossMargin = p(sinc.gross_profit_margin_ttm) / 100 || 0;
-    const opMargin    = p(sinc.operating_margin_ttm)    / 100 || 0;
-
-    // 52H, beta, dividend — statistics'ten + quote fallback
-    const high52 = p(sst['52_week_high']) || p(quote.fifty_two_week?.high) || 0;
-    const low52  = p(sst['52_week_low'])  || p(quote.fifty_two_week?.low)  || 0;
-    const beta   = p(sst.beta)            || p(quote.beta)                 || 0;
-    const divYield = p(sst.forward_annual_dividend_yield) / 100
-                  || p(sst.trailing_annual_dividend_yield) / 100 || 0;
+    // /quote endpoint field'larını direkt kullan
+    const fw = quote.fifty_two_week || {};
 
     return res.json({
       symbol:        sym,
@@ -73,39 +53,52 @@ export default async function handler(req, res) {
       change:        p(quote.change),
       changePct:     p(quote.percent_change),
       currency:      quote.currency || '',
-      marketCap:     p(sst.market_capitalization) || p(quote.market_cap) || 0,
+      marketCap:     p(quote.market_cap),
       volume:        p(quote.volume),
-      avgVolume:     p(sst.average_volume) || p(quote.average_volume) || 0,
+      avgVolume:     p(quote.average_volume),
 
-      pe:            p(sv.trailing_pe)         || p(quote.pe) || 0,
-      forwardPE:     p(sv.forward_pe)          || p(quote.forward_pe) || 0,
-      pb:            p(sv.price_to_book_mrq)   || p(quote.pb) || 0,
-      ps:            p(sv.price_to_sales_ttm)  || 0,
-      peg:           p(sv.peg_ratio)           || p(quote.peg) || 0,
-      evEbitda:      p(sv.enterprise_to_ebitda)|| 0,
+      // Değerleme — quote'dan
+      pe:            p(quote.pe),
+      forwardPE:     p(quote.forward_pe),
+      pb:            p(quote.pb),
+      ps:            p(quote.ps),
+      peg:           p(quote.peg),
+      evEbitda:      p(quote.ev_to_ebitda) || p(quote.enterprise_to_ebitda) || 0,
 
-      roe, roa, netMargin, grossMargin, opMargin,
+      // Karlılık — quote'dan
+      roe:           p(quote.roe) / 100,
+      roa:           p(quote.roa) / 100,
+      netMargin:     p(quote.net_margin) / 100,
+      grossMargin:   p(quote.gross_margin) / 100,
+      opMargin:      p(quote.operating_margin) / 100,
 
-      currentRatio:  p(sbal.current_ratio_mrq)         || p(quote.current_ratio) || 0,
-      debtToEquity:  p(sbal.total_debt_to_equity_mrq) / 100 || p(quote.debt_to_equity) / 100 || 0,
-      totalCash:     p(sbal.total_cash_mrq)            || p(quote.total_cash) || 0,
-      totalDebt:     p(sbal.total_debt_mrq)            || p(quote.total_debt) || 0,
-      freeCashFlow:  p(scf.levered_free_cash_flow_ttm) || p(quote.free_cash_flow) || 0,
+      // Bilanço
+      currentRatio:  p(quote.current_ratio),
+      debtToEquity:  p(quote.debt_to_equity) / 100,
+      totalCash:     p(quote.total_cash),
+      totalDebt:     p(quote.total_debt),
+      freeCashFlow:  p(quote.free_cash_flow),
 
-      revenueGrowth:  p(sinc.quarterly_revenue_growth_yoy)  / 100 || 0,
-      earningsGrowth: p(sinc.quarterly_earnings_growth_yoy) / 100 || p(quote.earnings_growth) || 0,
+      // Büyüme
+      revenueGrowth:  p(quote.revenue_growth) / 100,
+      earningsGrowth: p(quote.earnings_growth) / 100,
 
-      high52, low52, beta, dividendYield: divYield,
+      // 52H, beta, dividend — fifty_two_week objesinden
+      high52:        p(fw.high) || p(quote.fifty_two_week_high) || 0,
+      low52:         p(fw.low)  || p(quote.fifty_two_week_low)  || 0,
+      beta:          p(quote.beta),
+      dividendYield: p(quote.dividend_yield) / 100,
 
+      // Şirket
       sector:      profile?.sector      || quote.sector      || '',
       industry:    profile?.industry    || quote.industry    || '',
-      description: profile?.description || quote.description || '',
-      employees:   profile?.employees   || quote.employees   || 0,
+      description: profile?.description || '',
+      employees:   p(profile?.employees || quote.employees),
       website:     profile?.website     || quote.website     || '',
       country:     profile?.country     || quote.country     || '',
 
-      // Debug — statistics'in ham yapısını göster
-      _statsKeys: stats ? Object.keys(stats.statistics || {}) : [],
+      // Debug
+      _quoteKeys: Object.keys(quote),
     });
 
   } catch(e) {
