@@ -1228,9 +1228,10 @@ function _buildFinancials(d) {
 
 function goScreener() { window.location.href = '/'; }  // Tarayıcı → anasayfa (screener açık gelir)
 function closeProfil() {
-  var from = _urlParams.get('from');
+  var params = new URLSearchParams(window.location.search);
+  var from = params.get('from');
   if(from === 'screener') {
-    history.back(); // Screener'dan gelindiyse geri git
+    history.back();
   } else {
     window.location.href = '/';
   }
