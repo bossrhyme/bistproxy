@@ -1445,238 +1445,160 @@ function askPrfAI() {
 // ── Başlangıç ──
 
 // ═══════════════════════════════════════════
-// FMP API — Gerçek Veri Entegrasyonu
+// YAHOO FINANCE — Gerçek Veri (via /api/quote proxy)
 // ═══════════════════════════════════════════
-var FMP_KEY = 'HcjaupBb2nww7d0LGcSyUGPnnguCsVJx';
-var FMP_BASE = 'https://financialmodelingprep.com';
 
-// Exchange → FMP sembol suffix
-var FMP_SUFFIX = {
+// Exchange → Yahoo sembol suffix
+var YF_SUFFIX = {
   bist: '.IS', nasdaq: '', sp500: '', dax: '.DE', lse: '.L', nikkei: '.T'
 };
 
-function fmpSym(sym, ex) {
-  var suffix = FMP_SUFFIX[ex] || '';
-  // Zaten suffix varsa ekleme
-  if(sym.endsWith(suffix) || !suffix) return sym + suffix;
+function yfSym(sym, ex) {
+  var suffix = YF_SUFFIX[ex] || '';
+  if(!suffix) return sym;
+  var up = sym.toUpperCase();
+  if(up.endsWith(suffix.toUpperCase())) return sym;
   return sym + suffix;
 }
 
-async function fetchFMP(endpoint) {
-  try {
-    var sep = endpoint.includes('?') ? '&' : '?';
-    var r = await fetch(FMP_BASE + endpoint + sep + 'apikey=' + FMP_KEY);
-    if(!r.ok) return null;
-    return await r.json();
-  } catch(e) { return null; }
-}
-
-async function loadFMPData(sym, ex) {
-  var fsym = fmpSym(sym, ex);
+async function loadYahooData(sym, ex) {
+  var fsym = yfSym(sym, ex);
   
-  // Paralel fetch
-  var [profile, ratios, keymetrics, news] = await Promise.all([
-    fetchFMP('/api/v3/profile/' + fsym),
-    fetchFMP('/api/v3/ratios-ttm/' + fsym),
-    fetchFMP('/api/v3/key-metrics-ttm/' + fsym),
-    fetchFMP('/api/v3/stock_news?tickers=' + fsym + '&limit=5'),
-  ]);
+  try {
+    // Paralel: quote + news
+    var [qRes, nRes] = await Promise.all([
+      fetch('/api/quote?sym=' + encodeURIComponent(fsym)),
+      fetch('/api/quote?sym=' + encodeURIComponent(fsym) + '&type=news'),
+    ]);
 
-  var p = (profile && profile[0]) || {};
-  var r = (ratios && ratios[0]) || {};
-  var km = (keymetrics && keymetrics[0]) || {};
+    var q = qRes.ok ? await qRes.json() : {};
+    var n = nRes.ok ? await nRes.json() : {};
 
-  // Veriyi birleştir ve sayfayı güncelle
-  if(p.companyName) {
-    // Hero
-    document.getElementById('prf-fullname').textContent = p.companyName || sym;
-    document.getElementById('prf-logo').textContent = sym.substring(0,2).toUpperCase();
-    document.getElementById('prf-sector-tag').textContent = p.sector || '—';
-    
-    // Fiyat
-    var price = p.price || 0;
+    if(q.error) { console.warn('Yahoo error:', q.error); return; }
+
+    // ── Hero ──
     var cur = (EXCHANGE_META[ex] || {}).currency || '$';
-    var chgPct = p.changes || 0;
-    document.getElementById('prf-price').textContent = price ? cur + ' ' + price.toLocaleString('tr-TR', {minimumFractionDigits:2, maximumFractionDigits:2}) : '—';
+    if(q.name) document.getElementById('prf-fullname').textContent = q.name;
+    if(q.sector) document.getElementById('prf-sector-tag').textContent = q.sector;
+    document.getElementById('prf-logo').textContent = sym.substring(0,2).toUpperCase();
+
+    var price = q.price || 0;
+    document.getElementById('prf-price').textContent = price
+      ? cur + ' ' + price.toLocaleString('tr-TR', {minimumFractionDigits:2, maximumFractionDigits:2})
+      : '—';
+
     var chgEl = document.getElementById('prf-chg');
-    if(chgPct !== 0) {
+    var chgPct = (q.changePct || 0) * 100;
+    if(chgPct) {
       chgEl.textContent = (chgPct >= 0 ? '+' : '') + chgPct.toFixed(2) + '%';
       chgEl.className = 'prf-chg ' + (chgPct >= 0 ? 'up' : 'dn');
     }
 
-    // Score strip
-    var pe = r.peRatioTTM || km.peRatioTTM || 0;
-    var peg = r.priceEarningsToGrowthRatioTTM || 0;
-    var roe = r.returnOnEquityTTM || 0;
-    var fscore = km.piotroskiScoreTTM || null;
-    var mc = p.mktCap || 0;
+    // ── Score strip ──
+    _setScore('prf-sc-fscore', '—', '');
+    _setScore('prf-sc-peg',  q.peg  ? q.peg.toFixed(2)          : '—', q.peg  && q.peg < 1 ? 'g' : q.peg < 2 ? 'm' : 'b');
+    _setScore('prf-sc-fk',   q.pe   ? q.pe.toFixed(1) + 'x'     : '—', q.pe   && q.pe  < 15 ? 'g' : q.pe  < 25 ? 'm' : 'b');
+    _setScore('prf-sc-roe',  q.roe  ? (q.roe*100).toFixed(1)+'%': '—', q.roe  && q.roe*100 > 15 ? 'g' : q.roe*100 > 8 ? 'm' : 'b');
+    _setScore('prf-sc-mc',   q.marketCap ? _fmtN(q.marketCap)   : '—', '');
 
-    _setScore('prf-sc-fscore', fscore !== null && fscore !== undefined ? Math.round(fscore)+'/9' : '—', fscore >= 7 ? 'g' : fscore >= 4 ? 'm' : 'b');
-    _setScore('prf-sc-peg', peg ? peg.toFixed(2) : '—', peg && peg < 1 ? 'g' : peg && peg < 2 ? 'm' : 'b');
-    _setScore('prf-sc-fk', pe ? pe.toFixed(1)+'x' : '—', pe && pe < 15 ? 'g' : pe && pe < 25 ? 'm' : 'b');
-    _setScore('prf-sc-roe', roe ? (roe*100).toFixed(1)+'%' : '—', roe*100 > 15 ? 'g' : roe*100 > 8 ? 'm' : 'b');
-    _setScore('prf-sc-mc', mc ? _fmtN(mc) : '—', '');
-
-    // Şirket açıklaması
+    // ── Şirket açıklaması ──
     var descEl = document.getElementById('prf-desc');
-    if(descEl) descEl.textContent = p.description || 'Şirket bilgisi mevcut değil.';
+    if(descEl && q.description) descEl.textContent = q.description;
 
-    // Metrik grid'i FMP verisiyle güncelle
-    _buildPrfMetricsFMP(r, km, p, cur);
+    // ── Metrik grid ──
+    var metrics = [
+      {l:'F/K (TTM)',      v:q.pe,           fmt:function(v){return v.toFixed(1)+'x';},  cls:function(v){return v>0&&v<15?'g':v<25?'m':'b';}, sub:'Piyasa/Kazanç'},
+      {l:'F/K (İleriye)',  v:q.forwardPE,    fmt:function(v){return v.toFixed(1)+'x';},  cls:function(v){return v>0&&v<15?'g':v<25?'m':'b';}, sub:'Tahmini kazanç'},
+      {l:'PD/DD',          v:q.pb,           fmt:function(v){return v.toFixed(2)+'x';},  cls:function(v){return v>0&&v<2?'g':v<4?'m':'b';},  sub:'Defter değeri'},
+      {l:'ROE',            v:q.roe,          fmt:function(v){return (v*100).toFixed(1)+'%';}, cls:function(v){return v*100>15?'g':v*100>8?'m':'b';}, sub:'Özsermaye getirisi'},
+      {l:'ROA',            v:q.roa,          fmt:function(v){return (v*100).toFixed(1)+'%';}, cls:function(v){return v*100>8?'g':v*100>3?'m':'b';},  sub:'Varlık getirisi'},
+      {l:'Net Marj',       v:q.netMargin,    fmt:function(v){return (v*100).toFixed(1)+'%';}, cls:function(v){return v*100>12?'g':v*100>5?'m':'b';}, sub:'Kar/gelir oranı'},
+      {l:'Brüt Marj',      v:q.grossMargin,  fmt:function(v){return (v*100).toFixed(1)+'%';}, cls:function(v){return v*100>40?'g':v*100>20?'m':'b';},sub:'Ham kârlılık'},
+      {l:'PEG',            v:q.peg,          fmt:function(v){return v.toFixed(2);},       cls:function(v){return v>0&&v<1?'g':v<2?'m':'b';},  sub:'Büyümeye göre F/K'},
+      {l:'Cari Oran',      v:q.currentRatio, fmt:function(v){return v.toFixed(2)+'x';},  cls:function(v){return v>2?'g':v>1?'m':'b';},        sub:'Dönen/kısa borç'},
+      {l:'Borç/Öz',        v:q.debtToEquity, fmt:function(v){return v.toFixed(2);},       cls:function(v){return v<0.5?'g':v<1?'m':'b';},     sub:'Finansal kaldıraç'},
+      {l:'Temettü Verimi', v:q.dividendYield,fmt:function(v){return (v*100).toFixed(2)+'%';}, cls:function(v){return v*100>3?'g':v*100>1?'m':'b';}, sub:'Yıllık temettü'},
+      {l:'Beta',           v:q.beta,         fmt:function(v){return v.toFixed(2);},       cls:function(v){return v<1?'g':v<1.5?'m':'b';},     sub:'Piyasa duyarlılığı'},
+    ];
+    document.getElementById('prf-metrics').innerHTML = metrics.map(function(m){
+      var ok = m.v !== null && m.v !== undefined && !isNaN(m.v) && m.v !== 0;
+      var valStr = ok ? m.fmt(m.v) : '—';
+      var cls = ok ? m.cls(m.v) : '';
+      return '<div class="prf-mcell"><div class="prf-mlabel">'+m.l+'</div><div class="prf-mval '+cls+'">'+valStr+'</div><div class="prf-msub">'+m.sub+'</div></div>';
+    }).join('');
 
-    // F-Score
-    _buildPrfPiotronskiFMP(km, r, p);
+    // ── Guru ──
+    var pe = q.pe, pb = q.pb, roe = (q.roe||0)*100, nm = (q.netMargin||0)*100;
+    var cr = q.currentRatio, de = q.debtToEquity, peg = q.peg, dy = (q.dividendYield||0)*100;
+    var gurus = [
+      {emoji:'🎯', name:'Warren Buffett', sub:'Değer Yatırımı', crits:[
+        {t:'F/K < 20 → '+(pe?pe.toFixed(1)+'x':'—'),  p:pe&&pe>0&&pe<20},
+        {t:'ROE > 15% → '+roe.toFixed(1)+'%',           p:roe>15},
+        {t:'Net Marj > 10% → '+nm.toFixed(1)+'%',       p:nm>10},
+        {t:'Cari Oran > 1.2 → '+(cr?cr.toFixed(2):'—'),p:cr&&cr>1.2},
+        {t:'Borç/Öz < 0.8 → '+(de?de.toFixed(2):'—'), p:de!==undefined&&de<0.8},
+      ]},
+      {emoji:'📈', name:'Peter Lynch – PEG', sub:'Büyüme + Değer', crits:[
+        {t:'PEG < 1 → '+(peg?peg.toFixed(2):'—'),      p:peg&&peg>0&&peg<1},
+        {t:'F/K < 30 → '+(pe?pe.toFixed(1)+'x':'—'),   p:pe&&pe>0&&pe<30},
+        {t:'ROE > 12% → '+roe.toFixed(1)+'%',            p:roe>12},
+      ]},
+      {emoji:'📚', name:'Benjamin Graham', sub:'Derin Değer', crits:[
+        {t:'F/K < 15 → '+(pe?pe.toFixed(1)+'x':'—'),   p:pe&&pe>0&&pe<15},
+        {t:'PD/DD < 1.5 → '+(pb?pb.toFixed(2)+'x':'—'),p:pb&&pb<1.5},
+        {t:'Cari > 2 → '+(cr?cr.toFixed(2)+'x':'—'),   p:cr&&cr>2},
+        {t:'Temettü > 1% → '+dy.toFixed(1)+'%',          p:dy>1},
+      ]},
+      {emoji:'📊', name:'Büyüme Analizi', sub:'Gelir & Kazanç', crits:[
+        {t:'Gelir Büyümesi > 10%', p:(q.revenueGrowth||0)*100>10},
+        {t:'Kazanç Büyümesi > 15%',p:(q.earningsGrowth||0)*100>15},
+        {t:'Brüt Marj > 30%',      p:(q.grossMargin||0)*100>30},
+      ]},
+    ];
+    document.getElementById('prf-ggrid').innerHTML = gurus.map(function(g){
+      var passed = g.crits.filter(function(c){return c.p;}).length;
+      var total = g.crits.length, pct = passed/total;
+      var cls = pct>=0.8?'pass':pct>=0.5?'partial':'fail';
+      return '<div class="prf-gcard '+cls+'">'+
+        '<div class="prf-gtop"><span style="font-size:18px">'+g.emoji+'</span>'+
+        '<div><div style="font-size:12px;font-weight:700;color:var(--text)">'+g.name+'</div>'+
+        '<div style="font-size:10px;color:var(--text2)">'+g.sub+'</div></div>'+
+        '<span class="prf-gscore '+cls+'">'+passed+'/'+total+(pct>=0.8?' ✓':pct>=0.5?' ~':' ✗')+'</span></div>'+
+        g.crits.map(function(c){
+          return '<div class="prf-gcrit"><div class="prf-cdot" style="background:'+(c.p?'var(--green)':'var(--red)')+'"></div>'+c.t+'</div>';
+        }).join('')+'</div>';
+    }).join('');
 
-    // Guru
-    _buildPrfGuruFMP(r, km, p);
+    // ── Yan panel ──
+    var stats2 = [
+      {k:'52H Yüksek',    v: q.high52 ? cur+' '+q.high52.toLocaleString('tr-TR',{minimumFractionDigits:2}) : '—'},
+      {k:'52H Düşük',     v: q.low52  ? cur+' '+q.low52.toLocaleString('tr-TR',{minimumFractionDigits:2})  : '—'},
+      {k:'Beta',          v: q.beta   ? q.beta.toFixed(2) : '—'},
+      {k:'Piyasa Değeri', v: q.marketCap ? _fmtN(q.marketCap) : '—'},
+      {k:'Ort. Hacim',    v: q.avgVolume  ? _fmtN(q.avgVolume)  : '—'},
+      {k:'Temettü',       v: q.dividendYield ? (q.dividendYield*100).toFixed(2)+'%' : '—', cls:'g'},
+      {k:'Sektör',        v: q.sector || '—'},
+      {k:'Çalışan',       v: q.employees ? q.employees.toLocaleString() : '—'},
+    ];
+    document.getElementById('prf-price-stats').innerHTML = stats2.map(function(s){
+      return '<div class="prf-qstat"><span class="prf-qkey">'+s.k+'</span><span class="prf-qval '+(s.cls||'')+'">'+s.v+'</span></div>';
+    }).join('');
 
-    // Yan panel fiyat bilgileri
-    _buildPrfSideFMP(p, r, ex, cur);
+    // ── Haberler ──
+    if(n.news && n.news.length) {
+      document.getElementById('prf-news').innerHTML = n.news.slice(0,5).map(function(item){
+        var date = item.providerPublishTime ? new Date(item.providerPublishTime*1000).toLocaleDateString('tr-TR') : '';
+        return '<div class="prf-news-item">'+
+          '<div class="prf-news-src">'+(item.publisher||'Haber')+'</div>'+
+          '<div class="prf-news-title" onclick="window.open(\''+item.link+'\',\'_blank\')">'+item.title+'</div>'+
+          '<div class="prf-news-meta"><span>'+date+'</span></div>'+
+        '</div>';
+      }).join('');
+    }
+
+  } catch(e) {
+    console.error('Yahoo Finance error:', e);
   }
-
-  // Haberler
-  if(news && news.length) {
-    _buildPrfNewsFMP(news);
-  }
-}
-
-function _buildPrfMetricsFMP(r, km, p, cur) {
-  var metrics = [
-    {l:'F/K (TTM)',      v:r.peRatioTTM||km.peRatioTTM,          fmt:function(v){return v.toFixed(1)+'x';}, cls:function(v){return v<15?'g':v<25?'m':'b';}, sub:'Piyasa/Kazanç'},
-    {l:'PD/DD',          v:r.priceToBookRatioTTM,                  fmt:function(v){return v.toFixed(2)+'x';}, cls:function(v){return v<2?'g':v<4?'m':'b';}, sub:'Defter değeri'},
-    {l:'ROE',            v:r.returnOnEquityTTM,                    fmt:function(v){return (v*100).toFixed(1)+'%';}, cls:function(v){return v*100>15?'g':v*100>8?'m':'b';}, sub:'Özsermaye getirisi'},
-    {l:'ROA',            v:r.returnOnAssetsTTM,                    fmt:function(v){return (v*100).toFixed(1)+'%';}, cls:function(v){return v*100>8?'g':v*100>3?'m':'b';}, sub:'Varlık getirisi'},
-    {l:'Net Marj',       v:r.netProfitMarginTTM,                   fmt:function(v){return (v*100).toFixed(1)+'%';}, cls:function(v){return v*100>12?'g':v*100>5?'m':'b';}, sub:'Kar/gelir oranı'},
-    {l:'Brüt Marj',      v:r.grossProfitMarginTTM,                 fmt:function(v){return (v*100).toFixed(1)+'%';}, cls:function(v){return v*100>40?'g':v*100>20?'m':'b';}, sub:'Ham kârlılık'},
-    {l:'PEG',            v:r.priceEarningsToGrowthRatioTTM,        fmt:function(v){return v.toFixed(2);}, cls:function(v){return v<1?'g':v<2?'m':'b';}, sub:'Büyümeye göre F/K'},
-    {l:'F-Score',        v:km.piotroskiScoreTTM,                   fmt:function(v){return Math.round(v)+'/9';}, cls:function(v){return v>=7?'g':v>=4?'m':'b';}, sub:'Finansal sağlık'},
-    {l:'Cari Oran',      v:r.currentRatioTTM,                      fmt:function(v){return v.toFixed(2)+'x';}, cls:function(v){return v>2?'g':v>1?'m':'b';}, sub:'Dönen/kısa borç'},
-    {l:'Borç/Öz',        v:r.debtEquityRatioTTM,                   fmt:function(v){return v.toFixed(2);}, cls:function(v){return v<0.5?'g':v<1?'m':'b';}, sub:'Finansal kaldıraç'},
-    {l:'Temettü Verimi', v:r.dividendYielTTM||r.dividendYieldTTM,  fmt:function(v){return (v*100).toFixed(2)+'%';}, cls:function(v){return v*100>3?'g':v*100>1?'m':'b';}, sub:'Yıllık temettü/fiyat'},
-    {l:'F/S',            v:r.priceToSalesRatioTTM,                 fmt:function(v){return v.toFixed(2)+'x';}, cls:function(v){return v<2?'g':v<5?'m':'b';}, sub:'Fiyat/Satış'},
-  ];
-
-  document.getElementById('prf-metrics').innerHTML = metrics.map(function(m){
-    var ok = m.v !== null && m.v !== undefined && !isNaN(m.v) && m.v !== 0;
-    var valStr = ok ? m.fmt(m.v) : '—';
-    var cls = ok ? m.cls(m.v) : '';
-    return '<div class="prf-mcell"><div class="prf-mlabel">'+m.l+'</div><div class="prf-mval '+cls+'">'+valStr+'</div><div class="prf-msub">'+m.sub+'</div></div>';
-  }).join('');
-}
-
-function _buildPrfPiotronskiFMP(km, r, p) {
-  var score = km.piotroskiScoreTTM ? Math.round(km.piotroskiScoreTTM) : null;
-  if(score === null) return;
-  document.getElementById('prf-fscore-num').textContent = score;
-  var lbl = score >= 8 ? 'Güçlü Bilanço' : score >= 5 ? 'Orta Güç' : 'Zayıf Bilanço';
-  document.getElementById('prf-fscore-label').textContent = lbl;
-
-  var groups = [
-    {title:'Karlılık', items:[
-      {t:'Pozitif ROA',             p: r.returnOnAssetsTTM > 0},
-      {t:'Pozitif Nakit Akışı',     p: p.operatingCashFlow > 0},
-      {t:'Artan ROA (YoY)',         p: score >= 5},
-      {t:'Nakit Akışı > Net Gelir', p: score >= 6},
-    ]},
-    {title:'Kaldıraç & Likidite', items:[
-      {t:'Azalan Uzun Vadeli Borç', p: r.debtEquityRatioTTM < 1},
-      {t:'Artan Cari Oran',         p: r.currentRatioTTM > 1.5},
-      {t:'Hisse Dilüsyonu Yok',     p: score >= 7},
-    ]},
-    {title:'Verimlilik', items:[
-      {t:'Artan Brüt Marj',         p: r.grossProfitMarginTTM > 0.2},
-      {t:'Artan Varlık Devir Hızı', p: score >= 8},
-    ]},
-  ];
-
-  document.getElementById('prf-fgrid').innerHTML = groups.map(function(g){
-    return '<div class="prf-fgroup"><div class="prf-fgroup-title">'+g.title+'</div>'+
-      g.items.map(function(i){
-        return '<div class="prf-fitem"><div class="prf-fdot '+(i.p?'p':'f')+'"></div>'+i.t+'</div>';
-      }).join('')+'</div>';
-  }).join('');
-}
-
-function _buildPrfGuruFMP(r, km, p) {
-  var pe = r.peRatioTTM, pb = r.priceToBookRatioTTM;
-  var roe = (r.returnOnEquityTTM||0)*100;
-  var nm = (r.netProfitMarginTTM||0)*100;
-  var cr = r.currentRatioTTM, de = r.debtEquityRatioTTM;
-  var peg = r.priceEarningsToGrowthRatioTTM;
-  var dy = (r.dividendYielTTM||r.dividendYieldTTM||0)*100;
-  var fs = km.piotroskiScoreTTM ? Math.round(km.piotroskiScoreTTM) : 0;
-
-  var gurus = [
-    {emoji:'🎯', name:'Warren Buffett', sub:'Değer Yatırımı', crits:[
-      {t:'F/K < 20 → '+(pe?pe.toFixed(1)+'x':'—'), p:pe&&pe<20&&pe>0},
-      {t:'ROE > 15% → '+roe.toFixed(1)+'%',         p:roe>15},
-      {t:'Net Marj > 10% → '+nm.toFixed(1)+'%',     p:nm>10},
-      {t:'Cari Oran > 1.2 → '+(cr?cr.toFixed(2):'—'), p:cr&&cr>1.2},
-      {t:'Borç/Öz < 0.8 → '+(de?de.toFixed(2):'—'), p:de&&de<0.8},
-    ]},
-    {emoji:'📈', name:'Peter Lynch – PEG', sub:'Büyüme + Değer', crits:[
-      {t:'PEG < 1 → '+(peg?peg.toFixed(2):'—'),     p:peg&&peg<1&&peg>0},
-      {t:'F/K < 30 → '+(pe?pe.toFixed(1)+'x':'—'), p:pe&&pe<30&&pe>0},
-      {t:'ROE > 12% → '+roe.toFixed(1)+'%',         p:roe>12},
-    ]},
-    {emoji:'📚', name:'Benjamin Graham', sub:'Derin Değer', crits:[
-      {t:'F/K < 15 → '+(pe?pe.toFixed(1)+'x':'—'), p:pe&&pe<15&&pe>0},
-      {t:'PD/DD < 1.5 → '+(pb?pb.toFixed(2)+'x':'—'), p:pb&&pb<1.5},
-      {t:'Cari > 2 → '+(cr?cr.toFixed(2)+'x':'—'), p:cr&&cr>2},
-      {t:'Temettü > 1% → '+dy.toFixed(1)+'%',       p:dy>1},
-    ]},
-    {emoji:'⚡', name:'Piotroski F-Score', sub:'Finansal Sağlık', crits:[
-      {t:'Karlılık 4/4',    p:fs>=6},
-      {t:'Kaldıraç 3/3',    p:fs>=8},
-      {t:'Verimlilik 2/2',  p:fs>=7},
-    ]},
-  ];
-
-  document.getElementById('prf-ggrid').innerHTML = gurus.map(function(g){
-    var passed = g.crits.filter(function(c){return c.p;}).length;
-    var total = g.crits.length;
-    var pct = passed/total;
-    var cls = pct>=0.8?'pass':pct>=0.5?'partial':'fail';
-    return '<div class="prf-gcard '+cls+'">'+
-      '<div class="prf-gtop"><span style="font-size:18px">'+g.emoji+'</span>'+
-      '<div><div style="font-size:12px;font-weight:700;color:var(--text)">'+g.name+'</div>'+
-      '<div style="font-size:10px;color:var(--text2)">'+g.sub+'</div></div>'+
-      '<span class="prf-gscore '+cls+'">'+passed+'/'+total+(pct>=0.8?' ✓':pct>=0.5?' ~':' ✗')+'</span></div>'+
-      g.crits.map(function(c){
-        return '<div class="prf-gcrit"><div class="prf-cdot" style="background:'+(c.p?'var(--green)':'var(--red)')+'"></div>'+c.t+'</div>';
-      }).join('')+'</div>';
-  }).join('');
-}
-
-function _buildPrfSideFMP(p, r, ex, cur) {
-  var stats = [
-    {k:'52H Yüksek',      v: p.range ? cur+' '+(p.range.split('-')[1]||'—') : '—'},
-    {k:'52H Düşük',       v: p.range ? cur+' '+(p.range.split('-')[0]||'—') : '—'},
-    {k:'Beta',            v: p.beta ? p.beta.toFixed(2) : '—'},
-    {k:'Piyasa Değeri',   v: p.mktCap ? _fmtN(p.mktCap) : '—'},
-    {k:'Ortalama Hacim',  v: p.volAvg ? _fmtN(p.volAvg) : '—'},
-    {k:'Temettü Verimi',  v: r.dividendYielTTM ? (r.dividendYielTTM*100).toFixed(2)+'%' : '—', cls: 'g'},
-    {k:'Sektör',          v: p.sector || '—'},
-    {k:'Çalışan Sayısı',  v: p.fullTimeEmployees ? Number(p.fullTimeEmployees).toLocaleString() : '—'},
-  ];
-  document.getElementById('prf-price-stats').innerHTML = stats.map(function(s){
-    return '<div class="prf-qstat"><span class="prf-qkey">'+s.k+'</span><span class="prf-qval '+(s.cls||'')+'">' +s.v+'</span></div>';
-  }).join('');
-}
-
-function _buildPrfNewsFMP(news) {
-  var sentMap = {Positive:'pos', Negative:'neg', Neutral:'ntr'};
-  document.getElementById('prf-news').innerHTML = news.slice(0,5).map(function(n){
-    var date = n.publishedDate ? n.publishedDate.substring(0,10) : '';
-    var sent = sentMap[n.sentiment] || 'ntr';
-    var sentLabel = sent==='pos'?'Pozitif':sent==='neg'?'Negatif':'Nötr';
-    return '<div class="prf-news-item">'+
-      '<div class="prf-news-src">'+(n.site||'Haber')+'</div>'+
-      '<div class="prf-news-title" onclick="window.open(\''+n.url+'\',\'_blank\')">'+n.title+'</div>'+
-      '<div class="prf-news-meta"><span>'+date+'</span>'+
-      '<span class="prf-sent '+sent+'">'+sentLabel+'</span></div>'+
-    '</div>';
-  }).join('');
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -1713,7 +1635,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.title = 'DeepFin — ' + sym;
     showProfil(sym, ex);
     // FMP'den gerçek veri çek
-    loadFMPData(sym, ex);
+    loadYahooData(sym, ex);
   }
 });
 </script>
