@@ -91,7 +91,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .exbtn.on{border-color:var(--accent);background:rgba(59,130,246,.1);}
 .exbtn.on .exbtn-name{color:var(--accent);}
 .exbtn.disabled{opacity:.35;cursor:not-allowed;pointer-events:none;}
-.exbtn-flag{font-size:16px;line-height:1;}
+.exbtn-flag{line-height:0;display:flex;align-items:center;justify-content:center;}
 .exbtn-name{font-size:10px;font-weight:600;color:var(--text);}
 .exbtn-sub{font-size:9px;color:var(--muted2);}
 .exbtn-soon{position:absolute;top:3px;right:4px;font-size:7px;background:var(--border2);color:var(--muted2);padding:1px 4px;border-radius:3px;font-weight:600;letter-spacing:.3px;}
@@ -399,7 +399,7 @@ td:first-child,td:nth-child(2){text-align:left;}
 
   /* ── MAIN / CONTENT ── */
   .main { flex: 1; min-width: 0; overflow: hidden; display: flex; flex-direction: column; }
-  .content { min-height: 0; overflow: hidden; }
+  .content { min-height: 0; overflow: hidden; flex: 1; display: flex; flex-direction: column; }
 
   /* ── TOOLBAR ── */
   #toolbar { flex-wrap: wrap; gap: 4px; padding: 6px 8px; }
@@ -407,7 +407,7 @@ td:first-child,td:nth-child(2){text-align:left;}
   .tbl-scroll-btn { display: none; }
 
   /* ── TABLO ── */
-  .twrap { overflow: auto; -webkit-overflow-scrolling: touch; flex: 1; }
+  .twrap { overflow: auto; -webkit-overflow-scrolling: touch; flex: 1; min-height: 0; }
   table { min-width: 700px; }
   th, td { padding: 6px 8px; font-size: 10px; white-space: nowrap; }
 
@@ -436,10 +436,9 @@ td:first-child,td:nth-child(2){text-align:left;}
 }
 
 @media (max-width: 480px) {
-  /* Daha küçük ekranlarda borsa butonları 2 kolon */
   .exchange-grid { grid-template-columns: repeat(2, 1fr); }
-  /* Tablo — ilk 4 kolon */
-  th:nth-child(n+5), td:nth-child(n+5) { display: none; }
+  /* Sütunları gizleme — yatay scroll yap */
+  table { min-width: 900px; }
 }
 
 /* ── TICKER TAPE ── */
@@ -501,9 +500,10 @@ td:first-child,td:nth-child(2){text-align:left;}
 .hp-section-title::after{content:'';flex:1;height:1px;background:var(--border);}
 
 .hp-exchange-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
-.hp-excard{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:12px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:4px;}
-.hp-excard:hover{border-color:#333;background:#0a0a0a;transform:translateY(-1px);}
-.hp-excard-flag{font-size:20px;}
+.hp-excard{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:12px 14px;cursor:pointer;transition:all .15s;display:flex;flex-direction:row;align-items:center;gap:10px;}
+.hp-excard:hover{border-color:var(--accent);background:rgba(59,130,246,.05);transform:translateY(-1px);}
+.hp-excard-flag{flex-shrink:0;line-height:0;}
+.hp-excard-info{display:flex;flex-direction:column;gap:2px;min-width:0;}
 .hp-excard-name{font-size:12px;font-weight:700;color:var(--text);}
 .hp-excard-desc{font-size:10px;color:var(--muted2);}
 .hp-excard-count{font-size:10px;color:var(--accent);font-family:'JetBrains Mono',monospace;margin-top:2px;}
@@ -714,40 +714,52 @@ td:first-child,td:nth-child(2){text-align:left;}
         <div class="hp-section-title">Borsalar</div>
         <div class="hp-exchange-grid">
           <div class="hp-excard" onclick="selectExchangeAndGo('bist')">
-            <div class="hp-excard-flag">🇹🇷</div>
-            <div class="hp-excard-name">BIST</div>
-            <div class="hp-excard-desc">Borsa İstanbul</div>
-            <div class="hp-excard-count">~500 hisse</div>
+            <div class="hp-excard-flag"><img src="https://flagcdn.com/tr.svg" width="28" height="20" style="border-radius:3px;object-fit:cover;display:block;"></div>
+            <div class="hp-excard-info">
+              <div class="hp-excard-name">BIST</div>
+              <div class="hp-excard-desc">Borsa İstanbul</div>
+              <div class="hp-excard-count">~500 hisse</div>
+            </div>
           </div>
           <div class="hp-excard" onclick="selectExchangeAndGo('nasdaq')">
-            <div class="hp-excard-flag">🇺🇸</div>
-            <div class="hp-excard-name">NASDAQ</div>
-            <div class="hp-excard-desc">Teknoloji ağırlıklı</div>
-            <div class="hp-excard-count">~3000 hisse</div>
+            <div class="hp-excard-flag"><img src="https://flagcdn.com/us.svg" width="28" height="20" style="border-radius:3px;object-fit:cover;display:block;"></div>
+            <div class="hp-excard-info">
+              <div class="hp-excard-name">NASDAQ</div>
+              <div class="hp-excard-desc">Teknoloji ağırlıklı</div>
+              <div class="hp-excard-count">~3000 hisse</div>
+            </div>
           </div>
           <div class="hp-excard" onclick="selectExchangeAndGo('sp500')">
-            <div class="hp-excard-flag">🇺🇸</div>
-            <div class="hp-excard-name">S&P 500</div>
-            <div class="hp-excard-desc">ABD endeksi</div>
-            <div class="hp-excard-count">503 hisse</div>
+            <div class="hp-excard-flag"><img src="https://flagcdn.com/us.svg" width="28" height="20" style="border-radius:3px;object-fit:cover;display:block;"></div>
+            <div class="hp-excard-info">
+              <div class="hp-excard-name">S&P 500</div>
+              <div class="hp-excard-desc">ABD endeksi</div>
+              <div class="hp-excard-count">503 hisse</div>
+            </div>
           </div>
           <div class="hp-excard" onclick="selectExchangeAndGo('dax')">
-            <div class="hp-excard-flag">🇩🇪</div>
-            <div class="hp-excard-name">DAX</div>
-            <div class="hp-excard-desc">Frankfurt</div>
-            <div class="hp-excard-count">~500 hisse</div>
+            <div class="hp-excard-flag"><img src="https://flagcdn.com/de.svg" width="28" height="20" style="border-radius:3px;object-fit:cover;display:block;"></div>
+            <div class="hp-excard-info">
+              <div class="hp-excard-name">DAX</div>
+              <div class="hp-excard-desc">Frankfurt</div>
+              <div class="hp-excard-count">~500 hisse</div>
+            </div>
           </div>
           <div class="hp-excard" onclick="selectExchangeAndGo('lse')">
-            <div class="hp-excard-flag">🇬🇧</div>
-            <div class="hp-excard-name">LSE</div>
-            <div class="hp-excard-desc">Londra</div>
-            <div class="hp-excard-count">~2000 hisse</div>
+            <div class="hp-excard-flag"><img src="https://flagcdn.com/gb.svg" width="28" height="20" style="border-radius:3px;object-fit:cover;display:block;"></div>
+            <div class="hp-excard-info">
+              <div class="hp-excard-name">LSE</div>
+              <div class="hp-excard-desc">Londra</div>
+              <div class="hp-excard-count">~2000 hisse</div>
+            </div>
           </div>
           <div class="hp-excard" onclick="selectExchangeAndGo('nikkei')">
-            <div class="hp-excard-flag">🇯🇵</div>
-            <div class="hp-excard-name">Nikkei</div>
-            <div class="hp-excard-desc">Tokyo</div>
-            <div class="hp-excard-count">~4000 hisse</div>
+            <div class="hp-excard-flag"><img src="https://flagcdn.com/jp.svg" width="28" height="20" style="border-radius:3px;object-fit:cover;display:block;"></div>
+            <div class="hp-excard-info">
+              <div class="hp-excard-name">Nikkei</div>
+              <div class="hp-excard-desc">Tokyo</div>
+              <div class="hp-excard-count">~4000 hisse</div>
+            </div>
           </div>
         </div>
       </div>
@@ -872,22 +884,22 @@ td:first-child,td:nth-child(2){text-align:left;}
           <div class="exchange-title">Borsa</div>
           <div class="exchange-grid">
             <div class="exbtn on" data-exchange="bist" onclick="selectExchange(this)">
-              <span class="exbtn-flag">🇹🇷</span><span class="exbtn-name">BIST</span><span class="exbtn-sub">Borsa İstanbul</span>
+              <span class="exbtn-flag"><img src="https://flagcdn.com/tr.svg" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">BIST</span><span class="exbtn-sub">Borsa İstanbul</span>
             </div>
             <div class="exbtn" data-exchange="nasdaq" onclick="selectExchange(this)">
-              <span class="exbtn-flag">🇺🇸</span><span class="exbtn-name">NASDAQ</span><span class="exbtn-sub">Tech Ağırlıklı</span>
+              <span class="exbtn-flag"><img src="https://flagcdn.com/us.svg" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">NASDAQ</span><span class="exbtn-sub">Tech Ağırlıklı</span>
             </div>
             <div class="exbtn" data-exchange="sp500" onclick="selectExchange(this)">
-              <span class="exbtn-flag">🇺🇸</span><span class="exbtn-name">S&P 500</span><span class="exbtn-sub">ABD Endeksi</span>
+              <span class="exbtn-flag"><img src="https://flagcdn.com/us.svg" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">S&P 500</span><span class="exbtn-sub">ABD Endeksi</span>
             </div>
             <div class="exbtn" data-exchange="dax" onclick="selectExchange(this)">
-              <span class="exbtn-flag">🇩🇪</span><span class="exbtn-name">DAX</span><span class="exbtn-sub">Frankfurt</span>
+              <span class="exbtn-flag"><img src="https://flagcdn.com/de.svg" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">DAX</span><span class="exbtn-sub">Frankfurt</span>
             </div>
             <div class="exbtn" data-exchange="lse" onclick="selectExchange(this)">
-              <span class="exbtn-flag">🇬🇧</span><span class="exbtn-name">LSE</span><span class="exbtn-sub">Londra</span>
+              <span class="exbtn-flag"><img src="https://flagcdn.com/gb.svg" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">LSE</span><span class="exbtn-sub">Londra</span>
             </div>
             <div class="exbtn" data-exchange="nikkei" onclick="selectExchange(this)">
-              <span class="exbtn-flag">🇯🇵</span><span class="exbtn-name">Nikkei</span><span class="exbtn-sub">Tokyo</span>
+              <span class="exbtn-flag"><img src="https://flagcdn.com/jp.svg" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">Nikkei</span><span class="exbtn-sub">Tokyo</span>
             </div>
           </div>
         </div>
@@ -984,12 +996,12 @@ td:first-child,td:nth-child(2){text-align:left;}
         <div class="exchange-group">
           <div class="exchange-title">Borsa</div>
           <div class="exchange-grid" id="adv-ex-grid">
-            <div class="exbtn on" data-exchange="bist"   onclick="advSelectExchange(this)"><span class="exbtn-flag">🇹🇷</span><span class="exbtn-name">BIST</span><span class="exbtn-sub">Borsa İstanbul</span></div>
-            <div class="exbtn"    data-exchange="nasdaq" onclick="advSelectExchange(this)"><span class="exbtn-flag">🇺🇸</span><span class="exbtn-name">NASDAQ</span><span class="exbtn-sub">Tech Ağırlıklı</span></div>
-            <div class="exbtn"    data-exchange="sp500"  onclick="advSelectExchange(this)"><span class="exbtn-flag">🇺🇸</span><span class="exbtn-name">S&P 500</span><span class="exbtn-sub">ABD Endeksi</span></div>
-            <div class="exbtn"    data-exchange="dax"    onclick="advSelectExchange(this)"><span class="exbtn-flag">🇩🇪</span><span class="exbtn-name">DAX</span><span class="exbtn-sub">Frankfurt</span></div>
-            <div class="exbtn"    data-exchange="lse"    onclick="advSelectExchange(this)"><span class="exbtn-flag">🇬🇧</span><span class="exbtn-name">LSE</span><span class="exbtn-sub">Londra</span></div>
-            <div class="exbtn"    data-exchange="nikkei" onclick="advSelectExchange(this)"><span class="exbtn-flag">🇯🇵</span><span class="exbtn-name">Nikkei</span><span class="exbtn-sub">Tokyo</span></div>
+            <div class="exbtn on" data-exchange="bist"   onclick="advSelectExchange(this)"><span class="exbtn-flag"><img src="https://flagcdn.com/tr.svg" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">BIST</span><span class="exbtn-sub">Borsa İstanbul</span></div>
+            <div class="exbtn"    data-exchange="nasdaq" onclick="advSelectExchange(this)"><span class="exbtn-flag"><img src="https://flagcdn.com/us.svg" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">NASDAQ</span><span class="exbtn-sub">Tech Ağırlıklı</span></div>
+            <div class="exbtn"    data-exchange="sp500"  onclick="advSelectExchange(this)"><span class="exbtn-flag"><img src="https://flagcdn.com/us.svg" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">S&P 500</span><span class="exbtn-sub">ABD Endeksi</span></div>
+            <div class="exbtn"    data-exchange="dax"    onclick="advSelectExchange(this)"><span class="exbtn-flag"><img src="https://flagcdn.com/de.svg" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">DAX</span><span class="exbtn-sub">Frankfurt</span></div>
+            <div class="exbtn"    data-exchange="lse"    onclick="advSelectExchange(this)"><span class="exbtn-flag"><img src="https://flagcdn.com/gb.svg" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">LSE</span><span class="exbtn-sub">Londra</span></div>
+            <div class="exbtn"    data-exchange="nikkei" onclick="advSelectExchange(this)"><span class="exbtn-flag"><img src="https://flagcdn.com/jp.svg" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">Nikkei</span><span class="exbtn-sub">Tokyo</span></div>
           </div>
         </div>
 
@@ -3888,30 +3900,51 @@ function toggleMobileDrawer() {
   const btn     = document.getElementById('hamburger-btn');
   if (!panel) return;
   const isOpen = panel.classList.contains('open');
-  if (isOpen) {
-    closeMobileDrawer();
-  } else {
-    // Sidebar'ı doğrudan klonla (event listener'lar korunur)
-    const sidebar = document.querySelector('.sidebar');
-    const drawerContent = document.getElementById('drawer-content');
-    if (sidebar && drawerContent) {
-      drawerContent.innerHTML = '';
-      const clone = sidebar.cloneNode(true);
-      // Klondaki tüm onclick'leri yeniden bağla
-      clone.querySelectorAll('[onclick]').forEach(function(el) {
-        var oc = el.getAttribute('onclick');
-        el.removeAttribute('onclick');
-        el.addEventListener('click', function(e) { eval(oc); });
+  if (isOpen) { closeMobileDrawer(); return; }
+
+  // Sidebar klonla
+  const sidebar = document.querySelector('.sidebar');
+  const drawerContent = document.getElementById('drawer-content');
+  if (sidebar && drawerContent) {
+    drawerContent.innerHTML = '';
+    const clone = sidebar.cloneNode(true);
+    // onclick'leri: drawer kapat + gecikme ile çalıştır
+    clone.querySelectorAll('[onclick]').forEach(function(el) {
+      var oc = el.getAttribute('onclick');
+      el.removeAttribute('onclick');
+      el.addEventListener('click', function(e) {
+        e.stopPropagation();
+        // exbtn seçimini sidebar'da da güncelle
+        if (el.classList.contains('exbtn')) {
+          document.querySelectorAll('.sidebar .exbtn').forEach(function(b){ b.classList.remove('on'); });
+          var origBtn = document.querySelector('.sidebar .exbtn[data-exchange="' + el.dataset.exchange + '"]');
+          if (origBtn) origBtn.classList.add('on');
+        }
+        // chip seçimini sidebar'da da güncelle
+        if (el.classList.contains('chip') || el.classList.contains('goat-chip')) {
+          var origChip = document.querySelector('.sidebar [data-goat="'+(el.dataset.goat||'')+'"], .sidebar [data-preset="'+(el.dataset.preset||'')+'"], .sidebar [data-tech="'+(el.dataset.tech||'')+'"]');
+          if (origChip) origChip.click();
+          closeMobileDrawer();
+          return;
+        }
+        closeMobileDrawer();
+        setTimeout(function() { try { eval(oc); } catch(e){} }, 80);
       });
-      Array.from(clone.children).forEach(function(child) {
-        drawerContent.appendChild(child);
+    });
+    // select onchange
+    clone.querySelectorAll('select').forEach(function(el) {
+      var origId = el.id;
+      el.addEventListener('change', function() {
+        var orig = document.querySelector('.sidebar #' + origId);
+        if (orig) { orig.value = el.value; orig.dispatchEvent(new Event('change')); }
       });
-    }
-    panel.classList.add('open');
-    overlay.classList.add('open');
-    btn && btn.classList.add('open');
-    document.body.style.overflow = 'hidden';
+    });
+    Array.from(clone.children).forEach(function(c){ drawerContent.appendChild(c); });
   }
+  panel.classList.add('open');
+  overlay.classList.add('open');
+  btn && btn.classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 
 function closeMobileDrawer() {
