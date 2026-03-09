@@ -1,6 +1,5 @@
 {
   "rewrites": [
-    { "source": "/analiz/:path*", "destination": "/analiz/index.html" },
     { "source": "/(.*)", "destination": "/public/$1" }
   ]
 }
