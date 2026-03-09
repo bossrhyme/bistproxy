@@ -716,6 +716,7 @@ td:first-child,td:nth-child(2){text-align:left;}
     <span class="tlive">Canlı</span>
     <button class="hp-nav-btn active" id="nav-home" onclick="showHomepage()">Anasayfa</button>
     <button class="hp-nav-btn" id="nav-tarama" onclick="showScreener()">Tarayıcı</button>
+    <button class="hp-nav-btn" id="nav-analiz" onclick="showAnaliz()">Analiz</button>
     <button class="hamburger-btn" id="hamburger-btn" onclick="toggleMobileDrawer()" style="display:none;">
       <span></span><span></span><span></span>
     </button>
@@ -741,6 +742,63 @@ td:first-child,td:nth-child(2){text-align:left;}
 
 
 
+  <!-- ─── ANALİZ SAYFASI ─── -->
+  <div id="analiz-page">
+
+    <!-- Breadcrumb -->
+    <div class="analiz-breadcrumb" id="analiz-breadcrumb">
+      <span>deepfin</span><span class="sep">/</span>
+      <span class="crumb" id="analiz-bc-analiz">analiz</span>
+      <span class="sep" id="analiz-bc-sep1" style="display:none">/</span>
+      <span class="crumb" id="analiz-bc-ex" style="display:none"></span>
+      <span class="sep" id="analiz-bc-sep2" style="display:none">/</span>
+      <span class="crumb" id="analiz-bc-sym" style="display:none"></span>
+    </div>
+
+    <!-- Hero arama -->
+    <div class="analiz-hero">
+      <div class="analiz-hero-badge">🔍 HİSSE ANALİZ MERKEZİ</div>
+      <div class="analiz-hero-title">DeepFin <span>Analiz</span></div>
+      <div class="analiz-hero-sub">Hisse sembolünü gir, yapay zeka destekli detaylı finansal analizi anında gör</div>
+
+      <div class="analiz-search-wrap">
+        <div class="analiz-search-ex" id="analiz-ex-sel" onclick="toggleAnalizExMenu()">
+          <img src="https://flagcdn.com/tr.svg" width="18" height="13" style="border-radius:2px;object-fit:cover;" id="analiz-ex-flag">
+          <span id="analiz-ex-label">BIST</span>
+          <span style="font-size:9px;color:var(--muted)">▾</span>
+        </div>
+        <input type="text" class="analiz-search-input" id="analiz-search-input"
+          placeholder="Sembol gir  (örn: TUPRS, AAPL, NVDA...)"
+          oninput="onAnalizInput(this.value)"
+          onkeydown="if(event.key==='Enter') goAnaliz()">
+        <button class="analiz-search-btn" onclick="goAnaliz()">Analiz Et →</button>
+      </div>
+      <div class="analiz-search-hint">Örnek: <code>TUPRS</code> · <code>AAPL</code> · <code>NVDA</code> · <code>SASA</code></div>
+
+      <!-- Borsa seçici chipler -->
+      <div class="analiz-ex-grid">
+        <div class="analiz-ex-chip on" data-ex="bist" onclick="setAnalizEx(this)">
+          <img src="https://flagcdn.com/tr.svg" width="16" height="12" style="border-radius:2px;object-fit:cover;">BIST
+        </div>
+        <div class="analiz-ex-chip" data-ex="nasdaq" onclick="setAnalizEx(this)">
+          <img src="https://flagcdn.com/us.svg" width="16" height="12" style="border-radius:2px;object-fit:cover;">NASDAQ
+        </div>
+        <div class="analiz-ex-chip" data-ex="sp500" onclick="setAnalizEx(this)">
+          <img src="https://flagcdn.com/us.svg" width="16" height="12" style="border-radius:2px;object-fit:cover;">S&P 500
+        </div>
+        <div class="analiz-ex-chip" data-ex="dax" onclick="setAnalizEx(this)">
+          <img src="https://flagcdn.com/de.svg" width="16" height="12" style="border-radius:2px;object-fit:cover;">DAX
+        </div>
+        <div class="analiz-ex-chip" data-ex="lse" onclick="setAnalizEx(this)">
+          <img src="https://flagcdn.com/gb.svg" width="16" height="12" style="border-radius:2px;object-fit:cover;">LSE
+        </div>
+        <div class="analiz-ex-chip" data-ex="nikkei" onclick="setAnalizEx(this)">
+          <img src="https://flagcdn.com/jp.svg" width="16" height="12" style="border-radius:2px;object-fit:cover;">Nikkei
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /analiz-page -->
 
   <!-- ─── HOMEPAGE ─── -->
   <div id="homepage" style="display:none;">
@@ -3945,11 +4003,11 @@ function showProfil(sym, ex) {
     if(d) sessionStorage.setItem('deepfin_prf_data', JSON.stringify(d));
     else  sessionStorage.removeItem('deepfin_prf_data');
   } catch(e) {}
-  window.location.href = 'analiz/index.html?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(ex || currentExchange);
+  window.location.href = '/analiz/?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(ex || currentExchange);
 }
 
 function openDetayliAnaliz(sym, ex) {
-  window.open('https://deepfin.vercel.app/analiz/?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(ex || currentExchange), '_blank');
+  showProfil(sym, ex || currentExchange);
 }
 
 // ═══════════════════════════════════════════
@@ -4037,7 +4095,7 @@ function goAnaliz() {
 }
 
 function openDetayliAnaliz(sym, ex) {
-  window.open('https://deepfin.vercel.app/analiz/?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(ex || currentExchange), '_blank');
+  showProfil(sym, ex || currentExchange);
 }
 
 function onHemenAl(sym, ex) {
