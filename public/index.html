@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>DeepFin</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
@@ -16,7 +16,7 @@
   --accent:#3b82f6;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;overflow:hidden;}
+html,body{height:100%;overflow:hidden;touch-action:pan-y;}
 body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;}
 
 /* ── API KEY SETUP SCREEN ── */
@@ -45,7 +45,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .sfree strong{color:var(--teal);}
 
 /* ── APP ── */
-#app{display:flex;flex-direction:column;height:100vh;position:relative;z-index:1;}
+#app{display:flex;flex-direction:column;height:100dvh;position:relative;z-index:1;}
 
 
 /* ── TOPBAR ── */
@@ -71,6 +71,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .supportbtn{background:rgba(246,70,93,.08);border:1px solid rgba(246,70,93,.25);color:#f6465d;}
 .supportbtn:hover{background:rgba(246,70,93,.15);border-color:#f6465d;color:#f6465d;}
 #scantime{font-size:11px;color:var(--muted2);}
+#active-exchange-badge{display:none;align-items:center;gap:5px;padding:4px 10px;background:var(--s2);border:1px solid var(--border);border-radius:6px;font-size:11px;font-weight:600;color:var(--text);flex-shrink:0;}
 
 /* ── LAYOUT ── */
 .layout{display:flex;flex:1;overflow:hidden;}
@@ -104,9 +105,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 
 #goat-fund-chips .goat-chip:hover{border-color:#6ab4ff;background:rgba(100,180,255,.12);}
 
-
-
-
 .goat-info{display:none;margin-top:7px;font-size:10px;color:var(--text2);line-height:1.6;padding:8px 10px;background:rgba(240,180,41,.06);border-left:2px solid var(--gold);border-radius:0 4px 4px 0;}
 .presets{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:4px;}
 .fblock{margin-bottom:12px;}
@@ -139,7 +137,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 @keyframes spin{to{transform:rotate(360deg);}}
 
 /* ── TABLE ── */
-.twrap{flex:1;overflow:auto;}
+.twrap{flex:1;overflow:auto;position:relative;}
 .tbl-scroll-btn{background:var(--s2);border:1px solid var(--border);color:var(--text2);width:24px;height:24px;border-radius:4px;cursor:pointer;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;transition:background .15s,color .15s;}
 .tbl-scroll-btn:hover{background:var(--border2);color:var(--text);}
 .twrap::-webkit-scrollbar{width:5px;height:5px;}
@@ -382,8 +380,8 @@ td:first-child,td:nth-child(2){text-align:left;}
   .supportbtn { display: none; }
   .topbarbtn { padding: 5px 8px; font-size: 11px; }
 
-  /* ── LAYOUT — sidebar üstte, içerik altta ── */
-  .layout { flex-direction: column; height: auto; overflow: visible; }
+  /* ── LAYOUT — mobilde sidebar gizli, full height koru ── */
+  .layout { flex-direction: row; height: 100%; overflow: hidden; }
 
   /* ── SIDEBAR — mobilde gizle, drawer ile aç ── */
   .sidebar { display: none !important; }
@@ -400,8 +398,8 @@ td:first-child,td:nth-child(2){text-align:left;}
   .chips::-webkit-scrollbar-thumb { background: var(--border2); }
 
   /* ── MAIN / CONTENT ── */
-  .main { flex: 1; min-width: 0; }
-  .content { min-height: 50vh; }
+  .main { flex: 1; min-width: 0; overflow: hidden; display: flex; flex-direction: column; }
+  .content { min-height: 0; overflow: hidden; }
 
   /* ── TOOLBAR ── */
   #toolbar { flex-wrap: wrap; gap: 4px; padding: 6px 8px; }
@@ -409,22 +407,24 @@ td:first-child,td:nth-child(2){text-align:left;}
   .tbl-scroll-btn { display: none; }
 
   /* ── TABLO ── */
-  .twrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .twrap { overflow: auto; -webkit-overflow-scrolling: touch; flex: 1; }
   table { min-width: 700px; }
   th, td { padding: 6px 8px; font-size: 10px; white-space: nowrap; }
 
   /* ── DETAY PANELİ — tam ekran ── */
   .detail {
     position: fixed !important;
-    inset: 0 !important;
+    top: 48px !important;
+    left: 0 !important; right: 0 !important; bottom: 0 !important;
     width: 100% !important;
     min-width: unset !important;
     max-width: 100% !important;
     z-index: 50;
     border-left: none !important;
     overflow-y: auto;
+    display: none;
   }
-  .detail.open { width: 100% !important; }
+  .detail.open { width: 100% !important; display: block !important; }
   .dhead { padding: 12px 14px; position: sticky; top: 0; background: var(--s1); z-index: 2; }
   .dclose { font-size: 18px; padding: 4px 8px; }
   #chart-wrap { height: 220px !important; }
@@ -473,13 +473,13 @@ td:first-child,td:nth-child(2){text-align:left;}
 #homepage{display:flex;flex-direction:column;overflow-y:auto;flex:1;background:var(--bg);}
 #homepage::-webkit-scrollbar{width:4px;}
 #homepage::-webkit-scrollbar-thumb{background:#222;border-radius:2px;}
-.hp-hero{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 40px 40px;text-align:center;border-bottom:1px solid var(--border);background:radial-gradient(ellipse at 50% 0%,rgba(0,201,81,.06) 0%,transparent 65%);}
+.hp-hero{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 40px 40px;text-align:center;border-bottom:1px solid var(--border);background:radial-gradient(ellipse at 50% 0%,rgba(59,130,246,.06) 0%,transparent 65%);}
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
-.hp-badge{font-size:10px;font-weight:600;color:var(--green);background:rgba(0,201,81,.1);border:1px solid rgba(0,201,81,.2);padding:4px 12px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:20px;display:inline-flex;align-items:center;gap:6px;}
-.hp-badge::before{content:'';width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s ease-in-out infinite;}
+.hp-badge{font-size:10px;font-weight:600;color:var(--accent);background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);padding:4px 12px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:20px;display:inline-flex;align-items:center;gap:6px;}
+.hp-badge::before{content:'';width:6px;height:6px;background:var(--accent);border-radius:50%;animation:pulse 2s ease-in-out infinite;}
 .hp-title{font-size:52px;font-weight:800;color:var(--text);letter-spacing:-2px;line-height:1.1;margin-bottom:16px;}
-.hp-title span{color:var(--green);}
+.hp-title span{color:var(--accent);}
 .hp-sub{font-size:16px;color:var(--text2);max-width:480px;line-height:1.7;margin-bottom:32px;}
 .hp-cta{display:flex;gap:12px;align-items:center;}
 .hp-cta-primary{background:var(--text);color:#000;border:none;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;font-family:'Geist',sans-serif;}
@@ -491,7 +491,7 @@ td:first-child,td:nth-child(2){text-align:left;}
 .hp-stat{flex:1;padding:20px 24px;border-right:1px solid var(--border);text-align:center;}
 .hp-stat:last-child{border-right:none;}
 .hp-stat-val{font-size:28px;font-weight:800;color:var(--text);font-family:'JetBrains Mono',monospace;letter-spacing:-1px;}
-.hp-stat-val span{color:var(--green);font-size:16px;}
+.hp-stat-val span{color:var(--accent);font-size:16px;}
 .hp-stat-label{font-size:11px;color:var(--muted2);margin-top:4px;}
 
 .hp-body{display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid var(--border);}
@@ -506,7 +506,7 @@ td:first-child,td:nth-child(2){text-align:left;}
 .hp-excard-flag{font-size:20px;}
 .hp-excard-name{font-size:12px;font-weight:700;color:var(--text);}
 .hp-excard-desc{font-size:10px;color:var(--muted2);}
-.hp-excard-count{font-size:10px;color:var(--green);font-family:'JetBrains Mono',monospace;margin-top:2px;}
+.hp-excard-count{font-size:10px;color:var(--accent);font-family:'JetBrains Mono',monospace;margin-top:2px;}
 
 .hp-strategy-list{display:flex;flex-direction:column;gap:8px;}
 .hp-strategy{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:12px 14px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:12px;}
@@ -541,7 +541,7 @@ td:first-child,td:nth-child(2){text-align:left;}
 .hp-howto-steps{display:flex;align-items:flex-start;justify-content:center;gap:0;}
 .hp-howto-step{display:flex;flex-direction:column;align-items:center;gap:10px;width:180px;padding:24px 18px;background:var(--s1);border:1px solid var(--border);border-radius:12px;position:relative;transition:border-color .2s;}
 .hp-howto-step:hover{border-color:#333;}
-.hp-howto-num{position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:24px;height:24px;background:var(--green);border-radius:50%;font-size:11px;font-weight:800;color:#000;display:flex;align-items:center;justify-content:center;}
+.hp-howto-num{position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:24px;height:24px;background:var(--accent);border-radius:50%;font-size:11px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;}
 .hp-howto-icon{font-size:32px;margin-top:6px;}
 .hp-howto-label{font-size:14px;font-weight:700;color:var(--text);}
 .hp-howto-desc{font-size:11px;color:var(--muted2);line-height:1.65;text-align:center;}
@@ -566,7 +566,7 @@ td:first-child,td:nth-child(2){text-align:left;}
 .onb-steps{display:flex;align-items:flex-start;gap:0;justify-content:center;}
 .onb-step{display:flex;flex-direction:column;align-items:center;gap:8px;width:160px;padding:20px 16px;background:var(--s1);border:1px solid var(--border);border-radius:10px;position:relative;transition:border-color .2s;}
 .onb-step:hover{border-color:#333;}
-.onb-num{position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:20px;height:20px;background:var(--green);border-radius:50%;font-size:10px;font-weight:700;color:#000;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;}
+.onb-num{position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:20px;height:20px;background:var(--accent);border-radius:50%;font-size:10px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;}
 .onb-icon{font-size:28px;margin-top:4px;}
 .onb-label{font-size:13px;font-weight:700;color:var(--text);}
 .onb-desc{font-size:11px;color:var(--muted2);line-height:1.6;text-align:center;}
@@ -596,6 +596,13 @@ td:first-child,td:nth-child(2){text-align:left;}
 .footer-disclaimer-short{font-size:10px;color:var(--muted);font-style:italic;}
 @media(max-width:768px){.footer-top{flex-direction:column;gap:20px;}.footer-brand{flex:none;}.footer-links-group{flex-wrap:wrap;}.footer-bottom{flex-direction:column;text-align:center;}}
 
+
+
+
+
+/* ── TOOLTIP ── */
+#df-tooltip{position:fixed;background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:9px 13px;max-width:220px;font-size:11px;color:#bbb;line-height:1.6;z-index:99999;pointer-events:none;display:none;white-space:normal;box-shadow:0 6px 20px rgba(0,0,0,.7);}
+.goat-tip,.chip-tip,.th-tip{display:none!important;}
 </style>
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 </head>
@@ -617,6 +624,7 @@ td:first-child,td:nth-child(2){text-align:left;}
     </div>
     <div class="tright">
       <span id="scantime"></span>
+      <div id="active-exchange-badge"></div>
       <button class="topbarbtn tbtn" id="scanbtn" onclick="runScan()">▶ TARA</button>
       <button class="topbarbtn" id="stopbtn" onclick="abortScan()" style="display:none;background:rgba(255,77,109,.15);border:1px solid rgba(255,77,109,.3);color:var(--red)">⏹ DURDUR</button>
       <button class="topbarbtn infobtn" onclick="openInfo()">📚 Bilgi Bankası</button>
@@ -1176,24 +1184,24 @@ td:first-child,td:nth-child(2){text-align:left;}
         <table>
           <thead>
             <tr>
-              <th onclick="colSort('name')">ŞİRKET ADI</th>
-              <th onclick="colSort('symbol')">SEMBOL</th>
-              <th onclick="colSort('sector')">SEKTÖR</th>
-              <th onclick="colSort('marketCapitalization')">P. Değeri ($)</th>
-              <th onclick="colSort('currentPrice')" id="th-price">FİYAT</th>
-              <th onclick="colSort('piotroski')">F-Score</th>
-              <th onclick="colSort('peg')">PEG</th>
-              <th onclick="colSort('peNormalizedAnnual')">F/K</th>
-              <th onclick="colSort('pbAnnual')">PD/DD</th>
-              <th onclick="colSort('psTTM')">F/S</th>
-              <th onclick="colSort('roeTTM')">ROE%</th>
-              <th onclick="colSort('roaTTM')">ROA%</th>
-              <th onclick="colSort('netProfitMarginTTM')">MARJ%</th>
-              <th onclick="colSort('revenueGrowthTTMYoy')">GELİR↑%</th>
-              <th onclick="colSort('epsGrowthTTMYoy')">K.BÜY%</th>
-              <th onclick="colSort('dividendYieldIndicatedAnnual')">TEMETTÜ%</th>
-              <th onclick="colSort('totalDebt/totalEquityAnnual')">B/Ö</th>
-              <th onclick="colSort('currentRatioAnnual')">CARİ</th>
+              <th onclick="colSort('name')" data-tip="Şirketin tam ticari adı. Tıklayarak alfabetik sıralama yapabilirsiniz.">ŞİRKET ADI</th>
+              <th onclick="colSort('symbol')" data-tip="Borsa kodu (ticker). TradingView'da arama yaparken kullanılan kısa kod.">SEMBOL</th>
+              <th onclick="colSort('sector')" data-tip="Şirketin faaliyet gösterdiği sektör. Sektöre göre filtrelemek için sol paneli kullanın.">SEKTÖR</th>
+              <th onclick="colSort('marketCapitalization')" data-tip="Piyasa Değeri: Şirketin borsadaki toplam değeri (USD milyon).">P. Değeri ($)</th>
+              <th onclick="colSort('currentPrice')" id="th-price" data-tip="Son işlem fiyatı. Değişim yüzdesi önceki kapanışa göre hesaplanır.">FİYAT</th>
+              <th onclick="colSort('piotroski')" data-tip="Piotroski F-Score: 0-9 finansal sağlık puanı. 7+ güçlü, 3- zayıf.">F-Score</th>
+              <th onclick="colSort('peg')" data-tip="Fiyat/Kazanç Büyüme: PEG < 1 büyüme hızına göre ucuz demek. Peter Lynch'in favori metriği.">PEG<span class="th-tip">Fiyat/Kazanç Büyüme: PEG<1 ucuz büyüme, PEG>2 pahalı. Lynch'in favori metriği.</span></th>
+              <th onclick="colSort('peNormalizedAnnual')" data-tip="Fiyat/Kazanç: Hisse fiyatının yıllık kazanca oranı. Düşük = ucuz.">F/K</th>
+              <th onclick="colSort('pbAnnual')" data-tip="Piyasa/Defter: 1'in altı varlıkların altında işlem görüyor.">PD/DD</th>
+              <th onclick="colSort('psTTM')" data-tip="Fiyat/Satış: Kâr etmeyen büyüme şirketleri için kullanılır.">F/S</th>
+              <th onclick="colSort('roeTTM')" data-tip="Özsermaye Kârlılığı: Şirketin kendi parasını kullanma verimliliği. 15%+ iyi.">ROE%</th>
+              <th onclick="colSort('roaTTM')" data-tip="Varlık Kârlılığı: Toplam varlıkların kâra dönüşüm oranı. 5%+ iyi.">ROA%</th>
+              <th onclick="colSort('netProfitMarginTTM')" data-tip="Net Kâr Marjı: Her 100₺ gelirden kalan net kâr.">MARJ%</th>
+              <th onclick="colSort('revenueGrowthTTMYoy')" data-tip="Gelir Büyümesi YoY: Geçen yıla kıyasla ciro artışı.">GELİR↑%</th>
+              <th onclick="colSort('epsGrowthTTMYoy')" data-tip="Kazanç Büyümesi: Hisse başı kârın yıllık büyüme oranı.">K.BÜY%</th>
+              <th onclick="colSort('dividendYieldIndicatedAnnual')" data-tip="Temettü Verimi: Hisse fiyatına oranla yıllık ödenen temettü.">TEMETTÜ%</th>
+              <th onclick="colSort('totalDebt/totalEquityAnnual')" data-tip="Borç/Özsermaye: Şirketin borçluluk seviyesi. 1'in altı makul.">B/Ö</th>
+              <th onclick="colSort('currentRatioAnnual')" data-tip="Cari Oran: Kısa vadeli borç karşılama gücü. 1.5+ sağlıklı.">CARİ</th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
@@ -2352,6 +2360,7 @@ async function runScan(){
     allData = dedupedResults;
     const _exm = EXCHANGE_META[currentExchange]||EXCHANGE_META.bist;
     document.getElementById('scantime').textContent = `${_exm.flag} ${_exm.name} · ↻ ${new Date().toLocaleTimeString('tr-TR')} · ${results.length} hisse`;
+    updateExchangeBadge();
     applyAndRender();
 
   } catch(err) {
@@ -2368,12 +2377,12 @@ async function runScan(){
 // PRESETS
 // ═══════════════════════════════════════════
 const PRESETS = {
-  value:    { desc: 'Ucuz kalmış hisseler — düşük F/K (<15), düşük PD/DD (<2), temettü ödeyen (>%2)', filters: {pe_max:15, pb_max:2, div_min:2} },
-  growth:   { desc: 'Hızlı büyüyen şirketler — güçlü kazanç ve gelir artışı, yüksek ROE', filters: {earng_min:20, revg_min:15, roe_min:15} },
-  dividend: { desc: 'Yüksek temettü ödeyen, borç yükü makul hisseler (>%4 temettü)', filters: {div_min:4, de_max:100} },
-  quality:  { desc: 'Yüksek karlılık, güçlü marj, düşük borç ve iyi likidite — kaliteli şirket', filters: {roe_min:20, margin_min:10, de_max:80, cr_min:1.5} },
-  lowdebt:  { desc: 'Az borçla çalışan, nakit akışı güçlü, bilanço sağlıklı hisseler', filters: {de_max:30, cr_min:2} },
-  momentum: { desc: 'Hem gelir hem kazanç büyümesinde güçlü ivme yakalayan hisseler', filters: {revg_min:20, earng_min:20} }
+  value:    { label: 'Değer Hisseleri', desc: 'Ucuz kalmış hisseler — düşük F/K (<15), düşük PD/DD (<2), temettü ödeyen (>%2)', filters: {pe_max:15, pb_max:2, div_min:2} },
+  growth:   { label: 'Büyüme Hisseleri', desc: 'Hızlı büyüyen şirketler — güçlü kazanç ve gelir artışı, yüksek ROE', filters: {earng_min:20, revg_min:15, roe_min:15} },
+  dividend: { label: 'Temettü Hisseleri', desc: 'Yüksek temettü ödeyen, borç yükü makul hisseler (>%4 temettü)', filters: {div_min:4, de_max:100} },
+  quality:  { label: 'Kaliteli Şirketler', desc: 'Yüksek karlılık, güçlü marj, düşük borç ve iyi likidite — kaliteli şirket', filters: {roe_min:20, margin_min:10, de_max:80, cr_min:1.5} },
+  lowdebt:  { label: 'Az Borçlu Şirketler', desc: 'Az borçla çalışan, nakit akışı güçlü, bilanço sağlıklı hisseler', filters: {de_max:30, cr_min:2} },
+  momentum: { label: 'Momentum Hisseleri', desc: 'Hem gelir hem kazanç büyümesinde güçlü ivme yakalayan hisseler', filters: {revg_min:20, earng_min:20} }
 };
 
 // Teknik Analiz Presetleri
@@ -2721,6 +2730,56 @@ function applyAndRender(special){
       return s.piotroski !== null && s.piotroski >= 7;
     });
   }
+
+  if (filtered.length === 0 && allData.length > 0) {
+    showState('twrap');
+    renderTable(); // boş tablo göster
+    updateStatsBar();
+    updateTicker();
+    // Sıfır sonuç banner'ı
+    var zeroEl = document.getElementById('zero-results');
+    if (!zeroEl) {
+      zeroEl = document.createElement('div');
+      zeroEl.id = 'zero-results';
+      zeroEl.style.cssText = 'position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;z-index:10;background:var(--bg);';
+      var twrap = document.getElementById('twrap');
+      if (twrap) twrap.appendChild(zeroEl);
+    }
+    var activeChips = Array.from(document.querySelectorAll('.chip.on, .goat-chip.on')).map(c => c.textContent.trim());
+    var chipCount = activeChips.length;
+    var suggestions = [
+      { icon: '📉', title: 'Filtre kriterlerini genişletin', desc: chipCount > 1 ? 'Birden fazla strateji aynı anda uygulanıyor. Tek bir filtre ile başlayın.' : 'Mevcut kriterleri biraz daha esnek bir aralığa taşıyın.' },
+      { icon: '🌍', title: 'Farklı bir borsa deneyin', desc: 'NASDAQ veya S&P 500\'de çok daha geniş hisse evreni mevcut.' },
+      { icon: '🧩', title: 'Hazır stratejilerden birini seçin', desc: '<span onclick="clearFilters();document.querySelector(\'[data-preset=value]\').click();" style="color:var(--accent);cursor:pointer;">Değer</span> · <span onclick="clearFilters();document.querySelector(\'[data-preset=growth]\').click();" style="color:var(--accent);cursor:pointer;">Büyüme</span> · <span onclick="clearFilters();document.querySelector(\'[data-goat=buffett]\').click();" style="color:var(--accent);cursor:pointer;">Buffett</span> · <span onclick="clearFilters();document.querySelector(\'[data-goat=piotroski]\').click();" style="color:var(--accent);cursor:pointer;">Piotroski</span>' },
+    ];
+    var sugg_html = suggestions.map(function(s) {
+      return '<div style="display:flex;gap:12px;align-items:flex-start;text-align:left;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px;">' +
+        '<span style="font-size:18px;flex-shrink:0;margin-top:1px;">' + s.icon + '</span>' +
+        '<div><div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">' + s.title + '</div>' +
+        '<div style="font-size:11px;color:var(--muted2);line-height:1.6;">' + s.desc + '</div></div></div>';
+    }).join('');
+    var chipBadge = chipCount > 0
+      ? '<div style="display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-bottom:18px;">' +
+        activeChips.map(function(c){ return '<span style="padding:3px 10px;background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.25);border-radius:4px;font-size:10px;color:#60a5fa;font-weight:600;">' + c + '</span>'; }).join('') +
+        '</div>'
+      : '';
+    zeroEl.style.display = 'flex';
+    zeroEl.innerHTML =
+      '<div style="max-width:380px;margin:0 auto;padding:32px 16px;">' +
+        '<div style="font-size:28px;margin-bottom:14px;">🔍</div>' +
+        '<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;">Kriterlere uyan hisse bulunamadı</div>' +
+        '<div style="font-size:11px;color:var(--muted2);margin-bottom:18px;line-height:1.6;">' +
+        (chipCount > 0 ? 'Seçili <strong style="color:var(--text);">' + chipCount + ' filtre</strong> kombinasyonu bu borsada eşleşen hisse döndürmedi.' : 'Uygulanan filtreler bu borsadaki hisselerin hiçbiriyle eşleşmedi.') +
+        '</div>' +
+        chipBadge +
+        '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">' + sugg_html + '</div>' +
+        '<button onclick="clearFilters()" style="padding:9px 24px;background:var(--accent);color:#000;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.3px;">Tüm Filtreleri Temizle</button>' +
+      '</div>';
+    return;
+  }
+  // Önceki sıfır sonuç banner'ını gizle
+  var zeroEl = document.getElementById('zero-results');
+  if (zeroEl) zeroEl.style.display = 'none';
 
   showState('twrap');
   renderTable();
@@ -3778,6 +3837,15 @@ function showHomepage() {
 // ── DISCLAIMER POPUP ──
 let disclaimerAccepted = false;
 
+
+// ── AKTİF BORSA BADGE ──
+function updateExchangeBadge() {
+  var badge = document.getElementById('active-exchange-badge');
+  if (!badge) return;
+  var exm = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
+  badge.style.display = 'flex';
+  badge.innerHTML = exm.flag + ' ' + exm.name;
+}
 // ── TARAMA SÜRESİ TAHMİNİ ──
 let scanStartTime = null;
 let scanEtaTimer  = null;
@@ -3823,11 +3891,21 @@ function toggleMobileDrawer() {
   if (isOpen) {
     closeMobileDrawer();
   } else {
-    // Sidebar içeriğini drawer'a kopyala
-    const sidebar  = document.querySelector('.sidebar');
+    // Sidebar'ı doğrudan klonla (event listener'lar korunur)
+    const sidebar = document.querySelector('.sidebar');
     const drawerContent = document.getElementById('drawer-content');
     if (sidebar && drawerContent) {
-      drawerContent.innerHTML = sidebar.innerHTML;
+      drawerContent.innerHTML = '';
+      const clone = sidebar.cloneNode(true);
+      // Klondaki tüm onclick'leri yeniden bağla
+      clone.querySelectorAll('[onclick]').forEach(function(el) {
+        var oc = el.getAttribute('onclick');
+        el.removeAttribute('onclick');
+        el.addEventListener('click', function(e) { eval(oc); });
+      });
+      Array.from(clone.children).forEach(function(child) {
+        drawerContent.appendChild(child);
+      });
     }
     panel.classList.add('open');
     overlay.classList.add('open');
@@ -3921,12 +3999,46 @@ function applyStrategyAndGo(goatKey) {
   }, 100);
 }
 
+
+
+// ── TOOLTIP: sadece th[data-tip] ──
+(function(){
+  var t=null;
+  function el(){return t||(t=document.getElementById('df-tooltip'));}
+  function pos(cx,cy){
+    var d=el();if(!d)return;
+    var w=d.offsetWidth||220,h=d.offsetHeight||60;
+    var x=cx+14,y=cy+14;
+    if(x+w>window.innerWidth-8)x=cx-w-10;
+    if(y+h>window.innerHeight-8)y=cy-h-10;
+    if(y<8)y=8;
+    d.style.left=x+'px';d.style.top=y+'px';
+  }
+  document.addEventListener('mousemove',function(e){
+    if(el()&&el().style.display!=='none')pos(e.clientX,e.clientY);
+  });
+  document.addEventListener('mouseover',function(e){
+    var th=e.target.closest('th[data-tip]');
+    if(!th){if(el())el().style.display='none';return;}
+    var d=el();if(!d)return;
+    d.innerHTML=th.getAttribute('data-tip');
+    d.style.display='block';
+    pos(e.clientX,e.clientY);
+  });
+  document.addEventListener('mouseout',function(e){
+    if(e.target.closest('th[data-tip]')&&el())el().style.display='none';
+  });
+})();
+
 // Start on homepage
-document.addEventListener('DOMContentLoaded', function(){ showHomepage(); });
+document.addEventListener('DOMContentLoaded', function(){
+  showHomepage();
+});
 
 </script>
 
 <!-- ─── YASAL UYARI POPUP ─── -->
+<div id="df-tooltip"></div>
 <div class="modal-overlay" id="disclaimerModal" style="z-index:500;">
   <div class="modal" onclick="event.stopPropagation()" style="max-width:520px;padding:0;overflow:hidden;">
 
@@ -3965,6 +4077,9 @@ document.addEventListener('DOMContentLoaded', function(){ showHomepage(); });
 
   </div>
 </div>
+
+<!-- GLOBAL TOOLTIP -->
+<div id="df-tooltip"></div>
 
 </body>
 </html>
