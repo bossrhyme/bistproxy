@@ -18,7 +18,7 @@ const COLS_BIST = [
   'return_on_equity_fq','return_on_assets_fq',
   'net_margin','gross_margin',
   'dividends_yield','debt_to_equity_fq','current_ratio_fq',
-  'sector','High.1M','Low.1M','piotroski_f_score',
+  'sector','High.1M','Low.1M',
 ];
 
 const COLS_US = [
@@ -29,7 +29,7 @@ const COLS_US = [
   'net_margin','gross_margin',
   'dividends_yield_current','dividends_yield',
   'total_debt_to_equity','debt_to_equity_fq','current_ratio','current_ratio_fq',
-  'sector','High.1M','Low.1M','piotroski_f_score',
+  'sector','High.1M','Low.1M',
 ];
 
 const COLS_GLOBAL = [
@@ -40,7 +40,7 @@ const COLS_GLOBAL = [
   'net_margin','gross_margin',
   'dividends_yield_current','dividends_yield',
   'total_debt_to_equity','debt_to_equity_fq','current_ratio','current_ratio_fq',
-  'sector','High.1M','Low.1M','piotroski_f_score',
+  'sector','High.1M','Low.1M',
 ];
 
 const COL_MAP = {
@@ -134,7 +134,6 @@ module.exports = async function(req, res) {
       high52:        n(r['High.1M']),
       low52:         n(r['Low.1M']),
       sector:        r.sector || '',
-      piotroski:     n(r.piotroski_f_score),
     });
 
   } catch(e) {
