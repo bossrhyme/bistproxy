@@ -3998,7 +3998,7 @@ function showProfil(sym, ex) {
     var s = (x.symbol||'').replace('.IS','').toUpperCase();
     return s === sym.toUpperCase() || (x.symbol||'').toUpperCase() === sym.toUpperCase()+'.IS';
   });
-  var url = '/analiz/?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(exKey);
+  var url = '/analiz/?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(exKey) + '&from=screener';
   if(d) {
     // Veriyi URL'e sıkıştırarak geçir (küçük key mapping)
     var compact = {
