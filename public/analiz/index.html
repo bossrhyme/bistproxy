@@ -1261,12 +1261,13 @@ async function loadYahooData(sym, ex) {
     if(!_prfData) _prfData = {};
     var d = _prfData;
     // Metrics — screener yoksa TV'den al
-    if(!d.pe_ratio       && q.pe)            d.pe_ratio            = q.pe;
+    if(!d.pe_ratio         && q.pe)          d.pe_ratio            = q.pe;
     if(!d.price_book_ratio && q.pb)          d.price_book_ratio    = q.pb;
-    if(!d.roe            && q.roe)           d.roe                 = q.roe;
-    if(!d.roa            && q.roa)           d.roa                 = q.roa;
-    if(!d.net_margin     && q.netMargin)     d.net_margin          = q.netMargin;
-    if(!d.gross_margin   && q.grossMargin)   d.gross_margin        = q.grossMargin;
+    // TV ROE/ROA/margin % olarak geliyor (50.5), _prfData oran bekliyor (0.505)
+    if(!d.roe            && q.roe)           d.roe                 = q.roe / 100;
+    if(!d.roa            && q.roa)           d.roa                 = q.roa / 100;
+    if(!d.net_margin     && q.netMargin)     d.net_margin          = q.netMargin / 100;
+    if(!d.gross_margin   && q.grossMargin)   d.gross_margin        = q.grossMargin / 100;
     if(!d.peg_ratio      && q.peg)           d.peg_ratio           = q.peg;
     if(!d.current_ratio  && q.currentRatio)  d.current_ratio       = q.currentRatio;
     if(!d.debt_to_equity && q.debtToEquity)  d.debt_to_equity      = q.debtToEquity;
