@@ -1173,7 +1173,7 @@ function _buildPrfHero() {
   var fscore = d ? d.piotroski_f_score : null;
   var mc = d ? d.market_cap_basic : null;
 
-  _setScore('prf-sc-fscore', fscore !== null ? fscore+'/9' : '—', fscore >= 7 ? 'g' : fscore >= 4 ? 'm' : 'b');
+  _setScore('prf-sc-fscore', (fscore !== null && fscore !== undefined) ? fscore+'/9' : '—', fscore >= 7 ? 'g' : fscore >= 4 ? 'm' : 'b');
   _setScore('prf-sc-peg', peg ? peg.toFixed(2) : '—', peg && peg < 1 ? 'g' : peg && peg < 2 ? 'm' : 'b');
   _setScore('prf-sc-fk', pe ? pe.toFixed(1)+'x' : '—', pe && pe < 15 ? 'g' : pe && pe < 25 ? 'm' : 'b');
   _setScore('prf-sc-roe', roe ? (roe*100).toFixed(1)+'%' : '—', roe && roe*100 > 15 ? 'g' : roe && roe*100 > 8 ? 'm' : 'b');
@@ -1463,12 +1463,32 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', function() {
   var sym = _urlParams.get('sym') || '';
   var ex  = _urlParams.get('ex')  || 'bist';
+  var dParam = _urlParams.get('d') || '';
 
-  // SessionStorage'dan veri oku
-  try {
-    var raw = sessionStorage.getItem('deepfin_prf_data');
-    if(raw) allData = [JSON.parse(raw)];
-  } catch(e) {}
+  // URL'den compact veriyi decode et
+  if(dParam) {
+    try {
+      var compact = JSON.parse(atob(dParam));
+      // compact -> full data objesi
+      var d = {
+        symbol: sym, name: compact.n, sector: compact.sc,
+        close: compact.cl, price: compact.cl,
+        change_abs: compact.ch, change: compact.ca,
+        pe_ratio: compact.pe, price_book_ratio: compact.pb,
+        roe: compact.roe, roa: compact.roa,
+        net_margin: compact.nm, gross_margin: compact.gm,
+        peg_ratio: compact.peg, piotroski_f_score: compact.fs,
+        current_ratio: compact.cr, debt_to_equity: compact.de,
+        dividend_yield_recent: compact.dy,
+        Perf_W: compact.pw, Perf_1M: compact.pm, Perf_Y: compact.py,
+        beta: compact.bt, market_cap_basic: compact.mc,
+        average_volume_10d_calc: compact.av,
+        '52_week_high': compact.wh, '52_week_low': compact.wl,
+        cash_f_operating_activities: compact.cf
+      };
+      allData = [d];
+    } catch(e) { console.warn('Data decode error:', e); }
+  }
 
   if(sym) {
     document.title = 'DeepFin — ' + sym;
