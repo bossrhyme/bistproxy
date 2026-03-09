@@ -1,4 +1,4 @@
-// api/quote.js — TradingView single symbol proxy (verified working)
+// api/quote.js — TradingView proxy (robust parsing)
 const https = require('https');
 
 const EXCHANGE_CONFIG = {
@@ -46,10 +46,7 @@ function tvRequest(path, body) {
     }, (res) => {
       let data = '';
       res.on('data', c => data += c);
-      res.on('end', () => {
-        try { resolve(JSON.parse(data)); }
-        catch(e) { reject(new Error('Parse error: ' + data.slice(0,200))); }
-      });
+      res.on('end', () => resolve(data)); // raw string döndür
     });
     req.on('error', reject);
     req.write(payload);
@@ -71,22 +68,36 @@ module.exports = async function(req, res) {
   const ticker = cfg.prefix + sym;
 
   try {
-    const data = await tvRequest(cfg.tvPath, {
+    const rawStr = await tvRequest(cfg.tvPath, {
       symbols: { tickers: [ticker] },
       columns: PROFILE_COLS,
     });
 
-    const row = data?.data?.[0]?.d;
-    if (!row) return res.status(404).json({ error: 'Bulunamadı: ' + ticker });
+    let parsed;
+    try { parsed = JSON.parse(rawStr); }
+    catch(e) { return res.status(500).json({ error: 'JSON parse failed', raw: rawStr.slice(0,300) }); }
+
+    // Robust: data array'inden sembolü bul
+    const dataArr = parsed?.data || parsed?.result || [];
+    const entry   = dataArr.find(x => x.s === ticker) || dataArr[0];
+    const row     = entry?.d;
+
+    if (!row || !row.length) {
+      return res.status(404).json({ 
+        error: 'Bulunamadı: ' + ticker,
+        totalCount: parsed?.totalCount,
+        dataLength: dataArr.length,
+        raw: rawStr.slice(0, 400),
+      });
+    }
 
     const r = {};
-    PROFILE_COLS.forEach((col, i) => { r[col] = row[i]; });
+    PROFILE_COLS.forEach((col, i) => { r[col] = row[i] ?? null; });
     const n = (v) => (v !== null && v !== undefined && !isNaN(Number(v))) ? Number(v) : 0;
 
     return res.json({
       symbol:      sym,
       name:        r.description || r.name || sym,
-      ticker:      data.data[0].s,
       price:       n(r.close),
       change:      n(r.change_abs),
       changePct:   n(r.change),
@@ -94,23 +105,19 @@ module.exports = async function(req, res) {
       marketCap:   n(r.market_cap_basic),
       volume:      n(r.volume),
       avgVolume:   n(r.average_volume_10d_calc),
-
       pe:          n(r.price_earnings_ttm),
       pb:          n(r.price_book_fq),
       ps:          n(r.price_sales_current),
       peg:         n(r.peg_ratio),
       evEbitda:    n(r.enterprise_value_ebitda_ttm),
       eps:         n(r.earnings_per_share_diluted_ttm),
-
       roe:         n(r.return_on_equity_fq),
       roa:         n(r.return_on_assets_fq),
       netMargin:   n(r.net_margin),
       grossMargin: n(r.gross_margin),
       opMargin:    n(r.operating_margin),
-
       revenueGrowth:  n(r.revenue_growth_ttm_yoy) || n(r.total_revenue_change_ttm_yoy),
       earningsGrowth: n(r.earnings_per_share_diluted_yoy_growth_ttm),
-
       currentRatio: n(r.current_ratio_fq),
       quickRatio:   n(r.quick_ratio),
       debtToEquity: n(r.debt_to_equity_fq),
@@ -118,20 +125,16 @@ module.exports = async function(req, res) {
       totalDebt:    n(r.total_debt_fq),
       freeCashFlow: n(r.free_cash_flow),
       operatingCF:  n(r.cash_f_operating_activities),
-
       dividendYield: n(r.dividends_yield_current) || n(r.dividends_yield),
-
       high52:  n(r['52_week_high']),
       low52:   n(r['52_week_low']),
       beta:    n(r.beta_1_year),
-
       perfW:   n(r['Perf.W']),
       perf1M:  n(r['Perf.1M']),
       perf3M:  n(r['Perf.3M']),
       perf6M:  n(r['Perf.6M']),
       perfY:   n(r['Perf.Y']),
       perfYTD: n(r['Perf.YTD']),
-
       sector:    r.sector   || '',
       industry:  r.industry || '',
       employees: n(r.number_of_employees),
