@@ -965,8 +965,15 @@ html,body{height:100%;overflow:hidden;}
 
 <script>
 function goHome() { window.location.href = '/'; }
-function goScreener() { window.location.href = '/#screener'; }
-function closeProfil() { history.back(); }
+function goScreener() { window.location.href = '/'; }  // Tarayıcı → anasayfa (screener açık gelir)
+function closeProfil() {
+  var from = _urlParams.get('from');
+  if(from === 'screener') {
+    history.back(); // Screener'dan gelindiyse geri git
+  } else {
+    window.location.href = '/';
+  }
+}
 function onHemenAl(sym, ex) { showToast('🛒 ' + sym + ' — Broker entegrasyonu yakında!'); }
 function showToast(msg) {
   var t = document.getElementById('df-toast');
