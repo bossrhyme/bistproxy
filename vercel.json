@@ -1,6 +1,7 @@
 {
   "routes": [
     { "src": "/analiz/(.*)", "dest": "/analiz/index.html" },
-    { "src": "/(.*)", "dest": "/index.html" }
+    { "src": "/analiz", "dest": "/analiz/index.html" },
+    { "src": "/(.*)", "dest": "/public/$1" }
   ]
 }
