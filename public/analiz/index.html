@@ -827,7 +827,7 @@ html,body{height:100%;overflow:hidden;}
     <div class="tlogo" onclick="goHome()" style="cursor:pointer"><div class="tlogo-mark">D</div>DeepFin</div>
     <span class="tlive">Canlı</span>
     <button class="hp-nav-btn" onclick="goHome()">Anasayfa</button>
-    <button class="hp-nav-btn" onclick="goHome()">Tarayıcı</button>
+    <button class="hp-nav-btn" onclick="goScreener()">Tarayıcı</button>
     <button class="hp-nav-btn active">Analiz</button>
   </div>
 
@@ -965,7 +965,8 @@ html,body{height:100%;overflow:hidden;}
 
 <script>
 function goHome() { window.location.href = '/'; }
-function closeProfil() { goHome(); }
+function goScreener() { window.location.href = '/'; }
+function closeProfil() { history.back(); }
 function onHemenAl(sym, ex) { showToast('🛒 ' + sym + ' — Broker entegrasyonu yakında!'); }
 function showToast(msg) {
   var t = document.getElementById('df-toast');
