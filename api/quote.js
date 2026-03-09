@@ -1,4 +1,4 @@
-// api/quote.js — TradingView proxy (exchange-specific columns)
+// api/quote.js — TradingView proxy (exchange-specific safe columns)
 const https = require('https');
 
 const EXCHANGE_CONFIG = {
@@ -10,29 +10,54 @@ const EXCHANGE_CONFIG = {
   nikkei: { tvPath: '/japan/scan',   prefix: 'TSE:' },
 };
 
-// Screener'da zaten çalıştığı doğrulanmış base field'lar + ek profil field'ları
-const BASE_COLS = [
-  'name','description','close','change','change_abs','volume','average_volume_10d_calc',
-  'market_cap_basic',
-  'price_earnings_ttm','price_book_fq','price_sales_current',
-  'return_on_equity_fq','return_on_assets_fq',
-  'net_margin','gross_margin',
-  'total_revenue_change_ttm_yoy','earnings_per_share_change_ttm_yoy',
-  'revenue_growth_ttm_yoy','earnings_per_share_diluted_yoy_growth_ttm',
-  'dividends_yield','debt_to_equity_fq','current_ratio_fq',
-  'sector','High.1M','Low.1M','piotroski_f_score',
-  // Ek profil field'ları — bunlar TV'de standart
-  '52_week_high','52_week_low',
-  'Perf.W','Perf.1M','Perf.3M','Perf.6M','Perf.Y','Perf.YTD',
-  'beta_1_year',
-  'cash_f_operating_activities',
-];
+// Her exchange için güvenli col listesi
+const COLS = {
+  bist: [
+    'name','description','close','change','change_abs','volume','average_volume_10d_calc',
+    'market_cap_basic',
+    'price_earnings_ttm','price_book_fq','price_sales_current',
+    'return_on_equity_fq','return_on_assets_fq',
+    'net_margin','gross_margin',
+    'total_revenue_change_ttm_yoy','earnings_per_share_change_ttm_yoy',
+    'revenue_growth_ttm_yoy','earnings_per_share_diluted_yoy_growth_ttm',
+    'dividends_yield','debt_to_equity_fq','current_ratio_fq',
+    'sector','High.1M','Low.1M','piotroski_f_score',
+    '52_week_high','52_week_low','Perf.W','Perf.1M','Perf.3M','Perf.6M','Perf.Y','Perf.YTD',
+    'beta_1_year','cash_f_operating_activities',
+  ],
+  us: [
+    'name','description','close','change','change_abs','volume','average_volume_10d_calc',
+    'market_cap_basic',
+    'price_earnings_ttm','price_book_ratio','price_book_fq','price_sales_current',
+    'return_on_equity','return_on_equity_fq','return_on_assets','return_on_assets_fq',
+    'net_margin','gross_margin',
+    'revenue_growth_ttm_yoy','earnings_per_share_diluted_yoy_growth_ttm',
+    'earnings_per_share_change_ttm_yoy','earnings_per_share_diluted_ttm',
+    'dividends_yield_current','dividends_yield',
+    'total_debt_to_equity','debt_to_equity_fq','current_ratio','current_ratio_fq',
+    'sector','High.1M','Low.1M','piotroski_f_score',
+    '52_week_high','52_week_low','Perf.W','Perf.1M','Perf.3M','Perf.6M','Perf.Y','Perf.YTD',
+    'beta_1_year','cash_f_operating_activities',
+  ],
+  global: [
+    'name','description','close','change','change_abs','volume','average_volume_10d_calc',
+    'market_cap_basic',
+    'price_earnings_ttm','price_book_ratio','price_book_fq','price_sales_current',
+    'return_on_equity','return_on_equity_fq','return_on_assets','return_on_assets_fq',
+    'net_margin','gross_margin',
+    'revenue_growth_ttm_yoy','earnings_per_share_diluted_yoy_growth_ttm',
+    'dividends_yield_current','dividends_yield',
+    'total_debt_to_equity','debt_to_equity_fq','current_ratio','current_ratio_fq',
+    'sector','High.1M','Low.1M','piotroski_f_score',
+    '52_week_high','52_week_low','Perf.W','Perf.1M','Perf.3M','Perf.6M','Perf.Y','Perf.YTD',
+    'beta_1_year','cash_f_operating_activities',
+  ],
+};
 
-const US_EXTRA = [
-  'price_book_ratio','return_on_equity','return_on_assets',
-  'dividends_yield_current','total_debt_to_equity','current_ratio',
-  'earnings_per_share_diluted_ttm',
-];
+const COL_MAP = {
+  bist: COLS.bist, nasdaq: COLS.us, sp500: COLS.us,
+  dax: COLS.global, lse: COLS.global, nikkei: COLS.global,
+};
 
 function tvRequest(path, body) {
   return new Promise((resolve, reject) => {
@@ -70,9 +95,8 @@ module.exports = async function(req, res) {
   if (!sym) return res.status(400).json({ error: 'sym required' });
 
   const cfg    = EXCHANGE_CONFIG[ex] || EXCHANGE_CONFIG.bist;
+  const cols   = COL_MAP[ex] || COLS.global;
   const ticker = cfg.prefix + sym;
-  const isUS   = ['nasdaq','sp500'].includes(ex);
-  const cols   = isUS ? [...BASE_COLS, ...US_EXTRA] : BASE_COLS;
 
   try {
     const rawStr = await tvRequest(cfg.tvPath, {
@@ -88,7 +112,7 @@ module.exports = async function(req, res) {
 
     const entry = (parsed.data || []).find(x => x.s === ticker) || (parsed.data||[])[0];
     const row   = entry?.d;
-    if (!row?.length) return res.status(404).json({ error: 'Bulunamadı: ' + ticker, raw: rawStr.slice(0,300) });
+    if (!row?.length) return res.status(404).json({ error: 'Bulunamadı: ' + ticker });
 
     const r = {};
     cols.forEach((col, i) => { r[col] = row[i] ?? null; });
@@ -110,7 +134,7 @@ module.exports = async function(req, res) {
       roa:           n(r.return_on_assets_fq) || n(r.return_on_assets),
       netMargin:     n(r.net_margin),
       grossMargin:   n(r.gross_margin),
-      revenueGrowth: n(r.revenue_growth_ttm_yoy) || n(r.total_revenue_change_ttm_yoy),
+      revenueGrowth: n(r.revenue_growth_ttm_yoy),
       earningsGrowth:n(r.earnings_per_share_diluted_yoy_growth_ttm) || n(r.earnings_per_share_change_ttm_yoy),
       eps:           n(r.earnings_per_share_diluted_ttm),
       debtToEquity:  n(r.debt_to_equity_fq) || n(r.total_debt_to_equity),
