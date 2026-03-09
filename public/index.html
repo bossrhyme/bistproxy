@@ -600,6 +600,106 @@ td:first-child,td:nth-child(2){text-align:left;}
 
 
 
+
+/* ── ANALİZ SAYFASI ── */
+#analiz-page { display:none; flex:1; flex-direction:column; overflow:hidden; }
+#analiz-page.on { display:flex; }
+
+.analiz-hero {
+  background: linear-gradient(135deg, rgba(59,130,246,.06) 0%, transparent 60%);
+  border-bottom: 1px solid var(--border);
+  padding: 48px 40px 40px;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+}
+.analiz-hero-badge {
+  font-size: 9px; font-weight: 700; letter-spacing: 1.5px; padding: 4px 12px;
+  background: var(--accent2); color: var(--accent); border: 1px solid rgba(59,130,246,.3);
+  border-radius: 20px; margin-bottom: 16px;
+}
+.analiz-hero-title {
+  font-family: 'JetBrains Mono', monospace; font-size: 28px; font-weight: 700;
+  color: var(--text); margin-bottom: 8px; letter-spacing: -0.5px;
+}
+.analiz-hero-title span { color: var(--accent); }
+.analiz-hero-sub {
+  font-size: 13px; color: var(--text2); max-width: 480px; line-height: 1.6; margin-bottom: 28px;
+}
+.analiz-search-wrap {
+  width: 100%; max-width: 560px;
+  background: var(--s1); border: 1px solid var(--border2);
+  border-radius: 10px; display: flex; align-items: center; gap: 0;
+  overflow: hidden; transition: border-color .15s;
+  box-shadow: 0 4px 24px rgba(0,0,0,.4);
+}
+.analiz-search-wrap:focus-within { border-color: var(--accent); }
+.analiz-search-ex {
+  padding: 0 14px; height: 48px; background: var(--s2); border-right: 1px solid var(--border);
+  font-size: 11px; font-weight: 700; color: var(--text2); display: flex; align-items: center; gap: 6px;
+  cursor: pointer; white-space: nowrap; min-width: 90px; user-select: none;
+}
+.analiz-search-ex:hover { color: var(--text); }
+.analiz-search-input {
+  flex: 1; height: 48px; background: transparent; border: none; outline: none;
+  padding: 0 16px; font-size: 14px; color: var(--text); font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase; letter-spacing: 1px;
+}
+.analiz-search-input::placeholder { text-transform: none; font-size: 12px; letter-spacing: 0; color: var(--muted); font-family: 'DM Sans', sans-serif; }
+.analiz-search-btn {
+  height: 48px; padding: 0 20px; background: var(--accent); color: #fff;
+  border: none; cursor: pointer; font-size: 12px; font-weight: 700;
+  font-family: 'DM Sans', sans-serif; transition: background .15s; white-space: nowrap;
+}
+.analiz-search-btn:hover { background: #2563eb; }
+.analiz-search-hint { font-size: 10px; color: var(--muted); margin-top: 10px; }
+.analiz-search-hint code { background: var(--s2); padding: 1px 6px; border-radius: 3px; color: var(--text2); font-family: 'JetBrains Mono', monospace; }
+
+.analiz-ex-grid {
+  display: flex; gap: 8px; margin-top: 28px; flex-wrap: wrap; justify-content: center;
+}
+.analiz-ex-chip {
+  padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 600;
+  background: var(--s2); border: 1px solid var(--border); color: var(--text2);
+  cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 6px;
+}
+.analiz-ex-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent2); }
+.analiz-ex-chip.on { border-color: var(--accent); color: var(--accent); background: var(--accent2); }
+.analiz-ex-chip img { border-radius: 2px; }
+
+.analiz-breadcrumb { display:none !important; }
+.analiz-breadcrumb-UNUSED {
+  padding: 10px 20px; border-bottom: 1px solid var(--border); background: var(--s1);
+  display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+.analiz-breadcrumb span { color: var(--text2); }
+.analiz-breadcrumb .sep { color: var(--border2); }
+.analiz-breadcrumb .crumb { color: var(--accent); }
+
+/* Detay paneli — Hemen Al + Detaylı Analiz butonları */
+.dpl-action-row {
+  display: flex; gap: 8px; padding: 10px 0 12px;
+}
+.dpl-buy {
+  flex: 1; height: 36px; background: var(--green); color: #fff;
+  border: none; border-radius: 7px; font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all .15s; display: flex; align-items: center;
+  justify-content: center; gap: 6px; font-family: 'DM Sans', sans-serif;
+}
+.dpl-buy:hover { background: #00a864; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,192,118,.3); }
+.dpl-analyze {
+  flex: 1; height: 36px; background: var(--accent2); color: var(--accent);
+  border: 1px solid rgba(59,130,246,.3); border-radius: 7px; font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all .15s; display: flex; align-items: center;
+  justify-content: center; gap: 6px; font-family: 'DM Sans', sans-serif;
+}
+.dpl-analyze:hover { background: rgba(59,130,246,.2); border-color: var(--accent); transform: translateY(-1px); }
+
+@media (max-width: 768px) {
+  .analiz-hero { padding: 32px 20px 28px; }
+  .analiz-hero-title { font-size: 20px; }
+  .analiz-search-wrap { max-width: 100%; }
+}
+
 /* ── TOOLTIP ── */
 #df-tooltip{position:fixed;background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:9px 13px;max-width:220px;font-size:11px;color:#bbb;line-height:1.6;z-index:99999;pointer-events:none;display:none;white-space:normal;box-shadow:0 6px 20px rgba(0,0,0,.7);}
 .goat-tip,.chip-tip,.th-tip{display:none!important;}
@@ -615,6 +715,7 @@ td:first-child,td:nth-child(2){text-align:left;}
     <span class="tlive">Canlı</span>
     <button class="hp-nav-btn active" id="nav-home" onclick="showHomepage()">Anasayfa</button>
     <button class="hp-nav-btn" id="nav-tarama" onclick="showScreener()">Tarayıcı</button>
+    <button class="hp-nav-btn" id="nav-analiz" onclick="showAnaliz()">Analiz</button>
     <button class="hamburger-btn" id="hamburger-btn" onclick="toggleMobileDrawer()" style="display:none;">
       <span></span><span></span><span></span>
     </button>
@@ -636,6 +737,65 @@ td:first-child,td:nth-child(2){text-align:left;}
     </div>
   </div>
 
+
+
+  <!-- ─── ANALİZ SAYFASI ─── -->
+  <div id="analiz-page">
+
+    <!-- Breadcrumb -->
+    <div class="analiz-breadcrumb" id="analiz-breadcrumb">
+      <span>deepfin</span><span class="sep">/</span>
+      <span class="crumb" id="analiz-bc-analiz">analiz</span>
+      <span class="sep" id="analiz-bc-sep1" style="display:none">/</span>
+      <span class="crumb" id="analiz-bc-ex" style="display:none"></span>
+      <span class="sep" id="analiz-bc-sep2" style="display:none">/</span>
+      <span class="crumb" id="analiz-bc-sym" style="display:none"></span>
+    </div>
+
+    <!-- Hero arama -->
+    <div class="analiz-hero">
+      <div class="analiz-hero-badge">🔍 HİSSE ANALİZ MERKEZİ</div>
+      <div class="analiz-hero-title">DeepFin <span>Analiz</span></div>
+      <div class="analiz-hero-sub">Hisse sembolünü gir, yapay zeka destekli detaylı finansal analizi anında gör</div>
+
+      <div class="analiz-search-wrap">
+        <div class="analiz-search-ex" id="analiz-ex-sel" onclick="toggleAnalizExMenu()">
+          <img src="https://flagcdn.com/tr.svg" width="18" height="13" style="border-radius:2px;object-fit:cover;" id="analiz-ex-flag">
+          <span id="analiz-ex-label">BIST</span>
+          <span style="font-size:9px;color:var(--muted)">▾</span>
+        </div>
+        <input type="text" class="analiz-search-input" id="analiz-search-input"
+          placeholder="Sembol gir  (örn: TUPRS, AAPL, NVDA...)"
+          oninput="onAnalizInput(this.value)"
+          onkeydown="if(event.key==='Enter') goAnaliz()">
+        <button class="analiz-search-btn" onclick="goAnaliz()">Analiz Et →</button>
+      </div>
+      <div class="analiz-search-hint">Örnek: <code>TUPRS</code> · <code>AAPL</code> · <code>NVDA</code> · <code>SASA</code></div>
+
+      <!-- Borsa seçici chipler -->
+      <div class="analiz-ex-grid">
+        <div class="analiz-ex-chip on" data-ex="bist" onclick="setAnalizEx(this)">
+          <img src="https://flagcdn.com/tr.svg" width="16" height="12" style="border-radius:2px;object-fit:cover;">BIST
+        </div>
+        <div class="analiz-ex-chip" data-ex="nasdaq" onclick="setAnalizEx(this)">
+          <img src="https://flagcdn.com/us.svg" width="16" height="12" style="border-radius:2px;object-fit:cover;">NASDAQ
+        </div>
+        <div class="analiz-ex-chip" data-ex="sp500" onclick="setAnalizEx(this)">
+          <img src="https://flagcdn.com/us.svg" width="16" height="12" style="border-radius:2px;object-fit:cover;">S&P 500
+        </div>
+        <div class="analiz-ex-chip" data-ex="dax" onclick="setAnalizEx(this)">
+          <img src="https://flagcdn.com/de.svg" width="16" height="12" style="border-radius:2px;object-fit:cover;">DAX
+        </div>
+        <div class="analiz-ex-chip" data-ex="lse" onclick="setAnalizEx(this)">
+          <img src="https://flagcdn.com/gb.svg" width="16" height="12" style="border-radius:2px;object-fit:cover;">LSE
+        </div>
+        <div class="analiz-ex-chip" data-ex="nikkei" onclick="setAnalizEx(this)">
+          <img src="https://flagcdn.com/jp.svg" width="16" height="12" style="border-radius:2px;object-fit:cover;">Nikkei
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /analiz-page -->
 
   <!-- ─── HOMEPAGE ─── -->
   <div id="homepage" style="display:none;">
@@ -2922,28 +3082,17 @@ function buildProfile(s) {
   metaParts.push(exMeta.flag + ' ' + exMeta.name);
   metaEl.textContent = metaParts.join('  ·  ');
 
-  // Finansal linkler
-  var links = [];
-
-  // TradingView linki — borsa bazlı
-  var tvSym = '';
-  if(isBist) tvSym = 'https://tr.tradingview.com/symbols/BIST-'+symClean;
-  else if(ex === 'nasdaq') tvSym = 'https://www.tradingview.com/symbols/NASDAQ-'+sym;
-  else if(ex === 'sp500') tvSym = 'https://www.tradingview.com/symbols/NYSE-'+sym;
-  else if(ex === 'dax') tvSym = 'https://www.tradingview.com/symbols/XETR-'+sym;
-  else if(ex === 'lse') tvSym = 'https://www.tradingview.com/symbols/LSE-'+sym;
-  else if(ex === 'nikkei') tvSym = 'https://www.tradingview.com/symbols/TSE-'+sym;
-  else tvSym = 'https://www.tradingview.com/search/?q='+sym;
-
-  links.push({icon:'📉', label:'TradingView', url: tvSym});
-
-  // Şirket web sitesi — Google arama ile
-  links.push({icon:'🌐', label:'Web Sitesi', url:'https://www.google.com/search?q='+encodeURIComponent((s.name||sym)+' official site')});
-
-  linksEl.innerHTML = links.map(function(l) {
-    return '<a class="dpl" href="' + l.url + '" target="_blank" rel="noopener">' +
-      '<span class="dpl-icon">' + l.icon + '</span>' + l.label + '</a>';
-  }).join('');
+  // Hemen Al + Detaylı Analiz butonları
+  linksEl.innerHTML = [
+    '<div class="dpl-action-row">',
+      '<button class="dpl-buy" onclick="onHemenAl(\'' + sym + '\',\'' + ex + '\')" title="Broker\'da işlem aç">',
+        '🛒 Hemen Al',
+      '</button>',
+      '<button class="dpl-analyze" onclick="openDetayliAnaliz(\'' + symClean + '\',\'' + ex + '\')">',
+        '📊 Detaylı Analiz',
+      '</button>',
+    '</div>'
+  ].join('');
 
   profileEl.style.display = 'block';
   var adDetail = document.getElementById('ad-detail');
@@ -3835,14 +3984,139 @@ function syncSectorAndFilter(source) {
 
 // Patch basic sector select to also sync
 // ── HOMEPAGE / SCREENER NAV ──
+
+// ═══════════════════════════════════════════
+// ANALİZ SAYFASI
+// ═══════════════════════════════════════════
+
+var _analizEx = 'bist';
+var _analizExFlags = {
+  bist: {flag:'tr', label:'BIST'},
+  nasdaq: {flag:'us', label:'NASDAQ'},
+  sp500: {flag:'us', label:'S&P 500'},
+  dax: {flag:'de', label:'DAX'},
+  lse: {flag:'gb', label:'LSE'},
+  nikkei: {flag:'jp', label:'Nikkei'}
+};
+
+function showAnaliz() {
+  // Diğer sayfaları gizle
+  var hp = document.getElementById('homepage');
+  if(hp) hp.style.display = 'none';
+  var sl = document.getElementById('screener-layout');
+  if(sl) sl.style.display = 'none';
+
+  // Analiz sayfasını göster
+  var ap = document.getElementById('analiz-page');
+  if(ap){ ap.style.display = 'flex'; ap.classList.add('on'); }
+
+  // nav güncelle
+  document.querySelectorAll('.hp-nav-btn').forEach(function(b){ b.classList.remove('active'); });
+  var nb = document.getElementById('nav-analiz');
+  if(nb) nb.classList.add('active');
+
+  // search gizle
+  var ts = document.querySelector('.tsearch');
+  if(ts) ts.style.display = 'none';
+
+  // breadcrumb — sadece analiz-page içinde, otomatik güncellenir
+}
+
+function hideAnalizPage() {
+  var ap = document.getElementById('analiz-page');
+  if(ap){ ap.style.display = 'none'; ap.classList.remove('on'); }
+}
+
+function setAnalizEx(el) {
+  document.querySelectorAll('.analiz-ex-chip').forEach(function(c){ c.classList.remove('on'); });
+  el.classList.add('on');
+  _analizEx = el.dataset.ex;
+  var meta = _analizExFlags[_analizEx];
+  if(meta) {
+    document.getElementById('analiz-ex-label').textContent = meta.label;
+    document.getElementById('analiz-ex-flag').src = 'https://flagcdn.com/' + meta.flag + '.svg';
+  }
+  updateAnalizBreadcrumb(_analizEx, '');
+}
+
+function onAnalizInput(val) {
+  updateAnalizBreadcrumb(_analizEx, val.toUpperCase());
+}
+
+function updateAnalizBreadcrumb(ex, sym) {
+  var exEl = document.getElementById('analiz-bc-ex');
+  var symEl = document.getElementById('analiz-bc-sym');
+  var sep1 = document.getElementById('analiz-bc-sep1');
+  var sep2 = document.getElementById('analiz-bc-sep2');
+  if(ex) {
+    var meta = _analizExFlags[ex];
+    exEl.textContent = (meta ? meta.label : ex).toLowerCase();
+    exEl.style.display = 'inline'; sep1.style.display = 'inline';
+  } else {
+    exEl.style.display = 'none'; sep1.style.display = 'none';
+  }
+  if(sym) {
+    symEl.textContent = sym.toLowerCase();
+    symEl.style.display = 'inline'; sep2.style.display = 'inline';
+  } else {
+    symEl.style.display = 'none'; sep2.style.display = 'none';
+  }
+}
+
+function goAnaliz() {
+  var sym = (document.getElementById('analiz-search-input').value || '').trim().toUpperCase();
+  if(!sym) return;
+  openDetayliAnaliz(sym, _analizEx);
+}
+
+function openDetayliAnaliz(sym, ex) {
+  // Analiz profil sayfasını yeni sekmede aç
+  // (İleride in-app route: /analiz/{ex}/{sym})
+  var url = 'deepfin_profile.html?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(ex);
+  window.open(url, '_blank');
+  // Breadcrumb güncelle
+  _analizEx = ex || _analizEx;
+  updateAnalizBreadcrumb(_analizEx, sym);
+}
+
+function onHemenAl(sym, ex) {
+  // Affiliate linki — ileride broker bağlantısı eklenecek
+  // Şimdilik placeholder
+  var msg = sym + ' için işlem sayfası yakında aktif olacak!\nBroker entegrasyonu için bizi takip edin.';
+  // Basit toast göster
+  showToast('🛒 ' + sym + ' — Broker entegrasyonu yakında!');
+}
+
+function showToast(msg) {
+  var t = document.getElementById('df-toast');
+  if(!t) {
+    t = document.createElement('div');
+    t.id = 'df-toast';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid #2a2a2a;color:#ededed;font-size:12px;padding:10px 20px;border-radius:8px;z-index:9999;opacity:0;transition:opacity .2s;white-space:nowrap;font-family:DM Sans,sans-serif;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function(){ t.style.opacity = '0'; }, 3000);
+}
+
+function toggleAnalizExMenu() {
+  // Borsa seçici dropdown — chip grid'ini toggle et
+  var grid = document.querySelector('.analiz-ex-grid');
+  if(grid) grid.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+
 function showHomepage() {
+  hideAnalizPage();
   document.getElementById('homepage').style.display = 'flex';
   document.getElementById('screener-layout').style.display = 'none';
   document.getElementById('nav-home').classList.add('active');
   document.getElementById('nav-tarama').classList.remove('active');
+  var na = document.getElementById('nav-analiz'); if(na) na.classList.remove('active');
   var ts = document.querySelector('.tsearch');
   if(ts) ts.style.display = 'none';
-  // Tüm chip seçimlerini temizle
   clearFilters();
 }
 
@@ -3995,10 +4269,11 @@ function acceptDisclaimer() {
 }
 
 function showScreener() {
+  hideAnalizPage();
+  var na = document.getElementById('nav-analiz'); if(na) na.classList.remove('active');
   // Disclaimer kontrolü
   if (!disclaimerAccepted && !sessionStorage.getItem('df_disclaimer')) {
     showDisclaimerModal();
-    // Screener'ı göster ama taramayı engelle
     document.getElementById('homepage').style.display = 'none';
     document.getElementById('screener-layout').style.display = 'flex';
     document.getElementById('nav-home').classList.remove('active');
