@@ -1216,6 +1216,7 @@ td:first-child,td:nth-child(2){text-align:left;}
           <div class="frow"><div class="flbl">ROE — Özkaynak Kârlılığı %</div><div class="finps"><input type="number" id="roe_min" placeholder="—" oninput="liveFilter()"><input type="number" id="roe_max" placeholder="—" oninput="liveFilter()"></div></div>
           <div class="frow"><div class="flbl">ROA — Varlık Kârlılığı %</div><div class="finps"><input type="number" id="roa_min" placeholder="—" oninput="liveFilter()"><input type="number" id="roa_max" placeholder="—" oninput="liveFilter()"></div></div>
           <div class="frow"><div class="flbl">Net Kar Marjı %</div><div class="finps"><input type="number" id="margin_min" placeholder="—" oninput="liveFilter()"><input type="number" id="margin_max" placeholder="—" oninput="liveFilter()"></div></div>
+          <div class="frow"><div class="flbl">Brüt Marj %</div><div class="finps"><input type="number" id="gross_min" placeholder="—" oninput="liveFilter()"><input type="number" id="gross_max" placeholder="—" oninput="liveFilter()"></div></div>
         </div>
 
         <div class="filter-group">
@@ -2549,15 +2550,21 @@ async function runScan(){
 }
 
 // ═══════════════════════════════════════════
-// PRESETS
+// PRESETS — Temel Analiz Hazır Filtreler
 // ═══════════════════════════════════════════
 const PRESETS = {
-  value:    { label: 'Değer Hisseleri', desc: 'Ucuz kalmış hisseler — düşük F/K (<15), düşük PD/DD (<2), temettü ödeyen (>%2)', filters: {pe_max:15, pb_max:2, div_min:2} },
-  growth:   { label: 'Büyüme Hisseleri', desc: 'Hızlı büyüyen şirketler — güçlü kazanç ve gelir artışı, yüksek ROE', filters: {earng_min:20, revg_min:15, roe_min:15} },
-  dividend: { label: 'Temettü Hisseleri', desc: 'Yüksek temettü ödeyen, borç yükü makul hisseler (>%4 temettü)', filters: {div_min:4, de_max:100} },
-  quality:  { label: 'Kaliteli Şirketler', desc: 'Yüksek karlılık, güçlü marj, düşük borç ve iyi likidite — kaliteli şirket', filters: {roe_min:20, margin_min:10, de_max:80, cr_min:1.5} },
-  lowdebt:  { label: 'Az Borçlu Şirketler', desc: 'Az borçla çalışan, nakit akışı güçlü, bilanço sağlıklı hisseler', filters: {de_max:30, cr_min:2} },
-  momentum: { label: 'Momentum Hisseleri', desc: 'Hem gelir hem kazanç büyümesinde güçlü ivme yakalayan hisseler', filters: {revg_min:20, earng_min:20} }
+  // Klasik değer yatırımı: F/K<15, PD/DD<2, temettü ödeyen
+  value:    { label: 'Değer Hisseleri',    desc: 'Piyasanın gözden kaçırdığı ucuz hisseler: F/K<15, PD/DD<2, temettü>%2. Graham-Buffett değer yatırımı temeli.', filters: {pe_max:15, pb_max:2, div_min:2} },
+  // Büyüme: kazanç+gelir ivmesi, güçlü özkaynak getirisi
+  growth:   { label: 'Büyüme Hisseleri',   desc: 'Hızlı büyüyen, ivmesi artan şirketler: EPS büyümesi>%20, gelir büyümesi>%15, ROE>%15. Lynch "fast-grower" profili.', filters: {earng_min:20, revg_min:15, roe_min:15} },
+  // Temettü: yüksek verim, sürdürülebilir ödeme kapasitesi
+  dividend: { label: 'Temettü Hisseleri',  desc: 'Güçlü ve istikrarlı temettü: verim>%4, borç/özkaynak<%80, current ratio>1.2. Gelir odaklı uzun vadeli yatırım.', filters: {div_min:4, de_max:80, cr_min:1.2} },
+  // Kalite: Buffett/Munger "wonderful company at fair price"
+  quality:  { label: 'Kaliteli Şirketler', desc: 'Olağanüstü kalite: ROE>%20, net marj>%15, brüt marj>%35, borç<özkaynak, güçlü likidite. "Wonderful company at fair price."', filters: {roe_min:20, margin_min:15, gross_min:35, de_max:80, cr_min:1.5} },
+  // Az borçlu: Buffett "borçsuz şirket" prensibi
+  lowdebt:  { label: 'Az Borçlu Şirketler', desc: 'Borçsuz güç: D/E<%30, current ratio>2, bilanço temiz. Kriz dönemlerinde hayatta kalanlar. Buffett "borçlu şirketten uzak dur" prensibi.', filters: {de_max:30, cr_min:2} },
+  // Momentum: güçlü ivme, hem büyüme hem fiyat güç
+  momentum: { label: 'Momentum Hisseleri', desc: 'Çift ivme: gelir büyümesi>%20 VE kazanç büyümesi>%20. ARK/Minervini kesişim noktası — hem operasyonel hem hisse güçlü.', filters: {revg_min:20, earng_min:20} }
 };
 
 // Teknik Analiz Presetleri
@@ -2597,52 +2604,110 @@ const TECH_PRESETS = {
 };
 
 // Guru stratejileri
+// ──────────────────────────────────────────────────────────────
+// Kaynak: Berkshire Hathaway hissedar mektupları, "The New
+// Buffettology" (Buffin/Clark), AAII guru screen modelleri,
+// "One Up On Wall Street" (Lynch), "The Intelligent Investor"
+// (Graham), Validea guru portföyleri, Minervini SEPA kriterleri.
+// Quant fon filtreleri kamuya açık 13-F/haber analizlerine dayanır.
+// Kesin sonuçlar garantilenmez — ön eleme aracıdır.
+// ──────────────────────────────────────────────────────────────
 const GURUS = {
+
+  // ── BUFFETT ────────────────────────────────────────────────
+  // Gerçek kriterler: ROE 10 yıl ort. >%20 (min yıl >%15),
+  // Gross margin >%40, Net margin >%20, D/E <0.5 (toplam borç/özkaynak),
+  // Current ratio >1.5, F/K makul (kalite için esneklik var).
+  // Kaynak: 1987 shareholder letter + "The New Buffettology"
   buffett: {
     label: 'Warren Buffett',
-    desc: 'Güçlü marka, yüksek ROE, düşük borç, makul fiyat',
-    filters: {pe_min:5, pe_max:20, pb_max:3, roe_min:15, de_max:80, cr_min:1.2, margin_min:10}
+    desc: 'Sürdürülebilir rekabet avantajı: %20+ ROE, %40+ brüt marj, %20+ net marj, D/E<%50, güçlü nakit üretimi. Makul fiyat — kalite önce gelir.',
+    filters: {pe_min:5, pe_max:25, roe_min:20, margin_min:20, gross_min:40, de_max:50, cr_min:1.5}
   },
+
+  // ── GRAHAM ─────────────────────────────────────────────────
+  // "Intelligent Investor" net-net değer: F/K<10, PD/DD<1.5,
+  // current ratio >2, D/E <50%, temettü ödeme geçmişi var.
+  // Güvenlik marjı = ucuzun da ucuzu.
   graham: {
     label: 'Benjamin Graham',
-    desc: 'Derin değer: çok düşük F/K, PD/DD<1, güçlü bilanço',
-    filters: {pe_max:10, pb_max:1.2, de_max:50, cr_min:2, div_min:1}
+    desc: 'Derin değer & güvenlik marjı: F/K<10, PD/DD<1.5, current ratio>2, borç/özkaynak<%50, temettü geçmişi. Ucuzun da ucuzu.',
+    filters: {pe_max:10, pb_max:1.5, de_max:50, cr_min:2, div_min:1}
   },
+
+  // ── LYNCH ──────────────────────────────────────────────────
+  // GARP (Growth at a Reasonable Price): PEG <1 ideal, <2 kabul.
+  // Lynch asıl olarak dividend-adjusted PEG (PEGY) kullanır.
+  // EPS büyümesi tutarlı olmalı (fast-grower: >%20, stalwart: >%10).
+  // Küçük/orta ölçekli, kurumların az ilgisini çeken şirketler tercih.
+  // Kaynak: "One Up On Wall Street", AAII Lynch screen
   lynch: {
-    label: 'Peter Lynch — PEG',
-    desc: 'PEG < 1 = altın fırsat, PEG < 2 = makul. F/K büyüme hızına göre ucuz olmalı. Güçlü ROE, sağlıklı marj ve makul borç ile birlikte.',
-    filters: {pe_min:5, pe_max:30, roe_min:12, margin_min:8, de_max:100, cr_min:1},
+    label: 'Peter Lynch — GARP',
+    desc: 'PEG<1 altın fırsat: büyüme hızına göre ucuz. Kazanç büyümesi >%15, makul borç, pozitif nakit akışı. "Tanıdığın şirketi al, ama sayıları kontrol et."',
+    filters: {pe_min:5, pe_max:35, earng_min:15, de_max:80, cr_min:1},
     special: 'peg'
   },
+
+  // ── ARK / CATHIE WOOD ──────────────────────────────────────
+  // ARK disruptive teknolojiye yatırır: AI, genomik, fintech, kripto.
+  // Portföyün büyük kısmı zarar eden şirketler — ROE filtresi yanlış.
+  // Asıl kriter: çok yüksek gelir büyümesi, büyük adreslenebilir pazar.
+  // ROE filtresi kaldırıldı — ARK ruhuna aykırı.
   ark: {
     label: 'Cathie Wood / ARK',
-    desc: 'Yüksek büyüme, güçlü momentum, teknoloji ağırlıklı',
-    filters: {roe_min:10, earng_min:15}
+    desc: 'Disruptive büyüme: yıkıcı teknoloji, genomik, AI, fintech. Gelir büyümesi >%30, güçlü kazanç ivmesi. Kârlılık ikincil — pazar liderliği önce gelir.',
+    filters: {revg_min:30, earng_min:20, cr_min:1}
   },
+
+  // ── MINERVİNİ SEPA ─────────────────────────────────────────
+  // Specific Entry Point Analysis: EPS büyümesi >%25 (son 2 çeyrek),
+  // ROE >%17, net marj >%10, 52H zirvesine yakın, hareketli ort. üstünde.
+  // Teknik filtreler (from_high_max) ile tamamlanmalı.
   minervini: {
     label: 'Mark Minervini — SEPA',
-    desc: 'SEPA: Güçlü kazanç büyümesi (>%25), yüksek ROE (>%17), sağlıklı marj (>%10), düşük borç. 52 hafta yükseğine yakın, güçlü momentum arayan büyüme traderı stratejisi.',
+    desc: 'SEPA büyüme traderı: kazanç büyümesi >%25, ROE >%17, marj >%10, borç makul. Zirveye yakın + hacim patlamasıyla birleştirin.',
     filters: {earng_min:25, roe_min:17, margin_min:10, de_max:100, cr_min:1}
   },
+
+  // ── PİOTROSKİ F-SCORE ──────────────────────────────────────
+  // Joseph Piotroski 2000: 9 kriterlik bilanço sağlığı skoru.
+  // 8-9 = çok güçlü. Karlılık (ROA+, CFO+, ΔROA+, accrual),
+  // kaldıraç (ΔD/E-, Δcurrent+, dilüsyon yok), verimlilik (Δmarj+, Δciro+).
+  // Minimum ROA pozitif olmalı → roe_min:3 proxy olarak.
   piotroski: {
     label: 'Piotroski F-Score',
-    desc: 'F-Score 8-9 = çok güçlü bilanço. 9 kritere dayalı puanlama: karlılık (ROA, CFO, accrual), kaldıraç (borç, likidite, dilüsyon) ve verimlilik (marj, ciro). Graham niceliksel versiyonu.',
-    filters: {roe_min:5, cr_min:1, de_max:150},
+    desc: 'F-Score 8-9: bilanço güçlü, karlılık artıyor, borç azalıyor, verimlilik yükseliyor. 9 kriterli sistematik kalite taraması.',
+    filters: {roe_min:3, cr_min:1, de_max:120},
     special: 'piotroski'
   },
+
+  // ── CİTADEL ────────────────────────────────────────────────
+  // Ken Griffin multi-strategy: kalite + momentum kombinasyonu.
+  // 13-F analizlerine göre yüksek ROE, güçlü marj, makul borç,
+  // kazanç ivmesi olan büyüme+değer karışımı hisseler.
   citadel: {
-    label: 'Citadel — Wellington Multi-Strategy',
-    desc: '5Y ortalama %19+ getiri. Ken Griffin modeli: yüksek ROE, güçlü karlılık, düşük borç. Multi-strategy: hem büyüme hem değer hisselerinde uzun/kısa pozisyon. Momentum + kalite kombinasyonu.',
-    filters: {roe_min:15, margin_min:12, de_max:80, cr_min:1.2, earng_min:10}
+    label: 'Citadel — Multi-Strategy',
+    desc: 'Ken Griffin kalite+momentum: ROE >%15, net marj >%12, kazanç büyümesi >%10, düşük borç. Büyüme ve değer dengesinde kurumsal kalite.',
+    filters: {roe_min:15, margin_min:12, de_max:70, cr_min:1.2, earng_min:10}
   },
+
+  // ── D.E. SHAW ──────────────────────────────────────────────
+  // Oculus quant modeli: sistematik kalite + yüksek büyüme.
+  // 13-F ve performans analizlerine göre yüksek büyüme ivmesi,
+  // güçlü karlılık, gelir+kazanç büyümesi birlikte.
   deshaw: {
-    label: 'D.E. Shaw — Oculus Quant',
-    desc: '5Y ortalama %20+ getiri, 2024 yilinda %36. Kantitatif model: yüksek momentum, güçlü büyüme, volatilite fırsatları. Sektör rotasyonuna dayanmayan sistematik strateji. Yüksek kalite + büyüme odak.',
+    label: 'D.E. Shaw — Quant',
+    desc: 'Sistematik kalite+büyüme: kazanç >%20, gelir >%15, ROE >%18, marj >%15. Sektör bağımsız yüksek kalite + momentum kombinasyonu.',
     filters: {earng_min:20, roe_min:18, margin_min:15, revg_min:15, cr_min:1}
   },
+
+  // ── MİLLENNİUM ─────────────────────────────────────────────
+  // Israel Englander risk-adjusted getiri: çok strateji, düşük korelasyon.
+  // 13-F analizine göre: orta kaliteli karlılık + büyüme + düşük borç +
+  // yüksek likidite. Aşırı konsantrasyon yok, dengeli seçim.
   millennium: {
-    label: 'Millennium — Multi-Strategy',
-    desc: '2025 yilinda %10.5 getiri, tutarlı çift haneli yıllık. Israel Englander modeli: çok varlık, çok strateji. Hem karlılık hem büyüme, düşük borç, yüksek likidite. Risk-adjusted getiri odaklı.',
+    label: 'Millennium — Multi-Strat',
+    desc: 'Risk-adjusted kalite: ROE >%12, marj >%10, borç/özkaynak <%60, current ratio >1.5, kazanç büyümesi >%8. Dengeli ve düşük riskli portföy.',
     filters: {roe_min:12, margin_min:10, de_max:60, cr_min:1.5, earng_min:8}
   }
 };
@@ -2817,6 +2882,7 @@ function applyAndRender(special){
     ['roeTTM',                         'roe_min',    'roe_max',    1],   // already %
     ['roaTTM',                         'roa_min',    'roa_max',    1],
     ['netProfitMarginTTM',             'margin_min', 'margin_max', 1],
+    ['grossMarginTTM',                 'gross_min',  'gross_max',  1],
     ['revenueGrowthTTMYoy',            'revg_min',   'revg_max',  1],
     ['epsGrowthTTMYoy',                'earng_min',  'earng_max', 1],
     ['dividendYieldIndicatedAnnual',   'div_min',    'div_max',   1],
