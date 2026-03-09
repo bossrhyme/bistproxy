@@ -840,9 +840,8 @@ html,body{height:100%;overflow:hidden;}
     <div class="prf-topbar">
       <button class="prf-back" onclick="closeProfil()">← Geri</button>
       <div class="prf-crumb">
-        deepfin <span style="color:var(--muted)">/</span>
-        analiz <span style="color:var(--muted)">/</span>
-        <span id="prf-bc-ex">bist</span> <span style="color:var(--muted)">/</span>
+        <span id="prf-bc-ex" style="color:var(--text2)">BIST</span>
+        <span style="color:var(--muted)">/</span>
         <span class="prf-sym" id="prf-bc-sym">—</span>
       </div>
     </div>
@@ -1081,8 +1080,8 @@ function showProfil(sym, ex) {
   var bcEx = document.getElementById('prf-bc-ex');
   var bcSym = document.getElementById('prf-bc-sym');
   var exMeta = EXCHANGE_META[_prfEx] || {name:_prfEx};
-  if(bcEx) bcEx.textContent = exMeta.name || _prfEx;
-  if(bcSym) bcSym.textContent = sym;
+  if(bcEx) bcEx.textContent = (exMeta.name || _prfEx).toUpperCase();
+  if(bcSym) bcSym.textContent = sym.toUpperCase();
 
   // Screener verisinden bul
   // sessionStorage'dan veri yükle (tarayıcıdan geldiyse)
