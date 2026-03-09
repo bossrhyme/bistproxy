@@ -83,7 +83,12 @@ module.exports = async function(req, res) {
   const ex   = (url.searchParams.get('ex')  || 'bist').toLowerCase();
   const type = url.searchParams.get('type') || '';
 
+  // ── GÜVENLİK: sym ve ex whitelist doğrulama ──
+  const VALID_EX = ['bist','nasdaq','sp500','dax','lse','nikkei'];
   if (!sym) return res.status(400).json({ error: 'sym required' });
+  if (!VALID_EX.includes(ex)) return res.status(400).json({ error: 'Invalid exchange' });
+  // sym: sadece harf, rakam, nokta, tire — max 12 karakter
+  if (!/^[A-Z0-9.\-]{1,12}$/.test(sym)) return res.status(400).json({ error: 'Invalid symbol' });
 
   // Haberler için şimdilik boş dön — TV haber API'si yok
   if (type === 'news') return res.json({ news: [] });
