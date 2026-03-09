@@ -1635,7 +1635,7 @@ async function loadYahooData(sym, ex) {
           '<div class="prf-news-meta"><span>'+_esc(date)+'</span></div></div>';
       }).join('');
     }
-  } catch(e) { console.warn('Quote error:', e); }
+  } catch(e) { /* silent fail */ }
 }
 
 // ── Başlangıç ──
@@ -1664,7 +1664,7 @@ document.addEventListener('DOMContentLoaded', function() {
         cash_f_operating_activities:compact.cf
       };
       allData = [d];
-    } catch(e) { console.warn('Decode error:', e); }
+    } catch(e) { /* silent fail */ }
   }
 
   if(sym) {
