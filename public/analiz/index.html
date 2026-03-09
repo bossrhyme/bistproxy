@@ -1244,6 +1244,17 @@ function _buildFinancials(d) {
 }
 
 
+// ── GÜVENLİK: HTML escape helper ──
+function _esc(s) {
+  if(s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function goScreener() { window.location.href = '/'; }  // Tarayıcı → anasayfa (screener açık gelir)
 function closeProfil() {
   var params = new URLSearchParams(window.location.search);
@@ -1469,7 +1480,7 @@ function _buildPrfSide() {
     {k:'Aylık',         v: d.Perf_1M ? (d.Perf_1M>=0?'+':'')+d.Perf_1M.toFixed(2)+'%' : '—', cls:d.Perf_1M>=0?'g':'r'},
   ];
   document.getElementById('prf-price-stats').innerHTML = stats.map(function(s){
-    return '<div class="prf-qstat"><span class="prf-qkey">'+s.k+'</span><span class="prf-qval '+(s.cls||'')+'">'+s.v+'</span></div>';
+    return '<div class="prf-qstat"><span class="prf-qkey">'+_esc(s.k)+'</span><span class="prf-qval '+(s.cls||'')+'">'+_esc(s.v)+'</span></div>';
   }).join('');
 
   // Benzer hisseler
@@ -1478,7 +1489,7 @@ function _buildPrfSide() {
     var sym2=s.symbol.replace('.IS',''), chg=s.change_abs||0;
     return '<div class="prf-sim-item" onclick="showProfil(\''+sym2+'\',\''+_prfEx+'\')">'+
       '<span class="prf-sim-sym">'+sym2+'</span>'+
-      '<span class="prf-sim-name">'+((s.name||'').substring(0,22))+'</span>'+
+      '<span class="prf-sim-name">'+_esc((s.name||'').substring(0,22))+'</span>'+
       '<span class="prf-sim-chg" style="color:'+(chg>=0?'var(--green)':'var(--red)')+'">'+
       (chg>=0?'+':'')+chg.toFixed(2)+'%</span></div>';
   }).join('') : '<div style="font-size:11px;color:var(--muted)">Önce tarama yapın</div>';
@@ -1611,16 +1622,17 @@ async function loadYahooData(sym, ex) {
       {k:'Çalışan',       v: q.employees ? Number(q.employees).toLocaleString('tr-TR') : '—'},
     ];
     document.getElementById('prf-price-stats').innerHTML = st.map(function(s){
-      return '<div class="prf-qstat"><span class="prf-qkey">'+s.k+'</span><span class="prf-qval '+(s.cls||'')+'">'+s.v+'</span></div>';
+      return '<div class="prf-qstat"><span class="prf-qkey">'+_esc(s.k)+'</span><span class="prf-qval '+(s.cls||'')+'">'+_esc(s.v)+'</span></div>';
     }).join('');
 
     if(n.news && n.news.length) {
       document.getElementById('prf-news').innerHTML = n.news.slice(0,5).map(function(item){
         var date = item.datetime ? new Date(item.datetime).toLocaleDateString('tr-TR') : '';
+        var safeUrl = /^https?:\/\//.test(item.url||'') ? _esc(item.url) : '#';
         return '<div class="prf-news-item">'+
-          '<div class="prf-news-src">'+(item.source||'Haber')+'</div>'+
-          '<div class="prf-news-title" onclick="window.open(\''+item.url+'\',\'_blank\')">'+item.title+'</div>'+
-          '<div class="prf-news-meta"><span>'+date+'</span></div></div>';
+          '<div class="prf-news-src">'+_esc(item.source||'Haber')+'</div>'+
+          '<div class="prf-news-title" onclick="window.open(\''+safeUrl+'\',\'_blank\')">'+_esc(item.title)+'</div>'+
+          '<div class="prf-news-meta"><span>'+_esc(date)+'</span></div></div>';
       }).join('');
     }
   } catch(e) { console.warn('Quote error:', e); }
