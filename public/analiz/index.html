@@ -705,23 +705,24 @@ td:first-child,td:nth-child(2){text-align:left;}
 #df-tooltip{position:fixed;background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:9px 13px;max-width:220px;font-size:11px;color:#bbb;line-height:1.6;z-index:99999;pointer-events:none;display:none;white-space:normal;box-shadow:0 6px 20px rgba(0,0,0,.7);}
 .goat-tip,.chip-tip,.th-tip{display:none!important;}
 </style>
+<style>
+/* Profil sayfası override */
+html,body{height:100%;overflow:hidden;}
+#app{display:flex;flex-direction:column;height:100dvh;}
+</style>
 </head>
 <body>
 <div id="app">
 
-  <!-- Topbar — index.html ile aynı -->
   <div class="topbar">
     <div class="tlogo" onclick="goHome()" style="cursor:pointer"><div class="tlogo-mark">D</div>DeepFin</div>
     <span class="tlive">Canlı</span>
     <button class="hp-nav-btn" onclick="goHome()">Anasayfa</button>
     <button class="hp-nav-btn" onclick="goScreener()">Tarayıcı</button>
     <button class="hp-nav-btn active">Analiz</button>
-    <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
-      <button class="topbarbtn infobtn" style="background:none;border:1px solid var(--border2);color:var(--text2);border-radius:6px;" onclick="goHome()">← Tarayıcıya Dön</button>
-    </div>
   </div>
 
-<div id="profile-page" style="display:flex;flex:1;flex-direction:column;overflow:hidden;">
+<div id="profile-page" style="display:flex;flex:1;flex-direction:column;overflow:hidden;min-height:0;">
 
     <!-- Mini topbar -->
     <div class="prf-topbar">
@@ -889,9 +890,33 @@ td:first-child,td:nth-child(2){text-align:left;}
     </div><!-- /prf-layout -->
   </div><!-- /profile-page -->
 
-</div><!-- /app -->
+</div>
 
 <script>
+// ── Navigasyon ──
+function goHome()     { window.location.href = '/'; }
+function goScreener() { window.location.href = '/'; }
+function closeProfil(){ goHome(); }
+function onHemenAl(sym, ex) { showToast('🛒 ' + sym + ' — Broker entegrasyonu yakında!'); }
+function showToast(msg) {
+  var t = document.getElementById('df-toast');
+  if(!t) {
+    t = document.createElement('div');
+    t.id = 'df-toast';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid #2a2a2a;color:#ededed;font-size:12px;padding:10px 20px;border-radius:8px;z-index:9999;opacity:0;transition:opacity .2s;white-space:nowrap;font-family:Inter,sans-serif;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg; t.style.opacity = '1';
+  clearTimeout(t._t); t._t = setTimeout(function(){ t.style.opacity='0'; }, 3000);
+}
+
+
+
+var allData = [];
+var currentExchange = 'bist';
+var _urlParams = new URLSearchParams(window.location.search);
+
+
 // ── Navigasyon ──
 function goHome()     { window.location.href = '/'; }
 function goScreener() { window.location.href = '/#screener'; }
@@ -938,22 +963,7 @@ function showProfil(sym, ex) {
   _prfSym = sym;
   _prfEx  = ex || currentExchange;
 
-  // Diğer sayfaları gizle
-  ['homepage','screener-layout','analiz-page'].forEach(function(id){
-    var el = document.getElementById(id);
-    if(el){ el.style.display='none'; el.classList && el.classList.remove('on'); }
-  });
-
-  // Profil sayfasını göster
-  var pp = document.getElementById('profile-page');
-  if(pp){ pp.style.display='flex'; pp.classList.add('on'); }
-
-  // Nav — hiçbiri aktif değil (iç sayfa)
-  document.querySelectorAll('.hp-nav-btn').forEach(function(b){ b.classList.remove('active'); });
-
-  // Search gizle
-  var ts = document.querySelector('.tsearch');
-  if(ts) ts.style.display = 'none';
+  // Ayrı sayfa — gizleme gerekmez, profil-page zaten tek içerik
 
   // Breadcrumb güncelle
   var bcEx = document.getElementById('prf-bc-ex');
@@ -963,7 +973,18 @@ function showProfil(sym, ex) {
   if(bcSym) bcSym.textContent = sym;
 
   // Screener verisinden bul
-  _prfData = allData.find(function(x){ return x.symbol === sym || x.symbol === sym+'.IS' || x.symbol.replace('.IS','') === sym; });
+  // sessionStorage'dan veri yükle (tarayıcıdan geldiyse)
+  if(!allData.length) {
+    try {
+      var raw = sessionStorage.getItem('deepfin_prf_data');
+      if(raw) allData = [JSON.parse(raw)];
+    } catch(e) {}
+  }
+  _prfData = allData.find(function(x){
+    var s = (x.symbol||'').replace('.IS','').toUpperCase();
+    var q = (sym||'').toUpperCase();
+    return s === q || (x.symbol||'').toUpperCase() === q || (x.symbol||'').toUpperCase() === q+'.IS';
+  });
 
   // Sayfa verilerini doldur
   _buildPrfHero();
@@ -983,19 +1004,7 @@ function showProfil(sym, ex) {
   _prfAiDone = false;
 }
 
-function closeProfil() {
-  var pp = document.getElementById('profile-page');
-  if(pp){ pp.style.display='none'; pp.classList.remove('on'); }
-  // Nereden geldiyse oraya dön
-  if(_prfEx && document.getElementById('screener-layout') && document.getElementById('screener-layout').style.display !== 'none') {
-    // zaten screener açık
-  } else if(document.getElementById('analiz-page') && _prfCameFromAnaliz) {
-    showAnaliz();
-    _prfCameFromAnaliz = false;
-  } else {
-    showScreener();
-  }
-}
+function closeProfil() { goHome(); }
 var _prfCameFromAnaliz = false;
 var _prfAiDone = false;
 
@@ -1334,6 +1343,24 @@ document.addEventListener('DOMContentLoaded', function() {
     showProfil(sym, ex);
   } else {
     document.getElementById('prf-fullname').textContent = 'Hisse bulunamadı';
+  }
+});
+
+
+// ── Başlangıç ──
+document.addEventListener('DOMContentLoaded', function() {
+  var sym = _urlParams.get('sym') || '';
+  var ex  = _urlParams.get('ex')  || 'bist';
+
+  // SessionStorage'dan veri oku
+  try {
+    var raw = sessionStorage.getItem('deepfin_prf_data');
+    if(raw) allData = [JSON.parse(raw)];
+  } catch(e) {}
+
+  if(sym) {
+    document.title = 'DeepFin — ' + sym;
+    showProfil(sym, ex);
   }
 });
 </script>
