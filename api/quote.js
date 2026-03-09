@@ -1,4 +1,4 @@
-// api/quote.js — TradingView debug version
+// api/quote.js — TradingView single symbol proxy (verified working)
 const https = require('https');
 
 const EXCHANGE_CONFIG = {
@@ -9,6 +9,25 @@ const EXCHANGE_CONFIG = {
   lse:    { tvPath: '/uk/scan',      prefix: 'LSE:' },
   nikkei: { tvPath: '/japan/scan',   prefix: 'TSE:' },
 };
+
+const PROFILE_COLS = [
+  'name','description','close','change','change_abs','volume','average_volume_10d_calc',
+  'market_cap_basic','currency',
+  'price_earnings_ttm','price_book_fq','price_sales_current',
+  'enterprise_value_ebitda_ttm','peg_ratio','earnings_per_share_diluted_ttm',
+  'return_on_equity_fq','return_on_assets_fq',
+  'net_margin','gross_margin','operating_margin',
+  'total_revenue_change_ttm_yoy','revenue_growth_ttm_yoy',
+  'earnings_per_share_diluted_yoy_growth_ttm',
+  'debt_to_equity_fq','current_ratio_fq','quick_ratio',
+  'cash_n_short_term_investments_fq','total_debt_fq',
+  'free_cash_flow','cash_f_operating_activities',
+  'dividends_yield_current','dividends_yield',
+  '52_week_high','52_week_low',
+  'Perf.W','Perf.1M','Perf.3M','Perf.6M','Perf.Y','Perf.YTD',
+  'beta_1_year',
+  'sector','industry','piotroski_f_score','number_of_employees',
+];
 
 function tvRequest(path, body) {
   return new Promise((resolve, reject) => {
@@ -27,7 +46,10 @@ function tvRequest(path, body) {
     }, (res) => {
       let data = '';
       res.on('data', c => data += c);
-      res.on('end', () => resolve({ status: res.statusCode, raw: data }));
+      res.on('end', () => {
+        try { resolve(JSON.parse(data)); }
+        catch(e) { reject(new Error('Parse error: ' + data.slice(0,200))); }
+      });
     });
     req.on('error', reject);
     req.write(payload);
@@ -37,46 +59,86 @@ function tvRequest(path, body) {
 
 module.exports = async function(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET');
+
   const url = new URL(req.url, 'http://localhost');
   const sym = (url.searchParams.get('sym') || '').toUpperCase();
   const ex  = (url.searchParams.get('ex') || 'bist').toLowerCase();
-  const cfg = EXCHANGE_CONFIG[ex] || EXCHANGE_CONFIG.bist;
 
-  const cols = ['name','description','close','change','market_cap_basic','price_earnings_ttm','sector'];
+  if (!sym) return res.status(400).json({ error: 'sym required' });
 
-  // 3 farklı yöntemi paralel dene
-  const [r1, r2, r3] = await Promise.all([
-    // Yöntem 1: symbols + tickers
-    tvRequest(cfg.tvPath, {
-      symbols: { tickers: [cfg.prefix + sym] },
-      columns: cols,
-    }),
-    // Yöntem 2: symbols + query
-    tvRequest(cfg.tvPath, {
-      symbols: { tickers: [cfg.prefix + sym], query: { types: [] } },
-      columns: cols,
-    }),
-    // Yöntem 3: scan.js gibi range + sort, sembolü filtrele
-    tvRequest(cfg.tvPath, {
-      columns: cols,
-      range: [0, 1000],
-      sort: { sortBy: 'market_cap_basic', sortOrder: 'desc' },
-    }),
-  ]);
+  const cfg    = EXCHANGE_CONFIG[ex] || EXCHANGE_CONFIG.bist;
+  const ticker = cfg.prefix + sym;
 
-  // Yöntem 3'te sembolü bul
-  let found3 = null;
   try {
-    const parsed3 = JSON.parse(r3.raw);
-    const target = cfg.prefix + sym;
-    found3 = parsed3?.data?.find(row => row.s === target || row.s === sym);
-  } catch(e) {}
+    const data = await tvRequest(cfg.tvPath, {
+      symbols: { tickers: [ticker] },
+      columns: PROFILE_COLS,
+    });
 
-  return res.json({
-    target: cfg.prefix + sym,
-    m1_status: r1.status, m1: r1.raw.slice(0, 300),
-    m2_status: r2.status, m2: r2.raw.slice(0, 300),
-    m3_found: found3 ? found3 : 'not found in top 1000',
-    m3_sample: (() => { try { return JSON.parse(r3.raw)?.data?.slice(0,2); } catch(e) { return r3.raw.slice(0,200); } })(),
-  });
+    const row = data?.data?.[0]?.d;
+    if (!row) return res.status(404).json({ error: 'Bulunamadı: ' + ticker });
+
+    const r = {};
+    PROFILE_COLS.forEach((col, i) => { r[col] = row[i]; });
+    const n = (v) => (v !== null && v !== undefined && !isNaN(Number(v))) ? Number(v) : 0;
+
+    return res.json({
+      symbol:      sym,
+      name:        r.description || r.name || sym,
+      ticker:      data.data[0].s,
+      price:       n(r.close),
+      change:      n(r.change_abs),
+      changePct:   n(r.change),
+      currency:    r.currency || '',
+      marketCap:   n(r.market_cap_basic),
+      volume:      n(r.volume),
+      avgVolume:   n(r.average_volume_10d_calc),
+
+      pe:          n(r.price_earnings_ttm),
+      pb:          n(r.price_book_fq),
+      ps:          n(r.price_sales_current),
+      peg:         n(r.peg_ratio),
+      evEbitda:    n(r.enterprise_value_ebitda_ttm),
+      eps:         n(r.earnings_per_share_diluted_ttm),
+
+      roe:         n(r.return_on_equity_fq),
+      roa:         n(r.return_on_assets_fq),
+      netMargin:   n(r.net_margin),
+      grossMargin: n(r.gross_margin),
+      opMargin:    n(r.operating_margin),
+
+      revenueGrowth:  n(r.revenue_growth_ttm_yoy) || n(r.total_revenue_change_ttm_yoy),
+      earningsGrowth: n(r.earnings_per_share_diluted_yoy_growth_ttm),
+
+      currentRatio: n(r.current_ratio_fq),
+      quickRatio:   n(r.quick_ratio),
+      debtToEquity: n(r.debt_to_equity_fq),
+      totalCash:    n(r.cash_n_short_term_investments_fq),
+      totalDebt:    n(r.total_debt_fq),
+      freeCashFlow: n(r.free_cash_flow),
+      operatingCF:  n(r.cash_f_operating_activities),
+
+      dividendYield: n(r.dividends_yield_current) || n(r.dividends_yield),
+
+      high52:  n(r['52_week_high']),
+      low52:   n(r['52_week_low']),
+      beta:    n(r.beta_1_year),
+
+      perfW:   n(r['Perf.W']),
+      perf1M:  n(r['Perf.1M']),
+      perf3M:  n(r['Perf.3M']),
+      perf6M:  n(r['Perf.6M']),
+      perfY:   n(r['Perf.Y']),
+      perfYTD: n(r['Perf.YTD']),
+
+      sector:    r.sector   || '',
+      industry:  r.industry || '',
+      employees: n(r.number_of_employees),
+      piotroski: n(r.piotroski_f_score),
+    });
+
+  } catch(e) {
+    return res.status(500).json({ error: e.message });
+  }
 };
