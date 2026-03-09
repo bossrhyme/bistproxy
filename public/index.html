@@ -3993,17 +3993,32 @@ function syncSectorAndFilter(source) {
 // PROFİL — index.html stub (profil ayrı sayfa)
 // ═══════════════════════════════════════════
 function showProfil(sym, ex) {
-  // Screener verisini sessionStorage'a yaz, profil sayfasına geç
+  var exKey = ex || currentExchange;
   var d = allData.find(function(x){
-    return x.symbol === sym || x.symbol === sym+'.IS' || x.symbol.replace('.IS','') === sym;
+    var s = (x.symbol||'').replace('.IS','').toUpperCase();
+    return s === sym.toUpperCase() || (x.symbol||'').toUpperCase() === sym.toUpperCase()+'.IS';
   });
-  try {
-    sessionStorage.setItem('deepfin_prf_sym', sym);
-    sessionStorage.setItem('deepfin_prf_ex',  ex || currentExchange);
-    if(d) sessionStorage.setItem('deepfin_prf_data', JSON.stringify(d));
-    else  sessionStorage.removeItem('deepfin_prf_data');
-  } catch(e) {}
-  window.location.href = '/analiz/?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(ex || currentExchange);
+  var url = '/analiz/?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(exKey);
+  if(d) {
+    // Veriyi URL'e sıkıştırarak geçir (küçük key mapping)
+    var compact = {
+      n: d.name||'', sc: d.sector||'', cl: d.close||d.price||0,
+      ch: d.change_abs||0, ca: d.change||0,
+      pe: d.pe_ratio||0, pb: d.price_book_ratio||0,
+      roe: d.roe||0, roa: d.roa||0, nm: d.net_margin||0,
+      gm: d.gross_margin||0, peg: d.peg_ratio||0, fs: d.piotroski_f_score,
+      cr: d.current_ratio||0, de: d.debt_to_equity||0,
+      dy: d.dividend_yield_recent||0, pw: d.Perf_W||0,
+      pm: d.Perf_1M||0, py: d.Perf_Y||0, bt: d.beta||0,
+      mc: d.market_cap_basic||0, av: d.average_volume_10d_calc||0,
+      wh: d['52_week_high']||0, wl: d['52_week_low']||0,
+      cf: d.cash_f_operating_activities||0
+    };
+    try {
+      url += '&d=' + encodeURIComponent(btoa(JSON.stringify(compact)));
+    } catch(e) {}
+  }
+  window.location.href = url;
 }
 
 function openDetayliAnaliz(sym, ex) {
