@@ -818,6 +818,29 @@ td:first-child,td:nth-child(2){text-align:left;}
 
 html,body{height:100%;overflow:hidden;}
 #app{display:flex;flex-direction:column;height:100dvh;}
+
+/* ── FİNANSALLAR ── */
+.fin-cell{background:var(--s1);padding:12px 14px;transition:background .15s;}
+.fin-cell:hover{background:var(--s2);}
+.fin-cell-label{font-size:9px;color:var(--text2);margin-bottom:5px;letter-spacing:.3px;text-transform:uppercase;}
+.fin-cell-val{font-family:"JetBrains Mono",monospace;font-size:14px;font-weight:700;color:var(--text);}
+.fin-cell-val.good{color:var(--green);}
+.fin-cell-val.mid{color:var(--gold);}
+.fin-cell-val.bad{color:var(--red);}
+.fin-gauge-wrap{display:flex;flex-direction:column;gap:5px;padding:8px 0;}
+.fin-gauge-label{display:flex;justify-content:space-between;font-size:10px;color:var(--text2);}
+.fin-gauge-bar{height:5px;background:var(--s3);border-radius:3px;overflow:hidden;}
+.fin-gauge-fill{height:100%;border-radius:3px;transition:width .7s ease;}
+.fin-debt-card{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;}
+.fin-debt-label{font-size:10px;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px;}
+.fin-debt-val{font-family:"JetBrains Mono",monospace;font-size:20px;font-weight:700;}
+.fin-debt-sub{font-size:10px;color:var(--muted);margin-top:3px;}
+.sparkline-svg{width:100%;height:44px;display:block;}
+.perf-bar-row{display:flex;align-items:center;gap:7px;font-size:10px;}
+.perf-bar-label{color:var(--text2);width:28px;flex-shrink:0;}
+.perf-bar-track{flex:1;height:4px;background:var(--s3);border-radius:2px;overflow:hidden;}
+.perf-bar-fill{height:100%;border-radius:2px;transition:width .6s ease;}
+.perf-bar-val{font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:600;width:42px;text-align:right;flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -838,6 +861,10 @@ html,body{height:100%;overflow:hidden;}
         <span id="prf-bc-ex" style="color:var(--text2)">BIST</span>
         <span style="color:var(--muted)">/</span>
         <span class="prf-sym" id="prf-bc-sym">—</span>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+        <span id="prf-live-dot" style="display:none;font-size:10px;color:var(--green);"><span style="display:inline-block;width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s ease infinite;margin-right:4px;"></span>Canlı</span>
+        <button id="prf-tv-btn" onclick="openTradingView()" class="prf-back">↗ TradingView</button>
       </div>
     </div>
 
@@ -870,12 +897,46 @@ html,body{height:100%;overflow:hidden;}
 
         <div class="prf-tabs">
           <div class="prf-tab on" onclick="prfTab('overview',this)">Genel Bakış</div>
+          <div class="prf-tab" onclick="prfTab('financials',this)">Finansallar</div>
           <div class="prf-tab" onclick="prfTab('piotroski',this)">F-Score</div>
           <div class="prf-tab" onclick="prfTab('guru',this)">Guru Analizi</div>
           <div class="prf-tab" onclick="prfTab('ai',this)">🤖 YZ Analizi</div>
         </div>
 
         <div id="prf-panel-overview" class="prf-panel on">
+          <!-- TradingView Grafik -->
+          <div class="prf-section" style="padding:0;overflow:hidden;border-radius:0;">
+            <div id="prf-tv-widget" style="height:340px;background:var(--s2);position:relative;">
+              <div id="prf-tv-placeholder" style="height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--muted);font-size:12px;">
+                <div style="font-size:28px;">📈</div>
+                <span>Grafik yükleniyor...</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gelir & Kâr Trendi -->
+          <div class="prf-section">
+            <div class="prf-sec-title">Gelir & Kâr Trendi</div>
+            <div style="display:flex;gap:10px;margin-bottom:12px;" id="prf-trend-cards">
+              <div style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;">
+                <div style="font-size:9px;color:var(--text2);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">Gelir Büyümesi</div>
+                <div id="prf-rev-spark" style="height:44px;margin-bottom:6px;"></div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--text);" id="prf-rev-val">—</div>
+                <div style="font-size:10px;font-family:'JetBrains Mono',monospace;" id="prf-rev-chg">YoY TTM</div>
+              </div>
+              <div style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;">
+                <div style="font-size:9px;color:var(--text2);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">Kazanç Büyümesi</div>
+                <div id="prf-earn-spark" style="height:44px;margin-bottom:6px;"></div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--text);" id="prf-earn-val">—</div>
+                <div style="font-size:10px;font-family:'JetBrains Mono',monospace;" id="prf-earn-chg">YoY TTM</div>
+              </div>
+              <div style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;">
+                <div style="font-size:9px;color:var(--text2);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">Performans</div>
+                <div id="prf-perf-bars" style="display:flex;flex-direction:column;gap:5px;margin-top:4px;"></div>
+              </div>
+            </div>
+          </div>
+
           <div class="prf-section">
             <div class="prf-sec-title">Temel Metrikler</div>
             <div class="prf-mgrid" id="prf-metrics"><div style="padding:20px;color:var(--muted);font-size:12px;grid-column:span 4">Tarama yapıp Detaylı Analiz'e tıklayın</div></div>
@@ -883,6 +944,26 @@ html,body{height:100%;overflow:hidden;}
           <div class="prf-section">
             <div class="prf-sec-title">Şirket Hakkında</div>
             <p id="prf-desc" style="font-size:12px;color:var(--text2);line-height:1.7;">Yükleniyor...</p>
+          </div>
+        </div>
+
+        <!-- ═══ FİNANSALLAR ═══ -->
+        <div id="prf-panel-financials" class="prf-panel">
+          <div class="prf-section">
+            <div class="prf-sec-title">Temel Finansal Göstergeler</div>
+            <div id="prf-fin-summary" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:20px;"></div>
+          </div>
+          <div class="prf-section">
+            <div class="prf-sec-title">Kârlılık Göstergeleri</div>
+            <div id="prf-fin-gauges" style="display:flex;flex-direction:column;gap:12px;"></div>
+          </div>
+          <div class="prf-section">
+            <div class="prf-sec-title">Borç & Likidite</div>
+            <div id="prf-fin-debt" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;"></div>
+          </div>
+          <div class="prf-section" style="border-bottom:none;">
+            <div class="prf-sec-title">Veri Kaynağı Hakkında</div>
+            <p style="font-size:11px;color:var(--muted);line-height:1.6;">Finansal veriler TradingView Scanner API üzerinden gerçek zamanlı olarak çekilmektedir. Yıllık finansal tablolar (gelir tablosu, bilanço) için premium veri sağlayıcı entegrasyonu planlanmaktadır.</p>
           </div>
         </div>
 
@@ -964,7 +1045,187 @@ html,body{height:100%;overflow:hidden;}
 </div>
 
 <script>
-function goHome() { window.location.href = '/'; }
+function openTradingView() {
+  var ex = _prfEx || 'bist';
+  var sym = _prfSym || '';
+  var prefixes = {bist:'BIST',nasdaq:'NASDAQ',sp500:'NYSE',dax:'XETR',lse:'LSE',nikkei:'TSE'};
+  var pfx = prefixes[ex] || 'BIST';
+  window.open('https://www.tradingview.com/chart/?symbol='+pfx+'%3A'+sym, '_blank');
+}
+
+function loadTVWidget(sym, ex) {
+  var container = document.getElementById('prf-tv-widget');
+  if(!container) return;
+  var prefixes = {bist:'BIST',nasdaq:'NASDAQ',sp500:'NYSE',dax:'XETR',lse:'LSE',nikkei:'TSE'};
+  var pfx = prefixes[ex] || 'BIST';
+  var tvSym = pfx + ':' + sym;
+  var themes = 'dark';
+  container.innerHTML = '<div id="tv-widget-inner"></div>';
+  var script = document.createElement('script');
+  script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+  script.async = true;
+  script.innerHTML = JSON.stringify({
+    autosize: true,
+    symbol: tvSym,
+    interval: 'D',
+    timezone: 'Europe/Istanbul',
+    theme: themes,
+    style: '1',
+    locale: 'tr',
+    allow_symbol_change: false,
+    calendar: false,
+    hide_top_toolbar: false,
+    hide_legend: true,
+    save_image: false,
+    backgroundColor: 'rgba(14,14,14,1)',
+    gridColor: 'rgba(255,255,255,0.04)',
+    hide_volume: false,
+    support_host: 'https://www.tradingview.com'
+  });
+  var wrapper = document.createElement('div');
+  wrapper.className = 'tradingview-widget-container';
+  wrapper.style.cssText = 'width:100%;height:340px;';
+  var inner = document.createElement('div');
+  inner.className = 'tradingview-widget-container__widget';
+  inner.style.cssText = 'height:calc(100% - 32px);width:100%;';
+  wrapper.appendChild(inner);
+  wrapper.appendChild(script);
+  container.innerHTML = '';
+  container.appendChild(wrapper);
+  // live dot göster
+  var ld = document.getElementById('prf-live-dot');
+  if(ld) ld.style.display = 'flex';
+}
+
+function _mkSparkline(containerId, color, trend) {
+  // trend: 'up' | 'down' | 'flat'
+  var container = document.getElementById(containerId);
+  if(!container) return;
+  var pts = trend === 'up'   ? 'M0,40 L50,34 L100,26 L150,18 L200,10 L250,5 L300,2'
+           : trend === 'down' ? 'M0,5  L50,10 L100,18 L150,26 L200,32 L250,38 L300,42'
+           :                    'M0,22 L50,20 L100,24 L150,18 L200,22 L250,20 L300,22';
+  var fill = pts + ' L300,44 L0,44Z';
+  var cRgb = color === '#00c076' ? '0,192,118' : color === '#f0b429' ? '240,180,41' : '59,130,246';
+  container.innerHTML =
+    '<svg class="sparkline-svg" viewBox="0 0 300 44" preserveAspectRatio="none">'+
+    '<defs><linearGradient id="sg'+containerId+'" x1="0" y1="0" x2="0" y2="1">'+
+    '<stop offset="0%" stop-color="'+color+'" stop-opacity=".3"/>'+
+    '<stop offset="100%" stop-color="'+color+'" stop-opacity="0"/></linearGradient></defs>'+
+    '<path d="'+fill+'" fill="url(#sg'+containerId+')"/>'+
+    '<path d="'+pts+'" fill="none" stroke="'+color+'" stroke-width="1.5"/>'+
+    '</svg>';
+}
+
+function _buildTrend(d) {
+  if(!d) return;
+  var n = function(v){ return (v!==null&&v!==undefined&&!isNaN(Number(v)))?Number(v):null; };
+  var revGrowth = n(d.total_revenue_change_ttm_yoy) || n(d.revenue_growth_ttm_yoy);
+  var earnGrowth = n(d.earnings_per_share_diluted_yoy_growth_ttm) || n(d.earnings_per_share_change_ttm_yoy);
+
+  // Gelir büyümesi
+  var revEl  = document.getElementById('prf-rev-val');
+  var revChg = document.getElementById('prf-rev-chg');
+  if(revEl && revGrowth !== null) {
+    revEl.textContent  = (revGrowth >= 0 ? '+' : '') + revGrowth.toFixed(1) + '%';
+    revEl.style.color  = revGrowth >= 0 ? 'var(--green)' : 'var(--red)';
+    if(revChg) { revChg.textContent = 'YoY TTM'; revChg.style.color = revGrowth >= 0 ? 'var(--green)' : 'var(--red)'; }
+    _mkSparkline('prf-rev-spark', '#3b82f6', revGrowth > 5 ? 'up' : revGrowth < -5 ? 'down' : 'flat');
+  } else {
+    if(revEl) revEl.textContent = '—';
+    _mkSparkline('prf-rev-spark', '#3b82f6', 'flat');
+  }
+
+  // Kazanç büyümesi
+  var earnEl  = document.getElementById('prf-earn-val');
+  var earnChg = document.getElementById('prf-earn-chg');
+  if(earnEl && earnGrowth !== null) {
+    earnEl.textContent  = (earnGrowth >= 0 ? '+' : '') + earnGrowth.toFixed(1) + '%';
+    earnEl.style.color  = earnGrowth >= 0 ? 'var(--green)' : 'var(--red)';
+    if(earnChg) { earnChg.textContent = 'YoY TTM'; earnChg.style.color = earnGrowth >= 0 ? 'var(--green)' : 'var(--red)'; }
+    _mkSparkline('prf-earn-spark', '#00c076', earnGrowth > 5 ? 'up' : earnGrowth < -5 ? 'down' : 'flat');
+  } else {
+    if(earnEl) earnEl.textContent = '—';
+    _mkSparkline('prf-earn-spark', '#00c076', 'flat');
+  }
+
+  // Performans barları
+  var perfEl = document.getElementById('prf-perf-bars');
+  if(perfEl) {
+    var perfs = [
+      {l:'1H', v:n(d.Perf_W)  || n(d.perfW)},
+      {l:'1A', v:n(d.Perf_1M) || n(d.perf1M)},
+      {l:'1Y', v:n(d.Perf_Y)  || n(d.perfY)},
+    ];
+    perfEl.innerHTML = perfs.map(function(p){
+      if(p.v === null) return '<div class="perf-bar-row"><span class="perf-bar-label">'+p.l+'</span><div class="perf-bar-track"><div class="perf-bar-fill" style="width:0%;background:var(--muted)"></div></div><span class="perf-bar-val" style="color:var(--muted)">—</span></div>';
+      var pct = Math.min(Math.abs(p.v), 50);
+      var w = (pct / 50 * 100).toFixed(1);
+      var col = p.v >= 0 ? 'var(--green)' : 'var(--red)';
+      var txt = (p.v >= 0 ? '+' : '') + p.v.toFixed(1) + '%';
+      return '<div class="perf-bar-row">'+
+        '<span class="perf-bar-label">'+p.l+'</span>'+
+        '<div class="perf-bar-track"><div class="perf-bar-fill" style="width:'+w+'%;background:'+col+'"></div></div>'+
+        '<span class="perf-bar-val" style="color:'+col+'">'+txt+'</span>'+
+      '</div>';
+    }).join('');
+  }
+}
+
+function _buildFinancials(d) {
+  if(!d) return;
+  var n  = function(v,def){ var x=Number(v); return isNaN(x)?def:x; };
+  var pct = function(v){ return v!==0?(v*100).toFixed(1)+'%':'—'; };
+  var cur = (EXCHANGE_META[_prfEx]||{}).currency || '₺';
+
+  // Özet grid
+  var cells = [
+    {l:'F/K (TTM)',       v: n(d.pe_ratio,0) ? n(d.pe_ratio,0).toFixed(1)+'x' : '—', cls: n(d.pe_ratio,0)<15&&n(d.pe_ratio,0)>0 ? 'good' : n(d.pe_ratio,0)<25 ? 'mid' : 'bad'},
+    {l:'PD/DD',           v: n(d.price_book_ratio,0) ? n(d.price_book_ratio,0).toFixed(2)+'x' : '—', cls: n(d.price_book_ratio,0)<2&&n(d.price_book_ratio,0)>0 ? 'good' : n(d.price_book_ratio,0)<4 ? 'mid' : 'bad'},
+    {l:'F/S (TTM)',       v: n(d.price_sales,0) ? n(d.price_sales,0).toFixed(2)+'x' : '—', cls: n(d.price_sales,0)<1&&n(d.price_sales,0)>0 ? 'good' : 'mid'},
+    {l:'ROE (TTM)',       v: d.roe ? pct(d.roe) : '—', cls: n(d.roe,0)*100>15 ? 'good' : n(d.roe,0)*100>8 ? 'mid' : 'bad'},
+    {l:'ROA (TTM)',       v: d.roa ? pct(d.roa) : '—', cls: n(d.roa,0)*100>8 ? 'good' : n(d.roa,0)*100>3 ? 'mid' : 'bad'},
+    {l:'Net Marj',        v: d.net_margin ? pct(d.net_margin) : '—', cls: n(d.net_margin,0)*100>12 ? 'good' : n(d.net_margin,0)*100>5 ? 'mid' : 'bad'},
+  ];
+  var finSum = document.getElementById('prf-fin-summary');
+  if(finSum) finSum.innerHTML = cells.map(function(c){
+    return '<div class="fin-cell"><div class="fin-cell-label">'+c.l+'</div><div class="fin-cell-val '+c.cls+'">'+c.v+'</div></div>';
+  }).join('');
+
+  // Kârlılık gauge'ları
+  var gauges = [
+    {l:'Brüt Marj',  v: n(d.gross_margin,0)*100, max:60, color:'#3b82f6'},
+    {l:'Net Marj',   v: n(d.net_margin,0)*100,   max:30, color:'#00c076'},
+    {l:'ROE',        v: n(d.roe,0)*100,           max:50, color:'#f0b429'},
+    {l:'ROA',        v: n(d.roa,0)*100,           max:20, color:'#00c076'},
+  ];
+  var finGauge = document.getElementById('prf-fin-gauges');
+  if(finGauge) finGauge.innerHTML = gauges.map(function(g){
+    var w = g.v > 0 ? Math.min(g.v/g.max*100,100).toFixed(1) : 0;
+    var show = g.v !== 0 ? (g.v >= 0 ? '+' : '') + g.v.toFixed(1) + '%' : '—';
+    return '<div class="fin-gauge-wrap">'+
+      '<div class="fin-gauge-label"><span>'+g.l+'</span><span style="color:'+(g.v>0?g.color:'var(--muted)')+'">'+show+'</span></div>'+
+      '<div class="fin-gauge-bar"><div class="fin-gauge-fill" style="width:'+w+'%;background:'+g.color+'"></div></div>'+
+    '</div>';
+  }).join('');
+
+  // Borç & Likidite
+  var debtCards = [
+    {l:'Borç / Özsermaye', v: d.debt_to_equity ? n(d.debt_to_equity,0).toFixed(2) : '—', sub: n(d.debt_to_equity,0)<0.5?'✓ Düşük risk':n(d.debt_to_equity,0)<1?'Orta':'Yüksek', cls: n(d.debt_to_equity,0)<0.5 ? 'good' : n(d.debt_to_equity,0)<1 ? 'mid' : 'bad'},
+    {l:'Cari Oran',        v: d.current_ratio  ? n(d.current_ratio,0).toFixed(2)+'x' : '—', sub: n(d.current_ratio,0)>2?'✓ Güçlü likidite':n(d.current_ratio,0)>1?'Yeterli':'Zayıf likidite', cls: n(d.current_ratio,0)>2 ? 'good' : n(d.current_ratio,0)>1 ? 'mid' : 'bad'},
+    {l:'Temettü Verimi',   v: d.dividend_yield_recent ? (n(d.dividend_yield_recent,0)*100).toFixed(2)+'%' : '—', sub: 'Güncel veri', cls: n(d.dividend_yield_recent,0)*100>3 ? 'good' : n(d.dividend_yield_recent,0)*100>1 ? 'mid' : ''},
+    {l:'PEG Oranı',        v: d.peg_ratio ? n(d.peg_ratio,0).toFixed(2) : '—', sub: n(d.peg_ratio,0)>0&&n(d.peg_ratio,0)<1?'✓ Cazip büyüme':'<1 = cazip', cls: n(d.peg_ratio,0)>0&&n(d.peg_ratio,0)<1 ? 'good' : n(d.peg_ratio,0)<2 ? 'mid' : 'bad'},
+  ];
+  var finDebt = document.getElementById('prf-fin-debt');
+  if(finDebt) finDebt.innerHTML = debtCards.map(function(c){
+    return '<div class="fin-debt-card">'+
+      '<div class="fin-debt-label">'+c.l+'</div>'+
+      '<div class="fin-debt-val '+c.cls+'">'+c.v+'</div>'+
+      '<div class="fin-debt-sub">'+c.sub+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+
 function goScreener() { window.location.href = '/'; }  // Tarayıcı → anasayfa (screener açık gelir)
 function closeProfil() {
   var from = _urlParams.get('from');
@@ -1044,6 +1305,9 @@ function showProfil(sym, ex) {
   _buildPrfPiotroski();
   _buildPrfGuru();
   _buildPrfSide();
+  _buildTrend(_prfData);
+  _buildFinancials(_prfData);
+  loadTVWidget(sym, ex);
   prfTab('overview', document.querySelector('.prf-tab'));
   _prfAiDone = false;
 }
@@ -1298,6 +1562,8 @@ async function loadYahooData(sym, ex) {
     _buildPrfPiotroski();
     _buildPrfGuru();
     _buildPrfSide();
+    _buildTrend(_prfData);
+    _buildFinancials(_prfData);
 
     // Şirket adı + sektör
     if(q.name)   document.getElementById('prf-fullname').textContent   = q.name;
