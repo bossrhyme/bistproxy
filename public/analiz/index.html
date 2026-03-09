@@ -978,6 +978,15 @@ function showToast(msg) {
 
 
 
+var EXCHANGE_META = {
+  bist:   { name: 'BIST',    currency: '₺', currencyCode: 'TRY', yahooSuffix: '.IS', flag: '🇹🇷', tvUrl: 'https://scanner.tradingview.com/turkey/scan',  filters: [] },
+  nasdaq: { name: 'NASDAQ',  currency: '$',  currencyCode: 'USD', yahooSuffix: '',    flag: '🇺🇸', tvUrl: 'https://scanner.tradingview.com/america/scan', filters: [{ left: 'exchange', operation: 'equal', right: 'NASDAQ' }] },
+  sp500:  { name: 'S&P 500', currency: '$',  currencyCode: 'USD', yahooSuffix: '',    flag: '🇺🇸', tvUrl: 'https://scanner.tradingview.com/america/scan', filters: [] },
+  dax:    { name: 'DAX',     currency: '€',  currencyCode: 'EUR', yahooSuffix: '.DE', flag: '🇩🇪', tvUrl: 'https://scanner.tradingview.com/germany/scan', filters: [] },
+  lse:    { name: 'LSE',     currency: '£',  currencyCode: 'GBP', yahooSuffix: '.L',  flag: '🇬🇧', tvUrl: 'https://scanner.tradingview.com/uk/scan',      filters: [] },
+  nikkei: { name: 'Nikkei',  currency: '¥',  currencyCode: 'JPY', yahooSuffix: '.T',  flag: '🇯🇵', tvUrl: 'https://scanner.tradingview.com/japan/scan',   filters: [] },
+};
+
 var allData = [];
 var currentExchange = 'bist';
 var _prfSym = '';
@@ -1247,11 +1256,45 @@ async function loadYahooData(sym, ex) {
     if(q.error || !q.price) return;
 
     var cur = (EXCHANGE_META[ex]||{}).currency || '$';
-    var d   = _prfData || {};
 
-    if(q.name) document.getElementById('prf-fullname').textContent = q.name;
+    // TV verisini _prfData'ya merge et — screener verisi yoksa TV'den doldur
+    if(!_prfData) _prfData = {};
+    var d = _prfData;
+    // Metrics — screener yoksa TV'den al
+    if(!d.pe_ratio       && q.pe)            d.pe_ratio            = q.pe;
+    if(!d.price_book_ratio && q.pb)          d.price_book_ratio    = q.pb;
+    if(!d.roe            && q.roe)           d.roe                 = q.roe;
+    if(!d.roa            && q.roa)           d.roa                 = q.roa;
+    if(!d.net_margin     && q.netMargin)     d.net_margin          = q.netMargin;
+    if(!d.gross_margin   && q.grossMargin)   d.gross_margin        = q.grossMargin;
+    if(!d.peg_ratio      && q.peg)           d.peg_ratio           = q.peg;
+    if(!d.current_ratio  && q.currentRatio)  d.current_ratio       = q.currentRatio;
+    if(!d.debt_to_equity && q.debtToEquity)  d.debt_to_equity      = q.debtToEquity;
+    if(!d.piotroski_f_score && q.piotroski) d.piotroski_f_score   = q.piotroski;
+    if(!d.dividend_yield_recent && q.dividendYield) d.dividend_yield_recent = q.dividendYield;
+    if(!d['52_week_high'] && q.high52)       d['52_week_high']     = q.high52;
+    if(!d['52_week_low']  && q.low52)        d['52_week_low']      = q.low52;
+    if(!d.beta            && q.beta)         d.beta                = q.beta;
+    if(!d.market_cap_basic && q.marketCap)   d.market_cap_basic    = q.marketCap / 1e6;
+    if(!d.average_volume_10d_calc && q.avgVolume) d.average_volume_10d_calc = q.avgVolume;
+    if(!d.Perf_W  && q.perfW)  d.Perf_W  = q.perfW;
+    if(!d.Perf_1M && q.perf1M) d.Perf_1M = q.perf1M;
+    if(!d.Perf_Y  && q.perfY)  d.Perf_Y  = q.perfY;
+    if(!d.sector  && q.sector)  d.sector  = q.sector;
+    if(!d.name    && q.name)    d.name    = q.name;
+
+    // Metrics'i yeniden çiz (TV verisiyle dolu)
+    _buildPrfMetrics();
+    _buildPrfHero();
+    _buildPrfPiotroski();
+    _buildPrfGuru();
+    _buildPrfSide();
+
+    // Şirket adı + sektör
+    if(q.name)   document.getElementById('prf-fullname').textContent   = q.name;
     if(q.sector) document.getElementById('prf-sector-tag').textContent = q.sector;
 
+    // Canlı fiyat
     document.getElementById('prf-price').textContent =
       cur+' '+parseFloat(q.price).toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2});
     var chgEl = document.getElementById('prf-chg');
@@ -1259,14 +1302,16 @@ async function loadYahooData(sym, ex) {
     chgEl.textContent = (cp>=0?'+':'')+cp.toFixed(2)+'%';
     chgEl.className = 'prf-chg '+(cp>=0?'up':'dn');
 
+    // Açıklama
     if(q.description) document.getElementById('prf-desc').textContent = q.description;
 
+    // Yan panel (artık merge edilmiş _prfData kullan)
     var st = [
-      {k:'52H Yüksek',    v: q.high52 ? cur+' '+parseFloat(q.high52).toLocaleString('tr-TR',{minimumFractionDigits:2}) : (d['52_week_high']?cur+' '+d['52_week_high'].toFixed(2):'—')},
-      {k:'52H Düşük',     v: q.low52  ? cur+' '+parseFloat(q.low52).toLocaleString('tr-TR',{minimumFractionDigits:2})  : (d['52_week_low'] ?cur+' '+d['52_week_low'].toFixed(2) :'—')},
-      {k:'Beta',          v: d.beta ? d.beta.toFixed(2) : '—'},
-      {k:'Piyasa Değeri', v: d.market_cap_basic ? _fmtN(d.market_cap_basic*1e6) : '—'},
-      {k:'Ort. Hacim',    v: q.avgVolume ? _fmtN(parseFloat(q.avgVolume)) : (d.average_volume_10d_calc?_fmtN(d.average_volume_10d_calc):'—')},
+      {k:'52H Yüksek',    v: d['52_week_high'] ? cur+' '+parseFloat(d['52_week_high']).toLocaleString('tr-TR',{minimumFractionDigits:2}) : '—'},
+      {k:'52H Düşük',     v: d['52_week_low']  ? cur+' '+parseFloat(d['52_week_low']).toLocaleString('tr-TR',{minimumFractionDigits:2})  : '—'},
+      {k:'Beta',          v: d.beta ? parseFloat(d.beta).toFixed(2) : '—'},
+      {k:'Piyasa Değeri', v: d.market_cap_basic ? _fmtN(d.market_cap_basic*1e6) : (q.marketCap ? _fmtN(q.marketCap) : '—')},
+      {k:'Ort. Hacim',    v: d.average_volume_10d_calc ? _fmtN(d.average_volume_10d_calc) : (q.avgVolume?_fmtN(q.avgVolume):'—')},
       {k:'Temettü',       v: d.dividend_yield_recent ? (d.dividend_yield_recent*100).toFixed(2)+'%' : '—', cls:'g'},
       {k:'Sektör',        v: q.sector || d.sector || '—'},
       {k:'Çalışan',       v: q.employees ? Number(q.employees).toLocaleString('tr-TR') : '—'},
