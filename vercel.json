@@ -5,10 +5,6 @@
       "source": "/(.*)",
       "headers": [
         {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://*.tradingview.com https://*.tradingview-widget.com https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com https://*.tradingview.com; font-src 'self' https://fonts.gstatic.com https://*.tradingview.com; img-src 'self' data: blob: https://flagcdn.com https://*.tradingview.com https://*.tradingview-widget.com; frame-src https://*.tradingview.com https://*.tradingview-widget.com; connect-src 'self' https://*.tradingview.com https://*.tradingview-widget.com; worker-src blob:; object-src 'none'; base-uri 'self';"
-        },
-        {
           "key": "X-Frame-Options",
           "value": "SAMEORIGIN"
         },
