@@ -1,4 +1,4 @@
-// api/quote.js — TradingView proxy (verified fields only)
+// api/quote.js — TradingView proxy (exchange-specific columns)
 const https = require('https');
 
 const EXCHANGE_CONFIG = {
@@ -10,21 +10,28 @@ const EXCHANGE_CONFIG = {
   nikkei: { tvPath: '/japan/scan',   prefix: 'TSE:' },
 };
 
-// Sadece scan.js'de zaten çalışan + bilinen güvenli field'lar
-const PROFILE_COLS = [
+// Screener'da zaten çalıştığı doğrulanmış base field'lar + ek profil field'ları
+const BASE_COLS = [
   'name','description','close','change','change_abs','volume','average_volume_10d_calc',
   'market_cap_basic',
   'price_earnings_ttm','price_book_fq','price_sales_current',
   'return_on_equity_fq','return_on_assets_fq',
   'net_margin','gross_margin',
-  'total_revenue_change_ttm_yoy','revenue_growth_ttm_yoy',
-  'earnings_per_share_diluted_yoy_growth_ttm',
-  'debt_to_equity_fq','current_ratio_fq',
-  'cash_f_operating_activities',
-  'dividends_yield','dividends_yield_current',
+  'total_revenue_change_ttm_yoy','earnings_per_share_change_ttm_yoy',
+  'revenue_growth_ttm_yoy','earnings_per_share_diluted_yoy_growth_ttm',
+  'dividends_yield','debt_to_equity_fq','current_ratio_fq',
+  'sector','High.1M','Low.1M','piotroski_f_score',
+  // Ek profil field'ları — bunlar TV'de standart
   '52_week_high','52_week_low',
   'Perf.W','Perf.1M','Perf.3M','Perf.6M','Perf.Y','Perf.YTD',
-  'sector','piotroski_f_score',
+  'beta_1_year',
+  'cash_f_operating_activities',
+];
+
+const US_EXTRA = [
+  'price_book_ratio','return_on_equity','return_on_assets',
+  'dividends_yield_current','total_debt_to_equity','current_ratio',
+  'earnings_per_share_diluted_ttm',
 ];
 
 function tvRequest(path, body) {
@@ -64,26 +71,28 @@ module.exports = async function(req, res) {
 
   const cfg    = EXCHANGE_CONFIG[ex] || EXCHANGE_CONFIG.bist;
   const ticker = cfg.prefix + sym;
+  const isUS   = ['nasdaq','sp500'].includes(ex);
+  const cols   = isUS ? [...BASE_COLS, ...US_EXTRA] : BASE_COLS;
 
   try {
     const rawStr = await tvRequest(cfg.tvPath, {
       symbols: { tickers: [ticker] },
-      columns: PROFILE_COLS,
+      columns: cols,
     });
 
     let parsed;
     try { parsed = JSON.parse(rawStr); }
-    catch(e) { return res.status(500).json({ error: 'Parse failed', raw: rawStr.slice(0,200) }); }
+    catch(e) { return res.status(500).json({ error: 'Parse failed', raw: rawStr.slice(0,300) }); }
 
     if (parsed.error) return res.status(400).json({ error: parsed.error });
 
-    const entry = (parsed.data || []).find(x => x.s === ticker) || (parsed.data || [])[0];
+    const entry = (parsed.data || []).find(x => x.s === ticker) || (parsed.data||[])[0];
     const row   = entry?.d;
-    if (!row?.length) return res.status(404).json({ error: 'Bulunamadı: ' + ticker });
+    if (!row?.length) return res.status(404).json({ error: 'Bulunamadı: ' + ticker, raw: rawStr.slice(0,300) });
 
     const r = {};
-    PROFILE_COLS.forEach((col, i) => { r[col] = row[i] ?? null; });
-    const n = (v) => (v !== null && !isNaN(Number(v))) ? Number(v) : 0;
+    cols.forEach((col, i) => { r[col] = row[i] ?? null; });
+    const n = (v) => (v !== null && v !== undefined && !isNaN(Number(v))) ? Number(v) : 0;
 
     return res.json({
       symbol:        sym,
@@ -95,20 +104,22 @@ module.exports = async function(req, res) {
       volume:        n(r.volume),
       avgVolume:     n(r.average_volume_10d_calc),
       pe:            n(r.price_earnings_ttm),
-      pb:            n(r.price_book_fq),
+      pb:            n(r.price_book_fq) || n(r.price_book_ratio),
       ps:            n(r.price_sales_current),
-      roe:           n(r.return_on_equity_fq),
-      roa:           n(r.return_on_assets_fq),
+      roe:           n(r.return_on_equity_fq) || n(r.return_on_equity),
+      roa:           n(r.return_on_assets_fq) || n(r.return_on_assets),
       netMargin:     n(r.net_margin),
       grossMargin:   n(r.gross_margin),
       revenueGrowth: n(r.revenue_growth_ttm_yoy) || n(r.total_revenue_change_ttm_yoy),
-      earningsGrowth:n(r.earnings_per_share_diluted_yoy_growth_ttm),
-      debtToEquity:  n(r.debt_to_equity_fq),
-      currentRatio:  n(r.current_ratio_fq),
+      earningsGrowth:n(r.earnings_per_share_diluted_yoy_growth_ttm) || n(r.earnings_per_share_change_ttm_yoy),
+      eps:           n(r.earnings_per_share_diluted_ttm),
+      debtToEquity:  n(r.debt_to_equity_fq) || n(r.total_debt_to_equity),
+      currentRatio:  n(r.current_ratio_fq) || n(r.current_ratio),
       operatingCF:   n(r.cash_f_operating_activities),
       dividendYield: n(r.dividends_yield_current) || n(r.dividends_yield),
       high52:        n(r['52_week_high']),
       low52:         n(r['52_week_low']),
+      beta:          n(r.beta_1_year),
       perfW:         n(r['Perf.W']),
       perf1M:        n(r['Perf.1M']),
       perf3M:        n(r['Perf.3M']),
