@@ -369,47 +369,61 @@ td:first-child,td:nth-child(2){text-align:left;}
 ══════════════════════════════════ */
 @media (max-width: 768px) {
 
+  /* ── GENEL ── */
+  *, *::before, *::after { box-sizing: border-box; }
+  body { overflow-x: hidden; }
+
   /* ── TOPBAR ── */
   .topbar { padding: 0 8px; gap: 5px; }
   .tlive { display: none; }
   .tlogo span:not(.tlogo-mark) { display: none; }
-  .tsearch { max-width: 150px; }
+  .tsearch { max-width: 140px; }
   .tright { gap: 3px; }
   .tright #scantime { display: none; }
   .infobtn { font-size: 11px; padding: 5px 8px; }
   .supportbtn { display: none; }
   .topbarbtn { padding: 5px 8px; font-size: 11px; }
+  .hp-nav-btn { font-size: 11px; padding: 4px 8px; }
 
-  /* ── LAYOUT — mobilde sidebar gizli, full height koru ── */
-  .layout { flex-direction: row; height: 100%; overflow: hidden; }
+  /* ── LAYOUT ── */
+  .layout { flex-direction: row; height: 100%; overflow: hidden; width: 100%; }
 
-  /* ── SIDEBAR — mobilde gizle, drawer ile aç ── */
+  /* ── SIDEBAR — drawer ile yönetilir ── */
   .sidebar { display: none !important; }
   .hamburger-btn { display: flex !important; }
 
-  /* ── EXCHANGE GRID — 3 kolon ── */
+  /* ── EXCHANGE GRID ── */
   .exchange-grid { grid-template-columns: repeat(3, 1fr); gap: 3px; }
-  .exbtn { padding: 6px 4px; }
+  .exbtn { padding: 6px 4px; font-size: 10px; }
   .exbtn-sub { display: none; }
 
-  /* ── CHIPS — yatay scroll ── */
-  .chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
+  /* ── CHIPS ── */
+  .chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
   .chips::-webkit-scrollbar { height: 2px; }
   .chips::-webkit-scrollbar-thumb { background: var(--border2); }
 
   /* ── MAIN / CONTENT ── */
-  .main { flex: 1; min-width: 0; overflow: hidden; display: flex; flex-direction: column; }
+  .main { flex: 1; min-width: 0; overflow: hidden; display: flex; flex-direction: column; width: 100%; }
   .content { min-height: 0; overflow: hidden; flex: 1; display: flex; flex-direction: column; }
 
   /* ── TOOLBAR ── */
   #toolbar { flex-wrap: wrap; gap: 4px; padding: 6px 8px; }
   .ssel { font-size: 10px; padding: 3px 6px; }
   .tbl-scroll-btn { display: none; }
+  #scantime-mobile { display: block; }
 
   /* ── TABLO ── */
   .twrap { overflow: auto; -webkit-overflow-scrolling: touch; flex: 1; min-height: 0; }
-  table { min-width: 700px; }
+  table { min-width: 680px; }
   th, td { padding: 6px 8px; font-size: 10px; white-space: nowrap; }
+
+  /* ── STATS BAR ── */
+  .stats-bar { flex-wrap: wrap; gap: 4px; padding: 6px 8px; }
+  .stat-item { font-size: 10px; }
+
+  /* ── TICKER TAPE ── */
+  .ticker-wrap { height: 28px; }
+  .ticker-item { font-size: 10px; padding: 0 10px; }
 
   /* ── DETAY PANELİ — tam ekran ── */
   .detail {
@@ -427,19 +441,69 @@ td:first-child,td:nth-child(2){text-align:left;}
   .detail.open { width: 100% !important; display: block !important; }
   .dhead { padding: 12px 14px; position: sticky; top: 0; background: var(--s1); z-index: 2; }
   .dclose { font-size: 18px; padding: 4px 8px; }
-  #chart-wrap { height: 220px !important; }
+  #chart-wrap { height: 200px !important; }
+  .dtabs { overflow-x: auto; flex-wrap: nowrap; }
+  .dtab { white-space: nowrap; font-size: 11px; padding: 6px 10px; }
 
   /* ── FİLTRELER ── */
   .frow { flex-wrap: wrap; gap: 4px; }
   .finps { flex-direction: column; gap: 4px; }
   .filter-group-title { font-size: 10px; }
+  .filter-group { padding: 8px; }
+
+  /* ── HOMEPAGE ── */
+  .hp-hero { padding: 40px 20px 30px; }
+  .hp-hero-title { font-size: 28px !important; }
+  .hp-hero-sub { font-size: 14px !important; }
+  .hp-cta-row { flex-direction: column; align-items: stretch; gap: 10px; }
+  .hp-cta-primary, .hp-cta-secondary { text-align: center; }
+  .hp-features-grid { grid-template-columns: 1fr !important; gap: 12px; }
+  .hp-feature-card { padding: 16px; }
+  .hp-section { padding: 30px 16px; }
+  .hp-section-title { font-size: 18px; }
+  .hp-strategies-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px; }
+  .hp-strategy-card { padding: 12px; }
+  .hp-steps { flex-direction: column; gap: 16px; }
+  .hp-step-connector { display: none; }
+  .hp-stat-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
+  /* ── FOOTER ── */
+  .footer-top { flex-direction: column; gap: 20px; }
+  .footer-links-group { flex-wrap: wrap; }
+  .footer-bottom { flex-direction: column; text-align: center; gap: 8px; }
+
+  /* ── MODAL ── */
+  .modal { margin: 8px; max-height: calc(100vh - 100px); overflow-y: auto; }
+  .modal-overlay { padding: 8px; }
+
+  /* ── PROFIL SAYFASI ── */
+  #profile-page .analiz-hero { padding: 24px 16px; }
+  .profile-grid { grid-template-columns: 1fr !important; }
+
+  /* ── ANALİZ SAYFASI ── */
+  .analiz-hero { padding: 24px 16px; }
+  .analiz-hero-title { font-size: 18px; }
+  .analiz-search-wrap { max-width: 100%; }
+
+  /* ── ZERO STATE ── */
+  .zero-state { padding: 30px 16px; }
+  .zero-icon { font-size: 36px; }
+
+  /* ── SCAN ETA ── */
+  #scan-eta { font-size: 10px; }
 }
 
 @media (max-width: 480px) {
   .exchange-grid { grid-template-columns: repeat(2, 1fr); }
-  /* Sütunları gizleme — yatay scroll yap */
-  table { min-width: 900px; }
+  table { min-width: 600px; }
+  th, td { font-size: 9px; padding: 5px 6px; }
+  .hp-strategies-grid { grid-template-columns: 1fr !important; }
+  .hp-stat-grid { grid-template-columns: 1fr !important; }
+  .topbar { padding: 0 6px; }
+  .tlogo-mark { width: 24px; height: 24px; font-size: 12px; }
 }
+
+
 
 /* ── TICKER TAPE ── */
 .ticker-wrap{width:100%;overflow:hidden;background:var(--s1);border-bottom:1px solid var(--border);height:32px;display:flex;align-items:center;flex-shrink:0;position:relative;}
@@ -706,6 +770,42 @@ td:first-child,td:nth-child(2){text-align:left;}
 /* ── TOOLTIP ── */
 #df-tooltip{position:fixed;background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:9px 13px;max-width:220px;font-size:11px;color:#bbb;line-height:1.6;z-index:99999;pointer-events:none;display:none;white-space:normal;box-shadow:0 6px 20px rgba(0,0,0,.7);}
 .goat-tip,.chip-tip,.th-tip{display:none!important;}
+
+/* ── MOBILE TOUCH & SCROLL FIXES ── */
+html { overflow-x: hidden; }
+body { overflow-x: hidden; touch-action: pan-y; }
+.twrap { -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
+.drawer-panel { -webkit-overflow-scrolling: touch; }
+.chips { -webkit-overflow-scrolling: touch; }
+.dtabs { -webkit-overflow-scrolling: touch; }
+
+/* Butonlar ve interaktif elemanlar — minimum touch target */
+@media (max-width: 768px) {
+  button, .chip, .exbtn, .sb-tab, .dtab { min-height: 36px; }
+  .dclose { min-width: 36px; min-height: 36px; display: flex; align-items: center; justify-content: center; }
+  .hamburger-btn { min-width: 36px; min-height: 36px; }
+  
+  /* Row tıklama alanını genişlet */
+  tbody tr td:first-child { min-width: 60px; }
+  
+  /* Scan butonu mobile */
+  #scanbtn { width: 100%; font-size: 13px; padding: 10px; }
+  
+  /* Toolbar responsive */
+  #toolbar .flex-row { flex-wrap: wrap; gap: 4px; }
+  
+  /* Detail panel scroll düzelt */
+  .detail { overscroll-behavior: contain; }
+  
+  /* Horizontal overflow engelle */
+  #app, .layout, .main, .content { max-width: 100vw; }
+  
+  /* Homepage nav butonları */
+  .hp-nav-btn { padding: 4px 10px; font-size: 11px; }
+  
+  /* Profil sayfası */
+  #profile-page { overflow-y: auto; overflow-x: hidden; }
+}
 </style>
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 </head>
@@ -2182,6 +2282,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 // TRADINGVIEW SCANNER — tek istekte tüm BIST
 // ═══════════════════════════════════════════
 async function runScan(){
+  closeMobileDrawer();
   // Disclaimer kontrolü
   if (!disclaimerAccepted && !sessionStorage.getItem('df_disclaimer')) {
     showDisclaimerModal();
@@ -4284,22 +4385,48 @@ function toggleMobileDrawer() {
   if (sidebar && drawerContent) {
     drawerContent.innerHTML = '';
     const clone = sidebar.cloneNode(true);
-    // onclick'leri: drawer kapat + gecikme ile çalıştır
+
+    // Input değerlerini senkronize et
+    clone.querySelectorAll('input[type="number"], input[type="text"]').forEach(function(el) {
+      var orig = document.querySelector('.sidebar #' + el.id);
+      if (orig) el.value = orig.value;
+      el.addEventListener('input', function() {
+        var origEl = document.querySelector('.sidebar #' + el.id);
+        if (origEl) { origEl.value = el.value; origEl.dispatchEvent(new Event('input')); }
+      });
+    });
+
+    // Select senkronize et
+    clone.querySelectorAll('select').forEach(function(el) {
+      var origId = el.id;
+      var orig = document.querySelector('.sidebar #' + origId);
+      if (orig) el.value = orig.value;
+      el.addEventListener('change', function() {
+        var origEl = document.querySelector('.sidebar #' + origId);
+        if (origEl) { origEl.value = el.value; origEl.dispatchEvent(new Event('change')); }
+      });
+    });
+
+    // onclick'leri yönet
     clone.querySelectorAll('[onclick]').forEach(function(el) {
       var oc = el.getAttribute('onclick');
       el.removeAttribute('onclick');
       el.addEventListener('click', function(e) {
         e.stopPropagation();
-        // exbtn seçimini sidebar'da da güncelle
         if (el.classList.contains('exbtn')) {
           document.querySelectorAll('.sidebar .exbtn').forEach(function(b){ b.classList.remove('on'); });
           var origBtn = document.querySelector('.sidebar .exbtn[data-exchange="' + el.dataset.exchange + '"]');
           if (origBtn) origBtn.classList.add('on');
         }
-        // chip seçimini sidebar'da da güncelle
-        if (el.classList.contains('chip') || el.classList.contains('goat-chip')) {
-          var origChip = document.querySelector('.sidebar [data-goat="'+(el.dataset.goat||'')+'"], .sidebar [data-preset="'+(el.dataset.preset||'')+'"], .sidebar [data-tech="'+(el.dataset.tech||'')+'"]');
-          if (origChip) origChip.click();
+        if (el.classList.contains('chip') || el.classList.contains('goat-chip') || el.classList.contains('tech-chip')) {
+          var selector = '';
+          if (el.dataset.goat)   selector = '.sidebar [data-goat="'   + el.dataset.goat   + '"]';
+          if (el.dataset.preset) selector = '.sidebar [data-preset="' + el.dataset.preset + '"]';
+          if (el.dataset.tech)   selector = '.sidebar [data-tech="'   + el.dataset.tech   + '"]';
+          if (selector) {
+            var origChip = document.querySelector(selector);
+            if (origChip) origChip.click();
+          }
           closeMobileDrawer();
           return;
         }
@@ -4307,16 +4434,23 @@ function toggleMobileDrawer() {
         setTimeout(function() { try { eval(oc); } catch(e){} }, 80);
       });
     });
-    // select onchange
-    clone.querySelectorAll('select').forEach(function(el) {
-      var origId = el.id;
-      el.addEventListener('change', function() {
-        var orig = document.querySelector('.sidebar #' + origId);
-        if (orig) { orig.value = el.value; orig.dispatchEvent(new Event('change')); }
+
+    // Sb-tab butonları
+    clone.querySelectorAll('.sb-tab').forEach(function(el) {
+      el.addEventListener('click', function() {
+        var tabId = el.id.replace('drawer-', '');
+        var origTab = document.getElementById(tabId);
+        if (origTab) origTab.click();
+        // drawer içinde tab görünümünü de güncelle
+        clone.querySelectorAll('.sb-tab').forEach(function(t){ t.classList.remove('active'); });
+        el.classList.add('active');
+        var tabName = el.getAttribute('onclick') || '';
       });
     });
+
     Array.from(clone.children).forEach(function(c){ drawerContent.appendChild(c); });
   }
+
   panel.classList.add('open');
   overlay.classList.add('open');
   btn && btn.classList.add('open');
