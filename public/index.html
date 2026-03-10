@@ -1258,6 +1258,13 @@ td:first-child,td:nth-child(2){text-align:left;}
           <div class="frow"><div class="flbl">Piyasa Değeri (Milyon $)</div><div class="finps"><input type="number" id="mc_min" placeholder="—" oninput="liveFilter()"><input type="number" id="mc_max" placeholder="—" oninput="liveFilter()"></div></div>
         </div>
 
+        <!-- BIST'e özel filtreler — sadece BIST seçiliyken görünür -->
+        <div class="filter-group" id="bist-only-filters" style="display:none;">
+          <div class="filter-group-title">🇹🇷 BIST Özel</div>
+          <div class="frow"><div class="flbl">Halka Açıklık % <small>min / max</small></div><div class="finps"><input type="number" id="ff_min" placeholder="—" oninput="liveFilter()" min="0" max="100"><input type="number" id="ff_max" placeholder="—" oninput="liveFilter()" min="0" max="100"></div></div>
+          <div class="frow"><div class="flbl">Yabancı Oranı % <small>min / max</small></div><div class="finps"><input type="number" id="forr_min" placeholder="—" oninput="liveFilter()" min="0" max="100"><input type="number" id="forr_max" placeholder="—" oninput="liveFilter()" min="0" max="100"></div></div>
+        </div>
+
         <div class="filter-group">
           <div class="filter-group-title">📈 Teknik Analiz</div>
           <div class="frow"><div class="flbl">Günlük Değişim %<small> (min / max)</small></div><div class="finps"><input type="number" id="chg_min" placeholder="—" oninput="liveFilter()"><input type="number" id="chg_max" placeholder="—" oninput="liveFilter()"></div></div>
@@ -1406,6 +1413,8 @@ td:first-child,td:nth-child(2){text-align:left;}
               <th onclick="colSort('dividendYieldIndicatedAnnual')" data-tip="Temettü Verimi: Hisse fiyatına oranla yıllık ödenen temettü.">TEMETTÜ%</th>
               <th onclick="colSort('totalDebt/totalEquityAnnual')" data-tip="Borç/Özsermaye: Şirketin borçluluk seviyesi. 1'in altı makul.">B/Ö</th>
               <th onclick="colSort('currentRatioAnnual')" data-tip="Cari Oran: Kısa vadeli borç karşılama gücü. 1.5+ sağlıklı.">CARİ</th>
+              <th onclick="colSort('freeFloat')" class="bist-col" id="th-freefloat" data-tip="Halka Açıklık Oranı: Borsada işlem gören hisse yüzdesi. Düşük = dar float = daha volatil." style="display:none;">H.AÇIK%</th>
+              <th onclick="colSort('foreignRatio')" class="bist-col" id="th-foreign" data-tip="Yabancı Yatırımcı Oranı: Yabancıların toplam hisse içindeki payı. Yüksek = uluslararası ilgi." style="display:none;">YABANCI%</th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
@@ -2515,6 +2524,9 @@ async function runScan(){
           if (pe && epsG && epsG > 0) return pe / epsG;
           return null;
         })(),
+        // BIST özel — İş Yatırım enrichment sonrası dolar (başlangıçta null)
+        freeFloat: null,
+        foreignRatio: null,
       });
     }
 
@@ -2538,6 +2550,11 @@ async function runScan(){
     updateExchangeBadge();
     applyAndRender();
 
+    // BIST ise arka planda İş Yatırım'dan enrichment yap (halka açıklık + yabancı oranı)
+    if (currentExchange === 'bist') {
+      enrichBistData();
+    }
+
   } catch(err) {
     showState('errstate');
     document.getElementById('errmsg').textContent = err.message || 'Bilinmeyen hata';
@@ -2545,6 +2562,48 @@ async function runScan(){
     btn.disabled = false;
     stopScanEta();
     document.getElementById('stopbtn').style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════════
+// BIST ENRİCHMENT — İş Yatırım'dan ek veri
+// ═══════════════════════════════════════════
+// Tarama bittikten sonra arka planda çalışır:
+// freeFloat (halka açıklık%) ve foreignRatio (yabancı%) alanlarını doldurur.
+// Başarısızlık durumunda sessizce geçer, mevcut veriyi bozmaz.
+async function enrichBistData() {
+  if (currentExchange !== 'bist' || !allData.length) return;
+  try {
+    // /api/bist-scan — filtersiz (tüm hisseler), sadece free_float + foreign_ratio iç.
+    const res = await fetch('/api/bist-scan', { signal: AbortSignal.timeout(15000) });
+    if (!res.ok) return;
+    const json = await res.json();
+    const rows = json.data || [];
+    if (!rows.length) return;
+
+    // Symbol → row haritası
+    const bySymbol = {};
+    rows.forEach(function(r) {
+      if (r.symbol) bySymbol[r.symbol.toUpperCase()] = r;
+    });
+
+    // allData'ya merge et
+    let enriched = 0;
+    allData.forEach(function(s) {
+      const iy = bySymbol[s.symbol.toUpperCase()];
+      if (!iy) return;
+      if (iy.free_float   != null) { s.freeFloat    = iy.free_float;   enriched++; }
+      if (iy.foreign_ratio != null) { s.foreignRatio = iy.foreign_ratio; }
+    });
+
+    if (enriched > 0) {
+      // Tabloyu güncelle (sessizce — kullanıcı farketmez)
+      applyAndRender();
+      console.log(`[DeepFin] BIST enrichment: ${enriched} hisse için halka açıklık & yabancı oranı eklendi`);
+    }
+  } catch(e) {
+    // Enrichment başarısız — mevcut veri etkilenmez
+    console.warn('[DeepFin] BIST enrichment başarısız:', e.message);
   }
 }
 
@@ -2898,6 +2957,8 @@ function applyAndRender(special){
     ['fromHigh',                       null,         'from_high_max', 1],
     ['fromLow',                        'from_low_min', null,      1],
     ['currentPrice',                   'price_min',  'price_max', 1],
+    ['freeFloat',                       'ff_min',     'ff_max',    1],
+    ['foreignRatio',                    'forr_min',   'forr_max',  1],
   ];
   // Hacim ayrı — Milyon lot
   const volMin = getN('vol_min'), volMax = getN('vol_max');
@@ -3119,6 +3180,8 @@ function renderTable(){
       <td>${s.dividendYieldIndicatedAnnual!=null?`<span class="up">${s.dividendYieldIndicatedAnnual.toFixed(2)}%</span>`:nil}</td>
       <td>${fv(s['totalDebt/totalEquityAnnual'],1)}</td>
       <td>${fv(s.currentRatioAnnual,2)}</td>
+      <td class="bist-col" style="display:none;">${s.freeFloat!=null?`<span style="color:var(--muted)">${s.freeFloat.toFixed(1)}%</span>`:nil}</td>
+      <td class="bist-col" style="display:none;">${s.foreignRatio!=null?`<span style="color:#60a5fa">${s.foreignRatio.toFixed(1)}%</span>`:nil}</td>
     </tr>`;
   }).join('');
 }
@@ -3890,8 +3953,30 @@ function selectExchange(el) {
       if(tlTab) tlTab.style.display = '';
     }
   }
+  // BIST'e özel kolon + filtre görünürlüğü
+  toggleBistOnlyUI(currentExchange === 'bist');
   // Otomatik tarama
   runScan();
+}
+
+// ═══════════════════════════════════════════
+// BIST ÖZEL UI — Kolon + Filtre görünürlüğü
+// ═══════════════════════════════════════════
+function toggleBistOnlyUI(isBist) {
+  // Tablo kolonları
+  document.querySelectorAll('.bist-col').forEach(el => {
+    el.style.display = isBist ? '' : 'none';
+  });
+  // Sidebar filtre grubu
+  var bistFilters = document.getElementById('bist-only-filters');
+  if (bistFilters) bistFilters.style.display = isBist ? '' : 'none';
+  // Boş filtre inputlarını temizle (borsa değiştiğinde sıfırla)
+  if (!isBist) {
+    ['ff_min','ff_max','forr_min','forr_max'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+  }
 }
 
 function updateStatsBar() {
@@ -3966,7 +4051,7 @@ function showFooterModal(type) {
 <p>Platform üzerindeki hiçbir içerik; herhangi bir menkul kıymetin alım, satım veya elde tutulmasına yönelik tavsiye, öneri veya teşvik olarak yorumlanamaz.</p>
 <p>Yatırım kararları kişisel mali durumunuza, risk toleransınıza ve yatırım hedeflerinize göre değişir. Her türlü yatırım kararından önce lisanslı bir yatırım danışmanına başvurmanız tavsiye edilir.</p>
 <p>Geçmiş performans gelecekteki sonuçları garanti etmez. Tüm yatırımlar risk içerir ve yatırılan tutarın tamamı kaybedilebilir.</p>
-<p style="font-size:11px;color:var(--muted2);margin-top:16px;">Veri sağlayıcıların (TradingView, Yahoo Finance vb.) hizmet kesintileri veya veri hataları nedeniyle oluşabilecek zararlardan DeepFin sorumlu tutulamaz.</p>`,
+<p style="font-size:11px;color:var(--muted2);margin-top:16px;">Veri sağlayıcıların (TradingView, Yahoo Finance vb.) hizmet kesintileri veya veri hataları nedeniyle oluşabilecek zararlardan DeepFin sorumlu tutulamaz.</p><div style="margin-top:18px;padding:14px 16px;background:rgba(59,130,246,.05);border:1px solid rgba(59,130,246,.18);border-radius:8px;"><p style="font-size:11px;font-weight:700;color:var(--text);margin:0 0 8px 0;letter-spacing:.4px;text-transform:uppercase;">Üçüncü Taraf Strateji ve Marka Beyanı</p><p style="font-size:11px;color:var(--muted2);line-height:1.8;margin:0;">DeepFin'de yer alan tüm yatırımcı ve fon stratejileri — Warren Buffett, Benjamin Graham, Peter Lynch, Seth Klarman, Joel Greenblatt, Mark Minervini, Charlie Munger, Cathie Wood / ARK Invest, Citadel, D.E. Shaw, Millennium Management ve diğerleri dahil — söz konusu kişi ve kurumlarla herhangi bir iş birliği, lisans anlaşması veya resmi bağlantı olmaksızın hazırlanmıştır. Sunulan filtreler ve parametreler; kamuya açık kitaplar, akademik çalışmalar ve yayımlanmış röportajlar esas alınarak DeepFin tarafından bağımsız biçimde yorumlanmıştır. Bu filtreler anılan yaklaşımların tam, eksiksiz veya yetkili bir yansıması değildir; özgün hesaplama yöntemlerinden ve güncel portföy stratejilerinden farklılık gösterebilir. Adı geçen kişi ve kurumlar platformumuz üzerinde herhangi bir onay, tavsiye veya sorumluluk üstlenmemektedir.</p></div>`,
 
     privacy: `<p><strong style="color:var(--text)">Gizlilik Politikası</strong></p>
 <p>DeepFin olarak kullanıcı gizliliğine büyük önem veriyoruz.</p>
@@ -4447,6 +4532,8 @@ document.addEventListener('DOMContentLoaded', function(){
   var total = document.querySelectorAll('[data-goat],[data-preset],[data-tech]').length;
   var el = document.querySelector('[data-strat-count]');
   if(el) el.innerHTML = total + ' <span>strateji</span>';
+  // Sayfa açılışında BIST varsayılan seçili — BIST özel UI'yi aç
+  toggleBistOnlyUI(currentExchange === 'bist');
 });
 
 </script>
