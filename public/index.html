@@ -2234,7 +2234,7 @@ async function runScan(){
     'net_margin','gross_margin',
     'total_revenue_change_ttm_yoy','earnings_per_share_change_ttm_yoy',
     'revenue_growth_ttm_yoy','earnings_per_share_diluted_yoy_growth_ttm',
-    'dividends_yield','debt_to_equity_fq','current_ratio_fq',
+    'dividends_yield','debt_to_equity_fq','current_ratio_fq','free_float_shares_percent',
     'sector','High.1M','Low.1M','piotroski_f_score'
   ];
   const COLS_US = [
@@ -2524,8 +2524,7 @@ async function runScan(){
           if (pe && epsG && epsG > 0) return pe / epsG;
           return null;
         })(),
-        // BIST özel — İş Yatırım enrichment sonrası dolar (başlangıçta null)
-        freeFloat: null,
+        freeFloat: g('free_float_shares_percent'),
         foreignRatio: null,
       });
     }
@@ -2550,10 +2549,6 @@ async function runScan(){
     updateExchangeBadge();
     applyAndRender();
 
-    // BIST ise arka planda İş Yatırım'dan enrichment yap (halka açıklık + yabancı oranı)
-    if (currentExchange === 'bist') {
-      enrichBistData();
-    }
 
   } catch(err) {
     showState('errstate');
@@ -2567,46 +2562,6 @@ async function runScan(){
 
 // ═══════════════════════════════════════════
 // BIST ENRİCHMENT — İş Yatırım'dan ek veri
-// ═══════════════════════════════════════════
-// Tarama bittikten sonra arka planda çalışır:
-// freeFloat (halka açıklık%) ve foreignRatio (yabancı%) alanlarını doldurur.
-// Başarısızlık durumunda sessizce geçer, mevcut veriyi bozmaz.
-async function enrichBistData() {
-  if (currentExchange !== 'bist' || !allData.length) return;
-  try {
-    // /api/bist-scan — filtersiz (tüm hisseler), sadece free_float + foreign_ratio iç.
-    const res = await fetch('/api/bist-scan', { signal: AbortSignal.timeout(15000) });
-    if (!res.ok) return;
-    const json = await res.json();
-    const rows = json.data || [];
-    if (!rows.length) return;
-
-    // Symbol → row haritası
-    const bySymbol = {};
-    rows.forEach(function(r) {
-      if (r.symbol) bySymbol[r.symbol.toUpperCase()] = r;
-    });
-
-    // allData'ya merge et
-    let enriched = 0;
-    allData.forEach(function(s) {
-      const iy = bySymbol[s.symbol.toUpperCase()];
-      if (!iy) return;
-      if (iy.free_float   != null) { s.freeFloat    = iy.free_float;   enriched++; }
-      if (iy.foreign_ratio != null) { s.foreignRatio = iy.foreign_ratio; }
-    });
-
-    if (enriched > 0) {
-      // Tabloyu güncelle (sessizce — kullanıcı farketmez)
-      applyAndRender();
-      console.log(`[DeepFin] BIST enrichment: ${enriched} hisse için halka açıklık & yabancı oranı eklendi`);
-    }
-  } catch(e) {
-    // Enrichment başarısız — mevcut veri etkilenmez
-    console.warn('[DeepFin] BIST enrichment başarısız:', e.message);
-  }
-}
-
 // ═══════════════════════════════════════════
 // PRESETS — Temel Analiz Hazır Filtreler
 // ═══════════════════════════════════════════
