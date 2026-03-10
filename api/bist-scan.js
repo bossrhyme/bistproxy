@@ -47,10 +47,10 @@ async function fetchScreenerData() {
       'User-Agent':     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
       'Referer':        ISYATIRIM_REFERER,
       'Accept':         'application/json, text/plain, */*',
-      'Content-Type':   'application/json',
+      
       'X-Requested-With': 'XMLHttpRequest',
     },
-    body: '{}',
+    body: null,
     signal: AbortSignal.timeout(15000)
   });
 
