@@ -2549,6 +2549,10 @@ async function runScan(){
     updateExchangeBadge();
     applyAndRender();
 
+    // BIST ise arka planda İş Yatırım'dan client-side enrichment (CORS deneyi)
+    if (currentExchange === 'bist') {
+      enrichBistClientSide();
+    }
 
   } catch(err) {
     showState('errstate');
@@ -2562,6 +2566,57 @@ async function runScan(){
 
 // ═══════════════════════════════════════════
 // BIST ENRİCHMENT — İş Yatırım'dan ek veri
+
+// ═══════════════════════════════════════════
+// BIST Enrichment — client-side İş Yatırım fetch
+// Halka açıklık (id:11) + Yabancı oranı (id:40)
+// ═══════════════════════════════════════════
+async function enrichBistClientSide() {
+  try {
+    const IY_URL = 'https://www.isyatirim.com.tr/tr-tr/analiz/_Layouts/15/IsYatirim.Website/StockInfo/CompanyInfoAjax.aspx/getScreenerDataNEW';
+    const res = await fetch(IY_URL, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+      body: null,
+      signal: AbortSignal.timeout(12000)
+    });
+    if (!res.ok) { console.warn('[enrichBist] HTTP', res.status); return; }
+    const json = await res.json();
+    if (!json.d) { console.warn('[enrichBist] no d field'); return; }
+    const rows = JSON.parse(json.d);
+
+    // Map: symbol → {freeFloat, foreignRatio}
+    const map = {};
+    rows.forEach(function(row) {
+      const hisse = row['Hisse'] || '';
+      const dash  = hisse.indexOf(' - ');
+      const sym   = dash > -1 ? hisse.slice(0, dash).trim() : hisse.trim();
+      if (!sym) return;
+      map[sym] = {
+        freeFloat:    row['11'] != null ? parseFloat(row['11']) : null,
+        foreignRatio: row['40'] != null ? parseFloat(row['40']) : null,
+      };
+    });
+
+    let enriched = 0;
+    allData.forEach(function(s) {
+      const m = map[s.symbol];
+      if (!m) return;
+      if (m.freeFloat    != null) { s.freeFloat    = m.freeFloat;    enriched++; }
+      if (m.foreignRatio != null) { s.foreignRatio = m.foreignRatio; }
+    });
+
+    console.log(`[enrichBist] ${enriched} hisse zenginleştirildi`);
+    if (enriched > 0) applyAndRender();
+
+  } catch(e) {
+    console.warn('[enrichBist] CORS veya hata:', e.message);
+  }
+}
+
 // ═══════════════════════════════════════════
 // PRESETS — Temel Analiz Hazır Filtreler
 // ═══════════════════════════════════════════
