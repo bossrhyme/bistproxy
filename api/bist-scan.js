@@ -56,10 +56,14 @@ async function fetchScreenerData() {
 
   if (!res.ok) throw new Error(`İş Yatırım HTTP ${res.status}`);
 
-  const json = await res.json();
+  const text = await res.text();
+  console.log('[bist-scan] raw response length:', text.length);
+  console.log('[bist-scan] raw response preview:', text.substring(0, 200));
+
+  const json = JSON.parse(text);
 
   // Response formatı: { "d": "[{...}, {...}]" }
-  if (!json.d) throw new Error('Beklenmeyen response formatı');
+  if (!json.d) throw new Error(`d field missing. Keys: ${Object.keys(json).join(',')}`);
 
   return JSON.parse(json.d);
 }
