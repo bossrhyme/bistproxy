@@ -42,12 +42,15 @@ async function kvSet(key, value, ttlSec = 300) {
 // İş Yatırım'dan veri çek
 async function fetchScreenerData() {
   const res = await fetch(ISYATIRIM_API, {
+    method: 'POST',
     headers: {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-      'Referer':    ISYATIRIM_REFERER,
-      'Accept':     'application/json, text/plain, */*',
+      'User-Agent':     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+      'Referer':        ISYATIRIM_REFERER,
+      'Accept':         'application/json, text/plain, */*',
+      'Content-Type':   'application/json',
       'X-Requested-With': 'XMLHttpRequest',
     },
+    body: '{}',
     signal: AbortSignal.timeout(15000)
   });
 
