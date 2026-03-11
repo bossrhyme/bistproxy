@@ -82,12 +82,36 @@ function makeRequest(hostname, path, method, headers, body, callback) {
 }
 
 const EXCHANGE_CONFIG = {
-  bist:   { tvPath: '/turkey/scan',  yahooSuffix: '.IS', currency: 'TRY', extraFilters: [] },
-  nasdaq: { tvPath: '/america/scan', yahooSuffix: '',    currency: 'USD', extraFilters: [{ left: 'exchange', operation: 'equal', right: 'NASDAQ' }] },
-  sp500:  { tvPath: '/america/scan', yahooSuffix: '',    currency: 'USD', extraFilters: [{ left: 'is_primary', operation: 'equal', right: true }, { left: 'index', operation: 'equal', right: 'SP500' }] },
-  dax:    { tvPath: '/germany/scan', yahooSuffix: '.DE', currency: 'EUR', extraFilters: [] },
-  lse:    { tvPath: '/uk/scan',      yahooSuffix: '.L',  currency: 'GBP', extraFilters: [] },
-  nikkei: { tvPath: '/japan/scan',   yahooSuffix: '.T',  currency: 'JPY', extraFilters: [] },
+  bist:   { tvPath: '/turkey/scan',  yahooSuffix: '.IS', currency: 'TRY',
+            extraFilters: [{ left: 'typespecs', operation: 'has', right: ['common'] }] },
+  nasdaq: { tvPath: '/america/scan', yahooSuffix: '',    currency: 'USD',
+            extraFilters: [
+              { left: 'exchange',   operation: 'equal', right: 'NASDAQ' },
+              { left: 'is_primary', operation: 'equal', right: true },
+              { left: 'typespecs',  operation: 'has',   right: ['common'] },
+            ] },
+  sp500:  { tvPath: '/america/scan', yahooSuffix: '',    currency: 'USD',
+            extraFilters: [
+              { left: 'is_primary', operation: 'equal', right: true },
+              { left: 'typespecs',  operation: 'has',   right: ['common'] },
+              { left: 'index',      operation: 'equal', right: 'SP500' },
+            ] },
+  dax:    { tvPath: '/germany/scan', yahooSuffix: '.DE', currency: 'EUR',
+            extraFilters: [
+              { left: 'is_primary', operation: 'equal', right: true },
+              { left: 'typespecs',  operation: 'has',   right: ['common'] },
+            ] },
+  lse:    { tvPath: '/uk/scan',      yahooSuffix: '.L',  currency: 'GBP',
+            extraFilters: [
+              { left: 'is_primary', operation: 'equal', right: true },
+              { left: 'typespecs',  operation: 'has',   right: ['common'] },
+            ] },
+  nikkei: { tvPath: '/japan/scan',   yahooSuffix: '.T',  currency: 'JPY',
+            extraFilters: [
+              { left: 'exchange',   operation: 'equal', right: 'TSE' },
+              { left: 'is_primary', operation: 'equal', right: true },
+              { left: 'typespecs',  operation: 'has',   right: ['common'] },
+            ] },
 };
 
 module.exports = async function(req, res) {
