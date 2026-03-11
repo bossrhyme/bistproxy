@@ -2338,63 +2338,12 @@ async function runScan(){
   };
 
   try {
-    const exCfg = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
-  if (exCfg.filters.length > 0) payload.filter = exCfg.filters;
-  // SP500: is_primary + common stock filtresi, piyasa değerine göre ilk 503
-  if (currentExchange === 'sp500') {
-    payload.filter = [
-      { left: 'is_primary', operation: 'equal', right: true },
-      { left: 'typespecs', operation: 'has', right: ['common'] }
-    ];
-    payload.range = [0, 503];
-  }
-  // NASDAQ: sadece NASDAQ exchange hisseleri, 4500 limit
-  if (currentExchange === 'nasdaq') {
-    payload.range = [0, 4500];
-    payload.filter = [{ left: 'exchange', operation: 'equal', right: 'NASDAQ' }];
-    payload.filter2 = {
-      operator: 'and',
-      operands: [
-        { expression: { left: 'is_primary', operation: 'equal', right: true } },
-        { expression: { left: 'typespecs', operation: 'has', right: ['common'] } }
-      ]
-    };
-  }
-  // DAX: Frankfurt Borsası Prime Standard — DAX40 + MDAX50 + SDAX70 + TecDAX30 ≈ 190
-  if (currentExchange === 'dax') {
-    payload.filter2 = {
-      operator: 'and',
-      operands: [
-        { expression: { left: 'is_primary', operation: 'equal', right: true } },
-        { expression: { left: 'typespecs', operation: 'has', right: ['common'] } },
-        { expression: { left: 'exchange', operation: 'in_range', right: ['XETR', 'XETR'] } }
-      ]
-    };
-    payload.range = [0, 500];
-  }
-  // LSE: Ana pazar (Main Market) — birincil listeleme, adi hisse ~1400
-  if (currentExchange === 'lse') {
-    payload.filter2 = {
-      operator: 'and',
-      operands: [
-        { expression: { left: 'is_primary', operation: 'equal', right: true } },
-        { expression: { left: 'typespecs', operation: 'has', right: ['common'] } }
-      ]
-    };
-    payload.range = [0, 2000];
-  }
-  // Nikkei: Tokyo Borsası — birincil listeleme, adi hisse, TSE exchange
-  if (currentExchange === 'nikkei') {
-    payload.filter = [{ left: 'exchange', operation: 'equal', right: 'TSE' }];
-    payload.filter2 = {
-      operator: 'and',
-      operands: [
-        { expression: { left: 'is_primary', operation: 'equal', right: true } },
-        { expression: { left: 'typespecs', operation: 'has', right: ['common'] } }
-      ]
-    };
-    payload.range = [0, 4000];
-  }
+    // Borsa bazlı range limitleri — filtreler scan.js extraFilters'da tanımlı
+    if (currentExchange === 'sp500')  payload.range = [0, 503];
+    if (currentExchange === 'nasdaq') payload.range = [0, 4500];
+    if (currentExchange === 'dax')    payload.range = [0, 500];
+    if (currentExchange === 'lse')    payload.range = [0, 2000];
+    if (currentExchange === 'nikkei') payload.range = [0, 4000];
   // Proxy üzerinden — kaynak gizli
   const res = await fetch('/api/scan?exchange=' + currentExchange, {
       method: 'POST',
@@ -2604,7 +2553,8 @@ async function runScan(){
     });
     const dedupedResults = Array.from(seen.values());
 
-    allData = dedupedResults;
+    // Minimum veri: close yoksa tabloda tüm sütunlar boş görünür — filtrele
+    allData = dedupedResults.filter(s => s.currentPrice !== null && s.currentPrice > 0);
     const _exm = EXCHANGE_META[currentExchange]||EXCHANGE_META.bist;
     document.getElementById('scantime').textContent = `${_exm.flag} ${_exm.name} · ↻ ${new Date().toLocaleTimeString('tr-TR')} · ${results.length} hisse`;
     updateExchangeBadge();
