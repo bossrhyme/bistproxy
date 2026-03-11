@@ -2413,7 +2413,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 async function runScan(){
   closeMobileDrawer();
   // Disclaimer kontrolü
-  if (!disclaimerAccepted && !sessionStorage.getItem('df_disclaimer')) {
+  if (!disclaimerAccepted && !localStorage.getItem('df_disclaimer_v1')) {
     showDisclaimerModal();
     return;
   }
@@ -4520,6 +4520,7 @@ function closeMobileDrawer() {
 let disclaimerTimer = null;
 
 function showDisclaimerModal() {
+  if (localStorage.getItem('df_disclaimer_v1')) return; // zaten kabul edilmiş
   const modal = document.getElementById('disclaimerModal');
   modal.classList.add('open');
   // Countdown
@@ -4550,7 +4551,7 @@ function showDisclaimerModal() {
 
 function acceptDisclaimer() {
   disclaimerAccepted = true;
-  sessionStorage.setItem('df_disclaimer', '1');
+  localStorage.setItem('df_disclaimer_v1', '1');
   document.getElementById('disclaimerModal').classList.remove('open');
   clearInterval(disclaimerTimer);
 }
@@ -4560,7 +4561,7 @@ function showScreener() {
   var _pp=document.getElementById('profile-page'); if(_pp){_pp.style.display='none';_pp.classList.remove('on');}
   var na = document.getElementById('nav-analiz'); if(na) na.classList.remove('active');
   // Disclaimer kontrolü
-  if (!disclaimerAccepted && !sessionStorage.getItem('df_disclaimer')) {
+  if (!disclaimerAccepted && !localStorage.getItem('df_disclaimer_v1')) {
     showDisclaimerModal();
     document.getElementById('homepage').style.display = 'none';
     document.getElementById('screener-layout').style.display = 'flex';
@@ -4669,7 +4670,7 @@ document.addEventListener('DOMContentLoaded', function(){
           Okudum, Anladım &amp; Devam Et <span id="disclaimerCountdown">(5)</span>
         </button>
         <p style="text-align:center;font-size:10px;color:#444;margin:10px 0 0;">
-          Bu uyarı oturum başına bir kez gösterilir.
+          Bu uyarı yalnızca ilk girişte gösterilir.
         </p>
       </div>
     </div>
