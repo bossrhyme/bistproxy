@@ -2218,12 +2218,12 @@ const PROXY_URL = '/api/scan';
 // ── EXCHANGE CONFIG ──
 let currentExchange = 'bist';
 const EXCHANGE_META = {
-  bist:   { name: 'BIST',    currency: '₺', currencyCode: 'TRY', flag: '🇹🇷', filters: [] },
-  nasdaq: { name: 'NASDAQ',  currency: '$',  currencyCode: 'USD', flag: '🇺🇸', filters: [{ left: 'exchange', operation: 'equal', right: 'NASDAQ' }] },
-  sp500:  { name: 'S&P 500', currency: '$',  currencyCode: 'USD', flag: '🇺🇸', filters: [] },
-  dax:    { name: 'DAX',     currency: '€',  currencyCode: 'EUR', flag: '🇩🇪', filters: [] },
-  lse:    { name: 'LSE',     currency: '£',  currencyCode: 'GBP', flag: '🇬🇧', filters: [] },
-  nikkei: { name: 'Nikkei',  currency: '¥',  currencyCode: 'JPY', flag: '🇯🇵', filters: [] },
+  bist:   { name: 'BIST',    currency: '₺', currencyCode: 'TRY', flag: '🇹🇷', yahooSuffix: '.IS', filters: [] },
+  nasdaq: { name: 'NASDAQ',  currency: '$',  currencyCode: 'USD', flag: '🇺🇸', yahooSuffix: '',    filters: [{ left: 'exchange', operation: 'equal', right: 'NASDAQ' }] },
+  sp500:  { name: 'S&P 500', currency: '$',  currencyCode: 'USD', flag: '🇺🇸', yahooSuffix: '',    filters: [] },
+  dax:    { name: 'DAX',     currency: '€',  currencyCode: 'EUR', flag: '🇩🇪', yahooSuffix: '.DE', filters: [] },
+  lse:    { name: 'LSE',     currency: '£',  currencyCode: 'GBP', flag: '🇬🇧', yahooSuffix: '.L',  filters: [] },
+  nikkei: { name: 'Nikkei',  currency: '¥',  currencyCode: 'JPY', flag: '🇯🇵', yahooSuffix: '.T',  filters: [] },
 };
 
 let allData = [];
@@ -4581,7 +4581,5 @@ document.addEventListener('DOMContentLoaded', function(){
 </div>
 
 <!-- GLOBAL TOOLTIP -->
-<div id="df-tooltip"></div>
-
 </body>
 </html>
