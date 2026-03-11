@@ -2,992 +2,1072 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DeepFin — TUPRS Hisse Profili</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>DeepFin — Hisse Analizi</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
-:root {
-  --bg:       #080808;
-  --s1:       #0e0e0e;
-  --s2:       #141414;
-  --s3:       #1a1a1a;
-  --border:   #222;
-  --border2:  #2a2a2a;
-  --text:     #ededed;
-  --text2:    #999;
-  --muted:    #555;
-  --accent:   #3b82f6;
-  --accent2:  rgba(59,130,246,.12);
-  --green:    #00c076;
-  --green-bg: rgba(0,192,118,.08);
-  --red:      #f6465d;
-  --red-bg:   rgba(246,70,93,.08);
-  --gold:     #f0b429;
-  --gold-bg:  rgba(240,180,41,.08);
-  --mono:     'JetBrains Mono', monospace;
-  --head:     'Syne', sans-serif;
-  --body:     'DM Sans', sans-serif;
+:root{
+  --bg:#0b0e13;--s1:#111519;--s2:#161b22;--s3:#0d1117;
+  --border:#1e2733;--border2:#263040;
+  --green:#00c076;--green2:#00a060;--green-bg:rgba(0,192,118,.08);
+  --red:#f6465d;--red-bg:rgba(246,70,93,.08);
+  --blue:#3b82f6;--blue2:#2563d4;
+  --gold:#f0b429;--text:#e2e8f0;--text2:#94a3b8;--muted:#4a5568;--muted2:#64748b;
+  --accent:#3b82f6;
 }
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;touch-action:pan-y;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;}
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { background: var(--bg); color: var(--text); font-family: var(--body); min-height: 100vh; }
+/* ── API KEY SETUP SCREEN ── */
+#setup{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:100;background:var(--bg);}
+.sbox{position:relative;width:460px;background:var(--s1);border:1px solid var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.5);padding:40px;border-radius:12px;}
+.slogo{font-size:24px;font-weight:800;color:var(--text);letter-spacing:-.5px;display:flex;align-items:center;gap:10px;}
+.slogo-icon{width:36px;height:36px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;}
+.slogo span{color:var(--text2);font-weight:400;font-size:22px;}
+.ssub{font-size:13px;color:var(--muted2);margin-bottom:28px;margin-top:8px;}
+.ssteps{margin-bottom:28px;}
+.sstep{display:flex;gap:12px;margin-bottom:14px;align-items:flex-start;}
+.sstep-num{font-family:'Inter',sans-serif;font-weight:800;font-size:18px;color:var(--gold);width:22px;flex-shrink:0;line-height:1.3;}
+.sstep-txt{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted2);line-height:1.7;}
+.sstep-txt a{color:var(--teal);text-decoration:none;}
+.sstep-txt a:hover{text-decoration:underline;}
+.sstep-txt strong{color:var(--text);}
+.slabel{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;}
+.sinput-wrap{display:flex;gap:8px;}
+.sinput{flex:1;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:10px 14px;font-size:13px;outline:none;transition:all .15s;border-radius:6px;}
+.sinput:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(59,130,246,.15);}
+.sinput::placeholder{color:var(--muted);letter-spacing:0;}
+.sbtn{background:var(--accent);color:#fff;border:none;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;border-radius:6px;}
+.sbtn:hover{background:var(--blue2);}
+.serr{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--red);min-height:16px;margin-top:10px;}
+.sfree{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);margin-top:18px;padding-top:14px;border-top:1px solid var(--border);line-height:1.7;}
+.sfree strong{color:var(--teal);}
+
+/* ── APP ── */
+#app{display:flex;flex-direction:column;height:100dvh;position:relative;z-index:1;}
+
 
 /* ── TOPBAR ── */
-.topbar {
-  height: 48px;
-  border-bottom: 1px solid var(--border);
-  background: var(--s1);
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-  gap: 12px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-.logo { font-family: var(--head); font-size: 16px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 8px; }
-.logo-mark { width: 24px; height: 24px; background: var(--accent); border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; }
-.breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); margin-left: 16px; }
-.breadcrumb a { color: var(--text2); text-decoration: none; }
-.breadcrumb a:hover { color: var(--text); }
-.breadcrumb-sep { color: var(--muted); }
-.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
-.btn-sm { padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid var(--border2); background: var(--s2); color: var(--text2); transition: all .15s; font-family: var(--body); }
-.btn-sm:hover { border-color: var(--accent); color: var(--accent); }
-.btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-.btn-primary:hover { background: #2563eb; color: #fff; }
+.topbar{display:flex;align-items:center;padding:0 16px;height:48px;border-bottom:1px solid var(--border);background:var(--s1);flex-shrink:0;gap:10px;z-index:10;}
+.tlogo{font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;letter-spacing:-.3px;display:flex;align-items:center;gap:6px;}
+.tlogo-mark{width:22px;height:22px;background:var(--accent);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;}
+.tlogo span{color:var(--text2);font-weight:400;font-size:13px;}
+.tlive{font-size:10px;color:var(--green);background:var(--green-bg);border:1px solid rgba(0,192,118,.2);padding:2px 8px;border-radius:4px;font-weight:500;display:flex;align-items:center;gap:4px;}
+.tlive::before{content:'';width:5px;height:5px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.tsearch{position:relative;flex:1;max-width:320px;}
+.tsearch input{width:100%;background:var(--s2);border:1px solid var(--border);color:var(--text);padding:6px 12px 6px 32px;font-size:12px;outline:none;transition:border-color .15s;border-radius:6px;}
+.tsearch input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(59,130,246,.15);}
+.tsearch input::placeholder{color:var(--muted2);}
+.tsearch-ico{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted2);font-size:13px;pointer-events:none;}
+.tright{margin-left:auto;display:flex;align-items:center;gap:6px;}
+.topbarbtn{font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:6px;}
+.tbtn{background:var(--accent);color:#fff;border:none;font-weight:600;}
+.tbtn:hover{background:var(--blue2);}
+.tbtn:disabled{opacity:.4;cursor:not-allowed;}
+.infobtn{background:transparent;border:1px solid var(--border2);color:var(--text2);}
+.infobtn:hover{border-color:var(--accent);color:var(--accent);background:rgba(59,130,246,.05);}
+.supportbtn{background:rgba(246,70,93,.08);border:1px solid rgba(246,70,93,.25);color:#f6465d;}
+.supportbtn:hover{background:rgba(246,70,93,.15);border-color:#f6465d;color:#f6465d;}
+#scantime{font-size:11px;color:var(--muted2);}
+#active-exchange-badge{display:none;align-items:center;gap:5px;padding:4px 10px;background:var(--s2);border:1px solid var(--border);border-radius:6px;font-size:11px;font-weight:600;color:var(--text);flex-shrink:0;}
 
 /* ── LAYOUT ── */
-.page { display: grid; grid-template-columns: 1fr 340px; gap: 0; min-height: calc(100vh - 48px); }
-.main-col { border-right: 1px solid var(--border); overflow-y: auto; }
-.side-col { overflow-y: auto; background: var(--s1); }
+.layout{display:flex;flex:1;overflow:hidden;}
 
-/* ── HERO HEADER ── */
-.hero {
-  padding: 28px 28px 0;
+/* ── SIDEBAR ── */
+.sidebar{width:248px;min-width:248px;border-right:1px solid var(--border);overflow-y:auto;background:var(--s1);padding:12px 10px;}
+.sidebar::-webkit-scrollbar{width:3px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border2);}
+.stitle{font-size:10px;font-weight:600;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;}
+.filter-group{margin-bottom:14px;}
+.exchange-group{margin-bottom:14px;}
+.exchange-title{font-size:10px;font-weight:600;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px;display:flex;align-items:center;gap:6px;}
+.exchange-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.exchange-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
+.exbtn{display:flex;flex-direction:column;align-items:center;padding:7px 4px;border:1px solid var(--border);background:var(--s2);border-radius:6px;cursor:pointer;transition:all .12s;gap:2px;position:relative;}
+.exbtn:hover{border-color:var(--accent);background:rgba(59,130,246,.06);}
+.exbtn.on{border-color:var(--accent);background:rgba(59,130,246,.1);}
+.exbtn.on .exbtn-name{color:var(--accent);}
+.exbtn.disabled{opacity:.35;cursor:not-allowed;pointer-events:none;}
+.exbtn-flag{line-height:0;display:flex;align-items:center;justify-content:center;}
+.exbtn-name{font-size:10px;font-weight:600;color:var(--text);}
+.exbtn-sub{font-size:9px;color:var(--muted2);}
+.exbtn-soon{position:absolute;top:3px;right:4px;font-size:7px;background:var(--border2);color:var(--muted2);padding:1px 4px;border-radius:3px;font-weight:600;letter-spacing:.3px;}
+.filter-group-title{font-size:10px;font-weight:600;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px;display:flex;align-items:center;gap:6px;}
+.filter-group-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.chips{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:4px;}
+.chip{font-size:11px;font-weight:500;padding:3px 9px;border:1px solid var(--border2);color:var(--text2);cursor:pointer;transition:all .12s;user-select:none;border-radius:4px;background:var(--s2);}
+.chip:hover{border-color:var(--accent);color:var(--accent);background:rgba(59,130,246,.06);}
+.chip.on{border-color:var(--accent);color:#fff;background:var(--accent);}
+
+
+#goat-fund-chips .goat-chip:hover{border-color:#6ab4ff;background:rgba(100,180,255,.12);}
+
+.goat-info{display:none;margin-top:7px;font-size:10px;color:var(--text2);line-height:1.6;padding:8px 10px;background:rgba(240,180,41,.06);border-left:2px solid var(--gold);border-radius:0 4px 4px 0;}
+.presets{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:4px;}
+.fblock{margin-bottom:12px;}
+.fbtitle{font-size:10px;font-weight:600;color:var(--muted2);letter-spacing:.3px;margin-bottom:6px;}
+.frow{margin-bottom:5px;}
+.flbl{font-size:10px;color:var(--text2);margin-bottom:3px;display:flex;justify-content:space-between;font-weight:500;}
+.flbl small{font-size:9px;color:var(--muted2);}
+.finps{display:flex;gap:4px;}
+.finps input{flex:1;min-width:0;background:var(--s2);border:1px solid var(--border);color:var(--text);padding:5px 8px;font-size:11px;outline:none;transition:all .12s;border-radius:5px;}
+.finps input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(59,130,246,.12);}
+.finps input::placeholder{color:var(--muted2);}
+.clrbtn{width:100%;background:transparent;border:1px solid var(--border);color:var(--text2);padding:6px;font-size:11px;cursor:pointer;transition:all .15s;margin-top:4px;border-radius:5px;font-weight:500;}
+.clrbtn:hover{border-color:var(--red);color:var(--red);background:var(--red-bg);}
+
+/* ── CONTENT ── */
+.content{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.toolbar{padding:6px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:var(--s2);flex-shrink:0;}
+.rcount strong{font-size:18px;font-weight:700;color:var(--text);}
+.rcount span{font-size:11px;color:var(--muted2);margin-left:4px;}
+.pbar{height:2px;background:var(--border);flex:1;overflow:hidden;border-radius:2px;}
+.pbarfill{height:100%;background:var(--accent);width:0%;transition:width .2s;border-radius:2px;}
+.ssel{background:var(--s1);border:1px solid var(--border);color:var(--text);padding:4px 8px;font-size:11px;outline:none;cursor:pointer;border-radius:5px;}
+
+/* ── STATES ── */
+.cstate{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;}
+.cstate .big{font-size:48px;font-weight:800;color:var(--border);letter-spacing:-2px;line-height:1;}
+.cstate p{font-size:13px;color:var(--muted2);text-align:center;max-width:400px;line-height:1.6;}
+.cstate small{font-size:11px;color:var(--muted);}
+.spinner{width:24px;height:24px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── TABLE ── */
+.twrap{flex:1;overflow:auto;position:relative;}
+.tbl-scroll-btn{background:var(--s2);border:1px solid var(--border);color:var(--text2);width:24px;height:24px;border-radius:4px;cursor:pointer;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;transition:background .15s,color .15s;}
+.tbl-scroll-btn:hover{background:var(--border2);color:var(--text);}
+.twrap::-webkit-scrollbar{width:5px;height:5px;}
+.twrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+thead{position:sticky;top:0;z-index:5;}
+thead th{background:var(--s2);color:var(--muted2);font-size:11px;font-weight:600;padding:8px 10px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;letter-spacing:0;}
+thead th:first-child,thead th:nth-child(2){text-align:left;}
+thead th:hover{color:var(--text);}
+thead th.sorted{color:var(--accent);}
+thead th.sorted::after{content:' ↓';font-size:9px;}
+thead th.sorted.asc::after{content:' ↑';}
+tbody tr{transition:background .12s;cursor:pointer;}tbody tr:nth-child(even){background:rgba(255,255,255,.015);}
+tbody tr:hover{background:rgba(59,130,246,.1);}
+tbody tr:hover td{border-top:1px solid rgba(59,130,246,.25);border-bottom:1px solid rgba(59,130,246,.25);}
+tbody tr:hover .row-num{font-size:10px;color:var(--muted2);font-family:'JetBrains Mono',monospace;min-width:20px;display:inline-block;text-align:right;margin-right:8px;}
+.row-arrow{opacity:1;color:#60a5fa;}
+tbody tr.selrow{background:rgba(59,130,246,.12);}
+tbody tr.selrow td{border-left:none;}
+tbody tr.selrow td:first-child{border-left:3px solid var(--accent);}
+.row-num{font-size:10px;color:var(--text);font-family:'JetBrains Mono',monospace;min-width:20px;display:inline-block;text-align:right;margin-right:8px;}
+.row-arrow{color:#2a2a2a;font-size:16px;font-weight:900;transition:color .15s,transform .15s;margin-right:5px;display:inline-block;}
+tbody tr:hover .row-arrow{color:#60a5fa;transform:translateX(3px);}
+td{padding:6px 10px;text-align:right;font-size:12px;white-space:nowrap;color:var(--text);border-bottom:1px solid rgba(30,39,51,.7);}
+td:first-child,td:nth-child(2){text-align:left;}
+.sym{font-size:12px;font-weight:700;color:var(--text);letter-spacing:0;}
+.nmc{color:var(--muted2);font-size:11px;max-width:130px;overflow:hidden;text-overflow:ellipsis;font-weight:400;}
+.up{color:var(--green);}
+.dn{color:var(--red);}
+.nil{color:var(--muted);}
+.bdg{display:inline-block;padding:1px 6px;font-size:10px;font-weight:600;border-radius:4px;}
+.bbuy{background:var(--green-bg);color:var(--green);}
+.bhold{background:rgba(240,180,41,.08);color:var(--gold);}
+.bsell{background:var(--red-bg);color:var(--red);}
+
+/* ── DETAIL PANEL ── */
+.detail{width:0;min-width:0;border-left:1px solid var(--border);background:var(--s1);overflow:hidden;transition:width .2s,min-width .2s;flex-shrink:0;}
+.detail.open{width:360px;min-width:360px;overflow-y:auto;}
+.detail::-webkit-scrollbar{width:3px;}
+.detail::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.dhead{padding:14px 16px;border-bottom:1px solid var(--border);position:relative;background:var(--s2);}
+.dsym{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.5px;line-height:1;}
+.dprofile{padding:10px 14px 0;border-bottom:1px solid var(--border);margin-bottom:0;}
+.dprofile-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.3;}
+.dprofile-meta{font-size:10px;color:var(--muted2);margin-bottom:8px;line-height:1.6;}
+.dprofile-links{display:flex;flex-wrap:wrap;gap:5px;padding-bottom:10px;}
+.dpl{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:600;padding:3px 8px;border-radius:4px;border:1px solid var(--border);color:var(--text2);text-decoration:none;background:var(--s2);transition:all .15s;white-space:nowrap;}
+.dpl:hover{border-color:var(--accent);color:var(--accent);}
+.dpl-icon{font-size:10px;}
+.dname{font-size:11px;color:var(--muted2);margin-top:2px;font-weight:400;}
+.dclose{position:absolute;top:12px;right:12px;background:var(--border);border:none;color:var(--text2);font-size:14px;cursor:pointer;width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;}
+.dclose:hover{background:var(--red-bg);color:var(--red);}
+.dprice{font-size:26px;font-weight:800;padding:10px 16px 2px;letter-spacing:-.5px;}
+.dchg{font-size:11px;padding:0 16px 6px;font-weight:500;}
+.dsec{font-size:10px;color:var(--muted2);padding:0 16px 10px;border-bottom:1px solid var(--border);}
+.dsection{padding:10px 16px;border-bottom:1px solid var(--border);}
+.dstitle{font-size:10px;font-weight:700;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;}
+.drow{display:flex;justify-content:space-between;margin-bottom:5px;align-items:center;padding:2px 0;}
+.drow:hover{background:rgba(255,255,255,.03);border-radius:4px;}
+.dkey{font-size:11px;color:var(--muted2);font-weight:400;}
+.dkey tag{font-size:9px;color:var(--muted);background:var(--s2);padding:1px 4px;border-radius:3px;margin-left:4px;font-weight:500;}
+.dval{font-size:12px;font-weight:600;}
+.dfresh{font-size:10px;color:var(--muted2);padding:4px 16px 8px;border-bottom:1px solid var(--border);}
+.chart-section{padding:10px 12px;border-bottom:1px solid var(--border);}
+.chart-tabs{display:flex;gap:2px;margin-bottom:6px;flex-wrap:wrap;background:var(--s2);padding:3px;border-radius:6px;}
+.ctab{font-size:10px;font-weight:500;padding:3px 9px;color:var(--muted2);cursor:pointer;border-radius:4px;transition:all .12s;user-select:none;border:none;background:none;}
+.ctab:hover{color:var(--text);}
+.ctab.on{background:var(--s1);color:var(--text);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.3);}
+.ctab-cur{font-size:10px;font-weight:500;padding:3px 9px;color:var(--muted2);cursor:pointer;border-radius:4px;transition:all .12s;user-select:none;border:none;background:none;}
+.ctab-cur:hover{color:var(--text);}
+.ctab-cur.on{background:var(--s1);color:var(--text);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.3);}
+.itab{font-size:10px;font-weight:500;padding:2px 7px;border:1px solid var(--border);color:var(--muted2);cursor:pointer;border-radius:4px;transition:all .12s;user-select:none;}
+.itab:hover{border-color:var(--accent);color:var(--accent);}
+.itab.on{background:rgba(59,130,246,.1);color:var(--accent);border-color:var(--accent);}
+.chart-wrap{width:100%;height:260px;background:var(--bg);border:1px solid var(--border);overflow:hidden;position:relative;display:flex;}
+.chart-toolbar{width:28px;min-width:28px;background:var(--s2);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:4px 0;gap:2px;z-index:10;}
+.ctool{width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:3px;color:var(--muted2);font-size:13px;transition:all .15s;position:relative;}
+.ctool:hover{background:rgba(15,240,179,.08);color:var(--teal);}
+.ctool.on{background:rgba(15,240,179,.15);color:var(--teal);}
+.ctool-sep{width:18px;height:1px;background:var(--border);margin:3px 0;}
+.ctool-tip{position:absolute;left:30px;top:50%;transform:translateY(-50%);background:#1c2d40;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 7px;border-radius:3px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:100;border:1px solid var(--border2);}
+.ctool:hover .ctool-tip{opacity:1;}
+#tv-chart-container{flex:1;height:100%;min-width:0;}
+.chart-wrap.expanded{height:420px;}
+.expand-btn{position:absolute;top:4px;right:4px;z-index:20;background:rgba(13,17,23,.8);border:1px solid var(--border2);color:var(--muted2);width:20px;height:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:10px;border-radius:2px;}
+.expand-btn:hover{color:var(--teal);border-color:var(--teal);}
+.fib-panel{display:none;position:absolute;right:0;top:0;bottom:0;width:110px;background:rgba(10,15,24,.92);border-left:1px solid var(--border);z-index:15;padding:8px 6px;overflow-y:auto;}
+.fib-panel.show{display:block;}
+.fib-title{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--teal);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+.fib-row{display:flex;justify-content:space-between;margin-bottom:3px;}
+.fib-level{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--gold);}
+.fib-price{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text);}
+.fib-inputs{margin-bottom:8px;}
+.fib-inp{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:3px 5px;font-family:'JetBrains Mono',monospace;font-size:9px;margin-bottom:3px;outline:none;}
+.fib-inp:focus{border-color:var(--teal);}
+.fib-calc-btn{width:100%;background:var(--teal);color:#000;border:none;padding:4px;font-family:'JetBrains Mono',monospace;font-size:9px;cursor:pointer;font-weight:700;margin-bottom:6px;}
+
+/* ── INFO MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.modal-overlay.open{display:flex;}
+.modal{position:relative;width:900px;max-width:96vw;max-height:88vh;background:var(--s1);border:1px solid var(--border);box-shadow:0 25px 60px rgba(0,0,0,.6);display:flex;flex-direction:column;overflow:hidden;border-radius:10px;}
+
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.modal-title{font-size:17px;font-weight:700;color:var(--text);letter-spacing:-.3px;}
+.modal-title span{color:var(--text2);font-weight:400;}
+.modal-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;}
+.modal-close:hover{color:var(--red);}
+.modal-body{overflow-y:auto;padding:22px;display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.modal-body::-webkit-scrollbar{width:4px;}
+.modal-body::-webkit-scrollbar-thumb{background:var(--border2);}
+.icat{background:var(--s2);border:1px solid var(--border);padding:16px 18px;border-radius:8px;}
+.icat-title{font-size:12px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;padding-bottom:7px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;}
+.iitem{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid rgba(30,39,51,.6);}
+.iitem:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none;}
+.iitem-top{display:flex;align-items:baseline;gap:8px;margin-bottom:4px;}
+.iitem-name{font-size:16px;font-weight:700;color:var(--text);letter-spacing:-.3px;}
+.iitem-eng{font-size:10px;color:var(--muted2);letter-spacing:.3px;font-weight:500;}
+.iitem-desc{font-size:12px;color:var(--muted2);line-height:1.7;}
+.iitem-tip{display:inline-block;margin-top:6px;font-size:10px;padding:3px 10px;border-radius:4px;font-weight:600;}
+.tip-good{background:var(--green-bg);color:var(--green);border:1px solid rgba(0,192,118,.2);}
+.tip-warn{background:rgba(240,192,64,.08);color:var(--gold);border:1px solid rgba(240,192,64,.2);}
+.tip-bad{background:rgba(255,77,109,.08);color:var(--red);border:1px solid rgba(255,77,109,.2);}
+.preset-info-wrap{grid-column:1/-1;}
+.preset-info-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;}
+.preset-info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.goat-bank-section{margin-bottom:28px;}
+.goat-bank-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:8px;}
+.goat-card{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;transition:border-color .2s;}
+.goat-card:hover{border-color:var(--accent);}
+.goat-card-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.goat-card-emoji{font-size:20px;}
+.goat-card-title{font-size:12px;font-weight:700;color:var(--text);letter-spacing:-.2px;}
+.goat-card-subtitle{font-size:9px;color:var(--accent);font-weight:600;margin-top:1px;}
+.goat-card-perf{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;}
+.goat-perf-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;background:rgba(0,192,118,.12);color:#00c076;}
+.goat-perf-badge.neutral{background:rgba(59,130,246,.12);color:var(--accent);}
+.goat-card-body{font-size:10px;color:var(--text2);line-height:1.6;}
+.goat-card-criteria{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;}
+.goat-criterion{font-size:9px;background:var(--s1);border:1px solid var(--border);border-radius:3px;padding:2px 6px;color:var(--muted2);}
+.goat-divider{border:none;border-top:1px solid var(--border);margin:20px 0;}
+.goat-fund-tag{display:inline-block;font-size:8px;font-weight:700;padding:1px 5px;border-radius:2px;background:rgba(240,180,41,.15);color:#f0b429;margin-left:6px;vertical-align:middle;}
+.picard{background:var(--s2);border:1px solid var(--border);padding:16px 18px;border-radius:8px;transition:border-color .15s;}
+.picard:hover{border-color:var(--accent);}
+.picard-name{font-size:14px;font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-.2px;}
+.picard-desc{font-size:12px;color:var(--text2);line-height:1.65;}
+.picard-rules{margin-top:12px;display:flex;flex-wrap:wrap;gap:5px;}
+.picard-rule{font-size:11px;font-weight:600;padding:3px 9px;background:rgba(59,130,246,.08);color:var(--accent);border:1px solid rgba(59,130,246,.2);border-radius:5px;}
+
+/* ── SUPPORT MODAL ── */
+.smodal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
+.smodal-overlay.open{display:flex;}
+.smodal{position:relative;width:540px;max-width:96vw;background:var(--s1);border:1px solid var(--border2);box-shadow:0 0 80px rgba(240,192,64,.1);overflow:hidden;}
+.smodal::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),#f08020,var(--teal));}
+.smodal-head{padding:26px 26px 0;display:flex;justify-content:space-between;}
+.smodal-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;}
+.smodal-close:hover{color:var(--red);}
+.smodal-hero{padding:16px 26px 20px;border-bottom:1px solid var(--border);}
+.smodal-emoji{font-size:36px;margin-bottom:10px;display:block;}
+.smodal-title{font-family:'Inter',sans-serif;font-weight:800;font-size:26px;letter-spacing:4px;color:var(--gold);line-height:1.1;margin-bottom:9px;}
+.smodal-desc{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted2);line-height:1.75;}
+.smodal-desc strong{color:var(--text);}
+.smodal-options{padding:20px 26px;}
+.smodal-options-title{font-family:'Inter',sans-serif;font-weight:800;font-size:10px;letter-spacing:3px;color:var(--muted);margin-bottom:14px;text-transform:uppercase;}
+.soption{background:var(--s2);border:1px solid var(--border);padding:14px 16px;margin-bottom:10px;}
+.soption:last-child{margin-bottom:0;}
+.soption-head{display:flex;align-items:center;gap:9px;margin-bottom:9px;}
+.soption-icon{font-size:18px;}
+.soption-label{font-family:'Inter',sans-serif;font-weight:800;font-size:13px;letter-spacing:2px;color:var(--text);}
+.soption-sublabel{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--muted);margin-top:1px;}
+.bmc-link{display:flex;align-items:center;gap:9px;background:linear-gradient(135deg,#f0c040,#e08010);color:#000;padding:10px 15px;text-decoration:none;font-family:'Inter',sans-serif;font-weight:800;font-size:13px;letter-spacing:2px;transition:all .2s;width:100%;}
+.bmc-link:hover{box-shadow:0 0 20px rgba(240,192,64,.4);transform:translateY(-1px);}
+.wallet-row{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
+.wallet-row:last-child{margin-bottom:0;}
+.wallet-coin{font-family:'Inter',sans-serif;font-weight:800;font-size:11px;letter-spacing:1px;color:var(--gold);width:34px;flex-shrink:0;}
+.wallet-addr{flex:1;background:var(--bg);border:1px solid var(--border);padding:6px 9px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:text;user-select:all;}
+.copy-btn{background:var(--border2);border:none;color:var(--muted2);padding:6px 9px;font-family:'JetBrains Mono',monospace;font-size:8px;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0;}
+.copy-btn:hover,.copy-btn.copied{background:var(--teal);color:#000;}
+.smodal-thanks{padding:0 26px 20px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);text-align:center;line-height:1.7;}
+.smodal-thanks strong{color:var(--teal);}
+
+/* ── INSIDER & SHORT INTEREST ── */
+.dextra-tabs{display:flex;gap:4px;margin:10px 0 6px;border-bottom:1px solid var(--border);padding-bottom:0;}
+.dxtab{font-size:10px;font-weight:600;color:var(--muted2);padding:5px 10px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;letter-spacing:.3px;}
+.dxtab.on{color:var(--accent);border-bottom-color:var(--accent);}
+.dxtab:hover:not(.on){color:var(--text2);}
+.dxpanel{display:none;padding:4px 0;}
+.dxpanel.on{display:block;}
+.insider-table{width:100%;border-collapse:collapse;font-size:10px;}
+.insider-table th{color:var(--muted2);font-weight:600;padding:4px 6px;text-align:left;border-bottom:1px solid var(--border);font-size:9px;letter-spacing:.3px;}
+.insider-table td{padding:5px 6px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text2);vertical-align:top;}
+.insider-table tr:hover td{background:rgba(255,255,255,.03);}
+.insider-buy{color:#00c076;font-weight:700;}
+.insider-sell{color:#f6465d;font-weight:700;}
+.si-card{background:var(--s2);border-radius:6px;padding:10px 12px;margin-bottom:6px;}
+.si-card-title{font-size:9px;color:var(--muted2);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;}
+.si-card-val{font-size:18px;font-weight:800;color:var(--text);font-family:'JetBrains Mono',monospace;}
+.si-card-sub{font-size:9px;color:var(--muted2);margin-top:2px;}
+.si-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;}
+.si-bar-wrap{background:var(--s2);border-radius:6px;padding:10px 12px;}
+.si-bar-label{display:flex;justify-content:space-between;font-size:9px;color:var(--muted2);margin-bottom:5px;}
+.si-bar-track{height:8px;background:var(--border);border-radius:4px;overflow:hidden;}
+.si-bar-fill{height:100%;border-radius:4px;transition:width .6s ease;background:linear-gradient(90deg,#3b82f6,#f6465d);}
+
+/* ── HAMBURGER ── */
+.hamburger-btn{display:none;flex-direction:column;gap:5px;background:none;border:1px solid var(--border);border-radius:6px;padding:7px 8px;cursor:pointer;flex-shrink:0;}
+.hamburger-btn span{display:block;width:18px;height:2px;background:var(--text2);border-radius:2px;transition:all .2s;}
+.hamburger-btn.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger-btn.open span:nth-child(2){opacity:0;}
+.hamburger-btn.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+/* ── MOBILE DRAWER ── */
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;backdrop-filter:blur(2px);}
+.drawer-overlay.open{display:block;}
+.drawer-panel{position:fixed;top:0;left:0;bottom:0;width:280px;background:var(--s1);border-right:1px solid var(--border);z-index:201;transform:translateX(-100%);transition:transform .25s ease;overflow-y:auto;overflow-x:hidden;}
+.drawer-panel.open{transform:translateX(0);}
+.drawer-header{display:flex;align-items:center;justify-content:space-between;padding:14px 14px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.drawer-title{font-size:13px;font-weight:700;color:var(--text);}
+.drawer-close{background:none;border:none;color:var(--muted2);font-size:20px;cursor:pointer;padding:0;line-height:1;}
+
+/* ── SCAN ETA ── */
+#scan-eta{margin-top:12px;}
+
+.dxloading{text-align:center;padding:20px;color:var(--muted2);font-size:11px;}
+.dxerror{text-align:center;padding:16px;color:#f6465d;font-size:10px;}
+.dxonly-us{text-align:center;padding:16px;color:var(--muted2);font-size:10px;line-height:1.6;}
+
+/* ══════════════════════════════════
+   MOBİLE RESPONSIVE
+══════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* ── TOPBAR ── */
+  .topbar { padding: 0 8px; gap: 5px; }
+  .tlive { display: none; }
+  .tlogo span:not(.tlogo-mark) { display: none; }
+  .tsearch { max-width: 150px; }
+  .tright { gap: 3px; }
+  .tright #scantime { display: none; }
+  .infobtn { font-size: 11px; padding: 5px 8px; }
+  .supportbtn { display: none; }
+  .topbarbtn { padding: 5px 8px; font-size: 11px; }
+
+  /* ── LAYOUT — mobilde sidebar gizli, full height koru ── */
+  .layout { flex-direction: row; height: 100%; overflow: hidden; }
+
+  /* ── SIDEBAR — mobilde gizle, drawer ile aç ── */
+  .sidebar { display: none !important; }
+  .hamburger-btn { display: flex !important; }
+
+  /* ── EXCHANGE GRID — 3 kolon ── */
+  .exchange-grid { grid-template-columns: repeat(3, 1fr); gap: 3px; }
+  .exbtn { padding: 6px 4px; }
+  .exbtn-sub { display: none; }
+
+  /* ── CHIPS — yatay scroll ── */
+  .chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
+  .chips::-webkit-scrollbar { height: 2px; }
+  .chips::-webkit-scrollbar-thumb { background: var(--border2); }
+
+  /* ── MAIN / CONTENT ── */
+  .main { flex: 1; min-width: 0; overflow: hidden; display: flex; flex-direction: column; }
+  .content { min-height: 0; overflow: hidden; flex: 1; display: flex; flex-direction: column; }
+
+  /* ── TOOLBAR ── */
+  #toolbar { flex-wrap: wrap; gap: 4px; padding: 6px 8px; }
+  .ssel { font-size: 10px; padding: 3px 6px; }
+  .tbl-scroll-btn { display: none; }
+
+  /* ── TABLO ── */
+  .twrap { overflow: auto; -webkit-overflow-scrolling: touch; flex: 1; min-height: 0; }
+  table { min-width: 700px; }
+  th, td { padding: 6px 8px; font-size: 10px; white-space: nowrap; }
+
+  /* ── DETAY PANELİ — tam ekran ── */
+  .detail {
+    position: fixed !important;
+    top: 48px !important;
+    left: 0 !important; right: 0 !important; bottom: 0 !important;
+    width: 100% !important;
+    min-width: unset !important;
+    max-width: 100% !important;
+    z-index: 50;
+    border-left: none !important;
+    overflow-y: auto;
+    display: none;
+  }
+  .detail.open { width: 100% !important; display: block !important; }
+  .dhead { padding: 12px 14px; position: sticky; top: 0; background: var(--s1); z-index: 2; }
+  .dclose { font-size: 18px; padding: 4px 8px; }
+  #chart-wrap { height: 220px !important; }
+
+  /* ── FİLTRELER ── */
+  .frow { flex-wrap: wrap; gap: 4px; }
+  .finps { flex-direction: column; gap: 4px; }
+  .filter-group-title { font-size: 10px; }
+}
+
+@media (max-width: 480px) {
+  .exchange-grid { grid-template-columns: repeat(2, 1fr); }
+  /* Sütunları gizleme — yatay scroll yap */
+  table { min-width: 900px; }
+}
+
+/* ── TICKER TAPE ── */
+.ticker-wrap{width:100%;overflow:hidden;background:var(--s1);border-bottom:1px solid var(--border);height:32px;display:flex;align-items:center;flex-shrink:0;position:relative;}
+.ticker-wrap::before,.ticker-wrap::after{content:'';position:absolute;top:0;bottom:0;width:60px;z-index:2;pointer-events:none;}
+.ticker-wrap::before{left:0;background:linear-gradient(90deg,var(--s1),transparent);}
+.ticker-wrap::after{right:0;background:linear-gradient(-90deg,var(--s1),transparent);}
+.ticker-track{display:flex;gap:0;animation:ticker-scroll 80s linear infinite;white-space:nowrap;}
+.ticker-track:hover{animation-play-state:paused;}
+.ticker-item{display:inline-flex;align-items:center;gap:5px;padding:0 20px;font-size:11px;font-family:'JetBrains Mono',monospace;border-right:1px solid var(--border);}
+.ticker-sym{color:var(--text2);font-weight:500;}
+.ticker-px{color:var(--text);font-weight:600;}
+.ticker-chg.up{color:var(--green);}
+.ticker-chg.dn{color:var(--red);}
+.ticker-empty{font-size:11px;color:var(--muted2);padding:0 16px;font-family:'JetBrains Mono',monospace;}
+@keyframes ticker-scroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+
+/* ── STATS BAR ── */
+.stats-bar{display:none;align-items:center;gap:0;padding:0 16px;height:36px;background:var(--s2);border-bottom:1px solid var(--border);flex-shrink:0;font-size:11px;font-family:'JetBrains Mono',monospace;}
+.stats-bar.visible{display:flex;}
+.sb-item{display:flex;align-items:center;gap:6px;padding:0 14px;border-right:1px solid var(--border);}
+.sb-item:first-child{padding-left:0;}
+.sb-item:last-child{border-right:none;}
+.sb-label{color:var(--muted2);font-size:10px;letter-spacing:.4px;text-transform:uppercase;}
+.sb-val{font-weight:600;color:var(--text);}
+.sb-val.up{color:var(--green);}
+.sb-val.dn{color:var(--red);}
+
+
+/* ── HOMEPAGE ── */
+#homepage{display:flex;flex-direction:column;overflow-y:auto;flex:1;background:var(--bg);}
+#homepage::-webkit-scrollbar{width:4px;}
+#homepage::-webkit-scrollbar-thumb{background:#222;border-radius:2px;}
+.hp-hero{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 40px 40px;text-align:center;border-bottom:1px solid var(--border);background:radial-gradient(ellipse at 50% 0%,rgba(59,130,246,.06) 0%,transparent 65%);}
+.hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
+.hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
+.hp-badge{font-size:10px;font-weight:600;color:var(--accent);background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);padding:4px 12px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:20px;display:inline-flex;align-items:center;gap:6px;}
+.hp-badge::before{content:'';width:6px;height:6px;background:var(--accent);border-radius:50%;animation:pulse 2s ease-in-out infinite;}
+.hp-title{font-size:52px;font-weight:800;color:var(--text);letter-spacing:-2px;line-height:1.1;margin-bottom:16px;}
+.hp-title span{color:var(--accent);}
+.hp-sub{font-size:16px;color:var(--text2);max-width:480px;line-height:1.7;margin-bottom:32px;}
+.hp-cta{display:flex;gap:12px;align-items:center;}
+.hp-cta-primary{background:var(--text);color:#000;border:none;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;font-family:'Geist',sans-serif;}
+.hp-cta-primary:hover{background:#d4d4d4;transform:translateY(-1px);}
+.hp-cta-secondary{background:transparent;color:var(--text2);border:1px solid var(--border);padding:12px 22px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;font-family:'Geist',sans-serif;}
+.hp-cta-secondary:hover{border-color:#333;color:var(--text);}
+
+.hp-stats{display:flex;gap:0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.hp-stat{flex:1;padding:20px 24px;border-right:1px solid var(--border);text-align:center;}
+.hp-stat:last-child{border-right:none;}
+.hp-stat-val{font-size:28px;font-weight:800;color:var(--text);font-family:'JetBrains Mono',monospace;letter-spacing:-1px;}
+.hp-stat-val span{color:var(--accent);font-size:16px;}
+.hp-stat-label{font-size:11px;color:var(--muted2);margin-top:4px;}
+
+.hp-body{display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid var(--border);}
+.hp-section{padding:32px 40px;border-right:1px solid var(--border);}
+.hp-section:last-child{border-right:none;}
+.hp-section-title{font-size:11px;font-weight:600;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:20px;display:flex;align-items:center;gap:8px;}
+.hp-section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.hp-exchange-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.hp-excard{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:12px 14px;cursor:pointer;transition:all .15s;display:flex;flex-direction:row;align-items:center;gap:10px;}
+.hp-excard:hover{border-color:var(--accent);background:rgba(59,130,246,.05);transform:translateY(-1px);}
+.hp-excard-flag{flex-shrink:0;line-height:0;}
+.hp-excard-info{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.hp-excard-name{font-size:12px;font-weight:700;color:var(--text);}
+.hp-excard-desc{font-size:10px;color:var(--muted2);}
+.hp-excard-count{font-size:10px;color:var(--accent);font-family:'JetBrains Mono',monospace;margin-top:2px;}
+
+.hp-strategy-list{display:flex;flex-direction:column;gap:8px;}
+.hp-strategy{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:12px 14px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:12px;}
+.hp-strategy:hover{border-color:#333;background:#0a0a0a;}
+.hp-strategy-emoji{font-size:20px;width:28px;text-align:center;}
+.hp-strategy-info{flex:1;}
+.hp-strategy-name{font-size:12px;font-weight:700;color:var(--text);}
+.hp-strategy-desc{font-size:10px;color:var(--muted2);margin-top:2px;}
+.hp-strategy-arrow{color:var(--muted);font-size:14px;}
+
+.hp-nav-btn{background:transparent;border:none;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;padding:6px 12px;border-radius:6px;transition:all .15s;font-family:'Geist',sans-serif;}
+.hp-nav-btn:hover{background:var(--s2);color:var(--text);}
+.hp-nav-btn.active{color:var(--text);}
+
+/* ── ADV EXCHANGE BAR ── */
+.adv-exchange-bar{padding:10px 10px 6px;border-bottom:1px solid var(--border);background:var(--s1);}
+.adv-ex-label{font-size:9px;font-weight:600;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;}
+.adv-ex-pills{display:flex;flex-wrap:wrap;gap:4px;}
+.adv-ex-pill{font-size:10px;font-weight:600;padding:4px 8px;border:1px solid var(--border);border-radius:4px;color:var(--text2);cursor:pointer;transition:all .12s;background:var(--s2);white-space:nowrap;}
+.adv-ex-pill:hover{border-color:#444;color:var(--text);}
+.adv-ex-pill.on{border-color:var(--accent);color:var(--accent);background:rgba(59,130,246,.08);}
+
+/* ── HP DISCLAIMER ── */
+.hp-disclaimer{display:flex;align-items:flex-start;gap:12px;margin-top:28px;padding:16px 20px;background:rgba(240,180,41,.04);border:1px solid rgba(240,180,41,.15);border-radius:8px;max-width:680px;margin-left:auto;margin-right:auto;}
+.hp-disclaimer-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.hp-disclaimer p{font-size:11px;color:var(--muted2);line-height:1.75;margin:0;text-align:left;}
+.hp-disclaimer strong{color:var(--text2);font-weight:600;}
+
+/* ── HP HOW TO ── */
+.hp-howto{padding:40px 40px 36px;border-bottom:1px solid var(--border);text-align:center;}
+.hp-howto-title{font-size:11px;font-weight:600;color:var(--muted2);letter-spacing:.6px;text-transform:uppercase;margin-bottom:28px;}
+.hp-howto-steps{display:flex;align-items:flex-start;justify-content:center;gap:0;}
+.hp-howto-step{display:flex;flex-direction:column;align-items:center;gap:10px;width:180px;padding:24px 18px;background:var(--s1);border:1px solid var(--border);border-radius:12px;position:relative;transition:border-color .2s;}
+.hp-howto-step:hover{border-color:#333;}
+.hp-howto-num{position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:24px;height:24px;background:var(--accent);border-radius:50%;font-size:11px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;}
+.hp-howto-icon{font-size:32px;margin-top:6px;}
+.hp-howto-label{font-size:14px;font-weight:700;color:var(--text);}
+.hp-howto-desc{font-size:11px;color:var(--muted2);line-height:1.65;text-align:center;}
+.hp-howto-arrow{font-size:22px;color:var(--border);margin:0 10px;align-self:center;padding-bottom:24px;}
+
+/* ── HOMEPAGE FOOTER ── */
+.hp-footer{background:var(--s1);border-top:1px solid var(--border);padding:32px 40px 0;flex-shrink:0;}
+.hp-footer-top{display:flex;align-items:flex-start;gap:48px;margin-bottom:20px;}
+.hp-footer-bottom{border-top:1px solid var(--border);padding:14px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+.hp-footer-bottom span:first-child{font-size:11px;color:var(--muted2);}
+
+/* ── SIDEBAR TABS ── */
+.sb-tabs{display:flex;gap:4px;padding:10px 10px 0;flex-shrink:0;}
+.sb-tab{flex:1;padding:7px 6px;font-size:11px;font-weight:600;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--muted2);cursor:pointer;transition:all .15s;font-family:'Geist',sans-serif;letter-spacing:.2px;}
+.sb-tab:hover{color:var(--text);border-color:#333;}
+.sb-tab.active{background:var(--s2);color:var(--text);border-color:#333;}
+.sb-advanced-hint{font-size:10px;color:var(--muted2);background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.15);border-radius:5px;padding:7px 10px;margin:10px 10px 4px;line-height:1.5;}
+
+/* ── ONBOARDING ── */
+.onboarding{margin-top:32px;text-align:center;}
+.onb-title{font-size:11px;font-weight:600;color:var(--muted2);letter-spacing:.6px;text-transform:uppercase;margin-bottom:20px;}
+.onb-steps{display:flex;align-items:flex-start;gap:0;justify-content:center;}
+.onb-step{display:flex;flex-direction:column;align-items:center;gap:8px;width:160px;padding:20px 16px;background:var(--s1);border:1px solid var(--border);border-radius:10px;position:relative;transition:border-color .2s;}
+.onb-step:hover{border-color:#333;}
+.onb-num{position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:20px;height:20px;background:var(--accent);border-radius:50%;font-size:10px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;}
+.onb-icon{font-size:28px;margin-top:4px;}
+.onb-label{font-size:13px;font-weight:700;color:var(--text);}
+.onb-desc{font-size:11px;color:var(--muted2);line-height:1.6;text-align:center;}
+.onb-arrow{font-size:20px;color:var(--border);margin:0 8px;align-self:center;padding-bottom:20px;}
+
+
+.ad-slot{display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px dashed var(--border);border-radius:6px;background:var(--s2);color:var(--muted);font-size:10px;letter-spacing:.4px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;gap:4px;position:relative;overflow:hidden;}
+.ad-slot-label{font-size:9px;color:var(--muted);letter-spacing:.5px;opacity:.5;}
+.ad-slot-sidebar{width:100%;height:120px;margin-top:12px;}
+.ad-slot-ticker{width:100%;height:90px;border-left:none;border-right:none;border-radius:0;background:var(--s1);}
+.ad-slot-detail{width:100%;height:100px;border-radius:0;border-left:none;border-right:none;border-top:none;}
+
+.site-footer{display:none;}
+
+.footer-top{display:flex;align-items:flex-start;gap:48px;margin-bottom:20px;}
+.footer-brand{flex:0 0 200px;}
+.footer-logo{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:6px;color:var(--text);}
+.footer-tagline{font-size:11px;color:var(--text2);margin:0 0 3px 0;font-style:italic;}
+.footer-desc{font-size:11px;color:var(--muted2);line-height:1.5;margin:0;}
+.footer-links-group{display:flex;flex:1;gap:32px;}
+.footer-col{display:flex;flex-direction:column;gap:7px;flex:1;}
+.footer-col-title{font-size:10px;font-weight:600;color:var(--text);letter-spacing:.4px;text-transform:uppercase;margin-bottom:2px;}
+.footer-link{font-size:12px;color:var(--muted2);cursor:pointer;text-decoration:none;transition:color .15s;background:none;border:none;padding:0;text-align:left;}
+.footer-link:hover{color:var(--text);}
+.footer-bottom{border-top:1px solid var(--border);padding:10px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+.footer-bottom-left{font-size:11px;color:var(--muted2);}
+.footer-disclaimer-short{font-size:10px;color:var(--muted);font-style:italic;}
+@media(max-width:768px){.footer-top{flex-direction:column;gap:20px;}.footer-brand{flex:none;}.footer-links-group{flex-wrap:wrap;}.footer-bottom{flex-direction:column;text-align:center;}}
+
+
+
+
+
+
+/* ── ANALİZ SAYFASI ── */
+#analiz-page { display:none; flex:1; flex-direction:column; overflow:hidden; }
+#analiz-page.on { display:flex; }
+
+.analiz-hero {
+  background: linear-gradient(135deg, rgba(59,130,246,.06) 0%, transparent 60%);
   border-bottom: 1px solid var(--border);
-  background: linear-gradient(180deg, rgba(59,130,246,.04) 0%, transparent 100%);
+  padding: 48px 40px 40px;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
 }
-.hero-top { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 20px; }
-.company-logo {
-  width: 52px; height: 52px; border-radius: 10px;
-  background: var(--s2); border: 1px solid var(--border2);
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--accent);
-  flex-shrink: 0;
+.analiz-hero-badge {
+  font-size: 9px; font-weight: 700; letter-spacing: 1.5px; padding: 4px 12px;
+  background: var(--accent2); color: var(--accent); border: 1px solid rgba(59,130,246,.3);
+  border-radius: 20px; margin-bottom: 16px;
 }
-.company-meta { flex: 1; min-width: 0; }
-.company-name { font-family: var(--head); font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-.company-sub { font-size: 12px; color: var(--text2); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.tag { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; background: var(--s3); border: 1px solid var(--border2); color: var(--text2); }
-.tag.blue { background: var(--accent2); border-color: rgba(59,130,246,.3); color: var(--accent); }
-.price-block { text-align: right; }
-.price-main { font-family: var(--mono); font-size: 28px; font-weight: 700; color: var(--text); line-height: 1; margin-bottom: 6px; }
-.price-change { font-family: var(--mono); font-size: 13px; font-weight: 600; }
-.price-change.up { color: var(--green); }
-.price-change.dn { color: var(--red); }
-
-/* Score bar */
-.score-bar {
-  display: flex; gap: 0; height: 36px;
-  border-top: 1px solid var(--border);
+.analiz-hero-title {
+  font-family: 'JetBrains Mono', monospace; font-size: 28px; font-weight: 700;
+  color: var(--text); margin-bottom: 8px; letter-spacing: -0.5px;
 }
-.score-item {
-  flex: 1; display: flex; align-items: center; justify-content: center;
-  gap: 6px; border-right: 1px solid var(--border); font-size: 11px; color: var(--text2);
-  transition: background .15s; cursor: default;
+.analiz-hero-title span { color: var(--accent); }
+.analiz-hero-sub {
+  font-size: 13px; color: var(--text2); max-width: 480px; line-height: 1.6; margin-bottom: 28px;
 }
-.score-item:last-child { border-right: none; }
-.score-item:hover { background: var(--s2); }
-.score-val { font-family: var(--mono); font-weight: 700; font-size: 12px; }
-.score-val.good { color: var(--green); }
-.score-val.mid  { color: var(--gold); }
-.score-val.bad  { color: var(--red); }
-
-/* ── TABS ── */
-.tabs {
-  display: flex; gap: 0; border-bottom: 1px solid var(--border);
-  padding: 0 28px; background: var(--s1); position: sticky; top: 48px; z-index: 10;
+.analiz-search-wrap {
+  width: 100%; max-width: 560px;
+  background: var(--s1); border: 1px solid var(--border2);
+  border-radius: 10px; display: flex; align-items: center; gap: 0;
+  overflow: hidden; transition: border-color .15s;
+  box-shadow: 0 4px 24px rgba(0,0,0,.4);
 }
-.tab {
-  padding: 12px 16px; font-size: 12px; font-weight: 600; color: var(--text2);
-  cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px;
-  transition: all .15s; white-space: nowrap; letter-spacing: .2px;
+.analiz-search-wrap:focus-within { border-color: var(--accent); }
+.analiz-search-ex {
+  padding: 0 14px; height: 48px; background: var(--s2); border-right: 1px solid var(--border);
+  font-size: 11px; font-weight: 700; color: var(--text2); display: flex; align-items: center; gap: 6px;
+  cursor: pointer; white-space: nowrap; min-width: 90px; user-select: none;
 }
-.tab:hover { color: var(--text); }
-.tab.on { color: var(--accent); border-bottom-color: var(--accent); }
-
-/* ── SECTION ── */
-.section { padding: 24px 28px; border-bottom: 1px solid var(--border); }
-.section:last-child { border-bottom: none; }
-.sec-title {
-  font-family: var(--head); font-size: 11px; font-weight: 700;
-  color: var(--muted); letter-spacing: 1.2px; text-transform: uppercase;
-  margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+.analiz-search-ex:hover { color: var(--text); }
+.analiz-search-input {
+  flex: 1; height: 48px; background: transparent; border: none; outline: none;
+  padding: 0 16px; font-size: 14px; color: var(--text); font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase; letter-spacing: 1px;
 }
-.sec-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
-/* ── METRIC GRID ── */
-.metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-.metric-cell {
-  background: var(--s1); padding: 14px 16px;
-  transition: background .15s;
+.analiz-search-input::placeholder { text-transform: none; font-size: 12px; letter-spacing: 0; color: var(--muted); font-family: 'DM Sans', sans-serif; }
+.analiz-search-btn {
+  height: 48px; padding: 0 20px; background: var(--accent); color: #fff;
+  border: none; cursor: pointer; font-size: 12px; font-weight: 700;
+  font-family: 'DM Sans', sans-serif; transition: background .15s; white-space: nowrap;
 }
-.metric-cell:hover { background: var(--s2); }
-.metric-label { font-size: 10px; color: var(--text2); margin-bottom: 6px; letter-spacing: .3px; }
-.metric-value { font-family: var(--mono); font-size: 15px; font-weight: 700; color: var(--text); }
-.metric-value.good { color: var(--green); }
-.metric-value.mid  { color: var(--gold); }
-.metric-value.bad  { color: var(--red); }
-.metric-sub { font-size: 10px; color: var(--muted); margin-top: 3px; font-family: var(--mono); }
+.analiz-search-btn:hover { background: #2563eb; }
+.analiz-search-hint { font-size: 10px; color: var(--muted); margin-top: 10px; }
+.analiz-search-hint code { background: var(--s2); padding: 1px 6px; border-radius: 3px; color: var(--text2); font-family: 'JetBrains Mono', monospace; }
 
-/* ── GAUGE ── */
-.gauge-row { display: flex; gap: 12px; }
-.gauge-wrap { flex: 1; }
-.gauge-label { font-size: 10px; color: var(--text2); margin-bottom: 6px; display: flex; justify-content: space-between; }
-.gauge-bar { height: 4px; background: var(--s3); border-radius: 2px; overflow: hidden; }
-.gauge-fill { height: 100%; border-radius: 2px; transition: width .6s ease; }
-
-/* ── FINANCIAL CHART AREA ── */
-.chart-placeholder {
-  height: 200px; background: var(--s2); border-radius: 8px;
-  border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
-  flex-direction: column; gap: 8px; color: var(--muted); font-size: 12px;
-  position: relative; overflow: hidden;
+.analiz-ex-grid {
+  display: flex; gap: 8px; margin-top: 28px; flex-wrap: wrap; justify-content: center;
 }
-.chart-placeholder::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: repeating-linear-gradient(0deg, transparent, transparent 30px, rgba(255,255,255,.015) 30px, rgba(255,255,255,.015) 31px),
-              repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(255,255,255,.015) 60px, rgba(255,255,255,.015) 61px);
+.analiz-ex-chip {
+  padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 600;
+  background: var(--s2); border: 1px solid var(--border); color: var(--text2);
+  cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 6px;
 }
-.chart-icon { font-size: 24px; position: relative; z-index: 1; }
-.chart-placeholder span { position: relative; z-index: 1; }
+.analiz-ex-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent2); }
+.analiz-ex-chip.on { border-color: var(--accent); color: var(--accent); background: var(--accent2); }
+.analiz-ex-chip img { border-radius: 2px; }
 
-/* Sparkline SVG */
-.sparkline { width: 100%; height: 60px; }
-
-/* ── FINANCIAL TABLE ── */
-.fin-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-.fin-table th {
-  text-align: right; padding: 8px 12px; font-size: 10px; font-weight: 600;
-  color: var(--text2); border-bottom: 1px solid var(--border); letter-spacing: .4px;
-  font-family: var(--mono); background: var(--s2);
+.analiz-breadcrumb { display:none !important; }
+.analiz-breadcrumb-UNUSED {
+  padding: 10px 20px; border-bottom: 1px solid var(--border); background: var(--s1);
+  display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
 }
-.fin-table th:first-child { text-align: left; }
-.fin-table td {
-  text-align: right; padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.04);
-  font-family: var(--mono); color: var(--text2);
+.analiz-breadcrumb span { color: var(--text2); }
+.analiz-breadcrumb .sep { color: var(--border2); }
+.analiz-breadcrumb .crumb { color: var(--accent); }
+
+/* Detay paneli — Hemen Al + Detaylı Analiz butonları */
+.dpl-action-row {
+  display: flex; gap: 8px; padding: 10px 0 12px;
 }
-.fin-table td:first-child { text-align: left; color: var(--text); font-family: var(--body); font-size: 12px; }
-.fin-table tr:hover td { background: rgba(255,255,255,.02); }
-.fin-table .positive { color: var(--green); }
-.fin-table .negative { color: var(--red); }
-.fin-table .section-row td { font-weight: 700; color: var(--text); background: var(--s2); font-size: 11px; letter-spacing: .3px; }
-
-/* ── PIOTROSKI ── */
-.fscore-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.fscore-group { background: var(--s2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
-.fscore-group-title { font-size: 10px; font-weight: 700; color: var(--text2); letter-spacing: .5px; text-transform: uppercase; margin-bottom: 10px; }
-.fscore-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; }
-.fscore-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.fscore-dot.pass { background: var(--green); box-shadow: 0 0 6px rgba(0,192,118,.4); }
-.fscore-dot.fail { background: var(--muted); }
-.fscore-text { font-size: 11px; color: var(--text2); flex: 1; }
-.fscore-badge {
-  display: flex; align-items: center; justify-content: center; gap: 12px;
-  padding: 16px; background: var(--s2); border-radius: 8px; border: 1px solid var(--border);
-  margin-bottom: 16px;
+.dpl-buy {
+  flex: 1; height: 36px; background: var(--green); color: #fff;
+  border: none; border-radius: 7px; font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all .15s; display: flex; align-items: center;
+  justify-content: center; gap: 6px; font-family: 'DM Sans', sans-serif;
 }
-.fscore-num { font-family: var(--mono); font-size: 48px; font-weight: 700; color: var(--green); line-height: 1; }
-.fscore-label { font-size: 11px; color: var(--text2); }
-.fscore-label strong { display: block; font-size: 14px; color: var(--green); margin-bottom: 4px; }
-
-/* ── GURU CARDS ── */
-.guru-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.guru-card {
-  background: var(--s2); border: 1px solid var(--border); border-radius: 8px;
-  padding: 14px; transition: all .15s;
+.dpl-buy:hover { background: #00a864; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,192,118,.3); }
+.dpl-analyze {
+  flex: 1; height: 36px; background: var(--accent2); color: var(--accent);
+  border: 1px solid rgba(59,130,246,.3); border-radius: 7px; font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all .15s; display: flex; align-items: center;
+  justify-content: center; gap: 6px; font-family: 'DM Sans', sans-serif;
 }
-.guru-card:hover { border-color: var(--border2); }
-.guru-card.pass { border-color: rgba(0,192,118,.25); background: rgba(0,192,118,.04); }
-.guru-card.fail { border-color: rgba(246,70,93,.15); }
-.guru-card.partial { border-color: rgba(240,180,41,.2); background: rgba(240,180,41,.04); }
-.guru-top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-.guru-emoji { font-size: 20px; }
-.guru-name { font-size: 12px; font-weight: 700; color: var(--text); }
-.guru-score { margin-left: auto; font-family: var(--mono); font-size: 11px; font-weight: 700; }
-.guru-score.pass { color: var(--green); }
-.guru-score.partial { color: var(--gold); }
-.guru-score.fail { color: var(--red); }
-.guru-criteria { display: flex; flex-direction: column; gap: 3px; }
-.guru-crit { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--text2); }
-.guru-crit .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.dpl-analyze:hover { background: rgba(59,130,246,.2); border-color: var(--accent); transform: translateY(-1px); }
 
-/* ── AI ANALYSIS ── */
-.ai-box {
-  background: linear-gradient(135deg, rgba(59,130,246,.06) 0%, rgba(59,130,246,.02) 100%);
-  border: 1px solid rgba(59,130,246,.2); border-radius: 10px; padding: 20px;
+@media (max-width: 768px) {
+  .analiz-hero { padding: 32px 20px 28px; }
+  .analiz-hero-title { font-size: 20px; }
+  .analiz-search-wrap { max-width: 100%; }
 }
-.ai-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-.ai-icon {
-  width: 32px; height: 32px; background: var(--accent); border-radius: 8px;
-  display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
-}
-.ai-title { font-family: var(--head); font-size: 14px; font-weight: 700; }
-.ai-badge { margin-left: auto; font-size: 9px; font-weight: 700; padding: 3px 8px; border-radius: 4px; background: var(--accent2); color: var(--accent); border: 1px solid rgba(59,130,246,.3); letter-spacing: .5px; }
-.ai-content { font-size: 13px; color: var(--text2); line-height: 1.7; }
-.ai-content strong { color: var(--text); }
-.ai-bullets { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
-.ai-bullet { display: flex; gap: 10px; font-size: 12px; color: var(--text2); line-height: 1.5; }
-.ai-bullet-icon { flex-shrink: 0; font-size: 14px; }
-.ai-footer { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(59,130,246,.1); display: flex; align-items: center; gap: 8px; }
-.ai-disclaimer { font-size: 10px; color: var(--muted); flex: 1; }
-.ai-refresh { font-size: 10px; color: var(--accent); cursor: pointer; }
-.ai-refresh:hover { text-decoration: underline; }
 
-/* ── SIDE PANEL ── */
-.side-section { padding: 18px 18px; border-bottom: 1px solid var(--border); }
-.side-title { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
 
-/* Quick Stats */
-.quick-stat { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.04); }
-.quick-stat:last-child { border-bottom: none; }
-.qs-label { font-size: 11px; color: var(--text2); }
-.qs-val { font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--text); }
-.qs-val.up { color: var(--green); }
-.qs-val.dn { color: var(--red); }
-
-/* 52w range */
-.range-wrap { margin: 12px 0; }
-.range-label { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; color: var(--text2); margin-bottom: 6px; }
-.range-bar { height: 4px; background: var(--s3); border-radius: 2px; position: relative; }
-.range-fill { height: 100%; background: linear-gradient(90deg, var(--red), var(--gold), var(--green)); border-radius: 2px; width: 100%; }
-.range-cursor { position: absolute; top: -3px; width: 10px; height: 10px; background: var(--text); border-radius: 50%; transform: translateX(-50%); border: 2px solid var(--bg); }
-
-/* News */
-.news-item { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.04); }
-.news-item:last-child { border-bottom: none; }
-.news-source { font-size: 9px; font-weight: 700; color: var(--accent); letter-spacing: .5px; margin-bottom: 4px; }
-.news-title { font-size: 11px; color: var(--text); line-height: 1.4; margin-bottom: 4px; cursor: pointer; }
-.news-title:hover { color: var(--accent); }
-.news-meta { font-size: 10px; color: var(--muted); display: flex; gap: 8px; }
-.news-sentiment { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 3px; }
-.news-sentiment.pos { background: var(--green-bg); color: var(--green); }
-.news-sentiment.neg { background: var(--red-bg); color: var(--red); }
-.news-sentiment.ntr { background: var(--s3); color: var(--text2); }
-
-/* Similar stocks */
-.similar-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.04); cursor: pointer; }
-.similar-item:last-child { border-bottom: none; }
-.similar-item:hover .similar-name { color: var(--accent); }
-.similar-sym { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--accent); width: 52px; }
-.similar-name { font-size: 11px; color: var(--text2); flex: 1; }
-.similar-chg { font-family: var(--mono); font-size: 11px; font-weight: 600; }
-.similar-chg.up { color: var(--green); }
-.similar-chg.dn { color: var(--red); }
-
-/* Analyst */
-.analyst-bar { display: flex; border-radius: 6px; overflow: hidden; height: 8px; margin: 10px 0; }
-.analyst-buy  { background: var(--green); }
-.analyst-hold { background: var(--gold); }
-.analyst-sell { background: var(--red); }
-.analyst-legend { display: flex; justify-content: space-between; font-size: 10px; font-family: var(--mono); }
-.analyst-legend span:nth-child(1) { color: var(--green); }
-.analyst-legend span:nth-child(2) { color: var(--gold); }
-.analyst-legend span:nth-child(3) { color: var(--red); }
-.analyst-target { margin-top: 12px; display: flex; justify-content: space-between; align-items: center; }
-.analyst-target-label { font-size: 11px; color: var(--text2); }
-.analyst-target-val { font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--text); }
-.analyst-upside { font-family: var(--mono); font-size: 11px; color: var(--green); font-weight: 600; }
-
-/* ── ANIMATIONS ── */
-@keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
-@keyframes barGrow { from { width: 0; } to { } }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-
-.hero { animation: fadeIn .3s ease; }
-.section { animation: fadeIn .35s ease; }
-.metric-cell { animation: fadeIn .4s ease both; }
-.metric-cell:nth-child(2) { animation-delay: .05s; }
-.metric-cell:nth-child(3) { animation-delay: .10s; }
-.metric-cell:nth-child(4) { animation-delay: .15s; }
-
-.live-dot { display: inline-block; width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s ease infinite; margin-right: 4px; }
-
-/* Tab panels */
-.tab-panel { display: none; }
-.tab-panel.on { display: block; }
-
-/* ── RESPONSIVE ── */
-@media (max-width: 900px) {
-  .page { grid-template-columns: 1fr; }
-  .side-col { border-top: 1px solid var(--border); }
-  .metric-grid { grid-template-columns: repeat(2, 1fr); }
-  .fscore-grid { grid-template-columns: 1fr; }
-  .guru-grid { grid-template-columns: 1fr; }
-}
+/* ── TOOLTIP ── */
+#df-tooltip{position:fixed;background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:9px 13px;max-width:220px;font-size:11px;color:#bbb;line-height:1.6;z-index:99999;pointer-events:none;display:none;white-space:normal;box-shadow:0 6px 20px rgba(0,0,0,.7);}
+.goat-tip,.chip-tip,.th-tip{display:none!important;}
 
 /* ── DISCLAIMER MODAL ── */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
 .modal-overlay.open{display:flex;}
-.modal{background:var(--s1,#0d0d0d);border-radius:12px;border:1px solid #1a1a1a;width:100%;max-width:520px;overflow:hidden;margin:16px;}
 
+</style>
+<style>
+
+/* ══ PROFİL CSS ══ */
+#profile-page{display:flex;flex:1;flex-direction:column;overflow:hidden;min-height:0;}
+.prf-topbar{height:40px;border-bottom:1px solid var(--border);background:var(--s1);display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0;}
+.prf-back{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);cursor:pointer;background:none;border:1px solid var(--border);border-radius:5px;padding:4px 10px;transition:all .15s;font-family:Inter,sans-serif;}
+.prf-back:hover{color:var(--text);border-color:var(--border2);}
+.prf-crumb{font-size:11px;color:var(--muted2);display:flex;align-items:center;gap:5px;font-family:"JetBrains Mono",monospace;}
+.prf-crumb .prf-sym{color:var(--text);font-weight:700;}
+.prf-layout{display:grid;grid-template-columns:1fr 300px;flex:1;overflow:hidden;min-height:0;}
+.prf-main{overflow-y:auto;border-right:1px solid var(--border);}
+.prf-side{overflow-y:auto;background:var(--s1);}
+.prf-hero{padding:20px 24px 0;background:linear-gradient(180deg,rgba(59,130,246,.04) 0%,transparent 100%);border-bottom:1px solid var(--border);}
+.prf-hero-top{display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;}
+.prf-logo{width:44px;height:44px;border-radius:8px;background:var(--s2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:700;color:var(--accent);flex-shrink:0;}
+.prf-company{flex:1;min-width:0;}
+.prf-name{font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.prf-meta{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.prf-tag{padding:2px 7px;border-radius:3px;font-size:9px;font-weight:700;background:var(--s2);border:1px solid var(--border2);color:var(--text2);}
+.prf-tag.blue{background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.3);color:var(--accent);}
+.prf-price-block{text-align:right;flex-shrink:0;}
+.prf-price{font-family:"JetBrains Mono",monospace;font-size:22px;font-weight:700;color:var(--text);line-height:1;margin-bottom:4px;}
+.prf-chg{font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:600;}
+.prf-chg.up{color:var(--green);}
+.prf-chg.dn{color:var(--red);}
+.prf-scores{display:flex;height:32px;border-top:1px solid var(--border);}
+.prf-score{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;border-right:1px solid var(--border);font-size:10px;color:var(--text2);}
+.prf-score:last-child{border-right:none;}
+.prf-score-val{font-family:"JetBrains Mono",monospace;font-weight:700;font-size:11px;}
+.prf-score-val.g{color:var(--green);}
+.prf-score-val.m{color:var(--gold);}
+.prf-score-val.b{color:var(--red);}
+.prf-tabs{display:flex;border-bottom:1px solid var(--border);padding:0 24px;background:var(--s1);position:sticky;top:0;z-index:10;}
+.prf-tab{padding:10px 14px;font-size:11px;font-weight:600;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;white-space:nowrap;}
+.prf-tab:hover{color:var(--text);}
+.prf-tab.on{color:var(--accent);border-bottom-color:var(--accent);}
+.prf-section{padding:20px 24px;border-bottom:1px solid var(--border);}
+.prf-sec-title{font-size:10px;font-weight:700;color:var(--muted2);letter-spacing:1px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.prf-sec-title::after{content:"";flex:1;height:1px;background:var(--border);}
+.prf-mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.prf-mcell{background:var(--s1);padding:12px 14px;transition:background .15s;}
+.prf-mcell:hover{background:var(--s2);}
+.prf-mlabel{font-size:10px;color:var(--text2);margin-bottom:5px;}
+.prf-mval{font-family:"JetBrains Mono",monospace;font-size:14px;font-weight:700;color:var(--text);}
+.prf-mval.g{color:var(--green);}
+.prf-mval.m{color:var(--gold);}
+.prf-mval.b{color:var(--red);}
+.prf-msub{font-size:10px;color:var(--muted2);margin-top:2px;}
+.prf-panel{display:none;}
+.prf-panel.on{display:block;}
+.prf-fscore-num{font-family:"JetBrains Mono",monospace;font-size:42px;font-weight:700;color:var(--green);}
+.prf-fscore-badge{display:flex;align-items:center;gap:16px;padding:14px;background:var(--s2);border:1px solid var(--border);border-radius:8px;margin-bottom:14px;}
+.prf-fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.prf-fgroup{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px;}
+.prf-fgroup-title{font-size:9px;font-weight:700;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;}
+.prf-fitem{display:flex;align-items:center;gap:7px;padding:4px 0;font-size:11px;color:var(--text2);}
+.prf-fdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.prf-fdot.p{background:var(--green);}
+.prf-fdot.f{background:var(--muted);}
+.prf-ggrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.prf-gcard{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px;}
+.prf-gcard.pass{border-color:rgba(0,192,118,.25);background:rgba(0,192,118,.04);}
+.prf-gcard.partial{border-color:rgba(240,180,41,.2);background:rgba(240,180,41,.04);}
+.prf-gcard.fail{border-color:rgba(246,70,93,.15);}
+.prf-gtop{display:flex;align-items:center;gap:9px;margin-bottom:8px;}
+.prf-gscore{margin-left:auto;font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:700;}
+.prf-gscore.pass{color:var(--green);}
+.prf-gscore.partial{color:var(--gold);}
+.prf-gscore.fail{color:var(--red);}
+.prf-gcrit{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text2);padding:2px 0;}
+.prf-cdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.prf-ai-box{background:linear-gradient(135deg,rgba(59,130,246,.06),rgba(59,130,246,.02));border:1px solid rgba(59,130,246,.2);border-radius:10px;padding:18px;}
+.prf-ai-hdr{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.prf-ai-icon{width:30px;height:30px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.prf-ai-badge{margin-left:auto;font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;background:rgba(59,130,246,.12);color:var(--accent);border:1px solid rgba(59,130,246,.3);}
+.prf-ai-content{font-size:12px;color:var(--text2);line-height:1.7;}
+.prf-ai-loading{display:flex;align-items:center;gap:10px;padding:20px;color:var(--text2);font-size:12px;}
+.prf-spinner{width:18px;height:18px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:prf-spin .7s linear infinite;flex-shrink:0;}
+@keyframes prf-spin{to{transform:rotate(360deg);}}
+.prf-sside{padding:16px;border-bottom:1px solid var(--border);}
+.prf-stitle{font-size:10px;font-weight:700;color:var(--muted2);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;}
+.prf-qstat{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:11px;}
+.prf-qstat:last-child{border-bottom:none;}
+.prf-qkey{color:var(--text2);}
+.prf-qval{font-family:"JetBrains Mono",monospace;font-weight:600;color:var(--text);}
+.prf-qval.g{color:var(--green);}
+.prf-qval.r{color:var(--red);}
+.prf-buy-btn{width:100%;height:38px;background:var(--accent);color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;margin-bottom:8px;font-family:Inter,sans-serif;}
+.prf-buy-btn:hover{background:#2563eb;transform:translateY(-1px);}
+.prf-news-item{padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.prf-news-item:last-child{border-bottom:none;}
+.prf-news-src{font-size:9px;font-weight:700;color:var(--accent);margin-bottom:3px;}
+.prf-news-title{font-size:11px;color:var(--text);line-height:1.4;cursor:pointer;}
+.prf-news-title:hover{color:var(--accent);}
+.prf-news-meta{font-size:10px;color:var(--muted2);margin-top:3px;display:flex;gap:7px;}
+.prf-sent{font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;}
+.prf-sent.pos{background:var(--green-bg);color:var(--green);}
+.prf-sent.neg{background:var(--red-bg);color:var(--red);}
+.prf-sent.ntr{background:var(--s2);color:var(--text2);}
+.prf-sim-item{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;}
+.prf-sim-item:last-child{border-bottom:none;}
+.prf-sim-sym{font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:700;color:var(--accent);width:50px;}
+.prf-sim-name{font-size:11px;color:var(--text2);flex:1;}
+.prf-sim-chg{font-family:"JetBrains Mono",monospace;font-size:11px;font-weight:600;}
+@media(max-width:768px){
+  .prf-layout{grid-template-columns:1fr;}
+  .prf-mgrid{grid-template-columns:repeat(2,1fr);}
+  .prf-fgrid{grid-template-columns:1fr;}
+  .prf-ggrid{grid-template-columns:1fr;}
+}
+
+html,body{height:100%;overflow:hidden;}
+#app{display:flex;flex-direction:column;height:100dvh;}
+
+.prf-main::-webkit-scrollbar{width:3px;}
+.prf-main::-webkit-scrollbar-track{background:transparent;}
+.prf-main::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.prf-side::-webkit-scrollbar{width:3px;}
+.prf-side::-webkit-scrollbar-track{background:transparent;}
+.prf-side::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+.fin-cell{background:var(--s1);padding:12px 14px;transition:background .15s;}
+.fin-cell:hover{background:var(--s2);}
+.fin-cell-label{font-size:9px;color:var(--text2);margin-bottom:5px;letter-spacing:.3px;text-transform:uppercase;}
+.fin-cell-val{font-family:"JetBrains Mono",monospace;font-size:14px;font-weight:700;color:var(--text);}
+.fin-cell-val.good{color:var(--green);}
+.fin-cell-val.mid{color:var(--gold);}
+.fin-cell-val.bad{color:var(--red);}
+.fin-gauge-wrap{display:flex;flex-direction:column;gap:5px;padding:8px 0;}
+.fin-gauge-label{display:flex;justify-content:space-between;font-size:10px;color:var(--text2);}
+.fin-gauge-bar{height:5px;background:var(--s3);border-radius:3px;overflow:hidden;}
+.fin-gauge-fill{height:100%;border-radius:3px;transition:width .7s ease;}
+.fin-debt-card{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;}
+.fin-debt-label{font-size:10px;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px;}
+.fin-debt-val{font-family:"JetBrains Mono",monospace;font-size:20px;font-weight:700;}
+.fin-debt-sub{font-size:10px;color:var(--muted);margin-top:3px;}
+.sparkline-svg{width:100%;height:44px;display:block;}
+.perf-bar-row{display:flex;align-items:center;gap:7px;font-size:10px;}
+.perf-bar-label{color:var(--text2);width:28px;flex-shrink:0;}
+.perf-bar-track{flex:1;height:4px;background:var(--s3);border-radius:2px;overflow:hidden;}
+.perf-bar-fill{height:100%;border-radius:2px;transition:width .6s ease;}
+.perf-bar-val{font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:600;width:42px;text-align:right;flex-shrink:0;}
 </style>
 </head>
 <body>
+<div id="app">
 
-<!-- TOPBAR -->
-<div class="topbar">
-  <div class="logo">
-    <div class="logo-mark">D</div>
-    DeepFin
+  <div class="topbar">
+    <div class="tlogo" onclick="goHome()" style="cursor:pointer"><div class="tlogo-mark">D</div>DeepFin</div>
+    <span class="tlive">Canlı</span>
+    <button class="hp-nav-btn" onclick="goHome()">Anasayfa</button>
+    <button class="hp-nav-btn" onclick="goScreener()">Tarayıcı</button>
+    <button class="hp-nav-btn active">Analiz</button>
   </div>
-  <div class="breadcrumb">
-    <a href="#">Tarayıcı</a>
-    <span class="breadcrumb-sep">/</span>
-    <a href="#">BIST</a>
-    <span class="breadcrumb-sep">/</span>
-    <span style="color:var(--text)">TUPRS</span>
+
+  <div id="profile-page" style="display:flex;flex:1;flex-direction:column;overflow:hidden;min-height:0;">
+    <div class="prf-topbar">
+      <button class="prf-back" onclick="closeProfil()">← Geri</button>
+      <div class="prf-crumb">
+        <span id="prf-bc-ex" style="color:var(--text2)">BIST</span>
+        <span style="color:var(--muted)">/</span>
+        <span class="prf-sym" id="prf-bc-sym">—</span>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+        <span id="prf-live-dot" style="display:none;font-size:10px;color:var(--green);"><span style="display:inline-block;width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s ease infinite;margin-right:4px;"></span>Canlı</span>
+        <button id="prf-tv-btn" onclick="openTradingView()" class="prf-back">↗ TradingView</button>
+      </div>
+    </div>
+
+    <div class="prf-layout">
+      <div class="prf-main">
+        <div class="prf-hero">
+          <div class="prf-hero-top">
+            <div class="prf-logo" id="prf-logo">—</div>
+            <div class="prf-company">
+              <div class="prf-name" id="prf-fullname">Yükleniyor...</div>
+              <div class="prf-meta">
+                <span class="prf-tag blue" id="prf-sym-tag">—</span>
+                <span class="prf-tag" id="prf-ex-tag">—</span>
+                <span class="prf-tag" id="prf-sector-tag">—</span>
+              </div>
+            </div>
+            <div class="prf-price-block">
+              <div class="prf-price" id="prf-price">—</div>
+              <div class="prf-chg" id="prf-chg">—</div>
+            </div>
+          </div>
+          <div class="prf-scores">
+            <div class="prf-score">F-Score <span class="prf-score-val" id="prf-sc-fscore">—</span></div>
+            <div class="prf-score">PEG <span class="prf-score-val" id="prf-sc-peg">—</span></div>
+            <div class="prf-score">F/K <span class="prf-score-val" id="prf-sc-fk">—</span></div>
+            <div class="prf-score">ROE <span class="prf-score-val" id="prf-sc-roe">—</span></div>
+            <div class="prf-score">P.Değeri <span class="prf-score-val" id="prf-sc-mc">—</span></div>
+          </div>
+        </div>
+
+        <div class="prf-tabs">
+          <div class="prf-tab on" onclick="prfTab('overview',this)">Genel Bakış</div>
+          <div class="prf-tab" onclick="prfTab('financials',this)">Finansallar</div>
+          <div class="prf-tab" onclick="prfTab('piotroski',this)">F-Score</div>
+          <div class="prf-tab" onclick="prfTab('guru',this)">Guru Analizi</div>
+          <div class="prf-tab" onclick="prfTab('ai',this)">🤖 YZ Analizi</div>
+        </div>
+
+        <div id="prf-panel-overview" class="prf-panel on">
+          <!-- TradingView Grafik -->
+          <div class="prf-section" style="padding:0;overflow:hidden;border-radius:0;">
+            <div id="prf-tv-widget" style="height:340px;background:var(--s2);position:relative;">
+              <div id="prf-tv-placeholder" style="height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--muted);font-size:12px;">
+                <div style="font-size:28px;">📈</div>
+                <span>Grafik yükleniyor...</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gelir & Kâr Trendi -->
+          <div class="prf-section">
+            <div class="prf-sec-title">Gelir & Kâr Trendi</div>
+            <div style="display:flex;gap:10px;margin-bottom:12px;" id="prf-trend-cards">
+              <div style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;">
+                <div style="font-size:9px;color:var(--text2);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">Gelir Büyümesi</div>
+                <div id="prf-rev-spark" style="height:44px;margin-bottom:6px;"></div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--text);" id="prf-rev-val">—</div>
+                <div style="font-size:10px;font-family:'JetBrains Mono',monospace;" id="prf-rev-chg">YoY TTM</div>
+              </div>
+              <div style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;">
+                <div style="font-size:9px;color:var(--text2);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">Kazanç Büyümesi</div>
+                <div id="prf-earn-spark" style="height:44px;margin-bottom:6px;"></div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--text);" id="prf-earn-val">—</div>
+                <div style="font-size:10px;font-family:'JetBrains Mono',monospace;" id="prf-earn-chg">YoY TTM</div>
+              </div>
+              <div style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;">
+                <div style="font-size:9px;color:var(--text2);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">Performans</div>
+                <div id="prf-perf-bars" style="display:flex;flex-direction:column;gap:5px;margin-top:4px;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- AD M1: 728×90 -->
+          <div style="padding:12px 24px;border-bottom:1px solid var(--border);background:var(--s1);">
+            <div class="ad-slot" style="width:100%;height:90px;border-radius:6px;">
+              <span style="font-size:14px;">📢</span>
+              <span class="ad-slot-label">728 × 90 — Reklam</span>
+            </div>
+          </div>
+
+          <div class="prf-section">
+            <div class="prf-sec-title">Temel Metrikler</div>
+            <div class="prf-mgrid" id="prf-metrics"><div style="padding:20px;color:var(--muted);font-size:12px;grid-column:span 4">Tarama yapıp Detaylı Analiz'e tıklayın</div></div>
+          </div>
+          <div class="prf-section">
+            <div class="prf-sec-title">Şirket Hakkında</div>
+            <p id="prf-desc" style="font-size:12px;color:var(--text2);line-height:1.7;">Yükleniyor...</p>
+          </div>
+        </div>
+
+        <!-- ═══ FİNANSALLAR ═══ -->
+        <div id="prf-panel-financials" class="prf-panel">
+          <div class="prf-section">
+            <div class="prf-sec-title">Temel Finansal Göstergeler</div>
+            <div id="prf-fin-summary" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:20px;"></div>
+          </div>
+          <div class="prf-section">
+            <div class="prf-sec-title">Kârlılık Göstergeleri</div>
+            <div id="prf-fin-gauges" style="display:flex;flex-direction:column;gap:12px;"></div>
+          </div>
+          <div class="prf-section">
+            <div class="prf-sec-title">Borç & Likidite</div>
+            <div id="prf-fin-debt" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;"></div>
+          </div>
+          <div class="prf-section" style="border-bottom:none;">
+            <div class="prf-sec-title">Veri Kaynağı Hakkında</div>
+            <p style="font-size:11px;color:var(--muted);line-height:1.6;">Finansal veriler TradingView Scanner API üzerinden gerçek zamanlı olarak çekilmektedir. Yıllık finansal tablolar (gelir tablosu, bilanço) için premium veri sağlayıcı entegrasyonu planlanmaktadır.</p>
+          </div>
+        </div>
+
+        <div id="prf-panel-piotroski" class="prf-panel">
+          <div class="prf-section">
+            <div class="prf-sec-title">Piotroski F-Score</div>
+            <div class="prf-fscore-badge">
+              <div class="prf-fscore-num" id="prf-fscore-num">—</div>
+              <div>
+                <div id="prf-fscore-label" style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">—</div>
+                <div style="font-size:11px;color:var(--text2);">9 kriter üzerinden değerlendirme</div>
+              </div>
+            </div>
+            <div class="prf-fgrid" id="prf-fgrid"></div>
+          </div>
+        </div>
+
+        <div id="prf-panel-guru" class="prf-panel">
+          <div class="prf-section">
+            <div class="prf-sec-title">Efsane Yatırımcı Kriterleri</div>
+            <div class="prf-ggrid" id="prf-ggrid"></div>
+          </div>
+        </div>
+
+        <div id="prf-panel-ai" class="prf-panel">
+          <div class="prf-section">
+            <div class="prf-sec-title">Yapay Zeka Destekli Analiz</div>
+            <div class="prf-ai-box" id="prf-ai-box">
+              <div class="prf-ai-loading" id="prf-ai-loading">
+                <div class="prf-spinner"></div>YZ analizi hazırlanıyor...
+              </div>
+              <div id="prf-ai-content" style="display:none;">
+                <div class="prf-ai-hdr">
+                  <div class="prf-ai-icon">🤖</div>
+                  <div>
+                    <div style="font-size:13px;font-weight:700;color:var(--text);" id="prf-ai-title">DeepFin AI</div>
+                    <div style="font-size:10px;color:var(--text2);">Screener verisi üzerinde üretildi</div>
+                  </div>
+                  <div class="prf-ai-badge">CLAUDE</div>
+                </div>
+                <div class="prf-ai-content" id="prf-ai-text"></div>
+                <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(59,130,246,.1);font-size:10px;color:var(--muted2);">⚠ Bilgi amaçlıdır, yatırım tavsiyesi değildir.</div>
+              </div>
+            </div>
+            <div style="margin-top:14px;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:16px;">
+              <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:10px;">Soru sor</div>
+              <div style="display:flex;gap:8px;">
+                <input type="text" id="prf-ai-q" placeholder="Örn: Bu hisse Buffett kriterlerine uygun mu?"
+                  style="flex:1;background:var(--s3);border:1px solid var(--border2);border-radius:6px;padding:8px 12px;color:var(--text);font-size:11px;outline:none;font-family:Inter,sans-serif;"
+                  onkeydown="if(event.key==='Enter') askPrfAI()">
+                <button onclick="askPrfAI()" style="padding:8px 14px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">Sor →</button>
+              </div>
+              <div id="prf-ai-answer" style="display:none;margin-top:12px;font-size:12px;color:var(--text2);line-height:1.7;padding:12px;background:var(--s3);border-radius:6px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="prf-side">
+        <div class="prf-sside">
+          <button class="prf-buy-btn" id="prf-buy-btn" onclick="onHemenAl('','')">🛒 Hemen Al</button>
+          <div class="ad-slot" style="width:100%;height:250px;margin-top:10px;border-radius:8px;">
+            <span style="font-size:16px;">📢</span>
+            <span class="ad-slot-label">300 × 250 — Reklam</span>
+          </div>
+        </div>
+        <div class="prf-sside">
+          <div class="prf-stitle">Fiyat Bilgileri</div>
+          <div id="prf-price-stats"></div>
+        </div>
+        <div class="prf-sside">
+          <div class="prf-stitle">Son Haberler</div>
+          <div id="prf-news"><div style="font-size:11px;color:var(--muted)">Yükleniyor...</div></div>
+        </div>
+        <div class="prf-sside">
+          <div class="prf-stitle">Benzer Hisseler</div>
+          <div id="prf-similar"><div style="font-size:11px;color:var(--muted)">Önce tarama yapın</div></div>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="topbar-right">
-    <button class="btn-sm" onclick="history.back()">← Geri</button>
-    <button class="btn-sm">⊕ Listeye Ekle</button>
-    <button class="btn-sm btn-primary">↗ TradingView'da Aç</button>
-  </div>
+
 </div>
 
-<div class="page">
-
-  <!-- MAIN COLUMN -->
-  <div class="main-col">
-
-    <!-- HERO -->
-    <div class="hero">
-      <div class="hero-top">
-        <div class="company-logo">TU</div>
-        <div class="company-meta">
-          <div class="company-name">Türkiye Petrol Rafinerileri A.Ş.</div>
-          <div class="company-sub">
-            <span class="tag blue">TUPRS</span>
-            <span class="tag">BIST</span>
-            <span class="tag">Enerji</span>
-            <span class="tag">Büyük Ölçekli</span>
-            <span style="color:var(--green);font-size:11px;"><span class="live-dot"></span>Piyasa Açık</span>
-          </div>
-        </div>
-        <div class="price-block">
-          <div class="price-main">₺214.50</div>
-          <div class="price-change up">▲ +4.20 (+2.00%) bugün</div>
-          <div style="font-size:10px;color:var(--muted);margin-top:4px;font-family:var(--mono)">14:32 · BIST</div>
-        </div>
-      </div>
-
-      <!-- SCORE BAR -->
-      <div class="score-bar">
-        <div class="score-item">
-          <span>F-Score</span>
-          <span class="score-val good">8/9</span>
-        </div>
-        <div class="score-item">
-          <span>PEG</span>
-          <span class="score-val good">0.71</span>
-        </div>
-        <div class="score-item">
-          <span>F/K</span>
-          <span class="score-val mid">11.2x</span>
-        </div>
-        <div class="score-item">
-          <span>ROE</span>
-          <span class="score-val good">38.4%</span>
-        </div>
-        <div class="score-item">
-          <span>Piyasa Değeri</span>
-          <span class="score-val" style="color:var(--text)">$2.8B</span>
-        </div>
-        <div class="score-item">
-          <span>DeepFin Skoru</span>
-          <span class="score-val good">87/100</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- TABS -->
-    <div class="tabs">
-      <div class="tab on" onclick="switchTab('overview', this)">Genel Bakış</div>
-      <div class="tab" onclick="switchTab('financials', this)">Finansallar</div>
-      <div class="tab" onclick="switchTab('piotroski', this)">F-Score Detay</div>
-      <div class="tab" onclick="switchTab('guru', this)">Guru Analizi</div>
-      <div class="tab" onclick="switchTab('ai', this)">🤖 YZ Analizi</div>
-    </div>
-
-    <!-- ═══ TAB: GENEL BAKIŞ ═══ -->
-    <div id="tab-overview" class="tab-panel on">
-
-      <!-- Temel Metrikler -->
-      <div class="section">
-        <div class="sec-title">Temel Metrikler</div>
-        <div class="metric-grid">
-          <div class="metric-cell">
-            <div class="metric-label">F/K (TTM)</div>
-            <div class="metric-value mid">11.2x</div>
-            <div class="metric-sub">Sektör ort: 14.8x</div>
-          </div>
-          <div class="metric-cell">
-            <div class="metric-label">PD/DD</div>
-            <div class="metric-value good">1.81x</div>
-            <div class="metric-sub">Sektör ort: 2.3x</div>
-          </div>
-          <div class="metric-cell">
-            <div class="metric-label">F/S (TTM)</div>
-            <div class="metric-value good">0.22x</div>
-            <div class="metric-sub">Sektör ort: 0.41x</div>
-          </div>
-          <div class="metric-cell">
-            <div class="metric-label">EV/FAVÖK</div>
-            <div class="metric-value mid">7.4x</div>
-            <div class="metric-sub">Sektör ort: 9.1x</div>
-          </div>
-          <div class="metric-cell">
-            <div class="metric-label">ROE (TTM)</div>
-            <div class="metric-value good">38.4%</div>
-            <div class="metric-sub">↑ geçen yıl: 31.2%</div>
-          </div>
-          <div class="metric-cell">
-            <div class="metric-label">ROA (TTM)</div>
-            <div class="metric-value good">14.1%</div>
-            <div class="metric-sub">↑ geçen yıl: 11.8%</div>
-          </div>
-          <div class="metric-cell">
-            <div class="metric-label">Net Marj</div>
-            <div class="metric-value good">12.8%</div>
-            <div class="metric-sub">↑ geçen yıl: 9.4%</div>
-          </div>
-          <div class="metric-cell">
-            <div class="metric-label">Cari Oran</div>
-            <div class="metric-value good">1.65x</div>
-            <div class="metric-sub">Borç/Öz: 1.72</div>
-          </div>
-          <div class="metric-cell">
-            <div class="metric-label">Gelir Büyümesi</div>
-            <div class="metric-value good">+17.1%</div>
-            <div class="metric-sub">YoY (TTM)</div>
-          </div>
-          <div class="metric-cell">
-            <div class="metric-label">Kazanç Büyümesi</div>
-            <div class="metric-value good">+14.6%</div>
-            <div class="metric-sub">YoY (TTM)</div>
-          </div>
-          <div class="metric-cell">
-            <div class="metric-label">Temettü Verimi</div>
-            <div class="metric-value mid">2.66%</div>
-            <div class="metric-sub">Son ödeme: ₺5.70</div>
-          </div>
-          <div class="metric-cell">
-            <div class="metric-label">PEG Oranı</div>
-            <div class="metric-value good">0.71</div>
-            <div class="metric-sub">&lt;1 = cazip büyüme</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Gelir Trendi -->
-      <div class="section">
-        <div class="sec-title">Gelir & Kâr Trendi</div>
-        <div style="display:flex;gap:12px;margin-bottom:12px;">
-          <div style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;">
-            <div style="font-size:10px;color:var(--text2);margin-bottom:8px;letter-spacing:.3px;">YILLIK GELİR (₺M)</div>
-            <svg class="sparkline" viewBox="0 0 300 60">
-              <defs>
-                <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#3b82f6" stop-opacity=".3"/>
-                  <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
-                </linearGradient>
-              </defs>
-              <path d="M0,50 L50,44 L100,38 L150,30 L200,20 L250,12 L300,5" fill="none" stroke="#3b82f6" stroke-width="2"/>
-              <path d="M0,50 L50,44 L100,38 L150,30 L200,20 L250,12 L300,5 L300,60 L0,60Z" fill="url(#g1)"/>
-              <text x="0" y="58" font-size="9" fill="#555" font-family="JetBrains Mono">2019</text>
-              <text x="240" y="58" font-size="9" fill="#555" font-family="JetBrains Mono">2024</text>
-            </svg>
-            <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);margin-top:4px;">₺412.8B</div>
-            <div style="font-size:10px;color:var(--green);font-family:var(--mono);">+17.1% YoY</div>
-          </div>
-          <div style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;">
-            <div style="font-size:10px;color:var(--text2);margin-bottom:8px;letter-spacing:.3px;">NET KÂR (₺M)</div>
-            <svg class="sparkline" viewBox="0 0 300 60">
-              <defs>
-                <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#00c076" stop-opacity=".3"/>
-                  <stop offset="100%" stop-color="#00c076" stop-opacity="0"/>
-                </linearGradient>
-              </defs>
-              <path d="M0,55 L50,50 L100,42 L150,35 L200,22 L250,14 L300,8" fill="none" stroke="#00c076" stroke-width="2"/>
-              <path d="M0,55 L50,50 L100,42 L150,35 L200,22 L250,14 L300,8 L300,60 L0,60Z" fill="url(#g2)"/>
-              <text x="0" y="58" font-size="9" fill="#555" font-family="JetBrains Mono">2019</text>
-              <text x="240" y="58" font-size="9" fill="#555" font-family="JetBrains Mono">2024</text>
-            </svg>
-            <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);margin-top:4px;">₺52.8B</div>
-            <div style="font-size:10px;color:var(--green);font-family:var(--mono);">+14.6% YoY</div>
-          </div>
-          <div style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;">
-            <div style="font-size:10px;color:var(--text2);margin-bottom:8px;letter-spacing:.3px;">SERBEST NAKİT AKIŞI</div>
-            <svg class="sparkline" viewBox="0 0 300 60">
-              <defs>
-                <linearGradient id="g3" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#f0b429" stop-opacity=".25"/>
-                  <stop offset="100%" stop-color="#f0b429" stop-opacity="0"/>
-                </linearGradient>
-              </defs>
-              <path d="M0,52 L50,48 L100,44 L150,50 L200,28 L250,18 L300,10" fill="none" stroke="#f0b429" stroke-width="2"/>
-              <path d="M0,52 L50,48 L100,44 L150,50 L200,28 L250,18 L300,10 L300,60 L0,60Z" fill="url(#g3)"/>
-              <text x="0" y="58" font-size="9" fill="#555" font-family="JetBrains Mono">2019</text>
-              <text x="240" y="58" font-size="9" fill="#555" font-family="JetBrains Mono">2024</text>
-            </svg>
-            <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);margin-top:4px;">₺18.4B</div>
-            <div style="font-size:10px;color:var(--gold);font-family:var(--mono);">+8.9% YoY</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Hakkında -->
-      <div class="section">
-        <div class="sec-title">Şirket Hakkında</div>
-        <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:14px;">
-          Türkiye Petrol Rafinerileri A.Ş. (Tüpraş), Türkiye'nin en büyük sanayi kuruluşu olup İzmit, İzmir, Kırıkkale ve Batman rafinerilerinde faaliyet göstermektedir. Yıllık 28.1 milyon ton ham petrol işleme kapasitesiyle Türkiye'nin akaryakıt ihtiyacının büyük bölümünü karşılar.
-        </p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-          <div style="background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:12px;">
-            <div style="font-size:10px;color:var(--muted);margin-bottom:8px;letter-spacing:.4px;text-transform:uppercase;">Temel Bilgiler</div>
-            <div class="quick-stat"><span class="qs-label">Kuruluş</span><span class="qs-val">1983</span></div>
-            <div class="quick-stat"><span class="qs-label">Merkez</span><span class="qs-val">İzmit</span></div>
-            <div class="quick-stat"><span class="qs-label">Çalışan Sayısı</span><span class="qs-val">~4,200</span></div>
-            <div class="quick-stat"><span class="qs-label">CEO</span><span class="qs-val">İbrahim Yelmenoğlu</span></div>
-          </div>
-          <div style="background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:12px;">
-            <div style="font-size:10px;color:var(--muted);margin-bottom:8px;letter-spacing:.4px;text-transform:uppercase;">İşlem Bilgileri</div>
-            <div class="quick-stat"><span class="qs-label">Hisse Sayısı</span><span class="qs-val">280M</span></div>
-            <div class="quick-stat"><span class="qs-label">Halka Açıklık</span><span class="qs-val">49.0%</span></div>
-            <div class="quick-stat"><span class="qs-label">Ortalama Hacim</span><span class="qs-val">₺1.2B/gün</span></div>
-            <div class="quick-stat"><span class="qs-label">Endeks</span><span class="qs-val">BIST 30, BIST 50</span></div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- ═══ TAB: FİNANSALLAR ═══ -->
-    <div id="tab-financials" class="tab-panel">
-      <div class="section">
-        <div class="sec-title">Gelir Tablosu — Yıllık (₺M)</div>
-        <table class="fin-table">
-          <thead>
-            <tr>
-              <th>Kalem</th>
-              <th>2021</th><th>2022</th><th>2023</th><th>2024</th><th>YoY %</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="section-row"><td colspan="6">📊 GELİR</td></tr>
-            <tr><td>Net Satışlar</td><td>152,400</td><td>264,800</td><td>352,600</td><td>412,800</td><td class="positive">+17.1%</td></tr>
-            <tr><td>Satılan Malın Maliyeti</td><td>138,200</td><td>238,100</td><td>312,400</td><td>356,200</td><td class="negative">+14.0%</td></tr>
-            <tr class="section-row"><td colspan="6">💰 KÂRLILIK</td></tr>
-            <tr><td>Brüt Kâr</td><td>14,200</td><td>26,700</td><td>40,200</td><td>56,600</td><td class="positive">+40.8%</td></tr>
-            <tr><td>FAVÖK</td><td>18,400</td><td>34,100</td><td>47,800</td><td>58,200</td><td class="positive">+21.8%</td></tr>
-            <tr><td>Net Kâr</td><td>9,800</td><td>22,400</td><td>46,100</td><td>52,800</td><td class="positive">+14.6%</td></tr>
-            <tr><td>HBK (₺)</td><td>35.0</td><td>80.0</td><td>164.6</td><td>188.6</td><td class="positive">+14.6%</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="section">
-        <div class="sec-title">Bilanço — Özet (₺M)</div>
-        <table class="fin-table">
-          <thead>
-            <tr>
-              <th>Kalem</th><th>2022</th><th>2023</th><th>2024</th><th>YoY %</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="section-row"><td colspan="5">🏦 VARLIKLAR</td></tr>
-            <tr><td>Dönen Varlıklar</td><td>62,400</td><td>98,200</td><td>124,600</td><td class="positive">+26.9%</td></tr>
-            <tr><td>Duran Varlıklar</td><td>48,100</td><td>72,400</td><td>89,200</td><td class="positive">+23.2%</td></tr>
-            <tr><td><strong>Toplam Varlıklar</strong></td><td><strong>110,500</strong></td><td><strong>170,600</strong></td><td><strong>213,800</strong></td><td class="positive">+25.3%</td></tr>
-            <tr class="section-row"><td colspan="5">📋 YÜKÜMLÜLÜKLER</td></tr>
-            <tr><td>Kısa Vadeli Borçlar</td><td>28,400</td><td>48,200</td><td>75,600</td><td class="negative">+56.8%</td></tr>
-            <tr><td>Uzun Vadeli Borçlar</td><td>32,100</td><td>44,800</td><td>62,200</td><td class="negative">+38.8%</td></tr>
-            <tr><td><strong>Özsermaye</strong></td><td><strong>50,000</strong></td><td><strong>77,600</strong></td><td><strong>76,000</strong></td><td class="negative">-2.1%</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ═══ TAB: PİOTROSKİ ═══ -->
-    <div id="tab-piotroski" class="tab-panel">
-      <div class="section">
-        <div class="sec-title">Piotroski F-Score Analizi</div>
-        <div class="fscore-badge">
-          <div class="fscore-num">8</div>
-          <div>
-            <div class="fscore-label"><strong>Güçlü Bilanço</strong>9 üzerinden 8 puan — TUPRS finansal açıdan sağlıklı. Yalnızca 1 kriter karşılanmıyor.</div>
-            <div style="display:flex;gap:6px;margin-top:8px;">
-              <div style="width:100%;height:8px;background:var(--s3);border-radius:4px;overflow:hidden;">
-                <div style="width:88.8%;height:100%;background:linear-gradient(90deg,var(--green),#00e090);border-radius:4px;"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="fscore-grid">
-          <div class="fscore-group">
-            <div class="fscore-group-title">Karlılık (4/4)</div>
-            <div class="fscore-item"><div class="fscore-dot pass"></div><span class="fscore-text">Pozitif ROA</span></div>
-            <div class="fscore-item"><div class="fscore-dot pass"></div><span class="fscore-text">Pozitif Operasyonel Nakit Akışı</span></div>
-            <div class="fscore-item"><div class="fscore-dot pass"></div><span class="fscore-text">Artan ROA (YoY)</span></div>
-            <div class="fscore-item"><div class="fscore-dot pass"></div><span class="fscore-text">Nakit Akışı > Net Gelir</span></div>
-          </div>
-          <div class="fscore-group">
-            <div class="fscore-group-title">Kaldıraç & Likidite (2/3)</div>
-            <div class="fscore-item"><div class="fscore-dot pass"></div><span class="fscore-text">Azalan Uzun Vadeli Borç Oranı</span></div>
-            <div class="fscore-item"><div class="fscore-dot pass"></div><span class="fscore-text">Artan Cari Oran</span></div>
-            <div class="fscore-item"><div class="fscore-dot fail"></div><span class="fscore-text" style="color:var(--muted)">Hisse Dilüsyonu Yok ✗</span></div>
-          </div>
-          <div class="fscore-group">
-            <div class="fscore-group-title">Verimlilik (2/2)</div>
-            <div class="fscore-item"><div class="fscore-dot pass"></div><span class="fscore-text">Artan Brüt Marj</span></div>
-            <div class="fscore-item"><div class="fscore-dot pass"></div><span class="fscore-text">Artan Varlık Devir Hızı</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══ TAB: GURU ANALİZİ ═══ -->
-    <div id="tab-guru" class="tab-panel">
-      <div class="section">
-        <div class="sec-title">Efsane Yatırımcı Kriterleri</div>
-        <div class="guru-grid">
-
-          <div class="guru-card pass">
-            <div class="guru-top">
-              <div class="guru-emoji">🎯</div>
-              <div>
-                <div class="guru-name">Warren Buffett</div>
-                <div style="font-size:10px;color:var(--text2)">Değer Yatırımı</div>
-              </div>
-              <div class="guru-score pass">5/6 ✓</div>
-            </div>
-            <div class="guru-criteria">
-              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>F/K &lt; 20 → 11.2x ✓</div>
-              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>ROE &gt; 15% → 38.4% ✓</div>
-              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>Net Marj &gt; 10% → 12.8% ✓</div>
-              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>Cari Oran &gt; 1.2 → 1.65x ✓</div>
-              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>Borç/Öz &lt; 0.8 → 0.72 ✓</div>
-              <div class="guru-crit"><div class="dot" style="background:var(--red)"></div>PD/DD &lt; 3 → 1.81x (sınırda)</div>
-            </div>
-          </div>
-
-          <div class="guru-card pass">
-            <div class="guru-top">
-              <div class="guru-emoji">📈</div>
-              <div>
-                <div class="guru-name">Peter Lynch – PEG</div>
-                <div style="font-size:10px;color:var(--text2)">Büyüme + Değer</div>
-              </div>
-              <div class="guru-score pass">✓ GEÇTİ</div>
-            </div>
-            <div class="guru-criteria">
-              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>PEG &lt; 1 → 0.71 ✓</div>
-              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>F/K &lt; 30 → 11.2x ✓</div>
-              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>ROE &gt; 12% → 38.4% ✓</div>
-            </div>
-          </div>
-
-          <div class="guru-card partial">
-            <div class="guru-top">
-              <div class="guru-emoji">📚</div>
-              <div>
-                <div class="guru-name">Benjamin Graham</div>
-                <div style="font-size:10px;color:var(--text2)">Derin Değer</div>
-              </div>
-              <div class="guru-score partial">3/5 ~</div>
-            </div>
-            <div class="guru-criteria">
-              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>F/K &lt; 15 → 11.2x ✓</div>
-              <div class="guru-crit"><div class="dot" style="background:var(--gold)"></div>PD/DD &lt; 1.5 → 1.81x (sınırda)</div>
-              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>Cari &gt; 2 → 1.65x ~</div>
-              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>Temettü &gt; 1% → 2.66% ✓</div>
-              <div class="guru-crit"><div class="dot" style="background:var(--red)"></div>Borç/Öz &lt; 0.5 → 1.72 ✗</div>
-            </div>
-          </div>
-
-          <div class="guru-card pass">
-            <div class="guru-top">
-              <div class="guru-emoji">⚡</div>
-              <div>
-                <div class="guru-name">Piotroski F-Score</div>
-                <div style="font-size:10px;color:var(--text2)">Finansal Sağlık</div>
-              </div>
-              <div class="guru-score pass">8/9 ✓</div>
-            </div>
-            <div class="guru-criteria">
-              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>Karlılık 4/4 ✓</div>
-              <div class="guru-crit"><div class="dot" style="background:var(--gold)"></div>Kaldıraç 2/3 (dilüsyon var)</div>
-              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>Verimlilik 2/2 ✓</div>
-            </div>
-          </div>
-
-          <div class="guru-card fail">
-            <div class="guru-top">
-              <div class="guru-emoji">🚀</div>
-              <div>
-                <div class="guru-name">Minervini – SEPA</div>
-                <div style="font-size:10px;color:var(--text2)">Momentum</div>
-              </div>
-              <div class="guru-score fail">2/5 ✗</div>
-            </div>
-            <div class="guru-criteria">
-              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>Kazanç Büyümesi &gt;25% → ~</div>
-              <div class="guru-crit"><div class="dot" style="background:var(--red)"></div>52h yükseğine yakın → uzak</div>
-              <div class="guru-crit"><div class="dot" style="background:var(--red)"></div>Güçlü relatif güç → zayıf</div>
-            </div>
-          </div>
-
-          <div class="guru-card partial">
-            <div class="guru-top">
-              <div class="guru-emoji">🏢</div>
-              <div>
-                <div class="guru-name">Citadel Modeli</div>
-                <div style="font-size:10px;color:var(--text2)">Multi-Strategy</div>
-              </div>
-              <div class="guru-score partial">4/5 ~</div>
-            </div>
-            <div class="guru-criteria">
-              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>ROE &gt; 15% → 38.4% ✓</div>
-              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>Net Marj &gt; 12% → 12.8% ✓</div>
-              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>Kazanç Büyümesi &gt;10% ✓</div>
-              <div class="guru-crit"><div class="dot" style="background:var(--gold)"></div>Borç/Öz &lt; 0.8 → sınırda</div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══ TAB: YZ ANALİZİ ═══ -->
-    <div id="tab-ai" class="tab-panel">
-      <div class="section">
-        <div class="sec-title">Yapay Zeka Destekli Analiz</div>
-
-        <div class="ai-box">
-          <div class="ai-header">
-            <div class="ai-icon">🤖</div>
-            <div>
-              <div class="ai-title">DeepFin AI — TUPRS Analizi</div>
-              <div style="font-size:10px;color:var(--text2)">Finansal veriler + piyasa bağlamı üzerine üretildi</div>
-            </div>
-            <div class="ai-badge">CLAUDE 4</div>
-          </div>
-
-          <div class="ai-content">
-            <strong>Genel Değerlendirme:</strong> TUPRS, Türkiye'nin en büyük sanayi kuruluşu olarak güçlü finansal temellerle desteklenen bir değer yatırımı fırsatı sunuyor. F/K 11.2x ile sektörün belirgin biçimde altında işlem görürken, %38.4 ROE rakamı kurumsal yatırımcıların dikkatini çekecek seviyede.
-
-            <div class="ai-bullets">
-              <div class="ai-bullet">
-                <span class="ai-bullet-icon">💚</span>
-                <div><strong>Güçlü Yönler:</strong> Piotroski F-Score 8/9 ile finansal sağlık mükemmel seviyede. PEG 0.71 ile büyüme hızına göre ucuz. Net marj %12.8 ile 5 yıllık en yüksek seviyede. Buffett ve Lynch kriterlerinin büyük çoğunluğunu karşılıyor.</div>
-              </div>
-              <div class="ai-bullet">
-                <span class="ai-bullet-icon">🔴</span>
-                <div><strong>Riskler:</strong> Kısa vadeli borç oranındaki %56.8'lik artış dikkat gerektiriyor. Ham petrol fiyatlarına ve döviz kuruna yüksek duyarlılık. Minervini momentum kriterlerini karşılamıyor — hisse teknik açıdan trendin dışında.</div>
-              </div>
-              <div class="ai-bullet">
-                <span class="ai-bullet-icon">🎯</span>
-                <div><strong>Yatırımcı Profili:</strong> Bu hisse <strong>değer odaklı uzun vadeli yatırımcılar</strong> için uygun. Kısa vadeli momentum trader'ları için ideal değil. Temettü verimi (%2.66) pasif gelir arayan yatırımcıları tatmin edebilir.</div>
-              </div>
-              <div class="ai-bullet">
-                <span class="ai-bullet-icon">📊</span>
-                <div><strong>Sektör Karşılaştırması:</strong> Enerji sektörü ortalamasına kıyasla F/K 24% iskontolu, ROE ise %60 primli işlem görüyor. Benzer rafineriler (Neste, Saras) ile kıyaslandığında değerleme makul görünüyor.</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="ai-footer">
-            <div class="ai-disclaimer">⚠ Bu analiz bilgi amaçlıdır, yatırım tavsiyesi değildir. Finansal kararlarınızda profesyonel destek alın.</div>
-            <div class="ai-refresh">↻ Yenile</div>
-          </div>
-        </div>
-
-        <!-- Analiz Butonu (premium için) -->
-        <div style="margin-top:16px;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:20px;text-align:center;">
-          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;">Özel Soru Sor</div>
-          <div style="font-size:11px;color:var(--text2);margin-bottom:14px)">TUPRS hakkında istediğin soruyu sor — AI finansal verilere göre yanıtlar</div>
-          <div style="display:flex;gap:8px;margin-top:12px;">
-            <input type="text" placeholder="Örn: Bu hisse Buffett stratejisine uygun mu?" style="flex:1;background:var(--s3);border:1px solid var(--border2);border-radius:6px;padding:9px 14px;color:var(--text);font-size:12px;outline:none;font-family:var(--body);">
-            <button class="btn-sm btn-primary" style="white-space:nowrap;padding:9px 16px;">Sor →</button>
-          </div>
-          <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
-            <span style="font-size:10px;padding:4px 10px;background:var(--s3);border:1px solid var(--border);border-radius:20px;color:var(--text2);cursor:pointer;" onclick="fillQ(this)">Temettü artırmaya devam eder mi?</span>
-            <span style="font-size:10px;padding:4px 10px;background:var(--s3);border:1px solid var(--border);border-radius:20px;color:var(--text2);cursor:pointer;" onclick="fillQ(this)">Borç yükü risk oluşturuyor mu?</span>
-            <span style="font-size:10px;padding:4px 10px;background:var(--s3);border:1px solid var(--border);border-radius:20px;color:var(--text2);cursor:pointer;" onclick="fillQ(this)">Fair value nedir?</span>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-  </div><!-- /main-col -->
-
-  <!-- SIDE COLUMN -->
-  <div class="side-col">
-
-    <!-- Hızlı İstatistikler -->
-    <div class="side-section">
-      <div class="side-title">Fiyat Bilgileri</div>
-      <div class="range-wrap">
-        <div class="range-label">
-          <span>₺168.40 <span style="color:var(--muted)">(52h düşük)</span></span>
-          <span>₺248.20 <span style="color:var(--muted)">(52h yüksek)</span></span>
-        </div>
-        <div class="range-bar">
-          <div class="range-fill"></div>
-          <div class="range-cursor" style="left: 57%"></div>
-        </div>
-        <div style="text-align:center;font-size:10px;color:var(--text2);margin-top:6px;font-family:var(--mono)">₺214.50 — zirveden %13.6 uzakta</div>
-      </div>
-      <div class="quick-stat"><span class="qs-label">Açılış</span><span class="qs-val">₺210.80</span></div>
-      <div class="quick-stat"><span class="qs-label">Günlük Yüksek</span><span class="qs-val up">₺216.20</span></div>
-      <div class="quick-stat"><span class="qs-label">Günlük Düşük</span><span class="qs-val dn">₺209.40</span></div>
-      <div class="quick-stat"><span class="qs-label">Günlük Hacim</span><span class="qs-val">₺1.41B</span></div>
-      <div class="quick-stat"><span class="qs-label">Ort. Hacim (20g)</span><span class="qs-val">₺1.18B</span></div>
-      <div class="quick-stat"><span class="qs-label">Beta</span><span class="qs-val">0.87</span></div>
-    </div>
-
-    <!-- Analist Görüşü -->
-    <div class="side-section">
-      <div class="side-title">Analist Konsensüsü</div>
-      <div class="analyst-bar">
-        <div class="analyst-buy" style="width:58%"></div>
-        <div class="analyst-hold" style="width:29%"></div>
-        <div class="analyst-sell" style="width:13%"></div>
-      </div>
-      <div class="analyst-legend">
-        <span>AL 58%</span>
-        <span>TUT 29%</span>
-        <span>SAT 13%</span>
-      </div>
-      <div class="analyst-target">
-        <div>
-          <div class="analyst-target-label">12 Aylık Hedef Fiyat</div>
-          <div class="analyst-target-val">₺258.00</div>
-        </div>
-        <div class="analyst-upside">▲ +20.3% potansiyel</div>
-      </div>
-    </div>
-
-    <!-- Son Haberler -->
-    <div class="side-section">
-      <div class="side-title">Son Haberler</div>
-
-      <div class="news-item">
-        <div class="news-source">KAP · TUPRS</div>
-        <div class="news-title">Tüpraş 2024 yılı kâr payı dağıtım kararı açıklandı — hisse başına ₺5.70</div>
-        <div class="news-meta">
-          <span>2 gün önce</span>
-          <span class="news-sentiment pos">+ Pozitif</span>
-        </div>
-      </div>
-
-      <div class="news-item">
-        <div class="news-source">Bloomberg HT</div>
-        <div class="news-title">Ham petrol fiyatları Orta Doğu gerginliğiyle yükseldi — rafinerilere etki sınırlı</div>
-        <div class="news-meta">
-          <span>4 gün önce</span>
-          <span class="news-sentiment ntr">Nötr</span>
-        </div>
-      </div>
-
-      <div class="news-item">
-        <div class="news-source">Reuters</div>
-        <div class="news-title">Tüpraş İzmir rafinerisi modernizasyon yatırımını tamamladı, kapasite %8 arttı</div>
-        <div class="news-meta">
-          <span>1 hafta önce</span>
-          <span class="news-sentiment pos">+ Pozitif</span>
-        </div>
-      </div>
-
-      <div class="news-item">
-        <div class="news-source">Ekonomist</div>
-        <div class="news-title">EPDK akaryakıt fiyat düzenlemesi — Tüpraş marjlarına etkisi analizi</div>
-        <div class="news-meta">
-          <span>10 gün önce</span>
-          <span class="news-sentiment neg">- Negatif</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Benzer Hisseler -->
-    <div class="side-section">
-      <div class="side-title">Benzer Hisseler — Enerji Sektörü</div>
-      <div class="similar-item">
-        <span class="similar-sym">AYGAZ</span>
-        <span class="similar-name">Aygaz A.Ş.</span>
-        <span class="similar-chg up">+1.4%</span>
-      </div>
-      <div class="similar-item">
-        <span class="similar-sym">PETKM</span>
-        <span class="similar-name">Petkim Petrokimya</span>
-        <span class="similar-chg dn">-0.8%</span>
-      </div>
-      <div class="similar-item">
-        <span class="similar-sym">BIMAS</span>
-        <span class="similar-name">BİM Mağazalar</span>
-        <span class="similar-chg up">+0.6%</span>
-      </div>
-      <div class="similar-item">
-        <span class="similar-sym">EREGL</span>
-        <span class="similar-name">Ereğli Demir Çelik</span>
-        <span class="similar-chg dn">-1.2%</span>
-      </div>
-      <div class="similar-item">
-        <span class="similar-sym">AKSEN</span>
-        <span class="similar-name">Aksa Enerji</span>
-        <span class="similar-chg up">+2.1%</span>
-      </div>
-    </div>
-
-    <!-- KAP Bildirimleri -->
-    <div class="side-section">
-      <div class="side-title">KAP Bildirimleri</div>
-      <div class="news-item">
-        <div class="news-source" style="color:var(--gold)">KAP · Özel Durum</div>
-        <div class="news-title">2024 Yılı Olağan Genel Kurul Toplantısı — 28 Mart 2025</div>
-        <div class="news-meta"><span>3 gün önce</span></div>
-      </div>
-      <div class="news-item">
-        <div class="news-source" style="color:var(--gold)">KAP · Finansal Rapor</div>
-        <div class="news-title">2024 Yılı Yıllık Finansal Tablolar açıklandı</div>
-        <div class="news-meta"><span>2 hafta önce</span></div>
-      </div>
-      <div class="news-item">
-        <div class="news-source" style="color:var(--gold)">KAP · Yönetim</div>
-        <div class="news-title">Yönetim Kurulu Üyesi değişikliği hk. bildirim</div>
-        <div class="news-meta"><span>1 ay önce</span></div>
-      </div>
-    </div>
-
-  </div><!-- /side-col -->
-</div><!-- /page -->
-
 <script>
-function switchTab(id, el) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('on'));
-  el.classList.add('on');
-  document.getElementById('tab-' + id).classList.add('on');
-}
-
-function fillQ(el) {
-  document.querySelector('input[type="text"]').value = el.textContent;
-}
-
 
 // ── DISCLAIMER (localStorage — ilk girişte bir kez) ──
 var _disclaimerTimer = null;
@@ -998,7 +1078,6 @@ function _showDisclaimer(onAccept) {
   }
   var modal = document.getElementById('disclaimerModal');
   if (!modal) {
-    // DOM henüz hazır değil, DOMContentLoaded'ı bekle
     document.addEventListener('DOMContentLoaded', function() { _showDisclaimer(onAccept); });
     return;
   }
@@ -1032,87 +1111,612 @@ function _showDisclaimer(onAccept) {
     if (onAccept) onAccept();
   };
 }
-function acceptDisclaimer() {
-  localStorage.setItem('df_disclaimer_v1', '1');
-  var modal = document.getElementById('disclaimerModal');
-  if (modal) modal.classList.remove('open');
-  clearInterval(_disclaimerTimer);
-}
-
-// Sayfa yüklenince disclaimer kontrolü
 document.addEventListener('DOMContentLoaded', function() {
   _showDisclaimer(null);
 });
-</script>
 
-<script>
-// URL parametrelerinden sym + ex al
-(function(){
+function openTradingView() {
+  var ex = _prfEx || 'bist';
+  var sym = _prfSym || '';
+  var prefixes = {bist:'BIST',nasdaq:'NASDAQ',sp500:'NYSE',dax:'XETR',lse:'LSE',nikkei:'TSE'};
+  var pfx = prefixes[ex] || 'BIST';
+  window.open('https://www.tradingview.com/chart/?symbol='+pfx+'%3A'+sym, '_blank');
+}
+
+function loadTVWidget(sym, ex) {
+  var container = document.getElementById('prf-tv-widget');
+  if(!container) return;
+  var prefixes = {bist:'BIST',nasdaq:'NASDAQ',sp500:'NYSE',dax:'XETR',lse:'LSE',nikkei:'TSE'};
+  var pfx = prefixes[ex] || 'BIST';
+  var tvSym = pfx + ':' + sym;
+  var themes = 'dark';
+  container.innerHTML = '<div id="tv-widget-inner"></div>';
+  var script = document.createElement('script');
+  script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+  script.async = true;
+  script.innerHTML = JSON.stringify({
+    autosize: true,
+    symbol: tvSym,
+    interval: 'D',
+    timezone: 'Europe/Istanbul',
+    theme: themes,
+    style: '1',
+    locale: 'tr',
+    allow_symbol_change: false,
+    calendar: false,
+    hide_top_toolbar: false,
+    hide_legend: true,
+    save_image: false,
+    backgroundColor: 'rgba(14,14,14,1)',
+    gridColor: 'rgba(255,255,255,0.04)',
+    hide_volume: false,
+    support_host: 'https://www.tradingview.com'
+  });
+  var wrapper = document.createElement('div');
+  wrapper.className = 'tradingview-widget-container';
+  wrapper.style.cssText = 'width:100%;height:340px;';
+  var inner = document.createElement('div');
+  inner.className = 'tradingview-widget-container__widget';
+  inner.style.cssText = 'height:calc(100% - 32px);width:100%;';
+  wrapper.appendChild(inner);
+  wrapper.appendChild(script);
+  container.innerHTML = '';
+  container.appendChild(wrapper);
+  // live dot göster
+  var ld = document.getElementById('prf-live-dot');
+  if(ld) ld.style.display = 'flex';
+}
+
+function _mkSparkline(containerId, color, trend) {
+  // trend: 'up' | 'down' | 'flat'
+  var container = document.getElementById(containerId);
+  if(!container) return;
+  var pts = trend === 'up'   ? 'M0,40 L50,34 L100,26 L150,18 L200,10 L250,5 L300,2'
+           : trend === 'down' ? 'M0,5  L50,10 L100,18 L150,26 L200,32 L250,38 L300,42'
+           :                    'M0,22 L50,20 L100,24 L150,18 L200,22 L250,20 L300,22';
+  var fill = pts + ' L300,44 L0,44Z';
+  var cRgb = color === '#00c076' ? '0,192,118' : color === '#f0b429' ? '240,180,41' : '59,130,246';
+  container.innerHTML =
+    '<svg class="sparkline-svg" viewBox="0 0 300 44" preserveAspectRatio="none">'+
+    '<defs><linearGradient id="sg'+containerId+'" x1="0" y1="0" x2="0" y2="1">'+
+    '<stop offset="0%" stop-color="'+color+'" stop-opacity=".3"/>'+
+    '<stop offset="100%" stop-color="'+color+'" stop-opacity="0"/></linearGradient></defs>'+
+    '<path d="'+fill+'" fill="url(#sg'+containerId+')"/>'+
+    '<path d="'+pts+'" fill="none" stroke="'+color+'" stroke-width="1.5"/>'+
+    '</svg>';
+}
+
+function _buildTrend(d) {
+  if(!d) return;
+  var n = function(v){ return (v!==null&&v!==undefined&&!isNaN(Number(v)))?Number(v):null; };
+  var revGrowth = n(d.total_revenue_change_ttm_yoy) || n(d.revenue_growth_ttm_yoy);
+  var earnGrowth = n(d.earnings_per_share_diluted_yoy_growth_ttm) || n(d.earnings_per_share_change_ttm_yoy);
+
+  // Gelir büyümesi
+  var revEl  = document.getElementById('prf-rev-val');
+  var revChg = document.getElementById('prf-rev-chg');
+  if(revEl && revGrowth !== null) {
+    revEl.textContent  = (revGrowth >= 0 ? '+' : '') + revGrowth.toFixed(1) + '%';
+    revEl.style.color  = revGrowth >= 0 ? 'var(--green)' : 'var(--red)';
+    if(revChg) { revChg.textContent = 'YoY TTM'; revChg.style.color = revGrowth >= 0 ? 'var(--green)' : 'var(--red)'; }
+    _mkSparkline('prf-rev-spark', '#3b82f6', revGrowth > 5 ? 'up' : revGrowth < -5 ? 'down' : 'flat');
+  } else {
+    if(revEl) revEl.textContent = '—';
+    _mkSparkline('prf-rev-spark', '#3b82f6', 'flat');
+  }
+
+  // Kazanç büyümesi
+  var earnEl  = document.getElementById('prf-earn-val');
+  var earnChg = document.getElementById('prf-earn-chg');
+  if(earnEl && earnGrowth !== null) {
+    earnEl.textContent  = (earnGrowth >= 0 ? '+' : '') + earnGrowth.toFixed(1) + '%';
+    earnEl.style.color  = earnGrowth >= 0 ? 'var(--green)' : 'var(--red)';
+    if(earnChg) { earnChg.textContent = 'YoY TTM'; earnChg.style.color = earnGrowth >= 0 ? 'var(--green)' : 'var(--red)'; }
+    _mkSparkline('prf-earn-spark', '#00c076', earnGrowth > 5 ? 'up' : earnGrowth < -5 ? 'down' : 'flat');
+  } else {
+    if(earnEl) earnEl.textContent = '—';
+    _mkSparkline('prf-earn-spark', '#00c076', 'flat');
+  }
+
+  // Performans barları
+  var perfEl = document.getElementById('prf-perf-bars');
+  if(perfEl) {
+    var perfs = [
+      {l:'1H', v:n(d.Perf_W)  || n(d.perfW)},
+      {l:'1A', v:n(d.Perf_1M) || n(d.perf1M)},
+      {l:'1Y', v:n(d.Perf_Y)  || n(d.perfY)},
+    ];
+    perfEl.innerHTML = perfs.map(function(p){
+      if(p.v === null) return '<div class="perf-bar-row"><span class="perf-bar-label">'+p.l+'</span><div class="perf-bar-track"><div class="perf-bar-fill" style="width:0%;background:var(--muted)"></div></div><span class="perf-bar-val" style="color:var(--muted)">—</span></div>';
+      var pct = Math.min(Math.abs(p.v), 50);
+      var w = (pct / 50 * 100).toFixed(1);
+      var col = p.v >= 0 ? 'var(--green)' : 'var(--red)';
+      var txt = (p.v >= 0 ? '+' : '') + p.v.toFixed(1) + '%';
+      return '<div class="perf-bar-row">'+
+        '<span class="perf-bar-label">'+p.l+'</span>'+
+        '<div class="perf-bar-track"><div class="perf-bar-fill" style="width:'+w+'%;background:'+col+'"></div></div>'+
+        '<span class="perf-bar-val" style="color:'+col+'">'+txt+'</span>'+
+      '</div>';
+    }).join('');
+  }
+}
+
+function _buildFinancials(d) {
+  if(!d) return;
+  var n  = function(v,def){ var x=Number(v); return isNaN(x)?def:x; };
+  var pct = function(v){ return v!==0?(v*100).toFixed(1)+'%':'—'; };
+  var cur = (EXCHANGE_META[_prfEx]||{}).currency || '₺';
+
+  // Özet grid
+  var cells = [
+    {l:'F/K (TTM)',       v: n(d.pe_ratio,0) ? n(d.pe_ratio,0).toFixed(1)+'x' : '—', cls: n(d.pe_ratio,0)<15&&n(d.pe_ratio,0)>0 ? 'good' : n(d.pe_ratio,0)<25 ? 'mid' : 'bad'},
+    {l:'PD/DD',           v: n(d.price_book_ratio,0) ? n(d.price_book_ratio,0).toFixed(2)+'x' : '—', cls: n(d.price_book_ratio,0)<2&&n(d.price_book_ratio,0)>0 ? 'good' : n(d.price_book_ratio,0)<4 ? 'mid' : 'bad'},
+    {l:'F/S (TTM)',       v: n(d.price_sales,0) ? n(d.price_sales,0).toFixed(2)+'x' : '—', cls: n(d.price_sales,0)<1&&n(d.price_sales,0)>0 ? 'good' : 'mid'},
+    {l:'ROE (TTM)',       v: d.roe ? pct(d.roe) : '—', cls: n(d.roe,0)*100>15 ? 'good' : n(d.roe,0)*100>8 ? 'mid' : 'bad'},
+    {l:'ROA (TTM)',       v: d.roa ? pct(d.roa) : '—', cls: n(d.roa,0)*100>8 ? 'good' : n(d.roa,0)*100>3 ? 'mid' : 'bad'},
+    {l:'Net Marj',        v: d.net_margin ? pct(d.net_margin) : '—', cls: n(d.net_margin,0)*100>12 ? 'good' : n(d.net_margin,0)*100>5 ? 'mid' : 'bad'},
+  ];
+  var finSum = document.getElementById('prf-fin-summary');
+  if(finSum) finSum.innerHTML = cells.map(function(c){
+    return '<div class="fin-cell"><div class="fin-cell-label">'+c.l+'</div><div class="fin-cell-val '+c.cls+'">'+c.v+'</div></div>';
+  }).join('');
+
+  // Kârlılık gauge'ları
+  var gauges = [
+    {l:'Brüt Marj',  v: n(d.gross_margin,0)*100, max:60, color:'#3b82f6'},
+    {l:'Net Marj',   v: n(d.net_margin,0)*100,   max:30, color:'#00c076'},
+    {l:'ROE',        v: n(d.roe,0)*100,           max:50, color:'#f0b429'},
+    {l:'ROA',        v: n(d.roa,0)*100,           max:20, color:'#00c076'},
+  ];
+  var finGauge = document.getElementById('prf-fin-gauges');
+  if(finGauge) finGauge.innerHTML = gauges.map(function(g){
+    var w = g.v > 0 ? Math.min(g.v/g.max*100,100).toFixed(1) : 0;
+    var show = g.v !== 0 ? (g.v >= 0 ? '+' : '') + g.v.toFixed(1) + '%' : '—';
+    return '<div class="fin-gauge-wrap">'+
+      '<div class="fin-gauge-label"><span>'+g.l+'</span><span style="color:'+(g.v>0?g.color:'var(--muted)')+'">'+show+'</span></div>'+
+      '<div class="fin-gauge-bar"><div class="fin-gauge-fill" style="width:'+w+'%;background:'+g.color+'"></div></div>'+
+    '</div>';
+  }).join('');
+
+  // Borç & Likidite
+  var debtCards = [
+    {l:'Borç / Özsermaye', v: d.debt_to_equity ? n(d.debt_to_equity,0).toFixed(2) : '—', sub: n(d.debt_to_equity,0)<0.5?'✓ Düşük risk':n(d.debt_to_equity,0)<1?'Orta':'Yüksek', cls: n(d.debt_to_equity,0)<0.5 ? 'good' : n(d.debt_to_equity,0)<1 ? 'mid' : 'bad'},
+    {l:'Cari Oran',        v: d.current_ratio  ? n(d.current_ratio,0).toFixed(2)+'x' : '—', sub: n(d.current_ratio,0)>2?'✓ Güçlü likidite':n(d.current_ratio,0)>1?'Yeterli':'Zayıf likidite', cls: n(d.current_ratio,0)>2 ? 'good' : n(d.current_ratio,0)>1 ? 'mid' : 'bad'},
+    {l:'Temettü Verimi',   v: d.dividend_yield_recent ? (n(d.dividend_yield_recent,0)*100).toFixed(2)+'%' : '—', sub: 'Güncel veri', cls: n(d.dividend_yield_recent,0)*100>3 ? 'good' : n(d.dividend_yield_recent,0)*100>1 ? 'mid' : ''},
+    {l:'PEG Oranı',        v: d.peg_ratio ? n(d.peg_ratio,0).toFixed(2) : '—', sub: n(d.peg_ratio,0)>0&&n(d.peg_ratio,0)<1?'✓ Cazip büyüme':'<1 = cazip', cls: n(d.peg_ratio,0)>0&&n(d.peg_ratio,0)<1 ? 'good' : n(d.peg_ratio,0)<2 ? 'mid' : 'bad'},
+  ];
+  var finDebt = document.getElementById('prf-fin-debt');
+  if(finDebt) finDebt.innerHTML = debtCards.map(function(c){
+    return '<div class="fin-debt-card">'+
+      '<div class="fin-debt-label">'+c.l+'</div>'+
+      '<div class="fin-debt-val '+c.cls+'">'+c.v+'</div>'+
+      '<div class="fin-debt-sub">'+c.sub+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+
+function goScreener() { window.location.href = '/'; }  // Tarayıcı → anasayfa (screener açık gelir)
+function closeProfil() {
   var params = new URLSearchParams(window.location.search);
-  var sym = (params.get('sym') || 'TUPRS').toUpperCase();
-  var ex  = params.get('ex') || 'bist';
-
-  var EXCHANGE_NAMES = {bist:'BIST',nasdaq:'NASDAQ',sp500:'S&P 500',dax:'DAX',lse:'LSE',nikkei:'Nikkei'};
-  var EXCHANGE_FLAGS = {bist:'tr',nasdaq:'us',sp500:'us',dax:'de',lse:'gb',nikkei:'jp'};
-  var EXCHANGE_CUR   = {bist:'₺',nasdaq:'$',sp500:'$',dax:'€',lse:'£',nikkei:'¥'};
-
-  // Başlık güncelle
-  document.title = 'DeepFin — ' + sym + ' Analizi';
-
-  // Breadcrumb
-  var bcEl = document.querySelector('.breadcrumb');
-  if(bcEl){
-    bcEl.innerHTML =
-      '<a href="/">Tarayıcı</a>' +
-      '<span class="breadcrumb-sep">/</span>' +
-      '<a href="/analiz/">Analiz</a>' +
-      '<span class="breadcrumb-sep">/</span>' +
-      '<a href="/analiz/">' + (EXCHANGE_NAMES[ex]||ex).toLowerCase() + '</a>' +
-      '<span class="breadcrumb-sep">/</span>' +
-      '<span style="color:var(--text)">' + sym.toLowerCase() + '</span>';
+  var from = params.get('from');
+  if(from === 'screener') {
+    history.back();
+  } else {
+    window.location.href = '/';
   }
+}
+function onHemenAl(sym, ex) { showToast('🛒 ' + sym + ' — Broker entegrasyonu yakında!'); }
+function showToast(msg) {
+  var t = document.getElementById('df-toast');
+  if(!t) { t = document.createElement('div'); t.id='df-toast';
+    t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid #2a2a2a;color:#ededed;font-size:12px;padding:10px 20px;border-radius:8px;z-index:9999;opacity:0;transition:opacity .2s;white-space:nowrap;font-family:Inter,sans-serif;';
+    document.body.appendChild(t); }
+  t.textContent=msg; t.style.opacity='1';
+  clearTimeout(t._t); t._t=setTimeout(function(){t.style.opacity='0';},3000);
+}
 
-  // Logo, başlık, tag güncelle
-  var logoEl = document.querySelector('.company-logo');
-  if(logoEl) logoEl.textContent = sym.substring(0,2);
 
-  var nameEl = document.querySelector('.company-name');
-  if(nameEl) nameEl.textContent = sym + ' — ' + (EXCHANGE_NAMES[ex]||ex);
 
-  var symTag = document.querySelector('.tag.blue');
-  if(symTag) symTag.textContent = sym;
+var EXCHANGE_META = {
+  bist:   { name: 'BIST',    currency: '₺', currencyCode: 'TRY', yahooSuffix: '.IS', flag: '🇹🇷', tvUrl: 'https://scanner.tradingview.com/turkey/scan',  filters: [] },
+  nasdaq: { name: 'NASDAQ',  currency: '$',  currencyCode: 'USD', yahooSuffix: '',    flag: '🇺🇸', tvUrl: 'https://scanner.tradingview.com/america/scan', filters: [{ left: 'exchange', operation: 'equal', right: 'NASDAQ' }] },
+  sp500:  { name: 'S&P 500', currency: '$',  currencyCode: 'USD', yahooSuffix: '',    flag: '🇺🇸', tvUrl: 'https://scanner.tradingview.com/america/scan', filters: [] },
+  dax:    { name: 'DAX',     currency: '€',  currencyCode: 'EUR', yahooSuffix: '.DE', flag: '🇩🇪', tvUrl: 'https://scanner.tradingview.com/germany/scan', filters: [] },
+  lse:    { name: 'LSE',     currency: '£',  currencyCode: 'GBP', yahooSuffix: '.L',  flag: '🇬🇧', tvUrl: 'https://scanner.tradingview.com/uk/scan',      filters: [] },
+  nikkei: { name: 'Nikkei',  currency: '¥',  currencyCode: 'JPY', yahooSuffix: '.T',  flag: '🇯🇵', tvUrl: 'https://scanner.tradingview.com/japan/scan',   filters: [] },
+};
 
-  // Geri butonu
-  var topbarRight = document.querySelector('.topbar-right');
-  if(topbarRight){
-    var backBtn = topbarRight.querySelector('.btn-sm:first-child');
-    if(backBtn){ backBtn.textContent = '← Analiz'e Dön'; backBtn.onclick = function(){ history.back(); }; }
-  }
+var allData = [];
+var currentExchange = 'bist';
+var _prfSym = '';
+var _prfEx  = '';
+var _prfData = null;
+var _prfAiDone = false;
+var _urlParams = new URLSearchParams(window.location.search);
 
-  // Hemen Al butonu
-  document.querySelectorAll('.dpl-buy, .prf-buy-btn').forEach(function(b){
-    b.textContent = '🛒 ' + sym + ' — Hemen Al';
+function _fmtN(v) {
+  if(!v || isNaN(v)) return '—';
+  if(Math.abs(v)>=1e12) return (v/1e12).toFixed(1)+'T';
+  if(Math.abs(v)>=1e9)  return (v/1e9).toFixed(1)+'B';
+  if(Math.abs(v)>=1e6)  return (v/1e6).toFixed(1)+'M';
+  return parseFloat(v).toFixed(2);
+}
+
+function _setScore(id, val, cls) {
+  var el = document.getElementById(id);
+  if(el){ el.textContent=val; el.className='prf-score-val '+(cls||''); }
+}
+
+function showProfil(sym, ex) {
+  _prfSym = sym;
+  _prfEx  = ex || 'bist';
+
+  var exMeta = EXCHANGE_META[_prfEx] || {};
+  var bcEx = document.getElementById('prf-bc-ex');
+  var bcSym = document.getElementById('prf-bc-sym');
+  if(bcEx)  bcEx.textContent  = (exMeta.name || _prfEx).toUpperCase();
+  if(bcSym) bcSym.textContent = sym.toUpperCase();
+
+  document.getElementById('prf-sym-tag').textContent = sym;
+  document.getElementById('prf-ex-tag').textContent  = (exMeta.name || _prfEx).toUpperCase();
+  document.getElementById('prf-logo').textContent    = sym.substring(0,2).toUpperCase();
+  document.getElementById('prf-fullname').textContent = sym;
+
+  var buyBtn = document.getElementById('prf-buy-btn');
+  if(buyBtn) buyBtn.onclick = function(){ onHemenAl(sym, _prfEx); };
+
+  _prfData = allData.find(function(x){
+    var s = (x.symbol||'').replace('.IS','').toUpperCase();
+    return s === sym.toUpperCase() || (x.symbol||'').toUpperCase() === sym.toUpperCase()+'.IS';
   });
 
-  // TradingView butonu güncelle
-  var tvBtn = document.querySelector('.btn-primary');
-  if(tvBtn){
-    var tvUrl = '';
-    if(ex==='bist') tvUrl='https://tr.tradingview.com/symbols/BIST-'+sym;
-    else if(ex==='nasdaq') tvUrl='https://www.tradingview.com/symbols/NASDAQ-'+sym;
-    else if(ex==='sp500') tvUrl='https://www.tradingview.com/symbols/NYSE-'+sym;
-    else if(ex==='dax') tvUrl='https://www.tradingview.com/symbols/XETR-'+sym;
-    else if(ex==='lse') tvUrl='https://www.tradingview.com/symbols/LSE-'+sym;
-    else if(ex==='nikkei') tvUrl='https://www.tradingview.com/symbols/TSE-'+sym;
-    tvBtn.textContent = '↗ TradingView'da Aç';
-    tvBtn.onclick = function(){ window.open(tvUrl,'_blank'); };
+  _buildPrfHero();
+  _buildPrfMetrics();
+  _buildPrfPiotroski();
+  _buildPrfGuru();
+  _buildPrfSide();
+  _buildTrend(_prfData);
+  _buildFinancials(_prfData);
+  loadTVWidget(sym, ex);
+  prfTab('overview', document.querySelector('.prf-tab'));
+  _prfAiDone = false;
+}
+
+function _buildPrfHero() {
+  var d = _prfData;
+  if(!d) return;
+  var exMeta = EXCHANGE_META[_prfEx] || EXCHANGE_META.bist;
+  var cur = exMeta.currency || '₺';
+
+  var price = d.close || d.price || 0;
+  var chgPct = d.change_abs || 0;
+  document.getElementById('prf-price').textContent = price
+    ? cur+' '+price.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2})
+    : '—';
+  var chgEl = document.getElementById('prf-chg');
+  if(chgPct) {
+    var sign = chgPct >= 0 ? '+' : '';
+    chgEl.textContent = sign+(d.change||0).toFixed(2)+' ('+sign+chgPct.toFixed(2)+'%)';
+    chgEl.className = 'prf-chg '+(chgPct>=0?'up':'dn');
   }
-})();
 
+  var pe = d.pe_ratio, peg = d.peg_ratio, roe = d.roe, fs = d.piotroski_f_score, mc = d.market_cap_basic;
+  _setScore('prf-sc-fscore', fs!==undefined&&fs!==null ? fs+'/9' : '—', fs>=7?'g':fs>=4?'m':'b');
+  _setScore('prf-sc-peg', peg ? peg.toFixed(2) : '—', peg&&peg<1?'g':peg&&peg<2?'m':'b');
+  _setScore('prf-sc-fk',  pe  ? pe.toFixed(1)+'x' : '—', pe&&pe<15?'g':pe&&pe<25?'m':'b');
+  _setScore('prf-sc-roe', roe ? (roe*100).toFixed(1)+'%' : '—', roe&&roe*100>15?'g':roe&&roe*100>8?'m':'b');
+  _setScore('prf-sc-mc',  mc  ? _fmtN(mc*1e6) : '—', '');
 
+  if(d.sector) document.getElementById('prf-sector-tag').textContent = d.sector;
+  if(d.name)   document.getElementById('prf-fullname').textContent   = d.name;
+}
+
+function _buildPrfMetrics() {
+  var d = _prfData;
+  if(!d) return;
+  var metrics = [
+    {l:'F/K (TTM)',      v:d.pe_ratio,             fmt:function(v){return v.toFixed(1)+'x';},  cls:function(v){return v>0&&v<15?'g':v<25?'m':'b';}, sub:'Piyasa/Kazanç'},
+    {l:'PD/DD',          v:d.price_book_ratio,      fmt:function(v){return v.toFixed(2)+'x';},  cls:function(v){return v>0&&v<2?'g':v<4?'m':'b';},  sub:'Defter değeri'},
+    {l:'ROE',            v:d.roe,                   fmt:function(v){return (v*100).toFixed(1)+'%';}, cls:function(v){return v*100>15?'g':v*100>8?'m':'b';}, sub:'Özsermaye getirisi'},
+    {l:'ROA',            v:d.roa,                   fmt:function(v){return (v*100).toFixed(1)+'%';}, cls:function(v){return v*100>8?'g':v*100>3?'m':'b';},  sub:'Varlık getirisi'},
+    {l:'Net Marj',       v:d.net_margin,            fmt:function(v){return (v*100).toFixed(1)+'%';}, cls:function(v){return v*100>12?'g':v*100>5?'m':'b';}, sub:'Kar/gelir oranı'},
+    {l:'Brüt Marj',      v:d.gross_margin,          fmt:function(v){return (v*100).toFixed(1)+'%';}, cls:function(v){return v*100>40?'g':v*100>20?'m':'b';},sub:'Ham kârlılık'},
+    {l:'PEG',            v:d.peg_ratio,             fmt:function(v){return v.toFixed(2);},       cls:function(v){return v>0&&v<1?'g':v<2?'m':'b';},  sub:'Büyümeye göre F/K'},
+    {l:'F-Score',        v:d.piotroski_f_score,     fmt:function(v){return v+'/9';},              cls:function(v){return v>=7?'g':v>=4?'m':'b';},     sub:'Finansal sağlık'},
+    {l:'Cari Oran',      v:d.current_ratio,         fmt:function(v){return v.toFixed(2)+'x';},  cls:function(v){return v>2?'g':v>1?'m':'b';},        sub:'Dönen/kısa borç'},
+    {l:'Borç/Öz',        v:d.debt_to_equity,        fmt:function(v){return v.toFixed(2);},       cls:function(v){return v<0.5?'g':v<1?'m':'b';},     sub:'Finansal kaldıraç'},
+    {l:'Temettü Verimi', v:d.dividend_yield_recent, fmt:function(v){return (v*100).toFixed(2)+'%';}, cls:function(v){return v*100>3?'g':v*100>1?'m':'b';}, sub:'Yıllık temettü'},
+    {l:'Haftalık Değ.',  v:d.Perf_W,                fmt:function(v){return (v>=0?'+':'')+v.toFixed(2)+'%';}, cls:function(v){return v>0?'g':'b';}, sub:'7 günlük performans'},
+  ];
+  document.getElementById('prf-metrics').innerHTML = metrics.map(function(m){
+    var ok = m.v!==null && m.v!==undefined && !isNaN(m.v) && m.v!==0;
+    return '<div class="prf-mcell"><div class="prf-mlabel">'+m.l+'</div><div class="prf-mval '+(ok?m.cls(m.v):'')+'">'+(ok?m.fmt(m.v):'—')+'</div><div class="prf-msub">'+m.sub+'</div></div>';
+  }).join('');
+}
+
+function _buildPrfPiotroski() {
+  var d = _prfData;
+  var score = d ? d.piotroski_f_score : null;
+  if(score===null||score===undefined) { document.getElementById('prf-fscore-num').textContent='—'; return; }
+  document.getElementById('prf-fscore-num').textContent = score;
+  document.getElementById('prf-fscore-label').textContent = score>=8?'Güçlü Bilanço':score>=5?'Orta Güç':'Zayıf';
+  var groups = [
+    {title:'Karlılık', items:[
+      {t:'Pozitif ROA',             p:d.roa>0},
+      {t:'Pozitif Nakit Akışı',     p:d.cash_f_operating_activities>0},
+      {t:'Artan ROA (YoY)',         p:score>=5},
+      {t:'Nakit Akışı > Net Gelir', p:score>=6},
+    ]},
+    {title:'Kaldıraç & Likidite', items:[
+      {t:'Azalan Uzun Vadeli Borç', p:d.debt_to_equity<1},
+      {t:'Artan Cari Oran',         p:d.current_ratio>1.5},
+      {t:'Hisse Dilüsyonu Yok',     p:score>=7},
+    ]},
+    {title:'Verimlilik', items:[
+      {t:'Artan Brüt Marj',         p:d.gross_margin>0.2},
+      {t:'Artan Varlık Devir Hızı', p:score>=8},
+    ]},
+  ];
+  document.getElementById('prf-fgrid').innerHTML = groups.map(function(g){
+    return '<div class="prf-fgroup"><div class="prf-fgroup-title">'+g.title+'</div>'+
+      g.items.map(function(i){return '<div class="prf-fitem"><div class="prf-fdot '+(i.p?'p':'f')+'"></div>'+i.t+'</div>';}).join('')+'</div>';
+  }).join('');
+}
+
+function _buildPrfGuru() {
+  var d = _prfData;
+  if(!d) { document.getElementById('prf-ggrid').innerHTML='<div style="color:var(--muted);font-size:12px;padding:10px">Tarama yapıp Detaylı Analiz&#39;e tıklayın</div>'; return; }
+  var pe=d.pe_ratio, pb=d.price_book_ratio, roe=(d.roe||0)*100, nm=(d.net_margin||0)*100;
+  var cr=d.current_ratio, de=d.debt_to_equity, peg=d.peg_ratio, dy=(d.dividend_yield_recent||0)*100, fs=d.piotroski_f_score||0;
+  var gurus = [
+    {emoji:'🎯', name:'Warren Buffett', sub:'Değer Yatırımı', crits:[
+      {t:'F/K < 20 → '+(pe?pe.toFixed(1)+'x':'—'),  p:pe&&pe>0&&pe<20},
+      {t:'ROE > 15% → '+roe.toFixed(1)+'%',           p:roe>15},
+      {t:'Net Marj > 10% → '+nm.toFixed(1)+'%',       p:nm>10},
+      {t:'Cari Oran > 1.2 → '+(cr?cr.toFixed(2):'—'),p:cr&&cr>1.2},
+      {t:'Borç/Öz < 0.8 → '+(de?de.toFixed(2):'—'), p:de!==undefined&&de<0.8},
+    ]},
+    {emoji:'📈', name:'Peter Lynch – PEG', sub:'Büyüme + Değer', crits:[
+      {t:'PEG < 1 → '+(peg?peg.toFixed(2):'—'),      p:peg&&peg>0&&peg<1},
+      {t:'F/K < 30 → '+(pe?pe.toFixed(1)+'x':'—'),   p:pe&&pe>0&&pe<30},
+      {t:'ROE > 12% → '+roe.toFixed(1)+'%',            p:roe>12},
+    ]},
+    {emoji:'📚', name:'Benjamin Graham', sub:'Derin Değer', crits:[
+      {t:'F/K < 15 → '+(pe?pe.toFixed(1)+'x':'—'),   p:pe&&pe>0&&pe<15},
+      {t:'PD/DD < 1.5 → '+(pb?pb.toFixed(2)+'x':'—'),p:pb&&pb<1.5},
+      {t:'Cari > 2 → '+(cr?cr.toFixed(2)+'x':'—'),   p:cr&&cr>2},
+      {t:'Temettü > 1% → '+dy.toFixed(1)+'%',          p:dy>1},
+    ]},
+    {emoji:'⚡', name:'Piotroski F-Score', sub:'Finansal Sağlık', crits:[
+      {t:'Karlılık 4/4', p:fs>=6},
+      {t:'Kaldıraç 3/3', p:fs>=8},
+      {t:'Verimlilik 2/2',p:fs>=7},
+    ]},
+  ];
+  document.getElementById('prf-ggrid').innerHTML = gurus.map(function(g){
+    var passed=g.crits.filter(function(c){return c.p;}).length, total=g.crits.length, pct=passed/total;
+    var cls=pct>=0.8?'pass':pct>=0.5?'partial':'fail';
+    return '<div class="prf-gcard '+cls+'">'+
+      '<div class="prf-gtop"><span style="font-size:18px">'+g.emoji+'</span>'+
+      '<div><div style="font-size:12px;font-weight:700;color:var(--text)">'+g.name+'</div>'+
+      '<div style="font-size:10px;color:var(--text2)">'+g.sub+'</div></div>'+
+      '<span class="prf-gscore '+cls+'">'+passed+'/'+total+(pct>=0.8?' ✓':pct>=0.5?' ~':' ✗')+'</span></div>'+
+      g.crits.map(function(c){return '<div class="prf-gcrit"><div class="prf-cdot" style="background:'+(c.p?'var(--green)':'var(--red)')+'"></div>'+c.t+'</div>';}).join('')+'</div>';
+  }).join('');
+}
+
+function _buildPrfSide() {
+  var d = _prfData || {};
+  var exMeta = EXCHANGE_META[_prfEx] || EXCHANGE_META.bist;
+  var cur = exMeta.currency || '₺';
+  var stats = [
+    {k:'52H Yüksek',    v: d['52_week_high'] ? cur+' '+d['52_week_high'].toFixed(2) : '—'},
+    {k:'52H Düşük',     v: d['52_week_low']  ? cur+' '+d['52_week_low'].toFixed(2)  : '—'},
+    {k:'Beta',          v: d.beta ? d.beta.toFixed(2) : '—'},
+    {k:'Piyasa Değeri', v: d.market_cap_basic ? _fmtN(d.market_cap_basic*1e6) : '—'},
+    {k:'Ort. Hacim',    v: d.average_volume_10d_calc ? _fmtN(d.average_volume_10d_calc) : '—'},
+    {k:'Temettü',       v: d.dividend_yield_recent ? (d.dividend_yield_recent*100).toFixed(2)+'%' : '—', cls:'g'},
+    {k:'Haftalık',      v: d.Perf_W ? (d.Perf_W>=0?'+':'')+d.Perf_W.toFixed(2)+'%' : '—', cls:d.Perf_W>=0?'g':'r'},
+    {k:'Aylık',         v: d.Perf_1M ? (d.Perf_1M>=0?'+':'')+d.Perf_1M.toFixed(2)+'%' : '—', cls:d.Perf_1M>=0?'g':'r'},
+  ];
+  document.getElementById('prf-price-stats').innerHTML = stats.map(function(s){
+    return '<div class="prf-qstat"><span class="prf-qkey">'+s.k+'</span><span class="prf-qval '+(s.cls||'')+'">'+s.v+'</span></div>';
+  }).join('');
+
+  // Benzer hisseler
+  var similar = allData.filter(function(x){ return d.sector && x.sector===d.sector && x.symbol!==d.symbol; }).slice(0,5);
+  document.getElementById('prf-similar').innerHTML = similar.length ? similar.map(function(s){
+    var sym2=s.symbol.replace('.IS',''), chg=s.change_abs||0;
+    return '<div class="prf-sim-item" onclick="showProfil(\''+sym2+'\',\''+_prfEx+'\')">'+
+      '<span class="prf-sim-sym">'+sym2+'</span>'+
+      '<span class="prf-sim-name">'+((s.name||'').substring(0,22))+'</span>'+
+      '<span class="prf-sim-chg" style="color:'+(chg>=0?'var(--green)':'var(--red)')+'">'+
+      (chg>=0?'+':'')+chg.toFixed(2)+'%</span></div>';
+  }).join('') : '<div style="font-size:11px;color:var(--muted)">Önce tarama yapın</div>';
+}
+
+function prfTab(id, el) {
+  document.querySelectorAll('.prf-tab').forEach(function(t){t.classList.remove('on');});
+  document.querySelectorAll('.prf-panel').forEach(function(p){p.classList.remove('on');});
+  if(el) el.classList.add('on');
+  var panel = document.getElementById('prf-panel-'+id);
+  if(panel) panel.classList.add('on');
+  if(id==='ai' && !_prfAiDone) _startPrfAI();
+}
+
+function _startPrfAI() {
+  _prfAiDone = true;
+  var d = _prfData, sym = _prfSym;
+  var loading = document.getElementById('prf-ai-loading');
+  var content = document.getElementById('prf-ai-content');
+  var textEl  = document.getElementById('prf-ai-text');
+  if(!d) {
+    if(loading) loading.style.display='none';
+    if(content) content.style.display='block';
+    if(textEl) textEl.innerHTML='Screener verisi bulunamadı. Önce tarama yapın.';
+    return;
+  }
+  setTimeout(function(){
+    if(loading) loading.style.display='none';
+    if(content) content.style.display='block';
+    document.getElementById('prf-ai-title').textContent = sym+' — DeepFin AI';
+    var pe=d.pe_ratio, roe=(d.roe||0)*100, nm=(d.net_margin||0)*100, fs=d.piotroski_f_score, peg=d.peg_ratio, de=d.debt_to_equity;
+    var pos=[], neg=[];
+    if(pe&&pe<15&&pe>0) pos.push('F/K ('+pe.toFixed(1)+'x) değerli görünüyor');
+    if(roe>15) pos.push('ROE %'+roe.toFixed(1)+' güçlü özsermaye getirisi');
+    if(nm>10) pos.push('Net marj %'+nm.toFixed(1)+' sağlıklı');
+    if(fs>=7) pos.push('F-Score '+fs+'/9 — finansal sağlık güçlü');
+    if(peg&&peg<1&&peg>0) pos.push('PEG '+peg.toFixed(2)+' — büyümeye göre ucuz');
+    if(pe&&pe>30) neg.push('F/K ('+pe.toFixed(1)+'x) yüksek, primli');
+    if(roe<8) neg.push('ROE %'+roe.toFixed(1)+' — özsermaye verimliliği düşük');
+    if(fs&&fs<4) neg.push('F-Score '+fs+'/9 — finansal tablo zayıf');
+    if(de&&de>2) neg.push('Borç/Öz '+de.toFixed(2)+' — yüksek borç');
+    textEl.innerHTML =
+      (pos.length?'<div style="margin-bottom:10px"><span style="color:var(--green);font-weight:700">💚 Güçlü Yönler:</span><br>'+pos.map(function(p){return '• '+p;}).join('<br>')+'</div>':'')+
+      (neg.length?'<div><span style="color:var(--red);font-weight:700">🔴 Dikkat:</span><br>'+neg.map(function(n){return '• '+n;}).join('<br>')+'</div>':'')+
+      (!pos.length&&!neg.length?'Veri yetersiz — tarama yapıp tekrar deneyin.':'')+
+      '<br><div style="margin-top:8px;color:var(--muted2);font-size:10px">🔄 Claude API entegrasyonu yakında</div>';
+  }, 800);
+}
+
+function askPrfAI() {
+  var ans = document.getElementById('prf-ai-answer');
+  ans.style.display='block';
+  ans.innerHTML='<span style="color:var(--muted)">⏳ Claude API entegrasyonu yakında aktif olacak.</span>';
+}
+
+// ── Twelve Data: fiyat + şirket bilgisi ──
+async function loadYahooData(sym, ex) {
+  try {
+    var exParam = '&ex='+encodeURIComponent(ex);
+    var [qRes, nRes] = await Promise.all([
+      fetch('/api/quote?sym='+encodeURIComponent(sym)+exParam),
+      fetch('/api/quote?sym='+encodeURIComponent(sym)+exParam+'&type=news'),
+    ]);
+    var q = qRes.ok ? await qRes.json() : {};
+    var n = nRes.ok ? await nRes.json() : {};
+    if(q.error || !q.price) return;
+
+    var cur = (EXCHANGE_META[ex]||{}).currency || '$';
+
+    // TV verisini _prfData'ya merge et — screener verisi yoksa TV'den doldur
+    if(!_prfData) _prfData = {};
+    var d = _prfData;
+    // Metrics — screener yoksa TV'den al
+    if(!d.pe_ratio         && q.pe)          d.pe_ratio            = q.pe;
+    if(!d.price_book_ratio && q.pb)          d.price_book_ratio    = q.pb;
+    // TV ROE/ROA/margin % olarak geliyor (50.5), _prfData oran bekliyor (0.505)
+    if(!d.roe            && q.roe)           d.roe                 = q.roe / 100;
+    if(!d.roa            && q.roa)           d.roa                 = q.roa / 100;
+    if(!d.net_margin     && q.netMargin)     d.net_margin          = q.netMargin / 100;
+    if(!d.gross_margin   && q.grossMargin)   d.gross_margin        = q.grossMargin / 100;
+    if(!d.peg_ratio      && q.peg)           d.peg_ratio           = q.peg;
+    if(!d.current_ratio  && q.currentRatio)  d.current_ratio       = q.currentRatio;
+    if(!d.debt_to_equity && q.debtToEquity)  d.debt_to_equity      = q.debtToEquity;
+    if(!d.piotroski_f_score && q.piotroski) d.piotroski_f_score   = q.piotroski;
+    if(!d.dividend_yield_recent && q.dividendYield) d.dividend_yield_recent = q.dividendYield;
+    if(!d['52_week_high'] && q.high52)       d['52_week_high']     = q.high52;
+    if(!d['52_week_low']  && q.low52)        d['52_week_low']      = q.low52;
+    if(!d.beta            && q.beta)         d.beta                = q.beta;
+    if(!d.market_cap_basic && q.marketCap)   d.market_cap_basic    = q.marketCap / 1e6;
+    if(!d.average_volume_10d_calc && q.avgVolume) d.average_volume_10d_calc = q.avgVolume;
+    if(!d.Perf_W  && q.perfW)  d.Perf_W  = q.perfW;
+    if(!d.Perf_1M && q.perf1M) d.Perf_1M = q.perf1M;
+    if(!d.Perf_Y  && q.perfY)  d.Perf_Y  = q.perfY;
+    if(!d.sector  && q.sector)  d.sector  = q.sector;
+    if(!d.name    && q.name)    d.name    = q.name;
+
+    // Metrics'i yeniden çiz (TV verisiyle dolu)
+    _buildPrfMetrics();
+    _buildPrfHero();
+    _buildPrfPiotroski();
+    _buildPrfGuru();
+    _buildPrfSide();
+    _buildTrend(_prfData);
+    _buildFinancials(_prfData);
+
+    // Şirket adı + sektör
+    if(q.name)   document.getElementById('prf-fullname').textContent   = q.name;
+    if(q.sector) document.getElementById('prf-sector-tag').textContent = q.sector;
+
+    // Canlı fiyat
+    document.getElementById('prf-price').textContent =
+      cur+' '+parseFloat(q.price).toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2});
+    var chgEl = document.getElementById('prf-chg');
+    var cp = parseFloat(q.changePct)||0;
+    chgEl.textContent = (cp>=0?'+':'')+cp.toFixed(2)+'%';
+    chgEl.className = 'prf-chg '+(cp>=0?'up':'dn');
+
+    // Açıklama
+    if(q.description) document.getElementById('prf-desc').textContent = q.description;
+
+    // Yan panel (artık merge edilmiş _prfData kullan)
+    var st = [
+      {k:'52H Yüksek',    v: d['52_week_high'] ? cur+' '+parseFloat(d['52_week_high']).toLocaleString('tr-TR',{minimumFractionDigits:2}) : '—'},
+      {k:'52H Düşük',     v: d['52_week_low']  ? cur+' '+parseFloat(d['52_week_low']).toLocaleString('tr-TR',{minimumFractionDigits:2})  : '—'},
+      {k:'Beta',          v: d.beta ? parseFloat(d.beta).toFixed(2) : '—'},
+      {k:'Piyasa Değeri', v: d.market_cap_basic ? _fmtN(d.market_cap_basic*1e6) : (q.marketCap ? _fmtN(q.marketCap) : '—')},
+      {k:'Ort. Hacim',    v: d.average_volume_10d_calc ? _fmtN(d.average_volume_10d_calc) : (q.avgVolume?_fmtN(q.avgVolume):'—')},
+      {k:'Temettü',       v: d.dividend_yield_recent ? (d.dividend_yield_recent*100).toFixed(2)+'%' : '—', cls:'g'},
+      {k:'Sektör',        v: q.sector || d.sector || '—'},
+      {k:'Çalışan',       v: q.employees ? Number(q.employees).toLocaleString('tr-TR') : '—'},
+    ];
+    document.getElementById('prf-price-stats').innerHTML = st.map(function(s){
+      return '<div class="prf-qstat"><span class="prf-qkey">'+s.k+'</span><span class="prf-qval '+(s.cls||'')+'">'+s.v+'</span></div>';
+    }).join('');
+
+    if(n.news && n.news.length) {
+      document.getElementById('prf-news').innerHTML = n.news.slice(0,5).map(function(item){
+        var date = item.datetime ? new Date(item.datetime).toLocaleDateString('tr-TR') : '';
+        return '<div class="prf-news-item">'+
+          '<div class="prf-news-src">'+(item.source||'Haber')+'</div>'+
+          '<div class="prf-news-title" onclick="window.open(\''+item.url+'\',\'_blank\')">'+item.title+'</div>'+
+          '<div class="prf-news-meta"><span>'+date+'</span></div></div>';
+      }).join('');
+    }
+  } catch(e) { console.warn('Quote error:', e); }
+}
+
+// ── Başlangıç ──
+document.addEventListener('DOMContentLoaded', function() {
+  var sym    = _urlParams.get('sym') || '';
+  var ex     = _urlParams.get('ex')  || 'bist';
+  var dParam = _urlParams.get('d')   || '';
+
+  if(dParam) {
+    try {
+      var compact = JSON.parse(atob(dParam));
+      var d = {
+        symbol:sym, name:compact.n, sector:compact.sc,
+        close:compact.cl, price:compact.cl,
+        change_abs:compact.ch, change:compact.ca,
+        pe_ratio:compact.pe, price_book_ratio:compact.pb,
+        roe:compact.roe, roa:compact.roa,
+        net_margin:compact.nm, gross_margin:compact.gm,
+        peg_ratio:compact.peg, piotroski_f_score:compact.fs,
+        current_ratio:compact.cr, debt_to_equity:compact.de,
+        dividend_yield_recent:compact.dy,
+        Perf_W:compact.pw, Perf_1M:compact.pm, Perf_Y:compact.py,
+        beta:compact.bt, market_cap_basic:compact.mc,
+        average_volume_10d_calc:compact.av,
+        '52_week_high':compact.wh, '52_week_low':compact.wl,
+        cash_f_operating_activities:compact.cf
+      };
+      allData = [d];
+    } catch(e) { console.warn('Decode error:', e); }
+  }
+
+  if(sym) {
+    document.title = 'DeepFin — ' + sym;
+    showProfil(sym, ex);
+    loadYahooData(sym, ex);
+  }
+});
+</script>
 <!-- DISCLAIMER MODAL -->
 <div class="modal-overlay" id="disclaimerModal" style="z-index:9999;">
-  <div class="modal" onclick="event.stopPropagation()" style="max-width:520px;padding:0;overflow:hidden;">
+  <div onclick="event.stopPropagation()" style="background:#0d0d0d;border:1px solid #1a1a1a;border-radius:12px;max-width:520px;width:calc(100% - 32px);overflow:hidden;">
     <div style="background:#0a0a0a;border-bottom:1px solid #1a1a1a;padding:20px 24px;display:flex;align-items:center;gap:10px;">
       <span style="font-size:20px;">⚖️</span>
       <div>
@@ -1120,18 +1724,18 @@ document.addEventListener('DOMContentLoaded', function() {
         <div style="font-size:11px;color:#666;margin-top:2px;">Devam etmeden önce lütfen okuyun</div>
       </div>
     </div>
-    <div style="padding:24px;background:#0d0d0d;">
+    <div style="padding:24px;">
       <p style="font-size:12px;color:#888;line-height:1.85;margin:0 0 16px;">
         DeepFin'de sunulan tüm veriler, filtreler ve stratejiler yalnızca <strong style="color:#ccc;">bilgilendirme amaçlıdır.</strong>
       </p>
       <p style="font-size:12px;color:#888;line-height:1.85;margin:0 0 16px;">
-        Bu platform; herhangi bir finansal araç için <strong style="color:#ccc;">alım, satım veya elde tutma tavsiyesi vermez</strong> ve yatırım danışmanlığı hizmeti sunmaz. Geçmiş performans, gelecekteki sonuçların garantisi değildir.
+        Bu platform; herhangi bir finansal araç için <strong style="color:#ccc;">alım, satım veya elde tutma tavsiyesi vermez</strong> ve yatırım danışmanlığı hizmeti sunmaz.
       </p>
       <p style="font-size:12px;color:#888;line-height:1.85;margin:0;">
         Yatırım kararlarınızı almadan önce lisanslı bir finansal danışmana başvurmanızı tavsiye ederiz. <strong style="color:#ccc;">Tüm yatırım işlemleri kullanıcının kendi sorumluluğundadır.</strong>
       </p>
       <div style="margin-top:24px;border-top:1px solid #1a1a1a;padding-top:20px;">
-        <button id="disclaimerBtn" onclick="acceptDisclaimer()" disabled
+        <button id="disclaimerBtn" disabled
           style="width:100%;padding:13px;border-radius:8px;font-size:13px;font-weight:700;cursor:not-allowed;transition:all .3s;background:#1a1a1a;border:1px solid #333;color:#555;">
           Okudum, Anladım &amp; Devam Et <span id="disclaimerCountdown">(5)</span>
         </button>
