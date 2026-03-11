@@ -2413,7 +2413,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 async function runScan(){
   closeMobileDrawer();
   // Disclaimer kontrolü
-  if (!disclaimerAccepted && !localStorage.getItem('df_disclaimer_v1')) {
+  if (!disclaimerAccepted && !localStorage.getItem('df_disclaimer_v2')) {
     showDisclaimerModal();
     return;
   }
@@ -4234,7 +4234,7 @@ function showProfil(sym, ex) {
     var s = (x.symbol||'').replace('.IS','').toUpperCase();
     return s === sym.toUpperCase() || (x.symbol||'').toUpperCase() === sym.toUpperCase()+'.IS';
   });
-  var url = '/analiz/?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(exKey) + '&from=screener';
+  var url = '/analiz/profil.html?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(exKey);
   if(d) {
     // Veriyi URL'e sıkıştırarak geçir (küçük key mapping)
     var compact = {
@@ -4520,7 +4520,7 @@ function closeMobileDrawer() {
 let disclaimerTimer = null;
 
 function showDisclaimerModal() {
-  if (localStorage.getItem('df_disclaimer_v1')) return; // zaten kabul edilmiş
+  if (localStorage.getItem('df_disclaimer_v2')) return; // zaten kabul edilmiş
   const modal = document.getElementById('disclaimerModal');
   if (!modal) return;
   modal.classList.add('open');
@@ -4552,7 +4552,7 @@ function showDisclaimerModal() {
 
 function acceptDisclaimer() {
   disclaimerAccepted = true;
-  localStorage.setItem('df_disclaimer_v1', '1');
+  localStorage.setItem('df_disclaimer_v2', '1');
   document.getElementById('disclaimerModal').classList.remove('open');
   clearInterval(disclaimerTimer);
 }
@@ -4562,7 +4562,7 @@ function showScreener() {
   var _pp=document.getElementById('profile-page'); if(_pp){_pp.style.display='none';_pp.classList.remove('on');}
   var na = document.getElementById('nav-analiz'); if(na) na.classList.remove('active');
   // Disclaimer kontrolü
-  if (!disclaimerAccepted && !localStorage.getItem('df_disclaimer_v1')) {
+  if (!disclaimerAccepted && !localStorage.getItem('df_disclaimer_v2')) {
     showDisclaimerModal();
     document.getElementById('homepage').style.display = 'none';
     document.getElementById('screener-layout').style.display = 'flex';
