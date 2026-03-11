@@ -159,70 +159,16 @@ footer a:hover{color:var(--text2);}
 
 <script>
 var _ex = 'bist';
-
-function setEx(el) {
-  document.querySelectorAll('.ex-chip').forEach(function(c){c.classList.remove('on');});
-  el.classList.add('on');
-  _ex = el.dataset.ex;
-  document.getElementById('ex-flag').src = 'https://flagcdn.com/' + el.dataset.flag + '.svg';
-  document.getElementById('ex-label').textContent = el.dataset.label;
-}
-
-function cycleEx() {
-  var chips = Array.from(document.querySelectorAll('.ex-chip'));
-  var idx = chips.findIndex(function(c){return c.classList.contains('on');});
-  setEx(chips[(idx+1) % chips.length]);
-}
-
-function goAnaliz() {
-  var sym = document.getElementById('sym-input').value.trim().toUpperCase();
-  if(!sym){ document.getElementById('sym-input').focus(); return; }
-  var dest = '/analiz/profil?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(_ex);
-  if (localStorage.getItem('df_disclaimer_v1')) {
-    window.location.href = dest;
-  } else {
-    _showDisclaimer(function() { window.location.href = dest; });
-  }
-}
-
-function quickSearch(sym, ex) {
-  // Borsa chip'ini güncelle
-  var chip = document.querySelector('.ex-chip[data-ex="'+ex+'"]');
-  if(chip) setEx(chip);
-  document.getElementById('sym-input').value = sym;
-  goAnaliz();
-}
-
-// URL'de sym varsa direkt yönlendir (disclaimer kontrolü ile)
-(function(){
-  var params = new URLSearchParams(window.location.search);
-  var sym = params.get('sym');
-  var ex  = params.get('ex');
-  if(sym){
-    if(ex){
-      var chip = document.querySelector('.ex-chip[data-ex="'+ex+'"]');
-      if(chip) setEx(chip);
-    }
-    document.getElementById('sym-input').value = sym.toUpperCase();
-    var dest = '/analiz/profil?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(ex||'bist');
-    if (localStorage.getItem('df_disclaimer_v1')) {
-      window.location.href = dest;
-    } else {
-      document.addEventListener('DOMContentLoaded', function() {
-        _showDisclaimer(function() { window.location.href = dest; });
-      });
-    }
-  }
-})();
-
-// ── DISCLAIMER (localStorage — ilk girişte bir kez) ──
 var _disclaimerTimer = null;
+
+// ── DISCLAIMER ──
 function _showDisclaimer(onAccept) {
   if (localStorage.getItem('df_disclaimer_v1')) {
     if (onAccept) onAccept();
     return;
   }
   var modal = document.getElementById('disclaimerModal');
+  if (!modal) { document.addEventListener('DOMContentLoaded', function(){ _showDisclaimer(onAccept); }); return; }
   modal.classList.add('open');
   var btn = document.getElementById('disclaimerBtn');
   var cd  = document.getElementById('disclaimerCountdown');
@@ -240,13 +186,12 @@ function _showDisclaimer(onAccept) {
       clearInterval(_disclaimerTimer);
       btn.disabled = false;
       btn.style.cursor = 'pointer';
-      btn.style.background = 'var(--accent, #3b82f6)';
+      btn.style.background = '#3b82f6';
       btn.style.color = '#fff';
       btn.style.borderColor = 'transparent';
       if (cd) cd.textContent = '';
     }
   }, 1000);
-  // onAccept callback'i butona bağla
   btn.onclick = function() {
     localStorage.setItem('df_disclaimer_v1', '1');
     modal.classList.remove('open');
@@ -254,16 +199,56 @@ function _showDisclaimer(onAccept) {
     if (onAccept) onAccept();
   };
 }
-function acceptDisclaimer() {
-  // index.html uyumluluğu için — _showDisclaimer içinde yönetiliyor
-  localStorage.setItem('df_disclaimer_v1', '1');
-  var modal = document.getElementById('disclaimerModal');
-  if (modal) modal.classList.remove('open');
-  clearInterval(_disclaimerTimer);
+
+function setEx(el) {
+  document.querySelectorAll('.ex-chip').forEach(function(c){ c.classList.remove('on'); });
+  el.classList.add('on');
+  _ex = el.dataset.ex;
+  var flag = document.getElementById('ex-flag');
+  var label = document.getElementById('ex-label');
+  if (flag) flag.src = 'https://flagcdn.com/' + el.dataset.flag + '.svg';
+  if (label) label.textContent = el.dataset.label;
 }
 
-// ── INIT: disclaimer kontrolü ──
-// disclaimer: goAnaliz() ve IIFE içinde yönetiliyor
+function cycleEx() {
+  var chips = Array.from(document.querySelectorAll('.ex-chip'));
+  var idx = chips.findIndex(function(c){ return c.classList.contains('on'); });
+  setEx(chips[(idx + 1) % chips.length]);
+}
+
+function goAnaliz() {
+  var sym = document.getElementById('sym-input').value.trim().toUpperCase();
+  if (!sym) { document.getElementById('sym-input').focus(); return; }
+  var dest = '/analiz/profil?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(_ex);
+  _showDisclaimer(function() { window.location.href = dest; });
+}
+
+function quickSearch(sym, ex) {
+  var chip = document.querySelector('.ex-chip[data-ex="' + ex + '"]');
+  if (chip) setEx(chip);
+  document.getElementById('sym-input').value = sym;
+  goAnaliz();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // URL'de sym varsa yönlendir
+  var params = new URLSearchParams(window.location.search);
+  var sym = params.get('sym');
+  var ex  = params.get('ex');
+  if (sym) {
+    if (ex) {
+      var chip = document.querySelector('.ex-chip[data-ex="' + ex + '"]');
+      if (chip) setEx(chip);
+    }
+    var input = document.getElementById('sym-input');
+    if (input) input.value = sym.toUpperCase();
+    var dest = '/analiz/profil?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(ex || 'bist');
+    _showDisclaimer(function() { window.location.href = dest; });
+    return; // disclaimer gösterildi veya redirect başladı
+  }
+  // sym yoksa sadece disclaimer göster
+  _showDisclaimer(null);
+});
 </script>
 <!-- DISCLAIMER MODAL -->
 <div class="modal-overlay" id="disclaimerModal" style="z-index:9999;">
