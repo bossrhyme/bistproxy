@@ -997,6 +997,11 @@ function _showDisclaimer(onAccept) {
     return;
   }
   var modal = document.getElementById('disclaimerModal');
+  if (!modal) {
+    // DOM henüz hazır değil, DOMContentLoaded'ı bekle
+    document.addEventListener('DOMContentLoaded', function() { _showDisclaimer(onAccept); });
+    return;
+  }
   modal.classList.add('open');
   var btn = document.getElementById('disclaimerBtn');
   var cd  = document.getElementById('disclaimerCountdown');
@@ -1035,11 +1040,9 @@ function acceptDisclaimer() {
 }
 
 // Sayfa yüklenince disclaimer kontrolü
-if (!localStorage.getItem('df_disclaimer_v1')) {
-  document.addEventListener('DOMContentLoaded', function() {
-    _showDisclaimer(null);
-  });
-}
+document.addEventListener('DOMContentLoaded', function() {
+  _showDisclaimer(null);
+});
 </script>
 
 <script>
