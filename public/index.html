@@ -157,6 +157,8 @@ tbody tr:hover .row-num{font-size:10px;color:var(--muted2);font-family:'JetBrain
 .row-arrow{opacity:1;color:#60a5fa;}
 tbody tr.selrow{background:rgba(59,130,246,.12);}
 tbody tr.selrow td{border-left:none;}
+tbody tr.no-data{opacity:.45;}
+tbody tr.no-data td:first-child::after{content:"·";color:var(--muted2);margin-left:4px;font-size:9px;}
 tbody tr.selrow td:first-child{border-left:3px solid var(--accent);}
 .row-num{font-size:10px;color:var(--text);font-family:'JetBrains Mono',monospace;min-width:20px;display:inline-block;text-align:right;margin-right:8px;}
 .row-arrow{color:#2a2a2a;font-size:16px;font-weight:900;transition:color .15s,transform .15s;margin-right:5px;display:inline-block;}
