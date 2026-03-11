@@ -94,7 +94,6 @@ const EXCHANGE_CONFIG = {
             extraFilters: [
               { left: 'is_primary', operation: 'equal', right: true },
               { left: 'typespecs',  operation: 'has',   right: ['common'] },
-              { left: 'index',      operation: 'equal', right: 'SP500' },
             ] },
   dax:    { tvPath: '/germany/scan', yahooSuffix: '.DE', currency: 'EUR',
             extraFilters: [
@@ -224,7 +223,7 @@ module.exports = async function(req, res) {
 
     // Cache key: borsa + kolon listesi
     const colHash  = Buffer.from((merged.columns || []).join(',')).toString('base64').slice(0, 20);
-    const cacheKey = 'df_v1_' + exchange + '_' + colHash;
+    const cacheKey = 'df_v2_' + exchange + '_' + colHash; // v2: typespecs+is_primary filters
     const ttl      = getCacheTTL(exchange);
 
     // 1. Cache HIT?
