@@ -4522,6 +4522,7 @@ let disclaimerTimer = null;
 function showDisclaimerModal() {
   if (localStorage.getItem('df_disclaimer_v1')) return; // zaten kabul edilmiş
   const modal = document.getElementById('disclaimerModal');
+  if (!modal) return;
   modal.classList.add('open');
   // Countdown
   let secs = 5;
