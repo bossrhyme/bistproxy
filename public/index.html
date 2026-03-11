@@ -2556,7 +2556,21 @@ async function runScan(){
     const dedupedResults = Array.from(seen.values());
 
     // Minimum veri: close yoksa tabloda tüm sütunlar boş görünür — filtrele
-    allData = dedupedResults.filter(s => s.currentPrice !== null && s.currentPrice > 0);
+    // Geçersiz hisseleri filtrele: fiyat yoksa veya finansal veri YOK ise çıkar
+    // GİP / yeni hisseler: close var, High/Low var ama PE+ROE+margin+sektör hepsi null
+    allData = dedupedResults.filter(s => {
+      if (!s.currentPrice || s.currentPrice <= 0) return false;
+      // En az bir finansal alan veya sektör dolu olmalı
+      const hasFundamental = (
+        s.peNormalizedAnnual !== null ||
+        s.pbAnnual           !== null ||
+        s.roeTTM             !== null ||
+        s.netProfitMarginTTM !== null ||
+        s.revenueGrowthTTMYoy !== null ||
+        s.sector             !== null
+      );
+      return hasFundamental;
+    });
     const _exm = EXCHANGE_META[currentExchange]||EXCHANGE_META.bist;
     document.getElementById('scantime').textContent = `${_exm.flag} ${_exm.name} · ↻ ${new Date().toLocaleTimeString('tr-TR')} · ${results.length} hisse`;
     updateExchangeBadge();
