@@ -177,7 +177,12 @@ function cycleEx() {
 function goAnaliz() {
   var sym = document.getElementById('sym-input').value.trim().toUpperCase();
   if(!sym){ document.getElementById('sym-input').focus(); return; }
-  window.location.href = 'profil.html?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(_ex);
+  var dest = '/analiz/profil?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(_ex);
+  if (localStorage.getItem('df_disclaimer_v1')) {
+    window.location.href = dest;
+  } else {
+    _showDisclaimer(function() { window.location.href = dest; });
+  }
 }
 
 function quickSearch(sym, ex) {
@@ -188,7 +193,7 @@ function quickSearch(sym, ex) {
   goAnaliz();
 }
 
-// URL'de sym varsa direkt yönlendir
+// URL'de sym varsa direkt yönlendir (disclaimer kontrolü ile)
 (function(){
   var params = new URLSearchParams(window.location.search);
   var sym = params.get('sym');
@@ -199,7 +204,14 @@ function quickSearch(sym, ex) {
       if(chip) setEx(chip);
     }
     document.getElementById('sym-input').value = sym.toUpperCase();
-    window.location.href = 'profil.html?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(ex||'bist');
+    var dest = '/analiz/profil?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(ex||'bist');
+    if (localStorage.getItem('df_disclaimer_v1')) {
+      window.location.href = dest;
+    } else {
+      document.addEventListener('DOMContentLoaded', function() {
+        _showDisclaimer(function() { window.location.href = dest; });
+      });
+    }
   }
 })();
 
@@ -251,9 +263,7 @@ function acceptDisclaimer() {
 }
 
 // ── INIT: disclaimer kontrolü ──
-document.addEventListener("DOMContentLoaded", function() {
-  _showDisclaimer(null);
-});
+// disclaimer: goAnaliz() ve IIFE içinde yönetiliyor
 </script>
 <!-- DISCLAIMER MODAL -->
 <div class="modal-overlay" id="disclaimerModal" style="z-index:9999;">
