@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DeepFin — TUPRS Hisse Profili</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #080808;
+  --s1:       #0e0e0e;
+  --s2:       #141414;
+  --s3:       #1a1a1a;
+  --border:   #222;
+  --border2:  #2a2a2a;
+  --text:     #ededed;
+  --text2:    #999;
+  --muted:    #555;
+  --accent:   #3b82f6;
+  --accent2:  rgba(59,130,246,.12);
+  --green:    #00c076;
+  --green-bg: rgba(0,192,118,.08);
+  --red:      #f6465d;
+  --red-bg:   rgba(246,70,93,.08);
+  --gold:     #f0b429;
+  --gold-bg:  rgba(240,180,41,.08);
+  --mono:     'JetBrains Mono', monospace;
+  --head:     'Syne', sans-serif;
+  --body:     'DM Sans', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--bg); color: var(--text); font-family: var(--body); min-height: 100vh; }
+
+/* ── TOPBAR ── */
+.topbar {
+  height: 48px;
+  border-bottom: 1px solid var(--border);
+  background: var(--s1);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.logo { font-family: var(--head); font-size: 16px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 8px; }
+.logo-mark { width: 24px; height: 24px; background: var(--accent); border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: #fff; }
+.breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); margin-left: 16px; }
+.breadcrumb a { color: var(--text2); text-decoration: none; }
+.breadcrumb a:hover { color: var(--text); }
+.breadcrumb-sep { color: var(--muted); }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.btn-sm { padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid var(--border2); background: var(--s2); color: var(--text2); transition: all .15s; font-family: var(--body); }
+.btn-sm:hover { border-color: var(--accent); color: var(--accent); }
+.btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-primary:hover { background: #2563eb; color: #fff; }
+
+/* ── LAYOUT ── */
+.page { display: grid; grid-template-columns: 1fr 340px; gap: 0; min-height: calc(100vh - 48px); }
+.main-col { border-right: 1px solid var(--border); overflow-y: auto; }
+.side-col { overflow-y: auto; background: var(--s1); }
+
+/* ── HERO HEADER ── */
+.hero {
+  padding: 28px 28px 0;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(59,130,246,.04) 0%, transparent 100%);
+}
+.hero-top { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 20px; }
+.company-logo {
+  width: 52px; height: 52px; border-radius: 10px;
+  background: var(--s2); border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--accent);
+  flex-shrink: 0;
+}
+.company-meta { flex: 1; min-width: 0; }
+.company-name { font-family: var(--head); font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.company-sub { font-size: 12px; color: var(--text2); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.tag { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; background: var(--s3); border: 1px solid var(--border2); color: var(--text2); }
+.tag.blue { background: var(--accent2); border-color: rgba(59,130,246,.3); color: var(--accent); }
+.price-block { text-align: right; }
+.price-main { font-family: var(--mono); font-size: 28px; font-weight: 700; color: var(--text); line-height: 1; margin-bottom: 6px; }
+.price-change { font-family: var(--mono); font-size: 13px; font-weight: 600; }
+.price-change.up { color: var(--green); }
+.price-change.dn { color: var(--red); }
+
+/* Score bar */
+.score-bar {
+  display: flex; gap: 0; height: 36px;
+  border-top: 1px solid var(--border);
+}
+.score-item {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  gap: 6px; border-right: 1px solid var(--border); font-size: 11px; color: var(--text2);
+  transition: background .15s; cursor: default;
+}
+.score-item:last-child { border-right: none; }
+.score-item:hover { background: var(--s2); }
+.score-val { font-family: var(--mono); font-weight: 700; font-size: 12px; }
+.score-val.good { color: var(--green); }
+.score-val.mid  { color: var(--gold); }
+.score-val.bad  { color: var(--red); }
+
+/* ── TABS ── */
+.tabs {
+  display: flex; gap: 0; border-bottom: 1px solid var(--border);
+  padding: 0 28px; background: var(--s1); position: sticky; top: 48px; z-index: 10;
+}
+.tab {
+  padding: 12px 16px; font-size: 12px; font-weight: 600; color: var(--text2);
+  cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: all .15s; white-space: nowrap; letter-spacing: .2px;
+}
+.tab:hover { color: var(--text); }
+.tab.on { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ── SECTION ── */
+.section { padding: 24px 28px; border-bottom: 1px solid var(--border); }
+.section:last-child { border-bottom: none; }
+.sec-title {
+  font-family: var(--head); font-size: 11px; font-weight: 700;
+  color: var(--muted); letter-spacing: 1.2px; text-transform: uppercase;
+  margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+}
+.sec-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ── METRIC GRID ── */
+.metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.metric-cell {
+  background: var(--s1); padding: 14px 16px;
+  transition: background .15s;
+}
+.metric-cell:hover { background: var(--s2); }
+.metric-label { font-size: 10px; color: var(--text2); margin-bottom: 6px; letter-spacing: .3px; }
+.metric-value { font-family: var(--mono); font-size: 15px; font-weight: 700; color: var(--text); }
+.metric-value.good { color: var(--green); }
+.metric-value.mid  { color: var(--gold); }
+.metric-value.bad  { color: var(--red); }
+.metric-sub { font-size: 10px; color: var(--muted); margin-top: 3px; font-family: var(--mono); }
+
+/* ── GAUGE ── */
+.gauge-row { display: flex; gap: 12px; }
+.gauge-wrap { flex: 1; }
+.gauge-label { font-size: 10px; color: var(--text2); margin-bottom: 6px; display: flex; justify-content: space-between; }
+.gauge-bar { height: 4px; background: var(--s3); border-radius: 2px; overflow: hidden; }
+.gauge-fill { height: 100%; border-radius: 2px; transition: width .6s ease; }
+
+/* ── FINANCIAL CHART AREA ── */
+.chart-placeholder {
+  height: 200px; background: var(--s2); border-radius: 8px;
+  border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 8px; color: var(--muted); font-size: 12px;
+  position: relative; overflow: hidden;
+}
+.chart-placeholder::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 30px, rgba(255,255,255,.015) 30px, rgba(255,255,255,.015) 31px),
+              repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(255,255,255,.015) 60px, rgba(255,255,255,.015) 61px);
+}
+.chart-icon { font-size: 24px; position: relative; z-index: 1; }
+.chart-placeholder span { position: relative; z-index: 1; }
+
+/* Sparkline SVG */
+.sparkline { width: 100%; height: 60px; }
+
+/* ── FINANCIAL TABLE ── */
+.fin-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.fin-table th {
+  text-align: right; padding: 8px 12px; font-size: 10px; font-weight: 600;
+  color: var(--text2); border-bottom: 1px solid var(--border); letter-spacing: .4px;
+  font-family: var(--mono); background: var(--s2);
+}
+.fin-table th:first-child { text-align: left; }
+.fin-table td {
+  text-align: right; padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.04);
+  font-family: var(--mono); color: var(--text2);
+}
+.fin-table td:first-child { text-align: left; color: var(--text); font-family: var(--body); font-size: 12px; }
+.fin-table tr:hover td { background: rgba(255,255,255,.02); }
+.fin-table .positive { color: var(--green); }
+.fin-table .negative { color: var(--red); }
+.fin-table .section-row td { font-weight: 700; color: var(--text); background: var(--s2); font-size: 11px; letter-spacing: .3px; }
+
+/* ── PIOTROSKI ── */
+.fscore-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.fscore-group { background: var(--s2); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
+.fscore-group-title { font-size: 10px; font-weight: 700; color: var(--text2); letter-spacing: .5px; text-transform: uppercase; margin-bottom: 10px; }
+.fscore-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; }
+.fscore-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.fscore-dot.pass { background: var(--green); box-shadow: 0 0 6px rgba(0,192,118,.4); }
+.fscore-dot.fail { background: var(--muted); }
+.fscore-text { font-size: 11px; color: var(--text2); flex: 1; }
+.fscore-badge {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  padding: 16px; background: var(--s2); border-radius: 8px; border: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+.fscore-num { font-family: var(--mono); font-size: 48px; font-weight: 700; color: var(--green); line-height: 1; }
+.fscore-label { font-size: 11px; color: var(--text2); }
+.fscore-label strong { display: block; font-size: 14px; color: var(--green); margin-bottom: 4px; }
+
+/* ── GURU CARDS ── */
+.guru-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.guru-card {
+  background: var(--s2); border: 1px solid var(--border); border-radius: 8px;
+  padding: 14px; transition: all .15s;
+}
+.guru-card:hover { border-color: var(--border2); }
+.guru-card.pass { border-color: rgba(0,192,118,.25); background: rgba(0,192,118,.04); }
+.guru-card.fail { border-color: rgba(246,70,93,.15); }
+.guru-card.partial { border-color: rgba(240,180,41,.2); background: rgba(240,180,41,.04); }
+.guru-top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.guru-emoji { font-size: 20px; }
+.guru-name { font-size: 12px; font-weight: 700; color: var(--text); }
+.guru-score { margin-left: auto; font-family: var(--mono); font-size: 11px; font-weight: 700; }
+.guru-score.pass { color: var(--green); }
+.guru-score.partial { color: var(--gold); }
+.guru-score.fail { color: var(--red); }
+.guru-criteria { display: flex; flex-direction: column; gap: 3px; }
+.guru-crit { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--text2); }
+.guru-crit .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── AI ANALYSIS ── */
+.ai-box {
+  background: linear-gradient(135deg, rgba(59,130,246,.06) 0%, rgba(59,130,246,.02) 100%);
+  border: 1px solid rgba(59,130,246,.2); border-radius: 10px; padding: 20px;
+}
+.ai-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.ai-icon {
+  width: 32px; height: 32px; background: var(--accent); border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
+}
+.ai-title { font-family: var(--head); font-size: 14px; font-weight: 700; }
+.ai-badge { margin-left: auto; font-size: 9px; font-weight: 700; padding: 3px 8px; border-radius: 4px; background: var(--accent2); color: var(--accent); border: 1px solid rgba(59,130,246,.3); letter-spacing: .5px; }
+.ai-content { font-size: 13px; color: var(--text2); line-height: 1.7; }
+.ai-content strong { color: var(--text); }
+.ai-bullets { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+.ai-bullet { display: flex; gap: 10px; font-size: 12px; color: var(--text2); line-height: 1.5; }
+.ai-bullet-icon { flex-shrink: 0; font-size: 14px; }
+.ai-footer { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(59,130,246,.1); display: flex; align-items: center; gap: 8px; }
+.ai-disclaimer { font-size: 10px; color: var(--muted); flex: 1; }
+.ai-refresh { font-size: 10px; color: var(--accent); cursor: pointer; }
+.ai-refresh:hover { text-decoration: underline; }
+
+/* ── SIDE PANEL ── */
+.side-section { padding: 18px 18px; border-bottom: 1px solid var(--border); }
+.side-title { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+
+/* Quick Stats */
+.quick-stat { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.04); }
+.quick-stat:last-child { border-bottom: none; }
+.qs-label { font-size: 11px; color: var(--text2); }
+.qs-val { font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--text); }
+.qs-val.up { color: var(--green); }
+.qs-val.dn { color: var(--red); }
+
+/* 52w range */
+.range-wrap { margin: 12px 0; }
+.range-label { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10px; color: var(--text2); margin-bottom: 6px; }
+.range-bar { height: 4px; background: var(--s3); border-radius: 2px; position: relative; }
+.range-fill { height: 100%; background: linear-gradient(90deg, var(--red), var(--gold), var(--green)); border-radius: 2px; width: 100%; }
+.range-cursor { position: absolute; top: -3px; width: 10px; height: 10px; background: var(--text); border-radius: 50%; transform: translateX(-50%); border: 2px solid var(--bg); }
+
+/* News */
+.news-item { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.04); }
+.news-item:last-child { border-bottom: none; }
+.news-source { font-size: 9px; font-weight: 700; color: var(--accent); letter-spacing: .5px; margin-bottom: 4px; }
+.news-title { font-size: 11px; color: var(--text); line-height: 1.4; margin-bottom: 4px; cursor: pointer; }
+.news-title:hover { color: var(--accent); }
+.news-meta { font-size: 10px; color: var(--muted); display: flex; gap: 8px; }
+.news-sentiment { font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 3px; }
+.news-sentiment.pos { background: var(--green-bg); color: var(--green); }
+.news-sentiment.neg { background: var(--red-bg); color: var(--red); }
+.news-sentiment.ntr { background: var(--s3); color: var(--text2); }
+
+/* Similar stocks */
+.similar-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.04); cursor: pointer; }
+.similar-item:last-child { border-bottom: none; }
+.similar-item:hover .similar-name { color: var(--accent); }
+.similar-sym { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--accent); width: 52px; }
+.similar-name { font-size: 11px; color: var(--text2); flex: 1; }
+.similar-chg { font-family: var(--mono); font-size: 11px; font-weight: 600; }
+.similar-chg.up { color: var(--green); }
+.similar-chg.dn { color: var(--red); }
+
+/* Analyst */
+.analyst-bar { display: flex; border-radius: 6px; overflow: hidden; height: 8px; margin: 10px 0; }
+.analyst-buy  { background: var(--green); }
+.analyst-hold { background: var(--gold); }
+.analyst-sell { background: var(--red); }
+.analyst-legend { display: flex; justify-content: space-between; font-size: 10px; font-family: var(--mono); }
+.analyst-legend span:nth-child(1) { color: var(--green); }
+.analyst-legend span:nth-child(2) { color: var(--gold); }
+.analyst-legend span:nth-child(3) { color: var(--red); }
+.analyst-target { margin-top: 12px; display: flex; justify-content: space-between; align-items: center; }
+.analyst-target-label { font-size: 11px; color: var(--text2); }
+.analyst-target-val { font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--text); }
+.analyst-upside { font-family: var(--mono); font-size: 11px; color: var(--green); font-weight: 600; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+@keyframes barGrow { from { width: 0; } to { } }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+.hero { animation: fadeIn .3s ease; }
+.section { animation: fadeIn .35s ease; }
+.metric-cell { animation: fadeIn .4s ease both; }
+.metric-cell:nth-child(2) { animation-delay: .05s; }
+.metric-cell:nth-child(3) { animation-delay: .10s; }
+.metric-cell:nth-child(4) { animation-delay: .15s; }
+
+.live-dot { display: inline-block; width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s ease infinite; margin-right: 4px; }
+
+/* Tab panels */
+.tab-panel { display: none; }
+.tab-panel.on { display: block; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .page { grid-template-columns: 1fr; }
+  .side-col { border-top: 1px solid var(--border); }
+  .metric-grid { grid-template-columns: repeat(2, 1fr); }
+  .fscore-grid { grid-template-columns: 1fr; }
+  .guru-grid { grid-template-columns: 1fr; }
+}
+
+/* ── DISCLAIMER MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--s1,#0d0d0d);border-radius:12px;border:1px solid #1a1a1a;width:100%;max-width:520px;overflow:hidden;margin:16px;}
+
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-mark">D</div>
+    DeepFin
+  </div>
+  <div class="breadcrumb">
+    <a href="#">Tarayıcı</a>
+    <span class="breadcrumb-sep">/</span>
+    <a href="#">BIST</a>
+    <span class="breadcrumb-sep">/</span>
+    <span style="color:var(--text)">TUPRS</span>
+  </div>
+  <div class="topbar-right">
+    <button class="btn-sm" onclick="history.back()">← Geri</button>
+    <button class="btn-sm">⊕ Listeye Ekle</button>
+    <button class="btn-sm btn-primary">↗ TradingView'da Aç</button>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- MAIN COLUMN -->
+  <div class="main-col">
+
+    <!-- HERO -->
+    <div class="hero">
+      <div class="hero-top">
+        <div class="company-logo">TU</div>
+        <div class="company-meta">
+          <div class="company-name">Türkiye Petrol Rafinerileri A.Ş.</div>
+          <div class="company-sub">
+            <span class="tag blue">TUPRS</span>
+            <span class="tag">BIST</span>
+            <span class="tag">Enerji</span>
+            <span class="tag">Büyük Ölçekli</span>
+            <span style="color:var(--green);font-size:11px;"><span class="live-dot"></span>Piyasa Açık</span>
+          </div>
+        </div>
+        <div class="price-block">
+          <div class="price-main">₺214.50</div>
+          <div class="price-change up">▲ +4.20 (+2.00%) bugün</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:4px;font-family:var(--mono)">14:32 · BIST</div>
+        </div>
+      </div>
+
+      <!-- SCORE BAR -->
+      <div class="score-bar">
+        <div class="score-item">
+          <span>F-Score</span>
+          <span class="score-val good">8/9</span>
+        </div>
+        <div class="score-item">
+          <span>PEG</span>
+          <span class="score-val good">0.71</span>
+        </div>
+        <div class="score-item">
+          <span>F/K</span>
+          <span class="score-val mid">11.2x</span>
+        </div>
+        <div class="score-item">
+          <span>ROE</span>
+          <span class="score-val good">38.4%</span>
+        </div>
+        <div class="score-item">
+          <span>Piyasa Değeri</span>
+          <span class="score-val" style="color:var(--text)">$2.8B</span>
+        </div>
+        <div class="score-item">
+          <span>DeepFin Skoru</span>
+          <span class="score-val good">87/100</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <div class="tab on" onclick="switchTab('overview', this)">Genel Bakış</div>
+      <div class="tab" onclick="switchTab('financials', this)">Finansallar</div>
+      <div class="tab" onclick="switchTab('piotroski', this)">F-Score Detay</div>
+      <div class="tab" onclick="switchTab('guru', this)">Guru Analizi</div>
+      <div class="tab" onclick="switchTab('ai', this)">🤖 YZ Analizi</div>
+    </div>
+
+    <!-- ═══ TAB: GENEL BAKIŞ ═══ -->
+    <div id="tab-overview" class="tab-panel on">
+
+      <!-- Temel Metrikler -->
+      <div class="section">
+        <div class="sec-title">Temel Metrikler</div>
+        <div class="metric-grid">
+          <div class="metric-cell">
+            <div class="metric-label">F/K (TTM)</div>
+            <div class="metric-value mid">11.2x</div>
+            <div class="metric-sub">Sektör ort: 14.8x</div>
+          </div>
+          <div class="metric-cell">
+            <div class="metric-label">PD/DD</div>
+            <div class="metric-value good">1.81x</div>
+            <div class="metric-sub">Sektör ort: 2.3x</div>
+          </div>
+          <div class="metric-cell">
+            <div class="metric-label">F/S (TTM)</div>
+            <div class="metric-value good">0.22x</div>
+            <div class="metric-sub">Sektör ort: 0.41x</div>
+          </div>
+          <div class="metric-cell">
+            <div class="metric-label">EV/FAVÖK</div>
+            <div class="metric-value mid">7.4x</div>
+            <div class="metric-sub">Sektör ort: 9.1x</div>
+          </div>
+          <div class="metric-cell">
+            <div class="metric-label">ROE (TTM)</div>
+            <div class="metric-value good">38.4%</div>
+            <div class="metric-sub">↑ geçen yıl: 31.2%</div>
+          </div>
+          <div class="metric-cell">
+            <div class="metric-label">ROA (TTM)</div>
+            <div class="metric-value good">14.1%</div>
+            <div class="metric-sub">↑ geçen yıl: 11.8%</div>
+          </div>
+          <div class="metric-cell">
+            <div class="metric-label">Net Marj</div>
+            <div class="metric-value good">12.8%</div>
+            <div class="metric-sub">↑ geçen yıl: 9.4%</div>
+          </div>
+          <div class="metric-cell">
+            <div class="metric-label">Cari Oran</div>
+            <div class="metric-value good">1.65x</div>
+            <div class="metric-sub">Borç/Öz: 1.72</div>
+          </div>
+          <div class="metric-cell">
+            <div class="metric-label">Gelir Büyümesi</div>
+            <div class="metric-value good">+17.1%</div>
+            <div class="metric-sub">YoY (TTM)</div>
+          </div>
+          <div class="metric-cell">
+            <div class="metric-label">Kazanç Büyümesi</div>
+            <div class="metric-value good">+14.6%</div>
+            <div class="metric-sub">YoY (TTM)</div>
+          </div>
+          <div class="metric-cell">
+            <div class="metric-label">Temettü Verimi</div>
+            <div class="metric-value mid">2.66%</div>
+            <div class="metric-sub">Son ödeme: ₺5.70</div>
+          </div>
+          <div class="metric-cell">
+            <div class="metric-label">PEG Oranı</div>
+            <div class="metric-value good">0.71</div>
+            <div class="metric-sub">&lt;1 = cazip büyüme</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gelir Trendi -->
+      <div class="section">
+        <div class="sec-title">Gelir & Kâr Trendi</div>
+        <div style="display:flex;gap:12px;margin-bottom:12px;">
+          <div style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;">
+            <div style="font-size:10px;color:var(--text2);margin-bottom:8px;letter-spacing:.3px;">YILLIK GELİR (₺M)</div>
+            <svg class="sparkline" viewBox="0 0 300 60">
+              <defs>
+                <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#3b82f6" stop-opacity=".3"/>
+                  <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M0,50 L50,44 L100,38 L150,30 L200,20 L250,12 L300,5" fill="none" stroke="#3b82f6" stroke-width="2"/>
+              <path d="M0,50 L50,44 L100,38 L150,30 L200,20 L250,12 L300,5 L300,60 L0,60Z" fill="url(#g1)"/>
+              <text x="0" y="58" font-size="9" fill="#555" font-family="JetBrains Mono">2019</text>
+              <text x="240" y="58" font-size="9" fill="#555" font-family="JetBrains Mono">2024</text>
+            </svg>
+            <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);margin-top:4px;">₺412.8B</div>
+            <div style="font-size:10px;color:var(--green);font-family:var(--mono);">+17.1% YoY</div>
+          </div>
+          <div style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;">
+            <div style="font-size:10px;color:var(--text2);margin-bottom:8px;letter-spacing:.3px;">NET KÂR (₺M)</div>
+            <svg class="sparkline" viewBox="0 0 300 60">
+              <defs>
+                <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#00c076" stop-opacity=".3"/>
+                  <stop offset="100%" stop-color="#00c076" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M0,55 L50,50 L100,42 L150,35 L200,22 L250,14 L300,8" fill="none" stroke="#00c076" stroke-width="2"/>
+              <path d="M0,55 L50,50 L100,42 L150,35 L200,22 L250,14 L300,8 L300,60 L0,60Z" fill="url(#g2)"/>
+              <text x="0" y="58" font-size="9" fill="#555" font-family="JetBrains Mono">2019</text>
+              <text x="240" y="58" font-size="9" fill="#555" font-family="JetBrains Mono">2024</text>
+            </svg>
+            <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);margin-top:4px;">₺52.8B</div>
+            <div style="font-size:10px;color:var(--green);font-family:var(--mono);">+14.6% YoY</div>
+          </div>
+          <div style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;">
+            <div style="font-size:10px;color:var(--text2);margin-bottom:8px;letter-spacing:.3px;">SERBEST NAKİT AKIŞI</div>
+            <svg class="sparkline" viewBox="0 0 300 60">
+              <defs>
+                <linearGradient id="g3" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#f0b429" stop-opacity=".25"/>
+                  <stop offset="100%" stop-color="#f0b429" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M0,52 L50,48 L100,44 L150,50 L200,28 L250,18 L300,10" fill="none" stroke="#f0b429" stroke-width="2"/>
+              <path d="M0,52 L50,48 L100,44 L150,50 L200,28 L250,18 L300,10 L300,60 L0,60Z" fill="url(#g3)"/>
+              <text x="0" y="58" font-size="9" fill="#555" font-family="JetBrains Mono">2019</text>
+              <text x="240" y="58" font-size="9" fill="#555" font-family="JetBrains Mono">2024</text>
+            </svg>
+            <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--text);margin-top:4px;">₺18.4B</div>
+            <div style="font-size:10px;color:var(--gold);font-family:var(--mono);">+8.9% YoY</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hakkında -->
+      <div class="section">
+        <div class="sec-title">Şirket Hakkında</div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:14px;">
+          Türkiye Petrol Rafinerileri A.Ş. (Tüpraş), Türkiye'nin en büyük sanayi kuruluşu olup İzmit, İzmir, Kırıkkale ve Batman rafinerilerinde faaliyet göstermektedir. Yıllık 28.1 milyon ton ham petrol işleme kapasitesiyle Türkiye'nin akaryakıt ihtiyacının büyük bölümünü karşılar.
+        </p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div style="background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:12px;">
+            <div style="font-size:10px;color:var(--muted);margin-bottom:8px;letter-spacing:.4px;text-transform:uppercase;">Temel Bilgiler</div>
+            <div class="quick-stat"><span class="qs-label">Kuruluş</span><span class="qs-val">1983</span></div>
+            <div class="quick-stat"><span class="qs-label">Merkez</span><span class="qs-val">İzmit</span></div>
+            <div class="quick-stat"><span class="qs-label">Çalışan Sayısı</span><span class="qs-val">~4,200</span></div>
+            <div class="quick-stat"><span class="qs-label">CEO</span><span class="qs-val">İbrahim Yelmenoğlu</span></div>
+          </div>
+          <div style="background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:12px;">
+            <div style="font-size:10px;color:var(--muted);margin-bottom:8px;letter-spacing:.4px;text-transform:uppercase;">İşlem Bilgileri</div>
+            <div class="quick-stat"><span class="qs-label">Hisse Sayısı</span><span class="qs-val">280M</span></div>
+            <div class="quick-stat"><span class="qs-label">Halka Açıklık</span><span class="qs-val">49.0%</span></div>
+            <div class="quick-stat"><span class="qs-label">Ortalama Hacim</span><span class="qs-val">₺1.2B/gün</span></div>
+            <div class="quick-stat"><span class="qs-label">Endeks</span><span class="qs-val">BIST 30, BIST 50</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══ TAB: FİNANSALLAR ═══ -->
+    <div id="tab-financials" class="tab-panel">
+      <div class="section">
+        <div class="sec-title">Gelir Tablosu — Yıllık (₺M)</div>
+        <table class="fin-table">
+          <thead>
+            <tr>
+              <th>Kalem</th>
+              <th>2021</th><th>2022</th><th>2023</th><th>2024</th><th>YoY %</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="section-row"><td colspan="6">📊 GELİR</td></tr>
+            <tr><td>Net Satışlar</td><td>152,400</td><td>264,800</td><td>352,600</td><td>412,800</td><td class="positive">+17.1%</td></tr>
+            <tr><td>Satılan Malın Maliyeti</td><td>138,200</td><td>238,100</td><td>312,400</td><td>356,200</td><td class="negative">+14.0%</td></tr>
+            <tr class="section-row"><td colspan="6">💰 KÂRLILIK</td></tr>
+            <tr><td>Brüt Kâr</td><td>14,200</td><td>26,700</td><td>40,200</td><td>56,600</td><td class="positive">+40.8%</td></tr>
+            <tr><td>FAVÖK</td><td>18,400</td><td>34,100</td><td>47,800</td><td>58,200</td><td class="positive">+21.8%</td></tr>
+            <tr><td>Net Kâr</td><td>9,800</td><td>22,400</td><td>46,100</td><td>52,800</td><td class="positive">+14.6%</td></tr>
+            <tr><td>HBK (₺)</td><td>35.0</td><td>80.0</td><td>164.6</td><td>188.6</td><td class="positive">+14.6%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="section">
+        <div class="sec-title">Bilanço — Özet (₺M)</div>
+        <table class="fin-table">
+          <thead>
+            <tr>
+              <th>Kalem</th><th>2022</th><th>2023</th><th>2024</th><th>YoY %</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="section-row"><td colspan="5">🏦 VARLIKLAR</td></tr>
+            <tr><td>Dönen Varlıklar</td><td>62,400</td><td>98,200</td><td>124,600</td><td class="positive">+26.9%</td></tr>
+            <tr><td>Duran Varlıklar</td><td>48,100</td><td>72,400</td><td>89,200</td><td class="positive">+23.2%</td></tr>
+            <tr><td><strong>Toplam Varlıklar</strong></td><td><strong>110,500</strong></td><td><strong>170,600</strong></td><td><strong>213,800</strong></td><td class="positive">+25.3%</td></tr>
+            <tr class="section-row"><td colspan="5">📋 YÜKÜMLÜLÜKLER</td></tr>
+            <tr><td>Kısa Vadeli Borçlar</td><td>28,400</td><td>48,200</td><td>75,600</td><td class="negative">+56.8%</td></tr>
+            <tr><td>Uzun Vadeli Borçlar</td><td>32,100</td><td>44,800</td><td>62,200</td><td class="negative">+38.8%</td></tr>
+            <tr><td><strong>Özsermaye</strong></td><td><strong>50,000</strong></td><td><strong>77,600</strong></td><td><strong>76,000</strong></td><td class="negative">-2.1%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: PİOTROSKİ ═══ -->
+    <div id="tab-piotroski" class="tab-panel">
+      <div class="section">
+        <div class="sec-title">Piotroski F-Score Analizi</div>
+        <div class="fscore-badge">
+          <div class="fscore-num">8</div>
+          <div>
+            <div class="fscore-label"><strong>Güçlü Bilanço</strong>9 üzerinden 8 puan — TUPRS finansal açıdan sağlıklı. Yalnızca 1 kriter karşılanmıyor.</div>
+            <div style="display:flex;gap:6px;margin-top:8px;">
+              <div style="width:100%;height:8px;background:var(--s3);border-radius:4px;overflow:hidden;">
+                <div style="width:88.8%;height:100%;background:linear-gradient(90deg,var(--green),#00e090);border-radius:4px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="fscore-grid">
+          <div class="fscore-group">
+            <div class="fscore-group-title">Karlılık (4/4)</div>
+            <div class="fscore-item"><div class="fscore-dot pass"></div><span class="fscore-text">Pozitif ROA</span></div>
+            <div class="fscore-item"><div class="fscore-dot pass"></div><span class="fscore-text">Pozitif Operasyonel Nakit Akışı</span></div>
+            <div class="fscore-item"><div class="fscore-dot pass"></div><span class="fscore-text">Artan ROA (YoY)</span></div>
+            <div class="fscore-item"><div class="fscore-dot pass"></div><span class="fscore-text">Nakit Akışı > Net Gelir</span></div>
+          </div>
+          <div class="fscore-group">
+            <div class="fscore-group-title">Kaldıraç & Likidite (2/3)</div>
+            <div class="fscore-item"><div class="fscore-dot pass"></div><span class="fscore-text">Azalan Uzun Vadeli Borç Oranı</span></div>
+            <div class="fscore-item"><div class="fscore-dot pass"></div><span class="fscore-text">Artan Cari Oran</span></div>
+            <div class="fscore-item"><div class="fscore-dot fail"></div><span class="fscore-text" style="color:var(--muted)">Hisse Dilüsyonu Yok ✗</span></div>
+          </div>
+          <div class="fscore-group">
+            <div class="fscore-group-title">Verimlilik (2/2)</div>
+            <div class="fscore-item"><div class="fscore-dot pass"></div><span class="fscore-text">Artan Brüt Marj</span></div>
+            <div class="fscore-item"><div class="fscore-dot pass"></div><span class="fscore-text">Artan Varlık Devir Hızı</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: GURU ANALİZİ ═══ -->
+    <div id="tab-guru" class="tab-panel">
+      <div class="section">
+        <div class="sec-title">Efsane Yatırımcı Kriterleri</div>
+        <div class="guru-grid">
+
+          <div class="guru-card pass">
+            <div class="guru-top">
+              <div class="guru-emoji">🎯</div>
+              <div>
+                <div class="guru-name">Warren Buffett</div>
+                <div style="font-size:10px;color:var(--text2)">Değer Yatırımı</div>
+              </div>
+              <div class="guru-score pass">5/6 ✓</div>
+            </div>
+            <div class="guru-criteria">
+              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>F/K &lt; 20 → 11.2x ✓</div>
+              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>ROE &gt; 15% → 38.4% ✓</div>
+              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>Net Marj &gt; 10% → 12.8% ✓</div>
+              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>Cari Oran &gt; 1.2 → 1.65x ✓</div>
+              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>Borç/Öz &lt; 0.8 → 0.72 ✓</div>
+              <div class="guru-crit"><div class="dot" style="background:var(--red)"></div>PD/DD &lt; 3 → 1.81x (sınırda)</div>
+            </div>
+          </div>
+
+          <div class="guru-card pass">
+            <div class="guru-top">
+              <div class="guru-emoji">📈</div>
+              <div>
+                <div class="guru-name">Peter Lynch – PEG</div>
+                <div style="font-size:10px;color:var(--text2)">Büyüme + Değer</div>
+              </div>
+              <div class="guru-score pass">✓ GEÇTİ</div>
+            </div>
+            <div class="guru-criteria">
+              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>PEG &lt; 1 → 0.71 ✓</div>
+              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>F/K &lt; 30 → 11.2x ✓</div>
+              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>ROE &gt; 12% → 38.4% ✓</div>
+            </div>
+          </div>
+
+          <div class="guru-card partial">
+            <div class="guru-top">
+              <div class="guru-emoji">📚</div>
+              <div>
+                <div class="guru-name">Benjamin Graham</div>
+                <div style="font-size:10px;color:var(--text2)">Derin Değer</div>
+              </div>
+              <div class="guru-score partial">3/5 ~</div>
+            </div>
+            <div class="guru-criteria">
+              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>F/K &lt; 15 → 11.2x ✓</div>
+              <div class="guru-crit"><div class="dot" style="background:var(--gold)"></div>PD/DD &lt; 1.5 → 1.81x (sınırda)</div>
+              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>Cari &gt; 2 → 1.65x ~</div>
+              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>Temettü &gt; 1% → 2.66% ✓</div>
+              <div class="guru-crit"><div class="dot" style="background:var(--red)"></div>Borç/Öz &lt; 0.5 → 1.72 ✗</div>
+            </div>
+          </div>
+
+          <div class="guru-card pass">
+            <div class="guru-top">
+              <div class="guru-emoji">⚡</div>
+              <div>
+                <div class="guru-name">Piotroski F-Score</div>
+                <div style="font-size:10px;color:var(--text2)">Finansal Sağlık</div>
+              </div>
+              <div class="guru-score pass">8/9 ✓</div>
+            </div>
+            <div class="guru-criteria">
+              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>Karlılık 4/4 ✓</div>
+              <div class="guru-crit"><div class="dot" style="background:var(--gold)"></div>Kaldıraç 2/3 (dilüsyon var)</div>
+              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>Verimlilik 2/2 ✓</div>
+            </div>
+          </div>
+
+          <div class="guru-card fail">
+            <div class="guru-top">
+              <div class="guru-emoji">🚀</div>
+              <div>
+                <div class="guru-name">Minervini – SEPA</div>
+                <div style="font-size:10px;color:var(--text2)">Momentum</div>
+              </div>
+              <div class="guru-score fail">2/5 ✗</div>
+            </div>
+            <div class="guru-criteria">
+              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>Kazanç Büyümesi &gt;25% → ~</div>
+              <div class="guru-crit"><div class="dot" style="background:var(--red)"></div>52h yükseğine yakın → uzak</div>
+              <div class="guru-crit"><div class="dot" style="background:var(--red)"></div>Güçlü relatif güç → zayıf</div>
+            </div>
+          </div>
+
+          <div class="guru-card partial">
+            <div class="guru-top">
+              <div class="guru-emoji">🏢</div>
+              <div>
+                <div class="guru-name">Citadel Modeli</div>
+                <div style="font-size:10px;color:var(--text2)">Multi-Strategy</div>
+              </div>
+              <div class="guru-score partial">4/5 ~</div>
+            </div>
+            <div class="guru-criteria">
+              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>ROE &gt; 15% → 38.4% ✓</div>
+              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>Net Marj &gt; 12% → 12.8% ✓</div>
+              <div class="guru-crit"><div class="dot" style="background:var(--green)"></div>Kazanç Büyümesi &gt;10% ✓</div>
+              <div class="guru-crit"><div class="dot" style="background:var(--gold)"></div>Borç/Öz &lt; 0.8 → sınırda</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TAB: YZ ANALİZİ ═══ -->
+    <div id="tab-ai" class="tab-panel">
+      <div class="section">
+        <div class="sec-title">Yapay Zeka Destekli Analiz</div>
+
+        <div class="ai-box">
+          <div class="ai-header">
+            <div class="ai-icon">🤖</div>
+            <div>
+              <div class="ai-title">DeepFin AI — TUPRS Analizi</div>
+              <div style="font-size:10px;color:var(--text2)">Finansal veriler + piyasa bağlamı üzerine üretildi</div>
+            </div>
+            <div class="ai-badge">CLAUDE 4</div>
+          </div>
+
+          <div class="ai-content">
+            <strong>Genel Değerlendirme:</strong> TUPRS, Türkiye'nin en büyük sanayi kuruluşu olarak güçlü finansal temellerle desteklenen bir değer yatırımı fırsatı sunuyor. F/K 11.2x ile sektörün belirgin biçimde altında işlem görürken, %38.4 ROE rakamı kurumsal yatırımcıların dikkatini çekecek seviyede.
+
+            <div class="ai-bullets">
+              <div class="ai-bullet">
+                <span class="ai-bullet-icon">💚</span>
+                <div><strong>Güçlü Yönler:</strong> Piotroski F-Score 8/9 ile finansal sağlık mükemmel seviyede. PEG 0.71 ile büyüme hızına göre ucuz. Net marj %12.8 ile 5 yıllık en yüksek seviyede. Buffett ve Lynch kriterlerinin büyük çoğunluğunu karşılıyor.</div>
+              </div>
+              <div class="ai-bullet">
+                <span class="ai-bullet-icon">🔴</span>
+                <div><strong>Riskler:</strong> Kısa vadeli borç oranındaki %56.8'lik artış dikkat gerektiriyor. Ham petrol fiyatlarına ve döviz kuruna yüksek duyarlılık. Minervini momentum kriterlerini karşılamıyor — hisse teknik açıdan trendin dışında.</div>
+              </div>
+              <div class="ai-bullet">
+                <span class="ai-bullet-icon">🎯</span>
+                <div><strong>Yatırımcı Profili:</strong> Bu hisse <strong>değer odaklı uzun vadeli yatırımcılar</strong> için uygun. Kısa vadeli momentum trader'ları için ideal değil. Temettü verimi (%2.66) pasif gelir arayan yatırımcıları tatmin edebilir.</div>
+              </div>
+              <div class="ai-bullet">
+                <span class="ai-bullet-icon">📊</span>
+                <div><strong>Sektör Karşılaştırması:</strong> Enerji sektörü ortalamasına kıyasla F/K 24% iskontolu, ROE ise %60 primli işlem görüyor. Benzer rafineriler (Neste, Saras) ile kıyaslandığında değerleme makul görünüyor.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ai-footer">
+            <div class="ai-disclaimer">⚠ Bu analiz bilgi amaçlıdır, yatırım tavsiyesi değildir. Finansal kararlarınızda profesyonel destek alın.</div>
+            <div class="ai-refresh">↻ Yenile</div>
+          </div>
+        </div>
+
+        <!-- Analiz Butonu (premium için) -->
+        <div style="margin-top:16px;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:20px;text-align:center;">
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;">Özel Soru Sor</div>
+          <div style="font-size:11px;color:var(--text2);margin-bottom:14px)">TUPRS hakkında istediğin soruyu sor — AI finansal verilere göre yanıtlar</div>
+          <div style="display:flex;gap:8px;margin-top:12px;">
+            <input type="text" placeholder="Örn: Bu hisse Buffett stratejisine uygun mu?" style="flex:1;background:var(--s3);border:1px solid var(--border2);border-radius:6px;padding:9px 14px;color:var(--text);font-size:12px;outline:none;font-family:var(--body);">
+            <button class="btn-sm btn-primary" style="white-space:nowrap;padding:9px 16px;">Sor →</button>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+            <span style="font-size:10px;padding:4px 10px;background:var(--s3);border:1px solid var(--border);border-radius:20px;color:var(--text2);cursor:pointer;" onclick="fillQ(this)">Temettü artırmaya devam eder mi?</span>
+            <span style="font-size:10px;padding:4px 10px;background:var(--s3);border:1px solid var(--border);border-radius:20px;color:var(--text2);cursor:pointer;" onclick="fillQ(this)">Borç yükü risk oluşturuyor mu?</span>
+            <span style="font-size:10px;padding:4px 10px;background:var(--s3);border:1px solid var(--border);border-radius:20px;color:var(--text2);cursor:pointer;" onclick="fillQ(this)">Fair value nedir?</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /main-col -->
+
+  <!-- SIDE COLUMN -->
+  <div class="side-col">
+
+    <!-- Hızlı İstatistikler -->
+    <div class="side-section">
+      <div class="side-title">Fiyat Bilgileri</div>
+      <div class="range-wrap">
+        <div class="range-label">
+          <span>₺168.40 <span style="color:var(--muted)">(52h düşük)</span></span>
+          <span>₺248.20 <span style="color:var(--muted)">(52h yüksek)</span></span>
+        </div>
+        <div class="range-bar">
+          <div class="range-fill"></div>
+          <div class="range-cursor" style="left: 57%"></div>
+        </div>
+        <div style="text-align:center;font-size:10px;color:var(--text2);margin-top:6px;font-family:var(--mono)">₺214.50 — zirveden %13.6 uzakta</div>
+      </div>
+      <div class="quick-stat"><span class="qs-label">Açılış</span><span class="qs-val">₺210.80</span></div>
+      <div class="quick-stat"><span class="qs-label">Günlük Yüksek</span><span class="qs-val up">₺216.20</span></div>
+      <div class="quick-stat"><span class="qs-label">Günlük Düşük</span><span class="qs-val dn">₺209.40</span></div>
+      <div class="quick-stat"><span class="qs-label">Günlük Hacim</span><span class="qs-val">₺1.41B</span></div>
+      <div class="quick-stat"><span class="qs-label">Ort. Hacim (20g)</span><span class="qs-val">₺1.18B</span></div>
+      <div class="quick-stat"><span class="qs-label">Beta</span><span class="qs-val">0.87</span></div>
+    </div>
+
+    <!-- Analist Görüşü -->
+    <div class="side-section">
+      <div class="side-title">Analist Konsensüsü</div>
+      <div class="analyst-bar">
+        <div class="analyst-buy" style="width:58%"></div>
+        <div class="analyst-hold" style="width:29%"></div>
+        <div class="analyst-sell" style="width:13%"></div>
+      </div>
+      <div class="analyst-legend">
+        <span>AL 58%</span>
+        <span>TUT 29%</span>
+        <span>SAT 13%</span>
+      </div>
+      <div class="analyst-target">
+        <div>
+          <div class="analyst-target-label">12 Aylık Hedef Fiyat</div>
+          <div class="analyst-target-val">₺258.00</div>
+        </div>
+        <div class="analyst-upside">▲ +20.3% potansiyel</div>
+      </div>
+    </div>
+
+    <!-- Son Haberler -->
+    <div class="side-section">
+      <div class="side-title">Son Haberler</div>
+
+      <div class="news-item">
+        <div class="news-source">KAP · TUPRS</div>
+        <div class="news-title">Tüpraş 2024 yılı kâr payı dağıtım kararı açıklandı — hisse başına ₺5.70</div>
+        <div class="news-meta">
+          <span>2 gün önce</span>
+          <span class="news-sentiment pos">+ Pozitif</span>
+        </div>
+      </div>
+
+      <div class="news-item">
+        <div class="news-source">Bloomberg HT</div>
+        <div class="news-title">Ham petrol fiyatları Orta Doğu gerginliğiyle yükseldi — rafinerilere etki sınırlı</div>
+        <div class="news-meta">
+          <span>4 gün önce</span>
+          <span class="news-sentiment ntr">Nötr</span>
+        </div>
+      </div>
+
+      <div class="news-item">
+        <div class="news-source">Reuters</div>
+        <div class="news-title">Tüpraş İzmir rafinerisi modernizasyon yatırımını tamamladı, kapasite %8 arttı</div>
+        <div class="news-meta">
+          <span>1 hafta önce</span>
+          <span class="news-sentiment pos">+ Pozitif</span>
+        </div>
+      </div>
+
+      <div class="news-item">
+        <div class="news-source">Ekonomist</div>
+        <div class="news-title">EPDK akaryakıt fiyat düzenlemesi — Tüpraş marjlarına etkisi analizi</div>
+        <div class="news-meta">
+          <span>10 gün önce</span>
+          <span class="news-sentiment neg">- Negatif</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Benzer Hisseler -->
+    <div class="side-section">
+      <div class="side-title">Benzer Hisseler — Enerji Sektörü</div>
+      <div class="similar-item">
+        <span class="similar-sym">AYGAZ</span>
+        <span class="similar-name">Aygaz A.Ş.</span>
+        <span class="similar-chg up">+1.4%</span>
+      </div>
+      <div class="similar-item">
+        <span class="similar-sym">PETKM</span>
+        <span class="similar-name">Petkim Petrokimya</span>
+        <span class="similar-chg dn">-0.8%</span>
+      </div>
+      <div class="similar-item">
+        <span class="similar-sym">BIMAS</span>
+        <span class="similar-name">BİM Mağazalar</span>
+        <span class="similar-chg up">+0.6%</span>
+      </div>
+      <div class="similar-item">
+        <span class="similar-sym">EREGL</span>
+        <span class="similar-name">Ereğli Demir Çelik</span>
+        <span class="similar-chg dn">-1.2%</span>
+      </div>
+      <div class="similar-item">
+        <span class="similar-sym">AKSEN</span>
+        <span class="similar-name">Aksa Enerji</span>
+        <span class="similar-chg up">+2.1%</span>
+      </div>
+    </div>
+
+    <!-- KAP Bildirimleri -->
+    <div class="side-section">
+      <div class="side-title">KAP Bildirimleri</div>
+      <div class="news-item">
+        <div class="news-source" style="color:var(--gold)">KAP · Özel Durum</div>
+        <div class="news-title">2024 Yılı Olağan Genel Kurul Toplantısı — 28 Mart 2025</div>
+        <div class="news-meta"><span>3 gün önce</span></div>
+      </div>
+      <div class="news-item">
+        <div class="news-source" style="color:var(--gold)">KAP · Finansal Rapor</div>
+        <div class="news-title">2024 Yılı Yıllık Finansal Tablolar açıklandı</div>
+        <div class="news-meta"><span>2 hafta önce</span></div>
+      </div>
+      <div class="news-item">
+        <div class="news-source" style="color:var(--gold)">KAP · Yönetim</div>
+        <div class="news-title">Yönetim Kurulu Üyesi değişikliği hk. bildirim</div>
+        <div class="news-meta"><span>1 ay önce</span></div>
+      </div>
+    </div>
+
+  </div><!-- /side-col -->
+</div><!-- /page -->
+
+<script>
+function switchTab(id, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('tab-' + id).classList.add('on');
+}
+
+function fillQ(el) {
+  document.querySelector('input[type="text"]').value = el.textContent;
+}
+
+
+// ── DISCLAIMER (localStorage — ilk girişte bir kez) ──
+var _disclaimerTimer = null;
+function _showDisclaimer(onAccept) {
+  if (localStorage.getItem('df_disclaimer_v1')) {
+    if (onAccept) onAccept();
+    return;
+  }
+  var modal = document.getElementById('disclaimerModal');
+  modal.classList.add('open');
+  var btn = document.getElementById('disclaimerBtn');
+  var cd  = document.getElementById('disclaimerCountdown');
+  var secs = 5;
+  btn.disabled = true;
+  btn.style.cursor = 'not-allowed';
+  btn.style.background = '#1a1a1a';
+  btn.style.color = '#555';
+  btn.style.borderColor = '#333';
+  if (_disclaimerTimer) clearInterval(_disclaimerTimer);
+  _disclaimerTimer = setInterval(function() {
+    secs--;
+    if (cd) cd.textContent = '(' + secs + ')';
+    if (secs <= 0) {
+      clearInterval(_disclaimerTimer);
+      btn.disabled = false;
+      btn.style.cursor = 'pointer';
+      btn.style.background = '#3b82f6';
+      btn.style.color = '#fff';
+      btn.style.borderColor = 'transparent';
+      if (cd) cd.textContent = '';
+    }
+  }, 1000);
+  btn.onclick = function() {
+    localStorage.setItem('df_disclaimer_v1', '1');
+    modal.classList.remove('open');
+    clearInterval(_disclaimerTimer);
+    if (onAccept) onAccept();
+  };
+}
+function acceptDisclaimer() {
+  localStorage.setItem('df_disclaimer_v1', '1');
+  var modal = document.getElementById('disclaimerModal');
+  if (modal) modal.classList.remove('open');
+  clearInterval(_disclaimerTimer);
+}
+
+// Sayfa yüklenince disclaimer kontrolü
+if (!localStorage.getItem('df_disclaimer_v1')) {
+  document.addEventListener('DOMContentLoaded', function() {
+    _showDisclaimer(null);
+  });
+}
+</script>
+
+<script>
+// URL parametrelerinden sym + ex al
+(function(){
+  var params = new URLSearchParams(window.location.search);
+  var sym = (params.get('sym') || 'TUPRS').toUpperCase();
+  var ex  = params.get('ex') || 'bist';
+
+  var EXCHANGE_NAMES = {bist:'BIST',nasdaq:'NASDAQ',sp500:'S&P 500',dax:'DAX',lse:'LSE',nikkei:'Nikkei'};
+  var EXCHANGE_FLAGS = {bist:'tr',nasdaq:'us',sp500:'us',dax:'de',lse:'gb',nikkei:'jp'};
+  var EXCHANGE_CUR   = {bist:'₺',nasdaq:'$',sp500:'$',dax:'€',lse:'£',nikkei:'¥'};
+
+  // Başlık güncelle
+  document.title = 'DeepFin — ' + sym + ' Analizi';
+
+  // Breadcrumb
+  var bcEl = document.querySelector('.breadcrumb');
+  if(bcEl){
+    bcEl.innerHTML =
+      '<a href="/">Tarayıcı</a>' +
+      '<span class="breadcrumb-sep">/</span>' +
+      '<a href="/analiz/">Analiz</a>' +
+      '<span class="breadcrumb-sep">/</span>' +
+      '<a href="/analiz/">' + (EXCHANGE_NAMES[ex]||ex).toLowerCase() + '</a>' +
+      '<span class="breadcrumb-sep">/</span>' +
+      '<span style="color:var(--text)">' + sym.toLowerCase() + '</span>';
+  }
+
+  // Logo, başlık, tag güncelle
+  var logoEl = document.querySelector('.company-logo');
+  if(logoEl) logoEl.textContent = sym.substring(0,2);
+
+  var nameEl = document.querySelector('.company-name');
+  if(nameEl) nameEl.textContent = sym + ' — ' + (EXCHANGE_NAMES[ex]||ex);
+
+  var symTag = document.querySelector('.tag.blue');
+  if(symTag) symTag.textContent = sym;
+
+  // Geri butonu
+  var topbarRight = document.querySelector('.topbar-right');
+  if(topbarRight){
+    var backBtn = topbarRight.querySelector('.btn-sm:first-child');
+    if(backBtn){ backBtn.textContent = '← Analiz'e Dön'; backBtn.onclick = function(){ history.back(); }; }
+  }
+
+  // Hemen Al butonu
+  document.querySelectorAll('.dpl-buy, .prf-buy-btn').forEach(function(b){
+    b.textContent = '🛒 ' + sym + ' — Hemen Al';
+  });
+
+  // TradingView butonu güncelle
+  var tvBtn = document.querySelector('.btn-primary');
+  if(tvBtn){
+    var tvUrl = '';
+    if(ex==='bist') tvUrl='https://tr.tradingview.com/symbols/BIST-'+sym;
+    else if(ex==='nasdaq') tvUrl='https://www.tradingview.com/symbols/NASDAQ-'+sym;
+    else if(ex==='sp500') tvUrl='https://www.tradingview.com/symbols/NYSE-'+sym;
+    else if(ex==='dax') tvUrl='https://www.tradingview.com/symbols/XETR-'+sym;
+    else if(ex==='lse') tvUrl='https://www.tradingview.com/symbols/LSE-'+sym;
+    else if(ex==='nikkei') tvUrl='https://www.tradingview.com/symbols/TSE-'+sym;
+    tvBtn.textContent = '↗ TradingView'da Aç';
+    tvBtn.onclick = function(){ window.open(tvUrl,'_blank'); };
+  }
+})();
+
+
+<!-- DISCLAIMER MODAL -->
+<div class="modal-overlay" id="disclaimerModal" style="z-index:9999;">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:520px;padding:0;overflow:hidden;">
+    <div style="background:#0a0a0a;border-bottom:1px solid #1a1a1a;padding:20px 24px;display:flex;align-items:center;gap:10px;">
+      <span style="font-size:20px;">⚖️</span>
+      <div>
+        <div style="font-size:14px;font-weight:700;color:#ededed;">Yasal Uyarı</div>
+        <div style="font-size:11px;color:#666;margin-top:2px;">Devam etmeden önce lütfen okuyun</div>
+      </div>
+    </div>
+    <div style="padding:24px;background:#0d0d0d;">
+      <p style="font-size:12px;color:#888;line-height:1.85;margin:0 0 16px;">
+        DeepFin'de sunulan tüm veriler, filtreler ve stratejiler yalnızca <strong style="color:#ccc;">bilgilendirme amaçlıdır.</strong>
+      </p>
+      <p style="font-size:12px;color:#888;line-height:1.85;margin:0 0 16px;">
+        Bu platform; herhangi bir finansal araç için <strong style="color:#ccc;">alım, satım veya elde tutma tavsiyesi vermez</strong> ve yatırım danışmanlığı hizmeti sunmaz. Geçmiş performans, gelecekteki sonuçların garantisi değildir.
+      </p>
+      <p style="font-size:12px;color:#888;line-height:1.85;margin:0;">
+        Yatırım kararlarınızı almadan önce lisanslı bir finansal danışmana başvurmanızı tavsiye ederiz. <strong style="color:#ccc;">Tüm yatırım işlemleri kullanıcının kendi sorumluluğundadır.</strong>
+      </p>
+      <div style="margin-top:24px;border-top:1px solid #1a1a1a;padding-top:20px;">
+        <button id="disclaimerBtn" onclick="acceptDisclaimer()" disabled
+          style="width:100%;padding:13px;border-radius:8px;font-size:13px;font-weight:700;cursor:not-allowed;transition:all .3s;background:#1a1a1a;border:1px solid #333;color:#555;">
+          Okudum, Anladım &amp; Devam Et <span id="disclaimerCountdown">(5)</span>
+        </button>
+        <p style="text-align:center;font-size:10px;color:#444;margin:10px 0 0;">
+          Bu uyarı yalnızca ilk girişte gösterilir.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
