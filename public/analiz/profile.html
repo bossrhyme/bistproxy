@@ -708,7 +708,6 @@ td:first-child,td:nth-child(2){text-align:left;}
 /* ── DISCLAIMER MODAL ── */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
 .modal-overlay.open{display:flex;}
-
 </style>
 <style>
 
@@ -1068,53 +1067,6 @@ html,body{height:100%;overflow:hidden;}
 </div>
 
 <script>
-
-// ── DISCLAIMER (localStorage — ilk girişte bir kez) ──
-var _disclaimerTimer = null;
-function _showDisclaimer(onAccept) {
-  if (localStorage.getItem('df_disclaimer_v1')) {
-    if (onAccept) onAccept();
-    return;
-  }
-  var modal = document.getElementById('disclaimerModal');
-  if (!modal) {
-    document.addEventListener('DOMContentLoaded', function() { _showDisclaimer(onAccept); });
-    return;
-  }
-  modal.classList.add('open');
-  var btn = document.getElementById('disclaimerBtn');
-  var cd  = document.getElementById('disclaimerCountdown');
-  var secs = 5;
-  btn.disabled = true;
-  btn.style.cursor = 'not-allowed';
-  btn.style.background = '#1a1a1a';
-  btn.style.color = '#555';
-  btn.style.borderColor = '#333';
-  if (_disclaimerTimer) clearInterval(_disclaimerTimer);
-  _disclaimerTimer = setInterval(function() {
-    secs--;
-    if (cd) cd.textContent = '(' + secs + ')';
-    if (secs <= 0) {
-      clearInterval(_disclaimerTimer);
-      btn.disabled = false;
-      btn.style.cursor = 'pointer';
-      btn.style.background = '#3b82f6';
-      btn.style.color = '#fff';
-      btn.style.borderColor = 'transparent';
-      if (cd) cd.textContent = '';
-    }
-  }, 1000);
-  btn.onclick = function() {
-    localStorage.setItem('df_disclaimer_v1', '1');
-    modal.classList.remove('open');
-    clearInterval(_disclaimerTimer);
-    if (onAccept) onAccept();
-  };
-}
-document.addEventListener('DOMContentLoaded', function() {
-  _showDisclaimer(null);
-});
-
 function openTradingView() {
   var ex = _prfEx || 'bist';
   var sym = _prfSym || '';
@@ -1713,9 +1665,50 @@ document.addEventListener('DOMContentLoaded', function() {
     loadYahooData(sym, ex);
   }
 });
+
+
+// ── DISCLAIMER ──
+var _disclaimerTimer = null;
+function _showDisclaimer(onAccept) {
+  if (localStorage.getItem('df_disclaimer_v1')) {
+    if (onAccept) onAccept();
+    return;
+  }
+  var modal = document.getElementById('disclaimerModal');
+  if (!modal) { return; } // DOM henüz yok - DOMContentLoaded bekle
+  modal.classList.add('open');
+  var btn = document.getElementById('disclaimerBtn');
+  var cd  = document.getElementById('disclaimerCountdown');
+  var secs = 5;
+  btn.disabled = true;
+  btn.style.cssText = 'width:100%;padding:13px;border-radius:8px;font-size:13px;font-weight:700;cursor:not-allowed;transition:all .3s;background:#1a1a1a;border:1px solid #333;color:#555;';
+  if (_disclaimerTimer) clearInterval(_disclaimerTimer);
+  _disclaimerTimer = setInterval(function() {
+    secs--;
+    if (cd) cd.textContent = '(' + secs + ')';
+    if (secs <= 0) {
+      clearInterval(_disclaimerTimer);
+      btn.disabled = false;
+      btn.style.cssText = 'width:100%;padding:13px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:all .3s;background:#3b82f6;border:1px solid transparent;color:#fff;';
+      if (cd) cd.textContent = '';
+    }
+  }, 1000);
+  btn.onclick = function() {
+    localStorage.setItem('df_disclaimer_v1', '1');
+    modal.classList.remove('open');
+    clearInterval(_disclaimerTimer);
+    if (onAccept) onAccept();
+  };
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  _showDisclaimer(null);
+});
+
 </script>
+
 <!-- DISCLAIMER MODAL -->
-<div class="modal-overlay" id="disclaimerModal" style="z-index:9999;">
+<div class="modal-overlay" id="disclaimerModal">
   <div onclick="event.stopPropagation()" style="background:#0d0d0d;border:1px solid #1a1a1a;border-radius:12px;max-width:520px;width:calc(100% - 32px);overflow:hidden;">
     <div style="background:#0a0a0a;border-bottom:1px solid #1a1a1a;padding:20px 24px;display:flex;align-items:center;gap:10px;">
       <span style="font-size:20px;">⚖️</span>
@@ -1725,23 +1718,14 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
     </div>
     <div style="padding:24px;">
-      <p style="font-size:12px;color:#888;line-height:1.85;margin:0 0 16px;">
-        DeepFin'de sunulan tüm veriler, filtreler ve stratejiler yalnızca <strong style="color:#ccc;">bilgilendirme amaçlıdır.</strong>
-      </p>
-      <p style="font-size:12px;color:#888;line-height:1.85;margin:0 0 16px;">
-        Bu platform; herhangi bir finansal araç için <strong style="color:#ccc;">alım, satım veya elde tutma tavsiyesi vermez</strong> ve yatırım danışmanlığı hizmeti sunmaz.
-      </p>
-      <p style="font-size:12px;color:#888;line-height:1.85;margin:0;">
-        Yatırım kararlarınızı almadan önce lisanslı bir finansal danışmana başvurmanızı tavsiye ederiz. <strong style="color:#ccc;">Tüm yatırım işlemleri kullanıcının kendi sorumluluğundadır.</strong>
-      </p>
+      <p style="font-size:12px;color:#888;line-height:1.85;margin:0 0 16px;">DeepFin'de sunulan tüm veriler, filtreler ve stratejiler yalnızca <strong style="color:#ccc;">bilgilendirme amaçlıdır.</strong></p>
+      <p style="font-size:12px;color:#888;line-height:1.85;margin:0 0 16px;">Bu platform; herhangi bir finansal araç için <strong style="color:#ccc;">alım, satım veya elde tutma tavsiyesi vermez</strong> ve yatırım danışmanlığı hizmeti sunmaz.</p>
+      <p style="font-size:12px;color:#888;line-height:1.85;margin:0;">Yatırım kararlarınızı almadan önce lisanslı bir finansal danışmana başvurmanızı tavsiye ederiz. <strong style="color:#ccc;">Tüm yatırım işlemleri kullanıcının kendi sorumluluğundadır.</strong></p>
       <div style="margin-top:24px;border-top:1px solid #1a1a1a;padding-top:20px;">
-        <button id="disclaimerBtn" disabled
-          style="width:100%;padding:13px;border-radius:8px;font-size:13px;font-weight:700;cursor:not-allowed;transition:all .3s;background:#1a1a1a;border:1px solid #333;color:#555;">
+        <button id="disclaimerBtn" disabled style="width:100%;padding:13px;border-radius:8px;font-size:13px;font-weight:700;cursor:not-allowed;transition:all .3s;background:#1a1a1a;border:1px solid #333;color:#555;">
           Okudum, Anladım &amp; Devam Et <span id="disclaimerCountdown">(5)</span>
         </button>
-        <p style="text-align:center;font-size:10px;color:#444;margin:10px 0 0;">
-          Bu uyarı yalnızca ilk girişte gösterilir.
-        </p>
+        <p style="text-align:center;font-size:10px;color:#444;margin:10px 0 0;">Bu uyarı yalnızca ilk girişte gösterilir.</p>
       </div>
     </div>
   </div>
