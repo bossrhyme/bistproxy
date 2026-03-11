@@ -371,109 +371,255 @@ td:first-child,td:nth-child(2){text-align:left;}
 ══════════════════════════════════ */
 @media (max-width: 768px) {
 
-  /* ── TOPBAR ── */
-  .topbar { padding: 0 8px; gap: 5px; }
+  /* ─────────────────────────────────────────
+     TOPBAR
+  ───────────────────────────────────────── */
+  .topbar {
+    padding: 0 10px;
+    gap: 6px;
+    height: 52px;         /* iOS nav bar ile çakışmayı önler */
+  }
   .tlive { display: none; }
   .tlogo span:not(.tlogo-mark) { display: none; }
-  .tsearch { max-width: 150px; }
-  .tright { gap: 3px; }
-  .tright #scantime { display: none; }
-  .infobtn { font-size: 11px; padding: 5px 8px; }
+  .tlogo-mark { width: 28px; height: 28px; font-size: 14px; }
+  .tlogo { gap: 0; }
   .supportbtn { display: none; }
-  .topbarbtn { padding: 5px 8px; font-size: 11px; }
-  .hp-nav-btn { font-size: 11px; padding: 4px 8px; }
 
-  /* ── LAYOUT — mobilde sidebar gizli, full height koru ── */
-  .layout { flex-direction: row; height: 100%; overflow: hidden; }
+  /* Nav butonları — küçük ama dokunulabilir */
+  .hp-nav-btn {
+    font-size: 10px;
+    padding: 5px 7px;
+    min-height: 34px;
+    border-radius: 6px;
+  }
 
-  /* ── SIDEBAR — mobilde gizle, drawer ile aç ── */
+  /* Arama kutusu — esnek genişle */
+  .tsearch {
+    flex: 1;
+    max-width: unset;
+  }
+  .tsearch input { font-size: 13px; padding: 7px 10px 7px 30px; }
+
+  /* Sağ grup */
+  .tright { gap: 4px; margin-left: 0; }
+  .tright #scantime { display: none; }
+  .infobtn { font-size: 11px; padding: 5px 8px; min-height: 34px; }
+  .topbarbtn { padding: 5px 10px; font-size: 11px; min-height: 34px; }
+
+  /* Hamburger */
+  .hamburger-btn { display: flex !important; min-height: 36px; }
+
+  /* ─────────────────────────────────────────
+     LAYOUT — sidebar gizli, drawer ile açılır
+  ───────────────────────────────────────── */
+  .layout {
+    flex-direction: column;
+    height: calc(100% - 52px);   /* topbar yüksekliği kadar boşalt */
+    overflow: hidden;
+  }
   .sidebar { display: none !important; }
-  .hamburger-btn { display: flex !important; }
 
-  /* ── EXCHANGE GRID — 3 kolon ── */
-  .exchange-grid { grid-template-columns: repeat(3, 1fr); gap: 3px; }
-  .exbtn { padding: 6px 4px; font-size: 10px; }
+  /* ─────────────────────────────────────────
+     EXCHANGE GRID — 3'lü sütun
+  ───────────────────────────────────────── */
+  .exchange-grid { grid-template-columns: repeat(3, 1fr); gap: 4px; }
+  .exbtn { padding: 8px 4px; font-size: 10px; min-height: 44px; }
   .exbtn-sub { display: none; }
 
-  /* ── CHIPS — yatay scroll ── */
-  .chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
-  .chips::-webkit-scrollbar { height: 2px; }
-  .chips::-webkit-scrollbar-thumb { background: var(--border2); }
+  /* ─────────────────────────────────────────
+     CHIP'LER — yatay kaydırılabilir
+  ───────────────────────────────────────── */
+  .chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip, .goat-chip {
+    flex-shrink: 0;
+    font-size: 11px;
+    padding: 5px 10px;
+    min-height: 32px;
+  }
 
-  /* ── MAIN / CONTENT ── */
-  .main { flex: 1; min-width: 0; overflow: hidden; display: flex; flex-direction: column; }
-  .content { min-height: 0; overflow: hidden; flex: 1; display: flex; flex-direction: column; }
+  /* ─────────────────────────────────────────
+     MAIN & CONTENT
+  ───────────────────────────────────────── */
+  .main {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .content {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
 
-  /* ── TOOLBAR ── */
-  #toolbar { flex-wrap: wrap; gap: 4px; padding: 6px 8px; }
-  .ssel { font-size: 10px; padding: 3px 6px; }
-  .tbl-scroll-btn { display: none; }
+  /* ─────────────────────────────────────────
+     TOOLBAR — iki satıra sarılabilir
+  ───────────────────────────────────────── */
+  #toolbar {
+    padding: 6px 10px;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+  .rcount { font-size: 11px; }
+  .ssel { font-size: 11px; padding: 4px 6px; min-height: 32px; }
+  .tbl-scroll-btn { display: none; }   /* touch cihazda gereksiz */
+  .pbar { flex: 1; min-width: 60px; }
 
-  /* ── TABLO ── */
-  .twrap { overflow: auto; -webkit-overflow-scrolling: touch; flex: 1; min-height: 0; }
-  table { min-width: 700px; }
-  th, td { padding: 6px 8px; font-size: 10px; white-space: nowrap; }
+  /* ─────────────────────────────────────────
+     STATS BAR — yatay scroll
+  ───────────────────────────────────────── */
+  .stats-bar {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0 10px;
+    gap: 0;
+    height: 40px;
+  }
+  .stats-bar::-webkit-scrollbar { display: none; }
+  .sb-item { flex-shrink: 0; padding: 0 10px; }
+  .stat-item, .sb-label { font-size: 9px; }
+  .sb-val { font-size: 11px; }
 
-  /* ── DETAY PANELİ — tam ekran ── */
+  /* ─────────────────────────────────────────
+     TABLO — yatay kaydırılabilir (asıl düzeltme)
+  ───────────────────────────────────────── */
+  .twrap {
+    flex: 1;
+    min-height: 0;
+    overflow-x: auto;              /* ← sağa/sola serbestçe kaydır */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+  }
+  table {
+    min-width: 860px;              /* tüm kolonlar sığsın */
+    width: max-content;            /* içeriğe göre genişle */
+  }
+  thead { position: sticky; top: 0; z-index: 5; }
+  th {
+    padding: 8px 10px;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+  td {
+    padding: 10px 10px;            /* iOS parmak dokunuşu için yeterli yükseklik */
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  tbody tr { min-height: 44px; }  /* Apple HIG minimum dokunma hedefi */
+
+  /* İlk kolon (şirket adı) sticky — yatay kaydırmada sabit kalır */
+  th:first-child,
+  td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    background: var(--s1);
+    box-shadow: 2px 0 6px rgba(0,0,0,.18);
+    max-width: 130px;
+    min-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  thead th:first-child {
+    z-index: 6;
+    background: var(--s2);
+  }
+  /* Seçili satırda sticky kolon rengi korunsun */
+  tbody tr.selrow td:first-child { background: rgba(59,130,246,.12); }
+
+  /* ─────────────────────────────────────────
+     DETAY PANELİ — tam ekran overlay
+  ───────────────────────────────────────── */
   .detail {
     position: fixed !important;
-    top: 48px !important;
-    left: 0 !important; right: 0 !important; bottom: 0 !important;
+    top: 52px !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
     width: 100% !important;
     min-width: unset !important;
     max-width: 100% !important;
     z-index: 50;
     border-left: none !important;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     display: none;
   }
-  .detail.open { width: 100% !important; display: block !important; }
-  .dhead { padding: 12px 14px; position: sticky; top: 0; background: var(--s1); z-index: 2; }
-  .dclose { font-size: 18px; padding: 4px 8px; }
+  .detail.open {
+    width: 100% !important;
+    display: block !important;
+  }
+  .dhead {
+    padding: 14px 16px;
+    position: sticky;
+    top: 0;
+    background: var(--s1);
+    z-index: 2;
+  }
+  .dclose { font-size: 18px; min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center; }
   #chart-wrap { height: 220px !important; }
-  .dtabs { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
-  .dtab { white-space: nowrap; font-size: 11px; padding: 6px 10px; }
+  .dtabs { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .dtabs::-webkit-scrollbar { display: none; }
+  .dtab { white-space: nowrap; font-size: 11px; padding: 8px 12px; min-height: 40px; }
 
-  /* ── FİLTRELER ── */
-  .frow { flex-wrap: wrap; gap: 4px; }
-  .finps { flex-direction: column; gap: 4px; }
-  .filter-group-title { font-size: 10px; }
+  /* ─────────────────────────────────────────
+     FİLTRE DRAWER
+  ───────────────────────────────────────── */
+  .frow { flex-wrap: wrap; gap: 6px; }
+  .finps { flex-direction: row; gap: 4px; }   /* min/max yan yana */
+  .finps input { flex: 1; min-width: 60px; font-size: 13px; padding: 7px 8px; }
+  .flbl { font-size: 11px; }
+  .filter-group-title { font-size: 11px; }
 
-  /* ── STATS BAR ── */
-  .stats-bar { flex-wrap: wrap; gap: 4px; padding: 6px 8px; }
-  .stat-item { font-size: 10px; }
+  /* ─────────────────────────────────────────
+     STATS BAR sidebar sekmeleri
+  ───────────────────────────────────────── */
+  .sb-tabs { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .sb-tabs::-webkit-scrollbar { display: none; }
+  .sb-tab { flex-shrink: 0; font-size: 11px; padding: 8px 14px; min-height: 40px; }
 
-  /* ── HOMEPAGE ── */
+  /* ─────────────────────────────────────────
+     GENEL TOUCH TARGETS (Apple HIG & Material)
+  ───────────────────────────────────────── */
+  button, .chip, .goat-chip, .exbtn, .sb-tab, .dtab { min-height: 36px; }
+
+  /* ─────────────────────────────────────────
+     HOMEPAGE
+  ───────────────────────────────────────── */
   #homepage { overflow-x: hidden; }
-  .hp-hero { padding: 36px 20px 28px; }
-  .hp-title { font-size: 32px !important; letter-spacing: -1.5px; }
-  .hp-sub { font-size: 13px !important; }
+  .hp-hero { padding: 40px 20px 30px; }
+  .hp-title { font-size: 30px !important; letter-spacing: -1px; }
+  .hp-sub { font-size: 13px !important; line-height: 1.5; }
   .hp-cta { flex-direction: column; align-items: stretch; gap: 10px; }
-  .hp-cta-primary, .hp-cta-secondary { text-align: center; width: 100%; }
-
-  /* ── NASIL KULLANILIR — dikey ── */
+  .hp-cta-primary, .hp-cta-secondary { text-align: center; width: 100%; padding: 13px 20px; font-size: 14px; }
   .hp-howto { padding: 28px 20px; }
   .hp-howto-steps { flex-direction: column; align-items: center; gap: 0; }
   .hp-howto-step {
-    width: 100%;
-    max-width: 340px;
-    min-height: auto;
-    flex-direction: row;
-    align-items: center;
-    gap: 14px;
-    padding: 14px 16px;
-    text-align: left;
+    width: 100%; max-width: 360px; min-height: auto;
+    flex-direction: row; align-items: center; gap: 14px;
+    padding: 14px 16px; text-align: left;
   }
   .hp-howto-icon { font-size: 26px !important; margin-top: 0 !important; flex-shrink: 0; }
   .hp-howto-label { font-size: 13px; }
   .hp-howto-desc { min-height: auto !important; text-align: left !important; justify-content: flex-start !important; font-size: 11px; }
   .hp-howto-num { position: static !important; transform: none !important; flex-shrink: 0; }
   .hp-howto-arrow { transform: rotate(90deg); margin: 6px auto; padding-bottom: 0 !important; align-self: center; }
-
-  /* ── DISCLAIMER ── */
   .hp-disclaimer { margin: 16px 0 0; padding: 12px 14px; font-size: 11px; }
-
-  /* ── HP SECTIONS ── */
   .hp-section { padding: 28px 20px; }
   .hp-section-title { font-size: 18px; }
   .hp-features-grid { grid-template-columns: 1fr !important; gap: 10px; }
@@ -483,32 +629,43 @@ td:first-child,td:nth-child(2){text-align:left;}
   .hp-step-connector { display: none !important; }
   .hp-stat-grid { grid-template-columns: repeat(2, 1fr) !important; }
 
-  /* ── FOOTER ── */
+  /* ─────────────────────────────────────────
+     FOOTER
+  ───────────────────────────────────────── */
   .footer-top { flex-direction: column; gap: 20px; }
   .footer-links-group { flex-wrap: wrap; }
   .footer-bottom { flex-direction: column; text-align: center; gap: 8px; }
 
-  /* ── MODAL ── */
-  .modal { margin: 8px; max-height: calc(100vh - 80px); overflow-y: auto; }
+  /* ─────────────────────────────────────────
+     MODAL
+  ───────────────────────────────────────── */
+  .modal { margin: 12px; max-height: calc(100dvh - 80px); overflow-y: auto; border-radius: 12px; }
 
-  /* ── ANALİZ SAYFASI ── */
+  /* ─────────────────────────────────────────
+     ANALİZ SAYFASI
+  ───────────────────────────────────────── */
   .analiz-hero { padding: 24px 16px 20px; }
   .analiz-hero-title { font-size: 18px; }
   .analiz-search-wrap { max-width: 100%; }
-
-  /* ── TOUCH TARGETS ── */
-  button, .chip, .exbtn, .sb-tab { min-height: 36px; }
-  .dclose { min-width: 36px; min-height: 36px; display: flex; align-items: center; justify-content: center; }
 }
 
 @media (max-width: 480px) {
-  .exchange-grid { grid-template-columns: repeat(2, 1fr); }
-  table { min-width: 600px; }
-  th, td { font-size: 9px; padding: 5px 6px; }
-  .hp-title { font-size: 26px !important; }
+  /* Çok küçük ekranlar (SE, Mini) */
+  .exchange-grid { grid-template-columns: repeat(2, 1fr); gap: 4px; }
+  .exbtn { font-size: 10px; padding: 7px 4px; }
+
+  table { min-width: 760px; }
+  th { font-size: 9px; padding: 7px 8px; }
+  td { font-size: 10px; padding: 9px 8px; }
+
+  /* Sticky ilk kolon küçük ekranda biraz daha dar */
+  th:first-child, td:first-child { max-width: 100px; min-width: 80px; }
+
+  .hp-title { font-size: 24px !important; }
   .hp-strategies-grid { grid-template-columns: 1fr !important; }
   .hp-stat-grid { grid-template-columns: 1fr !important; }
   .hp-howto-step { max-width: 100%; }
+  .hp-cta-primary, .hp-cta-secondary { font-size: 13px; padding: 12px 16px; }
 }
 
 
@@ -2572,7 +2729,7 @@ async function runScan(){
       return hasFundamental;
     });
     const _exm = EXCHANGE_META[currentExchange]||EXCHANGE_META.bist;
-    document.getElementById('scantime').textContent = `${_exm.flag} ${_exm.name} · ↻ ${new Date().toLocaleTimeString('tr-TR')} · ${results.length} hisse`;
+    document.getElementById('scantime').textContent = `↻ ${new Date().toLocaleTimeString('tr-TR')} · ${results.length} hisse`;
     updateExchangeBadge();
     applyAndRender();
 
