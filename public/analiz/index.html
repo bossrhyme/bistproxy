@@ -163,7 +163,7 @@ var _disclaimerTimer = null;
 
 // ── DISCLAIMER ──
 function _showDisclaimer(onAccept) {
-  if (localStorage.getItem('df_disclaimer_v1')) {
+  if (localStorage.getItem('df_disclaimer_v2')) {
     if (onAccept) onAccept();
     return;
   }
@@ -193,7 +193,7 @@ function _showDisclaimer(onAccept) {
     }
   }, 1000);
   btn.onclick = function() {
-    localStorage.setItem('df_disclaimer_v1', '1');
+    localStorage.setItem('df_disclaimer_v2', '1');
     modal.classList.remove('open');
     clearInterval(_disclaimerTimer);
     if (onAccept) onAccept();
@@ -219,7 +219,7 @@ function cycleEx() {
 function goAnaliz() {
   var sym = document.getElementById('sym-input').value.trim().toUpperCase();
   if (!sym) { document.getElementById('sym-input').focus(); return; }
-  var dest = '/analiz/profil?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(_ex);
+  var dest = 'profil.html?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(_ex);
   _showDisclaimer(function() { window.location.href = dest; });
 }
 
@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     var input = document.getElementById('sym-input');
     if (input) input.value = sym.toUpperCase();
-    var dest = '/analiz/profil?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(ex || 'bist');
+    var dest = 'profil.html?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(ex || 'bist');
     _showDisclaimer(function() { window.location.href = dest; });
     return; // disclaimer gösterildi veya redirect başladı
   }
