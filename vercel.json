@@ -1,26 +1,12 @@
 {
-  "version": 2,
-  "routes": [
-    { "src": "/api/scan",   "dest": "/api/scan.js" },
-    { "src": "/api/quote",  "dest": "/api/quote.js" },
-    { "src": "/api/rates",  "dest": "/api/rates.js" },
-    { "src": "/(.*)",       "dest": "/public/$1" }
-  ],
+  "outputDirectory": "public",
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
         {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; frame-ancestors 'none';"
-        },
-        {
-          "key": "Strict-Transport-Security",
-          "value": "max-age=63072000; includeSubDomains; preload"
-        },
-        {
           "key": "X-Frame-Options",
-          "value": "DENY"
+          "value": "SAMEORIGIN"
         },
         {
           "key": "X-Content-Type-Options",
@@ -29,8 +15,50 @@
         {
           "key": "Referrer-Policy",
           "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; frame-ancestors 'none';"
         }
       ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/scan",
+      "destination": "/api/scan.js"
+    },
+    {
+      "source": "/api/quote",
+      "destination": "/api/quote.js"
+    },
+    {
+      "source": "/api/rates",
+      "destination": "/api/rates.js"
+    },
+    {
+      "source": "/analiz",
+      "destination": "/analiz/index.html"
+    },
+    {
+      "source": "/analiz/",
+      "destination": "/analiz/index.html"
+    },
+    {
+      "source": "/analiz/profil",
+      "destination": "/analiz/profil.html"
+    },
+    {
+      "source": "/analiz/profil/",
+      "destination": "/analiz/profil.html"
     }
   ]
 }
