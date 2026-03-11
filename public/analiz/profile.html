@@ -1670,7 +1670,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // ── DISCLAIMER ──
 var _disclaimerTimer = null;
 function _showDisclaimer(onAccept) {
-  if (localStorage.getItem('df_disclaimer_v1')) {
+  if (localStorage.getItem('df_disclaimer_v2')) {
     if (onAccept) onAccept();
     return;
   }
@@ -1694,7 +1694,7 @@ function _showDisclaimer(onAccept) {
     }
   }, 1000);
   btn.onclick = function() {
-    localStorage.setItem('df_disclaimer_v1', '1');
+    localStorage.setItem('df_disclaimer_v2', '1');
     modal.classList.remove('open');
     clearInterval(_disclaimerTimer);
     if (onAccept) onAccept();
