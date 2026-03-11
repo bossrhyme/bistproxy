@@ -2952,7 +2952,7 @@ function applyAndRender(special){
     ['peNormalizedAnnual',             'pe_min',     'pe_max',     1],
     ['pbAnnual',                       'pb_min',     'pb_max',     1],
     ['psTTM',                          'ps_min',     'ps_max',     1],
-    ['roeTTM',                         'roe_min',    'roe_max',    1],   // already %
+    ['roeTTM',                         'roe_min',    'roe_max',    1],
     ['roaTTM',                         'roa_min',    'roa_max',    1],
     ['netProfitMarginTTM',             'margin_min', 'margin_max', 1],
     ['grossMarginTTM',                 'gross_min',  'gross_max',  1],
@@ -2963,8 +2963,6 @@ function applyAndRender(special){
     ['currentRatioAnnual',             'cr_min',     'cr_max',    1],
     ['piotroski',                      'piotroski_min','piotroski_max', 1],
     ['peg',                            'peg_min',    'peg_max',   1],
-    ['piotroski',                       'piotroski_min','piotroski_max', 1],
-    ['peg',                             'peg_min',    'peg_max',   1],
     ['marketCapitalization',           'mc_min',     'mc_max',    1],
     ['changePercent',                  'chg_min',    'chg_max',   1],
     ['fromHigh',                       null,         'from_high_max', 1],
@@ -3003,20 +3001,7 @@ function applyAndRender(special){
     return true;
   });
 
-  // Special stratejiler — PEG ve Piotroski
-  if (special === 'peg') {
-    filtered = filtered.filter(function(s) {
-      if (s.peg === null || s.peg === undefined) return false;
-      return s.peg > 0 && s.peg < 2;
-    });
-  }
-  if (special === 'piotroski') {
-    filtered = filtered.filter(function(s) {
-      return s.piotroski !== null && s.piotroski >= 7;
-    });
-  }
-
-  // Special strateji filtreleri
+  // Special stratejiler — PEG (Lynch) ve Piotroski
   if (special === 'peg') {
     filtered = filtered.filter(function(s) {
       return s.peg !== null && s.peg > 0 && s.peg < 1.5;
@@ -3033,17 +3018,6 @@ function applyAndRender(special){
   document.getElementById('toolbar').style.display = 'flex';
   document.getElementById('resn').textContent = filtered.length;
   document.getElementById('scann').textContent = allData.length;
-  // Special — PEG ve Piotroski
-  if (special === 'peg') {
-    filtered = filtered.filter(function(s) {
-      return s.peg !== null && s.peg > 0 && s.peg < 2;
-    });
-  }
-  if (special === 'piotroski') {
-    filtered = filtered.filter(function(s) {
-      return s.piotroski !== null && s.piotroski >= 7;
-    });
-  }
 
   if (filtered.length === 0 && allData.length > 0) {
     showState('twrap');
