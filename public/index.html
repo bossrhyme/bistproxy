@@ -2344,13 +2344,7 @@ let scanAborted = false;
 // ═══════════════════════════════════════════
 function init(){
   showApp();
-  // Profile/analiz sayfasından geri gelinince screener'ı göster ve tara
-  var _initParams = new URLSearchParams(window.location.search);
-  var _from = _initParams.get('from');
-  if(_from === 'profile' || _from === 'screener' || _from === 'analiz') {
-    showScreener();
-    if(allData.length === 0) runScan();
-  }
+  // Not: from= kontrolü DOMContentLoaded'da yapılıyor (DOM hazır olsun diye)
 }
 
 function showApp(){
@@ -4531,7 +4525,13 @@ function applyStrategyAndGo(goatKey) {
 // Start on homepage
 document.addEventListener('click', function(e){ if(!e.target.closest('#analiz-search-outer')) _analizHideDd(); });
 document.addEventListener('DOMContentLoaded', function(){
-  showHomepage();
+  var _p = new URLSearchParams(window.location.search).get('from');
+  if (_p === 'profile' || _p === 'screener' || _p === 'analiz') {
+    showScreener();
+    if(allData.length === 0) runScan();
+  } else {
+    showHomepage();
+  }
   var total = document.querySelectorAll('[data-goat],[data-preset],[data-tech]').length;
   var el = document.querySelector('[data-strat-count]');
   if(el) el.innerHTML = total + ' <span>strateji</span>';
