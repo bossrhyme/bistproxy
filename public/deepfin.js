@@ -1,3 +1,4 @@
+var _tvCurrentSym = null;
 
 // ═══════════════════════════════════════════
 // BIST SYMBOLS — Full list (150+ hisse)
@@ -1588,25 +1589,45 @@ function applyIndicators() {
 
 function updateChart(sym) {
   if (!sym) return;
-  const interval = document.querySelector('.ctab.on')?.dataset.interval || '240';
-  const currency = document.querySelector('.ctab-cur.on')?.dataset.currency || 'TL';
-  const container = document.getElementById('tv-chart-container');
+  var container = document.getElementById('tv-widget-container');
+  if (!container) return;
 
-  initChart(container);
+  // TradingView exchange prefix
+  var tvPrefixes = {
+    bist:'BIST', nasdaq:'NASDAQ', sp500:'NYSE',
+    dax:'XETR', lse:'LSE', nikkei:'TSE'
+  };
+  var prefix = tvPrefixes[currentExchange] || 'BIST';
+  var tvSym  = prefix + ':' + sym;
 
-  const suffix = encodeURIComponent((EXCHANGE_META[currentExchange]||EXCHANGE_META.bist).yahooSuffix);
-  const url = PROXY_URL + '?action=chart&symbol=' + sym + '&interval=' + interval + '&currency=' + currency + '&suffix=' + suffix;
-  fetch(url)
-    .then(r => r.json())
-    .then(data => {
-      if (data.s !== 'ok' || !data.candles || !data.candles.length) return;
-      lwCandles = data.candles.map(c => ({ time: c.t, open: c.o, high: c.h, low: c.l, close: c.c, volume: c.v || 0 }));
-      lwSeries.setData(lwCandles);
-      lwChart.timeScale().fitContent();
-      lwChart.resize(container.offsetWidth || 340, 230);
-      applyIndicators();
-    })
-    .catch(e => console.error('Chart error:', e));
+  // interval tab → TV interval
+  var activeTab = document.querySelector('.ctab.on');
+  var interval  = (activeTab && activeTab.dataset.interval) || 'D';
+
+  // Mevcut widget varsa kaldır
+  container.innerHTML = '';
+
+  // TradingView Mini Chart Widget
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
+  script.async = true;
+  script.innerHTML = JSON.stringify({
+    "symbol": tvSym,
+    "width": "100%",
+    "height": "100%",
+    "locale": "tr",
+    "dateRange": interval === 'M' ? '12M' : interval === 'W' ? '1W' : '1D',
+    "colorTheme": "dark",
+    "isTransparent": true,
+    "autosize": true,
+    "largeChartUrl": "https://www.tradingview.com/chart/?symbol=" + tvSym,
+    "noTimeScale": false,
+    "chartOnly": false,
+    "hideLegend": false
+  });
+  container.appendChild(script);
+  _tvCurrentSym = tvSym;
 }
 
 function closeDetail(){
@@ -1663,19 +1684,12 @@ function abortScan(){
 init();
 
 // ── CHART TAB LISTENERS ──
-document.getElementById('chart-tabs').addEventListener('click', e => {
-  const itab = e.target.closest('.ctab');
-  const ctab = e.target.closest('.ctab-cur');
-  if(itab){
-    document.querySelectorAll('#chart-tabs .ctab').forEach(t=>t.classList.remove('on'));
-    itab.classList.add('on');
-    if(selSym) updateChart(selSym);
-  }
-  if(ctab){
-    document.querySelectorAll('.ctab-cur').forEach(t=>t.classList.remove('on'));
-    ctab.classList.add('on');
-    if(selSym) updateChart(selSym);
-  }
+document.getElementById('chart-tabs').addEventListener('click', function(e) {
+  var tab = e.target.closest('.ctab');
+  if (!tab) return;
+  document.querySelectorAll('.ctab').forEach(function(t){ t.classList.remove('on'); });
+  tab.classList.add('on');
+  if (selSym) updateChart(selSym);
 });
 
 document.getElementById('ind-tabs').addEventListener('click', e => {

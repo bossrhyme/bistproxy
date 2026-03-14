@@ -105,7 +105,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 </style>
 <link rel="preload" href="/deepfin.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="/deepfin.css"></noscript>
-<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -808,62 +807,12 @@ if('serviceWorker' in navigator){
 
       <div class="chart-section">
         <div class="chart-tabs" id="chart-tabs">
-          <div class="ctab on" data-interval="240">4S</div>
-          <div class="ctab" data-interval="D">1G</div>
+          <div class="ctab on" data-interval="D">1G</div>
           <div class="ctab" data-interval="W">1H</div>
-          <div class="ctab-cur on" data-currency="TL">₺</div>
-          <div class="ctab-cur" data-currency="USD">$</div>
-        </div>
-        <div class="chart-tabs" id="ind-tabs" style="margin-bottom:6px;">
-          <div class="itab" data-ind="MA20">MA20</div>
-          <div class="itab" data-ind="MA50">MA50</div>
-          <div class="itab" data-ind="EMA20">EMA20</div>
-          <div class="itab" data-ind="BB">BB</div>
-          <div class="itab" data-ind="VOL">Hacim</div>
+          <div class="ctab" data-interval="M">1A</div>
         </div>
         <div class="chart-wrap" id="chart-wrap">
-          <div class="chart-toolbar" id="chart-toolbar">
-            <div class="ctool on" data-tool="cursor" title="">
-              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 2l9 4.5-4.5 1L5 12 2 2z" fill="currentColor"/></svg>
-              <span class="ctool-tip">Cursor</span>
-            </div>
-            <div class="ctool-sep"></div>
-            <div class="ctool" data-tool="line" title="">
-              <svg width="13" height="13" viewBox="0 0 13 13"><line x1="2" y1="11" x2="11" y2="2" stroke="currentColor" stroke-width="1.5"/></svg>
-              <span class="ctool-tip">Trend Çizgisi</span>
-            </div>
-            <div class="ctool" data-tool="hline" title="">
-              <svg width="13" height="13" viewBox="0 0 13 13"><line x1="1" y1="6.5" x2="12" y2="6.5" stroke="currentColor" stroke-width="1.5"/></svg>
-              <span class="ctool-tip">Yatay Çizgi</span>
-            </div>
-            <div class="ctool" data-tool="rect" title="">
-              <svg width="13" height="13" viewBox="0 0 13 13"><rect x="2" y="3" width="9" height="7" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
-              <span class="ctool-tip">Dikdörtgen</span>
-            </div>
-            <div class="ctool-sep"></div>
-            <div class="ctool" data-tool="fib" title="">
-              <svg width="13" height="13" viewBox="0 0 13 13"><line x1="2" y1="3" x2="11" y2="3" stroke="currentColor" stroke-width="1"/><line x1="2" y1="5.5" x2="11" y2="5.5" stroke="#f0c040" stroke-width="1"/><line x1="2" y1="8" x2="11" y2="8" stroke="currentColor" stroke-width="1"/><line x1="2" y1="10" x2="11" y2="10" stroke="currentColor" stroke-width="1"/></svg>
-              <span class="ctool-tip">Fibonacci</span>
-            </div>
-            <div class="ctool-sep"></div>
-            <div class="ctool" data-tool="eraser" title="">
-              <svg width="13" height="13" viewBox="0 0 13 13"><path d="M2 10L7 3l3 3-5 7H2z" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
-              <span class="ctool-tip">Tümünü Sil</span>
-            </div>
-          </div>
-          <div style="position:relative;flex:1;min-width:0;height:100%;">
-            <div class="expand-btn" id="expand-btn" onclick="toggleExpand()">⤢</div>
-            <div id="tv-chart-container" style="height:100%;width:100%;"></div>
-            <div class="fib-panel" id="fib-panel">
-              <div class="fib-title">Fibonacci</div>
-              <div class="fib-inputs">
-                <input class="fib-inp" id="fib-high" placeholder="Yüksek fiyat" type="number">
-                <input class="fib-inp" id="fib-low" placeholder="Düşük fiyat" type="number">
-                <button class="fib-calc-btn" onclick="calcFib()">HESAPLA</button>
-              </div>
-              <div id="fib-results"></div>
-            </div>
-          </div>
+          <div id="tv-widget-container" style="width:100%;height:100%;"></div>
         </div>
       </div>
       <!-- Insider & Short Interest Tabs -->
