@@ -861,7 +861,7 @@ html,body{height:100%;overflow:hidden;}
     <span class="tlive">Canlı</span>
     <button class="hp-nav-btn" onclick="goHome()">Anasayfa</button>
     <button class="hp-nav-btn" onclick="goScreener()">Tarayıcı</button>
-    <button class="hp-nav-btn active">Analiz</button>
+    <button class="hp-nav-btn active" onclick="goAnaliz()">Analiz</button>
   </div>
 
   <div id="profile-page" style="display:flex;flex:1;flex-direction:column;overflow:hidden;min-height:0;">
@@ -1247,6 +1247,10 @@ function _buildFinancials(d) {
   }).join('');
 }
 
+
+function goAnaliz() {
+  window.location.href = '/analiz/';
+}
 
 function goHome() { window.location.href = '/'; }
 
