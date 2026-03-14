@@ -1,7 +1,7 @@
 // DeepFin Service Worker v1
-const CACHE_NAME = 'deepfin-v1';
-const STATIC_CACHE = 'deepfin-static-v1';
-const API_CACHE = 'deepfin-api-v1';
+const CACHE_NAME = 'deepfin-v3';
+const STATIC_CACHE = 'deepfin-static-v3';
+const API_CACHE = 'deepfin-api-v3';
 
 // Cache First: statik dosyalar
 const STATIC_ASSETS = [

@@ -2174,7 +2174,6 @@ function showToast(msg) {
   t._timer = setTimeout(function(){ t.style.opacity = '0'; }, 3000);
 }
 function showHomepage() {
-  if (document.startViewTransition) { document.startViewTransition(_doShowHomepage); return; }
   _doShowHomepage();
 }
 function _doShowHomepage() {
@@ -2350,7 +2349,6 @@ function acceptDisclaimer() {
 }
 
 function showScreener() {
-  if (document.startViewTransition) { document.startViewTransition(_doShowScreener); return; }
   _doShowScreener();
 }
 function _doShowScreener() {
