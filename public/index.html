@@ -70,8 +70,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .infobtn:hover{border-color:var(--accent);color:var(--accent);background:rgba(59,130,246,.05);}
 .supportbtn{background:rgba(246,70,93,.08);border:1px solid rgba(246,70,93,.25);color:#f6465d;}
 .supportbtn:hover{background:rgba(246,70,93,.15);border-color:#f6465d;color:#f6465d;}
-#scantime{font-size:11px;color:var(--muted2);}
-#active-exchange-badge{display:none;align-items:center;gap:5px;padding:4px 10px;background:var(--s2);border:1px solid var(--border);border-radius:6px;font-size:11px;font-weight:600;color:var(--text);flex-shrink:0;}
 
 /* ── LAYOUT ── */
 .layout{display:flex;flex:1;overflow:hidden;}
@@ -402,7 +400,6 @@ td:first-child,td:nth-child(2){text-align:left;}
 
   /* Sağ grup */
   .tright { gap: 4px; margin-left: 0; }
-  .tright #scantime { display: none; }
   .infobtn { font-size: 11px; padding: 5px 8px; min-height: 34px; }
   .topbarbtn { padding: 5px 10px; font-size: 11px; min-height: 34px; }
 
@@ -956,8 +953,7 @@ td:first-child,td:nth-child(2){text-align:left;}
       <input type="text" id="searchbox" placeholder="Sembol veya şirket ara..." oninput="onSearch()"/>
     </div>
     <div class="tright">
-      <span id="scantime"></span>
-      <div id="active-exchange-badge"></div>
+
       <button class="topbarbtn tbtn" id="scanbtn" onclick="runScan()">▶ TARA</button>
       <button class="topbarbtn" id="stopbtn" onclick="abortScan()" style="display:none;background:rgba(255,77,109,.15);border:1px solid rgba(255,77,109,.3);color:var(--red)">⏹ DURDUR</button>
       <button class="topbarbtn infobtn" onclick="openInfo()">📚 Bilgi Bankası</button>
@@ -2736,7 +2732,7 @@ async function runScan(){
       return hasFundamental;
     });
     const _exm = EXCHANGE_META[currentExchange]||EXCHANGE_META.bist;
-    document.getElementById('scantime').textContent = `↻ ${new Date().toLocaleTimeString('tr-TR')} · ${results.length} hisse`;
+
     updateExchangeBadge();
     applyAndRender();
 
@@ -4427,14 +4423,7 @@ function showHomepage() {
 let disclaimerAccepted = false;
 
 
-// ── AKTİF BORSA BADGE ──
-function updateExchangeBadge() {
-  var badge = document.getElementById('active-exchange-badge');
-  if (!badge) return;
-  var exm = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
-  badge.style.display = 'flex';
-  badge.innerHTML = exm.flag + ' ' + exm.name;
-}
+function updateExchangeBadge() {}
 // ── TARAMA SÜRESİ TAHMİNİ ──
 let scanStartTime = null;
 let scanEtaTimer  = null;
