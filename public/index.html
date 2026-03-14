@@ -151,14 +151,14 @@ thead th.sorted.asc::after{content:' ↑';}
 tbody tr{transition:background .12s;cursor:pointer;}tbody tr:nth-child(even){background:rgba(255,255,255,.015);}
 tbody tr:hover{background:rgba(59,130,246,.1);}
 tbody tr:hover td{border-top:1px solid rgba(59,130,246,.25);border-bottom:1px solid rgba(59,130,246,.25);}
-tbody tr:hover .row-num{font-size:10px;color:var(--text);font-family:'JetBrains Mono',monospace;min-width:14px;display:inline-block;text-align:right;margin-right:3px;}
+tbody tr:hover .row-num{font-size:10px;color:#ededed !important;font-family:'JetBrains Mono',monospace;min-width:14px;display:inline-block;text-align:right;margin-right:4px;vertical-align:middle;}
 .row-arrow{color:var(--border2);font-size:12px;margin-right:3px;display:inline-block;}
 tbody tr.selrow{background:rgba(59,130,246,.12);}
 tbody tr.selrow td{border-left:none;}
 tbody tr.no-data{opacity:.45;}
 tbody tr.no-data td:first-child::after{content:"·";color:var(--muted2);margin-left:4px;font-size:9px;}
 tbody tr.selrow td:first-child{border-left:3px solid var(--accent);}
-.row-num{font-size:10px;color:var(--muted2);font-family:'JetBrains Mono',monospace;min-width:18px;display:inline-block;text-align:right;margin-right:4px;}
+
 .row-arrow{color:var(--border2);font-size:14px;font-weight:700;transition:color .15s,transform .15s;margin-right:4px;display:inline-block;}
 tbody tr:hover .row-arrow{color:#60a5fa;transform:translateX(3px);}
 td{padding:6px 10px;text-align:right;font-size:12px;white-space:nowrap;color:var(--text);border-bottom:1px solid rgba(30,39,51,.7);}
@@ -974,6 +974,9 @@ td:first-child,td:nth-child(2){text-align:left;}
 .sb-search-input{background:var(--s1);border:1px solid var(--border);color:var(--text);padding:4px 10px 4px 24px;font-size:11px;outline:none;border-radius:5px;width:160px;font-family:'JetBrains Mono',monospace;transition:border-color .15s,width .2s;}
 .sb-search-input:focus{border-color:var(--accent);width:200px;}
 .sb-search-input::placeholder{color:var(--muted2);font-family:'Geist',sans-serif;font-size:10px;}
+
+[data-col="symbol"]{white-space:nowrap;}
+.sym-wrap{display:inline-flex;align-items:center;gap:2px;}
 </style>
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 </head>
@@ -3373,7 +3376,7 @@ function renderTable(){
     const isFav = favSet.has(s.symbol);
     return `<tr onclick="showDetail('${s.symbol}')" class="${selSym===s.symbol?'selrow':''}">
       <td class="nfav" onclick="event.stopPropagation();toggleFav('${s.symbol}')" title="${isFav?'Favorilerden çıkar':'Favorilere ekle'}"><span class="fav-icon${isFav?' fav-on':''}">${isFav?'★':'☆'}</span></td>
-      <td data-col="symbol"><span class="row-num">${idx+1}</span><span class="row-arrow">›</span><span class="sym">${s.symbol}</span></td>
+      <td data-col="symbol" style="display:table-cell;"><span class="row-num">${idx+1}</span><span class="sym-wrap"><span class="row-arrow">›</span><span class="sym">${s.symbol}</span></span></td>
       <td data-col="name" style="font-size:11px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.name}">${s.name}</td>
       <td data-col="sector" style="font-size:10px;color:var(--muted2)">${s.sector||'—'}</td>
       <td data-col="mcap">${fmc(s.marketCapitalization)}</td>
