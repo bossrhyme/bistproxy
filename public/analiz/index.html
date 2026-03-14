@@ -7,11 +7,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#080808; --s1:#0e0e0e; --s2:#141414;
-  --border:#222; --border2:#2a2a2a;
-  --text:#ededed; --text2:#999; --muted:#555;
-  --accent:#3b82f6; --accent2:rgba(59,130,246,.12);
+:root{
+  --bg:#0b0e13;--s1:#111519;--s2:#161b22;--s3:#0d1117;
+  --border:#1e2733;--border2:#263040;
+  --green:#00c076;--green2:#00a060;--green-bg:rgba(0,192,118,.08);
+  --red:#f6465d;--red-bg:rgba(246,70,93,.08);
+  --blue:#3b82f6;--blue2:#2563d4;
+  --gold:#f0b429;--text:#e2e8f0;--text2:#94a3b8;--muted:#4a5568;--muted2:#64748b;
+  --accent:#3b82f6;--accent2:rgba(59,130,246,.12);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html,body{background:var(--bg);color:var(--text);font-family:'Geist',sans-serif;min-height:100vh;display:flex;flex-direction:column;}
@@ -120,6 +123,26 @@ footer a:hover{color:var(--text2);}
 .wallet-row{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
 .wallet-addr{flex:1;background:var(--bg);border:1px solid var(--border);padding:6px 9px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:text;user-select:all;}
 .smodal-options-title{font-family:'Inter',sans-serif;font-weight:800;font-size:10px;letter-spacing:3px;color:var(--muted);margin-bottom:14px;text-transform:uppercase;}
+
+/* Modal içi ek CSS */
+.icat{background:var(--s2);border:1px solid var(--border);padding:16px 18px;border-radius:8px;}
+.icat-title{font-size:12px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;padding-bottom:7px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;}
+.iitem{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid rgba(30,39,51,.6);}
+.iitem-top{display:flex;align-items:baseline;gap:8px;margin-bottom:4px;}
+.iitem-name{font-size:16px;font-weight:700;color:var(--text);letter-spacing:-.3px;}
+.iitem-eng{font-size:10px;color:var(--muted2);letter-spacing:.3px;font-weight:500;}
+.iitem-desc{font-size:12px;color:var(--muted2);line-height:1.7;}
+.smodal-head{padding:26px 26px 0;display:flex;justify-content:space-between;}
+.smodal-hero{padding:16px 26px 20px;border-bottom:1px solid var(--border);}
+.smodal-emoji{font-size:36px;margin-bottom:10px;display:block;}
+.smodal-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;}
+
+.wallet-row{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
+.wallet-row:last-child{margin-bottom:0;}
+.wallet-addr{flex:1;background:var(--bg);border:1px solid var(--border);padding:6px 9px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:text;user-select:all;}
+.wallet-coin{font-family:'Inter',sans-serif;font-weight:800;font-size:11px;letter-spacing:1px;color:var(--gold);width:34px;flex-shrink:0;}
+.copy-btn{background:var(--border2);border:none;color:var(--muted2);padding:6px 9px;font-family:'JetBrains Mono',monospace;font-size:8px;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0;}
+.copy-btn.copied{background:var(--teal);color:#000;}
 </style>
 </head>
 <body>
@@ -435,7 +458,22 @@ function goSym(sym, ex) {
 function _showDisclaimer(onAccept) {
   if (localStorage.getItem('df_disclaimer_v2')) { if (onAccept) onAccept(); return; }
   var modal = document.getElementById('disclaimerModal');
-  if (!modal) { function openInfo(){ document.getElementById('infoModal').classList.add('open'); }
+  if (!modal) { function closeInfo(){ document.getElementById('infoModal').classList.remove('open'); }
+function copyWallet(btn, addr){
+  navigator.clipboard.writeText(addr).then(()=>{
+    btn.textContent='✓ KOPYALANDI'; btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent='KOPYALA'; btn.classList.remove('copied'); }, 2000);
+  }).catch(()=>{
+    const ta=document.createElement('textarea');
+    ta.value=addr; ta.style.cssText='position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent='✓ KOPYALANDI'; btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent='KOPYALA'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+function closeSupport(){ document.getElementById('supportModal').classList.remove('open'); }
+function openInfo(){ document.getElementById('infoModal').classList.add('open'); }
 function closeInfo(){ document.getElementById('infoModal').classList.remove('open'); }
 function openSupport(){ document.getElementById('supportModal').classList.add('open'); }
 function closeSupport(){ document.getElementById('supportModal').classList.remove('open'); }
@@ -454,8 +492,10 @@ function copyWallet(btn, addr){
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('infoModal').addEventListener('click', function(e){ if(e.target===this) closeInfo(); });
-  document.getElementById('supportModal').addEventListener('click', function(e){ if(e.target===this) closeSupport(); });
+  var _im = document.getElementById('infoModal');
+  var _sm = document.getElementById('supportModal');
+  if(_im) _im.addEventListener('click', function(e){ if(e.target===this) closeInfo(); });
+  if(_sm) _sm.addEventListener('click', function(e){ if(e.target===this) closeSupport(); });
   document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeInfo(); closeSupport(); }}); _showDisclaimer(onAccept); }); return; }
   modal.classList.add('open');
   var btn = document.getElementById('disclaimerBtn');
