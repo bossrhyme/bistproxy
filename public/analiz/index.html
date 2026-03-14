@@ -81,6 +81,43 @@ footer a:hover{color:var(--text2);}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
 .modal-overlay.open{display:flex;}
 .modal{background:var(--s1);border-radius:12px;border:1px solid #1a1a1a;width:100%;max-width:520px;overflow:hidden;margin:16px;}
+
+/* Topbar butonlar */
+.tright{margin-left:auto;display:flex;align-items:center;gap:6px;}
+.topbarbtn{font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:6px;}
+.tbtn{background:var(--accent);color:#fff;border:none;font-weight:600;}
+.tbtn:hover{background:var(--blue2);}
+.infobtn{background:transparent;border:1px solid var(--border2);color:var(--text2);}
+.infobtn:hover{border-color:var(--accent);color:var(--accent);background:rgba(59,130,246,.05);}
+.supportbtn{background:rgba(246,70,93,.08);border:1px solid rgba(246,70,93,.25);color:#f6465d;}
+.supportbtn:hover{background:rgba(246,70,93,.15);border-color:#f6465d;color:#f6465d;}
+/* Modaller */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.modal-overlay.open{display:flex;}
+.modal{position:relative;width:900px;max-width:96vw;max-height:88vh;background:var(--s1);border:1px solid var(--border);box-shadow:0 25px 60px rgba(0,0,0,.6);display:flex;flex-direction:column;overflow:hidden;border-radius:10px;}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.modal-title{font-size:17px;font-weight:700;color:var(--text);letter-spacing:-.3px;}
+.modal-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;}
+.smodal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
+.smodal-overlay.open{display:flex;}
+
+/* Modal içi CSS */
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.modal-title{font-size:17px;font-weight:700;color:var(--text);letter-spacing:-.3px;}
+.modal-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;}
+.modal-body{overflow-y:auto;padding:22px;display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.smodal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
+.smodal-overlay.open{display:flex;}
+.smodal{position:relative;width:540px;max-width:96vw;background:var(--s1);border:1px solid var(--border2);box-shadow:0 0 80px rgba(240,192,64,.1);overflow:hidden;}
+.smodal-title{font-family:'Inter',sans-serif;font-weight:800;font-size:26px;letter-spacing:4px;color:var(--gold);line-height:1.1;margin-bottom:9px;}
+.soption{background:var(--s2);border:1px solid var(--border);padding:14px 16px;margin-bottom:10px;}
+.soption-head{display:flex;align-items:center;gap:9px;margin-bottom:9px;}
+.soption-icon{font-size:18px;}
+.soption-label{font-family:'Inter',sans-serif;font-weight:800;font-size:13px;letter-spacing:2px;color:var(--text);}
+.soption-sublabel{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--muted);margin-top:1px;}
+.wallet-row{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
+.wallet-addr{flex:1;background:var(--bg);border:1px solid var(--border);padding:6px 9px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:text;user-select:all;}
+.smodal-options-title{font-family:'Inter',sans-serif;font-weight:800;font-size:10px;letter-spacing:3px;color:var(--muted);margin-bottom:14px;text-transform:uppercase;}
 </style>
 </head>
 <body>
@@ -93,6 +130,14 @@ footer a:hover{color:var(--text2);}
   <button class="hp-nav-btn" onclick="window.location.href='/'">Anasayfa</button>
   <button class="hp-nav-btn" onclick="window.location.href='/?from=profile'">Tarayıcı</button>
   <button class="hp-nav-btn active">Analiz</button>
+  <div class="tright">
+    <button class="topbarbtn tbtn" onclick="window.location.href='/?from=profile'">▶ TARA</button>
+    <button class="topbarbtn infobtn" onclick="openInfo()">📚 Bilgi Bankası</button>
+    <button class="topbarbtn supportbtn" onclick="openSupport()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+      Destek Ol
+    </button>
+  </div>
 </div>
 
 <div class="hero">
@@ -388,7 +433,28 @@ function goSym(sym, ex) {
 function _showDisclaimer(onAccept) {
   if (localStorage.getItem('df_disclaimer_v2')) { if (onAccept) onAccept(); return; }
   var modal = document.getElementById('disclaimerModal');
-  if (!modal) { document.addEventListener('DOMContentLoaded', function() { _showDisclaimer(onAccept); }); return; }
+  if (!modal) { function openInfo(){ document.getElementById('infoModal').classList.add('open'); }
+function closeInfo(){ document.getElementById('infoModal').classList.remove('open'); }
+function openSupport(){ document.getElementById('supportModal').classList.add('open'); }
+function closeSupport(){ document.getElementById('supportModal').classList.remove('open'); }
+function copyWallet(btn, addr){
+  navigator.clipboard.writeText(addr).then(()=>{
+    btn.textContent='✓ KOPYALANDI'; btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent='KOPYALA'; btn.classList.remove('copied'); }, 2000);
+  }).catch(()=>{
+    const ta=document.createElement('textarea');
+    ta.value=addr; ta.style.cssText='position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent='✓ KOPYALANDI'; btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent='KOPYALA'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('infoModal').addEventListener('click', function(e){ if(e.target===this) closeInfo(); });
+  document.getElementById('supportModal').addEventListener('click', function(e){ if(e.target===this) closeSupport(); });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeInfo(); closeSupport(); }}); _showDisclaimer(onAccept); }); return; }
   modal.classList.add('open');
   var btn = document.getElementById('disclaimerBtn');
   var cd  = document.getElementById('disclaimerCountdown');
@@ -460,6 +526,428 @@ document.addEventListener('DOMContentLoaded', function() {
         <p style="text-align:center;font-size:10px;color:#444;margin:10px 0 0;">Bu uyarı yalnızca ilk girişte gösterilir.</p>
       </div>
     </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="infoModal">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div class="modal-title">BİLGİ <span>BANKASI</span></div>
+      <button class="modal-close" onclick="closeInfo()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="icat">
+        <div class="icat-title">📊 Değerleme Oranları</div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">F/K Oranı</span><span class="iitem-eng">P/E — Price to Earnings</span></div>
+          <div class="iitem-desc">Hisse fiyatının hisse başına kâra bölünmesiyle bulunur. Yatırımcının 1 liralık kâr için kaç lira ödediğini gösterir. Düşük F/K, hissenin ucuz olabileceğine işaret eder; ancak sektöre göre değişir.</div>
+          <span class="iitem-tip tip-good">✓ 5–15 arası genellikle cazip</span>
+          <span class="iitem-tip tip-warn">△ 15–25 orta değerli</span>
+          <span class="iitem-tip tip-bad">✕ 25+ pahalı sayılabilir</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">PD/DD</span><span class="iitem-eng">P/B — Price to Book Value</span></div>
+          <div class="iitem-desc">Piyasa değerinin defter değerine oranıdır. 1'in altında defter değerinin altında işlem görüyor demektir.</div>
+          <span class="iitem-tip tip-good">✓ 1'in altı — defter değeri altında</span>
+          <span class="iitem-tip tip-warn">△ 1–3 arası normal</span>
+          <span class="iitem-tip tip-bad">✕ 5+ pahalı olabilir</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">F/S Oranı</span><span class="iitem-eng">P/S — Price to Sales</span></div>
+          <div class="iitem-desc">Piyasa değerinin yıllık satış gelirine oranıdır. Kâr etmeyen ama büyüyen şirketleri değerlemek için kullanılır.</div>
+          <span class="iitem-tip tip-good">✓ 1'in altı — satışlara göre ucuz</span>
+        </div>
+      </div>
+      <div class="icat">
+        <div class="icat-title">💰 Karlılık Göstergeleri</div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">ROE</span><span class="iitem-eng">Return on Equity — Özkaynak Karlılığı</span></div>
+          <div class="iitem-desc">Şirketin özkaynaklarını ne kadar verimli kullandığını gösterir. Yüksek ROE, ortaklara iyi getiri sağlandığı anlamına gelir.</div>
+          <span class="iitem-tip tip-bad">✕ %10 altı — zayıf</span>
+          <span class="iitem-tip tip-good">✓ %20+ güçlü</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">ROA</span><span class="iitem-eng">Return on Assets — Varlık Karlılığı</span></div>
+          <div class="iitem-desc">Şirketin tüm varlıklarını ne kadar verimli kullandığını gösterir. Bankalar için genellikle düşüktür.</div>
+          <span class="iitem-tip tip-good">✓ %5+ iyi kabul edilir</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Net Kar Marjı</span><span class="iitem-eng">Profit Margin TTM</span></div>
+          <div class="iitem-desc">Her 100 liralık satıştan ne kadar net kâr kaldığını gösterir. Sektöre göre büyük farklılık gösterebilir.</div>
+          <span class="iitem-tip tip-good">✓ %15+ güçlü marj</span>
+        </div>
+      </div>
+      <div class="icat">
+        <div class="icat-title">📈 Büyüme Göstergeleri</div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Gelir Büyümesi</span><span class="iitem-eng">Revenue Growth TTM YoY</span></div>
+          <div class="iitem-desc">Satış gelirinin geçen yıla göre yüzde kaç arttığını gösterir. Yüksek enflasyon ortamında reel büyümeye bakmak önemlidir.</div>
+          <span class="iitem-tip tip-bad">✕ Negatif — gelir düşüyor</span>
+          <span class="iitem-tip tip-good">✓ %20+ güçlü büyüme</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Kazanç Büyümesi</span><span class="iitem-eng">EPS Growth TTM YoY</span></div>
+          <div class="iitem-desc">Hisse başına kârın yıldan yıla ne kadar büyüdüğünü gösterir. Gelir büyümesinden daha önemlidir.</div>
+          <span class="iitem-tip tip-good">✓ %20+ büyüme hisseleri için ideal</span>
+        </div>
+      </div>
+      <div class="icat">
+        <div class="icat-title">🏦 Temettü ve Finansal Sağlık</div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Temettü Verimi</span><span class="iitem-eng">Dividend Yield Indicated Annual</span></div>
+          <div class="iitem-desc">Hisse başına ödenen yıllık temettünün mevcut fiyata oranıdır. Sürdürülebilirliği önemlidir.</div>
+          <span class="iitem-tip tip-good">✓ %4+ temettü yatırımcısı için cazip</span>
+          <span class="iitem-tip tip-warn">△ %15+ çok yüksek, risk işareti olabilir</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Borç/Özkaynak</span><span class="iitem-eng">Total Debt / Total Equity Annual</span></div>
+          <div class="iitem-desc">Şirketin ne kadar borçla çalıştığını gösterir. Bankalar için bu oran doğal olarak yüksektir.</div>
+          <span class="iitem-tip tip-good">✓ 50'nin altı — az borçlu</span>
+          <span class="iitem-tip tip-bad">✕ 200+ yüksek borç yükü</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Cari Oran</span><span class="iitem-eng">Current Ratio Annual</span></div>
+          <div class="iitem-desc">Kısa vadeli varlıkların kısa vadeli borçlara oranı. 1'in altında likidite sıkıntısı olabilir.</div>
+          <span class="iitem-tip tip-bad">✕ 1'in altı — riskli</span>
+          <span class="iitem-tip tip-good">✓ 1.5–3 arası sağlıklı</span>
+        </div>
+      </div>
+      <!-- ══════ GOAT STRATEJİLERİ BİLGİ BANKASI ══════ -->
+      <div class="preset-info-wrap goat-bank-section">
+        <div class="preset-info-title">🐐 GOAT Yatırımcı &amp; 🏦 GOAT Fonlar — Detaylı Rehber</div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;">🐐 GOAT Yatırımcı ve Traderlar</div>
+        <div class="goat-bank-grid">
+
+          <div class="goat-card"><div class="goat-card-head"><div class="goat-card-emoji">⚔️</div><div><div class="goat-card-title">Bill Ackman — Pershing Square</div><div class="goat-card-subtitle">Aktivist Değer — Pershing Square Capital</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">ROE &gt;15%</span><span class="goat-perf-badge">F/K &lt;20</span><span class="goat-perf-badge">Katalizör Arayan</span></div>
+            <div class="goat-card-body">Aktivist yatırım: güçlü iş modeli olan ama yanlış yönetilen şirketleri tespit et, hissedar baskısıyla değer aç. "Yönetimi değiştir, değeri aç." 20Y+ ~%20/yıl.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">ROE &gt;15%</span><span class="goat-criterion">Marj &gt;10%</span><span class="goat-criterion">B/Ö &lt;80</span><span class="goat-criterion">Cari &gt;1.2</span><span class="goat-criterion">F/K &lt;20</span></div></div>
+
+          <div class="goat-card"><div class="goat-card-head"><div class="goat-card-emoji">🚀</div><div><div class="goat-card-title">Cathie Wood / ARK</div><div class="goat-card-subtitle">Disruptif Teknoloji — ARK Invest</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">Gelir &gt;30%</span><span class="goat-perf-badge">EPS &gt;20%</span><span class="goat-perf-badge">5Y Vizyon</span></div>
+            <div class="goat-card-body">AI, genomik, enerji depolama, fintech, uzay gibi disruptif sektörlere odaklan. Gelir büyümesi &gt;%30, kazanç ivmesi güçlü. Kısa vadeli kârsızlık kabul — uzun vadeli pazar liderliği önce.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">Gelir &gt;30%</span><span class="goat-criterion">EPS &gt;20%</span><span class="goat-criterion">Cari &gt;1</span></div></div>
+
+          <div class="goat-card"><div class="goat-card-head"><div class="goat-card-emoji">🎯</div><div><div class="goat-card-title">Warren Buffett</div><div class="goat-card-subtitle">Değer Yatırımı — Berkshire Hathaway</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">ROE &gt;20%</span><span class="goat-perf-badge">Brüt &gt;40%</span><span class="goat-perf-badge">F/K 5-25</span></div>
+            <div class="goat-card-body">Güçlü marka ve rekabet avantajı (moat): ROE&gt;%20, brüt marj&gt;%40, net marj&gt;%20, D/E&lt;%50. "Harika bir şirketi adil fiyattan almak, adil bir şirketi harika fiyattan almaktan iyidir." ~%20/yıl.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">F/K: 5-25</span><span class="goat-criterion">ROE &gt;20%</span><span class="goat-criterion">Brüt &gt;40%</span><span class="goat-criterion">Marj &gt;20%</span><span class="goat-criterion">B/Ö &lt;50</span></div></div>
+
+          <div class="goat-card"><div class="goat-card-head"><div class="goat-card-emoji">🔍</div><div><div class="goat-card-title">David Einhorn — Greenlight</div><div class="goat-card-subtitle">Derin Değer — Greenlight Capital</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">F/K &lt;15</span><span class="goat-perf-badge">Cari &gt;1.5</span><span class="goat-perf-badge">Marj &gt;8%</span></div>
+            <div class="goat-card-body">Derin değer + kısa satış: Long taraf — düşük F/K, güçlü nakit, düşük borç, kârlı ama gözden kaçmış şirketler. "Piyasa geçici olarak yanılıyor, temel değer kazanır."</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">F/K &lt;15</span><span class="goat-criterion">B/Ö &lt;50</span><span class="goat-criterion">Cari &gt;1.5</span><span class="goat-criterion">Marj &gt;8%</span><span class="goat-criterion">ROE &gt;10%</span></div></div>
+
+          <div class="goat-card"><div class="goat-card-head"><div class="goat-card-emoji">🌱</div><div><div class="goat-card-title">Philip Fisher — Scuttlebutt</div><div class="goat-card-subtitle">Büyüme Yatırımı — "Common Stocks"</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">Gelir &gt;15%</span><span class="goat-perf-badge">Brüt &gt;35%</span><span class="goat-perf-badge">Uzun Vade</span></div>
+            <div class="goat-card-body">Uzun vadeli büyüme: gelir &gt;%15, kazanç &gt;%15, brüt marj &gt;%35, net marj &gt;%12. "Harika şirketi asla satma." Buffett ve Lynch'in ilham kaynağı.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">Gelir &gt;15%</span><span class="goat-criterion">EPS &gt;15%</span><span class="goat-criterion">Brüt &gt;35%</span><span class="goat-criterion">Marj &gt;12%</span><span class="goat-criterion">B/Ö &lt;60</span></div></div>
+
+          <div class="goat-card"><div class="goat-card-head"><div class="goat-card-emoji">📚</div><div><div class="goat-card-title">Benjamin Graham</div><div class="goat-card-subtitle">Derin Değer — "Akıllı Yatırımcı"</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">F/K &lt;10</span><span class="goat-perf-badge">PD/DD &lt;1.5</span><span class="goat-perf-badge">Temettü</span></div>
+            <div class="goat-card-body">Güvenlik marjı: gerçek değerinin çok altında işlem gören şirketleri bul. F/K&lt;10, PD/DD&lt;1.5, cari oran&gt;2, B/Ö&lt;%50, temettü geçmişi. En klasik değer yatırımı felsefesi.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">F/K &lt;10</span><span class="goat-criterion">PD/DD &lt;1.5</span><span class="goat-criterion">B/Ö &lt;50</span><span class="goat-criterion">Cari &gt;2</span><span class="goat-criterion">Temettü &gt;1%</span></div></div>
+
+          <div class="goat-card"><div class="goat-card-head"><div class="goat-card-emoji">🪄</div><div><div class="goat-card-title">Joel Greenblatt — Magic Formula</div><div class="goat-card-subtitle">Sistematik Değer — Gotham Capital</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">ROE &gt;25%</span><span class="goat-perf-badge">F/K &lt;15</span><span class="goat-perf-badge">17Y %30.8/yıl</span></div>
+            <div class="goat-card-body">Magic Formula: yüksek ROIC (iyi şirket) + yüksek kazanç verimi (ucuz fiyat). ROE&gt;%25, F/K&lt;15. 17 yılda S&amp;P'yi yıllık %18 geçti. "İki kural yeterli: iyi şirketi ucuza al."</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">ROE &gt;25%</span><span class="goat-criterion">F/K &lt;15</span><span class="goat-criterion">B/Ö &lt;80</span><span class="goat-criterion">Cari &gt;1</span></div></div>
+
+          <div class="goat-card"><div class="goat-card-head"><div class="goat-card-emoji">🦁</div><div><div class="goat-card-title">Carl Icahn — Activist Value</div><div class="goat-card-subtitle">Aktivist — Icahn Enterprises</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">PD/DD &lt;1.5</span><span class="goat-perf-badge">F/K &lt;12</span><span class="goat-perf-badge">Temettü</span></div>
+            <div class="goat-card-body">Nakit zengini, düşük borçlu, düşük F/K ama değer açıkta. Hissedar aktivizmi: geri alım, temettü artışı, şirket satışı. "Wall Street'in savaşçı yatırımcısı." 40Y+ piyasa üstü getiri.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">PD/DD &lt;1.5</span><span class="goat-criterion">F/K &lt;12</span><span class="goat-criterion">B/Ö &lt;60</span><span class="goat-criterion">Cari &gt;1.5</span><span class="goat-criterion">Temettü &gt;1%</span></div></div>
+
+          <div class="goat-card"><div class="goat-card-head"><div class="goat-card-emoji">🛡️</div><div><div class="goat-card-title">Seth Klarman — Margin of Safety</div><div class="goat-card-subtitle">Ultra Değer — Baupost Group</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">F/K &lt;10</span><span class="goat-perf-badge">PD/DD &lt;1.2</span><span class="goat-perf-badge">40Y %20/yıl</span></div>
+            <div class="goat-card-body">Güvenlik marjı — Graham'ın en katı versiyonu: F/K&lt;10, PD/DD&lt;1.2, B/Ö&lt;%40, güçlü nakit. "Ucuzu al, bilanço yanlış fiyatlanmışsa bekle." 1982'den beri ~%20/yıl.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">F/K &lt;10</span><span class="goat-criterion">PD/DD &lt;1.2</span><span class="goat-criterion">B/Ö &lt;40</span><span class="goat-criterion">Cari &gt;2</span><span class="goat-criterion">Marj &gt;5%</span></div></div>
+
+          <div class="goat-card"><div class="goat-card-head"><div class="goat-card-emoji">📈</div><div><div class="goat-card-title">Peter Lynch — GARP</div><div class="goat-card-subtitle">Büyüme+Değer — Fidelity Magellan</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">PEG &lt;1</span><span class="goat-perf-badge">EPS &gt;15%</span><span class="goat-perf-badge">13Y %29/yıl</span></div>
+            <div class="goat-card-body">PEG = F/K ÷ Büyüme. PEG&lt;1 altın fırsat. "Anlayabildiğin şirkete yatırım yap, sayıları kontrol et." 13 yılda %29/yıl, Magellan Fonu'nu $18M'dan $14B'ye taşıdı.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">PEG &lt;2</span><span class="goat-criterion">F/K: 5-35</span><span class="goat-criterion">EPS &gt;15%</span><span class="goat-criterion">B/Ö &lt;80</span><span class="goat-criterion">Cari &gt;1</span></div></div>
+
+          <div class="goat-card"><div class="goat-card-head"><div class="goat-card-emoji">⚡</div><div><div class="goat-card-title">Mark Minervini — SEPA</div><div class="goat-card-subtitle">Momentum — US Investing Champ.</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">EPS &gt;25%</span><span class="goat-perf-badge">ROE &gt;17%</span><span class="goat-perf-badge">52H Yakını</span></div>
+            <div class="goat-card-body">SEPA: kazanç büyümesi &gt;%25, ROE &gt;%17, marj &gt;%10, 52 hafta yükseğine yakın fiyat. Trend takipçisi — yükselen hisseleri al, zayıflayanları sat. ABD yatırım şampiyonu.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">EPS &gt;25%</span><span class="goat-criterion">ROE &gt;17%</span><span class="goat-criterion">Marj &gt;10%</span><span class="goat-criterion">B/Ö &lt;100</span><span class="goat-criterion">Cari &gt;1</span></div></div>
+
+          <div class="goat-card"><div class="goat-card-head"><div class="goat-card-emoji">🧠</div><div><div class="goat-card-title">Charlie Munger — Quality Compounder</div><div class="goat-card-subtitle">Kalite Odaklı — Berkshire / Wesco</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">Brüt &gt;50%</span><span class="goat-perf-badge">ROE &gt;20%</span><span class="goat-perf-badge">Neredeyse Borçsuz</span></div>
+            <div class="goat-card-body">Buffett'ın ortağı, kaliteyi daha da katı filtreler: brüt marj &gt;%50, ROE &gt;%20, borç neredeyse yok. "Harika şirketi adil fiyata al, adil şirketi harika fiyata asla."</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">Brüt &gt;50%</span><span class="goat-criterion">ROE &gt;20%</span><span class="goat-criterion">Marj &gt;20%</span><span class="goat-criterion">B/Ö &lt;30</span><span class="goat-criterion">Cari &gt;1.5</span></div></div>
+
+          <div class="goat-card"><div class="goat-card-head"><div class="goat-card-emoji">📊</div><div><div class="goat-card-title">William O'Neil — CAN SLIM</div><div class="goat-card-subtitle">Büyüme Traderı — Investor's Business Daily</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">EPS &gt;25%</span><span class="goat-perf-badge">Gelir &gt;15%</span><span class="goat-perf-badge">ROE &gt;17%</span></div>
+            <div class="goat-card-body">CAN SLIM: C (kazanç &gt;%25), A (yıllık büyüme), N (yeni ürün), S (arz-talep), L (sektör lideri), I (kurumsal alım), M (piyasa yönü). 52H zirvesine yakın. IBD kurucusu.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">EPS &gt;25%</span><span class="goat-criterion">Gelir &gt;15%</span><span class="goat-criterion">ROE &gt;17%</span><span class="goat-criterion">B/Ö &lt;100</span><span class="goat-criterion">Cari &gt;1</span></div></div>
+
+          <div class="goat-card"><div class="goat-card-head"><div class="goat-card-emoji">📉</div><div><div class="goat-card-title">O'Shaughnessy — What Works on Wall St.</div><div class="goat-card-subtitle">Kantitatif Değer — Osprey Funds</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">F/S &lt;1.5</span><span class="goat-perf-badge">Temettü &gt;1%</span><span class="goat-perf-badge">50Y Backtest</span></div>
+            <div class="goat-card-body">50 yıllık ABD borsası backtest kazananı: F/S&lt;1.5, temettü &gt;%1, gelir büyümesi &gt;%10. "What Works on Wall Street" — duygu yok, veri konuşur.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">F/S &lt;1.5</span><span class="goat-criterion">Temettü &gt;1%</span><span class="goat-criterion">Gelir &gt;10%</span><span class="goat-criterion">ROE &gt;10%</span></div></div>
+
+          <div class="goat-card"><div class="goat-card-head"><div class="goat-card-emoji">🏆</div><div><div class="goat-card-title">Piotroski F-Score</div><div class="goat-card-subtitle">Nicel Bilanço Puanlaması</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">8-9 = Güçlü</span><span class="goat-perf-badge">9 Kriter</span><span class="goat-perf-badge">Bilanço Sağlığı</span></div>
+            <div class="goat-card-body">9 kriterlik puanlama: Karlılık (ROA pozitif, nakit akışı güçlü, ROA artışı), Kaldıraç (borç azalışı, likidite artışı, hisse dilüsyonu yok), Verimlilik (marj artışı, varlık devir hızı artışı).</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">F-Score 7-9</span><span class="goat-criterion">ROE &gt;3%</span><span class="goat-criterion">Cari &gt;1</span><span class="goat-criterion">B/Ö &lt;120</span></div></div>
+
+          <div class="goat-card"><div class="goat-card-head"><div class="goat-card-emoji">💎</div><div><div class="goat-card-title">Walter Schloss — Deep Value</div><div class="goat-card-subtitle">Mutlak Değer — Walter &amp; Edwin Schloss</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">PD/DD &lt;1</span><span class="goat-perf-badge">F/K &lt;12</span><span class="goat-perf-badge">45Y %15.3/yıl</span></div>
+            <div class="goat-card-body">Graham'ın en sadık öğrencisi: 45 yılda %15.3/yıl. PD/DD&lt;1, az borç, temettü ödeyen, gözden düşmüş hisseler. 100+ hisse portföy. "Ucuz al, sabırla bekle."</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">PD/DD &lt;1</span><span class="goat-criterion">F/K &lt;12</span><span class="goat-criterion">B/Ö &lt;30</span><span class="goat-criterion">Temettü &gt;1%</span><span class="goat-criterion">Cari &gt;1.5</span></div></div>
+
+        </div>
+        <hr class="goat-divider">
+        <div style="font-size:10px;font-weight:700;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;">🏦 GOAT Fonlar — Son 5 Yılın Zirvesi</div>
+        <div class="goat-bank-grid">
+
+          <div class="goat-card"><div class="goat-card-head"><div class="goat-card-emoji">🏦</div><div><div class="goat-card-title">Citadel — Wellington <span class="goat-fund-tag">FON</span></div><div class="goat-card-subtitle">Ken Griffin · Multi-Strategy · $67B AUM</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">2020: +24%</span><span class="goat-perf-badge">2021: +26%</span><span class="goat-perf-badge">2022: +38%</span><span class="goat-perf-badge">2023: +15%</span><span class="goat-perf-badge">2024: +15%</span><span class="goat-perf-badge neutral">Ort: ~19%/yıl</span></div>
+            <div class="goat-card-body">1990'dan beri net %19.2/yıl — tarihin en karlı hedge fonu. Yüzlerce bağımsız ekip, farklı varlık sınıflarında uzun/kısa pozisyon. Yüksek ROE, güçlü karlılık, düşük borç, kazanç büyümesi.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">ROE &gt;15%</span><span class="goat-criterion">Marj &gt;12%</span><span class="goat-criterion">B/Ö &lt;70</span><span class="goat-criterion">Cari &gt;1.2</span><span class="goat-criterion">EPS &gt;10%</span></div></div>
+
+          <div class="goat-card"><div class="goat-card-head"><div class="goat-card-emoji">🤖</div><div><div class="goat-card-title">D.E. Shaw — Oculus <span class="goat-fund-tag">FON</span></div><div class="goat-card-subtitle">Quant + Makro · $85B AUM · Sıfır Kayıp Yılı</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">2021: +19%</span><span class="goat-perf-badge">2023: +22%</span><span class="goat-perf-badge">2024: +36%</span><span class="goat-perf-badge">2025: +28%</span><span class="goat-perf-badge neutral">5Y Ort: ~20%/yıl</span></div>
+            <div class="goat-card-body">2004'ten beri hiç kayıp yılı yok. Sistematik algoritmalar + discretionary makro. Hisse tarafı: yüksek büyüme + güçlü karlılık + momentum kombinasyonu.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">EPS &gt;20%</span><span class="goat-criterion">ROE &gt;18%</span><span class="goat-criterion">Marj &gt;15%</span><span class="goat-criterion">Gelir &gt;15%</span><span class="goat-criterion">Cari &gt;1</span></div></div>
+
+          <div class="goat-card"><div class="goat-card-head"><div class="goat-card-emoji">🌐</div><div><div class="goat-card-title">Millennium Management <span class="goat-fund-tag">FON</span></div><div class="goat-card-subtitle">Israel Englander · Multi-Strategy · $83B AUM</div></div></div>
+            <div class="goat-card-perf"><span class="goat-perf-badge">2021: +14%</span><span class="goat-perf-badge">2022: +12%</span><span class="goat-perf-badge">2023: +10%</span><span class="goat-perf-badge">2024: +15%</span><span class="goat-perf-badge">2025: +10.5%</span><span class="goat-perf-badge neutral">Tutarlı Çift Hane</span></div>
+            <div class="goat-card-body">1989'dan beri sürekli pozitif getiri. 300+ bağımsız portföy yöneticisi, çok varlık çok strateji. Kalite odaklı: güçlü marj, düşük borç, istikrarlı büyüme.</div>
+            <div class="goat-card-criteria"><span class="goat-criterion">ROE &gt;12%</span><span class="goat-criterion">Marj &gt;10%</span><span class="goat-criterion">B/Ö &lt;60</span><span class="goat-criterion">Cari &gt;1.5</span><span class="goat-criterion">EPS &gt;8%</span></div></div>
+
+        </div>
+      </div>
+
+      <div class="preset-info-wrap">
+        <div class="preset-info-title">⚡ Hazır Filtre Presetleri</div>
+        <div class="preset-info-grid">
+          <div class="picard"><div class="picard-name">AZ BORÇ</div><div class="picard-desc">Az borçla çalışan ve güçlü likiditeye sahip hisseler.</div><div class="picard-rules"><span class="picard-rule">B/Ö &lt;30</span><span class="picard-rule">Cari &gt;2</span></div></div>
+          <div class="picard"><div class="picard-name">BÜYÜME</div><div class="picard-desc">Hızlı büyüyen, güçlü kâr ve gelir artışı gösteren hisseler.</div><div class="picard-rules"><span class="picard-rule">K.Büy &gt;20%</span><span class="picard-rule">Gelir &gt;15%</span><span class="picard-rule">ROE &gt;15%</span></div></div>
+          <div class="picard"><div class="picard-name">DEĞER</div><div class="picard-desc">Ucuz kalmış, düşük F/K ve PD/DD ile işlem gören hisseler.</div><div class="picard-rules"><span class="picard-rule">F/K &lt;15</span><span class="picard-rule">PD/DD &lt;2</span><span class="picard-rule">Temettü &gt;2%</span></div></div>
+          <div class="picard"><div class="picard-name">KALİTELİ</div><div class="picard-desc">Yüksek karlılık, güçlü marj, düşük borç ve iyi likidite.</div><div class="picard-rules"><span class="picard-rule">ROE &gt;20%</span><span class="picard-rule">Marj &gt;10%</span><span class="picard-rule">B/Ö &lt;80</span><span class="picard-rule">Cari &gt;1.5</span></div></div>
+          <div class="picard"><div class="picard-name">MOMENTUM</div><div class="picard-desc">Her iki büyüme metriğinde güçlü ivme yakalayan hisseler.</div><div class="picard-rules"><span class="picard-rule">Gelir &gt;20%</span><span class="picard-rule">K.Büy &gt;20%</span></div></div>
+          <div class="picard"><div class="picard-name">TEMETTÜ</div><div class="picard-desc">Yüksek temettü ödeyen, borç yükü makul hisseler.</div><div class="picard-rules"><span class="picard-rule">Temettü &gt;4%</span><span class="picard-rule">B/Ö &lt;100</span></div></div>
+        </div>
+      </div>
+      <!-- ══════ TERİMLER SÖZLÜĞÜ ══════ -->
+      <div class="preset-info-wrap" style="margin-top:0;">
+        <div class="preset-info-title">📖 Terimler Sözlüğü</div>
+        <p style="font-size:12px;color:var(--text2);margin:0 0 16px 0;line-height:1.6;">DeepFin'de kullanılan tüm filtre, metrik ve kavramların açıklamaları.</p>
+
+        <!-- DEĞERLEMİE -->
+        <div class="icat" style="margin-bottom:0;">
+          <div class="icat-title">📊 Değerleme Metrikleri</div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">F/K — Fiyat/Kazanç</span><span class="iitem-eng">P/E — Price to Earnings</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> Hisse Fiyatı ÷ Hisse Başına Kâr (EPS)<br><strong>Ne gösterir:</strong> Yatırımcının şirketin 1 liralık kârı için kaç lira ödediği. Düşük F/K ucuzluğa işaret edebilir; ancak düşük büyüme beklentisi de F/K'yı düşürür. Sektörler arası kıyaslamada dikkatli olunmalı — teknoloji şirketlerinin F/K'sı bankalardan çok daha yüksek olabilir.</div>
+            <span class="iitem-tip tip-good">✓ 5–15 değer yatırımcısı için cazip</span>
+            <span class="iitem-tip tip-warn">△ 15–25 orta değerli</span>
+            <span class="iitem-tip tip-bad">✕ 25+ büyüme beklentisi fiyatlanmış</span>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">PEG — Büyümeye Göre F/K</span><span class="iitem-eng">Price/Earnings to Growth</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> F/K ÷ Kazanç Büyüme Oranı (%)<br><strong>Ne gösterir:</strong> Peter Lynch'in geliştirdiği bu oran, büyümeyi F/K'ya dahil ederek "büyümeye göre ucuz mu pahalı mı?" sorusunu yanıtlar. PEG &lt;1 altın fırsat olarak kabul edilir — şirket büyümesine kıyasla ucuz demektir. PEG = 1 adil değerlenmiş, PEG &gt;2 büyüme fiyatlanmış anlamına gelir.</div>
+            <span class="iitem-tip tip-good">✓ &lt;1 büyümeye göre ucuz — Lynch'in altın bölgesi</span>
+            <span class="iitem-tip tip-warn">△ 1–2 arası adil değerlenmiş</span>
+            <span class="iitem-tip tip-bad">✕ 2+ büyüme aşırı fiyatlanmış</span>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">PD/DD — Piyasa Değeri / Defter Değeri</span><span class="iitem-eng">P/B — Price to Book Value</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> Hisse Fiyatı ÷ Hisse Başına Özkaynak (Defter Değeri)<br><strong>Ne gösterir:</strong> Şirketin muhasebe kayıtlarındaki net varlıklarına göre kaç katına işlem gördüğünü gösterir. PD/DD &lt;1 teorik olarak "defter değerinin altında" demektir — tasfiye değerinden ucuz. Benjamin Graham'ın favori metriğidir. Maddi varlıkları az olan teknoloji şirketleri için anlamlılığı sınırlıdır.</div>
+            <span class="iitem-tip tip-good">✓ &lt;1 defter değeri altında — Graham bölgesi</span>
+            <span class="iitem-tip tip-warn">△ 1–3 normal aralık</span>
+            <span class="iitem-tip tip-bad">✕ 5+ maddi varlık az veya aşırı değerleme</span>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">F/S — Fiyat / Satışlar</span><span class="iitem-eng">P/S — Price to Sales</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> Piyasa Değeri ÷ Yıllık Satış Geliri<br><strong>Ne gösterir:</strong> Şirketin her 1 dolarlık satışı için piyasanın kaç dolar ödediği. Henüz kâr etmeyen büyüme şirketlerini değerlemek için kullanılır. Çok düşük marjlı sektörlerde (perakende, gıda) doğal olarak düşük kalır.</div>
+            <span class="iitem-tip tip-good">✓ &lt;1 satışlara göre ucuz</span>
+            <span class="iitem-tip tip-warn">△ 1–5 sektöre göre normal</span>
+            <span class="iitem-tip tip-bad">✕ 10+ büyüme beklentisi yüksek fiyatlanmış</span>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">Piyasa Değeri</span><span class="iitem-eng">Market Capitalization</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> Hisse Fiyatı × Toplam Hisse Sayısı<br><strong>Ne gösterir:</strong> Piyasanın şirkete biçtiği toplam değer. DeepFin'de USD cinsinden gösterilir; BIST hisseleri TRY'den, DAX hisseleri EUR'dan otomatik çevrilir. Büyüklük sınıflaması: &lt;$300M mikro, $300M–$2B küçük, $2B–$10B orta, $10B+ büyük ölçekli.</div>
+            <span class="iitem-tip tip-warn">△ Küçük ölçekli hisseler daha volatil, daha yüksek getiri potansiyeli taşıyabilir</span>
+          </div>
+        </div>
+
+        <!-- KARLILIK -->
+        <div class="icat" style="margin-bottom:0;margin-top:16px;">
+          <div class="icat-title">💰 Karlılık Metrikleri</div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">ROE — Özkaynak Karlılığı</span><span class="iitem-eng">Return on Equity</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> Net Kâr ÷ Ortalama Özkaynak × 100<br><strong>Ne gösterir:</strong> Şirketin hissedarların parasını ne kadar verimli kullandığı. Buffett'ın en önem verdiği metriklerden biri. Yüksek ROE, güçlü rekabet avantajının göstergesidir. Ancak aşırı borçla da ROE şişirilebilir — borç/özkaynak ile birlikte değerlendirilmeli.</div>
+            <span class="iitem-tip tip-bad">✕ %10 altı zayıf</span>
+            <span class="iitem-tip tip-warn">△ %10–20 orta</span>
+            <span class="iitem-tip tip-good">✓ %20+ güçlü rekabet avantajı sinyali</span>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">ROA — Varlık Karlılığı</span><span class="iitem-eng">Return on Assets</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> Net Kâr ÷ Toplam Varlıklar × 100<br><strong>Ne gösterir:</strong> Şirketin elindeki tüm varlıkları (hem özkaynak hem borçla finanse edilenler) ne kadar verimli kullandığı. Borç seviyesinden etkilenmez, bu yüzden ROE'ye göre daha "temiz" bir karlılık ölçüsüdür. Bankalar düşük ROA ile çalışır (%1–2 normal kabul edilir).</div>
+            <span class="iitem-tip tip-good">✓ %5+ genel sanayi için iyi</span>
+            <span class="iitem-tip tip-warn">△ Bankalar için %1–2 normal</span>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">Net Kar Marjı</span><span class="iitem-eng">Net Profit Margin TTM</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> Net Kâr ÷ Toplam Gelir × 100<br><strong>Ne gösterir:</strong> 100 liralık satıştan kaç lira net kâr kaldığı. Yüksek marj, fiyatlandırma gücünü ve operasyonel verimliliği gösterir. "TTM" son 12 ayı (Trailing Twelve Months) ifade eder — mevsimsellik etkisini azaltır.</div>
+            <span class="iitem-tip tip-bad">✕ %5 altı zayıf (sektöre bağlı)</span>
+            <span class="iitem-tip tip-good">✓ %15+ güçlü marj — fiyatlandırma gücü var</span>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">Piotroski F-Score</span><span class="iitem-eng">Piotroski Financial Score</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> 9 kriterlik puanlama sistemi (her kriter 0 veya 1 puan):<br>
+            <em>Karlılık (4 puan):</em> ROA pozitif mi? Faaliyet nakit akışı pozitif mi? ROA arttı mı? Nakit akışı &gt; Net kâr mı?<br>
+            <em>Kaldıraç/Likidite (3 puan):</em> Uzun vadeli borç azaldı mı? Cari oran arttı mı? Yeni hisse ihracı olmadı mı?<br>
+            <em>Verimlilik (2 puan):</em> Brüt marj arttı mı? Varlık devir hızı arttı mı?<br>
+            <strong>Ne gösterir:</strong> Bilançonun genel sağlığını ve kötüleşip iyileşmediğini ölçer. 8-9 mükemmel, 0-2 zayıf bilanço.</div>
+            <span class="iitem-tip tip-bad">✕ 0–2 zayıf bilanço, kısa pozisyon adayı</span>
+            <span class="iitem-tip tip-warn">△ 3–6 orta, nötr</span>
+            <span class="iitem-tip tip-good">✓ 7–9 güçlü bilanço — Piotroski'nin alım bölgesi</span>
+          </div>
+        </div>
+
+        <!-- BÜYÜME -->
+        <div class="icat" style="margin-bottom:0;margin-top:16px;">
+          <div class="icat-title">📈 Büyüme Metrikleri</div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">Gelir Büyümesi</span><span class="iitem-eng">Revenue Growth TTM YoY</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> (Bu yılın geliri − Geçen yılın geliri) ÷ Geçen yılın geliri × 100<br><strong>Ne gösterir:</strong> Son 12 ayda satış gelirinin yıldan yıla yüzde kaç büyüdüğü. Yüksek enflasyon ortamında nominal büyüme yanıltıcı olabilir — reel büyümeye (enflasyon çıkarılmış) bakmak daha sağlıklıdır. "YoY" (Year over Year) yıllık karşılaştırma anlamına gelir.</div>
+            <span class="iitem-tip tip-bad">✕ Negatif — gelir küçülüyor</span>
+            <span class="iitem-tip tip-warn">△ 0–10% zayıf büyüme</span>
+            <span class="iitem-tip tip-good">✓ %20+ güçlü büyüme şirketi</span>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">Kazanç Büyümesi (EPS)</span><span class="iitem-eng">EPS Growth TTM YoY</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> (Bu yılın EPS'i − Geçen yılın EPS'i) ÷ Geçen yılın EPS'i × 100<br><strong>Ne gösterir:</strong> Hisse başına kârın yıllık büyümesi. Gelir büyümesinden daha önemli kabul edilir çünkü şirketin kârlılık verimliliğini ölçer. Lynch, Minervini ve büyüme yatırımcıları bu metriğe en çok ağırlık verir. Negatif EPS büyümesi kâr sıkışması sinyalidir.</div>
+            <span class="iitem-tip tip-good">✓ %25+ Minervini/Lynch kriterleri — büyüme hissesi</span>
+            <span class="iitem-tip tip-bad">✕ Negatif kâr sıkışması var</span>
+          </div>
+        </div>
+
+        <!-- FİNANSAL SAĞLIK -->
+        <div class="icat" style="margin-bottom:0;margin-top:16px;">
+          <div class="icat-title">🏦 Finansal Sağlık & Temettü</div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">Temettü Verimi</span><span class="iitem-eng">Dividend Yield Indicated Annual</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> Hisse Başına Yıllık Temettü ÷ Hisse Fiyatı × 100<br><strong>Ne gösterir:</strong> Şu anki fiyatla hisseyi alırsanız yıllık ne kadar temettü getirisi alacağınız. "Indicated" ifadesi yönetim kurulunun açıkladığı beklenen temettüyü esas aldığını gösterir. Sürdürülebilirlik için ödeme oranına (payout ratio) bakılmalı — çok yüksek temettü bazen finansal sıkıntı sinyali olabilir.</div>
+            <span class="iitem-tip tip-warn">△ %15+ sürdürülebilirlik riski kontrol edilmeli</span>
+            <span class="iitem-tip tip-good">✓ %4–8 temettü yatırımcısı için cazip ve sürdürülebilir</span>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">B/Ö — Borç / Özkaynak</span><span class="iitem-eng">Debt to Equity — Total Debt / Total Equity</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> Toplam Borç ÷ Toplam Özkaynak × 100<br><strong>Ne gösterir:</strong> Şirketin faaliyetlerini ne ölçüde borçla finanse ettiği. Yüksek B/Ö faiz yükü ve iflas riskini artırır, ancak bazı sektörler (bankacılık, gayrimenkul, enerji altyapısı) yapısal olarak yüksek borçla çalışır. Bu sektörlerde sektör ortalamasıyla karşılaştırın.</div>
+            <span class="iitem-tip tip-good">✓ &lt;50 düşük borç yükü — Graham güvenli bölgesi</span>
+            <span class="iitem-tip tip-warn">△ 50–150 orta, sektöre bağlı normal</span>
+            <span class="iitem-tip tip-bad">✕ 200+ yüksek kaldıraç — faiz yükü riski</span>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">Cari Oran</span><span class="iitem-eng">Current Ratio Annual</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> Dönen Varlıklar ÷ Kısa Vadeli Borçlar<br><strong>Ne gösterir:</strong> Şirketin kısa vadeli (1 yıl içinde ödenecek) borçlarını karşılayabilme kapasitesi. 1'in altı, mevcut varlıklarının kısa vadeli borçlarını karşılayamayacağı anlamına gelir — likidite sıkışması riski. Graham minimum 2 olmasını şart koşuyordu.</div>
+            <span class="iitem-tip tip-bad">✕ &lt;1 likidite sıkıntısı riski</span>
+            <span class="iitem-tip tip-warn">△ 1–1.5 dikkatli izlenmeli</span>
+            <span class="iitem-tip tip-good">✓ 1.5–3 sağlıklı likidite</span>
+          </div>
+        </div>
+
+        <!-- TEKNİK -->
+        <div class="icat" style="margin-bottom:0;margin-top:16px;">
+          <div class="icat-title">⚡ Teknik & Fiyat Metrikleri</div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">52 Hafta Yüksek/Düşük Yüzdesi</span><span class="iitem-eng">52-Week High / Low %</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> Mevcut Fiyat ÷ 52 Haftalık Yüksek × 100<br><strong>Ne gösterir:</strong> Hissenin son bir yıldaki en yüksek seviyesine göre nerede olduğu. %80–100 arası "52 hafta zirvesine yakın" anlamına gelir — Minervini'nin SEPA stratejisinde bu güç işareti olarak aranır. %30'un altı derin düzeltme bölgesidir.</div>
+            <span class="iitem-tip tip-good">✓ %80–100 güç — momentum stratejisi için ideal</span>
+            <span class="iitem-tip tip-warn">△ %50–80 orta bölge</span>
+            <span class="iitem-tip tip-bad">✕ %30 altı derin düzeltme</span>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">Hacim (Lot)</span><span class="iitem-eng">Volume — Milyon Lot</span></div>
+            <div class="iitem-desc"><strong>Ne gösterir:</strong> Belirli bir günde el değiştiren hisse miktarı. Yüksek hacim, güçlü alıcı/satıcı ilgisini gösterir ve fiyat hareketlerinin "gerçekli" olduğunu teyit eder. Çok düşük hacimli hisselerde giriş/çıkış zor olabilir — likidite riski. Minervini, breakout'larda hacimin artmasını şart koşar.</div>
+            <span class="iitem-tip tip-warn">△ Düşük hacimli hisselerde yüksek spread ve likidite riski olabilir</span>
+          </div>
+        </div>
+
+        <!-- GENEL KAVRAMLAR -->
+        <div class="icat" style="margin-bottom:0;margin-top:16px;">
+          <div class="icat-title">🔑 Genel Kavramlar</div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">TTM — Son 12 Ay</span><span class="iitem-eng">Trailing Twelve Months</span></div>
+            <div class="iitem-desc">Son 12 aylık kümülatif veriyi ifade eder. Yıllık raporlar yerine en güncel 4 çeyreği toplar. Mevsimsel dalgalanmaları bastırır ve en güncel performans görüntüsünü verir. DeepFin'deki ROE, ROA, Marj, EPS Büyümesi gibi metrikler TTM bazlıdır.</div>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">YoY — Yıldan Yıla</span><span class="iitem-eng">Year over Year</span></div>
+            <div class="iitem-desc">Bu yılın aynı dönemini geçen yılın aynı dönemiyle kıyaslar. Mevsimsel etkilerden arındırılmış büyüme oranı sunar. "Gelir Büyümesi TTM YoY" = Son 12 ayın geliri, bir önceki 12 ayla karşılaştırılmış büyüme.</div>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">EPS — Hisse Başına Kâr</span><span class="iitem-eng">Earnings Per Share</span></div>
+            <div class="iitem-desc"><strong>Nasıl hesaplanır:</strong> Net Kâr ÷ Toplam Hisse Sayısı<br>Şirketin her bir hisse için ürettiği kâr miktarı. F/K hesaplamasının temel bileşenidir. "Dilute edilmiş EPS" stok opsiyonları ve varantlar gibi hisse seyrettirici araçları da hesaba katar — daha muhafazakâr bir ölçüdür.</div>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">Güvenlik Marjı</span><span class="iitem-eng">Margin of Safety</span></div>
+            <div class="iitem-desc">Benjamin Graham'ın temel ilkesi: İçsel değeri (intrinsic value) hesapla, piyasa fiyatı bundan önemli ölçüde düşükse al. Fark ne kadar büyükse güvenlik marjı o kadar geniş, hata payın o kadar fazla demektir. Değer yatırımının temel taşı.</div>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">Moat — Rekabet Avantajı</span><span class="iitem-eng">Economic Moat</span></div>
+            <div class="iitem-desc">Warren Buffett'ın popülerleştirdiği kavram: Bir şirketi rakiplerden koruyan ve uzun vadeli kârlılığını güvence altına alan sürdürülebilir avantajlar bütünü. Marka gücü (Coca-Cola), network etkisi (Visa), maliyet avantajı (Amazon), değiştirme maliyeti (Microsoft Office) moat örnekleridir. Yüksek ROE uzun süre devam ediyorsa güçlü moat işaretidir.</div>
+          </div>
+
+          <div class="iitem">
+            <div class="iitem-top"><span class="iitem-name">Breakout — Kırılım</span><span class="iitem-eng">Breakout</span></div>
+            <div class="iitem-desc">Hisse fiyatının önemli bir direnç seviyesini (önceki zirve, konsolidasyon bölgesi) yüksek hacimle aşması. Minervini SEPA stratejisinde, breakout sonrası pozisyon alınır. Yeterli hacim olmadan gerçekleşen kırılımlar "sahte kırılım" (false breakout) riski taşır.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<div class="smodal-overlay" id="supportModal">
+  <div class="smodal" onclick="event.stopPropagation()">
+    <div class="smodal-head"><div></div><button class="smodal-close" onclick="closeSupport()">✕</button></div>
+    <div class="smodal-hero">
+      <span class="smodal-emoji">☕</span>
+      <div class="smodal-title">BİZİ DESTEKLEYİN</div>
+      <div class="smodal-desc">Bu araç <strong>tamamen ücretsiz</strong> olarak sunulmaktadır — reklam yok, kayıt yok, sınır yok.<br><br>DeepFin'i geliştirmek ve güncel tutmak için <strong>geliştirme ve altyapı maliyetleri</strong> bulunmaktadır. Eğer bu araç işinize yaradıysa, bir kahve ısmarlayarak destek olabilirsiniz. 🙏</div>
+    </div>
+    <div class="smodal-options">
+      <div class="smodal-options-title">Destek Yöntemleri</div>
+      <div class="soption">
+        <div class="soption-head"><span class="soption-icon">☕</span><div><div class="soption-label">Buy Me a Coffee</div><div class="soption-sublabel">Kredi kartı veya PayPal ile kolayca destek ol</div></div></div>
+        <a class="bmc-link" href="https://buymeacoffee.com/KULLANICI_ADINIZ" target="_blank" rel="noopener"><span>☕</span> buymeacoffee.com/KULLANICI_ADINIZ</a>
+      </div>
+      <div class="soption">
+        <div class="soption-head"><span class="soption-icon">₿</span><div><div class="soption-label">Kripto Para ile Destek</div><div class="soption-sublabel">Adrese tıklayarak kopyalayabilirsiniz</div></div></div>
+        <div class="wallet-row"><span class="wallet-coin">BTC</span><div class="wallet-addr">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</div><button class="copy-btn" onclick="copyWallet(this,'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh')">KOPYALA</button></div>
+        <div class="wallet-row"><span class="wallet-coin">ETH</span><div class="wallet-addr">0x71C7656EC7ab88b098defB751B7401B5f6d8976F</div><button class="copy-btn" onclick="copyWallet(this,'0x71C7656EC7ab88b098defB751B7401B5f6d8976F')">KOPYALA</button></div>
+        <div class="wallet-row"><span class="wallet-coin">USDT</span><div class="wallet-addr">TN3W4H6rK2ce4vX9YnFQHwKx7TS2V5sL2h</div><button class="copy-btn" onclick="copyWallet(this,'TN3W4H6rK2ce4vX9YnFQHwKx7TS2V5sL2h')">KOPYALA</button></div>
+        <div class="wallet-row"><span class="wallet-coin">BNB</span><div class="wallet-addr">0x71C7656EC7ab88b098defB751B7401B5f6d8976F</div><button class="copy-btn" onclick="copyWallet(this,'0x71C7656EC7ab88b098defB751B7401B5f6d8976F')">KOPYALA</button></div>
+      </div>
+    </div>
+    <div class="smodal-thanks">Desteğiniz için şimdiden <strong>çok teşekkür ederiz</strong> 🙏</div>
   </div>
 </div>
 </body>
