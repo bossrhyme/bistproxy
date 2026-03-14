@@ -2398,6 +2398,13 @@ let scanAborted = false;
 // ═══════════════════════════════════════════
 function init(){
   showApp();
+  // Profile/analiz sayfasından geri gelinince screener'ı göster ve tara
+  var _initParams = new URLSearchParams(window.location.search);
+  if(_initParams.get('from') === 'profile' || _initParams.get('from') === 'screener') {
+    showScreener();
+    // Önceki tarama yoksa yeniden tara
+    if(allData.length === 0) runScan();
+  }
 }
 
 function showApp(){
@@ -4234,7 +4241,7 @@ function showProfil(sym, ex) {
     var s = (x.symbol||'').replace('.IS','').toUpperCase();
     return s === sym.toUpperCase() || (x.symbol||'').toUpperCase() === sym.toUpperCase()+'.IS';
   });
-  var url = '/analiz/profile.html?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(exKey);
+  var url = '/analiz/profile.html?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(exKey) + '&from=screener';
   if(d) {
     // Veriyi URL'e sıkıştırarak geçir (küçük key mapping)
     var compact = {

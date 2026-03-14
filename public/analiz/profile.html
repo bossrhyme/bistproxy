@@ -1248,7 +1248,17 @@ function _buildFinancials(d) {
 }
 
 
-function goScreener() { window.location.href = '/'; }  // Tarayıcı → anasayfa (screener açık gelir)
+function goHome() { window.location.href = '/'; }
+
+function goScreener() {
+  // history.back() ile screener'a dön (from=screener parametresiyle geldiyse)
+  var params = new URLSearchParams(window.location.search);
+  if(params.get('from') === 'screener') {
+    history.back();
+  } else {
+    window.location.href = '/?from=profile';
+  }
+}
 function closeProfil() {
   var params = new URLSearchParams(window.location.search);
   var from = params.get('from');
