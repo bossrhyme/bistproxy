@@ -458,45 +458,7 @@ function goSym(sym, ex) {
 function _showDisclaimer(onAccept) {
   if (localStorage.getItem('df_disclaimer_v2')) { if (onAccept) onAccept(); return; }
   var modal = document.getElementById('disclaimerModal');
-  if (!modal) { function closeInfo(){ document.getElementById('infoModal').classList.remove('open'); }
-function copyWallet(btn, addr){
-  navigator.clipboard.writeText(addr).then(()=>{
-    btn.textContent='✓ KOPYALANDI'; btn.classList.add('copied');
-    setTimeout(()=>{ btn.textContent='KOPYALA'; btn.classList.remove('copied'); }, 2000);
-  }).catch(()=>{
-    const ta=document.createElement('textarea');
-    ta.value=addr; ta.style.cssText='position:fixed;opacity:0';
-    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
-    document.body.removeChild(ta);
-    btn.textContent='✓ KOPYALANDI'; btn.classList.add('copied');
-    setTimeout(()=>{ btn.textContent='KOPYALA'; btn.classList.remove('copied'); }, 2000);
-  });
-}
-function closeSupport(){ document.getElementById('supportModal').classList.remove('open'); }
-function openInfo(){ document.getElementById('infoModal').classList.add('open'); }
-function closeInfo(){ document.getElementById('infoModal').classList.remove('open'); }
-function openSupport(){ document.getElementById('supportModal').classList.add('open'); }
-function closeSupport(){ document.getElementById('supportModal').classList.remove('open'); }
-function copyWallet(btn, addr){
-  navigator.clipboard.writeText(addr).then(()=>{
-    btn.textContent='✓ KOPYALANDI'; btn.classList.add('copied');
-    setTimeout(()=>{ btn.textContent='KOPYALA'; btn.classList.remove('copied'); }, 2000);
-  }).catch(()=>{
-    const ta=document.createElement('textarea');
-    ta.value=addr; ta.style.cssText='position:fixed;opacity:0';
-    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
-    document.body.removeChild(ta);
-    btn.textContent='✓ KOPYALANDI'; btn.classList.add('copied');
-    setTimeout(()=>{ btn.textContent='KOPYALA'; btn.classList.remove('copied'); }, 2000);
-  });
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-  var _im = document.getElementById('infoModal');
-  var _sm = document.getElementById('supportModal');
-  if(_im) _im.addEventListener('click', function(e){ if(e.target===this) closeInfo(); });
-  if(_sm) _sm.addEventListener('click', function(e){ if(e.target===this) closeSupport(); });
-  document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeInfo(); closeSupport(); }}); _showDisclaimer(onAccept); }); return; }
+  if (!modal) { document.addEventListener('DOMContentLoaded', function(){ _showDisclaimer(onAccept); }); return; }
   modal.classList.add('open');
   var btn = document.getElementById('disclaimerBtn');
   var cd  = document.getElementById('disclaimerCountdown');
@@ -523,6 +485,24 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 
 // ── INIT ──
+function openInfo(){ var m=document.getElementById('infoModal'); if(m) m.classList.add('open'); }
+function closeInfo(){ var m=document.getElementById('infoModal'); if(m) m.classList.remove('open'); }
+function openSupport(){ var m=document.getElementById('supportModal'); if(m) m.classList.add('open'); }
+function closeSupport(){ var m=document.getElementById('supportModal'); if(m) m.classList.remove('open'); }
+function copyWallet(btn, addr){
+  navigator.clipboard.writeText(addr).then(()=>{
+    btn.textContent='✓ KOPYALANDI'; btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent='KOPYALA'; btn.classList.remove('copied'); }, 2000);
+  }).catch(()=>{
+    const ta=document.createElement('textarea');
+    ta.value=addr; ta.style.cssText='position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent='✓ KOPYALANDI'; btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent='KOPYALA'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   // Dışarı tıklayınca dropdown kapat
   document.addEventListener('click', function(e) {

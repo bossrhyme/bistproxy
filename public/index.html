@@ -1509,7 +1509,12 @@ td:first-child,td:nth-child(2){text-align:left;}
         <p>Gürültü yok, fırsat var.</p>
         <small id="empty-sub"></small>
 
-        <div class="onboarding">
+        <div id="auto-scan-bar" style="display:none;align-items:center;justify-content:center;gap:10px;padding:10px 16px;background:var(--s2);border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);">
+  <span>⏳ <span class="auto-scan-count">10</span> saniye içinde otomatik taranıyor...</span>
+  <button onclick="cancelAutoScan();runScan();" style="background:var(--accent);color:#fff;border:none;border-radius:5px;padding:4px 12px;font-size:11px;font-weight:600;cursor:pointer;">▶ Şimdi Tara</button>
+  <button onclick="cancelAutoScan();" style="background:transparent;color:var(--muted2);border:1px solid var(--border);border-radius:5px;padding:4px 10px;font-size:11px;cursor:pointer;">✕ İptal</button>
+</div>
+<div class="onboarding">
           <div class="onb-title">Nasıl Kullanılır?</div>
           <div class="onb-steps">
             <div class="onb-step">
@@ -2342,6 +2347,45 @@ let scanAborted = false;
 // ═══════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════
+
+// ── OTOMATİK TARAMA ZAMANLAYICI ──────────────────────────────
+var _autoScanTimer  = null;
+var _autoScanCount  = 0;
+var _pendingAutoScan = false;
+
+function scheduleAutoScan() {
+  cancelAutoScan();
+  if (allData.length > 0) return; // zaten taranmış
+  _autoScanCount = 10;
+  _updateAutoScanUI();
+  _autoScanTimer = setInterval(function() {
+    _autoScanCount--;
+    _updateAutoScanUI();
+    if (_autoScanCount <= 0) {
+      cancelAutoScan();
+      runScan();
+    }
+  }, 1000);
+}
+
+function cancelAutoScan() {
+  if (_autoScanTimer) { clearInterval(_autoScanTimer); _autoScanTimer = null; }
+  _updateAutoScanUI();
+}
+
+function _updateAutoScanUI() {
+  var el = document.getElementById('auto-scan-bar');
+  if (!el) return;
+  if (_autoScanTimer && _autoScanCount > 0) {
+    el.style.display = 'flex';
+    var cnt = el.querySelector('.auto-scan-count');
+    if (cnt) cnt.textContent = _autoScanCount;
+  } else {
+    el.style.display = 'none';
+  }
+}
+// ─────────────────────────────────────────────────────────────
+
 function init(){
   showApp();
   // Not: from= kontrolü DOMContentLoaded'da yapılıyor (DOM hazır olsun diye)
@@ -2957,6 +3001,7 @@ document.getElementById('goat-chips').addEventListener('click', function(e) {
   var wasOn = chip.classList.contains('on');
   if (!wasOn && countSelectedChips() >= 3) return; // max 3
   chip.classList.toggle('on');
+  cancelAutoScan();
   applyAllChips();
 });
 document.getElementById('goat-fund-chips').addEventListener('click', function(e) {
@@ -4447,6 +4492,11 @@ function acceptDisclaimer() {
   localStorage.setItem('df_disclaimer_v2', '1');
   document.getElementById('disclaimerModal').classList.remove('open');
   clearInterval(disclaimerTimer);
+  // Disclaimer beklenirken gelen otomatik tarama isteğini şimdi başlat
+  if (_pendingAutoScan) {
+    _pendingAutoScan = false;
+    scheduleAutoScan();
+  }
 }
 
 function showScreener() {
@@ -4470,8 +4520,6 @@ function showScreener() {
   document.getElementById('nav-tarama').classList.add('active');
   var ts = document.querySelector('.tsearch');
   if(ts) ts.style.display = '';
-  // Tarama yoksa otomatik başlat
-  if(allData.length === 0) runScan();
 }
 
 function selectExchangeAndGo(exKey) {
@@ -4528,7 +4576,15 @@ document.addEventListener('DOMContentLoaded', function(){
   var _p = new URLSearchParams(window.location.search).get('from');
   if (_p === 'profile' || _p === 'screener' || _p === 'analiz') {
     showScreener();
-    if(allData.length === 0) runScan();
+    // Disclaimer yoksa 10 sn zamanlayıcı; varsa hemen tara
+    if (allData.length === 0) {
+      if (localStorage.getItem('df_disclaimer_v2')) {
+        scheduleAutoScan();
+      } else {
+        // Disclaimer kabul edilince tara
+        _pendingAutoScan = true;
+      }
+    }
   } else {
     showHomepage();
   }
