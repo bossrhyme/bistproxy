@@ -79,6 +79,13 @@ footer a:hover{color:var(--text2);}
 .modal-overlay.open{display:flex;}
 .modal{background:var(--s1,#0d0d0d);border-radius:12px;border:1px solid #1a1a1a;width:100%;max-width:520px;overflow:hidden;margin:16px;}
 
+
+/* DROPDOWN */
+#sym-dropdown { border-radius: 0 0 12px 12px; }
+.dd-item { display:flex; align-items:center; gap:12px; padding:10px 16px; cursor:pointer; transition:background .1s; }
+.dd-item:hover { background:var(--s2); }
+.dd-sym { font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; color:var(--text); min-width:60px; }
+.dd-name { font-size:11px; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 </style>
 </head>
 <body>
@@ -109,11 +116,12 @@ footer a:hover{color:var(--text2);}
         <span style="font-size:9px;color:var(--muted)">▾</span>
       </div>
       <input class="search-input" id="sym-input" type="text"
-        placeholder="Sembol gir  (örn: TUPRS, AAPL, NVDA...)"
-        oninput="this.value=this.value.toUpperCase()"
-        onkeydown="if(event.key==='Enter')goAnaliz()">
+        placeholder="Sembol veya şirket adı gir..."
+        oninput="onInput()"
+        onkeydown="if(event.key==='Enter')goAnaliz(); if(event.key==='Escape')closeDropdown()">
       <button class="search-btn" onclick="goAnaliz()">Analiz Et →</button>
     </div>
+    <div id="sym-dropdown" style="display:none;border-top:1px solid var(--border);background:var(--s1);max-height:280px;overflow-y:auto;"></div>
   </div>
   <div class="search-hint">Örnek: <code>TUPRS</code> · <code>AAPL</code> · <code>NVDA</code> · <code>SASA</code> · <code>THYAO</code></div>
 
@@ -160,6 +168,19 @@ footer a:hover{color:var(--text2);}
 <script>
 var _ex = 'bist';
 var _disclaimerTimer = null;
+var _selectedSym = null;
+
+// BIST sembol listesi (autocomplete için)
+var BIST_SYMBOLS = [{"s": "THYAO", "n": "Türk Hava Yolları"}, {"s": "GARAN", "n": "Garanti BBVA"}, {"s": "AKBNK", "n": "Akbank"}, {"s": "EREGL", "n": "Ereğli Demir Çelik"}, {"s": "KCHOL", "n": "Koç Holding"}, {"s": "SAHOL", "n": "Sabancı Holding"}, {"s": "SISE", "n": "Şişe ve Cam"}, {"s": "ASELS", "n": "Aselsan"}, {"s": "FROTO", "n": "Ford Otosan"}, {"s": "TOASO", "n": "Tofaş Otomobil"}, {"s": "YKBNK", "n": "Yapı Kredi Bankası"}, {"s": "PGSUS", "n": "Pegasus"}, {"s": "BIMAS", "n": "BİM Mağazalar"}, {"s": "TUPRS", "n": "Tüpraş"}, {"s": "PETKM", "n": "Petkim"}, {"s": "ARCLK", "n": "Arçelik"}, {"s": "KRDMD", "n": "Kardemir"}, {"s": "TTKOM", "n": "Türk Telekom"}, {"s": "TCELL", "n": "Turkcell"}, {"s": "ULKER", "n": "Ülker Bisküvi"}, {"s": "HEKTS", "n": "Hektaş"}, {"s": "GUBRF", "n": "Gübre Fabrikaları"}, {"s": "VESTL", "n": "Vestel"}, {"s": "MGROS", "n": "Migros"}, {"s": "DOHOL", "n": "Doğan Holding"}, {"s": "KOZAL", "n": "Koza Altın"}, {"s": "ISCTR", "n": "İş Bankası"}, {"s": "VAKBN", "n": "Vakıfbank"}, {"s": "HALKB", "n": "Halkbank"}, {"s": "ALARK", "n": "Alarko Holding"}, {"s": "CCOLA", "n": "Coca-Cola İçecek"}, {"s": "LOGO", "n": "Logo Yazılım"}, {"s": "NETAS", "n": "Netaş Telekomünikasyon"}, {"s": "AEFES", "n": "Anadolu Efes"}, {"s": "BRISA", "n": "Brisa Bridgestone"}, {"s": "EKGYO", "n": "Emlak Konut GYO"}, {"s": "ISGYO", "n": "İş GYO"}, {"s": "SNGYO", "n": "Sinpaş GYO"}, {"s": "ENKAI", "n": "Enka İnşaat"}, {"s": "OZRDN", "n": "Özerden"}, {"s": "AKSEN", "n": "Aksen Enerji"}, {"s": "KOZAA", "n": "Koza Anadolu Metal"}, {"s": "ANACM", "n": "Anadolu Cam"}, {"s": "TRKCM", "n": "Trakya Cam"}, {"s": "SOKM", "n": "Şok Marketler"}, {"s": "ODAS", "n": "Odaş Elektrik"}, {"s": "TAVHL", "n": "TAV Havalimanları"}, {"s": "SASA", "n": "Sasa Polyester"}, {"s": "CELHA", "n": "Çelik Halat"}, {"s": "KARSN", "n": "Karsan Otomotiv"}, {"s": "DOAS", "n": "Doğuş Otomotiv"}, {"s": "GESAN", "n": "Gedik Seramik"}, {"s": "TKFEN", "n": "Tekfen Holding"}, {"s": "ENJSA", "n": "Enerjisa Enerji"}, {"s": "AKFGY", "n": "Akiş GYO"}, {"s": "MAVI", "n": "Mavi Giyim"}, {"s": "BERA", "n": "Bera Holding"}, {"s": "CANTE", "n": "Çan Tekstil"}, {"s": "ERBOS", "n": "Erbosan"}, {"s": "EGEEN", "n": "Ege Endüstri"}, {"s": "INDES", "n": "İndeks Bilgisayar"}, {"s": "TRGYO", "n": "Torunlar GYO"}, {"s": "ISDMR", "n": "İskenderun Demir Çelik"}, {"s": "OTKAR", "n": "Otokar"}, {"s": "VESBE", "n": "Vestel Beyaz Eşya"}, {"s": "KONTR", "n": "Kontrolmatik"}, {"s": "KOCMT", "n": "Koç Çimento Deva"}, {"s": "POLHO", "n": "Polisan Holding"}, {"s": "ALGYO", "n": "Alarko GYO"}, {"s": "DEVA", "n": "Deva Holding"}, {"s": "SKBNK", "n": "Şekerbank"}, {"s": "GLYHO", "n": "Global Yatırım Holding"}, {"s": "HLGYO", "n": "Halk GYO"}, {"s": "ZRGYO", "n": "Ziraat GYO"}, {"s": "ISFIN", "n": "İş Finansal Kiralama"}, {"s": "AGHOL", "n": "AG Anadolu Grubu"}, {"s": "ARSAN", "n": "Arsan Tekstil"}, {"s": "CWENE", "n": "CW Enerji"}, {"s": "ATAKP", "n": "Ata Kap Girişim"}, {"s": "SELEC", "n": "Selçuk Ecza"}, {"s": "KLRHO", "n": "Kerevitaş Gıda"}, {"s": "LMKDC", "n": "Limaş"}, {"s": "PAGYO", "n": "Pera GYO"}, {"s": "YGYO", "n": "Yeni Gimat GYO"}, {"s": "SMART", "n": "Smart Güneş"}, {"s": "KARTN", "n": "Kartonsan"}, {"s": "ADEL", "n": "Adel Kalemcilik"}, {"s": "AFYON", "n": "Afyon Çimento"}, {"s": "AKGRT", "n": "Aksigorta"}, {"s": "AKMGY", "n": "Akmerkez GYO"}, {"s": "AKCNS", "n": "Akçansa"}, {"s": "ALCTL", "n": "Alcatel-Lucent"}, {"s": "ANHYT", "n": "Anadolu Hayat"}, {"s": "ANSGR", "n": "Anadolu Sigorta"}, {"s": "ARMDA", "n": "Armada"}, {"s": "ASUZU", "n": "Anadolu Isuzu"}, {"s": "BAGFS", "n": "Bagfaş Gübre"}, {"s": "BAKAB", "n": "Bak Ambalaj"}, {"s": "BANVT", "n": "Banvit"}, {"s": "BARMA", "n": "Barmak Maden"}, {"s": "BEYAZ", "n": "Beyaz Filo"}, {"s": "BFREN", "n": "Bosch Fren"}, {"s": "BIMAS", "n": "BİM Mağazalar"}, {"s": "BIZIM", "n": "Bizim Toptan"}, {"s": "BMEKS", "n": "Bimeks Bilgi İşlem"}, {"s": "BNTAS", "n": "Bantaş"}, {"s": "BOSSA", "n": "Bossa"}, {"s": "BUCIM", "n": "Bursa Çimento"}, {"s": "BURCE", "n": "Burçelik"}, {"s": "BURVA", "n": "Bursa Çimento Fabrikaları"}, {"s": "CIMBETON", "n": "Cimbeton"}, {"s": "CIMSA", "n": "Çimsa"}, {"s": "CLEBI", "n": "Çelebi Hava Servisi"}, {"s": "CPHO", "n": "Çağrı Holding"}, {"s": "DAGI", "n": "Dagi Giyim"}, {"s": "DENGE", "n": "Denge Yatırım Holding"}, {"s": "DGKLB", "n": "Doğanlar Mobilya"}, {"s": "DITAS", "n": "Ditaş Doğan"}, {"s": "DYOBY", "n": "DYO Boya"}, {"s": "ECILC", "n": "Eczacıbaşı İlaç"}, {"s": "EGPRO", "n": "EG Pro Enerji"}, {"s": "EMKEL", "n": "Emkel"}, {"s": "FENER", "n": "Fenerbahçe"}, {"s": "FLAP", "n": "Flap Kongre"}, {"s": "GSDDE", "n": "GSD Denizcilik"}, {"s": "GSDHO", "n": "GSD Holding"}, {"s": "GSRAY", "n": "Galatasaray"}, {"s": "HZNDR", "n": "Haznedar"}, {"s": "IDEAS", "n": "IDEAS"}, {"s": "IKTL", "n": "İktisat Yatırım"}, {"s": "IPEKE", "n": "İpek Enerji"}, {"s": "ISATR", "n": "İş Portföy"}, {"s": "JANTS", "n": "Jantsa"}, {"s": "KATMR", "n": "Katmerciler"}, {"s": "KERVT", "n": "Kerevitaş"}, {"s": "KLNMA", "n": "Kalınma Bank"}, {"s": "KNFRT", "n": "Konfrut Gıda"}, {"s": "KONKA", "n": "Konka"}, {"s": "KONYA", "n": "Konya Çimento"}, {"s": "KRPLAS", "n": "Kır Plastik"}, {"s": "KUYAS", "n": "Kuyaş"}, {"s": "LIDER", "n": "Lider Faktoring"}, {"s": "LINK", "n": "Link Bilgisayar"}, {"s": "MAALT", "n": "Mardin Çimento"}, {"s": "MNDRS", "n": "Menderes Tekstil"}, {"s": "MOBTL", "n": "Mobiltel"}, {"s": "NBORU", "n": "NetBoru"}, {"s": "NTHOL", "n": "Net Holding"}, {"s": "ORFIN", "n": "Öner Finans"}, {"s": "ORGE", "n": "Orge Enerji"}, {"s": "PAPIL", "n": "Papilon"}, {"s": "PCILT", "n": "Pcilet"}, {"s": "PENGD", "n": "Penguen Gıda"}, {"s": "PKART", "n": "Plastik Kart"}, {"s": "PRKAB", "n": "Türk Prysmian Kablo"}, {"s": "PRKME", "n": "Park Elektrik"}, {"s": "PSILO", "n": "Ege Seramik"}, {"s": "RHEAG", "n": "Rheag"}, {"s": "RTALB", "n": "RT Alba"}, {"s": "RUBNS", "n": "Rubenis"}, {"s": "SARKY", "n": "Sarkuysan"}, {"s": "SILVR", "n": "Silver Dilber"}, {"s": "SMART", "n": "Smart GES"}, {"s": "SNKRN", "n": "Şenkron Teknoloji"}, {"s": "SRVGY", "n": "Servet GYO"}, {"s": "TAHEM", "n": "TAH Enerji"}, {"s": "TATGD", "n": "Tat Gıda"}, {"s": "TDGYO", "n": "Trend GYO"}, {"s": "TEKTU", "n": "Tek-Art"}, {"s": "TEZOL", "n": "Tezol Tekstil"}, {"s": "TKNSA", "n": "Teknosa"}, {"s": "TMPOL", "n": "Tem Polimer"}, {"s": "TRGYO", "n": "Torunlar GYO"}, {"s": "TRILC", "n": "Trilyum"}, {"s": "TURSG", "n": "Türkiye Sigorta"}, {"s": "TUCLK", "n": "Tuçka Uzay"}, {"s": "USAK", "n": "Uşak Seramik"}, {"s": "VAKFN", "n": "Vakıf Finansal"}, {"s": "VKGYO", "n": "Vakıf GYO"}, {"s": "YATAS", "n": "Yataş"}, {"s": "YBTAS", "n": "Yibitaş"}, {"s": "YESIL", "n": "Yeşil Yatırım"}, {"s": "YUNSA", "n": "Yünsa"}, {"s": "ZOREN", "n": "Zorlu Enerji"}];
+
+// Türkçe normalize - TÜPRAŞ → TUPRAS aramasında eşleştir
+function normalize(str) {
+  return (str||'').toUpperCase()
+    .replace(/Ğ/g,'G').replace(/Ü/g,'U').replace(/Ş/g,'S')
+    .replace(/İ/g,'I').replace(/Ö/g,'O').replace(/Ç/g,'C')
+    .replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s')
+    .replace(/ı/g,'i').replace(/ö/g,'o').replace(/ç/g,'c');
+}
 
 // ── DISCLAIMER ──
 function _showDisclaimer(onAccept) {
@@ -208,6 +229,11 @@ function setEx(el) {
   var label = document.getElementById('ex-label');
   if (flag) flag.src = 'https://flagcdn.com/' + el.dataset.flag + '.svg';
   if (label) label.textContent = el.dataset.label;
+  // Borsaya göre placeholder güncelle
+  var input = document.getElementById('sym-input');
+  var placeholders = {bist:'TUPRS, THYAO, GARAN...', nasdaq:'AAPL, NVDA, MSFT...', sp500:'MSFT, AMZN, GOOGL...', dax:'SAP, SIE, ALV...', lse:'SHEL, ULVR, HSBA...', nikkei:'7203, 9984, 6758...'};
+  if(input) input.placeholder = placeholders[_ex] || 'Sembol gir...';
+  closeDropdown();
 }
 
 function cycleEx() {
@@ -216,10 +242,51 @@ function cycleEx() {
   setEx(chips[(idx + 1) % chips.length]);
 }
 
+// ── AUTOCOMPLETE ──
+function onInput() {
+  var raw = document.getElementById('sym-input').value;
+  var q = normalize(raw.trim());
+  _selectedSym = null;
+
+  if (!q || _ex !== 'bist') { closeDropdown(); return; }
+
+  var results = BIST_SYMBOLS.filter(function(item) {
+    return normalize(item.s).startsWith(q) || normalize(item.n).indexOf(q) !== -1;
+  }).slice(0, 8);
+
+  if (!results.length) { closeDropdown(); return; }
+
+  var dd = document.getElementById('sym-dropdown');
+  dd.innerHTML = '';
+  results.forEach(function(item) {
+    var div = document.createElement('div');
+    div.className = 'dd-item';
+    div.innerHTML = '<span class="dd-sym">' + item.s + '</span><span class="dd-name">' + item.n + '</span>';
+    (function(s){ div.addEventListener('mousedown', function(e){ e.preventDefault(); selectSym(s); }); })(item.s);
+    dd.appendChild(div);
+  });
+  dd.style.display = 'block';
+}
+
+function selectSym(sym) {
+  _selectedSym = sym;
+  document.getElementById('sym-input').value = sym;
+  closeDropdown();
+  goAnaliz();
+}
+
+function closeDropdown() {
+  var dd = document.getElementById('sym-dropdown');
+  if (dd) dd.style.display = 'none';
+}
+
 function goAnaliz() {
-  var sym = document.getElementById('sym-input').value.trim().toUpperCase();
+  // Seçili sembol varsa onu kullan, yoksa input değerini al
+  var sym = (_selectedSym || document.getElementById('sym-input').value.trim()).toUpperCase();
   if (!sym) { document.getElementById('sym-input').focus(); return; }
-  var dest = 'profile.html?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(_ex);
+  // Türkçe karakterleri normalize et (TÜPRAŞ → TUPRS arama yap ama sembol TUPRS)
+  // Direkt sembol olarak gönder
+  var dest = 'profile.html?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(_ex) + '&from=screener';
   _showDisclaimer(function() { window.location.href = dest; });
 }
 
@@ -227,10 +294,16 @@ function quickSearch(sym, ex) {
   var chip = document.querySelector('.ex-chip[data-ex="' + ex + '"]');
   if (chip) setEx(chip);
   document.getElementById('sym-input').value = sym;
+  _selectedSym = sym;
   goAnaliz();
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+  // Dropdown dışına tıklayınca kapat
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.search-card')) closeDropdown();
+  });
+
   // URL'de sym varsa yönlendir
   var params = new URLSearchParams(window.location.search);
   var sym = params.get('sym');
@@ -242,11 +315,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     var input = document.getElementById('sym-input');
     if (input) input.value = sym.toUpperCase();
-    var dest = 'profile.html?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(ex || 'bist');
+    var dest = 'profile.html?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(ex || 'bist') + '&from=screener';
     _showDisclaimer(function() { window.location.href = dest; });
-    return; // disclaimer gösterildi veya redirect başladı
+    return;
   }
-  // sym yoksa sadece disclaimer göster
   _showDisclaimer(null);
 });
 </script>
