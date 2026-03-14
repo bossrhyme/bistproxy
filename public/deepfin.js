@@ -1431,11 +1431,8 @@ function showDetail(sym){
     </div>`).join('');
 
   document.getElementById('detail').classList.add('open');
-  // Detail panel CSS transition (0.2s) bitmeden önce width 0 olabilir
-  // RAF + timeout ile panel gerçekten açıldıktan sonra chart'ı başlat
-  requestAnimationFrame(function() {
-    setTimeout(function() { updateChart(sym); }, 300);
-  });
+  // Panel açıldıktan sonra chart başlat (transition: 0.2s)
+  setTimeout(function() { updateChart(sym); }, 250);
 
   // Insider & Short Interest — sadece US hisseleri için
   const isUS = ['nasdaq','sp500'].includes(currentExchange);
@@ -1524,7 +1521,7 @@ function _loadLightweightCharts(cb) {
 function initChart(container) {
   if (lwChart) { lwChart.remove(); lwChart = null; lwSeries = null; lwVolSeries = null; lwIndSeries = {}; }
   lwChart = LightweightCharts.createChart(container, {
-    autoSize: true,
+    width: container.offsetWidth || 330,
     height: 260,
     layout: { background: { color: '#0d1117' }, textColor: '#6a8fa8' },
     grid: { vertLines: { color: '#1c2d40' }, horzLines: { color: '#1c2d40' } },
@@ -1610,11 +1607,6 @@ function applyIndicators() {
 
 function updateChart(sym) {
   if (!sym) return;
-  // LightweightCharts henüz yüklü değilse lazy load et
-  if (!_lcLoaded) {
-    _loadLightweightCharts(function() { updateChart(sym); });
-    return;
-  }
   const interval = document.querySelector('.ctab.on')?.dataset.interval || '240';
   const currency = document.querySelector('.ctab-cur.on')?.dataset.currency || 'TL';
   const container = document.getElementById('tv-chart-container');
