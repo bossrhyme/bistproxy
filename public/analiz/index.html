@@ -219,7 +219,7 @@ function cycleEx() {
 function goAnaliz() {
   var sym = document.getElementById('sym-input').value.trim().toUpperCase();
   if (!sym) { document.getElementById('sym-input').focus(); return; }
-  var dest = 'profil.html?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(_ex);
+  var dest = 'profile.html?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(_ex);
   _showDisclaimer(function() { window.location.href = dest; });
 }
 
@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     var input = document.getElementById('sym-input');
     if (input) input.value = sym.toUpperCase();
-    var dest = 'profil.html?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(ex || 'bist');
+    var dest = 'profile.html?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(ex || 'bist');
     _showDisclaimer(function() { window.location.href = dest; });
     return; // disclaimer gösterildi veya redirect başladı
   }

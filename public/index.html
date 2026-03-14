@@ -2166,10 +2166,10 @@ td:first-child,td:nth-child(2){text-align:left;}
       </div>
       <div class="soption">
         <div class="soption-head"><span class="soption-icon">₿</span><div><div class="soption-label">Kripto Para ile Destek</div><div class="soption-sublabel">Adrese tıklayarak kopyalayabilirsiniz</div></div></div>
-        <div class="wallet-row"><span class="wallet-coin">USDT-SOL</span><div class="wallet-addr">6CNc1omzzyKyzvcFTDmnsbPEwv5FpfaNJpNJ6s1vfNmQ</div><button class="copy-btn" onclick="copyWallet(this,'6CNc1omzzyKyzvcFTDmnsbPEwv5FpfaNJpNJ6s1vfNmQ')">KOPYALA</button></div>
-        <div class="wallet-row"><span class="wallet-coin">USDT-ERC20</span><div class="wallet-addr">0xffB08FcaEcc707fB35366b4FC44B2c0C471bbb52</div><button class="copy-btn" onclick="copyWallet(this,'0xffB08FcaEcc707fB35366b4FC44B2c0C471bbb52')">KOPYALA</button></div>
-        <div class="wallet-row"><span class="wallet-coin">USDT-TRC20</span><div class="wallet-addr">TGLwVYdz9zj23LZ9eMtUxbUpZ3QAGTuawm</div><button class="copy-btn" onclick="copyWallet(this,'TGLwVYdz9zj23LZ9eMtUxbUpZ3QAGTuawm')">KOPYALA</button></div>
-        <div class="wallet-row"><span class="wallet-coin">USDT-BSC20</span><div class="wallet-addr">0xffB08FcaEcc707fB35366b4FC44B2c0C471bbb52</div><button class="copy-btn" onclick="copyWallet(this,'0xffB08FcaEcc707fB35366b4FC44B2c0C471bbb52')">KOPYALA</button></div>
+        <div class="wallet-row"><span class="wallet-coin">BTC</span><div class="wallet-addr">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</div><button class="copy-btn" onclick="copyWallet(this,'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh')">KOPYALA</button></div>
+        <div class="wallet-row"><span class="wallet-coin">ETH</span><div class="wallet-addr">0x71C7656EC7ab88b098defB751B7401B5f6d8976F</div><button class="copy-btn" onclick="copyWallet(this,'0x71C7656EC7ab88b098defB751B7401B5f6d8976F')">KOPYALA</button></div>
+        <div class="wallet-row"><span class="wallet-coin">USDT</span><div class="wallet-addr">TN3W4H6rK2ce4vX9YnFQHwKx7TS2V5sL2h</div><button class="copy-btn" onclick="copyWallet(this,'TN3W4H6rK2ce4vX9YnFQHwKx7TS2V5sL2h')">KOPYALA</button></div>
+        <div class="wallet-row"><span class="wallet-coin">BNB</span><div class="wallet-addr">0x71C7656EC7ab88b098defB751B7401B5f6d8976F</div><button class="copy-btn" onclick="copyWallet(this,'0x71C7656EC7ab88b098defB751B7401B5f6d8976F')">KOPYALA</button></div>
       </div>
     </div>
     <div class="smodal-thanks">Desteğiniz için şimdiden <strong>çok teşekkür ederiz</strong> 🙏</div>
@@ -4234,7 +4234,7 @@ function showProfil(sym, ex) {
     var s = (x.symbol||'').replace('.IS','').toUpperCase();
     return s === sym.toUpperCase() || (x.symbol||'').toUpperCase() === sym.toUpperCase()+'.IS';
   });
-  var url = '/analiz/profil.html?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(exKey);
+  var url = '/analiz/profile.html?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(exKey);
   if(d) {
     // Veriyi URL'e sıkıştırarak geçir (küçük key mapping)
     var compact = {
