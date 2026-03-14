@@ -1434,7 +1434,7 @@ function showDetail(sym){
   // Detail panel CSS transition (0.2s) bitmeden önce width 0 olabilir
   // RAF + timeout ile panel gerçekten açıldıktan sonra chart'ı başlat
   requestAnimationFrame(function() {
-    setTimeout(function() { updateChart(sym); }, 220);
+    setTimeout(function() { updateChart(sym); }, 300);
   });
 
   // Insider & Short Interest — sadece US hisseleri için
@@ -1524,8 +1524,8 @@ function _loadLightweightCharts(cb) {
 function initChart(container) {
   if (lwChart) { lwChart.remove(); lwChart = null; lwSeries = null; lwVolSeries = null; lwIndSeries = {}; }
   lwChart = LightweightCharts.createChart(container, {
-    width: (container.offsetWidth > 50 ? container.offsetWidth : (document.querySelector('.detail.open')?.offsetWidth - 20 || 340)),
-    height: 230,
+    autoSize: true,
+    height: 260,
     layout: { background: { color: '#0d1117' }, textColor: '#6a8fa8' },
     grid: { vertLines: { color: '#1c2d40' }, horzLines: { color: '#1c2d40' } },
     crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
@@ -1630,9 +1630,7 @@ function updateChart(sym) {
       lwCandles = data.candles.map(c => ({ time: c.t, open: c.o, high: c.h, low: c.l, close: c.c, volume: c.v || 0 }));
       lwSeries.setData(lwCandles);
       lwChart.timeScale().fitContent();
-      var w = container.offsetWidth;
-      if (!w || w < 50) w = document.querySelector('.detail.open')?.offsetWidth - 20 || 340;
-      lwChart.resize(w, 230);
+
       applyIndicators();
     })
     .catch(e => console.error('Chart error:', e));
