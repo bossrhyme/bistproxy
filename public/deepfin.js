@@ -1422,7 +1422,11 @@ function showDetail(sym){
     </div>`).join('');
 
   document.getElementById('detail').classList.add('open');
-  updateChart(sym);
+  // Detail panel CSS transition (0.2s) bitmeden önce width 0 olabilir
+  // RAF + timeout ile panel gerçekten açıldıktan sonra chart'ı başlat
+  requestAnimationFrame(function() {
+    setTimeout(function() { updateChart(sym); }, 220);
+  });
 
   // Insider & Short Interest — sadece US hisseleri için
   const isUS = ['nasdaq','sp500'].includes(currentExchange);
@@ -1511,7 +1515,7 @@ function _loadLightweightCharts(cb) {
 function initChart(container) {
   if (lwChart) { lwChart.remove(); lwChart = null; lwSeries = null; lwVolSeries = null; lwIndSeries = {}; }
   lwChart = LightweightCharts.createChart(container, {
-    width: container.offsetWidth || 340,
+    width: (container.offsetWidth > 50 ? container.offsetWidth : (document.querySelector('.detail.open')?.offsetWidth - 20 || 340)),
     height: 230,
     layout: { background: { color: '#0d1117' }, textColor: '#6a8fa8' },
     grid: { vertLines: { color: '#1c2d40' }, horzLines: { color: '#1c2d40' } },
@@ -1525,6 +1529,7 @@ function initChart(container) {
     borderUpColor: '#0ff0b3', borderDownColor: '#ff4d6d',
     wickUpColor: '#09c48a', wickDownColor: '#cc2244',
   });
+  if (window._attachChartResizeObserver) window._attachChartResizeObserver(container);
 }
 
 function applyIndicators() {
@@ -1576,6 +1581,24 @@ function applyIndicators() {
   }
 }
 
+// ── Chart ResizeObserver ──────────────────────────
+(function() {
+  if (!window.ResizeObserver) return;
+  var _chartResizeRO = null;
+  window._attachChartResizeObserver = function(container) {
+    if (_chartResizeRO) _chartResizeRO.disconnect();
+    _chartResizeRO = new ResizeObserver(function(entries) {
+      if (!lwChart) return;
+      var entry = entries[0];
+      var w = entry.contentRect.width;
+      if (w > 50) lwChart.resize(w, 230);
+    });
+    _chartResizeRO.observe(container);
+  };
+})();
+// ─────────────────────────────────────────────────
+
+
 function updateChart(sym) {
   if (!sym) return;
   // LightweightCharts henüz yüklü değilse lazy load et
@@ -1598,7 +1621,9 @@ function updateChart(sym) {
       lwCandles = data.candles.map(c => ({ time: c.t, open: c.o, high: c.h, low: c.l, close: c.c, volume: c.v || 0 }));
       lwSeries.setData(lwCandles);
       lwChart.timeScale().fitContent();
-      lwChart.resize(container.offsetWidth || 340, 230);
+      var w = container.offsetWidth;
+      if (!w || w < 50) w = document.querySelector('.detail.open')?.offsetWidth - 20 || 340;
+      lwChart.resize(w, 230);
       applyIndicators();
     })
     .catch(e => console.error('Chart error:', e));
