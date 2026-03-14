@@ -938,6 +938,36 @@ td:first-child,td:nth-child(2){text-align:left;}
 /* ── TOOLTIP ── */
 #df-tooltip{position:fixed;background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:9px 13px;max-width:220px;font-size:11px;color:#bbb;line-height:1.6;z-index:99999;pointer-events:none;display:none;white-space:normal;box-shadow:0 6px 20px rgba(0,0,0,.7);}
 .goat-tip,.chip-tip,.th-tip{display:none!important;}
+
+/* ── FAV İKONU ── */
+.nfav{width:28px;text-align:center;cursor:pointer;padding:0 4px;user-select:none;}
+.fav-icon{font-size:14px;color:var(--muted);transition:color .15s,transform .15s;display:inline-block;}
+.fav-icon:hover{color:var(--gold);transform:scale(1.2);}
+.fav-icon.fav-on{color:var(--gold);}
+.sb-fav-btn{background:transparent;border:1px solid var(--border);color:var(--muted2);font-size:11px;font-weight:600;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all .15s;margin-right:4px;}
+.sb-fav-btn:hover,.sb-fav-btn.on{border-color:var(--gold);color:var(--gold);background:rgba(240,180,41,.08);}
+
+/* ── KOLON SEÇİCİ ── */
+#col-picker-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:8000;align-items:center;justify-content:center;}
+#col-picker-modal.open{display:flex;}
+.col-picker-box{background:var(--s1);border:1px solid var(--border2);border-radius:12px;padding:20px;width:360px;max-width:calc(100vw - 32px);max-height:80vh;overflow-y:auto;}
+.col-picker-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
+.col-picker-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.col-pick-item{display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:6px;background:var(--s2);cursor:pointer;font-size:11px;font-weight:600;color:var(--text2);}
+.col-pick-item input{accent-color:var(--accent);cursor:pointer;}
+.col-pick-fixed{opacity:.5;pointer-events:none;}
+.col-pick-close{background:transparent;border:none;color:var(--muted2);font-size:16px;cursor:pointer;padding:2px 6px;}
+.col-btn{background:transparent;border:1px solid var(--border);color:var(--muted2);font-size:11px;font-weight:600;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all .15s;margin-right:4px;}
+.col-btn:hover{border-color:var(--border2);color:var(--text);}
+
+/* ── HABERLER ── */
+.dnews-item{display:block;padding:10px 0;border-bottom:1px solid var(--border);text-decoration:none;color:var(--text);transition:color .1s;}
+.dnews-item:last-child{border-bottom:none;}
+.dnews-item:hover .dnews-title{color:var(--accent);}
+.dnews-meta{display:flex;justify-content:space-between;margin-bottom:4px;}
+.dnews-src{font-size:9px;font-weight:700;color:var(--accent);letter-spacing:.5px;text-transform:uppercase;}
+.dnews-date{font-size:9px;color:var(--muted2);}
+.dnews-title{font-size:11px;color:var(--text2);line-height:1.5;}
 </style>
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 </head>
@@ -1497,6 +1527,8 @@ td:first-child,td:nth-child(2){text-align:left;}
 
       <!-- STATS BAR -->
       <div class="stats-bar" id="stats-bar">
+        <button id="fav-filter-btn" class="sb-fav-btn" onclick="toggleFavFilter()" title="Sadece favorileri göster">☆ Favoriler</button>
+        <button class="col-btn" onclick="openColPicker()" title="Kolonları özelleştir">⚙ Kolonlar</button>
         <div class="sb-item"><span class="sb-label">TARAMA</span><span class="sb-val" id="sb-count">—</span></div>
         <div class="sb-item"><span class="sb-label">YÜKSELİŞ</span><span class="sb-val up" id="sb-up">—</span></div>
         <div class="sb-item"><span class="sb-label">DÜŞÜŞ</span><span class="sb-val dn" id="sb-dn">—</span></div>
@@ -1563,24 +1595,25 @@ td:first-child,td:nth-child(2){text-align:left;}
         <table>
           <thead>
             <tr>
-              <th onclick="colSort('name')" data-tip="Şirketin tam ticari adı. Tıklayarak alfabetik sıralama yapabilirsiniz.">ŞİRKET ADI</th>
-              <th onclick="colSort('symbol')" data-tip="Borsa kodu (ticker). TradingView'da arama yaparken kullanılan kısa kod.">SEMBOL</th>
-              <th onclick="colSort('sector')" data-tip="Şirketin faaliyet gösterdiği sektör. Sektöre göre filtrelemek için sol paneli kullanın.">SEKTÖR</th>
-              <th onclick="colSort('marketCapitalization')" data-tip="Piyasa Değeri: Şirketin borsadaki toplam değeri (USD milyon).">P. Değeri ($)</th>
-              <th onclick="colSort('currentPrice')" id="th-price" data-tip="Son işlem fiyatı. Değişim yüzdesi önceki kapanışa göre hesaplanır.">FİYAT</th>
-              <th onclick="colSort('piotroski')" data-tip="Piotroski F-Score: 0-9 finansal sağlık puanı. 7+ güçlü, 3- zayıf.">F-Score</th>
-              <th onclick="colSort('peg')" data-tip="Fiyat/Kazanç Büyüme: PEG < 1 büyüme hızına göre ucuz demek. Peter Lynch'in favori metriği.">PEG<span class="th-tip">Fiyat/Kazanç Büyüme: PEG<1 ucuz büyüme, PEG>2 pahalı. Lynch'in favori metriği.</span></th>
-              <th onclick="colSort('peNormalizedAnnual')" data-tip="Fiyat/Kazanç: Hisse fiyatının yıllık kazanca oranı. Düşük = ucuz.">F/K</th>
-              <th onclick="colSort('pbAnnual')" data-tip="Piyasa/Defter: 1'in altı varlıkların altında işlem görüyor.">PD/DD</th>
-              <th onclick="colSort('psTTM')" data-tip="Fiyat/Satış: Kâr etmeyen büyüme şirketleri için kullanılır.">F/S</th>
-              <th onclick="colSort('roeTTM')" data-tip="Özsermaye Kârlılığı: Şirketin kendi parasını kullanma verimliliği. 15%+ iyi.">ROE%</th>
-              <th onclick="colSort('roaTTM')" data-tip="Varlık Kârlılığı: Toplam varlıkların kâra dönüşüm oranı. 5%+ iyi.">ROA%</th>
-              <th onclick="colSort('netProfitMarginTTM')" data-tip="Net Kâr Marjı: Her 100₺ gelirden kalan net kâr.">MARJ%</th>
-              <th onclick="colSort('revenueGrowthTTMYoy')" data-tip="Gelir Büyümesi YoY: Geçen yıla kıyasla ciro artışı.">GELİR↑%</th>
-              <th onclick="colSort('epsGrowthTTMYoy')" data-tip="Kazanç Büyümesi: Hisse başı kârın yıllık büyüme oranı.">K.BÜY%</th>
-              <th onclick="colSort('dividendYieldIndicatedAnnual')" data-tip="Temettü Verimi: Hisse fiyatına oranla yıllık ödenen temettü.">TEMETTÜ%</th>
-              <th onclick="colSort('totalDebt/totalEquityAnnual')" data-tip="Borç/Özsermaye: Şirketin borçluluk seviyesi. 1'in altı makul.">B/Ö</th>
-              <th onclick="colSort('currentRatioAnnual')" data-tip="Cari Oran: Kısa vadeli borç karşılama gücü. 1.5+ sağlıklı.">CARİ</th>
+              <th style="width:28px;text-align:center;color:var(--muted2);font-size:9px;">#</th>
+              <th onclick="colSort('symbol')" data-col="symbol" data-tip="Borsa kodu (ticker).">SEMBOL</th>
+              <th onclick="colSort('name')" data-col="name" data-tip="Şirketin tam ticari adı.">ŞİRKET ADI</th>
+              <th onclick="colSort('sector')" data-col="sector" data-tip="Şirketin faaliyet gösterdiği sektör. Sektöre göre filtrelemek için sol paneli kullanın.">SEKTÖR</th>
+              <th onclick="colSort('marketCapitalization')" data-col="mcap" data-tip="Piyasa Değeri: Şirketin borsadaki toplam değeri (USD milyon).">P. Değeri ($)</th>
+              <th onclick="colSort('currentPrice')" data-col="price" id="th-price" data-tip="Son işlem fiyatı. Değişim yüzdesi önceki kapanışa göre hesaplanır.">FİYAT</th>
+              <th onclick="colSort('piotroski')" data-col="fscore" data-tip="Piotroski F-Score: 0-9 finansal sağlık puanı. 7+ güçlü, 3- zayıf.">F-Score</th>
+              <th onclick="colSort('peg')" data-col="peg" data-tip="Fiyat/Kazanç Büyüme: PEG < 1 büyüme hızına göre ucuz demek. Peter Lynch'in favori metriği.">PEG<span class="th-tip">Fiyat/Kazanç Büyüme: PEG<1 ucuz büyüme, PEG>2 pahalı. Lynch'in favori metriği.</span></th>
+              <th onclick="colSort('peNormalizedAnnual')" data-col="pe" data-tip="Fiyat/Kazanç: Hisse fiyatının yıllık kazanca oranı. Düşük = ucuz.">F/K</th>
+              <th onclick="colSort('pbAnnual')" data-col="pb" data-tip="Piyasa/Defter: 1'in altı varlıkların altında işlem görüyor.">PD/DD</th>
+              <th onclick="colSort('psTTM')" data-col="ps" data-tip="Fiyat/Satış: Kâr etmeyen büyüme şirketleri için kullanılır.">F/S</th>
+              <th onclick="colSort('roeTTM')" data-col="roe" data-tip="Özsermaye Kârlılığı: Şirketin kendi parasını kullanma verimliliği. 15%+ iyi.">ROE%</th>
+              <th onclick="colSort('roaTTM')" data-col="roa" data-tip="Varlık Kârlılığı: Toplam varlıkların kâra dönüşüm oranı. 5%+ iyi.">ROA%</th>
+              <th onclick="colSort('netProfitMarginTTM')" data-col="margin" data-tip="Net Kâr Marjı: Her 100₺ gelirden kalan net kâr.">MARJ%</th>
+              <th onclick="colSort('revenueGrowthTTMYoy')" data-col="revg" data-tip="Gelir Büyümesi YoY: Geçen yıla kıyasla ciro artışı.">GELİR↑%</th>
+              <th onclick="colSort('epsGrowthTTMYoy')" data-col="epsg" data-tip="Kazanç Büyümesi: Hisse başı kârın yıllık büyüme oranı.">K.BÜY%</th>
+              <th onclick="colSort('dividendYieldIndicatedAnnual')" data-col="div" data-tip="Temettü Verimi: Hisse fiyatına oranla yıllık ödenen temettü.">TEMETTÜ%</th>
+              <th onclick="colSort('totalDebt/totalEquityAnnual')" data-col="de" data-tip="Borç/Özsermaye: Şirketin borçluluk seviyesi. 1'in altı makul.">B/Ö</th>
+              <th onclick="colSort('currentRatioAnnual')" data-col="cr" data-tip="Cari Oran: Kısa vadeli borç karşılama gücü. 1.5+ sağlıklı.">CARİ</th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
@@ -1678,10 +1711,16 @@ td:first-child,td:nth-child(2){text-align:left;}
         <div class="dxtab on" data-xtab="fundamentals" onclick="switchXTab(this)">Temel</div>
         <div class="dxtab" data-xtab="insider" onclick="switchXTab(this)">Insider</div>
         <div class="dxtab" data-xtab="short" onclick="switchXTab(this)">Short Interest</div>
+        <div class="dxtab" data-xtab="news" onclick="switchXTab(this)">📰 Haberler</div>
       </div>
       <div id="dxpanel-fundamentals" class="dxpanel on"><div id="dbody"></div></div>
       <div id="dxpanel-insider"       class="dxpanel"><div id="insider-body"><div class="dxloading">Yükleniyor...</div></div></div>
-      <div id="dxpanel-short"         class="dxpanel"><div id="short-body"><div class="dxloading">Yükleniyor...</div></div></div>
+      <div id="dxpanel-short"         class="dxpanel"><div id="short-body"><div class="dxloading">Yükleniyor...</div>
+      <div id="dxpanel-news" class="dxpanel">
+        <div id="dnews-list" style="padding:4px 0;color:var(--muted2);font-size:11px;text-align:center;padding:20px;">
+          Haber yükleniyor...
+        </div>
+      </div></div></div>
     </div>
   </div>
 </div>
@@ -2343,8 +2382,114 @@ let scanAborted = false;
 // INIT
 // ═══════════════════════════════════════════
 
+
+// ═══════════════════════════════════════════
+// FAVORİLER
+// ═══════════════════════════════════════════
+var favSet = new Set(JSON.parse(localStorage.getItem('df_favs') || '[]'));
+var favFilterActive = false;
+
+function saveFavs() { localStorage.setItem('df_favs', JSON.stringify([...favSet])); }
+
+function toggleFav(sym) {
+  if (favSet.has(sym)) { favSet.delete(sym); showToast('✕ ' + sym + ' favorilerden çıkarıldı'); }
+  else { favSet.add(sym); showToast('★ ' + sym + ' favorilere eklendi'); }
+  saveFavs(); renderTable(); _updateFavBtn();
+}
+
+function _updateFavBtn() {
+  var btn = document.getElementById('fav-filter-btn');
+  if (!btn) return;
+  btn.classList.toggle('on', favFilterActive);
+  btn.textContent = favFilterActive ? '★ Favoriler (' + favSet.size + ')' : '☆ Favoriler';
+}
+
+function toggleFavFilter() {
+  favFilterActive = !favFilterActive;
+  _updateFavBtn(); renderTable();
+}
+
+// ═══════════════════════════════════════════
+// KOLON SEÇİCİ
+// ═══════════════════════════════════════════
+const COL_DEFS = [
+  {key:'sector',  label:'SEKTÖR',   def:true},  {key:'mcap',   label:'P.Değeri', def:true},
+  {key:'price',   label:'FİYAT',    def:true},  {key:'fscore', label:'F-Score',  def:true},
+  {key:'peg',     label:'PEG',      def:false}, {key:'pe',     label:'F/K',      def:true},
+  {key:'pb',      label:'PD/DD',    def:true},  {key:'ps',     label:'F/S',      def:false},
+  {key:'roe',     label:'ROE%',     def:true},  {key:'roa',    label:'ROA%',     def:false},
+  {key:'margin',  label:'MARJ%',    def:true},  {key:'revg',   label:'GELİR↑%', def:true},
+  {key:'epsg',    label:'K.BÜY%',  def:false}, {key:'div',    label:'TEMETTÜ%', def:true},
+  {key:'de',      label:'B/Ö',      def:true},  {key:'cr',     label:'CARİ',     def:false},
+];
+var _colVisible = null;
+
+function loadColPrefs() {
+  if (_colVisible) return;
+  try {
+    var saved = localStorage.getItem('df_cols');
+    if (saved) { _colVisible = {}; JSON.parse(saved).forEach(function(k){ _colVisible[k]=true; }); return; }
+  } catch(e) {}
+  _colVisible = {};
+  COL_DEFS.forEach(function(d){ if(d.def) _colVisible[d.key]=true; });
+}
+
+function saveColPrefs() {
+  localStorage.setItem('df_cols', JSON.stringify(Object.keys(_colVisible).filter(function(k){ return _colVisible[k]; })));
+}
+
+function isColVisible(key) { loadColPrefs(); return !!_colVisible[key]; }
+
+function applyColVisibility() {
+  loadColPrefs();
+  COL_DEFS.forEach(function(d) {
+    var vis = isColVisible(d.key);
+    document.querySelectorAll('[data-col="'+d.key+'"]').forEach(function(el){ el.style.display = vis ? '' : 'none'; });
+  });
+}
+
+function openColPicker() {
+  loadColPrefs();
+  var modal = document.getElementById('col-picker-modal');
+  if (!modal) return;
+  document.getElementById('col-picker-grid').innerHTML = COL_DEFS.map(function(d) {
+    return '<label class="col-pick-item"><input type="checkbox"' + (isColVisible(d.key)?' checked':'')
+      + ' data-ckey="'+d.key+'" onchange="toggleCol(this.dataset.ckey,this.checked)"><span>'+d.label+'</span></label>';
+  }).join('');
+  modal.classList.add('open');
+}
+
+function toggleCol(key, vis) { loadColPrefs(); _colVisible[key]=vis; saveColPrefs(); applyColVisibility(); }
+function closeColPicker() { var m=document.getElementById('col-picker-modal'); if(m) m.classList.remove('open'); }
+function resetColPrefs() { _colVisible=null; loadColPrefs(); saveColPrefs(); openColPicker(); applyColVisibility(); renderTable(); }
+
+// ═══════════════════════════════════════════
+// HABERLER
+// ═══════════════════════════════════════════
+async function fetchNews(sym) {
+  var list = document.getElementById('dnews-list');
+  if (!list) return;
+  list.innerHTML = '<div style="color:var(--muted2);font-size:11px;text-align:center;padding:20px;">Haberler yükleniyor...</div>';
+  try {
+    var res = await fetch('/api/news?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(currentExchange));
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var data = await res.json();
+    var items = data.news || [];
+    if (!items.length) { list.innerHTML = '<div style="color:var(--muted2);font-size:11px;text-align:center;padding:20px;">Haber bulunamadı.</div>'; return; }
+    list.innerHTML = items.slice(0, 10).map(function(n) {
+      var dt = n.published ? new Date(n.published*1000).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric'}) : '';
+      return '<a href="'+(n.url||'#')+'" target="_blank" rel="noopener" class="dnews-item">'
+        + '<div class="dnews-meta"><span class="dnews-src">'+(n.source||'')+'</span><span class="dnews-date">'+dt+'</span></div>'
+        + '<div class="dnews-title">'+(n.headline||n.title||'')+'</div></a>';
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<div style="color:var(--muted2);font-size:11px;text-align:center;padding:20px;">Haber yüklenemedi.</div>';
+  }
+}
+
 function init(){
   showApp();
+  loadColPrefs();
   // Not: from= kontrolü DOMContentLoaded'da yapılıyor (DOM hazır olsun diye)
 }
 
@@ -3202,7 +3347,7 @@ function fmc(v){
 }
 
 function renderTable(){
-  const data = sorted(filtered);
+  const data = sorted(favFilterActive ? filtered.filter(s=>favSet.has(s.symbol)) : filtered);
   // Update sorted column header
   document.querySelectorAll('thead th').forEach(th=>{
     const oc = th.getAttribute('onclick')||'';
@@ -3217,27 +3362,30 @@ function renderTable(){
     const chgPct = s.changePercent;
     const chgClass = chgPct===null ? '' : (chgPct>=0?'up':'dn');
     const chgTxt = chgPct===null ? '—' : `${chgPct>=0?'+':''}${chgPct.toFixed(2)}%`;
+    const isFav = favSet.has(s.symbol);
     return `<tr onclick="showDetail('${s.symbol}')" class="${selSym===s.symbol?'selrow':''}">
-      <td class="nmc" title="${s.name}"><span class="row-num">${idx+1}</span><span class="row-arrow">›</span>${s.name}</td>
-      <td><span class="sym">${s.symbol}</span></td>
-      <td style="font-size:10px;color:var(--muted2)">${s.sector||'—'}</td>
-      <td>${fmc(s.marketCapitalization)}</td>
-      <td>${s.currentPrice!=null?(s.currentPrice.toFixed(2)+' '+(EXCHANGE_META[currentExchange]||EXCHANGE_META.bist).currency):nil}</td>
-              <td>${s.piotroski !== null ? fScore(s.piotroski) : nil}</td>
-              <td>${s.peg !== null ? fPeg(s.peg) : nil}</td>
-      <td>${fv(s.peNormalizedAnnual,1)}</td>
-      <td>${fv(s.pbAnnual,2)}</td>
-      <td>${fv(s.psTTM,2)}</td>
-      <td>${fv(s.roeTTM,1,true)}</td>
-      <td>${fv(s.roaTTM,1,true)}</td>
-      <td>${fv(s.netProfitMarginTTM,1,true)}</td>
-      <td>${fv(s.revenueGrowthTTMYoy,1,true)}</td>
-      <td>${fv(s.epsGrowthTTMYoy,1,true)}</td>
-      <td>${s.dividendYieldIndicatedAnnual!=null?`<span class="up">${s.dividendYieldIndicatedAnnual.toFixed(2)}%</span>`:nil}</td>
-      <td>${fv(s['totalDebt/totalEquityAnnual'],1)}</td>
-      <td>${fv(s.currentRatioAnnual,2)}</td>
+      <td class="nfav" onclick="event.stopPropagation();toggleFav('${s.symbol}')" title="${isFav?'Favorilerden çıkar':'Favorilere ekle'}"><span class="fav-icon${isFav?' fav-on':''}">${isFav?'★':'☆'}</span></td>
+      <td data-col="symbol"><span class="sym">${s.symbol}</span></td>
+      <td data-col="name" class="nmc" title="${s.name}"><span class="row-num">${idx+1}</span><span class="row-arrow">›</span>${s.name}</td>
+      <td data-col="sector" style="font-size:10px;color:var(--muted2)">${s.sector||'—'}</td>
+      <td data-col="mcap">${fmc(s.marketCapitalization)}</td>
+      <td data-col="price">${s.currentPrice!=null?(s.currentPrice.toFixed(2)+' '+(EXCHANGE_META[currentExchange]||EXCHANGE_META.bist).currency):nil}</td>
+      <td data-col="fscore">${s.piotroski !== null ? fScore(s.piotroski) : nil}</td>
+      <td data-col="peg">${s.peg !== null ? fPeg(s.peg) : nil}</td>
+      <td data-col="pe">${fv(s.peNormalizedAnnual,1)}</td>
+      <td data-col="pb">${fv(s.pbAnnual,2)}</td>
+      <td data-col="ps">${fv(s.psTTM,2)}</td>
+      <td data-col="roe">${fv(s.roeTTM,1,true)}</td>
+      <td data-col="roa">${fv(s.roaTTM,1,true)}</td>
+      <td data-col="margin">${fv(s.netProfitMarginTTM,1,true)}</td>
+      <td data-col="revg">${fv(s.revenueGrowthTTMYoy,1,true)}</td>
+      <td data-col="epsg">${fv(s.epsGrowthTTMYoy,1,true)}</td>
+      <td data-col="div">${s.dividendYieldIndicatedAnnual!=null?`<span class="up">${s.dividendYieldIndicatedAnnual.toFixed(2)}%</span>`:nil}</td>
+      <td data-col="de">${fv(s['totalDebt/totalEquityAnnual'],1)}</td>
+      <td data-col="cr">${fv(s.currentRatioAnnual,2)}</td>
     </tr>`;
   }).join('');
+  setTimeout(applyColVisibility, 0);
 }
 
 // ═══════════════════════════════════════════
@@ -3362,13 +3510,13 @@ function showDetail(sym){
 
   // Insider & Short Interest — sadece US hisseleri için
   const isUS = ['nasdaq','sp500'].includes(currentExchange);
-  document.getElementById('dextra-tabs').style.display = isUS ? 'flex' : 'none';
-  if (isUS) {
-    // Fundamentals tab'a dön
-    switchXTab(document.querySelector('.dxtab[data-xtab="fundamentals"]'));
-    fetchInsider(sym);
-    fetchShortInterest(sym);
-  }
+  document.getElementById('dextra-tabs').style.display = 'flex';
+  var insTab = document.querySelector('.dxtab[data-xtab="insider"]');
+  var shrTab = document.querySelector('.dxtab[data-xtab="short"]');
+  if(insTab) insTab.style.display = isUS?'':'none';
+  if(shrTab) shrTab.style.display = isUS?'':'none';
+  switchXTab(document.querySelector('.dxtab[data-xtab="fundamentals"]'));
+  if (isUS) { fetchInsider(sym); fetchShortInterest(sym); }
 }
 
 let lwChart = null;
@@ -4289,6 +4437,7 @@ function showHomepage() {
   var ts = document.querySelector('.tsearch');
   if(ts) ts.style.display = 'none';
   clearFilters();
+  if(window.location.pathname !== '/') history.pushState({page:'home'}, '', '/');
 }
 
 // ── DISCLAIMER POPUP ──
@@ -4472,6 +4621,7 @@ function showScreener() {
   document.getElementById('nav-tarama').classList.add('active');
   var ts = document.querySelector('.tsearch');
   if(ts) ts.style.display = '';
+  if(window.location.pathname !== '/screener') history.pushState({page:'screener'}, '', '/screener');
 }
 
 function selectExchangeAndGo(exKey) {
@@ -4524,9 +4674,18 @@ function applyStrategyAndGo(goatKey) {
 
 // Start on homepage
 document.addEventListener('click', function(e){ if(!e.target.closest('#analiz-search-outer')) _analizHideDd(); });
+
+// ── URL ROUTING (History API) ─────────────────────────
+window.addEventListener('popstate', function(e) {
+  var path = window.location.pathname;
+  if (path === '/screener') { showScreener(); }
+  else if (path === '/' || path === '') { showHomepage(); }
+});
+// ─────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function(){
   var _p = new URLSearchParams(window.location.search).get('from');
-  if (_p === 'profile' || _p === 'screener' || _p === 'analiz') {
+  var _path = window.location.pathname;
+  if (_p === 'profile' || _p === 'screener' || _p === 'analiz' || _path === '/screener') {
     showScreener();
     if (allData.length === 0) runScan();
   } else {
@@ -4581,5 +4740,19 @@ document.addEventListener('DOMContentLoaded', function(){
 </div>
 
 <!-- GLOBAL TOOLTIP -->
+
+<!-- KOLON SEÇİCİ -->
+<div id="col-picker-modal" onclick="if(event.target===this)closeColPicker()">
+  <div class="col-picker-box">
+    <div class="col-picker-title">Kolonları Özelleştir
+      <button class="col-pick-close" onclick="closeColPicker()">✕</button>
+    </div>
+    <div id="col-picker-grid" class="col-picker-grid"></div>
+    <div style="margin-top:14px;display:flex;gap:8px;justify-content:flex-end;">
+      <button onclick="resetColPrefs()" style="background:transparent;border:1px solid var(--border);color:var(--muted2);font-size:11px;padding:6px 14px;border-radius:6px;cursor:pointer;">Varsayılan</button>
+      <button onclick="closeColPicker()" style="background:var(--accent);border:none;color:#fff;font-size:11px;padding:6px 14px;border-radius:6px;cursor:pointer;font-weight:600;">Uygula</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

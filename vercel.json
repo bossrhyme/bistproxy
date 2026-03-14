@@ -33,6 +33,10 @@
   ],
   "rewrites": [
     {
+      "source": "/screener",
+      "destination": "/"
+    },
+    {
       "source": "/api/scan",
       "destination": "/api/scan.js"
     },
