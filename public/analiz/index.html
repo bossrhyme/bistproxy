@@ -245,24 +245,69 @@ function cycleEx() {
 // ── AUTOCOMPLETE ──
 function onInput() {
   var raw = document.getElementById('sym-input').value;
-  var q = normalize(raw.trim());
+  var q = raw.trim();
   _selectedSym = null;
+  if (!q) { closeDropdown(); return; }
 
-  if (!q || _ex !== 'bist') { closeDropdown(); return; }
+  if (_ex === 'bist') {
+    // BIST: local liste (Türkçe normalize)
+    var qn = normalize(q);
+    var results = BIST_SYMBOLS.filter(function(item) {
+      return normalize(item.s).startsWith(qn) || normalize(item.n).indexOf(qn) !== -1;
+    }).slice(0, 8);
+    renderDropdown(results.map(function(r){ return {sym: r.s, name: r.n}; }));
+  } else {
+    // Diğer borsalar: TV Search API (debounced)
+    clearTimeout(_searchTimer);
+    _searchTimer = setTimeout(function() { tvSearch(q); }, 300);
+  }
+}
 
-  var results = BIST_SYMBOLS.filter(function(item) {
-    return normalize(item.s).startsWith(q) || normalize(item.n).indexOf(q) !== -1;
-  }).slice(0, 8);
+var _searchTimer = null;
 
+var TV_EXCHANGE = {
+  nasdaq: 'NASDAQ', sp500: 'NYSE', dax: 'XETR', lse: 'LSE', nikkei: 'TSE'
+};
+
+function tvSearch(q) {
+  var ex = TV_EXCHANGE[_ex] || '';
+  var url = 'https://symbol-search.tradingview.com/symbol_search/v3/'
+    + '?text=' + encodeURIComponent(q)
+    + '&type=stock'
+    + (ex ? '&exchange=' + ex : '')
+    + '&lang=en&domain=production';
+
+  // Loading göster
+  var dd = document.getElementById('sym-dropdown');
+  dd.innerHTML = '<div style="padding:10px 16px;font-size:11px;color:var(--muted)">Aranıyor...</div>';
+  dd.style.display = 'block';
+
+  fetch(url)
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      var symbols = data.symbols || data || [];
+      var results = symbols.slice(0, 8).map(function(item) {
+        return {
+          sym: item.symbol,
+          name: item.description || item.symbol
+        };
+      }).filter(function(r){ return r.sym; });
+      renderDropdown(results);
+    })
+    .catch(function() { closeDropdown(); });
+}
+
+
+function renderDropdown(results) {
   if (!results.length) { closeDropdown(); return; }
-
   var dd = document.getElementById('sym-dropdown');
   dd.innerHTML = '';
   results.forEach(function(item) {
     var div = document.createElement('div');
     div.className = 'dd-item';
-    div.innerHTML = '<span class="dd-sym">' + item.s + '</span><span class="dd-name">' + item.n + '</span>';
-    (function(s){ div.addEventListener('mousedown', function(e){ e.preventDefault(); selectSym(s); }); })(item.s);
+    div.innerHTML = '<span class="dd-sym">' + item.sym + '</span>'
+      + '<span class="dd-name">' + (item.name || '') + '</span>';
+    (function(s){ div.addEventListener('mousedown', function(e){ e.preventDefault(); selectSym(s); }); })(item.sym);
     dd.appendChild(div);
   });
   dd.style.display = 'block';
