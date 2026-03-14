@@ -926,7 +926,12 @@ function applyAllChips() {
 
   updateClrBtn();
   var special = specials.length > 0 ? specials[0] : null;
-  if (allData.length) applyAndRender(special);
+  if (allData.length > 0) {
+    applyAndRender(special);
+  } else {
+    // Veri yoksa tara ve bitince filtrele
+    runScan();
+  }
 }
 
 // Toplam seçili chip sayısı
@@ -1129,10 +1134,9 @@ function applyAndRender(special){
   var _wrap = document.getElementById('twrap');
   if (_wrap) _wrap.scrollTop = 0;
   _vsRender();
-  _updateStatsBar();
-  setTimeout(applyColVisibility, 0);;
   updateStatsBar();
   updateTicker();
+  setTimeout(applyColVisibility, 0);
 }
 
 function onSearch(){
@@ -1215,10 +1219,15 @@ var _vsRAF     = null;
 function _vsGetVisible() {
   var wrap = document.getElementById('twrap');
   if (!wrap) return {start:0, count:50};
-  var viewH  = wrap.clientHeight || 600;
-  var scrollY = wrap.scrollTop  || 0;
-  var count  = Math.ceil(viewH / _vsRowH) + _vsBuffer * 2;
-  var start  = Math.max(0, Math.floor(scrollY / _vsRowH) - _vsBuffer);
+  // clientHeight 0 ise (gizli/henüz render edilmemiş) window.innerHeight ile fallback
+  var viewH = wrap.clientHeight;
+  if (!viewH || viewH < 50) viewH = window.innerHeight - 200;
+  var scrollY = wrap.scrollTop || 0;
+  // Gerçek satır yüksekliğini ölç (ilk tbody satırından)
+  var firstRow = wrap.querySelector('tbody tr:not(.vs-pad)');
+  if (firstRow && firstRow.offsetHeight > 10) _vsRowH = firstRow.offsetHeight;
+  var count = Math.ceil(viewH / _vsRowH) + _vsBuffer * 2;
+  var start = Math.max(0, Math.floor(scrollY / _vsRowH) - _vsBuffer);
   return {start: start, count: count};
 }
 

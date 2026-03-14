@@ -66,6 +66,9 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .supportbtn:hover{background:rgba(246,70,93,.15);border-color:#f6465d;color:#f6465d;}
 
 /* ── LAYOUT ── */
+
+/* ── Screener Layout ── */
+#screener-layout{display:flex;flex-direction:row;flex:1;overflow:hidden;min-height:0;width:100%;}
 .layout{display:flex;flex:1;overflow:hidden;}
 
 /* ── SIDEBAR ── */
@@ -405,9 +408,9 @@ td:first-child,td:nth-child(2){text-align:left;}
   /* ─────────────────────────────────────────
      LAYOUT — sidebar gizli, drawer ile açılır
   ───────────────────────────────────────── */
-  .layout {
-    flex-direction: column;
-    height: calc(100% - 52px);   /* topbar yüksekliği kadar boşalt */
+  .layout, #screener-layout {
+    flex-direction: row;
+    height: calc(100% - 52px);
     overflow: hidden;
   }
   .sidebar { display: none !important; }
