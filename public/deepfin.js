@@ -1396,6 +1396,47 @@ function calcBB(data, period = 20, mult = 2) {
   return { upper, mid, lower };
 }
 
+
+// ── Modal Lazy Render ────────────────────────────
+var _modalsRendered = false;
+function _ensureModals() {
+  if (_modalsRendered) return;
+  _modalsRendered = true;
+  ['infoModalTpl','supportModalTpl'].forEach(function(tplId) {
+    var tpl = document.getElementById(tplId);
+    if (tpl && tpl.content) {
+      document.body.appendChild(tpl.content.cloneNode(true));
+      // Modal kapanış listener'ları
+      var im = document.getElementById('infoModal');
+      var sm = document.getElementById('supportModal');
+      if (im) im.addEventListener('click', function(e){ if(e.target===this) closeInfo(); });
+      if (sm) sm.addEventListener('click', function(e){ if(e.target===this) closeSupport(); });
+    }
+  });
+}
+// ────────────────────────────────────────────────
+
+// ── LightweightCharts lazy loader ──────────────────
+var _lcLoading = false;
+var _lcLoaded  = false;
+var _lcQueue   = [];
+
+function _loadLightweightCharts(cb) {
+  if (_lcLoaded) { cb(); return; }
+  _lcQueue.push(cb);
+  if (_lcLoading) return;
+  _lcLoading = true;
+  var script = document.createElement('script');
+  script.src = 'https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js';
+  script.onload = function() {
+    _lcLoaded = true; _lcLoading = false;
+    _lcQueue.forEach(function(fn){ fn(); }); _lcQueue = [];
+  };
+  script.onerror = function() { _lcLoading = false; };
+  document.head.appendChild(script);
+}
+// ────────────────────────────────────────────────────
+
 function initChart(container) {
   if (lwChart) { lwChart.remove(); lwChart = null; lwSeries = null; lwVolSeries = null; lwIndSeries = {}; }
   lwChart = LightweightCharts.createChart(container, {
@@ -1466,6 +1507,11 @@ function applyIndicators() {
 
 function updateChart(sym) {
   if (!sym) return;
+  // LightweightCharts henüz yüklü değilse lazy load et
+  if (!_lcLoaded) {
+    _loadLightweightCharts(function() { updateChart(sym); });
+    return;
+  }
   const interval = document.querySelector('.ctab.on')?.dataset.interval || '240';
   const currency = document.querySelector('.ctab-cur.on')?.dataset.currency || 'TL';
   const container = document.getElementById('tv-chart-container');

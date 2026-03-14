@@ -66,7 +66,7 @@ if('serviceWorker' in navigator){
     <div class="search-card" id="search-card">
       <div class="search-row">
         <div class="ex-picker" id="ex-picker" onclick="cycleEx()">
-          <img src="https://flagcdn.com/tr.svg" width="20" height="14" id="ex-flag">
+          <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjRTMwQTE3Ii8+PGNpcmNsZSBjeD0iMTAiIGN5PSIxMCIgcj0iNiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjExLjUiIGN5PSIxMCIgcj0iNC44IiBmaWxsPSIjRTMwQTE3Ii8+PHBvbHlnb24gcG9pbnRzPSIxOCwxMCAxNS41LDExIDE2LjMsOC4zIDE0LjIsNi44IDE3LDYuOCAxOCw0IDE5LDYuOCAyMS44LDYuOCAxOS43LDguMyAyMC41LDExIiBmaWxsPSIjZmZmIi8+PC9zdmc+" width="20" height="14" id="ex-flag">
           <span id="ex-label">BIST</span>
           <span style="font-size:9px;color:var(--muted)">▾</span>
         </div>
@@ -84,22 +84,22 @@ if('serviceWorker' in navigator){
 
   <div class="ex-chips">
     <div class="ex-chip on" data-ex="bist" data-flag="tr" data-label="BIST" onclick="setEx(this)">
-      <img src="https://flagcdn.com/tr.svg" width="16" height="11">BIST
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjRTMwQTE3Ii8+PGNpcmNsZSBjeD0iMTAiIGN5PSIxMCIgcj0iNiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjExLjUiIGN5PSIxMCIgcj0iNC44IiBmaWxsPSIjRTMwQTE3Ii8+PHBvbHlnb24gcG9pbnRzPSIxOCwxMCAxNS41LDExIDE2LjMsOC4zIDE0LjIsNi44IDE3LDYuOCAxOCw0IDE5LDYuOCAyMS44LDYuOCAxOS43LDguMyAyMC41LDExIiBmaWxsPSIjZmZmIi8+PC9zdmc+" width="16" height="11">BIST
     </div>
     <div class="ex-chip" data-ex="nasdaq" data-flag="us" data-label="NASDAQ" onclick="setEx(this)">
-      <img src="https://flagcdn.com/us.svg" width="16" height="11">NASDAQ
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjQjIyMjM0Ii8+PHJlY3QgeT0iMS41NCIgd2lkdGg9IjMwIiBoZWlnaHQ9IjEuNTQiIGZpbGw9IiNmZmYiLz48cmVjdCB5PSI0LjYyIiB3aWR0aD0iMzAiIGhlaWdodD0iMS41NCIgZmlsbD0iI2ZmZiIvPjxyZWN0IHk9IjcuNjkiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTAuNzciIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTMuODUiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTYuOTIiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3Qgd2lkdGg9IjEyIiBoZWlnaHQ9IjEwLjc3IiBmaWxsPSIjM0MzQjZFIi8+PC9zdmc+" width="16" height="11">NASDAQ
     </div>
     <div class="ex-chip" data-ex="sp500" data-flag="us" data-label="S&amp;P 500" onclick="setEx(this)">
-      <img src="https://flagcdn.com/us.svg" width="16" height="11">S&amp;P 500
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjQjIyMjM0Ii8+PHJlY3QgeT0iMS41NCIgd2lkdGg9IjMwIiBoZWlnaHQ9IjEuNTQiIGZpbGw9IiNmZmYiLz48cmVjdCB5PSI0LjYyIiB3aWR0aD0iMzAiIGhlaWdodD0iMS41NCIgZmlsbD0iI2ZmZiIvPjxyZWN0IHk9IjcuNjkiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTAuNzciIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTMuODUiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTYuOTIiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3Qgd2lkdGg9IjEyIiBoZWlnaHQ9IjEwLjc3IiBmaWxsPSIjM0MzQjZFIi8+PC9zdmc+" width="16" height="11">S&amp;P 500
     </div>
     <div class="ex-chip" data-ex="dax" data-flag="de" data-label="DAX" onclick="setEx(this)">
-      <img src="https://flagcdn.com/de.svg" width="16" height="11">DAX
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjYuNjciIGZpbGw9IiMwMDAiLz48cmVjdCB5PSI2LjY3IiB3aWR0aD0iMzAiIGhlaWdodD0iNi42NyIgZmlsbD0iI0REMDAwMCIvPjxyZWN0IHk9IjEzLjMzIiB3aWR0aD0iMzAiIGhlaWdodD0iNi42NyIgZmlsbD0iI0ZGQ0UwMCIvPjwvc3ZnPg==" width="16" height="11">DAX
     </div>
     <div class="ex-chip" data-ex="lse" data-flag="gb" data-label="LSE" onclick="setEx(this)">
-      <img src="https://flagcdn.com/gb.svg" width="16" height="11">LSE
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjMDEyMTY5Ii8+PHBhdGggZD0iTTAsMCBMMzAsMjAgTTMwLDAgTDAsMjAiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI0Ii8+PHBhdGggZD0iTTAsMCBMMzAsMjAgTTMwLDAgTDAsMjAiIHN0cm9rZT0iI0M4MTAyRSIgc3Ryb2tlLXdpZHRoPSIyLjUiLz48cGF0aCBkPSJNMTUsMCBWMjAgTTAsMTAgSDMwIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iNiIvPjxwYXRoIGQ9Ik0xNSwwIFYyMCBNMCwxMCBIMzAiIHN0cm9rZT0iI0M4MTAyRSIgc3Ryb2tlLXdpZHRoPSI0Ii8+PC9zdmc+" width="16" height="11">LSE
     </div>
     <div class="ex-chip" data-ex="nikkei" data-flag="jp" data-label="Nikkei" onclick="setEx(this)">
-      <img src="https://flagcdn.com/jp.svg" width="16" height="11">Nikkei
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjZmZmIi8+PGNpcmNsZSBjeD0iMTUiIGN5PSIxMCIgcj0iNiIgZmlsbD0iI0JDMDAyRCIvPjwvc3ZnPg==" width="16" height="11">Nikkei
     </div>
   </div>
 

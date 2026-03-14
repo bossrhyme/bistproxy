@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="/deepfin.css">
-<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<!-- lightweight-charts lazy loaded -->
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/icons/icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -158,7 +158,7 @@ if('serviceWorker' in navigator){
         <div class="hp-section-title">Borsalar</div>
         <div class="hp-exchange-grid">
           <div class="hp-excard" onclick="selectExchangeAndGo('bist')">
-            <div class="hp-excard-flag"><img src="https://flagcdn.com/tr.svg" width="28" height="20" style="border-radius:3px;object-fit:cover;display:block;"></div>
+            <div class="hp-excard-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjRTMwQTE3Ii8+PGNpcmNsZSBjeD0iMTAiIGN5PSIxMCIgcj0iNiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjExLjUiIGN5PSIxMCIgcj0iNC44IiBmaWxsPSIjRTMwQTE3Ii8+PHBvbHlnb24gcG9pbnRzPSIxOCwxMCAxNS41LDExIDE2LjMsOC4zIDE0LjIsNi44IDE3LDYuOCAxOCw0IDE5LDYuOCAyMS44LDYuOCAxOS43LDguMyAyMC41LDExIiBmaWxsPSIjZmZmIi8+PC9zdmc+" width="28" height="20" style="border-radius:3px;object-fit:cover;display:block;"></div>
             <div class="hp-excard-info">
               <div class="hp-excard-name">BIST</div>
               <div class="hp-excard-desc">Borsa İstanbul</div>
@@ -166,7 +166,7 @@ if('serviceWorker' in navigator){
             </div>
           </div>
           <div class="hp-excard" onclick="selectExchangeAndGo('nasdaq')">
-            <div class="hp-excard-flag"><img src="https://flagcdn.com/us.svg" width="28" height="20" style="border-radius:3px;object-fit:cover;display:block;"></div>
+            <div class="hp-excard-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjQjIyMjM0Ii8+PHJlY3QgeT0iMS41NCIgd2lkdGg9IjMwIiBoZWlnaHQ9IjEuNTQiIGZpbGw9IiNmZmYiLz48cmVjdCB5PSI0LjYyIiB3aWR0aD0iMzAiIGhlaWdodD0iMS41NCIgZmlsbD0iI2ZmZiIvPjxyZWN0IHk9IjcuNjkiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTAuNzciIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTMuODUiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTYuOTIiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3Qgd2lkdGg9IjEyIiBoZWlnaHQ9IjEwLjc3IiBmaWxsPSIjM0MzQjZFIi8+PC9zdmc+" width="28" height="20" style="border-radius:3px;object-fit:cover;display:block;"></div>
             <div class="hp-excard-info">
               <div class="hp-excard-name">NASDAQ</div>
               <div class="hp-excard-desc">Teknoloji ağırlıklı</div>
@@ -174,7 +174,7 @@ if('serviceWorker' in navigator){
             </div>
           </div>
           <div class="hp-excard" onclick="selectExchangeAndGo('sp500')">
-            <div class="hp-excard-flag"><img src="https://flagcdn.com/us.svg" width="28" height="20" style="border-radius:3px;object-fit:cover;display:block;"></div>
+            <div class="hp-excard-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjQjIyMjM0Ii8+PHJlY3QgeT0iMS41NCIgd2lkdGg9IjMwIiBoZWlnaHQ9IjEuNTQiIGZpbGw9IiNmZmYiLz48cmVjdCB5PSI0LjYyIiB3aWR0aD0iMzAiIGhlaWdodD0iMS41NCIgZmlsbD0iI2ZmZiIvPjxyZWN0IHk9IjcuNjkiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTAuNzciIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTMuODUiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTYuOTIiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3Qgd2lkdGg9IjEyIiBoZWlnaHQ9IjEwLjc3IiBmaWxsPSIjM0MzQjZFIi8+PC9zdmc+" width="28" height="20" style="border-radius:3px;object-fit:cover;display:block;"></div>
             <div class="hp-excard-info">
               <div class="hp-excard-name">S&P 500</div>
               <div class="hp-excard-desc">ABD endeksi</div>
@@ -182,7 +182,7 @@ if('serviceWorker' in navigator){
             </div>
           </div>
           <div class="hp-excard" onclick="selectExchangeAndGo('dax')">
-            <div class="hp-excard-flag"><img src="https://flagcdn.com/de.svg" width="28" height="20" style="border-radius:3px;object-fit:cover;display:block;"></div>
+            <div class="hp-excard-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjYuNjciIGZpbGw9IiMwMDAiLz48cmVjdCB5PSI2LjY3IiB3aWR0aD0iMzAiIGhlaWdodD0iNi42NyIgZmlsbD0iI0REMDAwMCIvPjxyZWN0IHk9IjEzLjMzIiB3aWR0aD0iMzAiIGhlaWdodD0iNi42NyIgZmlsbD0iI0ZGQ0UwMCIvPjwvc3ZnPg==" width="28" height="20" style="border-radius:3px;object-fit:cover;display:block;"></div>
             <div class="hp-excard-info">
               <div class="hp-excard-name">DAX</div>
               <div class="hp-excard-desc">Frankfurt</div>
@@ -190,7 +190,7 @@ if('serviceWorker' in navigator){
             </div>
           </div>
           <div class="hp-excard" onclick="selectExchangeAndGo('lse')">
-            <div class="hp-excard-flag"><img src="https://flagcdn.com/gb.svg" width="28" height="20" style="border-radius:3px;object-fit:cover;display:block;"></div>
+            <div class="hp-excard-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjMDEyMTY5Ii8+PHBhdGggZD0iTTAsMCBMMzAsMjAgTTMwLDAgTDAsMjAiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI0Ii8+PHBhdGggZD0iTTAsMCBMMzAsMjAgTTMwLDAgTDAsMjAiIHN0cm9rZT0iI0M4MTAyRSIgc3Ryb2tlLXdpZHRoPSIyLjUiLz48cGF0aCBkPSJNMTUsMCBWMjAgTTAsMTAgSDMwIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iNiIvPjxwYXRoIGQ9Ik0xNSwwIFYyMCBNMCwxMCBIMzAiIHN0cm9rZT0iI0M4MTAyRSIgc3Ryb2tlLXdpZHRoPSI0Ii8+PC9zdmc+" width="28" height="20" style="border-radius:3px;object-fit:cover;display:block;"></div>
             <div class="hp-excard-info">
               <div class="hp-excard-name">LSE</div>
               <div class="hp-excard-desc">Londra</div>
@@ -198,7 +198,7 @@ if('serviceWorker' in navigator){
             </div>
           </div>
           <div class="hp-excard" onclick="selectExchangeAndGo('nikkei')">
-            <div class="hp-excard-flag"><img src="https://flagcdn.com/jp.svg" width="28" height="20" style="border-radius:3px;object-fit:cover;display:block;"></div>
+            <div class="hp-excard-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjZmZmIi8+PGNpcmNsZSBjeD0iMTUiIGN5PSIxMCIgcj0iNiIgZmlsbD0iI0JDMDAyRCIvPjwvc3ZnPg==" width="28" height="20" style="border-radius:3px;object-fit:cover;display:block;"></div>
             <div class="hp-excard-info">
               <div class="hp-excard-name">Nikkei</div>
               <div class="hp-excard-desc">Tokyo</div>
@@ -328,22 +328,22 @@ if('serviceWorker' in navigator){
           <div class="exchange-title">Borsa</div>
           <div class="exchange-grid">
             <div class="exbtn on" data-exchange="bist" onclick="selectExchange(this)">
-              <span class="exbtn-flag"><img src="https://flagcdn.com/tr.svg" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">BIST</span><span class="exbtn-sub">Borsa İstanbul</span>
+              <span class="exbtn-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjRTMwQTE3Ii8+PGNpcmNsZSBjeD0iMTAiIGN5PSIxMCIgcj0iNiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjExLjUiIGN5PSIxMCIgcj0iNC44IiBmaWxsPSIjRTMwQTE3Ii8+PHBvbHlnb24gcG9pbnRzPSIxOCwxMCAxNS41LDExIDE2LjMsOC4zIDE0LjIsNi44IDE3LDYuOCAxOCw0IDE5LDYuOCAyMS44LDYuOCAxOS43LDguMyAyMC41LDExIiBmaWxsPSIjZmZmIi8+PC9zdmc+" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">BIST</span><span class="exbtn-sub">Borsa İstanbul</span>
             </div>
             <div class="exbtn" data-exchange="nasdaq" onclick="selectExchange(this)">
-              <span class="exbtn-flag"><img src="https://flagcdn.com/us.svg" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">NASDAQ</span><span class="exbtn-sub">Tech Ağırlıklı</span>
+              <span class="exbtn-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjQjIyMjM0Ii8+PHJlY3QgeT0iMS41NCIgd2lkdGg9IjMwIiBoZWlnaHQ9IjEuNTQiIGZpbGw9IiNmZmYiLz48cmVjdCB5PSI0LjYyIiB3aWR0aD0iMzAiIGhlaWdodD0iMS41NCIgZmlsbD0iI2ZmZiIvPjxyZWN0IHk9IjcuNjkiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTAuNzciIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTMuODUiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTYuOTIiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3Qgd2lkdGg9IjEyIiBoZWlnaHQ9IjEwLjc3IiBmaWxsPSIjM0MzQjZFIi8+PC9zdmc+" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">NASDAQ</span><span class="exbtn-sub">Tech Ağırlıklı</span>
             </div>
             <div class="exbtn" data-exchange="sp500" onclick="selectExchange(this)">
-              <span class="exbtn-flag"><img src="https://flagcdn.com/us.svg" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">S&P 500</span><span class="exbtn-sub">ABD Endeksi</span>
+              <span class="exbtn-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjQjIyMjM0Ii8+PHJlY3QgeT0iMS41NCIgd2lkdGg9IjMwIiBoZWlnaHQ9IjEuNTQiIGZpbGw9IiNmZmYiLz48cmVjdCB5PSI0LjYyIiB3aWR0aD0iMzAiIGhlaWdodD0iMS41NCIgZmlsbD0iI2ZmZiIvPjxyZWN0IHk9IjcuNjkiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTAuNzciIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTMuODUiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTYuOTIiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3Qgd2lkdGg9IjEyIiBoZWlnaHQ9IjEwLjc3IiBmaWxsPSIjM0MzQjZFIi8+PC9zdmc+" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">S&P 500</span><span class="exbtn-sub">ABD Endeksi</span>
             </div>
             <div class="exbtn" data-exchange="dax" onclick="selectExchange(this)">
-              <span class="exbtn-flag"><img src="https://flagcdn.com/de.svg" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">DAX</span><span class="exbtn-sub">Frankfurt</span>
+              <span class="exbtn-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjYuNjciIGZpbGw9IiMwMDAiLz48cmVjdCB5PSI2LjY3IiB3aWR0aD0iMzAiIGhlaWdodD0iNi42NyIgZmlsbD0iI0REMDAwMCIvPjxyZWN0IHk9IjEzLjMzIiB3aWR0aD0iMzAiIGhlaWdodD0iNi42NyIgZmlsbD0iI0ZGQ0UwMCIvPjwvc3ZnPg==" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">DAX</span><span class="exbtn-sub">Frankfurt</span>
             </div>
             <div class="exbtn" data-exchange="lse" onclick="selectExchange(this)">
-              <span class="exbtn-flag"><img src="https://flagcdn.com/gb.svg" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">LSE</span><span class="exbtn-sub">Londra</span>
+              <span class="exbtn-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjMDEyMTY5Ii8+PHBhdGggZD0iTTAsMCBMMzAsMjAgTTMwLDAgTDAsMjAiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI0Ii8+PHBhdGggZD0iTTAsMCBMMzAsMjAgTTMwLDAgTDAsMjAiIHN0cm9rZT0iI0M4MTAyRSIgc3Ryb2tlLXdpZHRoPSIyLjUiLz48cGF0aCBkPSJNMTUsMCBWMjAgTTAsMTAgSDMwIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iNiIvPjxwYXRoIGQ9Ik0xNSwwIFYyMCBNMCwxMCBIMzAiIHN0cm9rZT0iI0M4MTAyRSIgc3Ryb2tlLXdpZHRoPSI0Ii8+PC9zdmc+" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">LSE</span><span class="exbtn-sub">Londra</span>
             </div>
             <div class="exbtn" data-exchange="nikkei" onclick="selectExchange(this)">
-              <span class="exbtn-flag"><img src="https://flagcdn.com/jp.svg" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">Nikkei</span><span class="exbtn-sub">Tokyo</span>
+              <span class="exbtn-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjZmZmIi8+PGNpcmNsZSBjeD0iMTUiIGN5PSIxMCIgcj0iNiIgZmlsbD0iI0JDMDAyRCIvPjwvc3ZnPg==" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">Nikkei</span><span class="exbtn-sub">Tokyo</span>
             </div>
           </div>
         </div>
@@ -450,12 +450,12 @@ if('serviceWorker' in navigator){
         <div class="exchange-group">
           <div class="exchange-title">Borsa</div>
           <div class="exchange-grid" id="adv-ex-grid">
-            <div class="exbtn on" data-exchange="bist"   onclick="advSelectExchange(this)"><span class="exbtn-flag"><img src="https://flagcdn.com/tr.svg" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">BIST</span><span class="exbtn-sub">Borsa İstanbul</span></div>
-            <div class="exbtn"    data-exchange="nasdaq" onclick="advSelectExchange(this)"><span class="exbtn-flag"><img src="https://flagcdn.com/us.svg" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">NASDAQ</span><span class="exbtn-sub">Tech Ağırlıklı</span></div>
-            <div class="exbtn"    data-exchange="sp500"  onclick="advSelectExchange(this)"><span class="exbtn-flag"><img src="https://flagcdn.com/us.svg" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">S&P 500</span><span class="exbtn-sub">ABD Endeksi</span></div>
-            <div class="exbtn"    data-exchange="dax"    onclick="advSelectExchange(this)"><span class="exbtn-flag"><img src="https://flagcdn.com/de.svg" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">DAX</span><span class="exbtn-sub">Frankfurt</span></div>
-            <div class="exbtn"    data-exchange="lse"    onclick="advSelectExchange(this)"><span class="exbtn-flag"><img src="https://flagcdn.com/gb.svg" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">LSE</span><span class="exbtn-sub">Londra</span></div>
-            <div class="exbtn"    data-exchange="nikkei" onclick="advSelectExchange(this)"><span class="exbtn-flag"><img src="https://flagcdn.com/jp.svg" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">Nikkei</span><span class="exbtn-sub">Tokyo</span></div>
+            <div class="exbtn on" data-exchange="bist"   onclick="advSelectExchange(this)"><span class="exbtn-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjRTMwQTE3Ii8+PGNpcmNsZSBjeD0iMTAiIGN5PSIxMCIgcj0iNiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjExLjUiIGN5PSIxMCIgcj0iNC44IiBmaWxsPSIjRTMwQTE3Ii8+PHBvbHlnb24gcG9pbnRzPSIxOCwxMCAxNS41LDExIDE2LjMsOC4zIDE0LjIsNi44IDE3LDYuOCAxOCw0IDE5LDYuOCAyMS44LDYuOCAxOS43LDguMyAyMC41LDExIiBmaWxsPSIjZmZmIi8+PC9zdmc+" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">BIST</span><span class="exbtn-sub">Borsa İstanbul</span></div>
+            <div class="exbtn"    data-exchange="nasdaq" onclick="advSelectExchange(this)"><span class="exbtn-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjQjIyMjM0Ii8+PHJlY3QgeT0iMS41NCIgd2lkdGg9IjMwIiBoZWlnaHQ9IjEuNTQiIGZpbGw9IiNmZmYiLz48cmVjdCB5PSI0LjYyIiB3aWR0aD0iMzAiIGhlaWdodD0iMS41NCIgZmlsbD0iI2ZmZiIvPjxyZWN0IHk9IjcuNjkiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTAuNzciIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTMuODUiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTYuOTIiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3Qgd2lkdGg9IjEyIiBoZWlnaHQ9IjEwLjc3IiBmaWxsPSIjM0MzQjZFIi8+PC9zdmc+" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">NASDAQ</span><span class="exbtn-sub">Tech Ağırlıklı</span></div>
+            <div class="exbtn"    data-exchange="sp500"  onclick="advSelectExchange(this)"><span class="exbtn-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjQjIyMjM0Ii8+PHJlY3QgeT0iMS41NCIgd2lkdGg9IjMwIiBoZWlnaHQ9IjEuNTQiIGZpbGw9IiNmZmYiLz48cmVjdCB5PSI0LjYyIiB3aWR0aD0iMzAiIGhlaWdodD0iMS41NCIgZmlsbD0iI2ZmZiIvPjxyZWN0IHk9IjcuNjkiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTAuNzciIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTMuODUiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTYuOTIiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3Qgd2lkdGg9IjEyIiBoZWlnaHQ9IjEwLjc3IiBmaWxsPSIjM0MzQjZFIi8+PC9zdmc+" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">S&P 500</span><span class="exbtn-sub">ABD Endeksi</span></div>
+            <div class="exbtn"    data-exchange="dax"    onclick="advSelectExchange(this)"><span class="exbtn-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjYuNjciIGZpbGw9IiMwMDAiLz48cmVjdCB5PSI2LjY3IiB3aWR0aD0iMzAiIGhlaWdodD0iNi42NyIgZmlsbD0iI0REMDAwMCIvPjxyZWN0IHk9IjEzLjMzIiB3aWR0aD0iMzAiIGhlaWdodD0iNi42NyIgZmlsbD0iI0ZGQ0UwMCIvPjwvc3ZnPg==" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">DAX</span><span class="exbtn-sub">Frankfurt</span></div>
+            <div class="exbtn"    data-exchange="lse"    onclick="advSelectExchange(this)"><span class="exbtn-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjMDEyMTY5Ii8+PHBhdGggZD0iTTAsMCBMMzAsMjAgTTMwLDAgTDAsMjAiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI0Ii8+PHBhdGggZD0iTTAsMCBMMzAsMjAgTTMwLDAgTDAsMjAiIHN0cm9rZT0iI0M4MTAyRSIgc3Ryb2tlLXdpZHRoPSIyLjUiLz48cGF0aCBkPSJNMTUsMCBWMjAgTTAsMTAgSDMwIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iNiIvPjxwYXRoIGQ9Ik0xNSwwIFYyMCBNMCwxMCBIMzAiIHN0cm9rZT0iI0M4MTAyRSIgc3Ryb2tlLXdpZHRoPSI0Ii8+PC9zdmc+" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">LSE</span><span class="exbtn-sub">Londra</span></div>
+            <div class="exbtn"    data-exchange="nikkei" onclick="advSelectExchange(this)"><span class="exbtn-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjZmZmIi8+PGNpcmNsZSBjeD0iMTUiIGN5PSIxMCIgcj0iNiIgZmlsbD0iI0JDMDAyRCIvPjwvc3ZnPg==" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">Nikkei</span><span class="exbtn-sub">Tokyo</span></div>
           </div>
         </div>
 
@@ -806,7 +806,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <!-- ─── INFO MODAL ─── -->
-<div class="modal-overlay" id="infoModal">
+<template id="infoModalTpl"><div class="modal-overlay" id="infoModal">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-head">
       <div class="modal-title">BİLGİ <span>BANKASI</span></div>
@@ -1204,7 +1204,7 @@ if('serviceWorker' in navigator){
 </div>
 
 <!-- ─── SUPPORT MODAL ─── -->
-<div class="smodal-overlay" id="supportModal">
+<template id="supportModalTpl"><div class="smodal-overlay" id="supportModal">
   <div class="smodal" onclick="event.stopPropagation()">
     <div class="smodal-head"><div></div><button class="smodal-close" onclick="closeSupport()">✕</button></div>
     <div class="smodal-hero">
@@ -1289,4 +1289,4 @@ if('serviceWorker' in navigator){
   </div>
 </div>
 </body>
-</html>
+</html></template>
