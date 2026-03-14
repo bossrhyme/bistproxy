@@ -3365,8 +3365,8 @@ function renderTable(){
     const isFav = favSet.has(s.symbol);
     return `<tr onclick="showDetail('${s.symbol}')" class="${selSym===s.symbol?'selrow':''}">
       <td class="nfav" onclick="event.stopPropagation();toggleFav('${s.symbol}')" title="${isFav?'Favorilerden çıkar':'Favorilere ekle'}"><span class="fav-icon${isFav?' fav-on':''}">${isFav?'★':'☆'}</span></td>
-      <td data-col="symbol"><span class="sym">${s.symbol}</span></td>
-      <td data-col="name" class="nmc" title="${s.name}"><span class="row-num">${idx+1}</span><span class="row-arrow">›</span>${s.name}</td>
+      <td data-col="symbol"><span class="row-num">${idx+1}</span><span class="row-arrow">›</span><span class="sym">${s.symbol}</span></td>
+      <td data-col="name" class="nmc" title="${s.name}">${s.name}</td>
       <td data-col="sector" style="font-size:10px;color:var(--muted2)">${s.sector||'—'}</td>
       <td data-col="mcap">${fmc(s.marketCapitalization)}</td>
       <td data-col="price">${s.currentPrice!=null?(s.currentPrice.toFixed(2)+' '+(EXCHANGE_META[currentExchange]||EXCHANGE_META.bist).currency):nil}</td>
