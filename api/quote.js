@@ -80,7 +80,7 @@ module.exports = function(req, res) {
     'Accept':         'application/json',
   };
 
-  makeRequest('scanner.tradingview.com', '/scan', 'POST', headers, payload, (err, data, statusCode) => {
+  makeRequest('scanner.tradingview.com', meta.tvPath, 'POST', headers, payload, (err, data, statusCode) => {
     if (err) return res.status(500).json({ error: 'Bağlantı hatası' });
 
     try {
