@@ -1123,7 +1123,14 @@ function applyAndRender(special){
   if (zeroEl) zeroEl.style.display = 'none';
 
   showState('twrap');
-  renderTable();
+  // Virtual scroll render
+  _vsData = sorted(filtered);
+  _vsStart = 0;
+  var _wrap = document.getElementById('twrap');
+  if (_wrap) _wrap.scrollTop = 0;
+  _vsRender();
+  _updateStatsBar();
+  setTimeout(applyColVisibility, 0);;
   updateStatsBar();
   updateTicker();
 }
@@ -1184,24 +1191,79 @@ function fmc(v){
   return `$${v.toFixed(0)}M`;
 }
 
-function renderTable(){
-  const data = sorted(favFilterActive ? filtered.filter(s=>favSet.has(s.symbol)) : filtered);
-  // Update sorted column header
-  document.querySelectorAll('thead th').forEach(th=>{
-    const oc = th.getAttribute('onclick')||'';
-    const match = oc.match(/colSort\('([^']+)'\)/);
-    if(match){
-      th.classList.toggle('sorted', match[1]===sortSt.field);
-      th.classList.toggle('asc', match[1]===sortSt.field && sortSt.dir==='asc');
-    }
-  });
 
-  document.getElementById('tbody').innerHTML = data.map((s, idx)=>{
-    const chgPct = s.changePercent;
-    const chgClass = chgPct===null ? '' : (chgPct>=0?'up':'dn');
-    const chgTxt = chgPct===null ? '—' : `${chgPct>=0?'+':''}${chgPct.toFixed(2)}%`;
-    const isFav = favSet.has(s.symbol);
-    return `<tr onclick="showDetail('${s.symbol}')" class="${selSym===s.symbol?'selrow':''}">
+
+// ── WEB WORKER (filter + sort) ───────────────────
+var _filterWorker = null;
+
+function _initWorker() {
+  if (_filterWorker) return;
+  try {
+    _filterWorker = new Worker('/worker.js');
+    _filterWorker.onerror = function() { _filterWorker = null; };
+  } catch(e) { _filterWorker = null; }
+}
+// ─────────────────────────────────────────────────
+
+// ── VIRTUAL SCROLL ────────────────────────────────
+var _vsData    = [];      // sıralanmış tam liste
+var _vsStart   = 0;       // ilk görünen satır index'i
+var _vsRowH    = 36;      // satır yüksekliği (px) - CSS ile uyumlu
+var _vsBuffer  = 8;       // ekstra render (üst+alt buffer)
+var _vsRAF     = null;
+
+function _vsGetVisible() {
+  var wrap = document.getElementById('twrap');
+  if (!wrap) return {start:0, count:50};
+  var viewH  = wrap.clientHeight || 600;
+  var scrollY = wrap.scrollTop  || 0;
+  var count  = Math.ceil(viewH / _vsRowH) + _vsBuffer * 2;
+  var start  = Math.max(0, Math.floor(scrollY / _vsRowH) - _vsBuffer);
+  return {start: start, count: count};
+}
+
+function _vsRender() {
+  var tbody = document.getElementById('tbody');
+  if (!tbody || !_vsData.length) return;
+
+  var v      = _vsGetVisible();
+  var end    = Math.min(_vsData.length, v.start + v.count);
+  var topPad = v.start * _vsRowH;
+  var botPad = Math.max(0, (_vsData.length - end)) * _vsRowH;
+
+  // Padding row'ları ile toplam yüksekliği koru
+  var rows = '';
+  if (topPad > 0) {
+    rows += '<tr class="vs-pad" style="height:' + topPad + 'px"><td colspan="20"></td></tr>';
+  }
+  for (var i = v.start; i < end; i++) {
+    rows += _vsRowHtml(_vsData[i], i);
+  }
+  if (botPad > 0) {
+    rows += '<tr class="vs-pad" style="height:' + botPad + 'px"><td colspan="20"></td></tr>';
+  }
+  tbody.innerHTML = rows;
+}
+
+function _vsOnScroll() {
+  if (_vsRAF) cancelAnimationFrame(_vsRAF);
+  _vsRAF = requestAnimationFrame(_vsRender);
+}
+
+function _vsInit() {
+  var wrap = document.getElementById('twrap');
+  if (wrap && !wrap._vsListener) {
+    wrap.addEventListener('scroll', _vsOnScroll, {passive: true});
+    wrap._vsListener = true;
+  }
+}
+// ─────────────────────────────────────────────────
+
+
+
+function _vsRowHtml(s, idx) {
+  var isFav = favSet.has(s.symbol);
+  return `<tr onclick="showDetail('${s.symbol}')" class="${selSym===s.symbol?'selrow':''}">
       <td class="nfav" onclick="event.stopPropagation();toggleFav('${s.symbol}')" title="${isFav?'Favorilerden çıkar':'Favorilere ekle'}"><span class="fav-icon${isFav?' fav-on':''}">${isFav?'★':'☆'}</span></td>
       <td data-col="symbol" style="display:table-cell;"><span class="row-num">${idx+1}</span><span class="sym-wrap"><span class="row-arrow">›</span><span class="sym">${s.symbol}</span></span></td>
       <td data-col="name" style="font-size:11px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.name}">${s.name}</td>
@@ -1222,9 +1284,25 @@ function renderTable(){
       <td data-col="de">${fv(s['totalDebt/totalEquityAnnual'],1)}</td>
       <td data-col="cr">${fv(s.currentRatioAnnual,2)}</td>
     </tr>`;
-  }).join('');
+}
+
+function renderTable(){
+  // Sort header güncelle
+  document.querySelectorAll('thead th').forEach(function(th){
+    var oc = th.getAttribute('onclick')||'';
+    var match = oc.match(/colSort\('([^']+)'\)/);
+    if(match){
+      th.classList.toggle('sorted', match[1]===sortSt.field);
+      th.classList.toggle('asc', match[1]===sortSt.field && sortSt.dir==='asc');
+    }
+  });
+
+  _vsData = sorted(favFilterActive ? filtered.filter(function(s){ return favSet.has(s.symbol); }) : filtered);
+  _vsInit();
+  _vsRender();
   setTimeout(applyColVisibility, 0);
 }
+
 
 // ═══════════════════════════════════════════
 // DETAIL PANEL
@@ -2304,6 +2382,10 @@ function showToast(msg) {
   t._timer = setTimeout(function(){ t.style.opacity = '0'; }, 3000);
 }
 function showHomepage() {
+  if (document.startViewTransition) { document.startViewTransition(_doShowHomepage); return; }
+  _doShowHomepage();
+}
+function _doShowHomepage() {
   hideAnalizPage();
   var _pp=document.getElementById('profile-page'); if(_pp){_pp.style.display='none';_pp.classList.remove('on');}
   document.getElementById('homepage').style.display = 'flex';
@@ -2476,6 +2558,10 @@ function acceptDisclaimer() {
 }
 
 function showScreener() {
+  if (document.startViewTransition) { document.startViewTransition(_doShowScreener); return; }
+  _doShowScreener();
+}
+function _doShowScreener() {
   hideAnalizPage();
   var _pp=document.getElementById('profile-page'); if(_pp){_pp.style.display='none';_pp.classList.remove('on');}
   var na = document.getElementById('nav-analiz'); if(na) na.classList.remove('active');
@@ -2556,6 +2642,7 @@ window.addEventListener('popstate', function(e) {
 });
 // ─────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function(){
+  _initWorker();
   var _p = new URLSearchParams(window.location.search).get('from');
   var _path = window.location.pathname;
   if (_p === 'profile' || _p === 'screener' || _p === 'analiz' || _path === '/screener') {

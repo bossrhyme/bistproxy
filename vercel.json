@@ -69,6 +69,15 @@
           "value": "no-cache"
         }
       ]
+    },
+    {
+      "source": "/worker.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        }
+      ]
     }
   ],
   "rewrites": [

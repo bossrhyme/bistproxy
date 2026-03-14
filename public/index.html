@@ -24,7 +24,87 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/deepfin.css">
+<style id="critical-css">
+
+:root{
+  --bg:#0b0e13;--s1:#111519;--s2:#161b22;--s3:#0d1117;
+  --border:#1e2733;--border2:#263040;
+  --green:#00c076;--green2:#00a060;--green-bg:rgba(0,192,118,.08);
+  --red:#f6465d;--red-bg:rgba(246,70,93,.08);
+  --blue:#3b82f6;--blue2:#2563d4;
+  --gold:#f0b429;--text:#e2e8f0;--text2:#94a3b8;--muted:#4a5568;--muted2:#64748b;
+  --accent:#3b82f6;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+*{-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;touch-action:pan-y;;overflow-x:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;}
+
+/* ── API KEY SETUP SCREEN ── */
+#setup{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:100;background:var(--bg);}
+.sbox{position:relative;width:460px;background:var(--s1);border:1px solid var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.5);padding:40px;border-radius:12px;}
+.slogo{font-size:24px;font-weight:800;color:var(--text);letter-spacing:-.5px;display:flex;align-items:center;gap:10px;}
+.slogo-icon{width:36px;height:36px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;}
+.slogo span{color:var(--text2);font-weight:400;font-size:22px;}
+.ssub{font-size:13px;color:var(--muted2);margin-bottom:28px;margin-top:8px;}
+.ssteps{margin-bottom:28px;}
+.sstep{display:flex;gap:12px;margin-bottom:14px;align-items:flex-start;}
+.sstep-num{font-family:'Inter',sans-serif;font-weight:800;font-size:18px;color:var(--gold);width:22px;flex-shrink:0;line-height:1.3;}
+.sstep-txt{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted2);line-height:1.7;}
+.sstep-txt a{color:var(--teal);text-decoration:none;}
+.sstep-txt a:hover{text-decoration:underline;}
+.sstep-txt strong{color:var(--text);}
+.slabel{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;}
+.sinput-wrap{display:flex;gap:8px;}
+.sinput{flex:1;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:10px 14px;font-size:13px;outline:none;transition:all .15s;border-radius:6px;}
+.sinput:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(59,130,246,.15);}
+.sinput::placeholder{color:var(--muted);letter-spacing:0;}
+.sbtn{background:var(--accent);color:#fff;border:none;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;border-radius:6px;}
+.sbtn:hover{background:var(--blue2);}
+.serr{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--red);min-height:16px;margin-top:10px;}
+.sfree{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);margin-top:18px;padding-top:14px;border-top:1px solid var(--border);line-height:1.7;}
+.sfree strong{color:var(--teal);}
+
+/* ── APP ── */
+#app{display:flex;flex-direction:column;height:100dvh;position:relative;z-index:1;}
+
+
+/* ── TOPBAR ── */
+.topbar{display:flex;align-items:center;padding:0 16px;height:48px;border-bottom:1px solid var(--border);background:var(--s1);flex-shrink:0;gap:10px;z-index:10;}
+.tlogo{font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;letter-spacing:-.3px;display:flex;align-items:center;gap:6px;}
+.tlogo-mark{width:22px;height:22px;background:var(--accent);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;}
+.tlogo span{color:var(--text2);font-weight:400;font-size:13px;}
+.tlive{font-size:10px;color:var(--green);background:var(--green-bg);border:1px solid rgba(0,192,118,.2);padding:2px 8px;border-radius:4px;font-weight:500;display:flex;align-items:center;gap:4px;}
+.tlive::before{content:'';width:5px;height:5px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.tsearch{position:relative;flex:1;max-width:320px;}
+.tsearch input{width:100%;background:var(--s2);border:1px solid var(--border);color:var(--text);padding:6px 12px 6px 32px;font-size:12px;outline:none;transition:border-color .15s;border-radius:6px;}
+.tsearch input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(59,130,246,.15);}
+.tsearch input::placeholder{color:var(--muted2);}
+.tsearch-ico{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted2);font-size:13px;pointer-events:none;}
+.tright{margin-left:auto;display:flex;align-items:center;gap:6px;}
+.topbarbtn{font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:6px;}
+.tbtn{background:var(--accent);color:#fff;border:none;font-weight:600;}
+.tbtn:hover{background:var(--blue2);}
+.tbtn:disabled{opacity:.4;cursor:not-allowed;}
+.infobtn{background:transparent;border:1px solid var(--border2);color:var(--text2);}
+.infobtn:hover{border-color:var(--accent);color:var(--accent);background:rgba(59,130,246,.05);}
+.supportbtn{background:rgba(246,70,93,.08);border:1px solid rgba(246,70,93,.25);color:#f6465d;}
+.supportbtn:hover{background:rgba(246,70,93,.15);border-color:#f6465d;color:#f6465d;}
+
+/* ── LAYOUT ── */
+.hp-hero{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 40px 40px;text-align:center;border-bottom:1px solid var(--border);background:radial-gradient(ellipse at 50% 0%,rgba(59,130,246,.06) 0%,transparent 65%);}
+.hp-title{font-size:52px;font-weight:800;color:var(--text);letter-spacing:-2px;line-height:1.1;margin-bottom:16px;}
+.hp-sub{font-size:16px;color:var(--text2);max-width:480px;line-height:1.7;margin-bottom:32px;}
+.hp-cta{display:flex;gap:12px;align-items:center;}
+.hp-cta-primary{background:var(--text);color:#000;border:none;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;font-family:'Geist',sans-serif;}
+.hp-cta-secondary{background:transparent;color:var(--text2);border:1px solid var(--border);padding:12px 22px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;font-family:'Geist',sans-serif;}
+.hp-badge{font-size:10px;font-weight:600;color:var(--accent);background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);padding:4px 12px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:20px;display:inline-flex;align-items:center;gap:6px;}
+.hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
+.hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
+</style>
+<link rel="preload" href="/deepfin.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="/deepfin.css"></noscript>
 <!-- lightweight-charts lazy loaded -->
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
