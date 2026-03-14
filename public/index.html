@@ -990,10 +990,7 @@ td:first-child,td:nth-child(2){text-align:left;}
     <button class="hamburger-btn" id="hamburger-btn" onclick="toggleMobileDrawer()" style="display:none;">
       <span></span><span></span><span></span>
     </button>
-    <div class="tsearch" id="topbar-search" style="display:none;">
-      <span class="tsearch-ico">⌕</span>
-      <input type="text" id="searchbox" placeholder="Sembol veya şirket ara..." oninput="onSearch()"/>
-    </div>
+
     <div class="tright">
 
       <button class="topbarbtn tbtn" id="scanbtn" onclick="runScan()">▶ TARA</button>
@@ -3302,15 +3299,8 @@ function applyAndRender(special){
 }
 
 function onSearch(){
-  var sb1 = document.getElementById('searchbox');
-  var sb2 = document.getElementById('sb-searchbox');
-  // Hangisi aktif kullanıldıysa onu al, ikisini de senkronize et
-  var val = (sb2 && document.activeElement === sb2) 
-    ? sb2.value.trim() 
-    : (sb1 ? sb1.value.trim() : '');
-  if(sb1) sb1.value = val;
-  if(sb2) sb2.value = val;
-  searchQ = val;
+  var sb = document.getElementById('sb-searchbox');
+  searchQ = sb ? sb.value.trim() : '';
   if(allData.length) applyAndRender();
 }
 
@@ -4452,8 +4442,6 @@ function showHomepage() {
   document.getElementById('nav-home').classList.add('active');
   document.getElementById('nav-tarama').classList.remove('active');
   var na = document.getElementById('nav-analiz'); if(na) na.classList.remove('active');
-  var ts = document.querySelector('.tsearch');
-  if(ts) ts.style.display = 'none';
   clearFilters();
   if(window.location.pathname !== '/') history.pushState({page:'home'}, '', '/');
 }
@@ -4637,8 +4625,6 @@ function showScreener() {
   document.getElementById('screener-layout').style.display = 'flex';
   document.getElementById('nav-home').classList.remove('active');
   document.getElementById('nav-tarama').classList.add('active');
-  var ts = document.querySelector('.tsearch');
-  if(ts) ts.style.display = '';
   if(window.location.pathname !== '/screener') history.pushState({page:'screener'}, '', '/screener');
 }
 
