@@ -1264,13 +1264,8 @@ function goScreener() {
   }
 }
 function closeProfil() {
-  var params = new URLSearchParams(window.location.search);
-  var from = params.get('from');
-  if(from === 'screener') {
-    history.back();
-  } else {
-    window.location.href = '/';
-  }
+  // Her zaman screener'a dön
+  window.location.href = '/?from=profile';
 }
 function onHemenAl(sym, ex) { showToast('🛒 ' + sym + ' — Broker entegrasyonu yakında!'); }
 function showToast(msg) {

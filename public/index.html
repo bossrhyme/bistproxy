@@ -4476,6 +4476,8 @@ function showScreener() {
   document.getElementById('nav-tarama').classList.add('active');
   var ts = document.querySelector('.tsearch');
   if(ts) ts.style.display = '';
+  // Tarama yoksa otomatik başlat
+  if(allData.length === 0) runScan();
 }
 
 function selectExchangeAndGo(exKey) {
