@@ -13,43 +13,56 @@ function makeRequest(hostname, path, method, headers, body, callback) {
 }
 
 const EXCHANGE_META = {
-  bist:   { tvExchange: 'Turkey',     symbolPrefix: 'BIST:' },
-  nasdaq: { tvExchange: 'NASDAQ',     symbolPrefix: 'NASDAQ:' },
-  sp500:  { tvExchange: 'NYSE',       symbolPrefix: 'NYSE:' },
-  dax:    { tvExchange: 'XETR',       symbolPrefix: 'XETR:' },
-  lse:    { tvExchange: 'LSE',        symbolPrefix: 'LSE:' },
-  nikkei: { tvExchange: 'Japan',      symbolPrefix: 'TSE:' },
+  bist:   { symbolPrefix: 'BIST:',   tvPath: '/turkey/scan'   },
+  nasdaq: { symbolPrefix: 'NASDAQ:', tvPath: '/america/scan'  },
+  sp500:  { symbolPrefix: 'NYSE:',   tvPath: '/america/scan'  },
+  dax:    { symbolPrefix: 'XETR:',   tvPath: '/germany/scan'  },
+  lse:    { symbolPrefix: 'LSE:',    tvPath: '/uk/scan'       },
+  nikkei: { symbolPrefix: 'TSE:',    tvPath: '/japan/scan'    },
 };
 
+const ALLOWED_ORIGINS = [
+  'https://deepfin.vercel.app',
+  'https://bistproxy.vercel.app',
+  'https://www.deepfin.com',
+];
+
 module.exports = function(req, res) {
-  const ALLOWED_ORIGINS = [
-    'https://deepfin.vercel.app',
-    'https://bistproxy.vercel.app',
-    'https://www.deepfin.com',
-  ];
   const origin = req.headers.origin || '';
   const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
   res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Vary', 'Origin');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const url      = new URL(req.url, 'http://localhost');
-  const symbol   = (url.searchParams.get('symbol') || '').toUpperCase();
-  const exchange = (url.searchParams.get('exchange') || 'bist').toLowerCase();
+  const url = new URL(req.url, 'http://localhost');
+  // 'sym' veya 'symbol' her ikisini de kabul et
+  const symbol   = (url.searchParams.get('sym') || url.searchParams.get('symbol') || '').toUpperCase();
+  // 'ex' veya 'exchange' her ikisini de kabul et
+  const exchange = (url.searchParams.get('ex') || url.searchParams.get('exchange') || 'bist').toLowerCase();
 
   if (!symbol) return res.status(400).json({ error: 'symbol gerekli' });
 
-  const meta   = EXCHANGE_META[exchange] || EXCHANGE_META.bist;
-  const tvSym  = meta.symbolPrefix + symbol;
+  // Haber isteği - şimdilik boş döndür
+  const type = url.searchParams.get('type') || '';
+  if (type === 'news') return res.status(200).json({ news: [] });
+
+  const meta  = EXCHANGE_META[exchange] || EXCHANGE_META.bist;
+  const tvSym = meta.symbolPrefix + symbol;
 
   const fields = [
-    'name','description','close','change','change_abs','volume','average_volume_10d_calc',
-    'market_cap_basic','price_earnings_ttm','price_book_fq','price_sales_current',
-    'return_on_equity_fq','return_on_assets_fq','net_margin','gross_margin',
-    'dividends_yield','debt_to_equity_fq','current_ratio_fq','sector',
-    'High.1M','Low.1M',
+    'name', 'description', 'close', 'change', 'change_abs', 'volume',
+    'average_volume_10d_calc', 'market_cap_basic',
+    'price_earnings_ttm', 'price_book_fq', 'price_sales_current',
+    'return_on_equity_fq', 'return_on_assets_fq',
+    'net_margin', 'gross_margin', 'dividends_yield',
+    'debt_to_equity_fq', 'current_ratio_fq',
+    'sector', 'High.1M', 'Low.1M', 'beta_1_year',
+    '52_week_high', '52_week_low',
+    'Perf.W', 'Perf.1M', 'Perf.Y',
+    'Recommend.All', 'number_of_employees',
+    'piotroski_f_score',
   ];
 
   const payload = JSON.stringify({
@@ -67,19 +80,74 @@ module.exports = function(req, res) {
   };
 
   makeRequest('scanner.tradingview.com', '/scan', 'POST', headers, payload, (err, data, statusCode) => {
-    if (err) return res.status(500).json({ error: 'Veri alınamadı' });
+    if (err) return res.status(500).json({ error: 'Bağlantı hatası' });
 
     try {
       const parsed = JSON.parse(data);
       const row    = parsed.data?.[0]?.d || [];
-      const result = {};
-      fields.forEach((f, i) => { result[f] = row[i] ?? null; });
-      result._symbol   = symbol;
-      result._exchange = exchange;
+
+      if (!row.length) return res.status(404).json({ error: 'Hisse bulunamadı' });
+
+      const raw = {};
+      fields.forEach((f, i) => { raw[f] = row[i] ?? null; });
+
+      // profile.html'in beklediği alan isimlerine map et
+      const result = {
+        // Kimlik
+        symbol:       symbol,
+        exchange:     exchange,
+        name:         raw.name,
+        description:  raw.description,
+        sector:       raw.sector,
+
+        // Fiyat — 'price' olarak döndür (profile.html bunu bekliyor)
+        price:        raw.close,
+        close:        raw.close,
+        change:       raw.change_abs,
+        changePct:    raw.change,
+
+        // Hacim & piyasa
+        volume:       raw.volume,
+        avgVolume:    raw.average_volume_10d_calc,
+        marketCap:    raw.market_cap_basic != null ? raw.market_cap_basic * 1e6 : null,
+
+        // Çarpanlar
+        pe:           raw.price_earnings_ttm,
+        pb:           raw.price_book_fq,
+        ps:           raw.price_sales_current,
+
+        // Karlılık (TV % olarak veriyor, bölme yapma — profile.html /100 yapıyor)
+        roe:          raw.return_on_equity_fq,
+        roa:          raw.return_on_assets_fq,
+        netMargin:    raw.net_margin,
+        grossMargin:  raw.gross_margin,
+
+        // Finansal sağlık
+        dividendYield: raw.dividends_yield,
+        debtToEquity:  raw.debt_to_equity_fq,
+        currentRatio:  raw.current_ratio_fq,
+        beta:          raw['beta_1_year'],
+
+        // 52 hafta (gerçek 52H varsa onu, yoksa 1M yüksek/düşük)
+        high52: raw['52_week_high'] || raw['High.1M'],
+        low52:  raw['52_week_low']  || raw['Low.1M'],
+
+        // Performans
+        perfW:  raw['Perf.W'],
+        perf1M: raw['Perf.1M'],
+        perfY:  raw['Perf.Y'],
+
+        // Diğer
+        piotroski: raw['piotroski_f_score'],
+        employees: raw['number_of_employees'],
+      };
+
       res.setHeader('Content-Type', 'application/json');
-      res.status(200).json(result);
+      res.setHeader('Cache-Control', 'public, max-age=60');
+      return res.status(200).json(result);
+
     } catch(e) {
-      res.status(500).json({ error: 'Veri alınamadı' });
+      return res.status(500).json({ error: 'Veri işlenemedi' });
     }
   });
 };
