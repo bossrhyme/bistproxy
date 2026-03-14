@@ -1402,17 +1402,10 @@ var _modalsRendered = false;
 function _ensureModals() {
   if (_modalsRendered) return;
   _modalsRendered = true;
-  ['infoModalTpl','supportModalTpl'].forEach(function(tplId) {
-    var tpl = document.getElementById(tplId);
-    if (tpl && tpl.content) {
-      document.body.appendChild(tpl.content.cloneNode(true));
-      // Modal kapanış listener'ları
-      var im = document.getElementById('infoModal');
-      var sm = document.getElementById('supportModal');
-      if (im) im.addEventListener('click', function(e){ if(e.target===this) closeInfo(); });
-      if (sm) sm.addEventListener('click', function(e){ if(e.target===this) closeSupport(); });
-    }
-  });
+  var im = document.getElementById('infoModal');
+  var sm = document.getElementById('supportModal');
+  if (im) im.addEventListener('click', function(e){ if(e.target===this) closeInfo(); });
+  if (sm) sm.addEventListener('click', function(e){ if(e.target===this) closeSupport(); });
 }
 // ────────────────────────────────────────────────
 
