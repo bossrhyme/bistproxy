@@ -1535,6 +1535,10 @@ td:first-child,td:nth-child(2){text-align:left;}
       <div class="stats-bar" id="stats-bar">
         <button id="fav-filter-btn" class="sb-fav-btn" onclick="toggleFavFilter()" title="Sadece favorileri göster">☆ Favoriler</button>
         <button class="col-btn" onclick="openColPicker()" title="Kolonları özelleştir">⚙ Kolonlar</button>
+        <div class="sb-search">
+          <span class="sb-search-ico">⌕</span>
+          <input type="text" id="sb-searchbox" class="sb-search-input" placeholder="Ara..." oninput="onSearch()" />
+        </div>
         <div class="sb-item"><span class="sb-label">TARAMA</span><span class="sb-val" id="sb-count">—</span></div>
         <div class="sb-item"><span class="sb-label">YÜKSELİŞ</span><span class="sb-val up" id="sb-up">—</span></div>
         <div class="sb-item"><span class="sb-label">DÜŞÜŞ</span><span class="sb-val dn" id="sb-dn">—</span></div>
