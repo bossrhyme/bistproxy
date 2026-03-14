@@ -158,13 +158,13 @@ tbody tr.selrow td{border-left:none;}
 tbody tr.no-data{opacity:.45;}
 tbody tr.no-data td:first-child::after{content:"·";color:var(--muted2);margin-left:4px;font-size:9px;}
 tbody tr.selrow td:first-child{border-left:3px solid var(--accent);}
-.row-num{font-size:10px;color:var(--text);font-family:'JetBrains Mono',monospace;min-width:20px;display:inline-block;text-align:right;margin-right:8px;}
-.row-arrow{color:#2a2a2a;font-size:16px;font-weight:900;transition:color .15s,transform .15s;margin-right:5px;display:inline-block;}
+.row-num{font-size:10px;color:var(--muted2);font-family:'JetBrains Mono',monospace;min-width:18px;display:inline-block;text-align:right;margin-right:4px;}
+.row-arrow{color:var(--border2);font-size:14px;font-weight:700;transition:color .15s,transform .15s;margin-right:4px;display:inline-block;}
 tbody tr:hover .row-arrow{color:#60a5fa;transform:translateX(3px);}
 td{padding:6px 10px;text-align:right;font-size:12px;white-space:nowrap;color:var(--text);border-bottom:1px solid rgba(30,39,51,.7);}
 td:first-child,td:nth-child(2){text-align:left;}
 .sym{font-size:12px;font-weight:700;color:var(--text);letter-spacing:0;}
-.nmc{color:var(--muted2);font-size:11px;max-width:130px;overflow:hidden;text-overflow:ellipsis;font-weight:400;}
+.nmc{color:var(--text2);font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;font-weight:400;white-space:nowrap;vertical-align:middle;text-align:left;}
 .up{color:var(--green);}
 .dn{color:var(--red);}
 .nil{color:var(--muted);}
@@ -327,7 +327,7 @@ td:first-child,td:nth-child(2){text-align:left;}
 .dxpanel.on{display:block;}
 .insider-table{width:100%;border-collapse:collapse;font-size:10px;}
 .insider-table th{color:var(--muted2);font-weight:600;padding:4px 6px;text-align:left;border-bottom:1px solid var(--border);font-size:9px;letter-spacing:.3px;}
-.insider-table td{padding:5px 6px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text2);vertical-align:top;}
+.insider-table td{padding:5px 6px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text2);vertical-align:middle;}
 .insider-table tr:hover td{background:rgba(255,255,255,.03);}
 .insider-buy{color:#00c076;font-weight:700;}
 .insider-sell{color:#f6465d;font-weight:700;}
