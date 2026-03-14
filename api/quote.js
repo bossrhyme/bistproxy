@@ -111,7 +111,7 @@ module.exports = function(req, res) {
         // Hacim & piyasa
         volume:       raw.volume,
         avgVolume:    raw.average_volume_10d_calc,
-        marketCap:    raw.market_cap_basic != null ? raw.market_cap_basic * 1e6 : null,
+        marketCap:    raw.market_cap_basic,  // TV zaten tam deger veriyor
 
         // Çarpanlar
         pe:  raw.price_earnings_ttm,

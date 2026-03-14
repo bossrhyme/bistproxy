@@ -1567,7 +1567,8 @@ async function loadYahooData(sym, ex) {
     if(!d.current_ratio  && q.currentRatio)  d.current_ratio       = q.currentRatio;
     if(!d.debt_to_equity && q.debtToEquity)  d.debt_to_equity      = q.debtToEquity;
     if(!d.piotroski_f_score && q.piotroski) d.piotroski_f_score   = q.piotroski;
-    if(!d.dividend_yield_recent && q.dividendYield) d.dividend_yield_recent = q.dividendYield;
+    // dividendYield TV'den % olarak geliyor (6.49 = %6.49)
+    if(!d.dividend_yield_recent && q.dividendYield) d.dividend_yield_recent = q.dividendYield / 100;
     if(!d['52_week_high'] && q.high52)       d['52_week_high']     = q.high52;
     if(!d['52_week_low']  && q.low52)        d['52_week_low']      = q.low52;
     if(!d.beta            && q.beta)         d.beta                = q.beta;
