@@ -4238,17 +4238,42 @@ function showProfil(sym, ex) {
   if(d) {
     // Veriyi URL'e sıkıştırarak geçir (küçük key mapping)
     var compact = {
-      n: d.name||'', sc: d.sector||'', cl: d.close||d.price||0,
-      ch: d.change_abs||0, ca: d.change||0,
-      pe: d.pe_ratio||0, pb: d.price_book_ratio||0,
-      roe: d.roe||0, roa: d.roa||0, nm: d.net_margin||0,
-      gm: d.gross_margin||0, peg: d.peg_ratio||0, fs: d.piotroski_f_score,
-      cr: d.current_ratio||0, de: d.debt_to_equity||0,
-      dy: d.dividend_yield_recent||0, pw: d.Perf_W||0,
-      pm: d.Perf_1M||0, py: d.Perf_Y||0, bt: d.beta||0,
-      mc: d.market_cap_basic||0, av: d.average_volume_10d_calc||0,
-      wh: d['52_week_high']||0, wl: d['52_week_low']||0,
-      cf: d.cash_f_operating_activities||0
+      n:   d.name||'',
+      sc:  d.sector||'',
+      // Fiyat — allData'da currentPrice olarak saklanıyor
+      cl:  d.currentPrice||d.close||d.price||0,
+      ch:  d.change_abs||0,
+      ca:  d.changePercent||d.change||0,
+      // Değerleme — allData'da Normalized alan adları
+      pe:  d.peNormalizedAnnual||d.pe_ratio||0,
+      pb:  d.pbAnnual||d.price_book_ratio||0,
+      ps:  d.psTTM||d.price_sales||0,
+      // Karlılık
+      roe: d.roeTTM||d.roe||0,
+      roa: d.roaTTM||d.roa||0,
+      nm:  d.netProfitMarginTTM||d.net_margin||0,
+      gm:  d.grossMarginTTM||d.gross_margin||0,
+      // Büyüme
+      rg:  d.revenueGrowthTTMYoy||d.revenue_growth_ttm_yoy||0,
+      eg:  d.epsGrowthTTMYoy||d.earnings_per_share_change_ttm_yoy||0,
+      // Diğer finansal
+      peg: d.peg||d.peg_ratio||0,
+      fs:  d.piotroski||d.piotroski_f_score,
+      cr:  d.currentRatioAnnual||d.current_ratio||0,
+      de:  d['totalDebt/totalEquityAnnual']||d.debt_to_equity||0,
+      dy:  d.dividendYieldIndicatedAnnual||d.dividend_yield_recent||0,
+      // Piyasa
+      mc:  d.marketCapitalization||d.market_cap_basic||0,
+      av:  d.average_volume_10d_calc||0,
+      bt:  d.beta||0,
+      // 52 hafta — allData'da 52WeekHigh
+      wh:  d['52WeekHigh']||d['52_week_high']||0,
+      wl:  d['52WeekLow']||d['52_week_low']||0,
+      // Performans
+      pw:  d.Perf_W||0,
+      pm:  d.Perf_1M||0,
+      py:  d.Perf_Y||0,
+      cf:  d.cash_f_operating_activities||0
     };
     try {
       url += '&d=' + encodeURIComponent(btoa(JSON.stringify(compact)));
