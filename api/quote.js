@@ -63,6 +63,7 @@ module.exports = function(req, res) {
     'Perf.W', 'Perf.1M', 'Perf.Y',
     'Recommend.All', 'number_of_employees',
     'piotroski_f_score',
+    'price_earnings_growth_ttm',
   ];
 
   const payload = JSON.stringify({
@@ -138,6 +139,7 @@ module.exports = function(req, res) {
         perfY:  raw['Perf.Y'],
 
         // Diğer
+        peg:       raw['price_earnings_growth_ttm'],
         piotroski: raw['piotroski_f_score'],
         employees: raw['number_of_employees'],
       };
