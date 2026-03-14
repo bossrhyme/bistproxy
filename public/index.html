@@ -102,18 +102,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-badge{font-size:10px;font-weight:600;color:var(--accent);background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);padding:4px 12px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:20px;display:inline-flex;align-items:center;gap:6px;}
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
-
-/* detail+chart */
-.detail{width:0;min-width:0;border-left:1px solid var(--border);background:var(--s1);overflow:hidden;transition:width .2s,min-width .2s;flex-shrink:0;}
-.detail.open{width:360px;min-width:360px;overflow-y:auto;}
-.chart-wrap{width:100%;height:260px;background:var(--bg);border:1px solid var(--border);overflow:hidden;position:relative;display:flex;align-items:stretch;}
-.chart-section{padding:10px 12px;border-bottom:1px solid var(--border);}
-#tv-chart-container{flex:1;height:100%;min-width:0;max-width:100%;}
-.chart-toolbar{width:28px;min-width:28px;background:var(--s2);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:4px 0;gap:2px;z-index:10;}
-.dhead{padding:14px 16px;border-bottom:1px solid var(--border);position:relative;background:var(--s2);}
-.dsym{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.5px;line-height:1;}
-.dprice{font-size:26px;font-weight:800;padding:10px 16px 2px;letter-spacing:-.5px;}
-.dclose{position:absolute;top:12px;right:12px;background:var(--border);border:none;color:var(--text2);font-size:14px;cursor:pointer;width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;}
 </style>
 <noscript><link rel="stylesheet" href="/deepfin.css"></noscript>
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
