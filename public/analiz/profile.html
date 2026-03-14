@@ -957,7 +957,7 @@ html,body{height:100%;overflow:hidden;}
 
           <div class="prf-section">
             <div class="prf-sec-title">Temel Metrikler</div>
-            <div class="prf-mgrid" id="prf-metrics"><div style="padding:20px;color:var(--muted);font-size:12px;grid-column:span 4">Tarama yapıp Detaylı Analiz'e tıklayın</div></div>
+            <div class="prf-mgrid" id="prf-metrics"><div style="padding:20px;color:var(--muted);font-size:12px;grid-column:span 4">Veriler yükleniyor...</div></div>
           </div>
           <div class="prf-section">
             <div class="prf-sec-title">Şirket Hakkında</div>
@@ -1650,17 +1650,17 @@ document.addEventListener('DOMContentLoaded', function() {
         pe_ratio:compact.pe, peNormalizedAnnual:compact.pe,
         price_book_ratio:compact.pb, pbAnnual:compact.pb,
         price_sales:compact.ps, psTTM:compact.ps,
-        roe:compact.roe, roeTTM:compact.roe,
-        roa:compact.roa, roaTTM:compact.roa,
-        net_margin:compact.nm, netProfitMarginTTM:compact.nm,
-        gross_margin:compact.gm, grossMarginTTM:compact.gm,
+        roe:(compact.roe||0)/100, roeTTM:(compact.roe||0)/100,
+        roa:(compact.roa||0)/100, roaTTM:(compact.roa||0)/100,
+        net_margin:(compact.nm||0)/100, netProfitMarginTTM:(compact.nm||0)/100,
+        gross_margin:(compact.gm||0)/100, grossMarginTTM:(compact.gm||0)/100,
         revenue_growth_ttm_yoy:compact.rg, revenueGrowthTTMYoy:compact.rg,
         earnings_per_share_change_ttm_yoy:compact.eg, epsGrowthTTMYoy:compact.eg,
         peg_ratio:compact.peg, peg:compact.peg,
         piotroski_f_score:compact.fs, piotroski:compact.fs,
         current_ratio:compact.cr, currentRatioAnnual:compact.cr,
         debt_to_equity:compact.de,
-        dividend_yield_recent:compact.dy, dividendYieldIndicatedAnnual:compact.dy,
+        dividend_yield_recent:(compact.dy||0)/100, dividendYieldIndicatedAnnual:(compact.dy||0)/100,
         Perf_W:compact.pw, Perf_1M:compact.pm, Perf_Y:compact.py,
         beta:compact.bt,
         market_cap_basic:compact.mc, marketCapitalization:compact.mc,
