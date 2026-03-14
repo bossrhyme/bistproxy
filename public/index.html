@@ -1210,31 +1210,74 @@ if('serviceWorker' in navigator){
 <!-- ─── SUPPORT MODAL ─── -->
 <div class="smodal-overlay" id="supportModal">
   <div class="smodal" onclick="event.stopPropagation()">
-    <div class="smodal-head"><div></div><button class="smodal-close" onclick="closeSupport()">✕</button></div>
-    <div class="smodal-hero">
-      <span class="smodal-emoji">☕</span>
-      <div class="smodal-title">BİZİ DESTEKLEYİN</div>
-      <div class="smodal-desc">Bu araç <strong>tamamen ücretsiz</strong> olarak sunulmaktadır — reklam yok, kayıt yok, sınır yok.<br><br>DeepFin'i geliştirmek ve güncel tutmak için <strong>geliştirme ve altyapı maliyetleri</strong> bulunmaktadır. Eğer bu araç işinize yaradıysa, bir kahve ısmarlayarak destek olabilirsiniz. 🙏</div>
-    </div>
-    <div class="smodal-options">
-      <div class="smodal-options-title">Destek Yöntemleri</div>
-      <div class="soption">
-        <div class="soption-head"><span class="soption-icon">☕</span><div><div class="soption-label">Buy Me a Coffee</div><div class="soption-sublabel">Kredi kartı veya PayPal ile kolayca destek ol</div></div></div>
-        <a class="bmc-link" href="https://buymeacoffee.com/KULLANICI_ADINIZ" target="_blank" rel="noopener"><span>☕</span> buymeacoffee.com/KULLANICI_ADINIZ</a>
+    <!-- Üst şerit -->
+    <div class="smodal-bar"></div>
+    <!-- Başlık -->
+    <div class="smodal-head">
+      <div class="smodal-head-left">
+        <span class="smodal-emoji">☕</span>
+        <div>
+          <div class="smodal-title">DESTEKLEYİN</div>
+          <div class="smodal-subtitle">DeepFin'i ücretsiz ve reklamsız tutmak için</div>
+        </div>
       </div>
-      <div class="soption">
-        <div class="soption-head"><span class="soption-icon">₿</span><div><div class="soption-label">Kripto Para ile Destek</div><div class="soption-sublabel">Adrese tıklayarak kopyalayabilirsiniz</div></div></div>
-        <div class="wallet-row"><span class="wallet-coin">BTC</span><div class="wallet-addr">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</div><button class="copy-btn" onclick="copyWallet(this,'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh')">KOPYALA</button></div>
-        <div class="wallet-row"><span class="wallet-coin">ETH</span><div class="wallet-addr">0x71C7656EC7ab88b098defB751B7401B5f6d8976F</div><button class="copy-btn" onclick="copyWallet(this,'0x71C7656EC7ab88b098defB751B7401B5f6d8976F')">KOPYALA</button></div>
-        <div class="wallet-row"><span class="wallet-coin">USDT</span><div class="wallet-addr">TN3W4H6rK2ce4vX9YnFQHwKx7TS2V5sL2h</div><button class="copy-btn" onclick="copyWallet(this,'TN3W4H6rK2ce4vX9YnFQHwKx7TS2V5sL2h')">KOPYALA</button></div>
-        <div class="wallet-row"><span class="wallet-coin">BNB</span><div class="wallet-addr">0x71C7656EC7ab88b098defB751B7401B5f6d8976F</div><button class="copy-btn" onclick="copyWallet(this,'0x71C7656EC7ab88b098defB751B7401B5f6d8976F')">KOPYALA</button></div>
-      </div>
+      <button class="smodal-close" onclick="closeSupport()">✕</button>
     </div>
-    <div class="smodal-thanks">Desteğiniz için şimdiden <strong>çok teşekkür ederiz</strong> 🙏</div>
+    <!-- Açıklama -->
+    <div class="smodal-body">
+      <p class="smodal-desc">Bu araç tamamen <strong>ücretsizdir</strong> — reklam yok, kayıt yok, sınır yok. Eğer işinize yaradıysa bir kahve ısmarlayarak destek olabilirsiniz. 🙏</p>
+
+      <!-- Buy Me a Coffee -->
+      <div class="soption">
+        <div class="soption-head">
+          <span class="soption-icon">☕</span>
+          <div class="soption-info">
+            <div class="soption-label">Buy Me a Coffee</div>
+            <div class="soption-sublabel">Kredi kartı veya PayPal ile</div>
+          </div>
+        </div>
+        <a class="bmc-link" href="https://buymeacoffee.com/KULLANICI_ADINIZ" target="_blank" rel="noopener">
+          <span>☕</span><span class="bmc-text">buymeacoffee.com/KULLANICI_ADINIZ</span>
+        </a>
+      </div>
+
+      <!-- Kripto -->
+      <div class="soption">
+        <div class="soption-head">
+          <span class="soption-icon">₿</span>
+          <div class="soption-info">
+            <div class="soption-label">Kripto Para</div>
+            <div class="soption-sublabel">Kopyala butonuna tıklayın</div>
+          </div>
+        </div>
+        <div class="wallet-list">
+          <div class="wallet-row">
+            <span class="wallet-coin">BTC</span>
+            <span class="wallet-addr">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</span>
+            <button class="copy-btn" onclick="copyWallet(this,'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh')">KOP.</button>
+          </div>
+          <div class="wallet-row">
+            <span class="wallet-coin">ETH</span>
+            <span class="wallet-addr">0x71C7656EC7ab88b098defB751B7401B5f6d8976F</span>
+            <button class="copy-btn" onclick="copyWallet(this,'0x71C7656EC7ab88b098defB751B7401B5f6d8976F')">KOP.</button>
+          </div>
+          <div class="wallet-row">
+            <span class="wallet-coin">USDT</span>
+            <span class="wallet-addr">TN3W4H6rK2ce4vX9YnFQHwKx7TS2V5sL2h</span>
+            <button class="copy-btn" onclick="copyWallet(this,'TN3W4H6rK2ce4vX9YnFQHwKx7TS2V5sL2h')">KOP.</button>
+          </div>
+          <div class="wallet-row">
+            <span class="wallet-coin">BNB</span>
+            <span class="wallet-addr">0x71C7656EC7ab88b098defB751B7401B5f6d8976F</span>
+            <button class="copy-btn" onclick="copyWallet(this,'0x71C7656EC7ab88b098defB751B7401B5f6d8976F')">KOP.</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="smodal-thanks">Desteğiniz için teşekkürler 🙏</div>
+    </div>
   </div>
 </div>
-
-
 
 <!-- ─── YASAL UYARI POPUP ─── -->
 <div id="df-tooltip"></div>
