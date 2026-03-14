@@ -1255,17 +1255,16 @@ function goAnaliz() {
 function goHome() { window.location.href = '/'; }
 
 function goScreener() {
-  // history.back() ile screener'a dön (from=screener parametresiyle geldiyse)
-  var params = new URLSearchParams(window.location.search);
-  if(params.get('from') === 'screener') {
-    history.back();
-  } else {
-    window.location.href = '/?from=profile';
-  }
+  window.location.href = '/?from=profile';
 }
 function closeProfil() {
-  // Her zaman screener'a dön
-  window.location.href = '/?from=profile';
+  var from = new URLSearchParams(window.location.search).get('from');
+  if (from === 'analiz') {
+    window.location.href = '/analiz/';
+  } else {
+    // from=screener veya bilinmeyen → screener'a dön
+    window.location.href = '/?from=profile';
+  }
 }
 function onHemenAl(sym, ex) { showToast('🛒 ' + sym + ' — Broker entegrasyonu yakında!'); }
 function showToast(msg) {

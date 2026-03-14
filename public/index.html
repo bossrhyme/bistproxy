@@ -2346,9 +2346,9 @@ function init(){
   showApp();
   // Profile/analiz sayfasından geri gelinince screener'ı göster ve tara
   var _initParams = new URLSearchParams(window.location.search);
-  if(_initParams.get('from') === 'profile' || _initParams.get('from') === 'screener') {
+  var _from = _initParams.get('from');
+  if(_from === 'profile' || _from === 'screener' || _from === 'analiz') {
     showScreener();
-    // Önceki tarama yoksa yeniden tara
     if(allData.length === 0) runScan();
   }
 }
