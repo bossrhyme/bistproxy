@@ -968,6 +968,12 @@ td:first-child,td:nth-child(2){text-align:left;}
 .dnews-src{font-size:9px;font-weight:700;color:var(--accent);letter-spacing:.5px;text-transform:uppercase;}
 .dnews-date{font-size:9px;color:var(--muted2);}
 .dnews-title{font-size:11px;color:var(--text2);line-height:1.5;}
+
+.sb-search{position:relative;display:flex;align-items:center;margin:0 6px;flex-shrink:0;}
+.sb-search-ico{position:absolute;left:8px;font-size:11px;color:var(--muted2);pointer-events:none;z-index:1;}
+.sb-search-input{background:var(--s1);border:1px solid var(--border);color:var(--text);padding:4px 10px 4px 24px;font-size:11px;outline:none;border-radius:5px;width:160px;font-family:'JetBrains Mono',monospace;transition:border-color .15s,width .2s;}
+.sb-search-input:focus{border-color:var(--accent);width:200px;}
+.sb-search-input::placeholder{color:var(--muted2);font-family:'Geist',sans-serif;font-size:10px;}
 </style>
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 </head>
@@ -3292,7 +3298,15 @@ function applyAndRender(special){
 }
 
 function onSearch(){
-  searchQ = document.getElementById('searchbox').value.trim();
+  var sb1 = document.getElementById('searchbox');
+  var sb2 = document.getElementById('sb-searchbox');
+  // Hangisi aktif kullanıldıysa onu al, ikisini de senkronize et
+  var val = (sb2 && document.activeElement === sb2) 
+    ? sb2.value.trim() 
+    : (sb1 ? sb1.value.trim() : '');
+  if(sb1) sb1.value = val;
+  if(sb2) sb2.value = val;
+  searchQ = val;
   if(allData.length) applyAndRender();
 }
 
