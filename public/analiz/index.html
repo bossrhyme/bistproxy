@@ -116,14 +116,14 @@ footer a:hover{color:var(--text2);}
         <span style="font-size:9px;color:var(--muted)">▾</span>
       </div>
       <input class="search-input" id="sym-input" type="text"
-        placeholder="Sembol veya şirket adı gir..."
+        placeholder="Sembol veya şirket adı yaz, listeden seç..."
         oninput="onInput()"
         onkeydown="if(event.key==='Enter')goAnaliz(); if(event.key==='Escape')closeDropdown()">
       <button class="search-btn" onclick="goAnaliz()">Analiz Et →</button>
     </div>
     <div id="sym-dropdown" style="display:none;border-top:1px solid var(--border);background:var(--s1);max-height:280px;overflow-y:auto;"></div>
   </div>
-  <div class="search-hint">Örnek: <code>TUPRS</code> · <code>AAPL</code> · <code>NVDA</code> · <code>SASA</code> · <code>THYAO</code></div>
+  <div class="search-hint">Sembol <code>TUPRS</code> veya şirket adı <code>Tüpraş</code> yazıp listeden seçin</div>
 
   <div class="ex-chips">
     <div class="ex-chip on" data-ex="bist" data-flag="tr" data-label="BIST" onclick="setEx(this)">
@@ -326,11 +326,35 @@ function closeDropdown() {
 }
 
 function goAnaliz() {
-  // Seçili sembol varsa onu kullan, yoksa input değerini al
-  var sym = (_selectedSym || document.getElementById('sym-input').value.trim()).toUpperCase();
-  if (!sym) { document.getElementById('sym-input').focus(); return; }
-  // Türkçe karakterleri normalize et (TÜPRAŞ → TUPRS arama yap ama sembol TUPRS)
-  // Direkt sembol olarak gönder
+  var raw = document.getElementById('sym-input').value.trim();
+  if (!raw) { document.getElementById('sym-input').focus(); return; }
+
+  var dd = document.getElementById('sym-dropdown');
+  var ddVisible = dd && dd.style.display !== 'none' && dd.children.length > 0;
+
+  // Dropdown açık ama seçim yapılmadı → git deme, hint göster
+  if (ddVisible && !_selectedSym) {
+    // Dropdown'daki ilk öğeyi vurgula
+    var first = dd.querySelector('.dd-item');
+    if (first) {
+      first.style.background = 'var(--accent2)';
+      first.style.borderLeft = '2px solid var(--accent)';
+      setTimeout(function(){ first.style.background=''; first.style.borderLeft=''; }, 800);
+    }
+    return;
+  }
+
+  // Seçili sembol yoksa input direkt sembol mü? (harf+rakam, max 12 karakter)
+  var sym = _selectedSym || raw.toUpperCase();
+  if (!_selectedSym) {
+    var looksLikeSymbol = /^[A-Z0-9\.]{1,12}$/.test(sym);
+    if (!looksLikeSymbol) {
+      // Dropdown'u aç, kullanıcıyı seçmeye zorla
+      onInput();
+      return;
+    }
+  }
+
   var dest = 'profile.html?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(_ex) + '&from=screener';
   _showDisclaimer(function() { window.location.href = dest; });
 }
