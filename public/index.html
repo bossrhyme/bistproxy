@@ -869,9 +869,15 @@ td:first-child,td:nth-child(2){text-align:left;}
 .analiz-search-input {
   flex: 1; height: 48px; background: transparent; border: none; outline: none;
   padding: 0 16px; font-size: 14px; color: var(--text); font-family: 'JetBrains Mono', monospace;
-  text-transform: uppercase; letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }
 .analiz-search-input::placeholder { text-transform: none; font-size: 12px; letter-spacing: 0; color: var(--muted); font-family: 'DM Sans', sans-serif; }
+.analiz-dd-item{display:flex;align-items:center;gap:12px;padding:10px 16px;cursor:pointer;transition:background .1s;border-bottom:1px solid var(--border);}
+.analiz-dd-item:last-child{border-bottom:none;}
+.analiz-dd-item:hover,.analiz-dd-item.active{background:var(--s2);}
+.analiz-dd-sym{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--text);min-width:64px;}
+.analiz-dd-name{font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
 .analiz-search-btn {
   height: 48px; padding: 0 20px; background: var(--accent); color: #fff;
   border: none; cursor: pointer; font-size: 12px; font-weight: 700;
@@ -988,6 +994,7 @@ td:first-child,td:nth-child(2){text-align:left;}
       <div class="analiz-hero-title">DeepFin <span>Analiz</span></div>
       <div class="analiz-hero-sub">Hisse sembolünü gir, yapay zeka destekli detaylı finansal analizi anında gör</div>
 
+      <div class="analiz-search-outer" id="analiz-search-outer" style="position:relative;width:100%;max-width:560px;">
       <div class="analiz-search-wrap">
         <div class="analiz-search-ex" id="analiz-ex-sel" onclick="toggleAnalizExMenu()">
           <img src="https://flagcdn.com/tr.svg" width="18" height="13" style="border-radius:2px;object-fit:cover;" id="analiz-ex-flag">
@@ -995,10 +1002,13 @@ td:first-child,td:nth-child(2){text-align:left;}
           <span style="font-size:9px;color:var(--muted)">▾</span>
         </div>
         <input type="text" class="analiz-search-input" id="analiz-search-input"
-          placeholder="Sembol gir  (örn: TUPRS, AAPL, NVDA...)"
-          oninput="onAnalizInput(this.value)"
-          onkeydown="if(event.key==='Enter') goAnaliz()">
-        <button class="analiz-search-btn" onclick="goAnaliz()">Analiz Et →</button>
+          placeholder="Şirket adı veya sembol yazın..."
+          autocomplete="off" spellcheck="false"
+          oninput="onAnalizInput()"
+          onkeydown="onAnalizKey(event)">
+        <button class="analiz-search-btn" onclick="onAnalizBtn()">Analiz Et →</button>
+      </div>
+      <div class="analiz-dd" id="analiz-dd" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--s1);border:1px solid var(--accent);border-top:none;border-radius:0 0 10px 10px;max-height:280px;overflow-y:auto;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.5);"></div>
       </div>
       <div class="analiz-search-hint">Örnek: <code>TUPRS</code> · <code>AAPL</code> · <code>NVDA</code> · <code>SASA</code></div>
 
@@ -4324,6 +4334,9 @@ function showAnaliz() {
   if(ts) ts.style.display = 'none';
 
   // breadcrumb — sadece analiz-page içinde, otomatik güncellenir
+  _analizChosen = null;
+  _analizHideDd();
+  document.getElementById('analiz-search-input').value = '';
 }
 
 function hideAnalizPage() {
@@ -4340,11 +4353,80 @@ function setAnalizEx(el) {
     document.getElementById('analiz-ex-label').textContent = meta.label;
     document.getElementById('analiz-ex-flag').src = 'https://flagcdn.com/' + meta.flag + '.svg';
   }
+  _analizChosen = null;
+  document.getElementById('analiz-search-input').value = '';
+  _analizHideDd();
   updateAnalizBreadcrumb(_analizEx, '');
 }
 
-function onAnalizInput(val) {
-  updateAnalizBreadcrumb(_analizEx, val.toUpperCase());
+function onAnalizInput() {
+  var q = (document.getElementById('analiz-search-input').value || '').trim();
+  _analizChosen = null;
+  if (!q) { _analizHideDd(); return; }
+  if (_analizEx === 'bist') {
+    var qn = _analizNorm(q);
+    var res = BIST_SYMBOLS.filter(function(x) {
+      return _analizNorm(x.symbol).indexOf(qn) === 0 || _analizNorm(x.name).indexOf(qn) !== -1;
+    }).slice(0, 8).map(function(x){ return {s:x.symbol, n:x.name}; });
+    _analizShowDd(res);
+  } else {
+    clearTimeout(_analizTimer);
+    _analizShowDd([{s:'...', n:'Aranıyor...'}]);
+    _analizTimer = setTimeout(function(){ _analizTvSearch(q); }, 350);
+  }
+}
+var _analizChosen = null;
+var _analizTimer = null;
+function _analizNorm(s) {
+  return (s||'').toUpperCase()
+    .replace(/Ğ/g,'G').replace(/Ü/g,'U').replace(/Ş/g,'S')
+    .replace(/İ/g,'I').replace(/Ö/g,'O').replace(/Ç/g,'C')
+    .replace(/ğ/g,'G').replace(/ü/g,'U').replace(/ş/g,'S')
+    .replace(/ı/g,'I').replace(/ö/g,'O').replace(/ç/g,'C');
+}
+function _analizShowDd(items) {
+  var dd = document.getElementById('analiz-dd');
+  if (!dd) return;
+  dd.innerHTML = '';
+  if (!items.length) { dd.style.display='none'; return; }
+  items.forEach(function(item) {
+    var div = document.createElement('div');
+    div.className = 'analiz-dd-item';
+    div.innerHTML = '<span class="analiz-dd-sym">' + (item.s||'') + '</span>'
+      + '<span class="analiz-dd-name">' + (item.n||'') + '</span>';
+    if (!item.s.startsWith('...')) {
+      (function(s,n){ div.addEventListener('mousedown', function(e){
+        e.preventDefault(); _analizPick(s);
+      }); })(item.s, item.n);
+    }
+    dd.appendChild(div);
+  });
+  dd.style.display = 'block';
+}
+function _analizHideDd() {
+  var dd = document.getElementById('analiz-dd');
+  if (dd) dd.style.display = 'none';
+}
+function _analizPick(sym) {
+  _analizChosen = sym;
+  document.getElementById('analiz-search-input').value = sym;
+  _analizHideDd();
+  goAnaliz();
+}
+function _analizTvSearch(q) {
+  var TV_EX = {nasdaq:'NASDAQ', sp500:'NYSE', dax:'XETR', lse:'LSE', nikkei:'TSE'};
+  var ex = TV_EX[_analizEx] || '';
+  var url = 'https://symbol-search.tradingview.com/symbol_search/v3/?text='
+    + encodeURIComponent(q) + '&type=stock'
+    + (ex ? '&exchange='+ex : '') + '&lang=en&domain=production';
+  fetch(url)
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      var list = (data.symbols||data||[]).slice(0,8)
+        .filter(function(x){ return x.symbol; })
+        .map(function(x){ return {s:x.symbol, n:x.description||x.symbol}; });
+      _analizShowDd(list);
+    }).catch(function(){ _analizHideDd(); });
 }
 
 function updateAnalizBreadcrumb(ex, sym) {
@@ -4368,11 +4450,48 @@ function updateAnalizBreadcrumb(ex, sym) {
 }
 
 function goAnaliz() {
-  var sym = (document.getElementById('analiz-search-input').value || '').trim().toUpperCase();
-  if(!sym) return;
-  showProfil(sym, _analizEx);
+  if (!_analizChosen) return;
+  showProfil(_analizChosen, _analizEx);
 }
 
+
+function onAnalizKey(e) {
+  var dd = document.getElementById('analiz-dd');
+  if (!dd || dd.style.display === 'none') return;
+  var items = dd.querySelectorAll('.analiz-dd-item');
+  var active = dd.querySelector('.analiz-dd-item.active');
+  var idx = -1;
+  items.forEach(function(el,i){ if(el===active) idx=i; });
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    items.forEach(function(el){ el.classList.remove('active'); });
+    var next = idx < items.length-1 ? idx+1 : 0;
+    if(items[next]) items[next].classList.add('active');
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    items.forEach(function(el){ el.classList.remove('active'); });
+    var prev = idx > 0 ? idx-1 : items.length-1;
+    if(items[prev]) items[prev].classList.add('active');
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    var sel = active || dd.querySelector('.analiz-dd-item');
+    if (sel && !sel.querySelector('.analiz-dd-sym').textContent.startsWith('...')) {
+      sel.dispatchEvent(new MouseEvent('mousedown'));
+    }
+  } else if (e.key === 'Escape') {
+    _analizHideDd();
+  }
+}
+function onAnalizBtn() {
+  if (_analizChosen) { goAnaliz(); return; }
+  var dd = document.getElementById('analiz-dd');
+  var first = dd && dd.querySelector('.analiz-dd-item');
+  if (first && !first.querySelector('.analiz-dd-sym').textContent.startsWith('...')) {
+    first.dispatchEvent(new MouseEvent('mousedown'));
+  } else {
+    onAnalizInput();
+  }
+}
 function openDetayliAnaliz(sym, ex) {
   showProfil(sym, ex || currentExchange);
 }
@@ -4650,6 +4769,7 @@ function applyStrategyAndGo(goatKey) {
 })();
 
 // Start on homepage
+document.addEventListener('click', function(e){ if(!e.target.closest('#analiz-search-outer')) _analizHideDd(); });
 document.addEventListener('DOMContentLoaded', function(){
   showHomepage();
   var total = document.querySelectorAll('[data-goat],[data-preset],[data-tech]').length;
