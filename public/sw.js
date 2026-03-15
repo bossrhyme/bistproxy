@@ -1,122 +1,70 @@
-// DeepFin Service Worker v1
-const CACHE_NAME = 'deepfin-v3';
-const STATIC_CACHE = 'deepfin-static-v3';
-const API_CACHE = 'deepfin-api-v3';
+// DeepFin Service Worker v4 - minimal, sadece offline temel destek
+const CACHE = 'deepfin-v4';
 
-// Cache First: statik dosyalar
-const STATIC_ASSETS = [
-  '/',
-  '/screener',
-  '/analiz/',
-  '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png',
-];
-
-// Install: kritik statik dosyaları önbellekle
-self.addEventListener('install', function(event) {
-  event.waitUntil(
-    caches.open(STATIC_CACHE).then(function(cache) {
-      // Ana sayfa ve manifest'i önbellekle (hata toleranslı)
-      return Promise.allSettled(
-        STATIC_ASSETS.map(url => 
-          fetch(url).then(res => {
-            if (res.ok) return cache.put(url, res);
-          }).catch(() => {}) // Hata olsa da devam et
-        )
-      );
-    })
-  );
+// Install: hızlı geç
+self.addEventListener('install', function(e) {
   self.skipWaiting();
 });
 
 // Activate: eski cache'leri temizle
-self.addEventListener('activate', function(event) {
-  event.waitUntil(
+self.addEventListener('activate', function(e) {
+  e.waitUntil(
     caches.keys().then(function(keys) {
       return Promise.all(
-        keys
-          .filter(key => key !== STATIC_CACHE && key !== API_CACHE)
-          .map(key => caches.delete(key))
+        keys.filter(function(k){ return k !== CACHE; })
+            .map(function(k){ return caches.delete(k); })
       );
     })
   );
   self.clients.claim();
 });
 
-// Fetch: strateji
-self.addEventListener('fetch', function(event) {
-  const url = new URL(event.request.url);
-  
-  // API istekleri → Network First (veri güncel olsun)
-  if (url.pathname.startsWith('/api/')) {
-    event.respondWith(
-      fetch(event.request)
-        .then(function(res) {
-          // Başarılı API cevabını cache'le (5 dakika geçerli)
-          if (res.ok) {
-            const cloned = res.clone();
-            caches.open(API_CACHE).then(cache => {
-              cache.put(event.request, cloned);
-            });
-          }
-          return res;
-        })
-        .catch(function() {
-          // Network yoksa cache'den sun
-          return caches.match(event.request);
-        })
-    );
-    return;
+// Fetch: sadece same-origin GET isteklerini cache'le
+// Harici URL'leri (fonts, CDN) direkt network'e bırak - CSP ile çakışmayı önle
+self.addEventListener('fetch', function(e) {
+  var url = new URL(e.request.url);
+
+  // Sadece GET, sadece same-origin
+  if (e.request.method !== 'GET' || url.origin !== self.location.origin) {
+    return; // pass-through, SW müdahil olmuyor
   }
 
-  // Harici kaynaklar (fonts, CDN) → Cache First
-  if (url.origin !== self.location.origin) {
-    event.respondWith(
-      caches.match(event.request).then(function(cached) {
-        if (cached) return cached;
-        return fetch(event.request).then(function(res) {
-          if (res.ok) {
-            const cloned = res.clone();
-            caches.open(STATIC_CACHE).then(cache => cache.put(event.request, cloned));
-          }
-          return res;
-        }).catch(() => cached || new Response('', {status: 503}));
+  // /api/ istekleri: Network First (veri güncel kalsın)
+  if (url.pathname.startsWith('/api/')) {
+    e.respondWith(
+      fetch(e.request).catch(function() {
+        return caches.match(e.request);
       })
     );
     return;
   }
 
-  // HTML sayfaları → Network First, fallback cache
-  if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request)
+  // HTML navigasyonları: Network First
+  if (e.request.mode === 'navigate') {
+    e.respondWith(
+      fetch(e.request)
         .then(function(res) {
           if (res.ok) {
-            const cloned = res.clone();
-            caches.open(STATIC_CACHE).then(cache => cache.put(event.request, cloned));
+            var clone = res.clone();
+            caches.open(CACHE).then(function(c){ c.put(e.request, clone); });
           }
           return res;
         })
         .catch(function() {
-          return caches.match(event.request)
-            || caches.match('/')
-            || new Response('<h1>Çevrimdışı</h1><p>İnternet bağlantınızı kontrol edin.</p>', {
-              headers: {'Content-Type': 'text/html; charset=utf-8'}
-            });
+          return caches.match(e.request) || caches.match('/');
         })
     );
     return;
   }
 
-  // Diğer statik dosyalar → Cache First
-  event.respondWith(
-    caches.match(event.request).then(function(cached) {
+  // Diğer same-origin statik dosyalar: Cache First
+  e.respondWith(
+    caches.match(e.request).then(function(cached) {
       if (cached) return cached;
-      return fetch(event.request).then(function(res) {
-        if (res.ok && event.request.method === 'GET') {
-          const cloned = res.clone();
-          caches.open(STATIC_CACHE).then(cache => cache.put(event.request, cloned));
+      return fetch(e.request).then(function(res) {
+        if (res.ok) {
+          var clone = res.clone();
+          caches.open(CACHE).then(function(c){ c.put(e.request, clone); });
         }
         return res;
       });

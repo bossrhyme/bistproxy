@@ -2433,7 +2433,7 @@ function applyStrategyAndGo(goatKey) {
 })();
 
 // Start on homepage
-document.addEventListener('click', function(e){ if(!e.target.closest('#analiz-search-outer')) _analizHideDd(); });
+// analiz dropdown click-outside: analiz.js'de handle ediliyor
 
 // ── URL ROUTING (History API) ─────────────────────────
 window.addEventListener('popstate', function(e) {
