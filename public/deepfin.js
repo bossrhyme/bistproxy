@@ -1385,9 +1385,9 @@ function showDetail(sym){
 
   const G = [
     {t:'Değerleme', rows:[
-      ['F/K <tag>TTM</tag>', s.peNormalizedAnnual, v=>v.toFixed(1)],
-      ['PD/DD <tag>FQ</tag>', s.pbAnnual, v=>v.toFixed(2)],
-      ['F/S <tag>TTM</tag>', s.psTTM, v=>v.toFixed(2)],
+      ['F/K <tag>TTM</tag>', s.peNormalizedAnnual, v=>v.toFixed(1), 'dval-pe'],
+      ['PD/DD <tag>FQ</tag>', s.pbAnnual, v=>v.toFixed(2), 'dval-pb'],
+      ['F/S <tag>TTM</tag>', s.psTTM, v=>v.toFixed(2), 'dval-ps'],
       ['Piyasa Değeri', s.marketCapitalization, v=>fmc(v)],
       ['Sektör', s.sector, v=>v],
       ['1A Yüksek', s['52WeekHigh'], v=>`${v.toFixed(2)} ₺`],
@@ -1406,28 +1406,29 @@ function showDetail(sym){
       }],
     ]},
     {t:'Karlılık', rows:[
-      ['ROE <tag>FQ</tag>', s.roeTTM, v=>`<span class="${v>=0?'up':'dn'}">${v.toFixed(1)}%</span>`],
-      ['ROA <tag>FQ</tag>', s.roaTTM, v=>`<span class="${v>=0?'up':'dn'}">${v.toFixed(1)}%</span>`],
-      ['Net Kar Marjı <tag>TTM</tag>', s.netProfitMarginTTM, v=>`<span class="${v>=0?'up':'dn'}">${v.toFixed(1)}%</span>`],
-      ['Brüt Marj <tag>TTM</tag>', s.grossMarginTTM, v=>`<span class="${v>=0?'up':'dn'}">${v.toFixed(1)}%</span>`],
+      ['ROE <tag>FQ</tag>', s.roeTTM, v=>`<span class="${v>=0?'up':'dn'}">${v.toFixed(1)}%</span>`, 'dval-roe'],
+      ['ROA <tag>FQ</tag>', s.roaTTM, v=>`<span class="${v>=0?'up':'dn'}">${v.toFixed(1)}%</span>`, 'dval-roa'],
+      ['Net Kar Marjı <tag>TTM</tag>', s.netProfitMarginTTM, v=>`<span class="${v>=0?'up':'dn'}">${v.toFixed(1)}%</span>`, 'dval-nm'],
+      ['Brüt Marj <tag>TTM</tag>', s.grossMarginTTM, v=>`<span class="${v>=0?'up':'dn'}">${v.toFixed(1)}%</span>`, 'dval-gm'],
     ]},
     {t:'Büyüme', rows:[
       ['Gelir Büy. <tag>YoY</tag>', s.revenueGrowthTTMYoy, v=>`<span class="${v>=0?'up':'dn'}">${v>=0?'+':''}${v.toFixed(1)}%</span>`],
       ['EPS Büy. <tag>YoY</tag>', s.epsGrowthTTMYoy, v=>`<span class="${v>=0?'up':'dn'}">${v>=0?'+':''}${v.toFixed(1)}%</span>`],
     ]},
     {t:'Temettü & Sağlık', rows:[
-      ['Temettü <tag>yıllık</tag>', s.dividendYieldIndicatedAnnual, v=>`<span class="up">${v.toFixed(2)}%</span>`],
-      ['Borç/Özkaynak <tag>FQ</tag>', s['totalDebt/totalEquityAnnual'], v=>v.toFixed(1)],
-      ['Cari Oran <tag>FQ</tag>', s.currentRatioAnnual, v=>v.toFixed(2)],
+      ['Temettü <tag>yıllık</tag>', s.dividendYieldIndicatedAnnual, v=>`<span class="up">${v.toFixed(2)}%</span>`, 'dval-div'],
+      ['Borç/Özkaynak <tag>FQ</tag>', s['totalDebt/totalEquityAnnual'], v=>v.toFixed(1), 'dval-de'],
+      ['Cari Oran <tag>FQ</tag>', s.currentRatioAnnual, v=>v.toFixed(2), 'dval-cr'],
     ]},
   ];
 
   document.getElementById('dbody').innerHTML = G.map(g=>`
     <div class="dsection">
       <div class="dstitle">${g.t}</div>
-      ${g.rows.map(([k,v,fmt])=>{
+      ${g.rows.map(([k,v,fmt,id])=>{
         const d = (v===null||v===undefined) ? nil : fmt(v);
-        return `<div class="drow"><span class="dkey">${k}</span><span class="dval">${d}</span></div>`;
+        const idAttr = id ? ` id="${id}"` : '';
+        return `<div class="drow"><span class="dkey">${k}</span><span class="dval"${idAttr}>${d}</span></div>`;
       }).join('')}
     </div>`).join('');
 
@@ -1444,6 +1445,9 @@ function showDetail(sym){
   if(shrTab) shrTab.style.display = isUS?'':'none';
   switchXTab(document.querySelector('.dxtab[data-xtab="fundamentals"]'));
   if (isUS) { fetchInsider(sym); fetchShortInterest(sym); }
+
+  // Yahoo Finance doğrulama — TV verisiyle karşılaştır
+  fetchYahooVerify(sym, currentExchange);
 }
 
 let lwChart = null;
@@ -1634,6 +1638,109 @@ function updateChart(sym) {
     })
     .catch(function(e){ console.error('Chart error:', e); });
 }
+
+// ── Yahoo Finance Doğrulama ──────────────────────────────────────────────
+function fetchYahooVerify(sym, ex) {
+  var url = '/api/verify?symbol=' + encodeURIComponent(sym) + '&exchange=' + (ex || 'bist');
+
+  fetch(url)
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      if(!data || !data.yahoo) return;
+      var y = data.yahoo;
+      var s = allData.find(function(x){ return x.symbol === sym; });
+      if(!s) return;
+
+      // TV → Yahoo karşılaştırma
+      var pairs = [
+        { key:'peNormalizedAnnual', yVal:y.pe,           dId:'dval-pe',    label:'F/K' },
+        { key:'pbAnnual',           yVal:y.pb,           dId:'dval-pb',    label:'PD/DD' },
+        { key:'psTTM',              yVal:y.ps,           dId:'dval-ps',    label:'F/S' },
+        { key:'roeTTM',             yVal:y.roe,          dId:'dval-roe',   label:'ROE' },
+        { key:'roaTTM',             yVal:y.roa,          dId:'dval-roa',   label:'ROA' },
+        { key:'netProfitMarginTTM', yVal:y.netMargin,    dId:'dval-nm',    label:'Net Marj' },
+        { key:'grossMarginTTM',     yVal:y.grossMargin,  dId:'dval-gm',    label:'Brüt Marj' },
+        { key:'dividendYieldIndicatedAnnual', yVal:y.dividendYield, dId:'dval-div', label:'Temettü' },
+        { key:'currentRatioAnnual', yVal:y.currentRatio, dId:'dval-cr',    label:'Cari Oran' },
+        { key:'totalDebt/totalEquityAnnual',  yVal:y.debtToEquity,  dId:'dval-de',  label:'Borç/Özkaynak' },
+      ];
+
+      var mismatch = [];
+
+      pairs.forEach(function(p) {
+        var tvVal = s[p.key];
+        var yhVal = p.yVal;
+
+        if(tvVal == null || yhVal == null) return;
+
+        // Fark yüzdesi
+        var diff = Math.abs(tvVal - yhVal);
+        var pct  = tvVal !== 0 ? (diff / Math.abs(tvVal)) * 100 : diff;
+
+        // %15'ten fazla fark → uyarı
+        if(pct > 15) {
+          mismatch.push({
+            label: p.label,
+            tv:    tvVal,
+            yh:    yhVal,
+            pct:   pct.toFixed(0)
+          });
+        }
+
+        // Yahoo değerini UI'a yaz (daha güvenilir kaynak)
+        // dRow'larda dval-* ID'si kullan
+        var el = document.getElementById(p.dId);
+        if(el && yhVal != null) {
+          var formatted = yhVal.toFixed(
+            p.key === 'peNormalizedAnnual' || p.key === 'pbAnnual' || p.key === 'currentRatioAnnual' ||
+            p.key === 'totalDebt/totalEquityAnnual' || p.key === 'psTTM' ? 2 : 1
+          );
+          var pctSuffix = ['roeTTM','roaTTM','netProfitMarginTTM','grossMarginTTM',
+                           'dividendYieldIndicatedAnnual','revenueGrowthTTMYoy','epsGrowthTTMYoy'].includes(p.key);
+          var isColored  = ['roeTTM','roaTTM','netProfitMarginTTM','grossMarginTTM'].includes(p.key);
+          var colorClass = isColored ? (yhVal >= 0 ? 'up' : 'dn') : '';
+
+          el.innerHTML = colorClass
+            ? '<span class="'+colorClass+'">' + formatted + (pctSuffix ? '%' : '') + '</span>'
+            : formatted + (pctSuffix ? '%' : '');
+
+          if(pct > 15) {
+            el.innerHTML += ' <span title="TV: '+tvVal.toFixed(2)+' | Yahoo: '+yhVal.toFixed(2)+
+              ' (%'+Math.round(pct)+' fark)" style="cursor:help;color:#f0b429;font-size:9px;">⚠</span>';
+          }
+        }
+      });
+
+      // Eğer önemli farklar varsa detail header'ına badge ekle
+      var badge = document.getElementById('dverify-badge');
+      if(!badge) {
+        badge = document.createElement('div');
+        badge.id = 'dverify-badge';
+        badge.style.cssText = 'font-size:9px;padding:2px 7px;border-radius:4px;font-weight:600;letter-spacing:.3px;cursor:help;';
+        var dfresh = document.getElementById('dfresh');
+        if(dfresh && dfresh.parentNode) dfresh.parentNode.insertBefore(badge, dfresh.nextSibling);
+      }
+
+      if(mismatch.length === 0) {
+        badge.textContent = '✓ Yahoo doğrulandı';
+        badge.style.background = 'rgba(0,192,118,.1)';
+        badge.style.color = '#00c076';
+        badge.title = 'Tüm oranlar Yahoo Finance ile uyuşuyor';
+      } else {
+        badge.textContent = '⚠ ' + mismatch.length + ' oran farklı';
+        badge.style.background = 'rgba(240,180,41,.1)';
+        badge.style.color = '#f0b429';
+        badge.title = mismatch.map(function(m){
+          return m.label + ': TV='+parseFloat(m.tv).toFixed(2)+' Yahoo='+parseFloat(m.yh).toFixed(2)+' (%'+m.pct+' fark)';
+        }).join(' | ');
+      }
+
+      console.log('[DeepFin] Yahoo verify:', sym, mismatch.length === 0 ? '✅ uyumlu' : '⚠ '+mismatch.length+' fark', mismatch);
+    })
+    .catch(function(e){ console.warn('[DeepFin] Yahoo verify hatası:', e.message); });
+}
+// ─────────────────────────────────────────────────────────────────────────
+
 
 function closeDetail(){
   document.getElementById('detail').classList.remove('open');
