@@ -772,10 +772,12 @@ function renderFundPanel(type, period) {
 
   var cols = (period === 'quarterly' ? data.quarterly : data.annual) || [];
   if (!cols.length) {
-    if (type === 'income') {
-      el.innerHTML = '<div style="padding:20px 0;color:var(--muted2);font-size:12px;">Gelir tablosu verisi şu an bu hisse için mevcut değil. Özet oranlar Genel Bakış sekmesinde gösteriliyor.</div>';
+    // Tablo boşsa metrics kartını göster
+    var cachedMetrics = _fundCache['_metrics'];
+    if (cachedMetrics) {
+      el.innerHTML = _buildMetricsCard(cachedMetrics, type);
     } else {
-      el.innerHTML = '<div style="padding:20px 0;color:var(--muted2);font-size:12px;">Bu dönem için ' + (type === 'balance' ? 'bilanço' : 'nakit akışı') + ' verisi mevcut değil.</div>';
+      el.innerHTML = '<div style="padding:20px 0;color:var(--muted2);font-size:12px;">Detaylı tablo verisi bu hisse için mevcut değil.</div>';
     }
     return;
   }
