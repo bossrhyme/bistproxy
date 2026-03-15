@@ -1592,7 +1592,6 @@ function updateChart(sym) {
   var container = document.getElementById('tv-widget-container');
   if (!container) return;
 
-  // TradingView exchange prefix
   var tvPrefixes = {
     bist:'BIST', nasdaq:'NASDAQ', sp500:'NYSE',
     dax:'XETR', lse:'LSE', nikkei:'TSE'
@@ -1600,33 +1599,47 @@ function updateChart(sym) {
   var prefix = tvPrefixes[currentExchange] || 'BIST';
   var tvSym  = prefix + ':' + sym;
 
-  // interval tab → TV interval
   var activeTab = document.querySelector('.ctab.on');
   var interval  = (activeTab && activeTab.dataset.interval) || 'D';
+  var dateRange = interval === 'M' ? '12M' : interval === 'W' ? '1W' : '1D';
 
-  // Mevcut widget varsa kaldır
+  // Mevcut widget'ı temizle
   container.innerHTML = '';
 
-  // TradingView Mini Chart Widget
+  // TradingView widget HTML yapısı - textContent ile config
+  var wrapper = document.createElement('div');
+  wrapper.className = 'tradingview-widget-container';
+  wrapper.style.cssText = 'width:100%;height:100%;';
+
+  var widgetDiv = document.createElement('div');
+  widgetDiv.className = 'tradingview-widget-container__widget';
+  widgetDiv.style.cssText = 'width:100%;height:100%;';
+  wrapper.appendChild(widgetDiv);
+
+  var config = {
+    symbol: tvSym,
+    width: '100%',
+    height: '100%',
+    locale: 'tr',
+    dateRange: dateRange,
+    colorTheme: 'dark',
+    isTransparent: true,
+    autosize: true,
+    largeChartUrl: 'https://www.tradingview.com/chart/?symbol=' + tvSym,
+    noTimeScale: false,
+    chartOnly: false,
+    hideLegend: false
+  };
+
+  // script.textContent kullan - innerHTML değil
   var script = document.createElement('script');
   script.type = 'text/javascript';
-  script.src  = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
+  script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
   script.async = true;
-  script.innerHTML = JSON.stringify({
-    "symbol": tvSym,
-    "width": "100%",
-    "height": "100%",
-    "locale": "tr",
-    "dateRange": interval === 'M' ? '12M' : interval === 'W' ? '1W' : '1D',
-    "colorTheme": "dark",
-    "isTransparent": true,
-    "autosize": true,
-    "largeChartUrl": "https://www.tradingview.com/chart/?symbol=" + tvSym,
-    "noTimeScale": false,
-    "chartOnly": false,
-    "hideLegend": false
-  });
-  container.appendChild(script);
+  script.textContent = JSON.stringify(config);
+  wrapper.appendChild(script);
+
+  container.appendChild(wrapper);
   _tvCurrentSym = tvSym;
 }
 
