@@ -1432,7 +1432,8 @@ function showDetail(sym){
     </div>`).join('');
 
   document.getElementById('detail').classList.add('open');
-  updateChart(sym);
+  // Panel transition bitmesini bekle (200ms)
+  setTimeout(function(){ updateChart(sym); }, 260);
 
   // Insider & Short Interest — sadece US hisseleri için
   const isUS = ['nasdaq','sp500'].includes(currentExchange);

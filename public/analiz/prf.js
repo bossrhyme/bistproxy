@@ -47,13 +47,19 @@ function loadTVWidget(sym, ex) {
         }
         var candles = data.candles.map(function(c){
           return { time:c.t, open:c.o, high:c.h, low:c.l, close:c.c };
-        }).filter(function(c){ return c.open && c.close; });
+        }).filter(function(c){ return c.open != null && c.close != null; });
         if(!candles.length) return;
         series.setData(candles);
         chart.timeScale().fitContent();
-        setTimeout(function(){
-          if(chartEl && chartEl.offsetWidth > 0) chart.resize(chartEl.offsetWidth, 300);
-        }, 50);
+        // Resize - birkaç kez dene
+        function _tryResize(n) {
+          var el = document.getElementById('prf-chart-inner');
+          if(!el) return;
+          var w = el.offsetWidth || el.parentElement && el.parentElement.offsetWidth || 600;
+          if(w > 50) { chart.resize(w, 300); chart.timeScale().fitContent(); }
+          else if(n > 0) setTimeout(function(){ _tryResize(n-1); }, 100);
+        }
+        setTimeout(function(){ _tryResize(5); }, 100);
       })
       .catch(function(e){
         console.error('Chart error:', e);
