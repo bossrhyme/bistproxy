@@ -10,43 +10,62 @@ function openTradingView() {
 function loadTVWidget(sym, ex) {
   var container = document.getElementById('prf-tv-widget');
   if(!container) return;
-  var prefixes = {bist:'BIST',nasdaq:'NASDAQ',sp500:'NYSE',dax:'XETR',lse:'LSE',nikkei:'TSE'};
-  var pfx = prefixes[ex] || 'BIST';
-  var tvSym = pfx + ':' + sym;
 
-  container.innerHTML = '';
+  var exMeta  = EXCHANGE_META[ex] || EXCHANGE_META.bist;
+  var suffix  = encodeURIComponent(exMeta.yahooSuffix || '');
+  var url     = '/api/scan?action=chart&symbol=' + sym + '&interval=D&currency=TL&suffix=' + suffix;
 
-  var wrapper = document.createElement('div');
-  wrapper.className = 'tradingview-widget-container';
-  wrapper.style.cssText = 'width:100%;height:340px;';
+  container.innerHTML = '<div id="prf-chart-inner" style="width:100%;height:300px;background:#0d1117;"></div>';
+  var chartEl = document.getElementById('prf-chart-inner');
 
-  var inner = document.createElement('div');
-  inner.className = 'tradingview-widget-container__widget';
-  inner.style.cssText = 'width:100%;height:340px;';
-  wrapper.appendChild(inner);
+  // LightweightCharts yoksa yükle
+  function _drawChart() {
+    if(!window.LightweightCharts) return;
+    var chart = LightweightCharts.createChart(chartEl, {
+      width:  chartEl.offsetWidth  || 600,
+      height: 300,
+      layout:     { background:{ color:'#0d1117' }, textColor:'#6a8fa8' },
+      grid:       { vertLines:{ color:'#1c2d40' }, horzLines:{ color:'#1c2d40' } },
+      crosshair:  { mode: LightweightCharts.CrosshairMode.Normal },
+      rightPriceScale: { borderColor:'#1c2d40' },
+      timeScale:  { borderColor:'#1c2d40', timeVisible:true, secondsVisible:false },
+      handleScroll: true, handleScale: true,
+    });
+    var series = chart.addCandlestickSeries({
+      upColor:'#00c076', downColor:'#f6465d',
+      borderUpColor:'#00c076', borderDownColor:'#f6465d',
+      wickUpColor:'#00c076', wickDownColor:'#f6465d',
+    });
 
-  var script = document.createElement('script');
-  script.type = 'text/javascript';
-  script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
-  script.async = true;
-  script.textContent = JSON.stringify({
-    symbol: tvSym,
-    width: '100%',
-    height: '340',
-    locale: 'tr',
-    dateRange: '3M',
-    colorTheme: 'dark',
-    isTransparent: true,
-    autosize: true,
-    largeChartUrl: 'https://www.tradingview.com/chart/?symbol=' + tvSym,
-    noTimeScale: false,
-    chartOnly: false
-  });
-  wrapper.appendChild(script);
-  container.appendChild(wrapper);
+    fetch(url)
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        if(data.s !== 'ok' || !data.candles || !data.candles.length){
+          chartEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#64748b;font-size:12px;">Grafik verisi bulunamadı</div>';
+          return;
+        }
+        var candles = data.candles.map(function(c){
+          return { time:c.t, open:c.o, high:c.h, low:c.l, close:c.c };
+        });
+        series.setData(candles);
+        chart.timeScale().fitContent();
+        chart.resize(chartEl.offsetWidth || 600, 300);
+      })
+      .catch(function(){ chartEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#64748b;font-size:12px;">Bağlantı hatası</div>'; });
 
-  var ld = document.getElementById('prf-live-dot');
-  if(ld) ld.style.display = 'flex';
+    // live dot
+    var ld = document.getElementById('prf-live-dot');
+    if(ld) ld.style.display = 'flex';
+  }
+
+  if(window.LightweightCharts) {
+    _drawChart();
+  } else {
+    var s = document.createElement('script');
+    s.src = 'https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js';
+    s.onload = _drawChart;
+    document.head.appendChild(s);
+  }
 }
 
 function _mkSparkline(containerId, color, trend) {
