@@ -106,12 +106,10 @@ if('serviceWorker' in navigator){
         <div class="prf-tabs">
           <div class="prf-tab on" onclick="prfTab('overview',this)">Genel Bakış</div>
           <div class="prf-tab" onclick="prfTab('financials',this)">Finansallar</div>
-          <div class="prf-tab" onclick="prfTab('piotroski',this)">F-Score</div>
-          <div class="prf-tab" onclick="prfTab('guru',this)">Guru Analizi</div>
-          <div class="prf-tab" onclick="prfTab('ai',this)">🤖 YZ Analizi</div>
-          <div class="prf-tab" onclick="prfTab('balance',this)">Bilanço</div>
-          <div class="prf-tab" onclick="prfTab('cashflow',this)">Nakit Akışı</div>
           <div class="prf-tab" onclick="prfTab('news',this)">Haberler</div>
+          <div class="prf-tab" onclick="prfTab('piotroski',this)">F-Score</div>
+          <div class="prf-tab" onclick="prfTab('guru',this)">GOAT Analizi</div>
+          <div class="prf-tab" style="display:flex;align-items:center;gap:6px;" onclick="prfTab('ai',this)">🤖 YZ Analizi <span style="font-size:9px;padding:1px 6px;background:rgba(240,180,41,.15);color:#f0b429;border:1px solid rgba(240,180,41,.3);border-radius:3px;font-weight:600;letter-spacing:.3px;">YAKINDA</span></div>
         </div>
 
         <div id="prf-panel-overview" class="prf-panel on">
@@ -180,9 +178,46 @@ if('serviceWorker' in navigator){
             <div class="prf-sec-title">Borç & Likidite</div>
             <div id="prf-fin-debt" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;"></div>
           </div>
+
+          <!-- Gelir Tablosu (Yahoo) -->
+          <div class="prf-section">
+            <div class="prf-sec-title" style="display:flex;align-items:center;gap:8px;">
+              Gelir Tablosu
+              <span style="font-size:9px;padding:1px 6px;background:rgba(59,130,246,.1);color:var(--accent);border:1px solid rgba(59,130,246,.2);border-radius:3px;">Yahoo Finance</span>
+              <span id="inc-annual" onclick="setPeriod('income','annual',this)" style="cursor:pointer;font-size:9px;padding:2px 7px;background:var(--accent);color:#fff;border-radius:3px;margin-left:auto;">Yıllık</span>
+              <span id="inc-quarterly" onclick="setPeriod('income','quarterly',this)" style="cursor:pointer;font-size:9px;padding:2px 7px;border:1px solid var(--border2);border-radius:3px;color:var(--text2);">Çeyreklik</span>
+            </div>
+            <div id="prf-income-table" style="overflow-x:auto;"><div style="padding:16px;color:var(--muted2);font-size:12px;">Yükleniyor...</div></div>
+          </div>
+
+          <!-- Bilanço (Yahoo) -->
+          <div class="prf-section">
+            <div class="prf-sec-title" style="display:flex;align-items:center;gap:8px;">
+              Bilanço
+              <span style="font-size:9px;padding:1px 6px;background:rgba(59,130,246,.1);color:var(--accent);border:1px solid rgba(59,130,246,.2);border-radius:3px;">Yahoo Finance</span>
+              <span id="bal-annual" onclick="setPeriod('balance','annual',this)" style="cursor:pointer;font-size:9px;padding:2px 7px;background:var(--accent);color:#fff;border-radius:3px;margin-left:auto;">Yıllık</span>
+              <span id="bal-quarterly" onclick="setPeriod('balance','quarterly',this)" style="cursor:pointer;font-size:9px;padding:2px 7px;border:1px solid var(--border2);border-radius:3px;color:var(--text2);">Çeyreklik</span>
+            </div>
+            <div id="prf-balance-table" style="overflow-x:auto;"><div style="padding:16px;color:var(--muted2);font-size:12px;">Yükleniyor...</div></div>
+          </div>
+
+          <!-- Nakit Akışı (Yahoo) -->
           <div class="prf-section" style="border-bottom:none;">
-            <div class="prf-sec-title">Veri Kaynağı Hakkında</div>
-            <p style="font-size:11px;color:var(--muted);line-height:1.6;">Finansal veriler TradingView Scanner API üzerinden gerçek zamanlı olarak çekilmektedir. Yıllık finansal tablolar (gelir tablosu, bilanço) için premium veri sağlayıcı entegrasyonu planlanmaktadır.</p>
+            <div class="prf-sec-title" style="display:flex;align-items:center;gap:8px;">
+              Nakit Akışı
+              <span style="font-size:9px;padding:1px 6px;background:rgba(59,130,246,.1);color:var(--accent);border:1px solid rgba(59,130,246,.2);border-radius:3px;">Yahoo Finance</span>
+              <span id="cf-annual" onclick="setPeriod('cashflow','annual',this)" style="cursor:pointer;font-size:9px;padding:2px 7px;background:var(--accent);color:#fff;border-radius:3px;margin-left:auto;">Yıllık</span>
+              <span id="cf-quarterly" onclick="setPeriod('cashflow','quarterly',this)" style="cursor:pointer;font-size:9px;padding:2px 7px;border:1px solid var(--border2);border-radius:3px;color:var(--text2);">Çeyreklik</span>
+            </div>
+            <div id="prf-cashflow-table" style="overflow-x:auto;"><div style="padding:16px;color:var(--muted2);font-size:12px;">Yükleniyor...</div></div>
+          </div>
+        </div>
+
+        <!-- ═══ HABERLER ═══ -->
+        <div id="prf-panel-news" class="prf-panel">
+          <div class="prf-section" style="border-bottom:none;">
+            <div class="prf-sec-title">Son Haberler</div>
+            <div id="prf-news-list"><div style="padding:20px;color:var(--muted2);font-size:12px;">Haberler yükleniyor...</div></div>
           </div>
         </div>
 
@@ -200,7 +235,7 @@ if('serviceWorker' in navigator){
           </div>
         </div>
 
-        <div id="prf-panel-guru" class="prf-panel">
+        <div id="prf-panel-guru" class="prf-panel"><!-- GOAT Analizi -->
           <div class="prf-section">
             <div class="prf-sec-title">Efsane Yatırımcı Kriterleri</div>
             <div class="prf-ggrid" id="prf-ggrid"></div>
@@ -263,32 +298,7 @@ if('serviceWorker' in navigator){
         </div>
  
 
-        <div id="prf-panel-balance" class="prf-panel">
-          <div class="prf-section">
-            <div class="prf-sec-title">Bilanço &nbsp;
-              <span id="bal-annual" onclick="setPeriod('balance','annual',this)" style="cursor:pointer;font-size:9px;padding:2px 7px;background:var(--accent);color:#fff;border-radius:3px;">Yillik</span>
-              <span id="bal-quarterly" onclick="setPeriod('balance','quarterly',this)" style="cursor:pointer;font-size:9px;padding:2px 7px;border:1px solid var(--border2);border-radius:3px;color:var(--text2);">Ceyreklik</span>
-            </div>
-            <div id="prf-balance-table"><div style="padding:20px;color:var(--muted2);font-size:12px;">Yukleniiyor...</div></div>
-          </div>
-        </div>
 
-        <div id="prf-panel-cashflow" class="prf-panel">
-          <div class="prf-section">
-            <div class="prf-sec-title">Nakit Akisi &nbsp;
-              <span id="cf-annual" onclick="setPeriod('cashflow','annual',this)" style="cursor:pointer;font-size:9px;padding:2px 7px;background:var(--accent);color:#fff;border-radius:3px;">Yillik</span>
-              <span id="cf-quarterly" onclick="setPeriod('cashflow','quarterly',this)" style="cursor:pointer;font-size:9px;padding:2px 7px;border:1px solid var(--border2);border-radius:3px;color:var(--text2);">Ceyreklik</span>
-            </div>
-            <div id="prf-cashflow-table"><div style="padding:20px;color:var(--muted2);font-size:12px;">Yukleniiyor...</div></div>
-          </div>
-        </div>
-
-        <div id="prf-panel-news" class="prf-panel">
-          <div class="prf-section">
-            <div class="prf-sec-title">Son Haberler</div>
-            <div id="prf-news-list"><div style="padding:20px;color:var(--muted2);font-size:12px;">Haberler yukleniyor...</div></div>
-          </div>
-        </div>
      </div>
     </div>
   </div>

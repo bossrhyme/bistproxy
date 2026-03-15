@@ -748,7 +748,7 @@ function _buildFinTable(rows, cols) {
 // Dönem seç (annual/quarterly)
 function setPeriod(type, period, el) {
   // toggle UI
-  var prefix = type === 'balance' ? 'bal' : 'cf';
+  var prefix = type === 'balance' ? 'bal' : type === 'cashflow' ? 'cf' : 'inc';
   ['annual','quarterly'].forEach(function(p) {
     var btn = document.getElementById(prefix + '-' + p);
     if (!btn) return;
@@ -765,7 +765,7 @@ function setPeriod(type, period, el) {
 function renderFundPanel(type, period) {
   var cacheKey = type + '_' + period;
   var data = _fundCache[cacheKey];
-  var containerId = type === 'balance' ? 'prf-balance-table' : 'prf-cashflow-table';
+  var containerId = type === 'balance' ? 'prf-balance-table' : type === 'cashflow' ? 'prf-cashflow-table' : 'prf-income-table';
   var el = document.getElementById(containerId);
   if (!el) return;
 
@@ -783,7 +783,9 @@ function renderFundPanel(type, period) {
 
   var rows = type === 'balance'
     ? ['totalAssets','totalLiab','totalStockholderEquity','cash','totalDebt','shortLongTermDebt']
-    : ['operatingCashflow','capitalExpenditures','freeCashflow','dividendsPaid'];
+    : type === 'cashflow'
+    ? ['operatingCashflow','capitalExpenditures','freeCashflow','dividendsPaid']
+    : ['totalRevenue','grossProfit','operatingIncome','netIncome','ebitda'];
 
   el.innerHTML = _buildFinTable(rows, cols);
 }
@@ -794,7 +796,8 @@ function loadFundData(type, period) {
   var ex  = _prfEx;
   if (!sym) return;
 
-  fetch('/api/fundamentals?symbol=' + encodeURIComponent(sym) + '&exchange=' + encodeURIComponent(ex) + '&type=' + type)
+  var apiType = (type === 'income') ? 'financials' : type;
+  fetch('/api/fundamentals?symbol=' + encodeURIComponent(sym) + '&exchange=' + encodeURIComponent(ex) + '&type=' + apiType)
     .then(function(r) { return r.json(); })
     .then(function(data) {
       _fundCache[type + '_annual']    = data;
@@ -802,7 +805,7 @@ function loadFundData(type, period) {
       renderFundPanel(type, period);
     })
     .catch(function(e) {
-      var containerId = type === 'balance' ? 'prf-balance-table' : 'prf-cashflow-table';
+      var containerId = type === 'balance' ? 'prf-balance-table' : type === 'cashflow' ? 'prf-cashflow-table' : 'prf-income-table';
       var el = document.getElementById(containerId);
       if (el) el.innerHTML = '<div style="padding:20px;color:var(--muted2);font-size:12px;">Veri alınamadı: ' + e.message + '</div>';
     });
@@ -842,15 +845,17 @@ function loadNewsPanel() {
 var _origPrfTab = prfTab;
 prfTab = function(id, el) {
   _origPrfTab(id, el);
-  if (id === 'balance')   renderFundPanel('balance', 'annual');
-  if (id === 'cashflow')  renderFundPanel('cashflow', 'annual');
-  if (id === 'news')      loadNewsPanel();
-  if (id === 'financials') loadFinancialsPanel();
+  if (id === 'financials') {
+    loadFinancialsPanel();
+    renderFundPanel('balance', 'annual');
+    renderFundPanel('cashflow', 'annual');
+  }
+  if (id === 'news') loadNewsPanel();
 };
 
 
 // Finansallar paneli — Yahoo gelir tablosu
-function loadFinancialsPanel() {
+function loadFinancialsPanel_OLD() {
   var el = document.getElementById('prf-fin-yahoo');
   if (!el) {
     // Container yoksa oluştur
@@ -878,3 +883,5 @@ function loadFinancialsPanel() {
     })
     .catch(function(){ el.innerHTML = ''; });
 }
+
+function loadFinancialsPanel() { renderFundPanel('income', 'annual'); }
