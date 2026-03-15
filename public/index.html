@@ -103,6 +103,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 <link rel="stylesheet" href="/deepfin.css?v=3">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -805,12 +806,23 @@ if('serviceWorker' in navigator){
 
       <div class="chart-section">
         <div class="chart-tabs" id="chart-tabs">
-          <div class="ctab on" data-interval="D">1G</div>
+          <div class="ctab on" data-interval="240">4S</div>
+          <div class="ctab" data-interval="D">1G</div>
           <div class="ctab" data-interval="W">1H</div>
-          <div class="ctab" data-interval="M">1A</div>
+          <div class="ctab-cur on" data-currency="TL">₺</div>
+          <div class="ctab-cur" data-currency="USD">$</div>
+        </div>
+        <div class="chart-tabs" id="ind-tabs" style="margin-bottom:6px;">
+          <div class="itab" data-ind="MA20">MA20</div>
+          <div class="itab" data-ind="MA50">MA50</div>
+          <div class="itab" data-ind="EMA20">EMA20</div>
+          <div class="itab" data-ind="BB">BB</div>
+          <div class="itab" data-ind="VOL">Hacim</div>
         </div>
         <div class="chart-wrap" id="chart-wrap">
-          <div id="tv-widget-container" style="width:100%;height:100%;"></div>
+          <div style="position:relative;flex:1;min-width:0;height:100%;">
+            <div id="tv-chart-container" style="height:100%;width:100%;"></div>
+          </div>
         </div>
       </div>
       <!-- Insider & Short Interest Tabs -->

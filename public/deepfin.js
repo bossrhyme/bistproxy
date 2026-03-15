@@ -1521,7 +1521,7 @@ function _loadLightweightCharts(cb) {
 function initChart(container) {
   if (lwChart) { lwChart.remove(); lwChart = null; lwSeries = null; lwVolSeries = null; lwIndSeries = {}; }
   lwChart = LightweightCharts.createChart(container, {
-    width: container.offsetWidth || 340,
+    width: (container.offsetWidth > 50 ? container.offsetWidth : (document.querySelector('.detail.open')?.offsetWidth - 20 || 340)),
     height: 230,
     layout: { background: { color: '#0d1117' }, textColor: '#6a8fa8' },
     grid: { vertLines: { color: '#1c2d40' }, horzLines: { color: '#1c2d40' } },
@@ -1535,6 +1535,7 @@ function initChart(container) {
     borderUpColor: '#0ff0b3', borderDownColor: '#ff4d6d',
     wickUpColor: '#09c48a', wickDownColor: '#cc2244',
   });
+  if (window._attachChartResizeObserver) window._attachChartResizeObserver(container);
 }
 
 function applyIndicators() {
@@ -1589,57 +1590,32 @@ function applyIndicators() {
 
 function updateChart(sym) {
   if (!sym) return;
-  var container = document.getElementById('tv-widget-container');
-  if (!container) return;
+  // LightweightCharts henüz yüklü değilse lazy load et
+  if (!_lcLoaded) {
+    _loadLightweightCharts(function() { updateChart(sym); });
+    return;
+  }
+  const interval = document.querySelector('.ctab.on')?.dataset.interval || '240';
+  const currency = document.querySelector('.ctab-cur.on')?.dataset.currency || 'TL';
+  const container = document.getElementById('tv-chart-container');
 
-  var tvPrefixes = {
-    bist:'BIST', nasdaq:'NASDAQ', sp500:'NYSE',
-    dax:'XETR', lse:'LSE', nikkei:'TSE'
-  };
-  var prefix = tvPrefixes[currentExchange] || 'BIST';
-  var tvSym  = prefix + ':' + sym;
+  initChart(container);
 
-  var activeTab = document.querySelector('.ctab.on');
-  var interval  = (activeTab && activeTab.dataset.interval) || 'D';
-
-  // Mevcut widget temizle
-  container.innerHTML = '';
-
-  // TradingView Advanced Chart (candlestick)
-  var wrapper = document.createElement('div');
-  wrapper.className = 'tradingview-widget-container';
-  wrapper.style.cssText = 'width:100%;height:100%;';
-
-  var inner = document.createElement('div');
-  inner.className = 'tradingview-widget-container__widget';
-  inner.style.cssText = 'width:100%;height:100%;';
-  wrapper.appendChild(inner);
-
-  var script = document.createElement('script');
-  script.type = 'text/javascript';
-  script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
-  script.async = true;
-  script.textContent = JSON.stringify({
-    autosize: true,
-    symbol: tvSym,
-    interval: interval,
-    timezone: 'Europe/Istanbul',
-    theme: 'dark',
-    style: '1',
-    locale: 'tr',
-    allow_symbol_change: false,
-    calendar: false,
-    hide_top_toolbar: false,
-    hide_legend: true,
-    save_image: false,
-    backgroundColor: 'rgba(11,14,19,1)',
-    gridColor: 'rgba(30,39,51,0.6)',
-    hide_volume: false,
-    support_host: 'https://www.tradingview.com'
-  });
-  wrapper.appendChild(script);
-  container.appendChild(wrapper);
-  _tvCurrentSym = tvSym;
+  const suffix = encodeURIComponent((EXCHANGE_META[currentExchange]||EXCHANGE_META.bist).yahooSuffix);
+  const url = PROXY_URL + '?action=chart&symbol=' + sym + '&interval=' + interval + '&currency=' + currency + '&suffix=' + suffix;
+  fetch(url)
+    .then(r => r.json())
+    .then(data => {
+      if (data.s !== 'ok' || !data.candles || !data.candles.length) return;
+      lwCandles = data.candles.map(c => ({ time: c.t, open: c.o, high: c.h, low: c.l, close: c.c, volume: c.v || 0 }));
+      lwSeries.setData(lwCandles);
+      lwChart.timeScale().fitContent();
+      var w = container.offsetWidth;
+      if (!w || w < 50) w = document.querySelector('.detail.open')?.offsetWidth - 20 || 340;
+      lwChart.resize(w, 230);
+      applyIndicators();
+    })
+    .catch(e => console.error('Chart error:', e));
 }
 
 function closeDetail(){
@@ -1696,17 +1672,23 @@ function abortScan(){
 init();
 
 // ── CHART TAB LISTENERS ──
-document.getElementById('chart-tabs').addEventListener('click', function(e) {
-  var tab = e.target.closest('.ctab');
-  if (!tab) return;
-  document.querySelectorAll('.ctab').forEach(function(t){ t.classList.remove('on'); });
-  tab.classList.add('on');
-  if (selSym) updateChart(selSym);
+document.getElementById('chart-tabs').addEventListener('click', e => {
+  const itab = e.target.closest('.ctab');
+  const ctab = e.target.closest('.ctab-cur');
+  if(itab){
+    document.querySelectorAll('#chart-tabs .ctab').forEach(t=>t.classList.remove('on'));
+    itab.classList.add('on');
+    if(selSym) updateChart(selSym);
+  }
+  if(ctab){
+    document.querySelectorAll('.ctab-cur').forEach(t=>t.classList.remove('on'));
+    ctab.classList.add('on');
+    if(selSym) updateChart(selSym);
+  }
 });
 
-var _indTabsEl = document.getElementById('ind-tabs');
-if (_indTabsEl) _indTabsEl.addEventListener('click', function(e) {
-  var itab = e.target.closest('.itab');
+document.getElementById('ind-tabs').addEventListener('click', e => {
+  const itab = e.target.closest('.itab');
   if(!itab) return;
   itab.classList.toggle('on');
   applyIndicators();
