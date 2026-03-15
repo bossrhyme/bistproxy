@@ -1499,7 +1499,7 @@ function _ensureModals() {
 
 // ── LightweightCharts lazy loader ──────────────────
 var _lcLoading = false;
-var _lcLoaded  = false;
+var _lcLoaded  = (typeof LightweightCharts !== "undefined");
 var _lcQueue   = [];
 
 function _loadLightweightCharts(cb) {

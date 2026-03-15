@@ -11,18 +11,19 @@ function loadTVWidget(sym, ex) {
   var container = document.getElementById('prf-tv-widget');
   if(!container) return;
 
-  var exMeta  = EXCHANGE_META[ex] || EXCHANGE_META.bist;
-  var suffix  = encodeURIComponent(exMeta.yahooSuffix || '');
-  var url     = '/api/scan?action=chart&symbol=' + sym + '&interval=D&currency=TL&suffix=' + suffix;
+  var exMeta = EXCHANGE_META[ex] || EXCHANGE_META.bist;
+  var suffix = encodeURIComponent(exMeta.yahooSuffix || '');
+  var url    = '/api/scan?action=chart&symbol=' + sym + '&interval=D&currency=TL&suffix=' + suffix;
 
+  // Loading göster
   container.innerHTML = '<div id="prf-chart-inner" style="width:100%;height:300px;background:#0d1117;"></div>';
-  var chartEl = document.getElementById('prf-chart-inner');
 
-  // LightweightCharts yoksa yükle
   function _drawChart() {
-    if(!window.LightweightCharts) return;
+    var chartEl = document.getElementById('prf-chart-inner');
+    if(!chartEl || !window.LightweightCharts) return;
+
     var chart = LightweightCharts.createChart(chartEl, {
-      width:  chartEl.offsetWidth  || 600,
+      width:  chartEl.offsetWidth || 600,
       height: 300,
       layout:     { background:{ color:'#0d1117' }, textColor:'#6a8fa8' },
       grid:       { vertLines:{ color:'#1c2d40' }, horzLines:{ color:'#1c2d40' } },
@@ -40,32 +41,37 @@ function loadTVWidget(sym, ex) {
     fetch(url)
       .then(function(r){ return r.json(); })
       .then(function(data){
-        if(data.s !== 'ok' || !data.candles || !data.candles.length){
-          chartEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#64748b;font-size:12px;">Grafik verisi bulunamadı</div>';
+        if(!data || data.s !== 'ok' || !data.candles || !data.candles.length){
+          if(chartEl) chartEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#64748b;font-size:12px;">Grafik verisi bulunamadı</div>';
           return;
         }
         var candles = data.candles.map(function(c){
           return { time:c.t, open:c.o, high:c.h, low:c.l, close:c.c };
-        });
+        }).filter(function(c){ return c.open && c.close; });
+        if(!candles.length) return;
         series.setData(candles);
         chart.timeScale().fitContent();
-        chart.resize(chartEl.offsetWidth || 600, 300);
+        setTimeout(function(){
+          if(chartEl && chartEl.offsetWidth > 0) chart.resize(chartEl.offsetWidth, 300);
+        }, 50);
       })
-      .catch(function(){ chartEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#64748b;font-size:12px;">Bağlantı hatası</div>'; });
+      .catch(function(e){
+        console.error('Chart error:', e);
+      });
 
-    // live dot
     var ld = document.getElementById('prf-live-dot');
     if(ld) ld.style.display = 'flex';
   }
 
-  if(window.LightweightCharts) {
-    _drawChart();
-  } else {
-    var s = document.createElement('script');
-    s.src = 'https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js';
-    s.onload = _drawChart;
-    document.head.appendChild(s);
+  // LC yüklü mü kontrol et, değilse bekle
+  function _waitAndDraw(attempts) {
+    if(window.LightweightCharts) {
+      _drawChart();
+    } else if(attempts > 0) {
+      setTimeout(function(){ _waitAndDraw(attempts - 1); }, 100);
+    }
   }
+  _waitAndDraw(20); // max 2 saniye bekle
 }
 
 function _mkSparkline(containerId, color, trend) {
