@@ -1591,32 +1591,48 @@ function applyIndicators() {
 
 function updateChart(sym) {
   if (!sym) return;
-  // LightweightCharts henüz yüklü değilse lazy load et
   if (!_lcLoaded) {
     _loadLightweightCharts(function() { updateChart(sym); });
     return;
   }
-  const interval = document.querySelector('.ctab.on')?.dataset.interval || '240';
-  const currency = document.querySelector('.ctab-cur.on')?.dataset.currency || 'TL';
-  const container = document.getElementById('tv-chart-container');
+  var interval = (document.querySelector('.ctab.on') || {}).dataset && document.querySelector('.ctab.on').dataset.interval || '240';
+  var currency = (document.querySelector('.ctab-cur.on') || {}).dataset && document.querySelector('.ctab-cur.on').dataset.currency || 'TL';
+  var container = document.getElementById('tv-chart-container');
+  if (!container) return;
 
   initChart(container);
 
-  const suffix = encodeURIComponent((EXCHANGE_META[currentExchange]||EXCHANGE_META.bist).yahooSuffix);
-  const url = PROXY_URL + '?action=chart&symbol=' + sym + '&interval=' + interval + '&currency=' + currency + '&suffix=' + suffix;
+  var suffix = encodeURIComponent((EXCHANGE_META[currentExchange]||EXCHANGE_META.bist).yahooSuffix);
+  var url = PROXY_URL + '?action=chart&symbol=' + sym + '&interval=' + interval + '&currency=' + currency + '&suffix=' + suffix;
+
   fetch(url)
-    .then(r => r.json())
-    .then(data => {
-      if (data.s !== 'ok' || !data.candles || !data.candles.length) return;
-      lwCandles = data.candles.map(c => ({ time: c.t, open: c.o, high: c.h, low: c.l, close: c.c, volume: c.v || 0 }));
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      if (!data || data.s !== 'ok' || !data.candles || !data.candles.length) return;
+      lwCandles = data.candles.map(function(c){ return { time:c.t, open:c.o, high:c.h, low:c.l, close:c.c, volume:c.v||0 }; });
       lwSeries.setData(lwCandles);
       lwChart.timeScale().fitContent();
-      var w = container.offsetWidth;
-      if (!w || w < 50) w = document.querySelector('.detail.open')?.offsetWidth - 20 || 340;
-      lwChart.resize(w, 230);
+
+      // Resize: birden fazla deneme - panel transition sonrası kesin boyut
+      function _resizeChart(tries) {
+        var cont = document.getElementById('tv-chart-container');
+        if (!cont || !lwChart) return;
+        var w = cont.offsetWidth;
+        if (!w || w < 50) {
+          var det = document.querySelector('.detail.open');
+          w = det ? det.offsetWidth - 24 : 336;
+        }
+        if (w > 50) {
+          lwChart.resize(w, 230);
+          lwChart.timeScale().fitContent();
+        } else if (tries > 0) {
+          setTimeout(function(){ _resizeChart(tries - 1); }, 100);
+        }
+      }
+      _resizeChart(5);
       applyIndicators();
     })
-    .catch(e => console.error('Chart error:', e));
+    .catch(function(e){ console.error('Chart error:', e); });
 }
 
 function closeDetail(){

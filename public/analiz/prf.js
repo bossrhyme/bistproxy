@@ -299,9 +299,12 @@ function showProfil(sym, ex) {
   _buildPrfSide();
   _buildTrend(_prfData);
   _buildFinancials(_prfData);
-  loadTVWidget(sym, ex);
   prfTab('overview', document.querySelector('.prf-tab'));
   _prfAiDone = false;
+  // RAF: browser layout tamamlandıktan sonra chart çiz
+  requestAnimationFrame(function() {
+    setTimeout(function() { loadTVWidget(sym, ex); }, 50);
+  });
 }
 
 function _buildPrfHero() {
