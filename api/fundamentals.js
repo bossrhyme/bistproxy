@@ -35,41 +35,55 @@ function fmt(v) {
 // Yahoo quarterly/annual gelir tablosu parse
 function parseIncome(stmts) {
   if (!stmts || !Array.isArray(stmts)) return [];
-  return stmts.map(s => ({
-    date: s.endDate?.fmt || s.endDate?.raw,
-    totalRevenue:    fmt(s.totalRevenue?.raw),
-    grossProfit:     fmt(s.grossProfit?.raw),
-    operatingIncome: fmt(s.operatingIncome?.raw),
-    netIncome:       fmt(s.netIncome?.raw),
-    ebitda:          fmt(s.ebitda?.raw),
-    eps:             fmt(s.basicEps?.raw),
-  }));
+  return stmts.map(function(s) {
+    // formatted=false: direkt sayı; formatted=true: {raw, fmt}
+    var v = function(x) { return x && typeof x === 'object' ? x.raw : x; };
+    var d = s.endDate; var dateStr = d && typeof d === 'object' ? d.fmt : d;
+    return {
+      date:            dateStr || '',
+      totalRevenue:    fmt(v(s.totalRevenue)),
+      grossProfit:     fmt(v(s.grossProfit)),
+      operatingIncome: fmt(v(s.operatingIncome)),
+      netIncome:       fmt(v(s.netIncome)),
+      ebitda:          fmt(v(s.ebitda)),
+    };
+  });
 }
 
 // Yahoo bilanço parse
 function parseBalance(stmts) {
   if (!stmts || !Array.isArray(stmts)) return [];
-  return stmts.map(s => ({
-    date:             s.endDate?.fmt || s.endDate?.raw,
-    totalAssets:      fmt(s.totalAssets?.raw),
-    totalLiab:        fmt(s.totalLiab?.raw),
-    totalStockholderEquity: fmt(s.totalStockholderEquity?.raw),
-    cash:             fmt(s.cash?.raw),
-    totalDebt:        fmt(s.longTermDebt?.raw),
-    shortLongTermDebt: fmt(s.shortLongTermDebt?.raw),
-  }));
+  return stmts.map(function(s) {
+    var v = function(x) { return x && typeof x === 'object' ? x.raw : x; };
+    var d = s.endDate; var dateStr = d && typeof d === 'object' ? d.fmt : d;
+    return {
+      date:                   dateStr || '',
+      totalAssets:            fmt(v(s.totalAssets)),
+      totalLiab:              fmt(v(s.totalLiab)),
+      totalStockholderEquity: fmt(v(s.totalStockholderEquity)),
+      cash:                   fmt(v(s.cash)),
+      totalDebt:              fmt(v(s.longTermDebt)),
+      shortLongTermDebt:      fmt(v(s.shortLongTermDebt)),
+    };
+  });
 }
 
 // Yahoo nakit akışı parse
 function parseCashflow(stmts) {
   if (!stmts || !Array.isArray(stmts)) return [];
-  return stmts.map(s => ({
-    date:                  s.endDate?.fmt || s.endDate?.raw,
-    operatingCashflow:     fmt(s.totalCashFromOperatingActivities?.raw),
-    capitalExpenditures:   fmt(s.capitalExpenditures?.raw),
-    freeCashflow:          fmt((s.totalCashFromOperatingActivities?.raw || 0) + (s.capitalExpenditures?.raw || 0)),
-    dividendsPaid:         fmt(s.dividendsPaid?.raw),
-  }));
+  return stmts.map(function(s) {
+    var v = function(x) { return x && typeof x === 'object' ? x.raw : x; };
+    var d = s.endDate; var dateStr = d && typeof d === 'object' ? d.fmt : d;
+    var op  = v(s.totalCashFromOperatingActivities) || 0;
+    var cap = v(s.capitalExpenditures) || 0;
+    return {
+      date:                dateStr || '',
+      operatingCashflow:   fmt(op),
+      capitalExpenditures: fmt(cap),
+      freeCashflow:        fmt(op + cap),
+      dividendsPaid:       fmt(v(s.dividendsPaid)),
+    };
+  });
 }
 
 module.exports = async (req, res) => {
@@ -132,7 +146,7 @@ module.exports = async (req, res) => {
       all:        'incomeStatementHistory,balanceSheetHistory,cashflowStatementHistory,incomeStatementHistoryQuarterly',
     };
     const modules = moduleMap[type] || moduleMap.financials;
-    const path = `/v10/finance/quoteSummary/${yhSym}?modules=${modules}&formatted=true`;
+    const path = `/v10/finance/quoteSummary/${yhSym}?modules=${modules}&formatted=false`;
 
     const raw = await yhFetch(path);
     const parsed = JSON.parse(raw);

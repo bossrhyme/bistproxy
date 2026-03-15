@@ -181,33 +181,30 @@ if('serviceWorker' in navigator){
 
           <!-- Gelir Tablosu (Yahoo) -->
           <div class="prf-section">
-            <div class="prf-sec-title" style="display:flex;align-items:center;gap:8px;">
+            <div class="prf-sec-title" style="display:flex;align-items:center;gap:6px;">
               Gelir Tablosu
-              <span style="font-size:9px;padding:1px 6px;background:rgba(59,130,246,.1);color:var(--accent);border:1px solid rgba(59,130,246,.2);border-radius:3px;">Yahoo Finance</span>
-              <span id="inc-annual" onclick="setPeriod('income','annual',this)" style="cursor:pointer;font-size:9px;padding:2px 7px;background:var(--accent);color:#fff;border-radius:3px;margin-left:auto;">Yıllık</span>
-              <span id="inc-quarterly" onclick="setPeriod('income','quarterly',this)" style="cursor:pointer;font-size:9px;padding:2px 7px;border:1px solid var(--border2);border-radius:3px;color:var(--text2);">Çeyreklik</span>
+              <span id="inc-annual" onclick="setPeriod('income','annual',this)" class="prf-period-active" style="margin-left:auto;">Yıllık</span>
+              <span id="inc-quarterly" onclick="setPeriod('income','quarterly',this)" class="prf-period-btn">Çeyreklik</span>
             </div>
             <div id="prf-income-table" style="overflow-x:auto;"><div style="padding:16px;color:var(--muted2);font-size:12px;">Yükleniyor...</div></div>
           </div>
 
           <!-- Bilanço (Yahoo) -->
           <div class="prf-section">
-            <div class="prf-sec-title" style="display:flex;align-items:center;gap:8px;">
+            <div class="prf-sec-title" style="display:flex;align-items:center;gap:6px;">
               Bilanço
-              <span style="font-size:9px;padding:1px 6px;background:rgba(59,130,246,.1);color:var(--accent);border:1px solid rgba(59,130,246,.2);border-radius:3px;">Yahoo Finance</span>
-              <span id="bal-annual" onclick="setPeriod('balance','annual',this)" style="cursor:pointer;font-size:9px;padding:2px 7px;background:var(--accent);color:#fff;border-radius:3px;margin-left:auto;">Yıllık</span>
-              <span id="bal-quarterly" onclick="setPeriod('balance','quarterly',this)" style="cursor:pointer;font-size:9px;padding:2px 7px;border:1px solid var(--border2);border-radius:3px;color:var(--text2);">Çeyreklik</span>
+              <span id="bal-annual" onclick="setPeriod('balance','annual',this)" class="prf-period-active" style="margin-left:auto;">Yıllık</span>
+              <span id="bal-quarterly" onclick="setPeriod('balance','quarterly',this)" class="prf-period-btn">Çeyreklik</span>
             </div>
             <div id="prf-balance-table" style="overflow-x:auto;"><div style="padding:16px;color:var(--muted2);font-size:12px;">Yükleniyor...</div></div>
           </div>
 
           <!-- Nakit Akışı (Yahoo) -->
           <div class="prf-section" style="border-bottom:none;">
-            <div class="prf-sec-title" style="display:flex;align-items:center;gap:8px;">
+            <div class="prf-sec-title" style="display:flex;align-items:center;gap:6px;">
               Nakit Akışı
-              <span style="font-size:9px;padding:1px 6px;background:rgba(59,130,246,.1);color:var(--accent);border:1px solid rgba(59,130,246,.2);border-radius:3px;">Yahoo Finance</span>
-              <span id="cf-annual" onclick="setPeriod('cashflow','annual',this)" style="cursor:pointer;font-size:9px;padding:2px 7px;background:var(--accent);color:#fff;border-radius:3px;margin-left:auto;">Yıllık</span>
-              <span id="cf-quarterly" onclick="setPeriod('cashflow','quarterly',this)" style="cursor:pointer;font-size:9px;padding:2px 7px;border:1px solid var(--border2);border-radius:3px;color:var(--text2);">Çeyreklik</span>
+              <span id="cf-annual" onclick="setPeriod('cashflow','annual',this)" class="prf-period-active" style="margin-left:auto;">Yıllık</span>
+              <span id="cf-quarterly" onclick="setPeriod('cashflow','quarterly',this)" class="prf-period-btn">Çeyreklik</span>
             </div>
             <div id="prf-cashflow-table" style="overflow-x:auto;"><div style="padding:16px;color:var(--muted2);font-size:12px;">Yükleniyor...</div></div>
           </div>

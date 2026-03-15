@@ -747,16 +747,11 @@ function _buildFinTable(rows, cols) {
 
 // Dönem seç (annual/quarterly)
 function setPeriod(type, period, el) {
-  // toggle UI
   var prefix = type === 'balance' ? 'bal' : type === 'cashflow' ? 'cf' : 'inc';
   ['annual','quarterly'].forEach(function(p) {
     var btn = document.getElementById(prefix + '-' + p);
     if (!btn) return;
-    if (p === period) {
-      btn.style.background = 'var(--accent)'; btn.style.color = '#fff'; btn.style.borderColor = 'transparent';
-    } else {
-      btn.style.background = 'transparent'; btn.style.color = 'var(--text2)'; btn.style.borderColor = 'var(--border2)';
-    }
+    btn.className = (p === period) ? 'prf-period-active' : 'prf-period-btn';
   });
   renderFundPanel(type, period);
 }
