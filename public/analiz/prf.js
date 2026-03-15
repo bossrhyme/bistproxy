@@ -276,6 +276,7 @@ function _setScore(id, val, cls) {
 function showProfil(sym, ex) {
   _prfSym = sym;
   _prfEx  = ex || 'bist';
+  _fundCache = {}; // yeni hisse için cache temizle
 
   var exMeta = EXCHANGE_META[_prfEx] || {};
   var bcEx = document.getElementById('prf-bc-ex');
@@ -736,7 +737,6 @@ function _buildFinTable(rows, cols) {
     var label = labels[key] || key;
     html += '<tr><td style="padding:7px 6px;color:var(--text2);border-bottom:1px solid rgba(255,255,255,.04);">' + label + '</td>';
     cols.forEach(function(c) {
-      var cellCur = (key === 'eps') ? cur : cur;
       html += '<td style="text-align:right;padding:7px 6px;border-bottom:1px solid rgba(255,255,255,.04);">' + _fmtFin(c[key], key === 'eps' ? cur : '') + '</td>';
     });
     html += '</tr>';
@@ -845,5 +845,36 @@ prfTab = function(id, el) {
   if (id === 'balance')   renderFundPanel('balance', 'annual');
   if (id === 'cashflow')  renderFundPanel('cashflow', 'annual');
   if (id === 'news')      loadNewsPanel();
+  if (id === 'financials') loadFinancialsPanel();
 };
 
+
+// Finansallar paneli — Yahoo gelir tablosu
+function loadFinancialsPanel() {
+  var el = document.getElementById('prf-fin-yahoo');
+  if (!el) {
+    // Container yoksa oluştur
+    var sec = document.querySelector('#prf-panel-financials .prf-section');
+    if (!sec) return;
+    var div = document.createElement('div');
+    div.id = 'prf-fin-yahoo';
+    div.style.cssText = 'margin-top:16px;overflow-x:auto;';
+    div.innerHTML = '<div style="padding:10px;color:var(--muted2);font-size:12px;">Yükleniyor...</div>';
+    sec.appendChild(div);
+    el = div;
+  }
+
+  if (_fundCache['financials_done']) return;
+
+  fetch('/api/fundamentals?symbol=' + encodeURIComponent(_prfSym) + '&exchange=' + encodeURIComponent(_prfEx) + '&type=financials')
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      _fundCache['financials_done'] = true;
+      var cols = data.annual || [];
+      if (!cols.length) { el.innerHTML = ''; return; }
+      var rows = ['totalRevenue','grossProfit','operatingIncome','netIncome','ebitda'];
+      var title = '<div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">Yahoo Finance · Gelir Tablosu (Yıllık)</div>';
+      el.innerHTML = title + _buildFinTable(rows, cols);
+    })
+    .catch(function(){ el.innerHTML = ''; });
+}
