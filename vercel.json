@@ -116,11 +116,18 @@
     {
       "source": "/api/verify",
       "destination": "/api/verify.js"
+    },
+    {
+      "source": "/api/fundamentals",
+      "destination": "/api/fundamentals.js"
     }
   ],
   "functions": {
     "api/verify.js": {
       "maxDuration": 10
+    },
+    "api/fundamentals.js": {
+      "maxDuration": 15
     }
   }
 }

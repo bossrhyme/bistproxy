@@ -695,3 +695,155 @@ document.addEventListener('DOMContentLoaded', function() {
   _showDisclaimer(null);
 });
 
+
+// ══════════════════════════════════════════════════════════════════════════
+// YENİ PANELLER: Bilanço, Nakit Akışı, Haberler (Yahoo Finance + Finnhub)
+// ══════════════════════════════════════════════════════════════════════════
+
+var _fundCache = {}; // {type_period: data}
+
+// Sayı formatla (Milyar/Milyon)
+function _fmtFin(v, cur) {
+  if (v == null || isNaN(v)) return '<span style="color:var(--muted2)">—</span>';
+  var abs = Math.abs(v);
+  var s = '';
+  if (abs >= 1e12)      s = (v/1e12).toFixed(2) + ' T';
+  else if (abs >= 1e9)  s = (v/1e9).toFixed(2) + ' B';
+  else if (abs >= 1e6)  s = (v/1e6).toFixed(1) + ' M';
+  else                  s = v.toLocaleString('tr-TR');
+  var cls = v < 0 ? 'color:#f6465d' : 'color:#00c076';
+  return '<span style="' + cls + '">' + (cur || '') + ' ' + s + '</span>';
+}
+
+// Finansal tablo HTML oluştur
+function _buildFinTable(rows, cols) {
+  if (!cols || !cols.length) return '<div style="padding:20px;color:var(--muted2);font-size:12px;">Veri bulunamadı</div>';
+  var cur = (EXCHANGE_META[_prfEx] || {}).currency || '$';
+  var labels = {
+    totalRevenue: 'Toplam Gelir', grossProfit: 'Brüt Kar', operatingIncome: 'Faaliyet Karı',
+    netIncome: 'Net Kar', ebitda: 'EBITDA', eps: 'HBK',
+    totalAssets: 'Toplam Varlık', totalLiab: 'Toplam Yükümlülük',
+    totalStockholderEquity: 'Özkaynak', cash: 'Nakit', totalDebt: 'Uzun Vad. Borç', shortLongTermDebt: 'Kısa Vad. Borç',
+    operatingCashflow: 'Faaliyet NK', capitalExpenditures: 'Sermaye Harcaması', freeCashflow: 'Serbest NK', dividendsPaid: 'Temettü Ödemesi',
+  };
+  var html = '<table style="width:100%;border-collapse:collapse;font-size:11px;">';
+  html += '<thead><tr><th style="text-align:left;padding:8px 6px;color:var(--text2);border-bottom:1px solid var(--border);font-weight:600;">Kalem</th>';
+  cols.forEach(function(c) {
+    html += '<th style="text-align:right;padding:8px 6px;color:var(--text2);border-bottom:1px solid var(--border);font-weight:600;">' + (c.date || '') + '</th>';
+  });
+  html += '</tr></thead><tbody>';
+  rows.forEach(function(key) {
+    var label = labels[key] || key;
+    html += '<tr><td style="padding:7px 6px;color:var(--text2);border-bottom:1px solid rgba(255,255,255,.04);">' + label + '</td>';
+    cols.forEach(function(c) {
+      var cellCur = (key === 'eps') ? cur : cur;
+      html += '<td style="text-align:right;padding:7px 6px;border-bottom:1px solid rgba(255,255,255,.04);">' + _fmtFin(c[key], key === 'eps' ? cur : '') + '</td>';
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  return html;
+}
+
+// Dönem seç (annual/quarterly)
+function setPeriod(type, period, el) {
+  // toggle UI
+  var prefix = type === 'balance' ? 'bal' : 'cf';
+  ['annual','quarterly'].forEach(function(p) {
+    var btn = document.getElementById(prefix + '-' + p);
+    if (!btn) return;
+    if (p === period) {
+      btn.style.background = 'var(--accent)'; btn.style.color = '#fff'; btn.style.borderColor = 'transparent';
+    } else {
+      btn.style.background = 'transparent'; btn.style.color = 'var(--text2)'; btn.style.borderColor = 'var(--border2)';
+    }
+  });
+  renderFundPanel(type, period);
+}
+
+// Veriyi render et
+function renderFundPanel(type, period) {
+  var cacheKey = type + '_' + period;
+  var data = _fundCache[cacheKey];
+  var containerId = type === 'balance' ? 'prf-balance-table' : 'prf-cashflow-table';
+  var el = document.getElementById(containerId);
+  if (!el) return;
+
+  if (!data) {
+    el.innerHTML = '<div style="padding:20px;color:var(--muted2);font-size:12px;">Veri yükleniyor...</div>';
+    loadFundData(type, period);
+    return;
+  }
+
+  var cols = (period === 'quarterly' ? data.quarterly : data.annual) || [];
+  if (!cols.length) {
+    el.innerHTML = '<div style="padding:20px;color:var(--muted2);font-size:12px;">Bu dönem için veri bulunamadı.</div>';
+    return;
+  }
+
+  var rows = type === 'balance'
+    ? ['totalAssets','totalLiab','totalStockholderEquity','cash','totalDebt','shortLongTermDebt']
+    : ['operatingCashflow','capitalExpenditures','freeCashflow','dividendsPaid'];
+
+  el.innerHTML = _buildFinTable(rows, cols);
+}
+
+// API'den veri çek
+function loadFundData(type, period) {
+  var sym = _prfSym;
+  var ex  = _prfEx;
+  if (!sym) return;
+
+  fetch('/api/fundamentals?symbol=' + encodeURIComponent(sym) + '&exchange=' + encodeURIComponent(ex) + '&type=' + type)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      _fundCache[type + '_annual']    = data;
+      _fundCache[type + '_quarterly'] = data;
+      renderFundPanel(type, period);
+    })
+    .catch(function(e) {
+      var containerId = type === 'balance' ? 'prf-balance-table' : 'prf-cashflow-table';
+      var el = document.getElementById(containerId);
+      if (el) el.innerHTML = '<div style="padding:20px;color:var(--muted2);font-size:12px;">Veri alınamadı: ' + e.message + '</div>';
+    });
+}
+
+// Haberleri yükle ve göster
+function loadNewsPanel() {
+  var el = document.getElementById('prf-news-list');
+  if (!el) return;
+
+  fetch('/api/fundamentals?symbol=' + encodeURIComponent(_prfSym) + '&exchange=' + encodeURIComponent(_prfEx) + '&type=news')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var news = data.news || [];
+      if (!news.length) {
+        el.innerHTML = '<div style="padding:20px;color:var(--muted2);font-size:12px;">Haber bulunamadı.</div>';
+        return;
+      }
+      el.innerHTML = news.map(function(n) {
+        var date = n.datetime ? new Date(n.datetime).toLocaleDateString('tr-TR') : '';
+        var img  = n.image ? '<img src="'+n.image+'" onerror="this.style.display=\'none\'" style="width:72px;height:52px;object-fit:cover;border-radius:5px;flex-shrink:0;">' : '';
+        return '<div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);align-items:flex-start;">' +
+          img +
+          '<div style="flex:1;min-width:0;">' +
+            '<div style="font-size:11px;color:var(--muted2);margin-bottom:4px;">' + (n.source||'') + ' &bull; ' + date + '</div>' +
+            '<div onclick="window.open(\''+n.url+'\',\'_blank\')" style="font-size:12px;font-weight:600;color:var(--text);cursor:pointer;line-height:1.5;margin-bottom:4px;">' + n.title + '</div>' +
+            (n.summary ? '<div style="font-size:11px;color:var(--text2);line-height:1.6;">' + n.summary + '</div>' : '') +
+          '</div></div>';
+      }).join('');
+    })
+    .catch(function(e) {
+      el.innerHTML = '<div style="padding:20px;color:var(--muted2);font-size:12px;">Haberler alınamadı.</div>';
+    });
+}
+
+// prfTab override — yeni paneller için lazy load
+var _origPrfTab = prfTab;
+prfTab = function(id, el) {
+  _origPrfTab(id, el);
+  if (id === 'balance')   renderFundPanel('balance', 'annual');
+  if (id === 'cashflow')  renderFundPanel('cashflow', 'annual');
+  if (id === 'news')      loadNewsPanel();
+};
+

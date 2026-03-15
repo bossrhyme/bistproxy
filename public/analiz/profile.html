@@ -109,6 +109,9 @@ if('serviceWorker' in navigator){
           <div class="prf-tab" onclick="prfTab('piotroski',this)">F-Score</div>
           <div class="prf-tab" onclick="prfTab('guru',this)">Guru Analizi</div>
           <div class="prf-tab" onclick="prfTab('ai',this)">🤖 YZ Analizi</div>
+          <div class="prf-tab" onclick="prfTab('balance',this)">Bilanço</div>
+          <div class="prf-tab" onclick="prfTab('cashflow',this)">Nakit Akışı</div>
+          <div class="prf-tab" onclick="prfTab('news',this)">Haberler</div>
         </div>
 
         <div id="prf-panel-overview" class="prf-panel on">
@@ -258,7 +261,35 @@ if('serviceWorker' in navigator){
           <div class="prf-stitle">Benzer Hisseler</div>
           <div id="prf-similar"><div style="font-size:11px;color:var(--muted)">Önce tarama yapın</div></div>
         </div>
-      </div>
+ 
+
+        <div id="prf-panel-balance" class="prf-panel">
+          <div class="prf-section">
+            <div class="prf-sec-title">Bilanço &nbsp;
+              <span id="bal-annual" onclick="setPeriod('balance','annual',this)" style="cursor:pointer;font-size:9px;padding:2px 7px;background:var(--accent);color:#fff;border-radius:3px;">Yillik</span>
+              <span id="bal-quarterly" onclick="setPeriod('balance','quarterly',this)" style="cursor:pointer;font-size:9px;padding:2px 7px;border:1px solid var(--border2);border-radius:3px;color:var(--text2);">Ceyreklik</span>
+            </div>
+            <div id="prf-balance-table"><div style="padding:20px;color:var(--muted2);font-size:12px;">Yukleniiyor...</div></div>
+          </div>
+        </div>
+
+        <div id="prf-panel-cashflow" class="prf-panel">
+          <div class="prf-section">
+            <div class="prf-sec-title">Nakit Akisi &nbsp;
+              <span id="cf-annual" onclick="setPeriod('cashflow','annual',this)" style="cursor:pointer;font-size:9px;padding:2px 7px;background:var(--accent);color:#fff;border-radius:3px;">Yillik</span>
+              <span id="cf-quarterly" onclick="setPeriod('cashflow','quarterly',this)" style="cursor:pointer;font-size:9px;padding:2px 7px;border:1px solid var(--border2);border-radius:3px;color:var(--text2);">Ceyreklik</span>
+            </div>
+            <div id="prf-cashflow-table"><div style="padding:20px;color:var(--muted2);font-size:12px;">Yukleniiyor...</div></div>
+          </div>
+        </div>
+
+        <div id="prf-panel-news" class="prf-panel">
+          <div class="prf-section">
+            <div class="prf-sec-title">Son Haberler</div>
+            <div id="prf-news-list"><div style="padding:20px;color:var(--muted2);font-size:12px;">Haberler yukleniyor...</div></div>
+          </div>
+        </div>
+     </div>
     </div>
   </div>
 
