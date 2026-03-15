@@ -847,3 +847,7 @@ html,body{height:100%;overflow:hidden;}
 .perf-bar-track{flex:1;height:4px;background:var(--s3);border-radius:2px;overflow:hidden;}
 .perf-bar-fill{height:100%;border-radius:2px;transition:width .6s ease;}
 .perf-bar-val{font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:600;width:42px;text-align:right;flex-shrink:0;}
+
+/* ── Chart widget ── */
+#prf-tv-widget{height:340px;background:var(--s2);position:relative;overflow:hidden;}
+#prf-chart-inner{width:100%;height:300px;background:#0d1117;overflow:hidden;}

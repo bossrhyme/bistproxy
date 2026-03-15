@@ -22,8 +22,10 @@ function loadTVWidget(sym, ex) {
     var chartEl = document.getElementById('prf-chart-inner');
     if(!chartEl || !window.LightweightCharts) return;
 
+    // Sabit width ile başlat, sonra gerçek width ile resize
+    var _initW = chartEl.offsetWidth || chartEl.parentElement && chartEl.parentElement.offsetWidth || 600;
     var chart = LightweightCharts.createChart(chartEl, {
-      width:  chartEl.offsetWidth || 600,
+      width:  _initW > 50 ? _initW : 600,
       height: 300,
       layout:     { background:{ color:'#0d1117' }, textColor:'#6a8fa8' },
       grid:       { vertLines:{ color:'#1c2d40' }, horzLines:{ color:'#1c2d40' } },
@@ -49,6 +51,7 @@ function loadTVWidget(sym, ex) {
           return { time:c.t, open:c.o, high:c.h, low:c.l, close:c.c };
         }).filter(function(c){ return c.open != null && c.close != null; });
         if(!candles.length) return;
+        console.log('[DeepFin] Chart data loaded:', candles.length, 'candles');
         series.setData(candles);
         chart.timeScale().fitContent();
         // Resize - birkaç kez dene
@@ -67,6 +70,7 @@ function loadTVWidget(sym, ex) {
 
     var ld = document.getElementById('prf-live-dot');
     if(ld) ld.style.display = 'flex';
+    console.log('[DeepFin] Chart created. Container:', chartEl ? chartEl.offsetWidth+'x'+chartEl.offsetHeight : 'null');
   }
 
   // LC yüklü mü kontrol et, değilse bekle
