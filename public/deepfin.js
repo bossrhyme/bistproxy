@@ -381,7 +381,8 @@ async function runScan(){
   // TradingView field isimleri — konsoldan teyit edildi ✓
   const COLS_BIST = [
     'name','description','close','change','volume','market_cap_basic',
-    'price_earnings_ttm','price_book_fq','price_sales_current',
+    'price_earnings_ttm','price_to_revenue_ratio',
+    'price_book_fq','price_sales_current',
     'return_on_equity_fq','return_on_assets_fq',
     'net_margin','gross_margin',
     'total_revenue_change_ttm_yoy','earnings_per_share_change_ttm_yoy',
@@ -503,7 +504,7 @@ async function runScan(){
       const mcap   = g('market_cap_basic');
       const pe     = g('price_earnings_ttm');
       const pb     = g('price_book_fq')               ?? g('price_book_ratio');
-      const ps     = g('price_sales_current');
+      const ps     = g('price_sales_current') ?? g('price_to_revenue_ratio');
       const roe    = g('return_on_equity_fq')           ?? g('return_on_equity');
       const roa    = g('return_on_assets_fq')           ?? g('return_on_assets');
       const nm     = g('net_margin');

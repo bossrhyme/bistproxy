@@ -176,7 +176,7 @@ module.exports = async function(req, res) {
     const ALLOWED_COLS = new Set([
       'name','description','close','change','change_abs','volume','average_volume_10d_calc',
       'market_cap_basic','price_earnings_ttm','price_book_fq','price_book_ratio',
-      'price_sales_current','return_on_equity','return_on_equity_fq',
+      'price_sales_current','price_to_revenue_ratio','return_on_equity','return_on_equity_fq',
       'return_on_assets','return_on_assets_fq','net_margin','gross_margin',
       'dividends_yield','dividends_yield_current','debt_to_equity_fq','total_debt_to_equity',
       'current_ratio','current_ratio_fq','sector','High.1M','Low.1M',
@@ -201,7 +201,7 @@ module.exports = async function(req, res) {
     const ALLOWED_FILTER_FIELDS = new Set([
       'name','close','change','change_abs','volume','average_volume_10d_calc',
       'market_cap_basic','price_earnings_ttm','price_book_fq','price_book_ratio',
-      'price_sales_current','return_on_equity','return_on_equity_fq',
+      'price_sales_current','price_to_revenue_ratio','price_to_revenue_ratio','return_on_equity','return_on_equity_fq',
       'return_on_assets','return_on_assets_fq','net_margin','gross_margin',
       'dividends_yield','dividends_yield_current','debt_to_equity_fq','total_debt_to_equity',
       'current_ratio','current_ratio_fq','sector','High.1M','Low.1M',

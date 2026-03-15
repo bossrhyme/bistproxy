@@ -4,24 +4,40 @@ const https = require('https');
 
 const SUFFIX = { bist:'.IS', nasdaq:'', sp500:'', dax:'.DE', lse:'.L', nikkei:'.T' };
 
-function yhFetch(path) {
+function yhFetch(path, altHost) {
+  const hostname = altHost || 'query1.finance.yahoo.com';
   return new Promise((resolve, reject) => {
     const req = https.request({
-      hostname: 'query1.finance.yahoo.com',
+      hostname,
       path,
       method: 'GET',
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         'Accept': 'application/json',
         'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': 'https://finance.yahoo.com/',
       }
     }, (res) => {
       let d = '';
       res.on('data', c => d += c);
-      res.on('end', () => resolve(d));
+      res.on('end', () => {
+        // query2 mirror dene
+        if (res.statusCode === 429 && !altHost) {
+          yhFetch(path, 'query2.finance.yahoo.com').then(resolve).catch(reject);
+        } else {
+          resolve(d);
+        }
+      });
     });
-    req.on('error', reject);
-    req.setTimeout(9000, () => { req.destroy(); reject(new Error('timeout')); });
+    req.on('error', err => {
+      // query2 mirror dene
+      if (!altHost) {
+        yhFetch(path, 'query2.finance.yahoo.com').then(resolve).catch(reject);
+      } else {
+        reject(err);
+      }
+    });
+    req.setTimeout(10000, () => { req.destroy(); reject(new Error('Yahoo timeout')); });
     req.end();
   });
 }
@@ -154,24 +170,36 @@ module.exports = async (req, res) => {
     if (!r) return res.status(404).json({ error: 'Veri bulunamadı', symbol: sym + suffix });
 
     if (type === 'financials') {
+      const annInc = r.incomeStatementHistory?.incomeStatementHistory;
+      const qtrInc = r.incomeStatementHistoryQuarterly?.incomeStatementHistory;
+      console.log('financials annInc:', Array.isArray(annInc) ? annInc.length : typeof annInc);
       return res.status(200).json({
-        annual:    parseIncome(r.incomeStatementHistory?.incomeStatementHistory),
-        quarterly: parseIncome(r.incomeStatementHistoryQuarterly?.incomeStatementHistory),
+        annual:    parseIncome(annInc),
+        quarterly: parseIncome(qtrInc),
         symbol: sym + suffix,
+        _debug: { annCount: annInc?.length || 0, qtrCount: qtrInc?.length || 0 },
       });
     }
     if (type === 'balance') {
+      const annStmts = r.balanceSheetHistory?.balanceSheetStatements;
+      const qtrStmts = r.balanceSheetHistoryQuarterly?.balanceSheetStatements;
+      console.log('balance annStmts:', Array.isArray(annStmts) ? annStmts.length : typeof annStmts);
       return res.status(200).json({
-        annual:    parseBalance(r.balanceSheetHistory?.balanceSheetStatements),
-        quarterly: parseBalance(r.balanceSheetHistoryQuarterly?.balanceSheetStatements),
+        annual:    parseBalance(annStmts),
+        quarterly: parseBalance(qtrStmts),
         symbol: sym + suffix,
+        _debug: { annCount: annStmts?.length || 0, qtrCount: qtrStmts?.length || 0 },
       });
     }
     if (type === 'cashflow') {
+      const annCf = r.cashflowStatementHistory?.cashflowStatements;
+      const qtrCf = r.cashflowStatementHistoryQuarterly?.cashflowStatements;
+      console.log('cashflow annCf:', Array.isArray(annCf) ? annCf.length : typeof annCf);
       return res.status(200).json({
-        annual:    parseCashflow(r.cashflowStatementHistory?.cashflowStatements),
-        quarterly: parseCashflow(r.cashflowStatementHistoryQuarterly?.cashflowStatements),
+        annual:    parseCashflow(annCf),
+        quarterly: parseCashflow(qtrCf),
         symbol: sym + suffix,
+        _debug: { annCount: annCf?.length || 0, qtrCount: qtrCf?.length || 0 },
       });
     }
 

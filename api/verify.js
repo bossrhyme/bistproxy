@@ -57,7 +57,11 @@ module.exports = async (req, res) => {
     const yahoo = {
       symbol: yhSym,
       // Değerleme
-      pe:         num(sd.trailingPE)                   ?? num(fd.currentPrice / fd.earningsPerShare),
+      pe:         (function() {
+      var v = num(sd.trailingPE) ?? num(sd.forwardPE);
+      if (v == null && fd.currentPrice && fd.earningsPerShare) v = num(fd.currentPrice / fd.earningsPerShare);
+      return v;
+    })(),
       pb:         num(ks.priceToBook),
       ps:         num(sd.priceToSalesTrailing12Months),
       // Karlılık (Yahoo fraction → *100 = %)
