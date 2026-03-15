@@ -1601,44 +1601,43 @@ function updateChart(sym) {
 
   var activeTab = document.querySelector('.ctab.on');
   var interval  = (activeTab && activeTab.dataset.interval) || 'D';
-  var dateRange = interval === 'M' ? '12M' : interval === 'W' ? '1W' : '1D';
 
-  // Mevcut widget'ı temizle
+  // Mevcut widget temizle
   container.innerHTML = '';
 
-  // TradingView widget HTML yapısı - textContent ile config
+  // TradingView Advanced Chart (candlestick)
   var wrapper = document.createElement('div');
   wrapper.className = 'tradingview-widget-container';
   wrapper.style.cssText = 'width:100%;height:100%;';
 
-  var widgetDiv = document.createElement('div');
-  widgetDiv.className = 'tradingview-widget-container__widget';
-  widgetDiv.style.cssText = 'width:100%;height:100%;';
-  wrapper.appendChild(widgetDiv);
+  var inner = document.createElement('div');
+  inner.className = 'tradingview-widget-container__widget';
+  inner.style.cssText = 'width:100%;height:100%;';
+  wrapper.appendChild(inner);
 
-  var config = {
-    symbol: tvSym,
-    width: '100%',
-    height: '100%',
-    locale: 'tr',
-    dateRange: dateRange,
-    colorTheme: 'dark',
-    isTransparent: true,
-    autosize: true,
-    largeChartUrl: 'https://www.tradingview.com/chart/?symbol=' + tvSym,
-    noTimeScale: false,
-    chartOnly: false,
-    hideLegend: false
-  };
-
-  // script.textContent kullan - innerHTML değil
   var script = document.createElement('script');
   script.type = 'text/javascript';
-  script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
+  script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
   script.async = true;
-  script.textContent = JSON.stringify(config);
+  script.textContent = JSON.stringify({
+    autosize: true,
+    symbol: tvSym,
+    interval: interval,
+    timezone: 'Europe/Istanbul',
+    theme: 'dark',
+    style: '1',
+    locale: 'tr',
+    allow_symbol_change: false,
+    calendar: false,
+    hide_top_toolbar: false,
+    hide_legend: true,
+    save_image: false,
+    backgroundColor: 'rgba(11,14,19,1)',
+    gridColor: 'rgba(30,39,51,0.6)',
+    hide_volume: false,
+    support_host: 'https://www.tradingview.com'
+  });
   wrapper.appendChild(script);
-
   container.appendChild(wrapper);
   _tvCurrentSym = tvSym;
 }

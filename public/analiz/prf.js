@@ -13,9 +13,24 @@ function loadTVWidget(sym, ex) {
   var prefixes = {bist:'BIST',nasdaq:'NASDAQ',sp500:'NYSE',dax:'XETR',lse:'LSE',nikkei:'TSE'};
   var pfx = prefixes[ex] || 'BIST';
   var tvSym = pfx + ':' + sym;
-  var themes = 'dark';
-  container.innerHTML = '<div id="tv-widget-inner"></div>';
+
+  // Temizle
+  container.innerHTML = '';
+
+  // Wrapper
+  var wrapper = document.createElement('div');
+  wrapper.className = 'tradingview-widget-container';
+  wrapper.style.cssText = 'width:100%;height:340px;';
+
+  // Widget div (TV bunu kullanır)
+  var inner = document.createElement('div');
+  inner.className = 'tradingview-widget-container__widget';
+  inner.style.cssText = 'width:100%;height:340px;';
+  wrapper.appendChild(inner);
+
+  // Config script - textContent ile
   var script = document.createElement('script');
+  script.type = 'text/javascript';
   script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
   script.async = true;
   script.textContent = JSON.stringify({
@@ -23,7 +38,7 @@ function loadTVWidget(sym, ex) {
     symbol: tvSym,
     interval: 'D',
     timezone: 'Europe/Istanbul',
-    theme: themes,
+    theme: 'dark',
     style: '1',
     locale: 'tr',
     allow_symbol_change: false,
@@ -31,21 +46,15 @@ function loadTVWidget(sym, ex) {
     hide_top_toolbar: false,
     hide_legend: true,
     save_image: false,
-    backgroundColor: 'rgba(14,14,14,1)',
-    gridColor: 'rgba(255,255,255,0.04)',
+    backgroundColor: 'rgba(11,14,19,1)',
+    gridColor: 'rgba(30,39,51,0.6)',
     hide_volume: false,
     support_host: 'https://www.tradingview.com'
   });
-  var wrapper = document.createElement('div');
-  wrapper.className = 'tradingview-widget-container';
-  wrapper.style.cssText = 'width:100%;height:340px;';
-  var inner = document.createElement('div');
-  inner.className = 'tradingview-widget-container__widget';
-  inner.style.cssText = 'height:calc(100% - 32px);width:100%;';
-  wrapper.appendChild(inner);
   wrapper.appendChild(script);
-  container.innerHTML = '';
+
   container.appendChild(wrapper);
+
   // live dot göster
   var ld = document.getElementById('prf-live-dot');
   if(ld) ld.style.display = 'flex';
