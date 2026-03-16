@@ -31,8 +31,21 @@ module.exports = async (req, res) => {
 
   if (!sym) return res.status(400).json({ error: 'symbol gerekli' });
 
-  const key = process.env.FINNHUB_KEY || process.env.FINNHUB_API_KEY || '';
-  if (!key) return res.status(200).json({ error: 'FINNHUB_KEY yok', yahoo: null });
+  // Tüm olası isimler
+  const key = process.env.FINNHUB_KEY 
+           || process.env.FINNHUB_API_KEY 
+           || process.env.NEXT_PUBLIC_FINNHUB_KEY
+           || process.env.FINNHUB_TOKEN
+           || process.env.FINNHUB
+           || '';
+  const keySource = process.env.FINNHUB_KEY ? 'FINNHUB_KEY'
+                  : process.env.FINNHUB_API_KEY ? 'FINNHUB_API_KEY'
+                  : process.env.NEXT_PUBLIC_FINNHUB_KEY ? 'NEXT_PUBLIC_FINNHUB_KEY'
+                  : process.env.FINNHUB_TOKEN ? 'FINNHUB_TOKEN'
+                  : process.env.FINNHUB ? 'FINNHUB'
+                  : 'none';
+  console.log('verify key source:', keySource, 'key length:', key.length);
+  if (!key) return res.status(200).json({ error: 'FINNHUB_KEY yok - denenen: FINNHUB_KEY, FINNHUB_API_KEY, FINNHUB_TOKEN, FINNHUB', keySource, yahoo: null });
 
   const fullSym = sym + (SUFFIX[exchange] ?? '');
 
@@ -68,7 +81,7 @@ module.exports = async (req, res) => {
       currentRatio:  num(m.currentRatioAnnual),
     };
 
-    res.status(200).json({ source: 'finnhub', yahoo, symbol: fullSym });
+    res.status(200).json({ source: 'finnhub', yahoo, symbol: fullSym, _keySource: keySource });
 
   } catch (e) {
     res.status(500).json({ error: e.message });

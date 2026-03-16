@@ -26,7 +26,12 @@ function makeReq(hostname, path, headers) {
 
 // Finnhub API key
 function getFinnhubKey() {
-  return process.env.FINNHUB_KEY || process.env.FINNHUB_API_KEY || process.env.NEXT_PUBLIC_FINNHUB_KEY || '';
+  return process.env.FINNHUB_KEY 
+      || process.env.FINNHUB_API_KEY 
+      || process.env.NEXT_PUBLIC_FINNHUB_KEY
+      || process.env.FINNHUB_TOKEN
+      || process.env.FINNHUB
+      || '';
 }
 
 // Finnhub metrics → uygulama formatı
