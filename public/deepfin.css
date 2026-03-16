@@ -496,10 +496,11 @@ td:first-child,td:nth-child(2){text-align:left;}
   .twrap {
     flex: 1;
     min-height: 0;
-    overflow-x: auto;              /* ← sağa/sola serbestçe kaydır */
+    overflow-x: auto;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     position: relative;
+    -webkit-overflow-scrolling: touch;
   }
   table {
     min-width: 860px;              /* tüm kolonlar sığsın */
@@ -656,7 +657,55 @@ td:first-child,td:nth-child(2){text-align:left;}
   .wallet-row { flex-wrap: wrap; gap: 4px; }
   .wallet-addr { font-size: 8px; min-width: 0; }
   .copy-btn { font-size: 9px; padding: 6px 8px; }
-@media (max-width: 480px) {
+@media (
+/* ── MOBİL DRAWER ── */
+#drawer-panel {
+  position: fixed;
+  top: 52px;
+  left: 0;
+  bottom: 0;
+  width: 85vw;
+  max-width: 320px;
+  background: var(--s1);
+  z-index: 200;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  transform: translateX(-100%);
+  transition: transform .25s cubic-bezier(.4,0,.2,1);
+  will-change: transform;
+  border-right: 1px solid var(--border);
+}
+#drawer-panel.open {
+  transform: translateX(0);
+}
+#drawer-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  z-index: 199;
+  backdrop-filter: blur(2px);
+}
+#drawer-overlay.open {
+  display: block;
+}
+#drawer-content {
+  padding: 8px 0 80px;
+}
+
+/* Drawer içindeki chip seçim feedback */
+#drawer-content .chip.on,
+#drawer-content .goat-chip.on {
+  background: var(--accent) !important;
+  color: #fff !important;
+  border-color: var(--accent) !important;
+}
+
+/* Hamburger animasyonu */
+.hamburger-btn.open .ham-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger-btn.open .ham-line:nth-child(2) { opacity: 0; }
+.hamburger-btn.open .ham-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+max-width: 480px) {
   /* Çok küçük ekranlar (SE, Mini) */
   .exchange-grid { grid-template-columns: repeat(2, 1fr); gap: 4px; }
   .exbtn { font-size: 10px; padding: 7px 4px; }

@@ -1139,6 +1139,11 @@ function applyAndRender(special){
   updateStatsBar();
   updateTicker();
   setTimeout(applyColVisibility, 0);
+  // Mobil: tablo görünür alana scroll et
+  if (window.innerWidth <= 768) {
+    var twrapEl = document.getElementById('twrap');
+    if (twrapEl) twrapEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 }
 
 function onSearch(){
@@ -2023,6 +2028,8 @@ function selectExchange(el) {
   }
   // Otomatik tarama
   runScan();
+  // Mobil: borsa değişince drawer'ı kapat
+  if (window.innerWidth <= 768) { try { closeMobileDrawer(); } catch(e){} }
 }
 
 function updateStatsBar() {
@@ -2399,8 +2406,16 @@ function toggleMobileDrawer() {
           if (el.dataset.goat)   selector = '.sidebar [data-goat="'   + el.dataset.goat   + '"]';
           if (el.dataset.preset) selector = '.sidebar [data-preset="' + el.dataset.preset + '"]';
           if (el.dataset.tech)   selector = '.sidebar [data-tech="'   + el.dataset.tech   + '"]';
-          if (selector) { var origChip = document.querySelector(selector); if (origChip) origChip.click(); }
-          closeMobileDrawer();
+          if (selector) {
+            var origChip = document.querySelector(selector);
+            if (origChip) {
+              origChip.click();
+              // Seçim feedback - chip'e anlık .on class uygula
+              el.classList.toggle('on', origChip.classList.contains('on'));
+            }
+          }
+          // Chip seçimi sonrası drawer'ı kapat
+          setTimeout(function() { closeMobileDrawer(); }, 150);
           return;
         }
         closeMobileDrawer();
@@ -2409,6 +2424,18 @@ function toggleMobileDrawer() {
     });
 
     Array.from(clone.children).forEach(function(c){ drawerContent.appendChild(c); });
+
+    // Mevcut seçili chip'leri işaretle
+    clone.querySelectorAll('[data-goat],[data-preset],[data-tech]').forEach(function(cloneChip) {
+      var origSel = '';
+      if (cloneChip.dataset.goat)   origSel = '.sidebar [data-goat="'   + cloneChip.dataset.goat   + '"]';
+      if (cloneChip.dataset.preset) origSel = '.sidebar [data-preset="' + cloneChip.dataset.preset + '"]';
+      if (cloneChip.dataset.tech)   origSel = '.sidebar [data-tech="'   + cloneChip.dataset.tech   + '"]';
+      if (origSel) {
+        var orig = document.querySelector(origSel);
+        if (orig && orig.classList.contains('on')) cloneChip.classList.add('on');
+      }
+    });
   }
 
   panel.classList.add('open');
