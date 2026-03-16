@@ -1723,16 +1723,16 @@ function fetchYahooVerify(sym, ex) {
       }
 
       if(mismatch.length === 0) {
-        badge.textContent = '✓ Yahoo doğrulandı';
+        badge.textContent = '✓ Doğrulandı';
         badge.style.background = 'rgba(0,192,118,.1)';
         badge.style.color = '#00c076';
-        badge.title = 'Tüm oranlar Yahoo Finance ile uyuşuyor';
+        badge.title = 'Tüm oranlar anlık veriyle uyuşuyor';
       } else {
         badge.textContent = '⚠ ' + mismatch.length + ' oran farklı';
         badge.style.background = 'rgba(240,180,41,.1)';
         badge.style.color = '#f0b429';
         badge.title = mismatch.map(function(m){
-          return m.label + ': TV='+parseFloat(m.tv).toFixed(2)+' Yahoo='+parseFloat(m.yh).toFixed(2)+' (%'+m.pct+' fark)';
+          return m.label + ': Tarama='+parseFloat(m.tv).toFixed(2)+' Anlık='+parseFloat(m.yh).toFixed(2)+' (%'+m.pct+' fark)';
         }).join(' | ');
       }
 

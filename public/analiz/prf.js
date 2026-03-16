@@ -856,7 +856,7 @@ prfTab = function(id, el) {
 
 
 // Finansallar paneli — Yahoo gelir tablosu
-function loadFinancialsPanel_OLD() {
+function _unusedOldFinPanel() {
   var el = document.getElementById('prf-fin-yahoo');
   if (!el) {
     // Container yoksa oluştur
@@ -886,3 +886,54 @@ function loadFinancialsPanel_OLD() {
 }
 
 function loadFinancialsPanel() { renderFundPanel('income', 'annual'); }
+
+// ── Finnhub/TV metrics özet kartı ─────────────────────────────────────────
+function _buildMetricsCard(m, type) {
+  if (!m) return '<div style="padding:16px;color:var(--muted2);font-size:12px;">Veri yüklenemedi.</div>';
+  var cur = (EXCHANGE_META[_prfEx] || {}).currency || '$';
+  var f1  = function(v) { return v != null ? v.toFixed(1) : '—'; };
+  var f2  = function(v) { return v != null ? v.toFixed(2) : '—'; };
+  var fp  = function(v) { return v != null ? (v >= 0 ? '+' : '') + v.toFixed(1) + '%' : '—'; };
+  var clr = function(v, inv) {
+    if (v == null) return '#64748b';
+    return (inv ? v <= 0 : v >= 0) ? '#00c076' : '#f6465d';
+  };
+
+  var rows;
+  if (type === 'income') {
+    rows = [
+      ['Net Kar Marjı', m.netMargin   != null ? m.netMargin.toFixed(1)   + '%' : '—', clr(m.netMargin)],
+      ['Brüt Marj',    m.grossMargin != null ? m.grossMargin.toFixed(1) + '%' : '—', clr(m.grossMargin)],
+      ['ROE (TTM)',     m.roe         != null ? m.roe.toFixed(1)         + '%' : '—', clr(m.roe)],
+      ['ROA (TTM)',     m.roa         != null ? m.roa.toFixed(1)         + '%' : '—', clr(m.roa)],
+      ['Gelir Büyüme', fp(m.revenueGrowth), clr(m.revenueGrowth)],
+      ['EPS Büyüme',   fp(m.epsGrowth),     clr(m.epsGrowth)],
+    ];
+  } else if (type === 'balance') {
+    rows = [
+      ['Cari Oran',       f2(m.currentRatio), m.currentRatio != null && m.currentRatio >= 1 ? '#00c076' : '#f6465d'],
+      ['Borç/Özkaynak',   f2(m.debtToEquity), clr(m.debtToEquity, true)],
+      ['PD/DD',           f2(m.pb),           '#94a3b8'],
+      ['Temettü Verimi',  m.dividendYield != null ? m.dividendYield.toFixed(2) + '%' : '—', '#00c076'],
+    ];
+  } else {
+    rows = [
+      ['F/K',             f2(m.pe),   '#94a3b8'],
+      ['F/S',             f2(m.ps),   '#94a3b8'],
+      ['PEG',             m.peg != null ? f2(m.peg) : '—', '#94a3b8'],
+      ['Temettü Verimi',  m.dividendYield != null ? m.dividendYield.toFixed(2) + '%' : '—', '#00c076'],
+    ];
+  }
+
+  var html = '<div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-top:8px;">';
+  html += '<div style="padding:8px 14px;background:rgba(30,39,51,.5);font-size:9px;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;font-weight:600;">';
+  html += 'TradingView · Özet Metrikler</div>';
+  rows.forEach(function(row) {
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border-top:1px solid rgba(255,255,255,.04);">';
+    html += '<span style="font-size:11px;color:var(--text2);">' + row[0] + '</span>';
+    html += '<span style="font-size:12px;font-weight:600;color:' + row[2] + ';">' + row[1] + '</span>';
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
+}
