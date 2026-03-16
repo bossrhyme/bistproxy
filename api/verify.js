@@ -36,12 +36,14 @@ module.exports = async (req, res) => {
            || process.env.FINNHUB_API_KEY 
            || process.env.NEXT_PUBLIC_FINNHUB_KEY
            || process.env.FINNHUB_TOKEN
+           || process.env.FINHUB_KEY
            || process.env.FINNHUB
            || '';
   const keySource = process.env.FINNHUB_KEY ? 'FINNHUB_KEY'
                   : process.env.FINNHUB_API_KEY ? 'FINNHUB_API_KEY'
                   : process.env.NEXT_PUBLIC_FINNHUB_KEY ? 'NEXT_PUBLIC_FINNHUB_KEY'
                   : process.env.FINNHUB_TOKEN ? 'FINNHUB_TOKEN'
+                  : process.env.FINHUB_KEY ? 'FINHUB_KEY'
                   : process.env.FINNHUB ? 'FINNHUB'
                   : 'none';
   console.log('verify key source:', keySource, 'key length:', key.length);
