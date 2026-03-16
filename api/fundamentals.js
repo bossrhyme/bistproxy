@@ -1,69 +1,60 @@
-// api/fundamentals.js — Finansal veriler
-// type=metrics   → Finnhub stock metrics (özet kartlar)
-// type=financials → Yahoo v8 chart'tan gelir tahmini (fallback: metrics)
-// type=balance   → Yahoo v8 tabanlı (gelecek)  
-// type=cashflow  → Yahoo v8 tabanlı (gelecek)
-// type=news      → Finnhub company news
+// api/fundamentals.js — TV Scanner tabanlı finansal veriler
+// type=metrics   → TradingView Scanner (ücretsiz, tüm borsalar)
+// type=news      → Finnhub company-news (API key gerekli)
+// type=financials|balance|cashflow → TV'den özet metrics (detaylı tablo mevcut değil)
 const https = require('https');
 
 const SUFFIX = { bist:'.IS', nasdaq:'', sp500:'', dax:'.DE', lse:'.L', nikkei:'.T' };
+const TV_PATHS = {
+  bist:'/turkey/scan', nasdaq:'/america/scan', sp500:'/america/scan',
+  dax:'/germany/scan', lse:'/uk/scan', nikkei:'/japan/scan'
+};
 
-function makeReq(hostname, path, headers) {
+const TV_FIELDS = [
+  'name','close','change','volume','market_cap_basic',
+  'price_earnings_ttm','price_book_fq','price_book_ratio','price_sales_current',
+  'return_on_equity_fq','return_on_equity','return_on_assets_fq','return_on_assets',
+  'net_margin','gross_margin',
+  'total_revenue_change_ttm_yoy','revenue_growth_ttm_yoy',
+  'earnings_per_share_change_ttm_yoy','earnings_per_share_diluted_ttm',
+  'dividends_yield','dividends_yield_current',
+  'debt_to_equity_fq','total_debt_to_equity','current_ratio_fq','current_ratio',
+  'piotroski_f_score','price_earnings_growth_ttm','beta_1_year',
+  'High.1M','Low.1M','52_week_high','52_week_low',
+  'Perf.W','Perf.1M','Perf.Y',
+];
+
+function tvScan(exchange, symbol) {
+  const tvPath = TV_PATHS[exchange] || TV_PATHS.bist;
+  const payload = JSON.stringify({
+    filter: [{ left: 'name', operation: 'equal', right: symbol }],
+    columns: TV_FIELDS,
+    range: [0, 1],
+    ignore_unknown_fields: true,
+  });
   return new Promise((resolve, reject) => {
     const req = https.request({
-      hostname, path, method: 'GET',
-      headers: headers || { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' }
+      hostname: 'scanner.tradingview.com',
+      path: tvPath, method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload),
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+        'Origin': 'https://www.tradingview.com',
+        'Referer': 'https://www.tradingview.com/',
+        'Accept': 'application/json',
+      }
     }, (res) => {
-      let d = '';
-      res.on('data', c => d += c);
-      res.on('end', () => resolve({ status: res.statusCode, body: d }));
+      let d = ''; res.on('data', c => d += c); res.on('end', () => resolve({status:res.statusCode,body:d}));
     });
     req.on('error', reject);
-    req.setTimeout(10000, () => { req.destroy(); reject(new Error('timeout')); });
-    req.end();
+    req.setTimeout(9000, () => { req.destroy(); reject(new Error('TV timeout')); });
+    req.write(payload); req.end();
   });
 }
 
-// Finnhub API key
-function getFinnhubKey() {
-  return process.env.FINNHUB_KEY 
-      || process.env.FINNHUB_API_KEY 
-      || process.env.NEXT_PUBLIC_FINNHUB_KEY
-      || process.env.FINNHUB_TOKEN
-      || process.env.FINNHUB
-      || '';
-}
-
-// Finnhub metrics → uygulama formatı
-function parseFinnhubMetrics(m) {
-  if (!m) return null;
-  const pct = v => (v != null && !isNaN(v)) ? parseFloat((v).toFixed(2)) : null;
-  const num = v => (v != null && !isNaN(v)) ? parseFloat(parseFloat(v).toFixed(4)) : null;
-  return {
-    // Değerleme
-    pe:              num(m.peNormalizedAnnual) ?? num(m.peBasicExclExtraItemsTTM),
-    pb:              num(m.pbAnnual),
-    ps:              num(m.psTTM),
-    evEbitda:        num(m['ev/ebitdaAnnual']) ?? num(m['ev/ebitdaTTM']),
-    // Karlılık (Finnhub % olarak döndürür, fraction değil)
-    roe:             pct(m.roeTTM) ?? pct(m.roeRfy),
-    roa:             pct(m.roaTTM) ?? pct(m.roaRfy),
-    netMargin:       pct(m.netProfitMarginTTM) ?? pct(m.netProfitMarginAnnual),
-    grossMargin:     pct(m.grossMarginTTM) ?? pct(m.grossMarginAnnual),
-    // Büyüme
-    revenueGrowth:   pct(m.revenueGrowthTTMYoy),
-    epsGrowth:       pct(m.epsGrowthTTMYoy),
-    // Sağlık
-    dividendYield:   num(m.dividendYieldIndicatedAnnual),
-    debtToEquity:    num(m['totalDebt/totalEquityAnnual']),
-    currentRatio:    num(m.currentRatioAnnual),
-    // Ek
-    beta:            num(m.beta),
-    high52:          num(m['52WeekHigh']),
-    low52:           num(m['52WeekLow']),
-    bookValuePerShare: num(m.bookValuePerShareAnnual),
-  };
-}
+const num = v => (v != null && !isNaN(v)) ? parseFloat(parseFloat(v).toFixed(4)) : null;
+const pct = v => (v != null && !isNaN(v)) ? parseFloat(parseFloat(v).toFixed(2)) : null;
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -79,18 +70,38 @@ module.exports = async (req, res) => {
 
   const suffix  = SUFFIX[ex] ?? '';
   const fullSym = sym + suffix;
-  const key     = getFinnhubKey();
 
   try {
     // ── HABERLER ─────────────────────────────────────────────────────
     if (type === 'news') {
-      if (!key) return res.status(200).json({ news: [], error: 'FINNHUB_KEY yok' });
+      const key = process.env.FINHUB_KEY
+               || process.env.FINNHUB_KEY
+               || process.env.FINNHUB_API_KEY
+               || '';
+      if (!key) return res.status(200).json({ news: [], info: 'API key yok' });
 
       const today = new Date();
-      const from  = new Date(today - 90 * 864e5).toISOString().slice(0, 10);
-      const to    = today.toISOString().slice(0, 10);
-      const r     = await makeReq('finnhub.io',
-        `/api/v1/company-news?symbol=${fullSym}&from=${from}&to=${to}&token=${key}`);
+      const from  = new Date(today - 90*864e5).toISOString().slice(0,10);
+      const to    = today.toISOString().slice(0,10);
+
+      const r = await new Promise((resolve, reject) => {
+        const req2 = https.request({
+          hostname: 'finnhub.io',
+          path: `/api/v1/company-news?symbol=${fullSym}&from=${from}&to=${to}&token=${key}`,
+          method: 'GET',
+          headers: { 'User-Agent': 'Mozilla/5.0' }
+        }, (res2) => {
+          let d=''; res2.on('data',c=>d+=c);
+          res2.on('end', () => resolve({status:res2.statusCode, body:d}));
+        });
+        req2.on('error', reject);
+        req2.setTimeout(8000, () => { req2.destroy(); reject(new Error('timeout')); });
+        req2.end();
+      });
+
+      if (r.status === 403) {
+        return res.status(200).json({ news: [], info: 'Finnhub BIST için premium gerekli' });
+      }
 
       const items = JSON.parse(r.body);
       const news  = (Array.isArray(items) ? items : [])
@@ -108,122 +119,61 @@ module.exports = async (req, res) => {
       return res.status(200).json({ news, symbol: fullSym });
     }
 
-    // ── METRİKS (Finnhub) ────────────────────────────────────────────
-    if (!key) {
-      return res.status(200).json({
-        error: 'FINNHUB_KEY ortam değişkeni ayarlanmamış',
-        annual: [], quarterly: [], metrics: null
-      });
+    // ── TV SCANNER — metrics/financials/balance/cashflow ─────────────
+    const r    = await tvScan(ex, sym);
+    const data = JSON.parse(r.body);
+    const row  = data?.data?.[0]?.d || [];
+
+    if (!row.length) {
+      return res.status(404).json({ error: 'Hisse bulunamadı: ' + sym, annual:[], quarterly:[] });
     }
 
-    const mRes  = await makeReq('finnhub.io',
-      `/api/v1/stock/metric?symbol=${fullSym}&metric=all&token=${key}`);
+    const g = {};
+    TV_FIELDS.forEach((f, i) => { g[f] = row[i] ?? null; });
 
-    if (mRes.status !== 200) {
-      return res.status(200).json({ error: 'Finnhub ' + mRes.status, annual: [], quarterly: [] });
-    }
+    const metrics = {
+      // Değerleme
+      pe:           num(g.price_earnings_ttm),
+      pb:           num(g.price_book_fq) ?? num(g.price_book_ratio),
+      ps:           num(g.price_sales_current),
+      peg:          num(g.price_earnings_growth_ttm),
+      // Karlılık
+      roe:          pct(g.return_on_equity_fq) ?? pct(g.return_on_equity),
+      roa:          pct(g.return_on_assets_fq) ?? pct(g.return_on_assets),
+      netMargin:    pct(g.net_margin),
+      grossMargin:  pct(g.gross_margin),
+      // Büyüme
+      revenueGrowth: pct(g.total_revenue_change_ttm_yoy) ?? pct(g.revenue_growth_ttm_yoy),
+      epsGrowth:     pct(g.earnings_per_share_change_ttm_yoy),
+      // Sağlık
+      dividendYield: num(g.dividends_yield) ?? num(g.dividends_yield_current),
+      debtToEquity:  num(g.debt_to_equity_fq) ?? num(g.total_debt_to_equity),
+      currentRatio:  num(g.current_ratio_fq) ?? num(g.current_ratio),
+      // Ek
+      piotroski:     g.piotroski_f_score != null ? Math.round(g.piotroski_f_score) : null,
+      beta:          num(g.beta_1_year),
+      high52:        num(g['52_week_high']) ?? num(g['High.1M']),
+      low52:         num(g['52_week_low'])  ?? num(g['Low.1M']),
+      perfW:         pct(g['Perf.W']),
+      perf1M:        pct(g['Perf.1M']),
+      perfY:         pct(g['Perf.Y']),
+    };
 
-    const mData   = JSON.parse(mRes.body);
-    const metrics = parseFinnhubMetrics(mData.metric);
+    console.log('TV metrics', sym, 'pe:', metrics.pe, 'roe:', metrics.roe);
 
-    console.log('Finnhub metrics', fullSym, 'pe:', metrics?.pe, 'roe:', metrics?.roe);
-
-    if (type === 'metrics') {
-      return res.status(200).json({ metrics, symbol: fullSym });
-    }
-
-    // ── FİNANSALLAR / BİLANÇO / NAKİT AKIŞI ─────────────────────────
-    // Yahoo v10 BIST için çalışmıyor → Finnhub metrics'ten özet döndür
-    // Gerçek tablo verisi için Finnhub /financials endpoint dene
-
-    const finRes = await makeReq('finnhub.io',
-      `/api/v1/stock/financials-reported?symbol=${fullSym}&token=${key}&freq=annual&limit=4`);
-
-    let annual = [], quarterly = [];
-
-    if (finRes.status === 200) {
-      const finData = JSON.parse(finRes.body);
-      const reports = finData.data || [];
-
-      if (type === 'financials') {
-        annual = reports
-          .filter(r => r.form === '20-F' || r.form === '10-K' || r.form === 'annual')
-          .slice(0, 4)
-          .map(r => {
-            const ic = r.report?.ic || [];
-            const get = label => {
-              const item = ic.find(x => x.label === label || x.concept === label);
-              return item ? item.value : null;
-            };
-            return {
-              date:            r.period || '',
-              totalRevenue:    get('Revenues') || get('Revenue') || get('RevenueFromContractWithCustomerExcludingAssessedTax'),
-              grossProfit:     get('GrossProfit'),
-              operatingIncome: get('OperatingIncomeLoss'),
-              netIncome:       get('NetIncomeLoss') || get('ProfitLoss'),
-              ebitda:          null, // hesaplanabilir ama karmaşık
-            };
-          })
-          .filter(r => r.totalRevenue != null);
-      }
-
-      if (type === 'balance') {
-        annual = reports
-          .filter(r => r.form === '20-F' || r.form === '10-K' || r.form === 'annual')
-          .slice(0, 4)
-          .map(r => {
-            const bs = r.report?.bs || [];
-            const get = label => {
-              const item = bs.find(x => x.label === label || x.concept === label);
-              return item ? item.value : null;
-            };
-            return {
-              date:                   r.period || '',
-              totalAssets:            get('Assets'),
-              totalLiab:              get('Liabilities'),
-              totalStockholderEquity: get('StockholdersEquity') || get('Equity'),
-              cash:                   get('CashAndCashEquivalentsAtCarryingValue'),
-              totalDebt:              get('LongTermDebtNoncurrent') || get('LongTermDebt'),
-              shortLongTermDebt:      get('LongTermDebtCurrent'),
-            };
-          })
-          .filter(r => r.totalAssets != null);
-      }
-
-      if (type === 'cashflow') {
-        annual = reports
-          .filter(r => r.form === '20-F' || r.form === '10-K' || r.form === 'annual')
-          .slice(0, 4)
-          .map(r => {
-            const cf = r.report?.cf || [];
-            const get = label => {
-              const item = cf.find(x => x.label === label || x.concept === label);
-              return item ? item.value : null;
-            };
-            const op  = get('NetCashProvidedByUsedInOperatingActivities');
-            const cap = get('PaymentsToAcquirePropertyPlantAndEquipment');
-            return {
-              date:                r.period || '',
-              operatingCashflow:   op,
-              capitalExpenditures: cap != null ? -Math.abs(cap) : null,
-              freeCashflow:        op != null && cap != null ? op - Math.abs(cap) : null,
-              dividendsPaid:       get('PaymentsOfDividends'),
-            };
-          })
-          .filter(r => r.operatingCashflow != null);
-      }
-    }
-
-    // Tablo boşsa metrics'ten özet bilgi döndür
+    // Tüm tipler için aynı metrics döndür
+    // Bilanço/nakit detay tablosu için TV'de veri yok
     return res.status(200).json({
-      annual,
-      quarterly,
-      metrics,    // her durumda metrics gönder
-      symbol: fullSym,
+      metrics,
+      annual:    [],
+      quarterly: [],
+      symbol:    fullSym,
+      source:    'tradingview',
+      _note: type !== 'metrics' ? 'Detaylı tablo TradingView Scanner\'da mevcut değil. Özet metrikler gösteriliyor.' : undefined,
     });
 
   } catch (e) {
     console.error('fundamentals error:', e.message);
-    return res.status(500).json({ error: e.message, annual: [], quarterly: [] });
+    return res.status(500).json({ error: e.message, annual:[], quarterly:[] });
   }
 };
