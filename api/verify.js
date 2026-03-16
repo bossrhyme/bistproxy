@@ -45,7 +45,17 @@ module.exports = async (req, res) => {
                   : process.env.FINNHUB ? 'FINNHUB'
                   : 'none';
   console.log('verify key source:', keySource, 'key length:', key.length);
-  if (!key) return res.status(200).json({ error: 'FINNHUB_KEY yok - denenen: FINNHUB_KEY, FINNHUB_API_KEY, FINNHUB_TOKEN, FINNHUB', keySource, yahoo: null });
+  // Hangi env var'ların mevcut olduğunu göster (değerleri değil, sadece isimler)
+  const availableEnvKeys = Object.keys(process.env)
+    .filter(k => !['PATH','HOME','USER','SHELL','PWD','LANG'].includes(k))
+    .filter(k => k.length < 50)
+    .sort();
+  if (!key) return res.status(200).json({ 
+    error: 'FINNHUB_KEY bulunamadı', 
+    keySource, 
+    availableEnvKeys,
+    yahoo: null 
+  });
 
   const fullSym = sym + (SUFFIX[exchange] ?? '');
 
