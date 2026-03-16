@@ -1528,7 +1528,7 @@ function initChart(container) {
   if (lwChart) { lwChart.remove(); lwChart = null; lwSeries = null; lwVolSeries = null; lwIndSeries = {}; }
   lwChart = LightweightCharts.createChart(container, {
     width: (container.offsetWidth > 50 ? container.offsetWidth : (document.querySelector('.detail.open')?.offsetWidth - 20 || 340)),
-    height: 258,
+    height: 260,
     layout: { background: { color: '#0d1117' }, textColor: '#6a8fa8' },
     grid: { vertLines: { color: '#1c2d40' }, horzLines: { color: '#1c2d40' } },
     crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
@@ -1628,7 +1628,7 @@ function updateChart(sym) {
           w = det ? det.offsetWidth - 24 : 336;
         }
         if (w > 50) {
-          lwChart.resize(w, 258);
+          lwChart.resize(w, 260);
           lwChart.timeScale().fitContent();
         } else if (tries > 0) {
           setTimeout(function(){ _resizeChart(tries - 1); }, 100);
