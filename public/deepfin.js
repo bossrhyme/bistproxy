@@ -945,9 +945,10 @@ function countSelectedChips() {
 document.getElementById('goat-chips').addEventListener('click', function(e) {
   var chip = e.target.closest('.goat-chip'); if (!chip) return;
   var wasOn = chip.classList.contains('on');
-  if (!wasOn && countSelectedChips() >= 3) return; // max 3
+  if (!wasOn && countSelectedChips() >= 3) return;
   chip.classList.toggle('on');
   applyAllChips();
+  if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
 });
 document.getElementById('goat-fund-chips').addEventListener('click', function(e) {
   var chip = e.target.closest('.goat-chip'); if (!chip) return;
@@ -955,6 +956,7 @@ document.getElementById('goat-fund-chips').addEventListener('click', function(e)
   if (!wasOn && countSelectedChips() >= 3) return;
   chip.classList.toggle('on');
   applyAllChips();
+  if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
 });
 
 // Temel analiz preset'leri
@@ -965,6 +967,7 @@ document.getElementById('presets').addEventListener('click', function(e) {
   if (!wasOn && countSelectedChips() >= 3) return;
   chip.classList.toggle('on');
   applyAllChips();
+  if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
 });
 
 // Teknik analiz preset'leri
@@ -975,6 +978,7 @@ document.getElementById('tech-presets').addEventListener('click', function(e) {
   if (!wasOn && countSelectedChips() >= 3) return;
   chip.classList.toggle('on');
   applyAllChips();
+  if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
 });
 
 function updateClrBtn() {
@@ -2356,101 +2360,29 @@ function stopScanEta() {
 
 // ── MOBILE DRAWER ──
 function toggleMobileDrawer() {
-  const panel   = document.getElementById('drawer-panel');
-  const overlay = document.getElementById('drawer-overlay');
-  const btn     = document.getElementById('hamburger-btn');
-  if (!panel) return;
-  const isOpen = panel.classList.contains('open');
-  if (isOpen) { closeMobileDrawer(); return; }
+  var sidebar = document.querySelector('.sidebar');
+  var overlay = document.getElementById('drawer-overlay');
+  var btn     = document.getElementById('hamburger-btn');
+  if (!sidebar) return;
 
-  const sidebar = document.querySelector('.sidebar');
-  const drawerContent = document.getElementById('drawer-content');
-  if (sidebar && drawerContent) {
-    drawerContent.innerHTML = '';
-    const clone = sidebar.cloneNode(true);
-
-    // Input değerlerini senkronize et
-    clone.querySelectorAll('input[type="number"], input[type="text"]').forEach(function(el) {
-      var orig = document.querySelector('.sidebar #' + el.id);
-      if (orig) el.value = orig.value;
-      el.addEventListener('input', function() {
-        var origEl = document.querySelector('.sidebar #' + el.id);
-        if (origEl) { origEl.value = el.value; origEl.dispatchEvent(new Event('input')); }
-      });
-    });
-
-    // Select senkronize et
-    clone.querySelectorAll('select').forEach(function(el) {
-      var origId = el.id;
-      var orig = document.querySelector('.sidebar #' + origId);
-      if (orig) el.value = orig.value;
-      el.addEventListener('change', function() {
-        var origEl = document.querySelector('.sidebar #' + origId);
-        if (origEl) { origEl.value = el.value; origEl.dispatchEvent(new Event('change')); }
-      });
-    });
-
-    // onclick'leri yönet
-    clone.querySelectorAll('[onclick]').forEach(function(el) {
-      var oc = el.getAttribute('onclick');
-      el.removeAttribute('onclick');
-      el.addEventListener('click', function(e) {
-        e.stopPropagation();
-        if (el.classList.contains('exbtn')) {
-          document.querySelectorAll('.sidebar .exbtn').forEach(function(b){ b.classList.remove('on'); });
-          var origBtn = document.querySelector('.sidebar .exbtn[data-exchange="' + el.dataset.exchange + '"]');
-          if (origBtn) origBtn.classList.add('on');
-        }
-        if (el.classList.contains('chip') || el.classList.contains('goat-chip') || el.classList.contains('tech-chip')) {
-          var selector = '';
-          if (el.dataset.goat)   selector = '.sidebar [data-goat="'   + el.dataset.goat   + '"]';
-          if (el.dataset.preset) selector = '.sidebar [data-preset="' + el.dataset.preset + '"]';
-          if (el.dataset.tech)   selector = '.sidebar [data-tech="'   + el.dataset.tech   + '"]';
-          if (selector) {
-            var origChip = document.querySelector(selector);
-            if (origChip) {
-              origChip.click();
-              // Seçim feedback - chip'e anlık .on class uygula
-              el.classList.toggle('on', origChip.classList.contains('on'));
-            }
-          }
-          // Chip seçimi sonrası drawer'ı kapat
-          setTimeout(function() { closeMobileDrawer(); }, 150);
-          return;
-        }
-        closeMobileDrawer();
-        setTimeout(function() { try { eval(oc); } catch(e){} }, 80);
-      });
-    });
-
-    Array.from(clone.children).forEach(function(c){ drawerContent.appendChild(c); });
-
-    // Mevcut seçili chip'leri işaretle
-    clone.querySelectorAll('[data-goat],[data-preset],[data-tech]').forEach(function(cloneChip) {
-      var origSel = '';
-      if (cloneChip.dataset.goat)   origSel = '.sidebar [data-goat="'   + cloneChip.dataset.goat   + '"]';
-      if (cloneChip.dataset.preset) origSel = '.sidebar [data-preset="' + cloneChip.dataset.preset + '"]';
-      if (cloneChip.dataset.tech)   origSel = '.sidebar [data-tech="'   + cloneChip.dataset.tech   + '"]';
-      if (origSel) {
-        var orig = document.querySelector(origSel);
-        if (orig && orig.classList.contains('on')) cloneChip.classList.add('on');
-      }
-    });
+  var isOpen = sidebar.classList.contains('open');
+  if (isOpen) {
+    closeMobileDrawer();
+  } else {
+    sidebar.classList.add('open');
+    if (overlay) overlay.classList.add('open');
+    if (btn) btn.classList.add('open');
+    document.body.style.overflow = 'hidden';
   }
-
-  panel.classList.add('open');
-  overlay.classList.add('open');
-  btn && btn.classList.add('open');
-  document.body.style.overflow = 'hidden';
 }
 
 function closeMobileDrawer() {
-  const panel   = document.getElementById('drawer-panel');
-  const overlay = document.getElementById('drawer-overlay');
-  const btn     = document.getElementById('hamburger-btn');
-  panel && panel.classList.remove('open');
-  overlay && overlay.classList.remove('open');
-  btn && btn.classList.remove('open');
+  var sidebar = document.querySelector('.sidebar');
+  var overlay = document.getElementById('drawer-overlay');
+  var btn     = document.getElementById('hamburger-btn');
+  if (sidebar) sidebar.classList.remove('open');
+  if (overlay) overlay.classList.remove('open');
+  if (btn)     btn.classList.remove('open');
   document.body.style.overflow = '';
 }
 let disclaimerTimer = null;
