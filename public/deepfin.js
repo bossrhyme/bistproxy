@@ -251,16 +251,25 @@ function toggleFavFilter() {
 // KOLON SEÇİCİ
 // ═══════════════════════════════════════════
 const COL_DEFS = [
-  {key:'sector',      label:'SEKTÖR',     def:true},  {key:'mcap',        label:'P.Değeri',   def:true},
-  {key:'price',       label:'FİYAT',      def:true},  {key:'fscore',      label:'F-Score',    def:true},
-  {key:'peg',         label:'PEG',        def:true},  {key:'pe',          label:'F/K',        def:true},
-  {key:'pb',          label:'PD/DD',      def:true},  {key:'ps',          label:'F/S',        def:true},
-  {key:'roe',         label:'ROE%',       def:true},  {key:'roa',         label:'ROA%',       def:true},
-  {key:'margin',      label:'MARJ%',      def:true},  {key:'revg',        label:'GELİR↑%',   def:true},
-  {key:'epsg',        label:'K.BÜY%',    def:true},  {key:'div',         label:'TEMETTÜ%',   def:true},
-  {key:'de',          label:'B/Ö',        def:true},  {key:'cr',          label:'CARİ',       def:true},
-  {key:'tech_rating', label:'TV Rating',  def:true},  {key:'rsi',         label:'RSI',        def:true},
-  {key:'perf3m',      label:'3A Geti%',   def:true},
+  {key:'price', label:'FİYAT', def:true},
+  {key:'pe', label:'F/K', def:true},
+  {key:'pb', label:'PD/DD', def:true},
+  {key:'ps', label:'F/S', def:true},
+  {key:'roe', label:'ROE%', def:true},
+  {key:'roa', label:'ROA%', def:true},
+  {key:'margin', label:'MARJ%', def:true},
+  {key:'revg', label:'GELİR↑%', def:true},
+  {key:'epsg', label:'K.BÜY%', def:true},
+  {key:'fscore', label:'F-Score', def:true},
+  {key:'de', label:'B/Ö', def:true},
+  {key:'cr', label:'CARİ', def:true},
+  {key:'div', label:'TEMETTÜ%', def:true},
+  {key:'peg', label:'PEG', def:true},
+  {key:'tech_rating', label:'TV Rating', def:true},
+  {key:'rsi', label:'RSI', def:true},
+  {key:'perf3m', label:'3A Geti%', def:true},
+  {key:'mcap', label:'P.Değeri', def:true},
+  {key:'sector', label:'SEKTÖR', def:true},
 ];
 var _colVisible = null;
 
@@ -1398,11 +1407,7 @@ function _vsRowHtml(s, idx) {
       <td class="nfav" onclick="event.stopPropagation();toggleFav('${s.symbol}')" title="${isFav?'Favorilerden çıkar':'Favorilere ekle'}"><span class="fav-icon${isFav?' fav-on':''}">${isFav?'★':'☆'}</span></td>
       <td data-col="symbol" style="display:table-cell;"><span class="row-num">${idx+1}</span><span class="sym-wrap"><span class="row-arrow">›</span><span class="sym">${s.symbol}</span></span></td>
       <td data-col="name" style="font-size:11px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.name}">${s.name}</td>
-      <td data-col="sector" style="font-size:10px;color:var(--muted2)">${s.sector||'—'}</td>
-      <td data-col="mcap">${fmc(s.marketCapitalization)}</td>
       <td data-col="price">${s.currentPrice!=null?(s.currentPrice.toFixed(2)+' '+(EXCHANGE_META[currentExchange]||EXCHANGE_META.bist).currency):nil}</td>
-      <td data-col="fscore">${s.piotroski !== null ? fScore(s.piotroski) : nil}</td>
-      <td data-col="peg">${s.peg !== null ? fPeg(s.peg) : nil}</td>
       <td data-col="pe">${fv(s.peNormalizedAnnual,1)}</td>
       <td data-col="pb">${fv(s.pbAnnual,2)}</td>
       <td data-col="ps">${fv(s.psTTM,2)}</td>
@@ -1411,15 +1416,18 @@ function _vsRowHtml(s, idx) {
       <td data-col="margin">${fv(s.netProfitMarginTTM,1,true)}</td>
       <td data-col="revg">${fv(s.revenueGrowthTTMYoy,1,true)}</td>
       <td data-col="epsg">${fv(s.epsGrowthTTMYoy,1,true)}</td>
-      <td data-col="div">${s.dividendYieldIndicatedAnnual!=null?`<span class="up">${s.dividendYieldIndicatedAnnual.toFixed(2)}%</span>`:nil}</td>
+      <td data-col="fscore">${s.piotroski !== null ? fScore(s.piotroski) : nil}</td>
       <td data-col="de">${fv(s['totalDebt/totalEquityAnnual'],1)}</td>
       <td data-col="cr">${fv(s.currentRatioAnnual,2)}</td>
+      <td data-col="div">${s.dividendYieldIndicatedAnnual!=null?`<span class="up">${s.dividendYieldIndicatedAnnual.toFixed(2)}%</span>`:nil}</td>
+      <td data-col="peg">${s.peg !== null ? fPeg(s.peg) : nil}</td>
       <td data-col="tech_rating">${s.techRating!=null?fTechRating(s.techRating):nil}</td>
       <td data-col="rsi">${s.rsi14!=null?fRsi(s.rsi14):nil}</td>
       <td data-col="perf3m">${s.perf3m!=null?fPerf(s.perf3m):nil}</td>
+      <td data-col="mcap">${fmc(s.marketCapitalization)}</td>
+      <td data-col="sector" style="font-size:10px;color:var(--muted2)">${s.sector||'—'}</td>
     </tr>`;
 }
-
 function renderTable(){
   // Sort header güncelle
   document.querySelectorAll('thead th').forEach(function(th){

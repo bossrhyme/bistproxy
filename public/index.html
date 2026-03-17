@@ -764,16 +764,12 @@ if('serviceWorker' in navigator){
 
       <div class="twrap" id="twrap" style="display:none">
         <table>
-          <thead>
+                    <thead>
             <tr>
               <th style="width:28px;text-align:center;color:var(--muted2);font-size:9px;">#</th>
               <th onclick="colSort('symbol')" data-col="symbol" data-tip="Borsa kodu (ticker).">SEMBOL</th>
               <th onclick="colSort('name')" data-col="name" data-tip="Şirketin tam ticari adı.">ŞİRKET ADI</th>
-              <th onclick="colSort('sector')" data-col="sector" data-tip="Şirketin faaliyet gösterdiği sektör. Sektöre göre filtrelemek için sol paneli kullanın.">SEKTÖR</th>
-              <th onclick="colSort('marketCapitalization')" data-col="mcap" data-tip="Piyasa Değeri: Şirketin borsadaki toplam değeri (USD milyon).">P. Değeri ($)</th>
               <th onclick="colSort('currentPrice')" data-col="price" id="th-price" data-tip="Son işlem fiyatı. Değişim yüzdesi önceki kapanışa göre hesaplanır.">FİYAT</th>
-              <th onclick="colSort('piotroski')" data-col="fscore" data-tip="Piotroski F-Score: 0-9 finansal sağlık puanı. 7+ güçlü, 3- zayıf.">F-Score</th>
-              <th onclick="colSort('peg')" data-col="peg" data-tip="Fiyat/Kazanç Büyüme: PEG < 1 büyüme hızına göre ucuz demek. Peter Lynch'in favori metriği.">PEG<span class="th-tip">Fiyat/Kazanç Büyüme: PEG<1 ucuz büyüme, PEG>2 pahalı. Lynch'in favori metriği.</span></th>
               <th onclick="colSort('peNormalizedAnnual')" data-col="pe" data-tip="Fiyat/Kazanç: Hisse fiyatının yıllık kazanca oranı. Düşük = ucuz.">F/K</th>
               <th onclick="colSort('pbAnnual')" data-col="pb" data-tip="Piyasa/Defter: 1'in altı varlıkların altında işlem görüyor.">PD/DD</th>
               <th onclick="colSort('psTTM')" data-col="ps" data-tip="Fiyat/Satış: Kâr etmeyen büyüme şirketleri için kullanılır.">F/S</th>
@@ -782,15 +778,18 @@ if('serviceWorker' in navigator){
               <th onclick="colSort('netProfitMarginTTM')" data-col="margin" data-tip="Net Kâr Marjı: Her 100₺ gelirden kalan net kâr.">MARJ%</th>
               <th onclick="colSort('revenueGrowthTTMYoy')" data-col="revg" data-tip="Gelir Büyümesi YoY: Geçen yıla kıyasla ciro artışı.">GELİR↑%</th>
               <th onclick="colSort('epsGrowthTTMYoy')" data-col="epsg" data-tip="Kazanç Büyümesi: Hisse başı kârın yıllık büyüme oranı.">K.BÜY%</th>
-              <th onclick="colSort('dividendYieldIndicatedAnnual')" data-col="div" data-tip="Temettü Verimi: Hisse fiyatına oranla yıllık ödenen temettü.">TEMETTÜ%</th>
+              <th onclick="colSort('piotroski')" data-col="fscore" data-tip="Piotroski F-Score: 0-9 finansal sağlık puanı. 7+ güçlü, 3- zayıf.">F-Score</th>
               <th onclick="colSort('totalDebt/totalEquityAnnual')" data-col="de" data-tip="Borç/Özsermaye: Şirketin borçluluk seviyesi. 1'in altı makul.">B/Ö</th>
               <th onclick="colSort('currentRatioAnnual')" data-col="cr" data-tip="Cari Oran: Kısa vadeli borç karşılama gücü. 1.5+ sağlıklı.">CARİ</th>
+              <th onclick="colSort('dividendYieldIndicatedAnnual')" data-col="div" data-tip="Temettü Verimi: Hisse fiyatına oranla yıllık ödenen temettü.">TEMETTÜ%</th>
+              <th onclick="colSort('peg')" data-col="peg" data-tip="Fiyat/Kazanç Büyüme: PEG < 1 büyüme hızına göre ucuz demek. Peter Lynch'in favori metriği.">PEG<span class="th-tip">Fiyat/Kazanç Büyüme: PEG<1 ucuz büyüme, PEG>2 pahalı. Lynch'in favori metriği.</span></th>
               <th onclick="colSort('techRating')" data-col="tech_rating" data-tip="Teknik Rating: TradingView'nin RSI, MACD, ADX, Stochastic ve 15 hareketli ortalama dahil 26 indikatöre dayalı puanı. +1 = Güçlü Al, -1 = Güçlü Sat.">TV Rating</th>
               <th onclick="colSort('rsi14')" data-col="rsi" data-tip="RSI (14): 0-100 arasında momentum göstergesi. 30 altı aşırı satım (alım fırsatı), 70 üstü aşırı alım (dikkat).">RSI</th>
               <th onclick="colSort('perf3m')" data-col="perf3m" data-tip="3 Aylık Getiri: Hissenin son 3 ayda yüzdesel değişimi. Jegadeesh-Titman momentum faktörü.">3A Geti%</th>
+              <th onclick="colSort('marketCapitalization')" data-col="mcap" data-tip="Piyasa Değeri: Şirketin borsadaki toplam değeri (USD milyon).">P. Değeri ($)</th>
+              <th onclick="colSort('sector')" data-col="sector" data-tip="Şirketin faaliyet gösterdiği sektör. Sektöre göre filtrelemek için sol paneli kullanın.">SEKTÖR</th>
             </tr>
-          </thead>
-          <tbody id="tbody"></tbody>
+          </thead>          <tbody id="tbody"></tbody>
         </table>
       </div>
     </div>
