@@ -858,29 +858,17 @@ html,body{height:100%;overflow:hidden;}
 .prf-period-btn:hover{border-color:var(--accent);color:var(--accent);}
 
 /* ── Sektör Karşılaştırması ─────────────────────────────────── */
-.sec-meta{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
-.sec-sector-name{font-size:13px;font-weight:600;color:var(--text);}
-.sec-count{font-size:11px;color:var(--muted);background:var(--s2);border:1px solid var(--border2);border-radius:20px;padding:2px 8px;}
-
-.sec-legend{display:grid;grid-template-columns:1fr 60px 1fr 60px;gap:4px 8px;padding:0 0 6px;border-bottom:1px solid var(--border);margin-bottom:4px;font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.04em;}
-
-.sec-row{padding:8px 0;border-bottom:1px solid var(--border2);}
-.sec-row:last-child{border-bottom:none;}
-.sec-row-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
-.sec-rlabel{font-size:11px;color:var(--muted);font-weight:500;}
-
-.sec-badge{font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;letter-spacing:.02em;}
-.sec-badge-up{background:rgba(0,192,118,.15);color:#00c076;}
-.sec-badge-dn{background:rgba(246,70,93,.15);color:#f6465d;}
-.sec-badge-eq{background:var(--s2);color:var(--muted);}
-
-.sec-row-vals{display:grid;grid-template-columns:60px 1fr 60px;align-items:center;gap:8px;}
-.sec-val-stock{font-size:13px;font-weight:700;color:var(--text);text-align:right;font-family:"JetBrains Mono",monospace;}
-.sec-val-avg{font-size:12px;font-weight:500;color:var(--text2);text-align:left;font-family:"JetBrains Mono",monospace;}
-
-.sec-bar-wrap{height:6px;background:var(--s2);border-radius:3px;overflow:hidden;position:relative;}
-.sec-bar-wrap::after{content:'';position:absolute;left:50%;top:0;width:1px;height:100%;background:var(--border2);}
-.sec-bar-fill{height:100%;border-radius:3px;transition:width .4s ease;}
-.sec-bar-up{background:linear-gradient(90deg,var(--accent2,#3b82f6),#00c076);}
-.sec-bar-dn{background:linear-gradient(90deg,var(--accent2,#3b82f6),#f6465d);}
-.sec-bar-eq{background:var(--muted);}
+.sc-meta{font-size:12px;color:var(--muted);margin-bottom:10px;}
+.sc-tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.sc-tbl thead th{padding:4px 8px;color:var(--muted);font-weight:500;font-size:11px;text-align:left;border-bottom:1px solid var(--border);}
+.sc-tbl thead th:nth-child(2),.sc-tbl thead th:nth-child(3){text-align:right;}
+.sc-tbl tbody tr:hover{background:var(--s2);}
+.sc-lbl{padding:7px 8px;color:var(--text2);white-space:nowrap;}
+.sc-val{padding:7px 8px;text-align:right;font-family:"JetBrains Mono",monospace;font-weight:600;color:var(--text);}
+.sc-val.sc-muted{color:var(--muted);font-weight:400;}
+.sc-tbl td{border-bottom:1px solid var(--border2);}
+.sc-tbl tr:last-child td{border-bottom:none;}
+.sc-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700;white-space:nowrap;}
+.sc-g{background:rgba(0,192,118,.12);color:#00c076;}
+.sc-b{background:rgba(246,70,93,.12);color:#f6465d;}
+.sc-n{background:var(--s2);color:var(--muted);}

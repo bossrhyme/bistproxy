@@ -185,115 +185,84 @@ function _renderSectorComparison() {
   var el = document.getElementById('prf-sector-cmp');
   if (!el) return;
 
-  // ── Birim normalleşmesi ──────────────────────────────────────────────────
-  // TV Scanner: roe/roa/margin/dividendYield ham % olarak geliyor (50.5 = %50.5)
-  // _prfData içinde d.roe/roa/net_margin oran olarak tutuluyor (0.505)
-  // avg'daki değerler fundamentals.js'ten ham TV değerleri (50.5 gibi)
-  // → Karşılaştırma için HER İKİSİNİ de yüzde birime dönüştür
+  // Tüm değerleri % birimine normalize et
+  // _prfData: roe/roa/margin oran (0.505), TV avg: ham % (50.5)
   var s = {
-    pe:           d.pe_ratio,
-    pb:           d.price_book_ratio,
-    ps:           d.price_sales,
-    roe:          d.roe    != null ? d.roe * 100    : null,   // oran → %
-    roa:          d.roa    != null ? d.roa * 100    : null,
-    netMargin:    d.net_margin  != null ? d.net_margin  * 100 : null,
-    grossMargin:  d.gross_margin!= null ? d.gross_margin* 100 : null,
-    debtToEquity: d.debt_to_equity,
-    currentRatio: d.current_ratio,
-    divYield:     d.dividend_yield_recent != null ? d.dividend_yield_recent * 100 : null,
+    pe:    d.pe_ratio,
+    pb:    d.price_book_ratio,
+    ps:    d.price_sales,
+    roe:   d.roe   != null ? d.roe   * 100 : null,
+    roa:   d.roa   != null ? d.roa   * 100 : null,
+    nm:    d.net_margin   != null ? d.net_margin   * 100 : null,
+    gm:    d.gross_margin != null ? d.gross_margin * 100 : null,
+    de:    d.debt_to_equity,
+    cr:    d.current_ratio,
+    div:   d.dividend_yield_recent != null ? d.dividend_yield_recent * 100 : null,
   };
-  // avg alanları fundamentals.js'ten doğrudan TV'den geliyor — zaten ham %
   var a = {
-    pe:           avg.pe,
-    pb:           avg.pb,
-    ps:           avg.ps,
-    roe:          avg.roe,           // TV'den ham % (50.5)
-    roa:          avg.roa,
-    netMargin:    avg.netMargin,
-    grossMargin:  avg.grossMargin,
-    debtToEquity: avg.debtToEquity,
-    currentRatio: avg.currentRatio,
-    divYield:     avg.dividendYield,
+    pe:  avg.pe,
+    pb:  avg.pb,
+    ps:  avg.ps,
+    roe: avg.roe,
+    roa: avg.roa,
+    nm:  avg.netMargin,
+    gm:  avg.grossMargin,
+    de:  avg.debtToEquity,
+    cr:  avg.currentRatio,
+    div: avg.dividendYield,
   };
 
-  // ── Satır builder ────────────────────────────────────────────────────────
-  // badge: sektörün ne kadar altında/üstünde → progress bar gibi bar
-  function _row(label, sVal, aVal, fmtFn, higherBetter) {
-    if (sVal == null && aVal == null) return '';
-    var fmt = function(v) { return v != null ? fmtFn(v) : '<span style="color:var(--muted)">—</span>'; };
-
-    // Fark hesabı: mutlak fark (puan veya katı)
-    var diff = (sVal != null && aVal != null && aVal !== 0)
-      ? ((sVal - aVal) / Math.abs(aVal) * 100) : null;
-
-    var badge = '';
-    if (diff != null) {
-      var pos  = higherBetter ? diff > 3 : diff < -3;
-      var neg  = higherBetter ? diff < -3 : diff > 3;
-      var bCls = pos ? 'sec-badge-up' : neg ? 'sec-badge-dn' : 'sec-badge-eq';
-      var bTxt = (diff >= 0 ? '+' : '') + diff.toFixed(1) + '%';
-      badge = '<span class="sec-badge ' + bCls + '">' + bTxt + '</span>';
-    }
-
-    // Bar: hisse değerinin sektöre oranı (max 200%)
-    var barPct = 0, barCls = 'sec-bar-eq';
-    if (sVal != null && aVal != null && aVal > 0) {
-      barPct = Math.min(sVal / aVal * 50, 100); // 50 = tam ortalama = %50 doluluk
-      barCls = diff > 3 ? (higherBetter ? 'sec-bar-up' : 'sec-bar-dn')
-             : diff < -3 ? (higherBetter ? 'sec-bar-dn' : 'sec-bar-up')
-             : 'sec-bar-eq';
-    }
-
-    return '<div class="sec-row">' +
-      '<div class="sec-row-top">' +
-        '<span class="sec-rlabel">' + label + '</span>' +
-        badge +
-      '</div>' +
-      '<div class="sec-row-vals">' +
-        '<span class="sec-val-stock">' + fmt(sVal) + '</span>' +
-        '<div class="sec-bar-wrap"><div class="sec-bar-fill ' + barCls + '" style="width:' + barPct.toFixed(1) + '%"></div></div>' +
-        '<span class="sec-val-avg">' + fmt(aVal) + '</span>' +
-      '</div>' +
-    '</div>';
+  function row(label, sv, av, fmt, higherBetter) {
+    if (sv == null && av == null) return '';
+    var fv  = function(v) { return v != null ? fmt(v) : '—'; };
+    var diff = (sv != null && av != null && av !== 0) ? (sv - av) / Math.abs(av) * 100 : null;
+    var good = diff != null && (higherBetter ? diff > 5  : diff < -5);
+    var bad  = diff != null && (higherBetter ? diff < -5 : diff > 5);
+    var badgeCls = good ? 'sc-g' : bad ? 'sc-b' : 'sc-n';
+    var badgeTxt = diff != null ? (diff > 0 ? '+' : '') + diff.toFixed(0) + '%' : '—';
+    return '<tr>' +
+      '<td class="sc-lbl">'+ label +'</td>' +
+      '<td class="sc-val">'+ fv(sv) +'</td>' +
+      '<td class="sc-val sc-muted">'+ fv(av) +'</td>' +
+      '<td><span class="sc-badge '+ badgeCls +'">'+ badgeTxt +'</span></td>' +
+    '</tr>';
   }
 
-  var x1  = function(v) { return v.toFixed(1) + 'x'; };
-  var x2  = function(v) { return v.toFixed(2) + 'x'; };
-  var pct = function(v) { return v.toFixed(1) + '%'; };
-  var x2r = function(v) { return v.toFixed(2); };
+  var x1  = function(v) { return v.toFixed(1)+'x'; };
+  var x2  = function(v) { return v.toFixed(2)+'x'; };
+  var pct = function(v) { return v.toFixed(1)+'%'; };
+  var dec = function(v) { return v.toFixed(2); };
 
   var rows = [
-    _row('F/K (Fiyat/Kazanç)',     s.pe,           a.pe,           x1,  false),
-    _row('PD/DD (Fiyat/Defter)',   s.pb,           a.pb,           x2,  false),
-    _row('F/S (Fiyat/Satış)',      s.ps,           a.ps,           x2,  false),
-    _row('ROE (Özsermaye Getirisi)',s.roe,          a.roe,          pct, true),
-    _row('ROA (Varlık Getirisi)',   s.roa,          a.roa,          pct, true),
-    _row('Net Kâr Marjı',          s.netMargin,    a.netMargin,    pct, true),
-    _row('Brüt Kâr Marjı',         s.grossMargin,  a.grossMargin,  pct, true),
-    _row('Borç / Özsermaye',       s.debtToEquity, a.debtToEquity, x2r, false),
-    _row('Cari Oran',              s.currentRatio, a.currentRatio, x2r, true),
-    _row('Temettü Verimi',         s.divYield,     a.divYield,     pct, true),
+    row('F/K',       s.pe,  a.pe,  x1,  false),
+    row('PD/DD',     s.pb,  a.pb,  x2,  false),
+    row('F/S',       s.ps,  a.ps,  x2,  false),
+    row('ROE',       s.roe, a.roe, pct, true),
+    row('ROA',       s.roa, a.roa, pct, true),
+    row('Net Marj',  s.nm,  a.nm,  pct, true),
+    row('Brüt Marj', s.gm,  a.gm,  pct, true),
+    row('B/Ö',       s.de,  a.de,  dec, false),
+    row('Cari Oran', s.cr,  a.cr,  dec, true),
+    row('Temettü',   s.div, a.div, pct, true),
   ].filter(Boolean).join('');
 
   if (!rows) {
-    el.innerHTML = '<div style="padding:16px 0;color:var(--muted2);font-size:12px;text-align:center;">Sektör karşılaştırma verisi yok.</div>';
+    el.innerHTML = '<p style="color:var(--muted);font-size:12px;padding:12px 0;">Veri yok.</p>';
     return;
   }
 
-  var sector = (d.sector) || '';
-  var count  = avg._count || 0;
+  var cnt = avg._count || 0;
   el.innerHTML =
-    '<div class="sec-meta">' +
-      '<span class="sec-sector-name">' + sector + '</span>' +
-      (count ? '<span class="sec-count">' + count + ' şirket ortalaması</span>' : '') +
-    '</div>' +
-    '<div class="sec-legend">' +
-      '<span>Gösterge</span>' +
-      '<span style="text-align:right">Bu Hisse</span>' +
-      '<span></span>' +
-      '<span>Sektör Ort.</span>' +
-    '</div>' +
-    rows;
+    '<p class="sc-meta">'+ (d.sector||'') + (cnt ? ' &middot; '+ cnt +' şirket' : '') +'</p>'+
+    '<table class="sc-tbl">'+
+      '<thead><tr>'+
+        '<th></th>'+
+        '<th>Hisse</th>'+
+        '<th>Sektör</th>'+
+        '<th>Fark</th>'+
+      '</tr></thead>'+
+      '<tbody>'+ rows +'</tbody>'+
+    '</table>';
 }
 
 function _buildFinancials(d) {
@@ -428,19 +397,36 @@ function showProfil(sym, ex) {
   // TV logo CDN: BIST için TUPRS → BIST:TUPRS → logo slug
   var _logoEl = document.getElementById('prf-logo');
   if(_logoEl) {
-    var _exMeta2 = EXCHANGE_META[_prfEx] || EXCHANGE_META.bist;
-    var _tvPfx = { bist:'BIST', nasdaq:'NASDAQ', sp500:'NYSE', dax:'XETR', lse:'LSE', nikkei:'TSE' }[_prfEx] || 'BIST';
-    var _logoSlug = (sym + '--' + _tvPfx).toLowerCase().replace(/[^a-z0-9-]/g,'-');
-    var _logoUrl = 'https://s3-symbol-logo.tradingview.com/' + encodeURIComponent(sym.toLowerCase()) + '--big.svg';
+    // TradingView logo CDN - birden fazla format denenir
+    var _tvPfxMap = { bist:'BIST', nasdaq:'NASDAQ', sp500:'NYSE', dax:'XETR', lse:'LSE', nikkei:'TSE' };
+    var _tvPfx = _tvPfxMap[_prfEx] || 'BIST';
+    var _symLow = sym.toLowerCase();
+    // TV logo URL formatları (öncelik sırasıyla):
+    // 1. exchange/symbol--big.svg  2. symbol--big.svg  3. Clearbit domain
+    var _logoUrls = [
+      'https://s3-symbol-logo.tradingview.com/' + _tvPfx.toLowerCase() + '/' + _symLow + '--big.svg',
+      'https://s3-symbol-logo.tradingview.com/' + _symLow + '--big.svg',
+    ];
+    var _logoTry = 0;
     var _img = document.createElement('img');
-    _img.src = _logoUrl;
     _img.alt = sym;
-    _img.style.cssText = 'width:48px;height:48px;object-fit:contain;border-radius:10px;';
+    _img.style.cssText = 'width:40px;height:40px;object-fit:contain;';
     _img.onerror = function() {
-      // Fallback: renkli harf avatar
-      _logoEl.textContent = sym.substring(0,2).toUpperCase();
-      _logoEl.style.cssText = 'display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;';
+      _logoTry++;
+      if (_logoTry < _logoUrls.length) {
+        _img.src = _logoUrls[_logoTry];
+      } else {
+        // Fallback: renkli harf avatar
+        _logoEl.innerHTML = '';
+        _logoEl.textContent = sym.substring(0, 2).toUpperCase();
+        _logoEl.style.cssText = 'display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;';
+      }
     };
+    _img.onload = function() {
+      _logoEl.style.background = 'transparent';
+      _logoEl.style.border = 'none';
+    };
+    _img.src = _logoUrls[0];
     _logoEl.innerHTML = '';
     _logoEl.appendChild(_img);
   }
