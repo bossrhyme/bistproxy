@@ -268,56 +268,59 @@ function _renderSectorComparison() {
 
 function _buildFinancials(d) {
   if(!d) return;
-  var n  = function(v,def){ var x=Number(v); return isNaN(x)?def:x; };
-  var pct = function(v){ return v!==0?(v*100).toFixed(1)+'%':'—'; };
-  var cur = (EXCHANGE_META[_prfEx]||{}).currency || '₺';
+  var n = function(v){ var x=Number(v); return isNaN(x)?null:x; };
+  var pct = function(v){ return v!=null ? (v*100).toFixed(1)+'%' : '—'; };
+  var x1  = function(v){ return v!=null ? v.toFixed(1)+'x'       : '—'; };
+  var x2  = function(v){ return v!=null ? v.toFixed(2)+'x'       : '—'; };
+  var dec = function(v){ return v!=null ? v.toFixed(2)           : '—'; };
+  var pp  = function(v){ return v!=null ? v.toFixed(2)+'%'       : '—'; };
 
-  // Özet grid
-  var cells = [
-    {l:'F/K (TTM)',       v: n(d.pe_ratio,0) ? n(d.pe_ratio,0).toFixed(1)+'x' : '—', cls: n(d.pe_ratio,0)<15&&n(d.pe_ratio,0)>0 ? 'good' : n(d.pe_ratio,0)<25 ? 'mid' : 'bad'},
-    {l:'PD/DD',           v: n(d.price_book_ratio,0) ? n(d.price_book_ratio,0).toFixed(2)+'x' : '—', cls: n(d.price_book_ratio,0)<2&&n(d.price_book_ratio,0)>0 ? 'good' : n(d.price_book_ratio,0)<4 ? 'mid' : 'bad'},
-    {l:'F/S (TTM)',       v: n(d.price_sales,0) ? n(d.price_sales,0).toFixed(2)+'x' : '—', cls: n(d.price_sales,0)<1&&n(d.price_sales,0)>0 ? 'good' : 'mid'},
-    {l:'ROE (TTM)',       v: d.roe ? pct(d.roe) : '—', cls: n(d.roe,0)*100>15 ? 'good' : n(d.roe,0)*100>8 ? 'mid' : 'bad'},
-    {l:'ROA (TTM)',       v: d.roa ? pct(d.roa) : '—', cls: n(d.roa,0)*100>8 ? 'good' : n(d.roa,0)*100>3 ? 'mid' : 'bad'},
-    {l:'Net Marj',        v: d.net_margin ? pct(d.net_margin) : '—', cls: n(d.net_margin,0)*100>12 ? 'good' : n(d.net_margin,0)*100>5 ? 'mid' : 'bad'},
-  ];
+  function badge(cls){ return '<span class="fin-dot fin-dot-'+cls+'"></span>'; }
+  function row(label, val, cls) {
+    var dot = cls ? badge(cls) : '';
+    return '<tr><td class="fin-lbl">'+label+'</td><td class="fin-val">'+val+'</td><td class="fin-ind">'+dot+'</td></tr>';
+  }
+  function grp(title) {
+    return '<tr class="fin-grp"><td colspan="3">'+title+'</td></tr>';
+  }
+
+  var pe  = n(d.pe_ratio), pb = n(d.price_book_ratio), ps = n(d.price_sales);
+  var roe = n(d.roe), roa = n(d.roa), nm = n(d.net_margin), gm = n(d.gross_margin);
+  var de  = n(d.debt_to_equity), cr = n(d.current_ratio);
+  var div = n(d.dividend_yield_recent), peg = n(d.peg_ratio);
+
+  var rows =
+    grp('Değerleme') +
+    row('F/K (TTM)',     pe  ? pe.toFixed(1)+'x'  : '—', pe&&pe<15&&pe>0?'g':pe&&pe<25?'m':pe?'b':'') +
+    row('PD/DD',         pb  ? pb.toFixed(2)+'x'  : '—', pb&&pb<2&&pb>0?'g':pb&&pb<4?'m':pb?'b':'') +
+    row('F/S (TTM)',     ps  ? ps.toFixed(2)+'x'  : '—', ps&&ps<1&&ps>0?'g':ps&&ps<3?'m':ps?'b':'') +
+    row('PEG',           peg ? peg.toFixed(2)      : '—', peg&&peg>0&&peg<1?'g':peg&&peg<2?'m':peg?'b':'') +
+
+    grp('Kârlılık') +
+    row('Brüt Marj',    gm  ? pct(gm)  : '—', gm&&gm*100>30?'g':gm&&gm*100>15?'m':gm?'b':'') +
+    row('Net Marj',     nm  ? pct(nm)  : '—', nm&&nm*100>12?'g':nm&&nm*100>5?'m':nm?'b':'') +
+    row('ROE',          roe ? pct(roe) : '—', roe&&roe*100>15?'g':roe&&roe*100>8?'m':roe?'b':'') +
+    row('ROA',          roa ? pct(roa) : '—', roa&&roa*100>8?'g':roa&&roa*100>3?'m':roa?'b':'') +
+
+    grp('Borç & Likidite') +
+    row('Borç/Özsermaye', de  ? de.toFixed(2)       : '—', de&&de<0.5?'g':de&&de<1?'m':de?'b':'') +
+    row('Cari Oran',      cr  ? cr.toFixed(2)+'x'   : '—', cr&&cr>2?'g':cr&&cr>1?'m':cr?'b':'') +
+    row('Temettü',        div ? pp(div*100)          : '—', div&&div*100>3?'g':div&&div*100>1?'m':'') +
+    '';
+
+  var tbl =
+    '<table class="fin-tbl">'+
+      '<colgroup><col style="width:55%"/><col style="width:35%"/><col style="width:10%"/></colgroup>'+
+      '<tbody>'+rows+'</tbody>'+
+    '</table>';
+
+  // Özet, gauge, debt alanlarını hepsini tbl ile değiştir
   var finSum = document.getElementById('prf-fin-summary');
-  if(finSum) finSum.innerHTML = cells.map(function(c){
-    return '<div class="fin-cell"><div class="fin-cell-label">'+c.l+'</div><div class="fin-cell-val '+c.cls+'">'+c.v+'</div></div>';
-  }).join('');
-
-  // Kârlılık gauge'ları
-  var gauges = [
-    {l:'Brüt Marj',  v: n(d.gross_margin,0)*100, max:60, color:'#3b82f6'},
-    {l:'Net Marj',   v: n(d.net_margin,0)*100,   max:30, color:'#00c076'},
-    {l:'ROE',        v: n(d.roe,0)*100,           max:50, color:'#f0b429'},
-    {l:'ROA',        v: n(d.roa,0)*100,           max:20, color:'#00c076'},
-  ];
+  if(finSum){ finSum.style.cssText='margin-bottom:0'; finSum.innerHTML=tbl; }
   var finGauge = document.getElementById('prf-fin-gauges');
-  if(finGauge) finGauge.innerHTML = gauges.map(function(g){
-    var w = g.v > 0 ? Math.min(g.v/g.max*100,100).toFixed(1) : 0;
-    var show = g.v !== 0 ? (g.v >= 0 ? '+' : '') + g.v.toFixed(1) + '%' : '—';
-    return '<div class="fin-gauge-wrap">'+
-      '<div class="fin-gauge-label"><span>'+g.l+'</span><span style="color:'+(g.v>0?g.color:'var(--muted)')+'">'+show+'</span></div>'+
-      '<div class="fin-gauge-bar"><div class="fin-gauge-fill" style="width:'+w+'%;background:'+g.color+'"></div></div>'+
-    '</div>';
-  }).join('');
-
-  // Borç & Likidite
-  var debtCards = [
-    {l:'Borç / Özsermaye', v: d.debt_to_equity ? n(d.debt_to_equity,0).toFixed(2) : '—', sub: n(d.debt_to_equity,0)<0.5?'✓ Düşük risk':n(d.debt_to_equity,0)<1?'Orta':'Yüksek', cls: n(d.debt_to_equity,0)<0.5 ? 'good' : n(d.debt_to_equity,0)<1 ? 'mid' : 'bad'},
-    {l:'Cari Oran',        v: d.current_ratio  ? n(d.current_ratio,0).toFixed(2)+'x' : '—', sub: n(d.current_ratio,0)>2?'✓ Güçlü likidite':n(d.current_ratio,0)>1?'Yeterli':'Zayıf likidite', cls: n(d.current_ratio,0)>2 ? 'good' : n(d.current_ratio,0)>1 ? 'mid' : 'bad'},
-    {l:'Temettü Verimi',   v: d.dividend_yield_recent ? (n(d.dividend_yield_recent,0)*100).toFixed(2)+'%' : '—', sub: 'Güncel veri', cls: n(d.dividend_yield_recent,0)*100>3 ? 'good' : n(d.dividend_yield_recent,0)*100>1 ? 'mid' : ''},
-    {l:'PEG Oranı',        v: d.peg_ratio ? n(d.peg_ratio,0).toFixed(2) : '—', sub: n(d.peg_ratio,0)>0&&n(d.peg_ratio,0)<1?'✓ Cazip büyüme':'<1 = cazip', cls: n(d.peg_ratio,0)>0&&n(d.peg_ratio,0)<1 ? 'good' : n(d.peg_ratio,0)<2 ? 'mid' : 'bad'},
-  ];
+  if(finGauge){ finGauge.closest('.prf-section').style.display='none'; }
   var finDebt = document.getElementById('prf-fin-debt');
-  if(finDebt) finDebt.innerHTML = debtCards.map(function(c){
-    return '<div class="fin-debt-card">'+
-      '<div class="fin-debt-label">'+c.l+'</div>'+
-      '<div class="fin-debt-val '+c.cls+'">'+c.v+'</div>'+
-      '<div class="fin-debt-sub">'+c.sub+'</div>'+
-    '</div>';
-  }).join('');
+  if(finDebt){ finDebt.closest('.prf-section').style.display='none'; }
 }
 
 

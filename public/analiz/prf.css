@@ -876,3 +876,18 @@ html,body{height:100%;overflow:hidden;}
 .sc-g{background:rgba(0,192,118,.12);color:#00c076;}
 .sc-b{background:rgba(246,70,93,.12);color:#f6465d;}
 .sc-n{background:var(--s2);color:var(--muted);}
+
+/* ── Kârlılık / Finansal Tablo ───────────────────────────────── */
+.fin-tbl{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed;}
+.fin-tbl td{padding:6px 8px;border-bottom:1px solid var(--border2);vertical-align:middle;}
+.fin-tbl tr:last-child td{border-bottom:none;}
+.fin-tbl tbody tr:not(.fin-grp):hover{background:var(--s2);}
+.fin-grp td{padding:10px 8px 4px;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;border-bottom:none;background:none;}
+.fin-grp:first-child td{padding-top:4px;}
+.fin-lbl{color:var(--text2);}
+.fin-val{text-align:right;font-family:"JetBrains Mono",monospace;font-weight:600;color:var(--text);}
+.fin-ind{text-align:center;width:24px;}
+.fin-dot{display:inline-block;width:7px;height:7px;border-radius:50%;}
+.fin-dot-g{background:#00c076;}
+.fin-dot-m{background:#f0b429;}
+.fin-dot-b{background:#f6465d;}
