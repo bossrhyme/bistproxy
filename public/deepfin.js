@@ -1013,7 +1013,7 @@ function countSelectedChips() {
 document.getElementById('goat-chips').addEventListener('click', function(e) {
   var chip = e.target.closest('.goat-chip'); if (!chip) return;
   var wasOn = chip.classList.contains('on');
-  if (!wasOn && countSelectedChips() >= 3) return;
+  if (!wasOn && countSelectedChips() >= 5) return;
   chip.classList.toggle('on');
   applyAllChips();
   if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
@@ -1021,7 +1021,7 @@ document.getElementById('goat-chips').addEventListener('click', function(e) {
 document.getElementById('goat-fund-chips').addEventListener('click', function(e) {
   var chip = e.target.closest('.goat-chip'); if (!chip) return;
   var wasOn = chip.classList.contains('on');
-  if (!wasOn && countSelectedChips() >= 3) return;
+  if (!wasOn && countSelectedChips() >= 5) return;
   chip.classList.toggle('on');
   applyAllChips();
   if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
@@ -1032,7 +1032,7 @@ document.getElementById('presets').addEventListener('click', function(e) {
   var chip = e.target.closest('.chip'); if (!chip) return;
   if (!PRESETS[chip.dataset.preset]) return;
   var wasOn = chip.classList.contains('on');
-  if (!wasOn && countSelectedChips() >= 3) return;
+  if (!wasOn && countSelectedChips() >= 5) return;
   chip.classList.toggle('on');
   applyAllChips();
   if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
@@ -1043,7 +1043,7 @@ document.getElementById('tech-presets').addEventListener('click', function(e) {
   var chip = e.target.closest('.tech-chip'); if (!chip) return;
   if (!TECH_PRESETS[chip.dataset.tech]) return;
   var wasOn = chip.classList.contains('on');
-  if (!wasOn && countSelectedChips() >= 3) return;
+  if (!wasOn && countSelectedChips() >= 5) return;
   chip.classList.toggle('on');
   applyAllChips();
   if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
@@ -1120,7 +1120,13 @@ function applyAndRender(special){
       const mn=getN(minId), mx=getN(maxId);
       if(mn===null && mx===null) continue;
       const raw = s[field];
-      if(raw===null||raw===undefined){ if(mn!==null||mx!==null) return false; continue; }
+      if(raw===null||raw===undefined){
+        // Teknik/performans alanları: veri yoksa bu filtreyi atla (eleme)
+        const techFields = ['techRating','maRating','oscRating','perf3m','perf6m','perfY','rsi14'];
+        if(techFields.indexOf(field) !== -1) continue;
+        if(mn!==null||mx!==null) return false;
+        continue;
+      }
       const val = raw * mult;
       if(mn!==null && val<mn) return false;
       if(mx!==null && val>mx) return false;
@@ -1320,14 +1326,16 @@ var _vsRAF     = null;
 function _vsGetVisible() {
   var wrap = document.getElementById('twrap');
   if (!wrap) return {start:0, count:50};
-  // clientHeight 0 ise (gizli/henüz render edilmemiş) window.innerHeight ile fallback
-  var viewH = wrap.clientHeight;
-  if (!viewH || viewH < 50) viewH = window.innerHeight - 200;
+  // offsetHeight kullan - overflow:auto olan container'da clientHeight sıfır olabilir
+  var viewH = wrap.offsetHeight || wrap.clientHeight;
+  // Fallback: window yüksekliği - header/toolbar tahmini
+  if (!viewH || viewH < 100) viewH = window.innerHeight - 200;
   var scrollY = wrap.scrollTop || 0;
   // Gerçek satır yüksekliğini ölç (ilk tbody satırından)
   var firstRow = wrap.querySelector('tbody tr:not(.vs-pad)');
   if (firstRow && firstRow.offsetHeight > 10) _vsRowH = firstRow.offsetHeight;
-  var count = Math.ceil(viewH / _vsRowH) + _vsBuffer * 2;
+  // En az 30 satır göster, en fazla veri sayısı kadar
+  var count = Math.max(30, Math.ceil(viewH / _vsRowH) + _vsBuffer * 2);
   var start = Math.max(0, Math.floor(scrollY / _vsRowH) - _vsBuffer);
   return {start: start, count: count};
 }
@@ -1362,9 +1370,18 @@ function _vsOnScroll() {
 
 function _vsInit() {
   var wrap = document.getElementById('twrap');
-  if (wrap && !wrap._vsListener) {
+  if (!wrap) return;
+  // Her seferinde temiz bağla — flag kaldırıldı
+  if (!wrap._vsListener) {
     wrap.addEventListener('scroll', _vsOnScroll, {passive: true});
     wrap._vsListener = true;
+  }
+  // ResizeObserver: tablo boyutu değişince yeniden render
+  if (window.ResizeObserver && !wrap._vsResizeObs) {
+    wrap._vsResizeObs = new ResizeObserver(function() {
+      if (_vsData && _vsData.length) _vsRender();
+    });
+    wrap._vsResizeObs.observe(wrap);
   }
 }
 // ─────────────────────────────────────────────────
