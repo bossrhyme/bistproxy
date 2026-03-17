@@ -1895,7 +1895,17 @@ function closeDetail(){
 // ═══════════════════════════════════════════
 // MODALS
 // ═══════════════════════════════════════════
-function openInfo(){ document.getElementById('infoModal').classList.add('open'); }
+function openInfo(tab) {
+  document.getElementById('infoModal').classList.add('open');
+  if (tab) switchInfoTab(tab, document.querySelector('.info-tab[onclick*="' + tab + '"]'));
+}
+function switchInfoTab(id, btn) {
+  document.querySelectorAll('.info-tab-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.info-tab').forEach(function(b){ b.classList.remove('active'); });
+  var panel = document.getElementById('info-panel-' + id);
+  if (panel) panel.classList.add('active');
+  if (btn) btn.classList.add('active');
+}
 function closeInfo(){ document.getElementById('infoModal').classList.remove('open'); }
 function openSupport(){ document.getElementById('supportModal').classList.add('open'); }
 function closeSupport(){ document.getElementById('supportModal').classList.remove('open'); }

@@ -878,124 +878,172 @@ if('serviceWorker' in navigator){
       <div class="modal-title">BİLGİ <span>BANKASI</span></div>
       <button class="modal-close" onclick="closeInfo()">✕</button>
     </div>
-        <div class="modal-body">
+            <div class="modal-body">
+      <div class="info-tabs">
+        <button class="info-tab active" onclick="switchInfoTab('goat',this)">🐐 GOAT</button>
+        <button class="info-tab" onclick="switchInfoTab('temel',this)">📊 Temel Analiz</button>
+        <button class="info-tab" onclick="switchInfoTab('teknik',this)">⚡ Teknik Analiz</button>
+        <button class="info-tab" onclick="switchInfoTab('sozluk',this)">📖 Terimler</button>
+      </div>
+      <div class="info-tab-panel active" id="info-panel-goat">
       <div class="icat">
-        <div class="icat-title">📖 Terimler & Göstergeler (A–Z)</div>
+        <div class="icat-title">🐐 GOAT Yatırımcı Stratejileri (A–Z)</div>
         <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">52 Hafta Yüksek/Düşük Yüzdesi</span><span class="iitem-eng">52-Week High / Low %</span></div>
-          <div class="iitem-desc">Hissenin 52 haftalık en yüksek fiyatına olan uzaklığını yüzde olarak gösterir. Momentumun ne kadar güçlü olduğunu anlamak için kullanılır.</div>
-          <span class="iitem-tip tip-good">✓ %80–100 güç — momentum stratejisi için ideal</span><span class="iitem-tip tip-warn">△ %50–80 orta bölge</span><span class="iitem-tip tip-bad">✕ %30 altı derin düzeltme</span>
+          <div class="iitem-top"><span class="iitem-name">Benjamin Graham — Derin Değer</span></div>
+          <div class="iitem-desc">Değer yatırımının babası. Güvenlik marjı ilkesi: içsel değerin altında al, bekle. F/K<10, PD/DD<1.5, cari oran>2, borç düşük, temettü geçmişi. En muhafazakâr yatırım felsefesi.</div>
+          <span class="iitem-tip tip-warn">F/K <10 · PD/DD <1.5 · Cari >2 · B/Ö <%50 · Temettü >%1</span>
         </div>
         <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">B/Ö — Borç / Özkaynak</span><span class="iitem-eng">Debt to Equity Ratio</span></div>
-          <div class="iitem-desc">Şirketin ne kadar borçla çalıştığını gösterir. Bankalar için bu oran doğal olarak yüksektir; sektöre göre değerlendirin.</div>
-          <span class="iitem-tip tip-good">✓ <50 düşük borç yükü — Graham güvenli bölgesi</span><span class="iitem-tip tip-warn">△ 50–150 orta, sektöre bağlı normal</span><span class="iitem-tip tip-bad">✕ 200+ yüksek kaldıraç — faiz yükü riski</span>
+          <div class="iitem-top"><span class="iitem-name">Bill Ackman — Activist</span></div>
+          <div class="iitem-desc">Aktivist değer yatırımı. Piyasanın gözden kaçırdığı, katalizör bekleyen kaliteli şirketler. Yüksek ROE, güçlü marj, makul borç. Aktif hissedar olarak yönetim değişikliği veya strateji revizyonu talep eder.</div>
+          <span class="iitem-tip tip-warn">ROE >%15 · Net marj >%10 · B/Ö <%80 · F/K <20</span>
         </div>
         <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Breakout — Kırılım</span><span class="iitem-eng">Breakout</span></div>
-          <div class="iitem-desc">Hisse fiyatının önemli bir direnç seviyesini (önceki zirve, konsolidasyon bölgesi) yüksek hacimle aşmasıdır. Kırılımın geçerli olması için hacim artışı şarttır.</div>
-          
+          <div class="iitem-top"><span class="iitem-name">Carl Icahn — Activist Value</span></div>
+          <div class="iitem-desc">Nakit zengini, düşük borçlu, düşük F/K şirketler. Yönetim baskısıyla değer açığa çıkar — geri alım, temettü artışı, bölünme.</div>
+          <span class="iitem-tip tip-warn">PD/DD <1.5 · F/K <12 · B/Ö <%60 · Temettü >%1</span>
         </div>
         <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Cari Oran</span><span class="iitem-eng">Current Ratio</span></div>
-          <div class="iitem-desc">Dönen varlıkların kısa vadeli borçlara oranıdır. Şirketin kısa vadeli yükümlülüklerini karşılayıp karşılayamayacağını gösterir.</div>
-          <span class="iitem-tip tip-bad">✕ <1 likidite sıkıntısı riski</span><span class="iitem-tip tip-warn">△ 1–1.5 dikkatli izlenmeli</span><span class="iitem-tip tip-good">✓ 1.5–3 sağlıklı likidite</span>
+          <div class="iitem-top"><span class="iitem-name">Cathie Wood / ARK — Disruptive Büyüme</span></div>
+          <div class="iitem-desc">Yıkıcı teknoloji, genomik, AI, fintech. Gelir büyümesi >%30, güçlü kazanç ivmesi. Kârlılık ikincil — büyüme ve adreslenebilir pazar büyüklüğü (TAM) öncelikli.</div>
+          <span class="iitem-tip tip-warn">Gelir büyümesi >%30 · Kazanç büyümesi >%20 · Cari >1</span>
         </div>
         <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">EPS — Hisse Başına Kâr</span><span class="iitem-eng">Earnings Per Share</span></div>
-          <div class="iitem-desc">Şirketin net kârının toplam hisse sayısına bölünmesiyle bulunur. Kârlılığı ve büyümeyi izlemek için temel göstergedir.</div>
-          
+          <div class="iitem-top"><span class="iitem-name">Charlie Munger — Quality Compounder</span></div>
+          <div class="iitem-desc">"Harika şirketi adil fiyata al." Brüt marj>%50, ROE>%20, neredeyse borçsuz, sektör lideri. Buffett'ın ortağı; kalite odaklı uzun vadeli tutuş.</div>
+          <span class="iitem-tip tip-warn">Brüt marj >%50 · ROE >%20 · B/Ö <%30 · Net marj >%20</span>
         </div>
         <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">F/K — Fiyat / Kazanç</span><span class="iitem-eng">P/E — Price to Earnings</span></div>
-          <div class="iitem-desc">Hisse fiyatının hisse başına kâra bölünmesiyle bulunur. Yatırımcının 1 liralık kâr için kaç lira ödediğini gösterir. Sektörler arası karşılaştırmada dikkatli olunmalıdır.</div>
-          <span class="iitem-tip tip-good">✓ 5–15 değer yatırımcısı için cazip</span><span class="iitem-tip tip-warn">△ 15–25 orta değerli</span><span class="iitem-tip tip-bad">✕ 25+ büyüme beklentisi fiyatlanmış</span>
+          <div class="iitem-top"><span class="iitem-name">David Einhorn — Deep Value</span></div>
+          <div class="iitem-desc">Derin değer + kısa satış. Düşük F/K, güçlü nakit, düşük borç, kârlı ama gözden kaçmış şirketler.</div>
+          <span class="iitem-tip tip-warn">F/K <15 · B/Ö <%50 · Cari >1.5 · Net marj >%8 · ROE >%10</span>
         </div>
         <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">F/S — Fiyat / Satışlar</span><span class="iitem-eng">P/S — Price to Sales</span></div>
-          <div class="iitem-desc">Piyasa değerinin yıllık satış gelirine oranıdır. Kâr etmeyen ama büyüyen şirketleri değerlemek için kullanılır.</div>
-          <span class="iitem-tip tip-good">✓ <1 satışlara göre ucuz</span><span class="iitem-tip tip-warn">△ 1–5 sektöre göre normal</span><span class="iitem-tip tip-bad">✕ 10+ büyüme beklentisi yüksek fiyatlanmış</span>
+          <div class="iitem-top"><span class="iitem-name">Mark Minervini — SEPA</span></div>
+          <div class="iitem-desc">Süper performanslı büyüme hissesi: kazanç büyümesi>%25, ROE>%17, marj>%10. Zirveye yakın + hacim patlaması. SEPA (Specific Entry Point Analysis) kırılım modeliyle tamamlanır.</div>
+          <span class="iitem-tip tip-warn">Kazanç büyümesi >%25 · ROE >%17 · Net marj >%10 · B/Ö <100</span>
         </div>
         <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Gelir Büyümesi</span><span class="iitem-eng">Revenue Growth TTM YoY</span></div>
-          <div class="iitem-desc">Satış gelirinin geçen yıla göre yüzde kaç arttığını gösterir. Yüksek enflasyon ortamında reel büyümeye bakmak önemlidir.</div>
-          <span class="iitem-tip tip-bad">✕ Negatif — gelir küçülüyor</span><span class="iitem-tip tip-warn">△ 0–10% zayıf büyüme</span><span class="iitem-tip tip-good">✓ %20+ güçlü büyüme şirketi</span>
+          <div class="iitem-top"><span class="iitem-name">Piotroski F-Score</span></div>
+          <div class="iitem-desc">9 soruluk bilanço sağlığı skoru. Kârlılık (4 puan) + Kaldıraç/Likidite (3 puan) + Operasyonel Verimlilik (2 puan). 7–9 güçlü, 0–2 zayıf.</div>
+          <span class="iitem-tip tip-good">✓ 7–9 güçlü alım bölgesi</span><span class="iitem-tip tip-warn">△ 3–6 nötr</span><span class="iitem-tip tip-bad">✕ 0–2 zayıf bilanço</span>
         </div>
         <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Güvenlik Marjı</span><span class="iitem-eng">Margin of Safety</span></div>
-          <div class="iitem-desc">Benjamin Graham'ın temel ilkesi: İçsel değeri (intrinsic value) hesapla, piyasa fiyatı bundan önemli ölçüde düşükse al. Bu fark güvenlik marjıdır.</div>
-          
+          <div class="iitem-top"><span class="iitem-name">Warren Buffett — Moat</span></div>
+          <div class="iitem-desc">Sürdürülebilir rekabet avantajı (moat): ROE>%20, brüt marj>%40, net marj>%20, D/E<%50. Makul fiyat, uzun vadeli tutuş. "Harika şirketi adil fiyata al."</div>
+          <span class="iitem-tip tip-warn">F/K 5–25 · ROE >%20 · Brüt marj >%40 · Net marj >%20 · B/Ö <%50</span>
+        </div>
+      </div>
+      </div>
+      <div class="info-tab-panel" id="info-panel-temel">
+      <div class="icat">
+        <div class="icat-title">📊 Temel Analiz Presetleri (A–Z)</div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Az Borçlu Şirketler</span></div>
+          <div class="iitem-desc">Borçsuz güç: B/Ö<%30, cari oran>2, bilanço temiz. Kriz dönemlerinde hayatta kalanlar.</div>
+          <span class="iitem-tip tip-warn">B/Ö <%30 · Cari >2</span>
         </div>
         <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Hacim</span><span class="iitem-eng">Volume — Milyon Lot</span></div>
-          <div class="iitem-desc">Belirli bir sürede el değiştiren hisse adedidir. Yüksek hacim, fiyat hareketlerinin geçerliliğini artırır. Kırılımlarda hacim onayı kritiktir.</div>
-          <span class="iitem-tip tip-warn">△ Düşük hacimli hisselerde yüksek spread ve likidite riski olabilir</span>
+          <div class="iitem-top"><span class="iitem-name">Büyüme Hisseleri</span></div>
+          <div class="iitem-desc">Hızlı büyüyen şirketler: EPS büyümesi>%20, gelir büyümesi>%15, ROE>%15. Lynch "fast-grower" profili.</div>
+          <span class="iitem-tip tip-warn">Kazanç büyümesi >%20 · Gelir büyümesi >%15 · ROE >%15</span>
         </div>
         <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Kazanç Büyümesi (EPS)</span><span class="iitem-eng">EPS Growth TTM YoY</span></div>
-          <div class="iitem-desc">Hisse başına kârın yıldan yıla ne kadar büyüdüğünü gösterir. Gelir büyümesinden daha önemlidir; marj genişlemesini de yansıtır.</div>
-          <span class="iitem-tip tip-good">✓ %25+ Minervini/Lynch kriterleri — büyüme hissesi</span><span class="iitem-tip tip-bad">✕ Negatif kâr sıkışması var</span>
+          <div class="iitem-top"><span class="iitem-name">Değer Hisseleri</span></div>
+          <div class="iitem-desc">Piyasanın gözden kaçırdığı ucuz hisseler: F/K<15, PD/DD<2, temettü>%2. Graham-Buffett değer yatırımı temeli.</div>
+          <span class="iitem-tip tip-warn">F/K <15 · PD/DD <2 · Temettü >%2</span>
         </div>
         <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Moat — Rekabet Avantajı</span><span class="iitem-eng">Economic Moat</span></div>
-          <div class="iitem-desc">Warren Buffett'ın popülerleştirdiği kavram: Bir şirketi rakiplerden koruyan ve uzun vadeli kârlılığı sürdüren yapısal avantajlar. Marka gücü, ağ etkisi, maliyet avantajı sayılabilir.</div>
-          
+          <div class="iitem-top"><span class="iitem-name">Kaliteli Şirketler</span></div>
+          <div class="iitem-desc">Olağanüstü kalite: ROE>%20, net marj>%15, brüt marj>%35, düşük borç, güçlü likidite.</div>
+          <span class="iitem-tip tip-warn">ROE >%20 · Net marj >%15 · Brüt marj >%35 · B/Ö <80 · Cari >1.5</span>
         </div>
         <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Net Kâr Marjı</span><span class="iitem-eng">Net Profit Margin TTM</span></div>
-          <div class="iitem-desc">Her 100 liralık satıştan ne kadar net kâr kaldığını gösterir. Sektöre göre büyük farklılık gösterebilir.</div>
-          <span class="iitem-tip tip-bad">✕ %5 altı zayıf (sektöre bağlı)</span><span class="iitem-tip tip-good">✓ %15+ güçlü marj — fiyatlandırma gücü var</span>
+          <div class="iitem-top"><span class="iitem-name">Momentum Hisseleri</span></div>
+          <div class="iitem-desc">Çift ivme: gelir büyümesi>%20 VE kazanç büyümesi>%20. ARK/Minervini kesişim noktası — hem operasyonel hem hisse güçlü.</div>
+          <span class="iitem-tip tip-warn">Gelir büyümesi >%20 · Kazanç büyümesi >%20</span>
         </div>
         <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">PD/DD — Piyasa Değeri / Defter Değeri</span><span class="iitem-eng">P/B — Price to Book Value</span></div>
-          <div class="iitem-desc">Piyasa değerinin defter değerine oranıdır. 1'in altında defter değerinin altında işlem görüyor demektir.</div>
-          <span class="iitem-tip tip-good">✓ 1'in altı — defter değeri altında</span><span class="iitem-tip tip-warn">△ 1–3 arası normal</span><span class="iitem-tip tip-bad">✕ 5+ pahalı olabilir</span>
+          <div class="iitem-top"><span class="iitem-name">Temettü Hisseleri</span></div>
+          <div class="iitem-desc">Güçlü ve istikrarlı temettü: verim>%4, B/Ö<%80, cari>1.2. Gelir odaklı uzun vadeli yatırım.</div>
+          <span class="iitem-tip tip-warn">Temettü >%4 · B/Ö <%80 · Cari >1.2</span>
+        </div>
+      </div>
+      </div>
+      <div class="info-tab-panel" id="info-panel-teknik">
+      <div class="icat">
+        <div class="icat-title">⚡ Teknik Analiz Presetleri (A–Z)</div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">26 İndikatör AL</span></div>
+          <div class="iitem-desc">TradingView'in 26 teknik indikatörünü (RSI, MACD, ADX, Stochastic, 15 hareketli ortalama) birleştiren konsensüs skoru 0.5 üzeri olan hisseler.</div>
+          <span class="iitem-tip tip-warn">TV Rating >0.5</span>
         </div>
         <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">PEG — Büyümeye Göre F/K</span><span class="iitem-eng">Price/Earnings to Growth</span></div>
-          <div class="iitem-desc">F/K oranını kazanç büyüme hızına böler. Hem büyümeyi hem değerlemeyi tek göstergede birleştirir. Peter Lynch'in favori metriği.</div>
-          <span class="iitem-tip tip-good">✓ <1 büyümeye göre ucuz — Lynch'in altın bölgesi</span><span class="iitem-tip tip-warn">△ 1–2 arası adil değerlenmiş</span><span class="iitem-tip tip-bad">✕ 2+ büyüme aşırı fiyatlanmış</span>
+          <div class="iitem-top"><span class="iitem-name">3 Aylık Lider</span></div>
+          <div class="iitem-desc">Son 3 ayda %15+, 6 ayda %20+ kazanan hisseler. Jegadeesh-Titman momentum anomalisi: geçen dönemin kazananları kazanmaya devam eder.</div>
+          <span class="iitem-tip tip-warn">3A getiri >%15 · 6A getiri >%20</span>
         </div>
         <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Piotroski F-Score</span><span class="iitem-eng">Piotroski Financial Score</span></div>
-          <div class="iitem-desc">Joseph Piotroski'nin geliştirdiği 9 soruluk bilanço sağlığı skoru. Kârlılık (4), kaldıraç (3) ve verimlilik (2) alt skorlarından oluşur.</div>
-          <span class="iitem-tip tip-bad">✕ 0–2 zayıf bilanço, kısa pozisyon adayı</span><span class="iitem-tip tip-warn">△ 3–6 orta, nötr</span><span class="iitem-tip tip-good">✓ 7–9 güçlü bilanço — Piotroski'nin alım bölgesi</span>
+          <div class="iitem-top"><span class="iitem-name">Dip Fırsatı</span></div>
+          <div class="iitem-desc">Sert düşen, dibine yakın, RSI<35 aşırı satılmış hisseler. Kontrarian yaklaşım — paniği fırsata çevir.</div>
+          <span class="iitem-tip tip-warn">52H zirvesinden >-%20 · RSI <35</span>
         </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Güçlü Gün</span></div>
+          <div class="iitem-desc">Bugün %2+ yükselen, hacimle desteklenen hisseler. Katalizör sinyali: haber, kırılım veya sektör rotasyonu.</div>
+          <span class="iitem-tip tip-warn">Günlük değişim >%2 · Hacim >0.5M lot</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Güçlü Trendde</span></div>
+          <div class="iitem-desc">52 hafta düşüğünden %25+ yukarıda, 6 aylık getiri pozitif. Minervini Trend Template — sadece yapısal olarak güçlü hisseler.</div>
+          <span class="iitem-tip tip-warn">52H düşüğünden >%25 · 6A getiri >%10</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Kırılım</span></div>
+          <div class="iitem-desc">Zirvesine yakın, hacim destekli, indikatörler AL sinyali. Mark Minervini SEPA kırılım koşulu — güçlü trendlerin başlangıç noktası.</div>
+          <span class="iitem-tip tip-warn">Zirveden >-%5 · Değişim >%1.5 · Hacim >0.5M · TV Rating >0.1</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Kurumsal Hacim</span></div>
+          <div class="iitem-desc">Normalin çok üzerinde hacimle işlem gören, fiyatı artan hisseler. Büyük kurumsal oyuncuların (fon, banka) pozisyon açtığının sinyali.</div>
+          <span class="iitem-tip tip-warn">Hacim >5M lot · Günlük değişim >0</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">RSI Toparlanması</span></div>
+          <div class="iitem-desc">RSI 30–50 bandında: aşırı satımdan çıkmış, henüz aşırı alıma girmemiş hisseler. Dipten toparlanmanın erken aşaması.</div>
+          <span class="iitem-tip tip-warn">RSI 30–50 · 52H düşüğünden >%3</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Sağlıklı Çekilme</span></div>
+          <div class="iitem-desc">Zirveden %10–25 geri çekilen, 6 aylık trendi hâlâ güçlü hisseler. Güçlü trendde pullback alım fırsatı.</div>
+          <span class="iitem-tip tip-warn">Zirveden -%10 ila -%25 · 6A getiri >%10</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Zirveye Yakın</span></div>
+          <div class="iitem-desc">1 aylık zirvesinin %3'ü yakınında, son 3 ayda %5+ kazanmış hisseler. Güçlü trend devam sinyali.</div>
+          <span class="iitem-tip tip-warn">Zirveden >-%3 · 3A getiri >%5</span>
+        </div>
+      </div>
+      </div>
+      <div class="info-tab-panel" id="info-panel-sozluk">
+      <div class="icat">
+        <div class="icat-title">📖 Terimler Sözlüğü (A–Z)</div>
         <div class="iitem">
           <div class="iitem-top"><span class="iitem-name">Piyasa Değeri</span><span class="iitem-eng">Market Capitalization</span></div>
           <div class="iitem-desc">Hisse fiyatının toplam hisse adediyle çarpımıdır. Şirketin borsadaki toplam değerini gösterir.</div>
-          <span class="iitem-tip tip-warn">△ Küçük ölçekli hisseler daha volatil, daha yüksek getiri potansiyeli taşıyabilir</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">ROA — Varlık Kârlılığı</span><span class="iitem-eng">Return on Assets</span></div>
-          <div class="iitem-desc">Şirketin tüm varlıklarını ne kadar verimli kullandığını gösterir. Bankalar için genellikle düşüktür.</div>
-          <span class="iitem-tip tip-good">✓ %5+ genel sanayi için iyi</span><span class="iitem-tip tip-warn">△ Bankalar için %1–2 normal</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">ROE — Özkaynak Kârlılığı</span><span class="iitem-eng">Return on Equity</span></div>
-          <div class="iitem-desc">Şirketin özkaynaklarını ne kadar verimli kullandığını gösterir. Yüksek ROE, ortaklara iyi getiri sağlandığı anlamına gelir.</div>
-          <span class="iitem-tip tip-bad">✕ %10 altı zayıf</span><span class="iitem-tip tip-warn">△ %10–20 orta</span><span class="iitem-tip tip-good">✓ %20+ güçlü rekabet avantajı sinyali</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Temettü Verimi</span><span class="iitem-eng">Dividend Yield</span></div>
-          <div class="iitem-desc">Hisse başına ödenen yıllık temettünün mevcut fiyata oranıdır. Sürdürülebilirliği önemlidir.</div>
-          <span class="iitem-tip tip-good">✓ %4+ temettü yatırımcısı için cazip</span><span class="iitem-tip tip-warn">△ %15+ çok yüksek, risk işareti olabilir</span>
+          <span class="iitem-tip tip-warn">△ Küçük ölçekli hisseler daha volatil olabilir</span>
         </div>
         <div class="iitem">
           <div class="iitem-top"><span class="iitem-name">TTM — Son 12 Ay</span><span class="iitem-eng">Trailing Twelve Months</span></div>
-          <div class="iitem-desc">Son 12 aylık kümülatif veriyi ifade eder. Yıllık raporlar yerine en güncel 4 çeyreği toplar. Mevsimsel etkilere dikkat edilmelidir.</div>
+          <div class="iitem-desc">Son 12 aylık kümülatif veriyi ifade eder. Yıllık raporlar yerine en güncel 4 çeyreği toplar.</div>
           
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">TV Rating — 26 İndikatör</span><span class="iitem-eng">TradingView Recommend.All</span></div>
-          <div class="iitem-desc">TradingView'in RSI, MACD, ADX, Stochastic ve 15 hareketli ortalama dahil 26 teknik indikatörünü birleştiren teknik konsensüs skoru.</div>
-          <span class="iitem-tip tip-good">✓ 0.5–1.0 güçlü AL sinyali</span><span class="iitem-tip tip-warn">△ -0.5–0.5 nötr</span><span class="iitem-tip tip-bad">✕ -1.0– -0.5 güçlü SAT sinyali</span>
         </div>
         <div class="iitem">
           <div class="iitem-top"><span class="iitem-name">YoY — Yıldan Yıla</span><span class="iitem-eng">Year over Year</span></div>
           <div class="iitem-desc">Bu yılın aynı dönemini geçen yılın aynı dönemiyle kıyaslar. Mevsimsel etkilerden arındırılmış büyümeyi gösterir.</div>
           
         </div>
+      </div>
       </div>
     </div>
   </div>
