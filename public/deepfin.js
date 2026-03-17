@@ -390,7 +390,9 @@ async function runScan(){
     'total_revenue_change_ttm_yoy','earnings_per_share_change_ttm_yoy',
     'revenue_growth_ttm_yoy','earnings_per_share_diluted_yoy_growth_ttm',
     'dividends_yield','debt_to_equity_fq','current_ratio_fq',
-    'sector','High.1M','Low.1M','piotroski_f_score'
+    'sector','High.1M','Low.1M','piotroski_f_score',
+    'Recommend.All','Recommend.MA','Recommend.Other',
+    'Perf.3M','Perf.6M','Perf.Y','RSI'
   ];
   const COLS_US = [
     'name','description','close','change','volume','market_cap_basic',
@@ -402,7 +404,9 @@ async function runScan(){
     'earnings_per_share_diluted_ttm',
     'dividends_yield_current','dividends_yield',
     'total_debt_to_equity','debt_to_equity_fq','current_ratio','current_ratio_fq',
-    'sector','High.1M','Low.1M','piotroski_f_score'
+    'sector','High.1M','Low.1M','piotroski_f_score',
+    'Recommend.All','Recommend.MA','Recommend.Other',
+    'Perf.3M','Perf.6M','Perf.Y','RSI'
   ];
   const COLS_GLOBAL = [
     'name','description','close','change','volume','market_cap_basic',
@@ -413,7 +417,9 @@ async function runScan(){
     'earnings_per_share_diluted_yoy_growth_ttm','earnings_per_share_change_ttm_yoy',
     'dividends_yield_current','dividends_yield',
     'total_debt_to_equity','debt_to_equity_fq','current_ratio','current_ratio_fq',
-    'sector','High.1M','Low.1M','piotroski_f_score'
+    'sector','High.1M','Low.1M','piotroski_f_score',
+    'Recommend.All','Recommend.MA','Recommend.Other',
+    'Perf.3M','Perf.6M','Perf.Y','RSI'
   ];
   const COLUMNS_BY_EXCHANGE = {
     bist:   COLS_BIST,
@@ -1338,13 +1344,13 @@ function _vsRender() {
   // Padding row'ları ile toplam yüksekliği koru
   var rows = '';
   if (topPad > 0) {
-    rows += '<tr class="vs-pad" style="height:' + topPad + 'px"><td colspan="20"></td></tr>';
+    rows += '<tr class="vs-pad" style="height:' + topPad + 'px"><td colspan="23"></td></tr>';
   }
   for (var i = v.start; i < end; i++) {
     rows += _vsRowHtml(_vsData[i], i);
   }
   if (botPad > 0) {
-    rows += '<tr class="vs-pad" style="height:' + botPad + 'px"><td colspan="20"></td></tr>';
+    rows += '<tr class="vs-pad" style="height:' + botPad + 'px"><td colspan="23"></td></tr>';
   }
   tbody.innerHTML = rows;
 }
