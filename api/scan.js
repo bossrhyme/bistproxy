@@ -236,6 +236,8 @@ module.exports = async function(req, res) {
     if (kvEnabled()) {
       const cached = await kvGet(cacheKey);
       if (cached) {
+        // Cache'e yazılırken columns eklenmemişse safeCols'tan ekle
+        if (!cached.columns) cached.columns = safeCols;
         res.setHeader('Content-Type', 'application/json');
         return res.status(200).end(JSON.stringify(cached));
       }
@@ -261,6 +263,7 @@ module.exports = async function(req, res) {
           // Sadece client'ın ihtiyacı olan meta — kaynak detayları gizli
           parsed._exchange  = exchange;
           parsed._currency  = cfg.currency;
+          parsed.columns    = merged.columns; // client CI map için gerçek sıra
 
           // 3. Cache'e yaz (response'u bloklamaz)
           if (kvEnabled() && parsed.data && parsed.data.length > 0) {

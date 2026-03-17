@@ -497,8 +497,12 @@ async function runScan(){
 
     // Parse TradingView response — index bazlı, sıra garantili
     const results = [];
-    const cols = (COLUMNS_BY_EXCHANGE[currentExchange] || COLUMNS_BY_EXCHANGE.default);
-    const ci = {}; cols.forEach((c,i) => ci[c]=i); // column → index map
+    // CI map: response'dan gelen gerçek columns sırası (scan.js'nin safeCols filtrelemesi
+    // sırayı bozabilir). Yoksa client listesine fallback.
+    const responseCols = Array.isArray(json.columns) ? json.columns
+                       : (COLUMNS_BY_EXCHANGE[currentExchange] || []);
+    const ci = {};
+    responseCols.forEach((c,i) => ci[c]=i); // column → index map
 
     for(const row of json.data) {
       const d = row.d;
@@ -1320,22 +1324,26 @@ function _initWorker() {
 var _vsData    = [];      // sıralanmış tam liste
 var _vsStart   = 0;       // ilk görünen satır index'i
 var _vsRowH    = 36;      // satır yüksekliği (px) - CSS ile uyumlu
-var _vsBuffer  = 8;       // ekstra render (üst+alt buffer)
+var _vsBuffer  = 15;      // ekstra render (üst+alt buffer)
 var _vsRAF     = null;
 
 function _vsGetVisible() {
   var wrap = document.getElementById('twrap');
-  if (!wrap) return {start:0, count:50};
-  // offsetHeight kullan - overflow:auto olan container'da clientHeight sıfır olabilir
-  var viewH = wrap.offsetHeight || wrap.clientHeight;
-  // Fallback: window yüksekliği - header/toolbar tahmini
+  if (!wrap) return {start:0, count:100};
+  // Birden fazla yöntemle yüksekliği dene
+  var viewH = wrap.clientHeight || wrap.offsetHeight;
+  if (!viewH || viewH < 100) {
+    // twrap'ın parent'ından hesapla
+    var parent = wrap.parentElement;
+    viewH = parent ? (parent.clientHeight - 60) : (window.innerHeight - 250);
+  }
   if (!viewH || viewH < 100) viewH = window.innerHeight - 200;
   var scrollY = wrap.scrollTop || 0;
-  // Gerçek satır yüksekliğini ölç (ilk tbody satırından)
+  // Gerçek satır yüksekliğini ölç
   var firstRow = wrap.querySelector('tbody tr:not(.vs-pad)');
   if (firstRow && firstRow.offsetHeight > 10) _vsRowH = firstRow.offsetHeight;
-  // En az 30 satır göster, en fazla veri sayısı kadar
-  var count = Math.max(30, Math.ceil(viewH / _vsRowH) + _vsBuffer * 2);
+  // En az 60 satır render et — scroll çalışmasa bile yeterli veri görünür
+  var count = Math.max(60, Math.ceil(viewH / _vsRowH) + _vsBuffer * 2);
   var start = Math.max(0, Math.floor(scrollY / _vsRowH) - _vsBuffer);
   return {start: start, count: count};
 }
@@ -1352,13 +1360,13 @@ function _vsRender() {
   // Padding row'ları ile toplam yüksekliği koru
   var rows = '';
   if (topPad > 0) {
-    rows += '<tr class="vs-pad" style="height:' + topPad + 'px"><td colspan="23"></td></tr>';
+    rows += '<tr class="vs-pad" style="height:' + topPad + 'px"><td colspan="22"></td></tr>';
   }
   for (var i = v.start; i < end; i++) {
     rows += _vsRowHtml(_vsData[i], i);
   }
   if (botPad > 0) {
-    rows += '<tr class="vs-pad" style="height:' + botPad + 'px"><td colspan="23"></td></tr>';
+    rows += '<tr class="vs-pad" style="height:' + botPad + 'px"><td colspan="22"></td></tr>';
   }
   tbody.innerHTML = rows;
 }
@@ -1371,7 +1379,6 @@ function _vsOnScroll() {
 function _vsInit() {
   var wrap = document.getElementById('twrap');
   if (!wrap) return;
-  // Her seferinde temiz bağla — flag kaldırıldı
   if (!wrap._vsListener) {
     wrap.addEventListener('scroll', _vsOnScroll, {passive: true});
     wrap._vsListener = true;
@@ -1382,6 +1389,13 @@ function _vsInit() {
       if (_vsData && _vsData.length) _vsRender();
     });
     wrap._vsResizeObs.observe(wrap);
+  }
+  // Window resize — ekran boyutu değişince daha fazla satır göster
+  if (!window._vsWinListener) {
+    window.addEventListener('resize', function() {
+      if (_vsData && _vsData.length) { if (_vsRAF) cancelAnimationFrame(_vsRAF); _vsRAF = requestAnimationFrame(_vsRender); }
+    }, {passive: true});
+    window._vsWinListener = true;
   }
 }
 // ─────────────────────────────────────────────────
