@@ -684,17 +684,8 @@ async function runScan(){
     // Geçersiz hisseleri filtrele: fiyat yoksa veya finansal veri YOK ise çıkar
     // GİP / yeni hisseler: close var, High/Low var ama PE+ROE+margin+sektör hepsi null
     allData = dedupedResults.filter(s => {
-      if (!s.currentPrice || s.currentPrice <= 0) return false;
-      // En az bir finansal alan veya sektör dolu olmalı
-      const hasFundamental = (
-        s.peNormalizedAnnual !== null ||
-        s.pbAnnual           !== null ||
-        s.roeTTM             !== null ||
-        s.netProfitMarginTTM !== null ||
-        s.revenueGrowthTTMYoy !== null ||
-        s.sector             !== null
-      );
-      return hasFundamental;
+      // Sadece fiyatı olan hisseler — finansal veri yoksa sütunlar tire gösterir
+      return s.currentPrice && s.currentPrice > 0;
     });
     const _exm = EXCHANGE_META[currentExchange]||EXCHANGE_META.bist;
 
@@ -1221,6 +1212,7 @@ function applyAndRender(special){
   _vsStart = 0;
   var _wrap = document.getElementById('twrap');
   if (_wrap) _wrap.scrollTop = 0;
+  _vsInit();
   _vsRender();
   updateStatsBar();
   updateTicker();
@@ -1365,9 +1357,28 @@ function _vsRender() {
     rows += _vsRowHtml(_vsData[i], i);
   }
   if (botPad > 0) {
-    rows += '<tr class="vs-pad" style="height:' + botPad + 'px"><td colspan="22"></td></tr>';
+    rows += '<tr class="vs-pad vs-sentinel" style="height:' + botPad + 'px"><td colspan="22"></td></tr>';
   }
   tbody.innerHTML = rows;
+
+  // Sentinel observer: botPad row görünürce daha fazla yükle
+  _vsBindSentinel();
+}
+
+function _vsBindSentinel() {
+  if (!window.IntersectionObserver) return;
+  var sentinel = document.querySelector('.vs-sentinel');
+  if (!sentinel || sentinel._vsObs) return;
+  var obs = new IntersectionObserver(function(entries) {
+    if (entries[0].isIntersecting) {
+      obs.disconnect();
+      sentinel._vsObs = null;
+      if (_vsRAF) cancelAnimationFrame(_vsRAF);
+      _vsRAF = requestAnimationFrame(_vsRender);
+    }
+  }, { threshold: 0.01 });
+  obs.observe(sentinel);
+  sentinel._vsObs = obs;
 }
 
 function _vsOnScroll() {
