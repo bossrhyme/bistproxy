@@ -119,6 +119,94 @@ module.exports = async (req, res) => {
       return res.status(200).json({ news, symbol: fullSym });
     }
 
+
+    // ── SEKTÖR ORTALAMASI ─────────────────────────────────────────────
+    if (type === 'sector_avg') {
+      const sector = url.searchParams.get('sector') || '';
+      if (!sector) return res.status(400).json({ error: 'sector gerekli' });
+
+      const tvPath = TV_PATHS[ex] || TV_PATHS.bist;
+      const avgFields = [
+        'price_earnings_ttm', 'price_book_fq', 'price_sales_current',
+        'return_on_equity_fq', 'return_on_assets_fq',
+        'net_margin', 'gross_margin', 'dividends_yield',
+        'debt_to_equity_fq', 'current_ratio_fq',
+        'revenue_growth_ttm_yoy', 'price_earnings_growth_ttm',
+      ];
+
+      const payload = JSON.stringify({
+        filter: [{ left: 'sector', operation: 'equal', right: sector }],
+        columns: avgFields,
+        range: [0, 100],
+        ignore_unknown_fields: true,
+      });
+
+      return new Promise(async (resolve) => {
+        try {
+          const reqBody = payload;
+          const r = await new Promise((ok, fail) => {
+            const req2 = https.request({
+              hostname: 'scanner.tradingview.com',
+              path: tvPath, method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(reqBody),
+                'User-Agent': 'Mozilla/5.0',
+                'Origin': 'https://www.tradingview.com',
+                'Referer': 'https://www.tradingview.com/',
+              }
+            }, (res2) => { let d=''; res2.on('data',c=>d+=c); res2.on('end',()=>ok({status:res2.statusCode,body:d})); });
+            req2.on('error', fail);
+            req2.setTimeout(9000, () => { req2.destroy(); fail(new Error('timeout')); });
+            req2.write(reqBody); req2.end();
+          });
+
+          const parsed = JSON.parse(r.body);
+          const rows = parsed.data || [];
+          if (!rows.length) return res.status(200).json({ avg: {}, count: 0, sector });
+
+          // Her alan için null olmayan değerlerin ortalamasını al
+          const sums = {}, counts = {};
+          avgFields.forEach(f => { sums[f] = 0; counts[f] = 0; });
+
+          rows.forEach(row => {
+            (row.d || []).forEach((v, i) => {
+              const f = avgFields[i];
+              if (v != null && !isNaN(v)) { sums[f] += parseFloat(v); counts[f]++; }
+            });
+          });
+
+          const avg = {};
+          avgFields.forEach(f => {
+            avg[f] = counts[f] > 0 ? parseFloat((sums[f] / counts[f]).toFixed(4)) : null;
+          });
+
+          res.status(200).json({
+            avg: {
+              pe:            avg.price_earnings_ttm,
+              pb:            avg.price_book_fq,
+              ps:            avg.price_sales_current,
+              roe:           avg.return_on_equity_fq,
+              roa:           avg.return_on_assets_fq,
+              netMargin:     avg.net_margin,
+              grossMargin:   avg.gross_margin,
+              dividendYield: avg.dividends_yield,
+              debtToEquity:  avg.debt_to_equity_fq,
+              currentRatio:  avg.current_ratio_fq,
+              revenueGrowth: avg.revenue_growth_ttm_yoy,
+              peg:           avg.price_earnings_growth_ttm,
+            },
+            count: rows.length,
+            sector,
+            exchange: ex,
+          });
+        } catch(e) {
+          res.status(500).json({ error: e.message });
+        }
+        resolve();
+      });
+    }
+
     // ── TV SCANNER — metrics/financials/balance/cashflow ─────────────
     const r    = await tvScan(ex, sym);
     const data = JSON.parse(r.body);

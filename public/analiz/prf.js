@@ -15,12 +15,18 @@ function loadTVWidget(sym, ex) {
   var suffix = encodeURIComponent(exMeta.yahooSuffix || '');
   var url    = '/api/scan?action=chart&symbol=' + sym + '&interval=D&currency=TL&suffix=' + suffix;
 
-  // Loading göster
+  // Placeholder gizle, chart container oluştur
+  var ph = document.getElementById('prf-tv-placeholder');
+  if(ph) ph.style.display = 'none';
   container.innerHTML = '<div id="prf-chart-inner" style="width:100%;height:300px;background:#0d1117;"></div>';
 
   function _drawChart() {
     var chartEl = document.getElementById('prf-chart-inner');
-    if(!chartEl || !window.LightweightCharts) return;
+    if(!chartEl || !window.LightweightCharts) {
+      // LC yüklenmedi - hata göster
+      if(chartEl) chartEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#64748b;font-size:12px;">Grafik kütüphanesi yüklenemedi</div>';
+      return;
+    }
 
     // Sabit width ile başlat, sonra gerçek width ile resize
     var _initW = chartEl.offsetWidth || chartEl.parentElement && chartEl.parentElement.offsetWidth || 600;
@@ -158,6 +164,73 @@ function _buildTrend(d) {
   }
 }
 
+
+// ── Sektör Ortalaması Yükle ───────────────────────────────────────────────
+function loadSectorAvg(sector, ex) {
+  if (!sector || _sectorAvg !== null) { _renderSectorComparison(); return; }
+  fetch('/api/fundamentals?symbol=_&exchange=' + encodeURIComponent(ex) + '&type=sector_avg&sector=' + encodeURIComponent(sector))
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      _sectorAvg = data.avg || {};
+      _sectorAvg._count = data.count || 0;
+      _renderSectorComparison();
+    })
+    .catch(function() { _sectorAvg = {}; });
+}
+
+function _renderSectorComparison() {
+  var d = _prfData;
+  var avg = _sectorAvg;
+  if (!d || !avg) return;
+  var el = document.getElementById('prf-sector-cmp');
+  if (!el) return;
+
+  function _cmpRow(label, stockVal, avgVal, fmt, higherIsBetter) {
+    if (stockVal == null && avgVal == null) return '';
+    var fmtV = function(v) { return v != null ? fmt(v) : '—'; };
+    var diff = (stockVal != null && avgVal != null && avgVal !== 0)
+      ? ((stockVal - avgVal) / Math.abs(avgVal) * 100) : null;
+    var better = diff != null ? (higherIsBetter ? diff > 5 : diff < -5) : false;
+    var worse  = diff != null ? (higherIsBetter ? diff < -5 : diff > 5) : false;
+    var cls = better ? 'sec-better' : worse ? 'sec-worse' : 'sec-neutral';
+    var arrow = better ? '▲' : worse ? '▼' : '≈';
+    var diffStr = diff != null ? (diff >= 0 ? '+' : '') + diff.toFixed(1) + '%' : '';
+    return '<tr>' +
+      '<td class="sec-label">' + label + '</td>' +
+      '<td class="sec-stock ' + cls + '">' + fmtV(stockVal) + '</td>' +
+      '<td class="sec-avg">' + fmtV(avgVal) + '</td>' +
+      '<td class="sec-diff ' + cls + '">' + arrow + ' ' + diffStr + '</td>' +
+    '</tr>';
+  }
+
+  var pct2 = function(v) { return v != null ? (v * 100).toFixed(1) + '%' : '—'; };
+  var x2   = function(v) { return v != null ? v.toFixed(2) + 'x' : '—'; };
+  var x1   = function(v) { return v != null ? v.toFixed(1) + 'x' : '—'; };
+
+  var rows = [
+    _cmpRow('F/K',          d.pe_ratio,              avg.pe,           x1,   false),
+    _cmpRow('PD/DD',        d.price_book_ratio,      avg.pb,           x2,   false),
+    _cmpRow('F/S',          d.price_sales,            avg.ps,           x2,   false),
+    _cmpRow('ROE',          d.roe    != null ? d.roe : null, avg.roe != null ? avg.roe/100 : null, pct2, true),
+    _cmpRow('ROA',          d.roa    != null ? d.roa : null, avg.roa != null ? avg.roa/100 : null, pct2, true),
+    _cmpRow('Net Marj',     d.net_margin,            avg.netMargin != null ? avg.netMargin/100 : null, pct2, true),
+    _cmpRow('Brüt Marj',    d.gross_margin,          avg.grossMargin != null ? avg.grossMargin/100 : null, pct2, true),
+    _cmpRow('B/Ö',          d.debt_to_equity,        avg.debtToEquity, x2,   false),
+    _cmpRow('Cari Oran',    d.current_ratio,         avg.currentRatio, x2,   true),
+    _cmpRow('Temettü',      d.dividend_yield_recent, avg.dividendYield != null ? avg.dividendYield/100 : null, pct2, true),
+  ].filter(Boolean).join('');
+
+  if (!rows) { el.innerHTML = '<div style="padding:12px 0;color:var(--muted2);font-size:12px;">Karşılaştırma için yeterli veri yok.</div>'; return; }
+
+  var sector = (_prfData && _prfData.sector) || '';
+  var count  = avg._count || 0;
+  el.innerHTML =
+    '<div class="sec-header">' + sector + (count ? ' · ' + count + ' şirket' : '') + '</div>' +
+    '<table class="sec-table">' +
+    '<thead><tr><th>Gösterge</th><th>Hisse</th><th>Sektör Ort.</th><th>Fark</th></tr></thead>' +
+    '<tbody>' + rows + '</tbody></table>';
+}
+
 function _buildFinancials(d) {
   if(!d) return;
   var n  = function(v,def){ var x=Number(v); return isNaN(x)?def:x; };
@@ -258,6 +331,7 @@ var _prfSym = '';
 var _prfEx  = '';
 var _prfData = null;
 var _prfAiDone = false;
+var _sectorAvg = null;
 var _urlParams = new URLSearchParams(window.location.search);
 
 function _fmtN(v) {
@@ -286,7 +360,25 @@ function showProfil(sym, ex) {
 
   document.getElementById('prf-sym-tag').textContent = sym;
   document.getElementById('prf-ex-tag').textContent  = (exMeta.name || _prfEx).toUpperCase();
-  document.getElementById('prf-logo').textContent    = sym.substring(0,2).toUpperCase();
+  // TV logo CDN: BIST için TUPRS → BIST:TUPRS → logo slug
+  var _logoEl = document.getElementById('prf-logo');
+  if(_logoEl) {
+    var _exMeta2 = EXCHANGE_META[_prfEx] || EXCHANGE_META.bist;
+    var _tvPfx = { bist:'BIST', nasdaq:'NASDAQ', sp500:'NYSE', dax:'XETR', lse:'LSE', nikkei:'TSE' }[_prfEx] || 'BIST';
+    var _logoSlug = (sym + '--' + _tvPfx).toLowerCase().replace(/[^a-z0-9-]/g,'-');
+    var _logoUrl = 'https://s3-symbol-logo.tradingview.com/' + encodeURIComponent(sym.toLowerCase()) + '--big.svg';
+    var _img = document.createElement('img');
+    _img.src = _logoUrl;
+    _img.alt = sym;
+    _img.style.cssText = 'width:48px;height:48px;object-fit:contain;border-radius:10px;';
+    _img.onerror = function() {
+      // Fallback: renkli harf avatar
+      _logoEl.textContent = sym.substring(0,2).toUpperCase();
+      _logoEl.style.cssText = 'display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;';
+    };
+    _logoEl.innerHTML = '';
+    _logoEl.appendChild(_img);
+  }
   document.getElementById('prf-fullname').textContent = sym;
 
   var buyBtn = document.getElementById('prf-buy-btn');
@@ -549,6 +641,8 @@ async function loadYahooData(sym, ex) {
     if(!d['52_week_high'] && q.high52)       d['52_week_high']     = q.high52;
     if(!d['52_week_low']  && q.low52)        d['52_week_low']      = q.low52;
     if(!d.beta            && q.beta)         d.beta                = q.beta;
+    if(!d.price_sales     && q.ps)           d.price_sales         = q.ps;
+    if(!d.revenue_growth  && q.revenueGrowth) d.revenue_growth     = q.revenueGrowth / 100;
     if(!d.market_cap_basic && q.marketCap)   d.market_cap_basic    = q.marketCap / 1e6;
     if(!d.average_volume_10d_calc && q.avgVolume) d.average_volume_10d_calc = q.avgVolume;
     if(!d.Perf_W  && q.perfW)  d.Perf_W  = q.perfW;
@@ -569,6 +663,10 @@ async function loadYahooData(sym, ex) {
     // Şirket adı + sektör
     if(q.name)   document.getElementById('prf-fullname').textContent   = q.name;
     if(q.sector) document.getElementById('prf-sector-tag').textContent = q.sector;
+
+    // Sektör ortalamasını yükle
+    _sectorAvg = null;
+    loadSectorAvg(q.sector || d.sector, ex);
 
     // Canlı fiyat
     document.getElementById('prf-price').textContent =
