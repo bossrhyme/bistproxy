@@ -764,12 +764,13 @@ if('serviceWorker' in navigator){
 
       <div class="twrap" id="twrap" style="display:none">
         <table>
-                    <thead>
+                              <thead>
             <tr>
               <th style="width:28px;text-align:center;color:var(--muted2);font-size:9px;">#</th>
               <th onclick="colSort('symbol')" data-col="symbol" data-tip="Borsa kodu (ticker).">SEMBOL</th>
               <th onclick="colSort('name')" data-col="name" data-tip="Şirketin tam ticari adı.">ŞİRKET ADI</th>
               <th onclick="colSort('currentPrice')" data-col="price" id="th-price" data-tip="Son işlem fiyatı. Değişim yüzdesi önceki kapanışa göre hesaplanır.">FİYAT</th>
+              <th onclick="colSort('marketCapitalization')" data-col="mcap" data-tip="Piyasa Değeri: Şirketin borsadaki toplam değeri (USD milyon).">P. Değeri ($)</th>
               <th onclick="colSort('peNormalizedAnnual')" data-col="pe" data-tip="Fiyat/Kazanç: Hisse fiyatının yıllık kazanca oranı. Düşük = ucuz.">F/K</th>
               <th onclick="colSort('pbAnnual')" data-col="pb" data-tip="Piyasa/Defter: 1'in altı varlıkların altında işlem görüyor.">PD/DD</th>
               <th onclick="colSort('psTTM')" data-col="ps" data-tip="Fiyat/Satış: Kâr etmeyen büyüme şirketleri için kullanılır.">F/S</th>
@@ -786,10 +787,9 @@ if('serviceWorker' in navigator){
               <th onclick="colSort('techRating')" data-col="tech_rating" data-tip="Teknik Rating: TradingView'nin RSI, MACD, ADX, Stochastic ve 15 hareketli ortalama dahil 26 indikatöre dayalı puanı. +1 = Güçlü Al, -1 = Güçlü Sat.">TV Rating</th>
               <th onclick="colSort('rsi14')" data-col="rsi" data-tip="RSI (14): 0-100 arasında momentum göstergesi. 30 altı aşırı satım (alım fırsatı), 70 üstü aşırı alım (dikkat).">RSI</th>
               <th onclick="colSort('perf3m')" data-col="perf3m" data-tip="3 Aylık Getiri: Hissenin son 3 ayda yüzdesel değişimi. Jegadeesh-Titman momentum faktörü.">3A Geti%</th>
-              <th onclick="colSort('marketCapitalization')" data-col="mcap" data-tip="Piyasa Değeri: Şirketin borsadaki toplam değeri (USD milyon).">P. Değeri ($)</th>
               <th onclick="colSort('sector')" data-col="sector" data-tip="Şirketin faaliyet gösterdiği sektör. Sektöre göre filtrelemek için sol paneli kullanın.">SEKTÖR</th>
             </tr>
-          </thead>          <tbody id="tbody"></tbody>
+          </thead>         <tbody id="tbody"></tbody>
         </table>
       </div>
     </div>

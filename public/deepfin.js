@@ -252,6 +252,7 @@ function toggleFavFilter() {
 // ═══════════════════════════════════════════
 const COL_DEFS = [
   {key:'price', label:'FİYAT', def:true},
+  {key:'mcap', label:'P.Değeri', def:true},
   {key:'pe', label:'F/K', def:true},
   {key:'pb', label:'PD/DD', def:true},
   {key:'ps', label:'F/S', def:true},
@@ -268,7 +269,6 @@ const COL_DEFS = [
   {key:'tech_rating', label:'TV Rating', def:true},
   {key:'rsi', label:'RSI', def:true},
   {key:'perf3m', label:'3A Geti%', def:true},
-  {key:'mcap', label:'P.Değeri', def:true},
   {key:'sector', label:'SEKTÖR', def:true},
 ];
 var _colVisible = null;
@@ -1408,6 +1408,7 @@ function _vsRowHtml(s, idx) {
       <td data-col="symbol" style="display:table-cell;"><span class="row-num">${idx+1}</span><span class="sym-wrap"><span class="row-arrow">›</span><span class="sym">${s.symbol}</span></span></td>
       <td data-col="name" style="font-size:11px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.name}">${s.name}</td>
       <td data-col="price">${s.currentPrice!=null?(s.currentPrice.toFixed(2)+' '+(EXCHANGE_META[currentExchange]||EXCHANGE_META.bist).currency):nil}</td>
+      <td data-col="mcap">${fmc(s.marketCapitalization)}</td>
       <td data-col="pe">${fv(s.peNormalizedAnnual,1)}</td>
       <td data-col="pb">${fv(s.pbAnnual,2)}</td>
       <td data-col="ps">${fv(s.psTTM,2)}</td>
@@ -1424,11 +1425,9 @@ function _vsRowHtml(s, idx) {
       <td data-col="tech_rating">${s.techRating!=null?fTechRating(s.techRating):nil}</td>
       <td data-col="rsi">${s.rsi14!=null?fRsi(s.rsi14):nil}</td>
       <td data-col="perf3m">${s.perf3m!=null?fPerf(s.perf3m):nil}</td>
-      <td data-col="mcap">${fmc(s.marketCapitalization)}</td>
       <td data-col="sector" style="font-size:10px;color:var(--muted2)">${s.sector||'—'}</td>
     </tr>`;
-}
-function renderTable(){
+}function renderTable(){
   // Sort header güncelle
   document.querySelectorAll('thead th').forEach(function(th){
     var oc = th.getAttribute('onclick')||'';
