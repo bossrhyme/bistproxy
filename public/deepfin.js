@@ -2202,13 +2202,14 @@ function updateTicker() {
 
 function showFooterModal(type) {
   var titles = {
-    about:      'HAKKIMIZDA',
-    mission:    'MİSYON & VİZYON',
-    contact:    'İLETİŞİM',
-    disclaimer: 'YASAL UYARI',
-    privacy:    'GİZLİLİK POLİTİKASI',
-    terms:      'KULLANIM KOŞULLARI',
-    cookies:    'ÇEREZ POLİTİKASI'
+    about:        'HAKKIMIZDA',
+    mission:      'MİSYON & VİZYON',
+    contact:      'İLETİŞİM',
+    disclaimer:   'YASAL UYARI',
+    privacy:      'GİZLİLİK POLİTİKASI',
+    terms:        'KULLANIM KOŞULLARI',
+    cookies:      'ÇEREZ POLİTİKASI',
+    teknikanaliz: 'TEKNİK ANALİZ STRATEJİLERİ'
   };
   var contents = {
     about: `<p><strong style="color:var(--text)">DeepFin</strong>, Türkiye ve küresel piyasalarda yatırım yapan bireysel yatırımcılar için geliştirilmiş profesyonel bir hisse tarama ve finansal analiz platformudur.</p>
@@ -2270,7 +2271,85 @@ function showFooterModal(type) {
   <div><strong style="color:var(--text)">3. Taraf İzleme:</strong> Kullanılmaz ✓</div>
 </div>
 <p>Tarayıcı ayarlarından çerezleri devre dışı bırakabilirsiniz. Bu durumda bazı tercihler kaydedilemeyebilir.</p>
-<p style="font-size:11px;color:var(--muted2);">Son güncelleme: Ocak 2026</p>`
+<p style="font-size:11px;color:var(--muted2);">Son güncelleme: Ocak 2026</p>`,
+
+    teknikanaliz: `
+<p style="color:var(--muted);font-size:11px;margin-bottom:16px;">TradingView'in 26 teknik indikatörü kullanılarak hesaplanan gerçek zamanlı sinyaller. Her preset farklı bir piyasa durumuna veya strateji felsefesine karşılık gelir.</p>
+
+<div class="fbk-section">
+  <div class="fbk-section-title">📈 Trend & Kırılım Presetleri</div>
+
+  <div class="fbk-card">
+    <div class="fbk-card-header"><span class="fbk-chip">Kırılım</span><span class="fbk-tag">Minervini SEPA</span></div>
+    <p>Zirvesine yakın, hacim destekli, 26 indikatör AL sinyali veren hisseler. Mark Minervini'nin SEPA (Specific Entry Point Analysis) kırılım koşuluna dayanır. Güçlü trendlerin başlangıç noktasını yakalar.</p>
+    <div class="fbk-filters">from_high &gt; -5% · hacim &gt; 0.5M lot · TV Rating &gt; 0.1</div>
+  </div>
+
+  <div class="fbk-card">
+    <div class="fbk-card-header"><span class="fbk-chip">Zirveye Yakın</span><span class="fbk-tag">Trend Devam</span></div>
+    <p>1 aylık zirvesinin %3'ü yakınında VE son 3 ayda en az %5 kazanmış hisseler. Güçlü trendin devam ettiğini gösteren, sürüş biter bitmez alım noktasını işaret eder.</p>
+    <div class="fbk-filters">from_high &gt; -3% · 3 ay getiri &gt; %5</div>
+  </div>
+
+  <div class="fbk-card">
+    <div class="fbk-card-header"><span class="fbk-chip">Güçlü Trendde</span><span class="fbk-tag">Minervini Template</span></div>
+    <p>52 hafta düşüğünden %25+ yukarıda, 6 aylık getiri pozitif. Minervini'nin "Trend Template" kriterinin basitleştirilmiş versiyonu — sadece yapısal olarak güçlü hisseler taranır.</p>
+    <div class="fbk-filters">52H düşüğünden %25+ · 6 ay getiri &gt; %10</div>
+  </div>
+
+  <div class="fbk-card">
+    <div class="fbk-card-header"><span class="fbk-chip">Sağlıklı Çekilme</span><span class="fbk-tag">Trend İçi Fırsat</span></div>
+    <p>Zirveden %10–25 geri çekilen ama 6 aylık trendi hâlâ güçlü olan hisseler. Güçlü bir trendde normal konsolidasyon sırasında alım fırsatı sunar. "Pullback in uptrend" stratejisi.</p>
+    <div class="fbk-filters">from_high: -10% ila -25% · 6 ay getiri &gt; %10</div>
+  </div>
+</div>
+
+<div class="fbk-section">
+  <div class="fbk-section-title">📊 Momentum Presetleri</div>
+
+  <div class="fbk-card">
+    <div class="fbk-card-header"><span class="fbk-chip">3 Aylık Lider</span><span class="fbk-tag">Jegadeesh-Titman</span></div>
+    <p>Son 3 ayda %15+, 6 ayda %20+ kazanan hisseler. Nobel ödüllü Jegadeesh ve Titman'ın momentum anomalisine dayanır: geçen dönemin en iyi hisseleri gelecek dönemde de outperform eder (3–12 aylık pencerede).</p>
+    <div class="fbk-filters">3 ay getiri &gt; %15 · 6 ay getiri &gt; %20</div>
+  </div>
+
+  <div class="fbk-card">
+    <div class="fbk-card-header"><span class="fbk-chip">Güçlü Gün</span><span class="fbk-tag">Katalizör Tespiti</span></div>
+    <p>Bugün %2+ yükselen, normalin üzerinde hacimle desteklenen hisseler. Haber, kazanç açıklaması veya sektör rotasyonu gibi bir katalizörün varlığına işaret eder. Gün içi fırsat taraması.</p>
+    <div class="fbk-filters">günlük değişim &gt; %2 · hacim &gt; 0.5M lot</div>
+  </div>
+
+  <div class="fbk-card">
+    <div class="fbk-card-header"><span class="fbk-chip">Kurumsal Hacim</span><span class="fbk-tag">Büyük Para Tespiti</span></div>
+    <p>Normalin çok üzerinde hacim eşliğinde fiyat artışı. Büyük kurumsal oyuncuların (fon, banka) pozisyon açtığının teknik sinyali. "Follow the smart money" yaklaşımı.</p>
+    <div class="fbk-filters">hacim &gt; 5M lot · günlük değişim &gt; 0</div>
+  </div>
+</div>
+
+<div class="fbk-section">
+  <div class="fbk-section-title">🔄 RSI & Osilatör Presetleri</div>
+
+  <div class="fbk-card">
+    <div class="fbk-card-header"><span class="fbk-chip">Dip Fırsatı</span><span class="fbk-tag">Kontrarian</span></div>
+    <p>Sert düşen, dibine yakın VE RSI 35 altında gerçekten aşırı satılmış hisseler. Piyasa paniğini fırsata çeviren kontrarian yaklaşım. Dikkat: aşırı satım düzelene kadar devam edebilir.</p>
+    <div class="fbk-filters">from_high &lt; -20% · RSI &lt; 35</div>
+  </div>
+
+  <div class="fbk-card">
+    <div class="fbk-card-header"><span class="fbk-chip">RSI Toparlanması</span><span class="fbk-tag">Erken Dönüş</span></div>
+    <p>RSI 30–50 bandında: aşırı satım bölgesinden çıkmış, henüz aşırı alım bölgesine girmemiş hisseler. Dipten toparlanmanın erken aşamasını yakalar. En dengeli RSI bölgesi.</p>
+    <div class="fbk-filters">RSI 30–50 · 52H düşüğünden %3+ yukarıda</div>
+  </div>
+
+  <div class="fbk-card">
+    <div class="fbk-card-header"><span class="fbk-chip">26 İndikatör AL</span><span class="fbk-tag">TradingView Consensus</span></div>
+    <p>TradingView'in 26 teknik indikatörünü (RSI, MACD, ADX, Stochastic, 15 farklı hareketli ortalama) birleştiren "Recommend.All" skorunun 0.5 üzeri olduğu hisseler. Teknik analizin toplu onayı.</p>
+    <div class="fbk-filters">TV Rating &gt; 0.5 (26 indikatör çoğunluğu AL)</div>
+  </div>
+</div>
+
+<p style="font-size:11px;color:var(--muted2);margin-top:16px;padding-top:12px;border-top:1px solid var(--border);">⚠️ Teknik presetler geçmiş fiyat hareketlerine dayanır. Geleceği garanti etmez. Temel analiz ile birlikte kullanılması önerilir.</p>
+`
   };
 
   document.getElementById('footer-modal-title').textContent = titles[type] || '';
