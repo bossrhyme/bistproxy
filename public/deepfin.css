@@ -96,8 +96,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .chip{font-size:11px;font-weight:500;padding:3px 9px;border:1px solid var(--border2);color:var(--text2);cursor:pointer;transition:all .12s;user-select:none;border-radius:4px;background:var(--s2);}
 .chip:hover{border-color:var(--accent);color:var(--accent);background:rgba(59,130,246,.06);}
 .chip.on{border-color:var(--accent);color:#fff;background:var(--accent);}
-.chip-new{position:relative;}
-.chip-new::after{content:'YENİ';font-size:8px;font-weight:700;line-height:1;padding:1px 3px;border-radius:3px;background:#10b981;color:#fff;position:absolute;top:-5px;right:-4px;pointer-events:none;}
 
 
 #goat-fund-chips .goat-chip:hover{border-color:#6ab4ff;background:rgba(100,180,255,.12);}

@@ -253,29 +253,30 @@ function toggleFavFilter() {
 const COL_DEFS = [
   {key:'sector',      label:'SEKTÖR',     def:true},  {key:'mcap',        label:'P.Değeri',   def:true},
   {key:'price',       label:'FİYAT',      def:true},  {key:'fscore',      label:'F-Score',    def:true},
-  {key:'peg',         label:'PEG',        def:false}, {key:'pe',          label:'F/K',        def:true},
-  {key:'pb',          label:'PD/DD',      def:true},  {key:'ps',          label:'F/S',        def:false},
-  {key:'roe',         label:'ROE%',       def:true},  {key:'roa',         label:'ROA%',       def:false},
+  {key:'peg',         label:'PEG',        def:true},  {key:'pe',          label:'F/K',        def:true},
+  {key:'pb',          label:'PD/DD',      def:true},  {key:'ps',          label:'F/S',        def:true},
+  {key:'roe',         label:'ROE%',       def:true},  {key:'roa',         label:'ROA%',       def:true},
   {key:'margin',      label:'MARJ%',      def:true},  {key:'revg',        label:'GELİR↑%',   def:true},
-  {key:'epsg',        label:'K.BÜY%',    def:false}, {key:'div',         label:'TEMETTÜ%',   def:true},
-  {key:'de',          label:'B/Ö',        def:true},  {key:'cr',          label:'CARİ',       def:false},
+  {key:'epsg',        label:'K.BÜY%',    def:true},  {key:'div',         label:'TEMETTÜ%',   def:true},
+  {key:'de',          label:'B/Ö',        def:true},  {key:'cr',          label:'CARİ',       def:true},
   {key:'tech_rating', label:'TV Rating',  def:true},  {key:'rsi',         label:'RSI',        def:true},
-  {key:'perf3m',      label:'3A Geti%',   def:false},
+  {key:'perf3m',      label:'3A Geti%',   def:true},
 ];
 var _colVisible = null;
 
 function loadColPrefs() {
   if (_colVisible) return;
   try {
-    var saved = localStorage.getItem('df_cols');
+    var saved = localStorage.getItem('df_cols_v3');
     if (saved) { _colVisible = {}; JSON.parse(saved).forEach(function(k){ _colVisible[k]=true; }); return; }
   } catch(e) {}
+  // Varsayılan: tüm sütunlar görünür
   _colVisible = {};
-  COL_DEFS.forEach(function(d){ if(d.def) _colVisible[d.key]=true; });
+  COL_DEFS.forEach(function(d){ _colVisible[d.key]=true; });
 }
 
 function saveColPrefs() {
-  localStorage.setItem('df_cols', JSON.stringify(Object.keys(_colVisible).filter(function(k){ return _colVisible[k]; })));
+  localStorage.setItem('df_cols_v3', JSON.stringify(Object.keys(_colVisible).filter(function(k){ return _colVisible[k]; })));
 }
 
 function isColVisible(key) { loadColPrefs(); return !!_colVisible[key]; }
@@ -728,73 +729,63 @@ const TECH_PRESETS = {
 
   breakout: {
     label: 'Kırılım',
-    badge: 'GELİŞTİRİLDİ',
     desc: 'Zirvesine yakın, güçlü artışla kapanan, hacim destekli VE indikatörler AL sinyali veren hisseler. Minervini SEPA kırılım koşulu.',
     filters: { from_high_max: -5, chg_min: 1.5, vol_min: 0.5, tech_rating_min: 0.1 }
   },
 
   oversold: {
     label: 'Dip Fırsatı',
-    badge: 'GELİŞTİRİLDİ',
-    desc: 'Sert düşen, dibine yakın VE RSI 35 altında gerçekten aşırı satılmış hisseler. Kontrarian yaklaşım — yalnızca teknik olarak aşırı satılanlarda.',
+    desc: 'Sert düşen, dibine yakın VE RSI 35 altında gerçekten aşırı satılmış hisseler. Kontrarian yaklaşım.',
     filters: { from_high_max: -20, chg_min: 0, rsi_max: 35 }
   },
 
   nearHigh: {
     label: 'Zirveye Yakın',
-    badge: 'GELİŞTİRİLDİ',
-    desc: '1 aylık zirvesinin %3 yakınında VE son 3 ayda en az %5 kazanmış hisseler. Güçlü trend devam sinyali — sadece gerçekten yükselen trende.',
+    desc: '1 aylık zirvesinin %3 yakınında VE son 3 ayda en az %5 kazanmış hisseler. Güçlü trend devam sinyali.',
     filters: { from_high_max: -3, perf3m_min: 5 }
   },
 
   pullback: {
     label: 'Sağlıklı Çekilme',
-    badge: 'GELİŞTİRİLDİ',
-    desc: 'Zirveden %10-25 geri çekilen VE son 6 ayda en az %10 kazanmış hisseler. Güçlü trendde alım fırsatı — değer tuzağından değil, sağlıklı nefeslenmeden.',
+    desc: 'Zirveden %10-25 geri çekilen VE son 6 ayda en az %10 kazanmış hisseler. Güçlü trendde alım fırsatı.',
     filters: { from_high_max: -10, from_low_min: 10, perf6m_min: 10 }
   },
 
   strongDay: {
     label: 'Güçlü Gün',
-    badge: 'GELİŞTİRİLDİ',
     desc: 'Bugün %2+ yükselen VE hacimle desteklenen hisseler. Katalizör: haber, kırılım veya sektör rotasyonu.',
     filters: { chg_min: 2, vol_min: 0.5 }
   },
 
   highVolume: {
     label: 'Kurumsal Hacim',
-    badge: 'GELİŞTİRİLDİ',
-    desc: 'Normalin çok üzerinde hacimle işlem gören VE fiyat artan hisseler. Büyük oyuncuların alım yaptığı, fiyatı yukarı taşıdığı hisseler.',
+    desc: 'Normalin çok üzerinde hacimle işlem gören VE fiyat artan hisseler. Büyük oyuncuların alım yaptığı hisseler.',
     filters: { vol_min: 5, chg_min: 0 }
   },
 
-  // ── YENİ (4 yeni strateji) ─────────────────────────────────────────────
+  // ── YENİ ──────────────────────────────────────────────────────────────
 
   techBuy: {
     label: '26 İndikatör AL',
-    badge: 'YENİ',
     desc: 'TradingView\'nin 26 teknik indikatörünün (RSI, MACD, ADX, Stochastic, 15 hareketli ortalama…) çoğunluğu AL sinyali veriyor. En güçlü teknik onay.',
     filters: { tech_rating_min: 0.5 }
   },
 
   momentum3m: {
     label: '3 Aylık Lider',
-    badge: 'YENİ',
-    desc: 'Son 3 ayda %15+, 6 ayda %20+ kazanan hisseler. Jegadeesh-Titman 1993 akademik bulgusuna dayalı: geçen dönemin kazananları kazanmaya devam eder.',
+    desc: 'Son 3 ayda %15+, 6 ayda %20+ kazanan hisseler. Jegadeesh-Titman momentum stratejisi: geçen dönemin kazananları kazanmaya devam eder.',
     filters: { perf3m_min: 15, perf6m_min: 20 }
   },
 
   trendFollow: {
     label: 'Güçlü Trendde',
-    badge: 'YENİ',
-    desc: '52 hafta düşüğünden %25+ yukarıda, 6 ay getirisini koruyan hisseler. Minervini Trend Template\'in temel kriteri — kurumsal birikim tamamlanmış güçlü trendler.',
+    desc: '52 hafta düşüğünden %25+ yukarıda, 6 ay getirisini koruyan hisseler. Minervini Trend Template kriteri.',
     filters: { from_low_min: 25, perf6m_min: 10 }
   },
 
   rsiBounce: {
     label: 'RSI Toparlanması',
-    badge: 'YENİ',
-    desc: 'RSI 30-50 arasında — aşırı satımdan çıkmış, henüz aşırı alıma girmemiş hisseler. Dipten toparlanma erken aşaması. MACD+RSI kombinasyonu en güçlü dönüş sinyali.',
+    desc: 'RSI 30-50 arasında — aşırı satımdan çıkmış, henüz aşırı alıma girmemiş hisseler. Dipten toparlanma erken aşaması.',
     filters: { rsi_min: 30, rsi_max: 50, from_low_min: 3 }
   },
 
@@ -978,8 +969,7 @@ function applyAllChips() {
   });
   document.querySelectorAll('#tech-presets .chip.on').forEach(function(c) {
     var p = TECH_PRESETS[c.dataset.tech];
-    var lbl = p ? (p.badge ? '<span style="font-size:9px;font-weight:700;padding:1px 4px;border-radius:3px;background:' + (p.badge === 'YENİ' ? '#10b981' : '#3b82f6') + ';color:#fff;margin-right:4px;">' + p.badge + '</span>' + p.label : p.label) : c.textContent;
-    if (p) allInfos.push({ label: lbl, desc: p.desc, infoId: 'tech-preset-info' });
+    if (p) allInfos.push({ label: p.label, desc: p.desc, infoId: 'tech-preset-info' });
   });
 
   // Tüm info div'leri gizle
