@@ -891,3 +891,10 @@ html,body{height:100%;overflow:hidden;}
 .fin-dot-g{background:#00c076;}
 .fin-dot-m{background:#f0b429;}
 .fin-dot-b{background:#f6465d;}
+
+/* ── Finansal Legend & Tooltip ───────────────────────────────── */
+.fin-legend{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);margin-bottom:10px;flex-wrap:wrap;}
+.fin-legend .fin-dot{flex-shrink:0;}
+.fin-legend-hint{margin-left:4px;font-style:italic;opacity:.6;}
+.fin-dot{cursor:help;}
+.fin-tt{position:fixed;z-index:9999;background:#1a2535;color:#e2e8f0;font-size:11px;padding:6px 10px;border-radius:6px;border:1px solid #2d3f55;pointer-events:none;display:none;max-width:220px;line-height:1.4;box-shadow:0 4px 12px rgba(0,0,0,.4);}

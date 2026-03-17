@@ -270,15 +270,29 @@ function _buildFinancials(d) {
   if(!d) return;
   var n = function(v){ var x=Number(v); return isNaN(x)?null:x; };
   var pct = function(v){ return v!=null ? (v*100).toFixed(1)+'%' : '—'; };
-  var x1  = function(v){ return v!=null ? v.toFixed(1)+'x'       : '—'; };
-  var x2  = function(v){ return v!=null ? v.toFixed(2)+'x'       : '—'; };
-  var dec = function(v){ return v!=null ? v.toFixed(2)           : '—'; };
-  var pp  = function(v){ return v!=null ? v.toFixed(2)+'%'       : '—'; };
 
-  function badge(cls){ return '<span class="fin-dot fin-dot-'+cls+'"></span>'; }
+  // Her metrik için eşik açıklamaları
+  var TIPS = {
+    'F/K (TTM)':      { g:'<15x — Ucuz değerlenmiş',   m:'15–25x — Makul fiyat',     b:'>25x — Pahalı veya zarar' },
+    'PD/DD':          { g:'<2x — Defter değerine yakın', m:'2–4x — Ortalama',          b:'>4x — Değeri aşmış olabilir' },
+    'F/S (TTM)':      { g:'<1x — Satışa göre ucuz',     m:'1–3x — Normal aralık',     b:'>3x — Satışa göre pahalı' },
+    'PEG':            { g:'<1 — Büyümeye göre ucuz',    m:'1–2 — Adil fiyat',         b:'>2 — Büyümeye göre pahalı' },
+    'Brüt Marj':      { g:'>%30 — Güçlü brüt kâr',     m:'%15–30 — Orta marj',       b:'<%15 — Zayıf brüt kâr' },
+    'Net Marj':       { g:'>%12 — Yüksek net kâr',      m:'%5–12 — Kabul edilebilir', b:'<%5 — Düşük net kâr' },
+    'ROE':            { g:'>%15 — Güçlü özsermaye getirisi', m:'%8–15 — Orta',        b:'<%8 — Düşük getiri' },
+    'ROA':            { g:'>%8 — Varlıkları verimli kullanıyor', m:'%3–8 — Orta',     b:'<%3 — Varlık verimliliği düşük' },
+    'Borç/Özsermaye': { g:'<0.5 — Düşük borç, az risk', m:'0.5–1 — Yönetilebilir',   b:'>1 — Yüksek kaldıraç' },
+    'Cari Oran':      { g:'>2x — Güçlü likidite',       m:'1–2x — Yeterli',           b:'<1x — Kısa vadeli risk var' },
+    'Temettü':        { g:'>%3 — Cazip temettü',        m:'%1–3 — Düşük-orta',        b:'' },
+  };
+
+  function dot(cls, label) {
+    if(!cls) return '';
+    var tip = (TIPS[label]||{})[cls] || '';
+    return '<span class="fin-dot fin-dot-'+cls+'" title="'+tip+'" data-tip="'+tip.replace(/"/g,"'")+'"></span>';
+  }
   function row(label, val, cls) {
-    var dot = cls ? badge(cls) : '';
-    return '<tr><td class="fin-lbl">'+label+'</td><td class="fin-val">'+val+'</td><td class="fin-ind">'+dot+'</td></tr>';
+    return '<tr><td class="fin-lbl">'+label+'</td><td class="fin-val">'+val+'</td><td class="fin-ind">'+dot(cls,label)+'</td></tr>';
   }
   function grp(title) {
     return '<tr class="fin-grp"><td colspan="3">'+title+'</td></tr>';
@@ -291,36 +305,63 @@ function _buildFinancials(d) {
 
   var rows =
     grp('Değerleme') +
-    row('F/K (TTM)',     pe  ? pe.toFixed(1)+'x'  : '—', pe&&pe<15&&pe>0?'g':pe&&pe<25?'m':pe?'b':'') +
-    row('PD/DD',         pb  ? pb.toFixed(2)+'x'  : '—', pb&&pb<2&&pb>0?'g':pb&&pb<4?'m':pb?'b':'') +
-    row('F/S (TTM)',     ps  ? ps.toFixed(2)+'x'  : '—', ps&&ps<1&&ps>0?'g':ps&&ps<3?'m':ps?'b':'') +
-    row('PEG',           peg ? peg.toFixed(2)      : '—', peg&&peg>0&&peg<1?'g':peg&&peg<2?'m':peg?'b':'') +
-
+    row('F/K (TTM)',      pe  ? pe.toFixed(1)+'x'   : '—', pe&&pe<15&&pe>0?'g':pe&&pe<25?'m':pe?'b':'') +
+    row('PD/DD',          pb  ? pb.toFixed(2)+'x'   : '—', pb&&pb<2&&pb>0?'g':pb&&pb<4?'m':pb?'b':'') +
+    row('F/S (TTM)',      ps  ? ps.toFixed(2)+'x'   : '—', ps&&ps<1&&ps>0?'g':ps&&ps<3?'m':ps?'b':'') +
+    row('PEG',            peg ? peg.toFixed(2)       : '—', peg&&peg>0&&peg<1?'g':peg&&peg<2?'m':peg?'b':'') +
     grp('Kârlılık') +
-    row('Brüt Marj',    gm  ? pct(gm)  : '—', gm&&gm*100>30?'g':gm&&gm*100>15?'m':gm?'b':'') +
-    row('Net Marj',     nm  ? pct(nm)  : '—', nm&&nm*100>12?'g':nm&&nm*100>5?'m':nm?'b':'') +
-    row('ROE',          roe ? pct(roe) : '—', roe&&roe*100>15?'g':roe&&roe*100>8?'m':roe?'b':'') +
-    row('ROA',          roa ? pct(roa) : '—', roa&&roa*100>8?'g':roa&&roa*100>3?'m':roa?'b':'') +
-
+    row('Brüt Marj',      gm  ? pct(gm)  : '—', gm&&gm*100>30?'g':gm&&gm*100>15?'m':gm?'b':'') +
+    row('Net Marj',       nm  ? pct(nm)  : '—', nm&&nm*100>12?'g':nm&&nm*100>5?'m':nm?'b':'') +
+    row('ROE',            roe ? pct(roe) : '—', roe&&roe*100>15?'g':roe&&roe*100>8?'m':roe?'b':'') +
+    row('ROA',            roa ? pct(roa) : '—', roa&&roa*100>8?'g':roa&&roa*100>3?'m':roa?'b':'') +
     grp('Borç & Likidite') +
-    row('Borç/Özsermaye', de  ? de.toFixed(2)       : '—', de&&de<0.5?'g':de&&de<1?'m':de?'b':'') +
-    row('Cari Oran',      cr  ? cr.toFixed(2)+'x'   : '—', cr&&cr>2?'g':cr&&cr>1?'m':cr?'b':'') +
-    row('Temettü',        div ? pp(div*100)          : '—', div&&div*100>3?'g':div&&div*100>1?'m':'') +
+    row('Borç/Özsermaye', de  ? de.toFixed(2)        : '—', de&&de<0.5?'g':de&&de<1?'m':de?'b':'') +
+    row('Cari Oran',      cr  ? cr.toFixed(2)+'x'    : '—', cr&&cr>2?'g':cr&&cr>1?'m':cr?'b':'') +
+    row('Temettü',        div ? (div*100).toFixed(2)+'%' : '—', div&&div*100>3?'g':div&&div*100>1?'m':'') +
     '';
 
+  var legend =
+    '<div class="fin-legend">'+
+      '<span>Değerlendirme eşiği:</span>'+
+      '<span class="fin-dot fin-dot-g"></span><span>İyi</span>'+
+      '<span class="fin-dot fin-dot-m"></span><span>Orta</span>'+
+      '<span class="fin-dot fin-dot-b"></span><span>Zayıf</span>'+
+      '<span class="fin-legend-hint">— üzerine gelin</span>'+
+    '</div>';
+
   var tbl =
+    legend +
     '<table class="fin-tbl">'+
       '<colgroup><col style="width:55%"/><col style="width:35%"/><col style="width:10%"/></colgroup>'+
       '<tbody>'+rows+'</tbody>'+
     '</table>';
 
-  // Özet, gauge, debt alanlarını hepsini tbl ile değiştir
   var finSum = document.getElementById('prf-fin-summary');
   if(finSum){ finSum.style.cssText='margin-bottom:0'; finSum.innerHTML=tbl; }
   var finGauge = document.getElementById('prf-fin-gauges');
   if(finGauge){ finGauge.closest('.prf-section').style.display='none'; }
   var finDebt = document.getElementById('prf-fin-debt');
   if(finDebt){ finDebt.closest('.prf-section').style.display='none'; }
+
+  // Tooltip - native title yeterli değilse özel tooltip
+  finSum && finSum.querySelectorAll('.fin-dot[data-tip]').forEach(function(el) {
+    el.addEventListener('mouseenter', function(e) {
+      var tip = el.getAttribute('data-tip');
+      if(!tip) return;
+      var tt = document.getElementById('fin-tt');
+      if(!tt){ tt=document.createElement('div'); tt.id='fin-tt'; tt.className='fin-tt'; document.body.appendChild(tt); }
+      tt.textContent = tip;
+      tt.style.display = 'block';
+    });
+    el.addEventListener('mousemove', function(e) {
+      var tt = document.getElementById('fin-tt');
+      if(tt){ tt.style.left=(e.clientX+12)+'px'; tt.style.top=(e.clientY-8)+'px'; }
+    });
+    el.addEventListener('mouseleave', function() {
+      var tt = document.getElementById('fin-tt');
+      if(tt) tt.style.display='none';
+    });
+  });
 }
 
 
