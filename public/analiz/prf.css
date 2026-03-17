@@ -859,15 +859,19 @@ html,body{height:100%;overflow:hidden;}
 
 /* ── Sektör Karşılaştırması ─────────────────────────────────── */
 .sc-meta{font-size:12px;color:var(--muted);margin-bottom:10px;}
-.sc-tbl{width:100%;border-collapse:collapse;font-size:12px;}
-.sc-tbl thead th{padding:4px 8px;color:var(--muted);font-weight:500;font-size:11px;text-align:left;border-bottom:1px solid var(--border);}
-.sc-tbl thead th:nth-child(2),.sc-tbl thead th:nth-child(3){text-align:right;}
+.sc-tbl{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed;}
+.sc-tbl colgroup col:nth-child(1){width:40%;}
+.sc-tbl colgroup col:nth-child(2){width:20%;}
+.sc-tbl colgroup col:nth-child(3){width:20%;}
+.sc-tbl colgroup col:nth-child(4){width:20%;}
+.sc-tbl thead th{padding:5px 8px;color:var(--muted);font-weight:500;font-size:11px;text-align:center;border-bottom:1px solid var(--border);}
+.sc-tbl thead th:first-child{text-align:left;}
 .sc-tbl tbody tr:hover{background:var(--s2);}
-.sc-lbl{padding:7px 8px;color:var(--text2);white-space:nowrap;}
-.sc-val{padding:7px 8px;text-align:right;font-family:"JetBrains Mono",monospace;font-weight:600;color:var(--text);}
-.sc-val.sc-muted{color:var(--muted);font-weight:400;}
-.sc-tbl td{border-bottom:1px solid var(--border2);}
+.sc-tbl td{border-bottom:1px solid var(--border2);padding:7px 8px;text-align:center;vertical-align:middle;}
 .sc-tbl tr:last-child td{border-bottom:none;}
+.sc-lbl{text-align:left !important;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sc-val{font-family:"JetBrains Mono",monospace;font-weight:600;color:var(--text);}
+.sc-val.sc-muted{color:var(--muted);font-weight:400;}
 .sc-badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:700;white-space:nowrap;}
 .sc-g{background:rgba(0,192,118,.12);color:#00c076;}
 .sc-b{background:rgba(246,70,93,.12);color:#f6465d;}

@@ -255,8 +255,9 @@ function _renderSectorComparison() {
   el.innerHTML =
     '<p class="sc-meta">'+ (d.sector||'') + (cnt ? ' &middot; '+ cnt +' şirket' : '') +'</p>'+
     '<table class="sc-tbl">'+
+      '<colgroup><col/><col/><col/><col/></colgroup>'+
       '<thead><tr>'+
-        '<th></th>'+
+        '<th>Gösterge</th>'+
         '<th>Hisse</th>'+
         '<th>Sektör</th>'+
         '<th>Fark</th>'+
