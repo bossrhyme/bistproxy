@@ -857,17 +857,30 @@ html,body{height:100%;overflow:hidden;}
 .prf-period-btn{cursor:pointer;font-size:9px;padding:2px 8px;border:1px solid var(--border2);border-radius:3px;color:var(--text2);background:transparent;line-height:1.4;}
 .prf-period-btn:hover{border-color:var(--accent);color:var(--accent);}
 
-/* ── Sektör Karşılaştırma Tablosu ─────────────────────────── */
-.sec-header{font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:500;}
-.sec-table{width:100%;border-collapse:collapse;font-size:12px;}
-.sec-table th{text-align:left;color:var(--muted);font-weight:500;padding:4px 8px;border-bottom:1px solid var(--border);}
-.sec-table td{padding:5px 8px;border-bottom:1px solid var(--border2);}
-.sec-label{color:var(--text2);}
-.sec-stock{font-weight:600;color:var(--text);}
-.sec-avg{color:var(--muted);}
-.sec-diff{font-size:11px;font-weight:600;}
-.sec-better{color:#00c076;}
-.sec-worse{color:#f6465d;}
-.sec-neutral{color:var(--muted);}
+/* ── Sektör Karşılaştırması ─────────────────────────────────── */
+.sec-meta{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.sec-sector-name{font-size:13px;font-weight:600;color:var(--text);}
+.sec-count{font-size:11px;color:var(--muted);background:var(--s2);border:1px solid var(--border2);border-radius:20px;padding:2px 8px;}
 
-.prf-logo img{width:100%;height:100%;object-fit:contain;border-radius:6px;}
+.sec-legend{display:grid;grid-template-columns:1fr 60px 1fr 60px;gap:4px 8px;padding:0 0 6px;border-bottom:1px solid var(--border);margin-bottom:4px;font-size:10px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.04em;}
+
+.sec-row{padding:8px 0;border-bottom:1px solid var(--border2);}
+.sec-row:last-child{border-bottom:none;}
+.sec-row-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.sec-rlabel{font-size:11px;color:var(--muted);font-weight:500;}
+
+.sec-badge{font-size:10px;font-weight:700;padding:1px 6px;border-radius:4px;letter-spacing:.02em;}
+.sec-badge-up{background:rgba(0,192,118,.15);color:#00c076;}
+.sec-badge-dn{background:rgba(246,70,93,.15);color:#f6465d;}
+.sec-badge-eq{background:var(--s2);color:var(--muted);}
+
+.sec-row-vals{display:grid;grid-template-columns:60px 1fr 60px;align-items:center;gap:8px;}
+.sec-val-stock{font-size:13px;font-weight:700;color:var(--text);text-align:right;font-family:"JetBrains Mono",monospace;}
+.sec-val-avg{font-size:12px;font-weight:500;color:var(--text2);text-align:left;font-family:"JetBrains Mono",monospace;}
+
+.sec-bar-wrap{height:6px;background:var(--s2);border-radius:3px;overflow:hidden;position:relative;}
+.sec-bar-wrap::after{content:'';position:absolute;left:50%;top:0;width:1px;height:100%;background:var(--border2);}
+.sec-bar-fill{height:100%;border-radius:3px;transition:width .4s ease;}
+.sec-bar-up{background:linear-gradient(90deg,var(--accent2,#3b82f6),#00c076);}
+.sec-bar-dn{background:linear-gradient(90deg,var(--accent2,#3b82f6),#f6465d);}
+.sec-bar-eq{background:var(--muted);}

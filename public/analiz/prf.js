@@ -179,56 +179,121 @@ function loadSectorAvg(sector, ex) {
 }
 
 function _renderSectorComparison() {
-  var d = _prfData;
+  var d   = _prfData;
   var avg = _sectorAvg;
   if (!d || !avg) return;
   var el = document.getElementById('prf-sector-cmp');
   if (!el) return;
 
-  function _cmpRow(label, stockVal, avgVal, fmt, higherIsBetter) {
-    if (stockVal == null && avgVal == null) return '';
-    var fmtV = function(v) { return v != null ? fmt(v) : '—'; };
-    var diff = (stockVal != null && avgVal != null && avgVal !== 0)
-      ? ((stockVal - avgVal) / Math.abs(avgVal) * 100) : null;
-    var better = diff != null ? (higherIsBetter ? diff > 5 : diff < -5) : false;
-    var worse  = diff != null ? (higherIsBetter ? diff < -5 : diff > 5) : false;
-    var cls = better ? 'sec-better' : worse ? 'sec-worse' : 'sec-neutral';
-    var arrow = better ? '▲' : worse ? '▼' : '≈';
-    var diffStr = diff != null ? (diff >= 0 ? '+' : '') + diff.toFixed(1) + '%' : '';
-    return '<tr>' +
-      '<td class="sec-label">' + label + '</td>' +
-      '<td class="sec-stock ' + cls + '">' + fmtV(stockVal) + '</td>' +
-      '<td class="sec-avg">' + fmtV(avgVal) + '</td>' +
-      '<td class="sec-diff ' + cls + '">' + arrow + ' ' + diffStr + '</td>' +
-    '</tr>';
+  // ── Birim normalleşmesi ──────────────────────────────────────────────────
+  // TV Scanner: roe/roa/margin/dividendYield ham % olarak geliyor (50.5 = %50.5)
+  // _prfData içinde d.roe/roa/net_margin oran olarak tutuluyor (0.505)
+  // avg'daki değerler fundamentals.js'ten ham TV değerleri (50.5 gibi)
+  // → Karşılaştırma için HER İKİSİNİ de yüzde birime dönüştür
+  var s = {
+    pe:           d.pe_ratio,
+    pb:           d.price_book_ratio,
+    ps:           d.price_sales,
+    roe:          d.roe    != null ? d.roe * 100    : null,   // oran → %
+    roa:          d.roa    != null ? d.roa * 100    : null,
+    netMargin:    d.net_margin  != null ? d.net_margin  * 100 : null,
+    grossMargin:  d.gross_margin!= null ? d.gross_margin* 100 : null,
+    debtToEquity: d.debt_to_equity,
+    currentRatio: d.current_ratio,
+    divYield:     d.dividend_yield_recent != null ? d.dividend_yield_recent * 100 : null,
+  };
+  // avg alanları fundamentals.js'ten doğrudan TV'den geliyor — zaten ham %
+  var a = {
+    pe:           avg.pe,
+    pb:           avg.pb,
+    ps:           avg.ps,
+    roe:          avg.roe,           // TV'den ham % (50.5)
+    roa:          avg.roa,
+    netMargin:    avg.netMargin,
+    grossMargin:  avg.grossMargin,
+    debtToEquity: avg.debtToEquity,
+    currentRatio: avg.currentRatio,
+    divYield:     avg.dividendYield,
+  };
+
+  // ── Satır builder ────────────────────────────────────────────────────────
+  // badge: sektörün ne kadar altında/üstünde → progress bar gibi bar
+  function _row(label, sVal, aVal, fmtFn, higherBetter) {
+    if (sVal == null && aVal == null) return '';
+    var fmt = function(v) { return v != null ? fmtFn(v) : '<span style="color:var(--muted)">—</span>'; };
+
+    // Fark hesabı: mutlak fark (puan veya katı)
+    var diff = (sVal != null && aVal != null && aVal !== 0)
+      ? ((sVal - aVal) / Math.abs(aVal) * 100) : null;
+
+    var badge = '';
+    if (diff != null) {
+      var pos  = higherBetter ? diff > 3 : diff < -3;
+      var neg  = higherBetter ? diff < -3 : diff > 3;
+      var bCls = pos ? 'sec-badge-up' : neg ? 'sec-badge-dn' : 'sec-badge-eq';
+      var bTxt = (diff >= 0 ? '+' : '') + diff.toFixed(1) + '%';
+      badge = '<span class="sec-badge ' + bCls + '">' + bTxt + '</span>';
+    }
+
+    // Bar: hisse değerinin sektöre oranı (max 200%)
+    var barPct = 0, barCls = 'sec-bar-eq';
+    if (sVal != null && aVal != null && aVal > 0) {
+      barPct = Math.min(sVal / aVal * 50, 100); // 50 = tam ortalama = %50 doluluk
+      barCls = diff > 3 ? (higherBetter ? 'sec-bar-up' : 'sec-bar-dn')
+             : diff < -3 ? (higherBetter ? 'sec-bar-dn' : 'sec-bar-up')
+             : 'sec-bar-eq';
+    }
+
+    return '<div class="sec-row">' +
+      '<div class="sec-row-top">' +
+        '<span class="sec-rlabel">' + label + '</span>' +
+        badge +
+      '</div>' +
+      '<div class="sec-row-vals">' +
+        '<span class="sec-val-stock">' + fmt(sVal) + '</span>' +
+        '<div class="sec-bar-wrap"><div class="sec-bar-fill ' + barCls + '" style="width:' + barPct.toFixed(1) + '%"></div></div>' +
+        '<span class="sec-val-avg">' + fmt(aVal) + '</span>' +
+      '</div>' +
+    '</div>';
   }
 
-  var pct2 = function(v) { return v != null ? (v * 100).toFixed(1) + '%' : '—'; };
-  var x2   = function(v) { return v != null ? v.toFixed(2) + 'x' : '—'; };
-  var x1   = function(v) { return v != null ? v.toFixed(1) + 'x' : '—'; };
+  var x1  = function(v) { return v.toFixed(1) + 'x'; };
+  var x2  = function(v) { return v.toFixed(2) + 'x'; };
+  var pct = function(v) { return v.toFixed(1) + '%'; };
+  var x2r = function(v) { return v.toFixed(2); };
 
   var rows = [
-    _cmpRow('F/K',          d.pe_ratio,              avg.pe,           x1,   false),
-    _cmpRow('PD/DD',        d.price_book_ratio,      avg.pb,           x2,   false),
-    _cmpRow('F/S',          d.price_sales,            avg.ps,           x2,   false),
-    _cmpRow('ROE',          d.roe    != null ? d.roe : null, avg.roe != null ? avg.roe/100 : null, pct2, true),
-    _cmpRow('ROA',          d.roa    != null ? d.roa : null, avg.roa != null ? avg.roa/100 : null, pct2, true),
-    _cmpRow('Net Marj',     d.net_margin,            avg.netMargin != null ? avg.netMargin/100 : null, pct2, true),
-    _cmpRow('Brüt Marj',    d.gross_margin,          avg.grossMargin != null ? avg.grossMargin/100 : null, pct2, true),
-    _cmpRow('B/Ö',          d.debt_to_equity,        avg.debtToEquity, x2,   false),
-    _cmpRow('Cari Oran',    d.current_ratio,         avg.currentRatio, x2,   true),
-    _cmpRow('Temettü',      d.dividend_yield_recent, avg.dividendYield != null ? avg.dividendYield/100 : null, pct2, true),
+    _row('F/K (Fiyat/Kazanç)',     s.pe,           a.pe,           x1,  false),
+    _row('PD/DD (Fiyat/Defter)',   s.pb,           a.pb,           x2,  false),
+    _row('F/S (Fiyat/Satış)',      s.ps,           a.ps,           x2,  false),
+    _row('ROE (Özsermaye Getirisi)',s.roe,          a.roe,          pct, true),
+    _row('ROA (Varlık Getirisi)',   s.roa,          a.roa,          pct, true),
+    _row('Net Kâr Marjı',          s.netMargin,    a.netMargin,    pct, true),
+    _row('Brüt Kâr Marjı',         s.grossMargin,  a.grossMargin,  pct, true),
+    _row('Borç / Özsermaye',       s.debtToEquity, a.debtToEquity, x2r, false),
+    _row('Cari Oran',              s.currentRatio, a.currentRatio, x2r, true),
+    _row('Temettü Verimi',         s.divYield,     a.divYield,     pct, true),
   ].filter(Boolean).join('');
 
-  if (!rows) { el.innerHTML = '<div style="padding:12px 0;color:var(--muted2);font-size:12px;">Karşılaştırma için yeterli veri yok.</div>'; return; }
+  if (!rows) {
+    el.innerHTML = '<div style="padding:16px 0;color:var(--muted2);font-size:12px;text-align:center;">Sektör karşılaştırma verisi yok.</div>';
+    return;
+  }
 
-  var sector = (_prfData && _prfData.sector) || '';
+  var sector = (d.sector) || '';
   var count  = avg._count || 0;
   el.innerHTML =
-    '<div class="sec-header">' + sector + (count ? ' · ' + count + ' şirket' : '') + '</div>' +
-    '<table class="sec-table">' +
-    '<thead><tr><th>Gösterge</th><th>Hisse</th><th>Sektör Ort.</th><th>Fark</th></tr></thead>' +
-    '<tbody>' + rows + '</tbody></table>';
+    '<div class="sec-meta">' +
+      '<span class="sec-sector-name">' + sector + '</span>' +
+      (count ? '<span class="sec-count">' + count + ' şirket ortalaması</span>' : '') +
+    '</div>' +
+    '<div class="sec-legend">' +
+      '<span>Gösterge</span>' +
+      '<span style="text-align:right">Bu Hisse</span>' +
+      '<span></span>' +
+      '<span>Sektör Ort.</span>' +
+    '</div>' +
+    rows;
 }
 
 function _buildFinancials(d) {
