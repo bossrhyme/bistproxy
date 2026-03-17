@@ -2,6 +2,19 @@
   "outputDirectory": "public",
   "headers": [
     {
+      "source": "/(.*\\.html)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        },
+        {
+          "key": "Pragma",
+          "value": "no-cache"
+        }
+      ]
+    },
+    {
       "source": "/(.*)",
       "headers": [
         {
@@ -62,7 +75,7 @@
       ]
     },
     {
-      "source": "/(|screener|analiz/|analiz/profile.html)",
+      "source": "/(|index\\.html|screener|analiz/|analiz/index\\.html|analiz/profil\\.html|analiz/profile\\.html)",
       "headers": [
         {
           "key": "Cache-Control",
