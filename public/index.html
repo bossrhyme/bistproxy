@@ -514,12 +514,16 @@ if('serviceWorker' in navigator){
           <div class="goat-info" id="preset-info"></div>
           <div class="filter-group-title" style="margin-top:10px;">📈 Hazır Teknik Analiz</div>
           <div class="presets chips" id="tech-presets">
-            <div class="chip tech-chip" data-tech="breakout">Breakout</div>
-            <div class="chip tech-chip" data-tech="oversold">Aşırı Satım</div>
+            <div class="chip tech-chip" data-tech="breakout">Kırılım</div>
+            <div class="chip tech-chip" data-tech="oversold">Dip Fırsatı</div>
             <div class="chip tech-chip" data-tech="nearHigh">Zirveye Yakın</div>
-            <div class="chip tech-chip" data-tech="pullback">Geri Çekilme</div>
+            <div class="chip tech-chip" data-tech="pullback">Sağlıklı Çekilme</div>
             <div class="chip tech-chip" data-tech="strongDay">Güçlü Gün</div>
-            <div class="chip tech-chip" data-tech="highVolume">Yüksek Hacim</div>
+            <div class="chip tech-chip" data-tech="highVolume">Kurumsal Hacim</div>
+            <div class="chip tech-chip chip-new" data-tech="techBuy">26 İndikatör AL</div>
+            <div class="chip tech-chip chip-new" data-tech="momentum3m">3 Aylık Lider</div>
+            <div class="chip tech-chip chip-new" data-tech="trendFollow">Güçlü Trendde</div>
+            <div class="chip tech-chip chip-new" data-tech="rsiBounce">RSI Toparlanması</div>
           </div>
           <div class="goat-info" id="tech-preset-info"></div>
         </div>
@@ -622,6 +626,15 @@ if('serviceWorker' in navigator){
           <div class="frow"><div class="flbl">Günlük Değişim %<small> (min / max)</small></div><div class="finps"><input type="number" id="chg_min" placeholder="—" oninput="liveFilter()"><input type="number" id="chg_max" placeholder="—" oninput="liveFilter()"></div></div>
           <div class="frow"><div class="flbl">1A Yüksekten Uzaklık % <small>(max)</small></div><div class="finps"><input type="number" id="from_high_max" placeholder="örn. -10" oninput="liveFilter()"><div style="width:70px"></div></div></div>
           <div class="frow"><div class="flbl">1A Düşükten Uzaklık % <small>(min)</small></div><div class="finps"><input type="number" id="from_low_min" placeholder="örn. 10" oninput="liveFilter()"><div style="width:70px"></div></div></div>
+        </div>
+
+        <div class="filter-group">
+          <div class="filter-group-title">📊 Teknik Göstergeler</div>
+          <div class="frow"><div class="flbl">TV Teknik Rating <small>(-1 sat / +1 al)</small></div><div class="finps"><input type="number" id="tech_rating_min" placeholder="örn. 0.5" step="0.1" oninput="liveFilter()"><input type="number" id="tech_rating_max" placeholder="—" step="0.1" oninput="liveFilter()"></div></div>
+          <div class="frow"><div class="flbl">RSI (14)</div><div class="finps"><input type="number" id="rsi_min" placeholder="—" oninput="liveFilter()"><input type="number" id="rsi_max" placeholder="örn. 35" oninput="liveFilter()"></div></div>
+          <div class="frow"><div class="flbl">3 Ay Getiri %</div><div class="finps"><input type="number" id="perf3m_min" placeholder="örn. 15" oninput="liveFilter()"><input type="number" id="perf3m_max" placeholder="—" oninput="liveFilter()"></div></div>
+          <div class="frow"><div class="flbl">6 Ay Getiri %</div><div class="finps"><input type="number" id="perf6m_min" placeholder="örn. 20" oninput="liveFilter()"><input type="number" id="perf6m_max" placeholder="—" oninput="liveFilter()"></div></div>
+          <div class="frow"><div class="flbl">1 Yıl Getiri %</div><div class="finps"><input type="number" id="perfy_min" placeholder="örn. 0" oninput="liveFilter()"><input type="number" id="perfy_max" placeholder="—" oninput="liveFilter()"></div></div>
         </div>
 
         <div class="filter-group">
@@ -772,6 +785,9 @@ if('serviceWorker' in navigator){
               <th onclick="colSort('dividendYieldIndicatedAnnual')" data-col="div" data-tip="Temettü Verimi: Hisse fiyatına oranla yıllık ödenen temettü.">TEMETTÜ%</th>
               <th onclick="colSort('totalDebt/totalEquityAnnual')" data-col="de" data-tip="Borç/Özsermaye: Şirketin borçluluk seviyesi. 1'in altı makul.">B/Ö</th>
               <th onclick="colSort('currentRatioAnnual')" data-col="cr" data-tip="Cari Oran: Kısa vadeli borç karşılama gücü. 1.5+ sağlıklı.">CARİ</th>
+              <th onclick="colSort('techRating')" data-col="tech_rating" data-tip="Teknik Rating: TradingView'nin RSI, MACD, ADX, Stochastic ve 15 hareketli ortalama dahil 26 indikatöre dayalı puanı. +1 = Güçlü Al, -1 = Güçlü Sat.">TV Rating</th>
+              <th onclick="colSort('rsi14')" data-col="rsi" data-tip="RSI (14): 0-100 arasında momentum göstergesi. 30 altı aşırı satım (alım fırsatı), 70 üstü aşırı alım (dikkat).">RSI</th>
+              <th onclick="colSort('perf3m')" data-col="perf3m" data-tip="3 Aylık Getiri: Hissenin son 3 ayda yüzdesel değişimi. Jegadeesh-Titman momentum faktörü.">3A Geti%</th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>

@@ -251,14 +251,16 @@ function toggleFavFilter() {
 // KOLON SEÇİCİ
 // ═══════════════════════════════════════════
 const COL_DEFS = [
-  {key:'sector',  label:'SEKTÖR',   def:true},  {key:'mcap',   label:'P.Değeri', def:true},
-  {key:'price',   label:'FİYAT',    def:true},  {key:'fscore', label:'F-Score',  def:true},
-  {key:'peg',     label:'PEG',      def:false}, {key:'pe',     label:'F/K',      def:true},
-  {key:'pb',      label:'PD/DD',    def:true},  {key:'ps',     label:'F/S',      def:false},
-  {key:'roe',     label:'ROE%',     def:true},  {key:'roa',    label:'ROA%',     def:false},
-  {key:'margin',  label:'MARJ%',    def:true},  {key:'revg',   label:'GELİR↑%', def:true},
-  {key:'epsg',    label:'K.BÜY%',  def:false}, {key:'div',    label:'TEMETTÜ%', def:true},
-  {key:'de',      label:'B/Ö',      def:true},  {key:'cr',     label:'CARİ',     def:false},
+  {key:'sector',      label:'SEKTÖR',     def:true},  {key:'mcap',        label:'P.Değeri',   def:true},
+  {key:'price',       label:'FİYAT',      def:true},  {key:'fscore',      label:'F-Score',    def:true},
+  {key:'peg',         label:'PEG',        def:false}, {key:'pe',          label:'F/K',        def:true},
+  {key:'pb',          label:'PD/DD',      def:true},  {key:'ps',          label:'F/S',        def:false},
+  {key:'roe',         label:'ROE%',       def:true},  {key:'roa',         label:'ROA%',       def:false},
+  {key:'margin',      label:'MARJ%',      def:true},  {key:'revg',        label:'GELİR↑%',   def:true},
+  {key:'epsg',        label:'K.BÜY%',    def:false}, {key:'div',         label:'TEMETTÜ%',   def:true},
+  {key:'de',          label:'B/Ö',        def:true},  {key:'cr',          label:'CARİ',       def:false},
+  {key:'tech_rating', label:'TV Rating',  def:true},  {key:'rsi',         label:'RSI',        def:true},
+  {key:'perf3m',      label:'3A Geti%',   def:false},
 ];
 var _colVisible = null;
 
@@ -517,6 +519,13 @@ async function runScan(){
       const sector = g('sector');
       const high1m = g('High.1M');
       const low1m  = g('Low.1M');
+      const techRating = g('Recommend.All');
+      const maRating   = g('Recommend.MA');
+      const oscRating  = g('Recommend.Other');
+      const perf3m     = g('Perf.3M');
+      const perf6m     = g('Perf.6M');
+      const perfY      = g('Perf.Y');
+      const rsi14      = g('RSI');
 
       // TradingView sembol formatı: "BIST:THYAO" → "THYAO"
       const rawSym = row.s || '';
@@ -623,6 +632,13 @@ async function runScan(){
         piotroski: g('piotroski_f_score') !== null ? Math.round(g('piotroski_f_score')) : null,
         fromHigh: (high1m && close && high1m > 0) ? ((close - high1m) / high1m * 100) : null,
         fromLow:  (low1m  && close && low1m  > 0) ? ((close - low1m)  / low1m  * 100) : null,
+        techRating: techRating !== null ? techRating : null,
+        maRating:   maRating   !== null ? maRating   : null,
+        oscRating:  oscRating  !== null ? oscRating  : null,
+        perf3m:     perf3m     !== null ? perf3m     : null,
+        perf6m:     perf6m     !== null ? perf6m     : null,
+        perfY:      perfY      !== null ? perfY      : null,
+        rsi14:      rsi14      !== null ? rsi14      : null,
         peg: (function() {
           if (pe && epsG && epsG > 0) return pe / epsG;
           return null;
@@ -697,36 +713,81 @@ const PRESETS = {
 // Teknik Analiz Presetleri
 // Teknik Analiz Presetleri
 const TECH_PRESETS = {
+
+  // ── GELİŞTİRİLMİŞ (mevcut 6) ──────────────────────────────────────────
+
   breakout: {
-    label: 'Breakout — Kırılım',
-    desc: 'Zirvesine yakın, güçlü artışla gün kapatan ve hacim desteği olan hisseler. Minervini SEPA modelinin tetikleyici koşulu.',
-    filters: { from_high_max: -5, chg_min: 1.5, vol_min: 0.5 }
+    label: 'Kırılım',
+    badge: 'GELİŞTİRİLDİ',
+    desc: 'Zirvesine yakın, güçlü artışla kapanan, hacim destekli VE indikatörler AL sinyali veren hisseler. Minervini SEPA kırılım koşulu.',
+    filters: { from_high_max: -5, chg_min: 1.5, vol_min: 0.5, tech_rating_min: 0.1 }
   },
+
   oversold: {
-    label: 'Aşırı Satım — Dip Fırsatı',
-    desc: 'Son 1 ayda sert düşen, dibine yakın seyreden ve gün içi toparlanma gösteren hisseler. Kontrarian yaklaşım.',
-    filters: { from_low_min: 0, from_high_max: -20, chg_min: 0 }
+    label: 'Dip Fırsatı',
+    badge: 'GELİŞTİRİLDİ',
+    desc: 'Sert düşen, dibine yakın VE RSI 35 altında gerçekten aşırı satılmış hisseler. Kontrarian yaklaşım — yalnızca teknik olarak aşırı satılanlarda.',
+    filters: { from_high_max: -20, chg_min: 0, rsi_max: 35 }
   },
+
   nearHigh: {
-    label: 'Zirveye Yakın — Güç Teyidi',
-    desc: '1 aylık zirvesinin %3 yakınında işlem gören hisseler. Güçlü trend devam sinyali.',
-    filters: { from_high_max: -3 }
+    label: 'Zirveye Yakın',
+    badge: 'GELİŞTİRİLDİ',
+    desc: '1 aylık zirvesinin %3 yakınında VE son 3 ayda en az %5 kazanmış hisseler. Güçlü trend devam sinyali — sadece gerçekten yükselen trende.',
+    filters: { from_high_max: -3, perf3m_min: 5 }
   },
+
   pullback: {
-    label: 'Geri Çekilme — Alım Fırsatı',
-    desc: 'Zirvesinden %10-25 geri çekilmiş, düşükten ise %10+ yukarıda hisseler. Sağlıklı konsolidasyon.',
-    filters: { from_high_max: -10, from_low_min: 10 }
+    label: 'Sağlıklı Çekilme',
+    badge: 'GELİŞTİRİLDİ',
+    desc: 'Zirveden %10-25 geri çekilen VE son 6 ayda en az %10 kazanmış hisseler. Güçlü trendde alım fırsatı — değer tuzağından değil, sağlıklı nefeslenmeden.',
+    filters: { from_high_max: -10, from_low_min: 10, perf6m_min: 10 }
   },
+
   strongDay: {
-    label: 'Güçlü Gün — Momentum',
-    desc: 'Bugün %2+ yükselen hisseler. Katalizör: haber, kırılım veya sektör rotasyonu.',
-    filters: { chg_min: 2 }
+    label: 'Güçlü Gün',
+    badge: 'GELİŞTİRİLDİ',
+    desc: 'Bugün %2+ yükselen VE hacimle desteklenen hisseler. Katalizör: haber, kırılım veya sektör rotasyonu.',
+    filters: { chg_min: 2, vol_min: 0.5 }
   },
+
   highVolume: {
-    label: 'Yüksek Hacim — Kurumsal İlgi',
-    desc: 'Normalin çok üzerinde hacimle işlem gören hisseler. Büyük oyuncuların hareketi.',
-    filters: { vol_min: 5 }
-  }
+    label: 'Kurumsal Hacim',
+    badge: 'GELİŞTİRİLDİ',
+    desc: 'Normalin çok üzerinde hacimle işlem gören VE fiyat artan hisseler. Büyük oyuncuların alım yaptığı, fiyatı yukarı taşıdığı hisseler.',
+    filters: { vol_min: 5, chg_min: 0 }
+  },
+
+  // ── YENİ (4 yeni strateji) ─────────────────────────────────────────────
+
+  techBuy: {
+    label: '26 İndikatör AL',
+    badge: 'YENİ',
+    desc: 'TradingView\'nin 26 teknik indikatörünün (RSI, MACD, ADX, Stochastic, 15 hareketli ortalama…) çoğunluğu AL sinyali veriyor. En güçlü teknik onay.',
+    filters: { tech_rating_min: 0.5 }
+  },
+
+  momentum3m: {
+    label: '3 Aylık Lider',
+    badge: 'YENİ',
+    desc: 'Son 3 ayda %15+, 6 ayda %20+ kazanan hisseler. Jegadeesh-Titman 1993 akademik bulgusuna dayalı: geçen dönemin kazananları kazanmaya devam eder.',
+    filters: { perf3m_min: 15, perf6m_min: 20 }
+  },
+
+  trendFollow: {
+    label: 'Güçlü Trendde',
+    badge: 'YENİ',
+    desc: '52 hafta düşüğünden %25+ yukarıda, 6 ay getirisini koruyan hisseler. Minervini Trend Template\'in temel kriteri — kurumsal birikim tamamlanmış güçlü trendler.',
+    filters: { from_low_min: 25, perf6m_min: 10 }
+  },
+
+  rsiBounce: {
+    label: 'RSI Toparlanması',
+    badge: 'YENİ',
+    desc: 'RSI 30-50 arasında — aşırı satımdan çıkmış, henüz aşırı alıma girmemiş hisseler. Dipten toparlanma erken aşaması. MACD+RSI kombinasyonu en güçlü dönüş sinyali.',
+    filters: { rsi_min: 30, rsi_max: 50, from_low_min: 3 }
+  },
+
 };
 
 // Guru stratejileri
@@ -907,7 +968,8 @@ function applyAllChips() {
   });
   document.querySelectorAll('#tech-presets .chip.on').forEach(function(c) {
     var p = TECH_PRESETS[c.dataset.tech];
-    if (p) allInfos.push({ label: p.label, desc: p.desc, infoId: 'tech-preset-info' });
+    var lbl = p ? (p.badge ? '<span style="font-size:9px;font-weight:700;padding:1px 4px;border-radius:3px;background:' + (p.badge === 'YENİ' ? '#10b981' : '#3b82f6') + ';color:#fff;margin-right:4px;">' + p.badge + '</span>' + p.label : p.label) : c.textContent;
+    if (p) allInfos.push({ label: lbl, desc: p.desc, infoId: 'tech-preset-info' });
   });
 
   // Tüm info div'leri gizle
@@ -1031,6 +1093,11 @@ function applyAndRender(special){
     ['changePercent',                  'chg_min',    'chg_max',   1],
     ['fromHigh',                       null,         'from_high_max', 1],
     ['fromLow',                        'from_low_min', null,      1],
+    ['techRating',                     'tech_rating_min', 'tech_rating_max', 1],
+    ['perf3m',                         'perf3m_min', 'perf3m_max', 1],
+    ['perf6m',                         'perf6m_min', 'perf6m_max', 1],
+    ['perfY',                          'perfy_min',  'perfy_max',  1],
+    ['rsi14',                          'rsi_min',    'rsi_max',    1],
     ['currentPrice',                   'price_min',  'price_max', 1],
   ];
   // Hacim ayrı — Milyon lot
@@ -1198,6 +1265,23 @@ function fPeg(v) {
   var color = v < 1 ? '#00c076' : v < 2 ? '#f0b429' : '#f6465d';
   return '<span style="font-weight:700;color:' + color + '">' + v.toFixed(2) + '</span>';
 }
+function fTechRating(v) {
+  if (v === null || v === undefined) return nil;
+  var label = v >= 0.5 ? 'Güçlü Al' : v >= 0.1 ? 'Al' : v <= -0.5 ? 'Güçlü Sat' : v <= -0.1 ? 'Sat' : 'Nötr';
+  var color = v >= 0.1 ? '#00c076' : v <= -0.1 ? '#f6465d' : '#f0b429';
+  return '<span style="font-weight:600;color:' + color + '">' + label + '</span>';
+}
+function fRsi(v) {
+  if (v === null || v === undefined) return nil;
+  var color = v < 30 ? '#00c076' : v > 70 ? '#f6465d' : v < 50 ? '#f0b429' : 'var(--text1)';
+  return '<span style="font-weight:600;color:' + color + '">' + v.toFixed(0) + '</span>';
+}
+function fPerf(v) {
+  if (v === null || v === undefined) return nil;
+  var color = v > 0 ? '#00c076' : '#f6465d';
+  return '<span style="font-weight:600;color:' + color + '">' + (v > 0 ? '+' : '') + v.toFixed(1) + '%</span>';
+}
+
 function fmc(v){
   if(!v) return nil;
   // TradingView market_cap_basic her zaman USD — milyon USD olarak saklıyoruz
@@ -1303,6 +1387,9 @@ function _vsRowHtml(s, idx) {
       <td data-col="div">${s.dividendYieldIndicatedAnnual!=null?`<span class="up">${s.dividendYieldIndicatedAnnual.toFixed(2)}%</span>`:nil}</td>
       <td data-col="de">${fv(s['totalDebt/totalEquityAnnual'],1)}</td>
       <td data-col="cr">${fv(s.currentRatioAnnual,2)}</td>
+      <td data-col="tech_rating">${s.techRating!=null?fTechRating(s.techRating):nil}</td>
+      <td data-col="rsi">${s.rsi14!=null?fRsi(s.rsi14):nil}</td>
+      <td data-col="perf3m">${s.perf3m!=null?fPerf(s.perf3m):nil}</td>
     </tr>`;
 }
 
