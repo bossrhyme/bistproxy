@@ -76,7 +76,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans', san
 .layout{display:flex;flex:1;overflow:hidden;}
 
 /* ── SIDEBAR ── */
-.sidebar{width:248px;min-width:248px;border-right:1px solid var(--border);overflow-y:auto;background:var(--s1);padding:12px 10px;}
+.sidebar{width:248px;min-width:248px;border-right:1px solid var(--border);overflow-y:auto;background:var(--s1);padding:12px 10px;transition:width .22s ease,min-width .22s ease,padding .22s ease,opacity .18s ease;}
 .sidebar::-webkit-scrollbar{width:3px;}
 .sidebar::-webkit-scrollbar-thumb{background:var(--border2);}
 .stitle{font-size:10px;font-weight:600;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;}
@@ -1157,3 +1157,30 @@ tbody tr td { height: 36px; }
 
 /* ── Bilgi Bankası Sekme Giriş Açıklaması ───────────────────── */
 .icat-desc{font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:16px;padding:10px 12px;background:rgba(59,130,246,.06);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;}
+
+/* ── Sidebar Collapse ────────────────────────────────────────── */
+.sidebar.collapsed{width:0;min-width:0;padding:0;overflow:hidden;opacity:0;border-right:none;}
+
+.sb-toggle{
+  position:relative;
+  z-index:10;
+  width:16px;
+  min-width:16px;
+  height:100%;
+  background:var(--s1);
+  border:none;
+  border-right:1px solid var(--border);
+  color:var(--muted);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  font-weight:700;
+  padding:0;
+  transition:background .15s,color .15s;
+  flex-shrink:0;
+  font-family:'Plus Jakarta Sans',sans-serif;
+}
+.sb-toggle:hover{background:var(--s2);color:var(--text);}
+.sb-toggle.collapsed{border-right:1px solid var(--border);}
