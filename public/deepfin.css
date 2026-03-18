@@ -644,7 +644,6 @@ td:first-child,td:nth-child(2){text-align:left;}
   .wallet-row { flex-wrap: wrap; gap: 4px; }
   .wallet-addr { font-size: 8px; min-width: 0; }
   .copy-btn { font-size: 9px; padding: 6px 8px; }
-@media (
 /* ── MOBİL DRAWER ── */
 #drawer-panel {
   position: fixed;
