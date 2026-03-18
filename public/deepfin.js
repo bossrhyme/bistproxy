@@ -251,7 +251,6 @@ function toggleFavFilter() {
 // KOLON SEÇİCİ
 // ═══════════════════════════════════════════
 const COL_DEFS = [
-  {key:'name',  label:'ŞİRKET ADI', def:true},
   {key:'price', label:'FİYAT', def:true},
   {key:'mcap', label:'P.Değeri', def:true},
   {key:'pe', label:'F/K', def:true},
@@ -1414,34 +1413,53 @@ function _vsInit() {
 
 
 function _vsRowHtml(s, idx) {
-  // Sütun görünürlüğünü inline style olarak yaz — scroll sonrası da korunur
-  var cv = function(key) { return isColVisible(key) ? '' : 'display:none;'; };
   var isFav = favSet.has(s.symbol);
   return `<tr onclick="showDetail('${s.symbol}')" class="${selSym===s.symbol?'selrow':''}">
-      <td class="nfav" onclick="event.stopPropagation();toggleFav('${s.symbol}')" title="${isFav?'Favorilerden çıkar':'Favorilere ekle'}"><span class="fav-icon${isFav?' fav-on':''}">★</span></td>
+      <td class="nfav" onclick="event.stopPropagation();toggleFav('${s.symbol}')" title="${isFav?'Favorilerden çıkar':'Favorilere ekle'}"><span class="fav-icon${isFav?' fav-on':''}">${isFav?'★':'☆'}</span></td>
       <td data-col="symbol" style="display:table-cell;"><span class="row-num">${idx+1}</span><span class="sym-wrap"><span class="row-arrow">›</span><span class="sym">${s.symbol}</span></span></td>
-      <td data-col="name" style="${cv('name')}font-size:11px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.name}">${s.name}</td>
-      <td data-col="price" style="${cv('price')}">${s.currentPrice!=null?(s.currentPrice.toFixed(2)+' '+(EXCHANGE_META[currentExchange]||EXCHANGE_META.bist).currency):nil}</td>
-      <td data-col="mcap" style="${cv('mcap')}">${fmc(s.marketCapitalization)}</td>
-      <td data-col="pe" style="${cv('pe')}">${fv(s.peNormalizedAnnual,1)}</td>
-      <td data-col="pb" style="${cv('pb')}">${fv(s.pbAnnual,2)}</td>
-      <td data-col="ps" style="${cv('ps')}">${fv(s.psTTM,2)}</td>
-      <td data-col="roe" style="${cv('roe')}">${fv(s.roeTTM,1,true)}</td>
-      <td data-col="roa" style="${cv('roa')}">${fv(s.roaTTM,1,true)}</td>
-      <td data-col="margin" style="${cv('margin')}">${fv(s.netProfitMarginTTM,1,true)}</td>
-      <td data-col="revg" style="${cv('revg')}">${fv(s.revenueGrowthTTMYoy,1,true)}</td>
-      <td data-col="epsg" style="${cv('epsg')}">${fv(s.epsGrowthTTMYoy,1,true)}</td>
-      <td data-col="fscore" style="${cv('fscore')}">${s.piotroski !== null ? fScore(s.piotroski) : nil}</td>
-      <td data-col="de" style="${cv('de')}">${fv(s['totalDebt/totalEquityAnnual'],1)}</td>
-      <td data-col="cr" style="${cv('cr')}">${fv(s.currentRatioAnnual,2)}</td>
-      <td data-col="div" style="${cv('div')}">${s.dividendYieldIndicatedAnnual!=null?`<span class="up">${s.dividendYieldIndicatedAnnual.toFixed(2)}%</span>`:nil}</td>
-      <td data-col="peg" style="${cv('peg')}">${s.peg !== null ? fPeg(s.peg) : nil}</td>
-      <td data-col="tech_rating" style="${cv('tech_rating')}">${s.techRating!=null?fTechRating(s.techRating):nil}</td>
-      <td data-col="rsi" style="${cv('rsi')}">${s.rsi14!=null?fRsi(s.rsi14):nil}</td>
-      <td data-col="perf3m" style="${cv('perf3m')}">${s.perf3m!=null?fPerf(s.perf3m):nil}</td>
-      <td data-col="sector" style="${cv('sector')}font-size:10px;color:var(--muted2)">${s.sector||'—'}</td>
+      <td data-col="name" style="font-size:11px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.name}">${s.name}</td>
+      <td data-col="price">${s.currentPrice!=null?(s.currentPrice.toFixed(2)+' '+(EXCHANGE_META[currentExchange]||EXCHANGE_META.bist).currency):nil}</td>
+      <td data-col="mcap">${fmc(s.marketCapitalization)}</td>
+      <td data-col="pe">${fv(s.peNormalizedAnnual,1)}</td>
+      <td data-col="pb">${fv(s.pbAnnual,2)}</td>
+      <td data-col="ps">${fv(s.psTTM,2)}</td>
+      <td data-col="roe">${fv(s.roeTTM,1,true)}</td>
+      <td data-col="roa">${fv(s.roaTTM,1,true)}</td>
+      <td data-col="margin">${fv(s.netProfitMarginTTM,1,true)}</td>
+      <td data-col="revg">${fv(s.revenueGrowthTTMYoy,1,true)}</td>
+      <td data-col="epsg">${fv(s.epsGrowthTTMYoy,1,true)}</td>
+      <td data-col="fscore">${s.piotroski !== null ? fScore(s.piotroski) : nil}</td>
+      <td data-col="de">${fv(s['totalDebt/totalEquityAnnual'],1)}</td>
+      <td data-col="cr">${fv(s.currentRatioAnnual,2)}</td>
+      <td data-col="div">${s.dividendYieldIndicatedAnnual!=null?`<span class="up">${s.dividendYieldIndicatedAnnual.toFixed(2)}%</span>`:nil}</td>
+      <td data-col="peg">${s.peg !== null ? fPeg(s.peg) : nil}</td>
+      <td data-col="tech_rating">${s.techRating!=null?fTechRating(s.techRating):nil}</td>
+      <td data-col="rsi">${s.rsi14!=null?fRsi(s.rsi14):nil}</td>
+      <td data-col="perf3m">${s.perf3m!=null?fPerf(s.perf3m):nil}</td>
+      <td data-col="sector" style="font-size:10px;color:var(--muted2)">${s.sector||'—'}</td>
     </tr>`;
+}function renderTable(){
+  // Sort header güncelle
+  document.querySelectorAll('thead th').forEach(function(th){
+    var oc = th.getAttribute('onclick')||'';
+    var match = oc.match(/colSort\('([^']+)'\)/);
+    if(match){
+      th.classList.toggle('sorted', match[1]===sortSt.field);
+      th.classList.toggle('asc', match[1]===sortSt.field && sortSt.dir==='asc');
+    }
+  });
+
+  _vsData = sorted(favFilterActive ? filtered.filter(function(s){ return favSet.has(s.symbol); }) : filtered);
+  _vsInit();
+  _vsRender();
+  setTimeout(applyColVisibility, 0);
 }
+
+
+// ═══════════════════════════════════════════
+// DETAIL PANEL
+// ═══════════════════════════════════════════
+
 function buildProfile(s) {
   const profileEl = document.getElementById('dprofile');
   const nameEl = document.getElementById('dprofile-name');
@@ -2634,6 +2652,7 @@ function showScreener() {
 }
 function _doShowScreener() {
   hideAnalizPage();
+  setTimeout(initSidebarState, 0);
   var _pp=document.getElementById('profile-page'); if(_pp){_pp.style.display='none';_pp.classList.remove('on');}
   var na = document.getElementById('nav-analiz'); if(na) na.classList.remove('active');
   // Disclaimer kontrolü
@@ -2727,3 +2746,27 @@ document.addEventListener('DOMContentLoaded', function(){
   if(el) el.innerHTML = total + ' <span>strateji</span>';
 });
 
+
+// ── Sidebar Collapse ──
+
+function toggleSidebar() {
+  var sb  = document.getElementById('sidebar');
+  var btn = document.getElementById('sb-toggle');
+  if (!sb || !btn) return;
+  var collapsed = sb.classList.toggle('collapsed');
+  btn.classList.toggle('collapsed', collapsed);
+  btn.textContent = collapsed ? '›' : '‹';
+  btn.title = collapsed ? 'Strateji panelini aç' : 'Strateji panelini gizle';
+  try { localStorage.setItem('df_sb_collapsed', collapsed ? '1' : '0'); } catch(e) {}
+}
+
+function initSidebarState() {
+  try {
+    if (localStorage.getItem('df_sb_collapsed') === '1') {
+      var sb  = document.getElementById('sidebar');
+      var btn = document.getElementById('sb-toggle');
+      if (sb)  sb.classList.add('collapsed');
+      if (btn) { btn.classList.add('collapsed'); btn.textContent = '›'; btn.title = 'Strateji panelini aç'; }
+    }
+  } catch(e) {}
+}
