@@ -185,8 +185,9 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 
 /* ── SIDEBAR ── */
 
-.sidebar::-webkit-scrollbar{width:3px;}
-.sidebar::-webkit-scrollbar-thumb{background:var(--border2);}
+.sidebar::-webkit-scrollbar{width:0;}
+.sidebar-inner::-webkit-scrollbar{width:3px;}
+.sidebar-inner::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 .stitle{font-size:10px;font-weight:600;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;}
 .filter-group{margin-bottom:14px;}
 .exchange-group{margin-bottom:14px;}
@@ -1189,5 +1190,6 @@ tbody tr td { height: 36px; }
 @media(max-width:728px){
   .hp-ads-inner{width:100%;height:90px;}
 }
-.sidebar-inner{flex:1;overflow-y:auto;overflow-x:hidden;min-height:0;padding:0;}
-.sidebar.collapsed .sidebar-inner{display:none !important;}
+.sidebar-inner{flex:1;overflow-y:auto;overflow-x:hidden;min-height:0;padding:0;display:flex;flex-direction:column;}
+.sidebar.collapsed 
+.sidebar.collapsed .sidebar-inner{display:none;}
