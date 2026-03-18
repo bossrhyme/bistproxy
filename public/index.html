@@ -402,7 +402,6 @@ if('serviceWorker' in navigator){
   </div>
 
   <div class="layout" id="screener-layout" style="display:none;">
-    <button class="sb-toggle" id="sb-toggle" onclick="toggleSidebar()" title="Strateji panelini gizle/göster">‹</button>
     <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
 
@@ -656,7 +655,8 @@ if('serviceWorker' in navigator){
     </div>
 
     <!-- CONTENT -->
-    <div class="content">
+    <div class="content" style="position:relative;">
+      <button class="sb-toggle" id="sb-toggle" onclick="toggleSidebar()" title="Strateji panelini gizle/göster">‹</button>
       <!-- TICKER TAPE -->
       <div class="ticker-wrap" id="ticker-wrap">
         <div class="ticker-track" id="ticker-track">

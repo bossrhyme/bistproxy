@@ -1162,15 +1162,16 @@ tbody tr td { height: 36px; }
 .sidebar.collapsed{width:0;min-width:0;padding:0;border-right:none;overflow:hidden;opacity:0;}
 .sidebar.collapsed > *{pointer-events:none;}
 .sb-toggle{
-  position:fixed;
+  position:absolute;
+  left:-16px;
   top:50%;
   transform:translateY(-50%);
-  z-index:100;
+  z-index:10;
   width:16px;
   height:44px;
   background:var(--accent);
   border:none;
-  border-radius:0 6px 6px 0;
+  border-radius:6px 0 0 6px;
   color:#fff;
   cursor:pointer;
   display:flex;
@@ -1179,9 +1180,8 @@ tbody tr td { height: 36px; }
   font-size:13px;
   font-weight:900;
   padding:0;
-  transition:left .22s ease, opacity .15s;
   opacity:.9;
-  left:248px;
+  pointer-events:auto;
 }
 .sb-toggle:hover{opacity:1;background:var(--blue2,#2563d4);}
 .sidebar.collapsed + * ~ * .sb-toggle,
