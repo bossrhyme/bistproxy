@@ -1159,16 +1159,20 @@ tbody tr td { height: 36px; }
 .icat-desc{font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:16px;padding:10px 12px;background:rgba(59,130,246,.06);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;}
 
 /* ── Sidebar Collapse ────────────────────────────────────────── */
-.sidebar.collapsed{width:0;min-width:0;padding:0;overflow:hidden;opacity:0;border-right:none;}
+.sidebar.collapsed{width:0;min-width:0;padding:0;overflow:visible;border-right:none;}
+.sidebar.collapsed > *:not(.sb-toggle){opacity:0;pointer-events:none;}
 
 .sb-toggle{
-  position:relative;
-  z-index:10;
+  position:absolute;
+  right:-20px;
+  top:50%;
+  transform:translateY(-50%);
+  z-index:20;
   width:20px;
-  min-width:20px;
-  height:100%;
+  height:48px;
   background:var(--accent);
   border:none;
+  border-radius:0 6px 6px 0;
   color:#fff;
   cursor:pointer;
   display:flex;
@@ -1177,10 +1181,12 @@ tbody tr td { height: 36px; }
   font-size:13px;
   font-weight:800;
   padding:0;
-  transition:background .15s,opacity .15s;
+  transition:opacity .15s;
   flex-shrink:0;
   font-family:'Plus Jakarta Sans',sans-serif;
-  opacity:.85;
+  opacity:.9;
+  pointer-events:auto;
 }
 .sb-toggle:hover{opacity:1;}
-.sb-toggle.collapsed{background:var(--accent);}
+/* Collapsed: sidebar width 0, buton layout'a göre kendiliğinden doğru yerde */
+.sidebar.collapsed .sb-toggle{border-radius:0 6px 6px 0;}

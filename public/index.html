@@ -402,11 +402,9 @@ if('serviceWorker' in navigator){
   </div>
 
   <div class="layout" id="screener-layout" style="display:none;">
-    <!-- SIDEBAR TOGGLE -->
-    <button class="sb-toggle" id="sb-toggle" onclick="toggleSidebar()" title="Strateji panelini gizle/göster">‹</button>
-
     <!-- SIDEBAR -->
-    <div class="sidebar" id="sidebar">
+    <div class="sidebar" id="sidebar" style="position:relative;">
+      <button class="sb-toggle" id="sb-toggle" onclick="toggleSidebar()" title="Strateji panelini gizle/göster">‹</button>
 
       <!-- SIDEBAR TABS -->
       <div class="sb-tabs">
