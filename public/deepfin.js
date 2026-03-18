@@ -1,25 +1,3 @@
-
-// ── Sidebar Collapse ─────────────────────────────────────────────────────────
-function toggleSidebar() {
-  var sb  = document.getElementById('sidebar');
-  var btn = document.getElementById('sb-toggle');
-  if (!sb || !btn) return;
-  var collapsed = sb.classList.toggle('collapsed');
-  btn.textContent = collapsed ? '›' : '‹';
-  btn.title = collapsed ? 'Strateji panelini aç' : 'Strateji panelini gizle';
-  try { localStorage.setItem('df_sb_collapsed', collapsed ? '1' : '0'); } catch(e) {}
-}
-function initSidebarState() {
-  try {
-    if (localStorage.getItem('df_sb_collapsed') === '1') {
-      var sb  = document.getElementById('sidebar');
-      var btn = document.getElementById('sb-toggle');
-      if (sb)  sb.classList.add('collapsed');
-      if (btn) { btn.textContent = '›'; btn.title = 'Strateji panelini aç'; }
-    }
-  } catch(e) {}
-}
-
 var _tvCurrentSym = null;
 
 // ═══════════════════════════════════════════
@@ -2656,7 +2634,6 @@ function showScreener() {
 }
 function _doShowScreener() {
   hideAnalizPage();
-  setTimeout(initSidebarState, 0);
   var _pp=document.getElementById('profile-page'); if(_pp){_pp.style.display='none';_pp.classList.remove('on');}
   var na = document.getElementById('nav-analiz'); if(na) na.classList.remove('active');
   // Disclaimer kontrolü
