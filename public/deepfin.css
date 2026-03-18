@@ -42,8 +42,6 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .sb-toggle:hover{opacity:1;background:var(--blue2,#2563d4);}
 
 /* ── detail.open (display:flex eklendi) ─────────────────────────── */
-.detail.open{width:360px;min-width:360px;overflow-y:auto;display:flex;flex-direction:column;}
-
 /* ── Bilgi Bankası Sekmeleri ─────────────────────────────────── */
 .info-tabs{display:flex;gap:4px;padding:0 0 14px;border-bottom:1px solid var(--border);margin-bottom:4px;flex-wrap:wrap;}
 .info-tab{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;padding:6px 14px;border-radius:20px;border:1px solid var(--border2);background:var(--s2);color:var(--text2);cursor:pointer;transition:all .15s;letter-spacing:.02em;}
@@ -286,6 +284,8 @@ td:first-child,td:nth-child(2){text-align:left;}
 
 /* ── DETAIL PANEL ── */
 .detail{width:0;min-width:0;border-left:1px solid var(--border);background:var(--s1);overflow:hidden;transition:width .2s,min-width .2s;flex-shrink:0;}
+.detail.open{width:360px;min-width:360px;overflow-y:auto;display:flex;flex-direction:column;}
+
 
 .detail::-webkit-scrollbar{width:3px;}
 .detail::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
