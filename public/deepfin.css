@@ -1164,23 +1164,23 @@ tbody tr td { height: 36px; }
 .sb-toggle{
   position:relative;
   z-index:10;
-  width:16px;
-  min-width:16px;
+  width:20px;
+  min-width:20px;
   height:100%;
-  background:var(--s1);
+  background:var(--accent);
   border:none;
-  border-right:1px solid var(--border);
-  color:var(--muted);
+  color:#fff;
   cursor:pointer;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:14px;
-  font-weight:700;
+  font-size:13px;
+  font-weight:800;
   padding:0;
-  transition:background .15s,color .15s;
+  transition:background .15s,opacity .15s;
   flex-shrink:0;
   font-family:'Plus Jakarta Sans',sans-serif;
+  opacity:.85;
 }
-.sb-toggle:hover{background:var(--s2);color:var(--text);}
-.sb-toggle.collapsed{border-right:1px solid var(--border);}
+.sb-toggle:hover{opacity:1;}
+.sb-toggle.collapsed{background:var(--accent);}
