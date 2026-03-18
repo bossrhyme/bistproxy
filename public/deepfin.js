@@ -1884,18 +1884,20 @@ function toggleSidebar() {
   var btn = document.getElementById('sb-toggle');
   if (!sb || !btn) return;
   var collapsed = sb.classList.toggle('collapsed');
-  btn.classList.toggle('collapsed', collapsed);
   btn.textContent = collapsed ? '›' : '‹';
   btn.title = collapsed ? 'Strateji panelini aç' : 'Strateji panelini gizle';
+  btn.style.left = collapsed ? '0px' : '248px';
   try { localStorage.setItem('df_sb_collapsed', collapsed ? '1' : '0'); } catch(e) {}
 }
 function initSidebarState() {
   try {
+    var btn = document.getElementById('sb-toggle');
     if (localStorage.getItem('df_sb_collapsed') === '1') {
-      var sb  = document.getElementById('sidebar');
-      var btn = document.getElementById('sb-toggle');
+      var sb = document.getElementById('sidebar');
       if (sb)  sb.classList.add('collapsed');
-      if (btn) { btn.classList.add('collapsed'); btn.textContent = '›'; btn.title = 'Strateji panelini aç'; }
+      if (btn) { btn.textContent = '›'; btn.title = 'Strateji panelini aç'; btn.style.left = '0px'; }
+    } else {
+      if (btn) btn.style.left = '248px';
     }
   } catch(e) {}
 }
