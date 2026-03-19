@@ -251,7 +251,7 @@ function toggleFavFilter() {
 // KOLON SEÇİCİ
 // ═══════════════════════════════════════════
 const COL_DEFS = [
-  {key:'name',  label:'ŞİRKET ADI', def:true},
+  {key:'name', label:'ŞİRKET ADI', def:true},
   {key:'price', label:'FİYAT', def:true},
   {key:'mcap', label:'P.Değeri', def:true},
   {key:'pe', label:'F/K', def:true},
@@ -1441,7 +1441,28 @@ function _vsRowHtml(s, idx) {
       <td data-col="perf3m" style="${cv('perf3m')}">${s.perf3m!=null?fPerf(s.perf3m):nil}</td>
       <td data-col="sector" style="${cv('sector')}font-size:10px;color:var(--muted2)">${s.sector||'—'}</td>
     </tr>`;
+}function renderTable(){
+  // Sort header güncelle
+  document.querySelectorAll('thead th').forEach(function(th){
+    var oc = th.getAttribute('onclick')||'';
+    var match = oc.match(/colSort\('([^']+)'\)/);
+    if(match){
+      th.classList.toggle('sorted', match[1]===sortSt.field);
+      th.classList.toggle('asc', match[1]===sortSt.field && sortSt.dir==='asc');
+    }
+  });
+
+  _vsData = sorted(favFilterActive ? filtered.filter(function(s){ return favSet.has(s.symbol); }) : filtered);
+  _vsInit();
+  _vsRender();
+  setTimeout(applyColVisibility, 0);
 }
+
+
+// ═══════════════════════════════════════════
+// DETAIL PANEL
+// ═══════════════════════════════════════════
+
 function buildProfile(s) {
   const profileEl = document.getElementById('dprofile');
   const nameEl = document.getElementById('dprofile-name');
