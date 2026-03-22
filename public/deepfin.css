@@ -1162,37 +1162,35 @@ tbody tr td { height: 36px; }
 .sb-toggle{position:relative;z-index:2;width:16px;min-width:16px;height:100%;background:var(--accent);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;padding:0;flex-shrink:0;}
 .sb-toggle:hover{opacity:.8;}
 
-/* ── Asset Navigation System ──────────────────────────────── */
+/* ── Asset Nav & Panel System ─────────────────────────────────── */
 .sidebar{display:flex !important;flex-direction:column !important;overflow:hidden !important;padding:0 !important;}
-.asset-landing{display:flex;flex-direction:column;flex:1;overflow:hidden;}
-.asset-landing-header{padding:18px 12px 12px;flex-shrink:0;text-align:center;}
-.asset-landing-title{font-size:16px;font-weight:800;color:var(--text);letter-spacing:-.3px;margin-bottom:4px;}
-.asset-landing-sub{font-size:11px;color:var(--text2);line-height:1.4;}
-.asset-landing-list{flex:1;overflow-y:auto;padding:6px 8px 8px;}
-.asset-landing-list::-webkit-scrollbar{width:3px;}
-.asset-landing-list::-webkit-scrollbar-thumb{background:var(--border2);}
-.asset-landing-btn{width:100%;display:flex;align-items:center;gap:8px;padding:10px 12px;margin-bottom:3px;border:1px solid var(--border2);border-radius:6px;background:var(--s2);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .12s;}
-.asset-landing-btn:hover{border-color:var(--accent);background:rgba(59,130,246,.06);}
-.alb-icon{font-size:16px;flex-shrink:0;line-height:1;width:22px;text-align:center;}
-.alb-name{font-size:12px;font-weight:700;color:var(--text);flex:1;text-align:left;}
-.alb-live{display:flex;align-items:center;flex-shrink:0;opacity:.9;}
-.alb-badge-soon{font-size:9px;font-weight:700;letter-spacing:.05em;color:#fff;background:var(--muted);padding:2px 7px;border-radius:20px;flex-shrink:0;text-transform:uppercase;}
-.alb-soon-btn .alb-name{color:var(--text2);}
-.alb-soon-btn .alb-icon{opacity:.55;}
-.alb-soon-btn:hover{border-color:var(--border2) !important;background:var(--s2) !important;}
-.asset-detail{display:flex;flex-direction:column;flex:1;overflow:hidden;}
-.asset-detail-header{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--s2);}
-.asset-back-btn{width:26px;height:26px;border:1px solid var(--border2);border-radius:5px;background:none;color:var(--text2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;flex-shrink:0;transition:all .12s;}
-.asset-back-btn:hover{border-color:var(--accent);color:var(--accent);}
-.asset-detail-icon{font-size:16px;line-height:1;}
-.asset-detail-name{font-size:13px;font-weight:700;color:var(--text);flex:1;}
-.asset-panel{display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0;}
-.asset-panel.active{display:flex;}
-.asset-panel-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 8px;}
-.asset-panel-scroll::-webkit-scrollbar{width:3px;}
-.asset-panel-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.asset-nav-bar{display:flex;overflow-x:auto;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--s2);scrollbar-width:none;}
+.asset-nav-bar::-webkit-scrollbar{display:none;}
+.anb{display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 9px 6px;border:none;border-bottom:2px solid transparent;background:none;color:var(--muted2);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap;transition:color .12s,border-color .12s;flex-shrink:0;font-size:14px;line-height:1;}
+.anb span{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
+.anb small{font-size:7px;color:var(--muted);letter-spacing:.03em;}
+.anb:hover{color:var(--text2);}
+.anb.active{color:var(--accent);border-bottom-color:var(--accent);}
+.anb.soon{opacity:.38;cursor:default;}
+.sb-varlık{display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0;}
+.sb-varlık.active{display:flex;}
+.sb-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 2px;}
+.sb-scroll::-webkit-scrollbar{width:3px;}
+.sb-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 .ast-scan-wrap{padding:6px 8px 8px;flex-shrink:0;}
 .ast-scan-btn{width:100%;padding:9px;background:var(--accent);border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:.02em;transition:opacity .15s;}
 .ast-scan-btn:hover{opacity:.85;}
-.ast-clear-btn{width:100%;background:transparent;border:1px solid var(--border);color:var(--muted2);padding:5px;font-size:10px;cursor:pointer;transition:all .15s;margin-top:2px;border-radius:5px;font-weight:500;font-family:'Plus Jakarta Sans',sans-serif;}
-.ast-clear-btn:hover{border-color:var(--red);color:var(--red);}
+
+/* ── Ortak tablo stilleri (fon, kripto, hisse) ───────────────── */
+.tbar-meta{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--s2);border-bottom:1px solid var(--border);font-size:11px;flex-wrap:wrap;}
+.tbar-meta b{color:var(--text);}
+.tbm-cnt{color:var(--accent);font-weight:600;}
+.tbm-src{color:var(--muted2);margin-left:auto;}
+.tbm-note{color:var(--green);font-size:10px;}
+.rtable{width:100%;border-collapse:collapse;}
+.rtable thead th{padding:5px 6px;text-align:left;font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border);background:var(--s1);}
+.rtable tbody tr{border-bottom:1px solid var(--border2);transition:background .1s;}
+.rtable tbody tr:hover{background:var(--s2);}
+.tc{padding:7px 6px;font-size:10px;color:var(--muted2);}
+.tn{padding:7px 6px;font-family:'Geist Mono',monospace;font-size:11px;text-align:right;}
+.tsub{font-size:9px;color:var(--muted2);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}

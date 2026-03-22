@@ -1,294 +1,178 @@
-
-// ── Chip seçim fonksiyonları ──────────────────────────────────────────
-// Radio: aynı .chips container içinde tek seçim
+// ── Chip fonksiyonları ────────────────────────────────────────────────
 function chipRadio(el) {
-  var container = el.closest('.chips') || el.parentElement;
-  container.querySelectorAll('.chip').forEach(function(c) { c.classList.remove('on'); });
+  var c = el.closest('.chips') || el.parentElement;
+  c.querySelectorAll('.chip').forEach(function(x){ x.classList.remove('on'); });
   el.classList.add('on');
 }
-// Toggle: çoklu seçim (checkbox davranışı)
-function chipToggle(el) {
-  el.classList.toggle('on');
+function chipToggle(el) { el.classList.toggle('on'); }
+
+// ── Varlık geçişi ─────────────────────────────────────────────────────
+var _currentAsset = 'hisse';
+
+function switchAsset(type) {
+  if (_currentAsset === type) return;
+  _currentAsset = type;
+
+  document.querySelectorAll('.anb').forEach(function(b){ b.classList.remove('active'); });
+  var nb = document.getElementById('anb-' + type);
+  if (nb) nb.classList.add('active');
+
+  document.querySelectorAll('.sb-varlık').forEach(function(p){ p.classList.remove('active'); });
+  var sp = document.getElementById('sbp-' + type);
+  if (sp) sp.classList.add('active');
+
+  resetScreener();
 }
 
+function resetScreener() {
+  if (typeof allData !== 'undefined') allData = [];
+  if (typeof filtered !== 'undefined') filtered = [];
+  var tbody = document.getElementById('tbody');
+  if (tbody) tbody.innerHTML = '';
+  var twrap = document.getElementById('twrap');
+  if (twrap) twrap.style.display = 'none';
+  var det = document.getElementById('detail');
+  if (det) det.classList.remove('open');
+  var cnt = document.getElementById('sb-count');
+  if (cnt) cnt.textContent = '—';
+  var flt = document.getElementById('sb-filtered');
+  if (flt) flt.textContent = '—';
+}
 
 // ── Fon Tarama ────────────────────────────────────────────────────────
-async function runFonScan() {
-  const btn = document.querySelector('#asset-panel-fon .ast-scan-btn');
+function runFonScan() {
+  var btn = document.querySelector('#sbp-fon .ast-scan-btn');
   if (btn) { btn.textContent = '⏳ Taranıyor...'; btn.disabled = true; }
 
-  // Panel'den filtre değerlerini topla
-  const panel = document.getElementById('asset-panel-fon');
-  const getVal = (sel) => { const el = panel?.querySelector(sel); return el?.value || ''; };
+  var params = new URLSearchParams({ fontur: 'YAT', sort: 'ret1y', limit: '100' });
 
-  const params = new URLSearchParams({
-    fontur:     'YAT',
-    sort:       'ret1y',
-    limit:      '100'
-  });
-  const minRet1y  = getVal('input[placeholder="—"]:nth-of-type(1)');
-  const minSharpe = panel?.querySelectorAll('.filter-group')[4]?.querySelectorAll('input')[0]?.value;
-  const minSize   = panel?.querySelectorAll('.filter-group')[4]?.querySelectorAll('input')[2]?.value;
-  if (minRet1y)  params.set('min_ret1y',  minRet1y);
-  if (minSharpe) params.set('min_sharpe', minSharpe);
-  if (minSize)   params.set('min_size',   minSize);
+  var stratChip = document.querySelector('#sbp-fon .chip.on[data-preset]');
+  if (stratChip) params.set('sort', stratChip.dataset.preset);
 
-  try {
-    const r = await fetch('/api/fon-scan?' + params.toString());
-    const data = await r.json();
+  var v = function(id){ var el=document.getElementById(id); return el&&el.value?el.value:''; };
+  if (v('fon_ret1y_min'))  params.set('min_ret1y',  v('fon_ret1y_min'));
+  if (v('fon_ret1y_max'))  params.set('max_ret1y',  v('fon_ret1y_max'));
+  if (v('fon_sharpe_min')) params.set('min_sharpe', v('fon_sharpe_min'));
+  if (v('fon_size_min'))   params.set('min_size',   v('fon_size_min'));
 
-    if (data.error && !data.funds?.length) {
-      alert('Fon verisi alınamadı: ' + data.error);
-      return;
-    }
-
-    // Sonuçları göster
-    renderFonResults(data.funds || [], data);
-
-  } catch(err) {
-    alert('Fon tarama hatası: ' + err.message);
-  } finally {
-    if (btn) { btn.textContent = '▶ Fon Tara'; btn.disabled = false; }
-  }
+  fetch('/api/fon-scan?' + params.toString())
+    .then(function(r){ return r.json(); })
+    .then(function(d){ _renderFonTable(d.funds || [], d); })
+    .catch(function(e){ alert('Fon tarama hatası: ' + e.message); })
+    .finally(function(){ if (btn){ btn.textContent='▶ Fon Tara'; btn.disabled=false; } });
 }
 
-function renderFonResults(funds, meta) {
-  // Tarayıcı ekranını aç
-  showScreener();
-
-  // twrap içine fon tablosu yaz
-  const twrap = document.getElementById('twrap');
+function _renderFonTable(funds, meta) {
+  var twrap = document.getElementById('twrap');
   if (!twrap) return;
 
-  const fmt = (v, dec=1) => v != null ? v.toFixed(dec) + '%' : '—';
-  const fmtM = (v) => v != null ? '₺' + v.toFixed(0) + 'M' : '—';
+  var fR = function(v, cls){
+    if (v == null) return '<span class="nil">—</span>';
+    return '<span class="' + (v>=0?'up':'dn') + '">' + (v>=0?'+':'') + v.toFixed(1) + '%</span>';
+  };
 
-  const rows = funds.map((f, i) => {
-    const retColor = (v) => v == null ? '' : v >= 0 ? 'color:var(--green)' : 'color:var(--red)';
-    const verBadge = f.verified
-      ? '<span style="font-size:8px;color:var(--green);margin-left:4px;">✓CG+TV</span>'
-      : '<span style="font-size:8px;color:var(--muted);margin-left:4px;">CG</span>';
-
-    return `<tr>
-      <td style="padding:8px 10px;font-size:11px;color:var(--muted2)">${i+1}</td>
-      <td style="padding:8px 10px">
-        <div style="font-size:12px;font-weight:700;color:var(--text)">${f.code}${verBadge}</div>
-        <div style="font-size:10px;color:var(--muted2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${f.name}">${f.name}</div>
-      </td>
-      <td style="padding:8px 10px;font-family:'Geist Mono',monospace;font-size:11px;color:var(--text)">₺${f.price?.toFixed(4) || '—'}</td>
-      <td style="padding:8px 10px;font-family:'Geist Mono',monospace;font-size:11px;${retColor(f.ret1m)}">${fmt(f.ret1m)}</td>
-      <td style="padding:8px 10px;font-family:'Geist Mono',monospace;font-size:11px;${retColor(f.ret3m)}">${fmt(f.ret3m)}</td>
-      <td style="padding:8px 10px;font-family:'Geist Mono',monospace;font-size:11px;${retColor(f.ret1y)}">${fmt(f.ret1y)}</td>
-      <td style="padding:8px 10px;font-family:'Geist Mono',monospace;font-size:11px;color:var(--text)">${f.sharpe != null ? f.sharpe.toFixed(2) : '—'}</td>
-      <td style="padding:8px 10px;font-family:'Geist Mono',monospace;font-size:11px;color:var(--text2)">${fmtM(f.totalValueM)}</td>
-    </tr>`;
+  var rows = funds.map(function(f, i){
+    var ver = f.verified ? '<sup style="color:var(--green);font-size:8px">✓</sup>' : '';
+    return '<tr><td class="tc">'+(i+1)+'</td>'
+      +'<td><b style="font-size:11px">'+f.code+ver+'</b>'
+      +'<div class="tsub" title="'+f.name+'">'+f.name+'</div></td>'
+      +'<td class="tn">₺'+(f.price||0).toFixed(4)+'</td>'
+      +'<td class="tn">'+fR(f.ret1m)+'</td>'
+      +'<td class="tn">'+fR(f.ret3m)+'</td>'
+      +'<td class="tn">'+fR(f.ret1y)+'</td>'
+      +'<td class="tn">'+(f.sharpe!=null?f.sharpe.toFixed(2):'—')+'</td>'
+      +'<td class="tn">₺'+(f.totalValueM||0).toFixed(0)+'M</td></tr>';
   }).join('');
 
   twrap.style.display = 'block';
-  twrap.innerHTML = `
-    <div style="padding:8px 12px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted2);display:flex;align-items:center;gap:8px;">
-      <span>📊 TEFAS Fon Taraması</span>
-      <span style="color:var(--green)">${funds.length} fon</span>
-      <span>·</span>
-      <span>Kaynak: TEFAS + Yahoo Finance doğrulaması</span>
-      <span style="margin-left:auto;font-size:10px;color:var(--muted)">${meta.updatedAt ? new Date(meta.updatedAt).toLocaleTimeString('tr-TR') : ''}</span>
-    </div>
-    <table style="width:100%;border-collapse:collapse;">
-      <thead>
-        <tr style="border-bottom:1px solid var(--border)">
-          <th style="padding:6px 10px;text-align:left;font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase">#</th>
-          <th style="padding:6px 10px;text-align:left;font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase">Fon</th>
-          <th style="padding:6px 10px;text-align:right;font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase">Fiyat</th>
-          <th style="padding:6px 10px;text-align:right;font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase">1A%</th>
-          <th style="padding:6px 10px;text-align:right;font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase">3A%</th>
-          <th style="padding:6px 10px;text-align:right;font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase">1Y%</th>
-          <th style="padding:6px 10px;text-align:right;font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase">Sharpe</th>
-          <th style="padding:6px 10px;text-align:right;font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase">Büyüklük</th>
-        </tr>
-      </thead>
-      <tbody>${rows}</tbody>
-    </table>`;
+  twrap.innerHTML = '<div class="tbar-meta"><b>TEFAS Fon</b>'
+    +'<span class="tbm-cnt">'+funds.length+' fon</span>'
+    +'<span class="tbm-src">TEFAS · Yahoo Finance</span></div>'
+    +'<table class="rtable"><thead><tr>'
+    +'<th>#</th><th>Fon</th><th>Fiyat</th><th>1A%</th><th>3A%</th><th>1Y%</th><th>Sharpe</th><th>Büyüklük</th>'
+    +'</tr></thead><tbody>'+rows+'</tbody></table>';
+
+  var cnt = document.getElementById('sb-count');
+  if (cnt) cnt.textContent = funds.length;
 }
 
 // ── Kripto Tarama ─────────────────────────────────────────────────────
-async function runKriptoScan() {
-  const btn = document.querySelector('#asset-panel-kripto .ast-scan-btn');
+function runKriptoScan() {
+  var btn = document.querySelector('#sbp-kripto .ast-scan-btn');
   if (btn) { btn.textContent = '⏳ Taranıyor...'; btn.disabled = true; }
 
-  const panel = document.getElementById('asset-panel-kripto');
+  var params = new URLSearchParams({ limit: '100', sort: 'market_cap_desc' });
 
-  // Aktif chip'ten kategori belirle
-  const activeChip = panel?.querySelector('.chip.on');
-  const chipText = activeChip?.textContent?.trim() || '';
-  const categoryMap = {
-    'Layer 1': 'layer-1', 'Layer 2': 'layer-2',
-    'DeFi': 'decentralized-finance-defi',
-    'Meme': 'meme-token',
-    'AI': 'artificial-intelligence',
-    'Gaming / GameFi': 'gaming'
-  };
-  const category = categoryMap[chipText] || '';
+  var catChip = document.querySelector('#sbp-kripto .chip.on[data-cat]');
+  if (catChip && catChip.dataset.cat) params.set('category', catChip.dataset.cat);
 
-  // Aktif strateji presetini belirle
-  const stratChip = panel?.querySelectorAll('.filter-group')[1]?.querySelector('.chip.on');
-  const stratText = stratChip?.textContent?.trim() || '';
-  const presetMap = {
-    'Hacim Patlaması': 'hacim_patlamasi',
-    'RSI Dip': 'rsi_dip',
-    'ATH Yakını': 'ath_yakini',
-    'Büyük Kapı': 'buyuk_kap',
-    'Küçük Kapı Gem': 'kucuk_cap_gem',
-    'Momentum': 'momentum',
-    'Düşük Arz': 'dusuk_arz'
-  };
-  const preset = presetMap[stratText] || '';
+  var preChip = document.querySelector('#sbp-kripto .chip.on[data-preset]');
+  if (preChip && preChip.dataset.preset) params.set('preset', preChip.dataset.preset);
 
-  // Filtre inputları
-  const filterGroups = panel?.querySelectorAll('.filter-group');
-  const getInput = (groupIdx, inputIdx) => {
-    return filterGroups?.[groupIdx]?.querySelectorAll('input')?.[inputIdx]?.value || '';
-  };
+  var ids = {min_mcap:'k_mcap_min',max_mcap:'k_mcap_max',min_vol24h:'k_vol_min',max_vol24h:'k_vol_max',min_chg24h:'k_chg24h_min',max_chg24h:'k_chg24h_max',min_rsi:'k_rsi_min',max_rsi:'k_rsi_max'};
+  Object.keys(ids).forEach(function(p){
+    var el=document.getElementById(ids[p]);
+    if (el&&el.value) params.set(p, el.value);
+  });
 
-  const params = new URLSearchParams({ limit: '100', sort: 'market_cap_desc' });
-  if (category) params.set('category', category);
-  if (preset)   params.set('preset', preset);
-
-  // Piyasa filtreleri (group index 3)
-  const minMcap = getInput(3, 0); if (minMcap) params.set('min_mcap', minMcap);
-  const minVol  = getInput(3, 2); if (minVol)  params.set('min_vol24h', minVol);
-  // Performans filtreleri (group index 4)
-  const minChg24h = getInput(4, 0); if (minChg24h) params.set('min_chg24h', minChg24h);
-  const minChg7d  = getInput(4, 2); if (minChg7d)  params.set('min_chg7d', minChg7d);
-  // Teknik filtreler (group index 5)
-  const maxRsi = getInput(5, 1); if (maxRsi) params.set('max_rsi', maxRsi);
-
-  try {
-    const r = await fetch('/api/kripto-scan?' + params.toString());
-    const data = await r.json();
-
-    if (data.error && !data.coins?.length) {
-      alert('Kripto verisi alınamadı: ' + data.error);
-      return;
-    }
-
-    renderKriptoResults(data.coins || [], data);
-
-  } catch(err) {
-    alert('Kripto tarama hatası: ' + err.message);
-  } finally {
-    if (btn) { btn.textContent = '▶ Kripto Tara'; btn.disabled = false; }
-  }
+  fetch('/api/kripto-scan?' + params.toString())
+    .then(function(r){ return r.json(); })
+    .then(function(d){ _renderKriptoTable(d.coins || [], d); })
+    .catch(function(e){ alert('Kripto tarama hatası: ' + e.message); })
+    .finally(function(){ if (btn){ btn.textContent='▶ Kripto Tara'; btn.disabled=false; } });
 }
 
-function renderKriptoResults(coins, meta) {
-  showScreener();
-  const twrap = document.getElementById('twrap');
+function _renderKriptoTable(coins, meta) {
+  var twrap = document.getElementById('twrap');
   if (!twrap) return;
 
-  const fmt = (v, dec=2) => v != null ? (v >= 0 ? '+' : '') + v.toFixed(dec) + '%' : '—';
-  const fmtPrice = (v) => {
-    if (v == null) return '—';
-    if (v >= 1000) return '$' + v.toLocaleString('en', {maximumFractionDigits:0});
-    if (v >= 1)    return '$' + v.toFixed(2);
-    if (v >= 0.01) return '$' + v.toFixed(4);
-    return '$' + v.toFixed(6);
-  };
-  const fmtMcap = (v) => {
+  var fP = function(v){
     if (!v) return '—';
-    if (v >= 1e9) return '$' + (v/1e9).toFixed(1) + 'B';
-    if (v >= 1e6) return '$' + (v/1e6).toFixed(0) + 'M';
-    return '$' + v.toFixed(0);
+    if (v>=1000) return '$'+v.toLocaleString('en',{maximumFractionDigits:0});
+    if (v>=1) return '$'+v.toFixed(2);
+    if (v>=0.01) return '$'+v.toFixed(4);
+    return '$'+v.toFixed(6);
+  };
+  var fM = function(v){
+    if (!v) return '—';
+    if (v>=1e9) return '$'+(v/1e9).toFixed(1)+'B';
+    if (v>=1e6) return '$'+(v/1e6).toFixed(0)+'M';
+    return '$'+v.toFixed(0);
+  };
+  var fC = function(v){
+    if (v==null) return '<span class="nil">—</span>';
+    return '<span class="'+(v>=0?'up':'dn')+'">'+(v>=0?'+':'')+v.toFixed(1)+'%</span>';
   };
 
-  const rows = coins.map((c, i) => {
-    const chgColor = (v) => v == null ? '' : v >= 0 ? 'color:var(--green)' : 'color:var(--red)';
-    const verBadge = c.verified
-      ? '<span style="font-size:8px;color:var(--green);margin-left:3px">✓</span>'
-      : '';
-    const imgEl = c.image
-      ? `<img src="${c.image}" width="16" height="16" style="border-radius:50%;flex-shrink:0" onerror="this.style.display='none'">`
-      : '';
-
-    return `<tr style="border-bottom:1px solid var(--border2)">
-      <td style="padding:7px 8px;font-size:10px;color:var(--muted2)">${c.rank || i+1}</td>
-      <td style="padding:7px 8px">
-        <div style="display:flex;align-items:center;gap:5px">
-          ${imgEl}
-          <div>
-            <div style="font-size:11px;font-weight:700;color:var(--text)">${c.symbol}${verBadge}</div>
-            <div style="font-size:9px;color:var(--muted2)">${c.name}</div>
-          </div>
-        </div>
-      </td>
-      <td style="padding:7px 8px;font-family:'Geist Mono',monospace;font-size:11px;color:var(--text);text-align:right">${fmtPrice(c.price)}</td>
-      <td style="padding:7px 8px;font-family:'Geist Mono',monospace;font-size:11px;text-align:right;${chgColor(c.change24h)}">${fmt(c.change24h)}</td>
-      <td style="padding:7px 8px;font-family:'Geist Mono',monospace;font-size:11px;text-align:right;${chgColor(c.change7d)}">${fmt(c.change7d)}</td>
-      <td style="padding:7px 8px;font-family:'Geist Mono',monospace;font-size:11px;text-align:right;${chgColor(c.change30d)}">${fmt(c.change30d)}</td>
-      <td style="padding:7px 8px;font-family:'Geist Mono',monospace;font-size:11px;color:var(--text2);text-align:right">${fmtMcap(c.mcap)}</td>
-      <td style="padding:7px 8px;font-family:'Geist Mono',monospace;font-size:11px;color:var(--text2);text-align:right">${fmtMcap(c.volume24h)}</td>
-      <td style="padding:7px 8px;font-family:'Geist Mono',monospace;font-size:11px;color:var(--text2);text-align:right">${c.rsi14 != null ? c.rsi14.toFixed(0) : '—'}</td>
-    </tr>`;
+  var rows = coins.map(function(c, i){
+    var ver = c.verified ? '<sup style="color:var(--green);font-size:8px">✓</sup>' : '';
+    var img = c.image ? '<img src="'+c.image+'" width="13" height="13" style="border-radius:50%;vertical-align:middle;margin-right:3px" onerror="this.remove()">' : '';
+    return '<tr><td class="tc">'+(c.rank||i+1)+'</td>'
+      +'<td>'+img+'<b style="font-size:11px">'+c.symbol+ver+'</b>'
+      +'<div class="tsub">'+c.name+'</div></td>'
+      +'<td class="tn">'+fP(c.price)+'</td>'
+      +'<td class="tn">'+fC(c.change24h)+'</td>'
+      +'<td class="tn">'+fC(c.change7d)+'</td>'
+      +'<td class="tn">'+fC(c.change30d)+'</td>'
+      +'<td class="tn">'+fM(c.mcap)+'</td>'
+      +'<td class="tn">'+(c.rsi14!=null?c.rsi14.toFixed(0):'—')+'</td></tr>';
   }).join('');
 
-  const verNote = meta.sources?.note || '';
+  var note = (meta.sources && meta.sources.note) || '';
 
   twrap.style.display = 'block';
-  twrap.innerHTML = `
-    <div style="padding:8px 12px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted2);display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-      <span>₿ Kripto Taraması</span>
-      <span style="color:var(--accent)">${coins.length} coin</span>
-      <span>·</span>
-      <span style="color:var(--green);font-size:10px">${verNote}</span>
-      <span style="margin-left:auto;font-size:10px">${meta.updatedAt ? new Date(meta.updatedAt).toLocaleTimeString('tr-TR') : ''}</span>
-    </div>
-    <table style="width:100%;border-collapse:collapse;font-size:11px">
-      <thead><tr style="border-bottom:1px solid var(--border)">
-        <th style="padding:6px 8px;text-align:left;font-size:9px;color:var(--muted);font-weight:600">#</th>
-        <th style="padding:6px 8px;text-align:left;font-size:9px;color:var(--muted);font-weight:600">Coin</th>
-        <th style="padding:6px 8px;text-align:right;font-size:9px;color:var(--muted);font-weight:600">Fiyat</th>
-        <th style="padding:6px 8px;text-align:right;font-size:9px;color:var(--muted);font-weight:600">24s%</th>
-        <th style="padding:6px 8px;text-align:right;font-size:9px;color:var(--muted);font-weight:600">7G%</th>
-        <th style="padding:6px 8px;text-align:right;font-size:9px;color:var(--muted);font-weight:600">30G%</th>
-        <th style="padding:6px 8px;text-align:right;font-size:9px;color:var(--muted);font-weight:600">Piy.Değ.</th>
-        <th style="padding:6px 8px;text-align:right;font-size:9px;color:var(--muted);font-weight:600">Hacim</th>
-        <th style="padding:6px 8px;text-align:right;font-size:9px;color:var(--muted);font-weight:600">RSI</th>
-      </tr></thead>
-      <tbody>${rows}</tbody>
-    </table>`;
+  twrap.innerHTML = '<div class="tbar-meta"><b>₿ Kripto</b>'
+    +'<span class="tbm-cnt">'+coins.length+' coin</span>'
+    +'<span class="tbm-src">CoinGecko · TradingView</span>'
+    +(note?'<span class="tbm-note">'+note+'</span>':'')+'</div>'
+    +'<table class="rtable"><thead><tr>'
+    +'<th>#</th><th>Coin</th><th>Fiyat</th><th>24s%</th><th>7G%</th><th>30G%</th><th>Piy.Değ.</th><th>RSI</th>'
+    +'</tr></thead><tbody>'+rows+'</tbody></table>';
+
+  var cnt = document.getElementById('sb-count');
+  if (cnt) cnt.textContent = coins.length;
 }
 
-// ── Asset Type Switcher ──────────────────────────────────────────────
-var ASSET_META={
-  hisse:{icon:'📈',name:'Hisse'},
-  tahvil:{icon:'📜',name:'Bono / Tahvil'},
-  etf:{icon:'📦',name:'ETF'},
-  eurobond:{icon:'🌍',name:'Eurobond'},
-  fon:{icon:'💼',name:'Fon'},
-  kripto:{icon:'₿',name:'Kripto'},
-  opsiyon:{icon:'🔧',name:'Opsiyon'},
-  varant:{icon:'🎯',name:'Varant'},
-  viop:{icon:'⚡',name:'Viop'}
-};
-function selectAsset(type){
-  document.querySelectorAll('.asset-panel').forEach(function(p){p.classList.remove('active');});
-  var p=document.getElementById('asset-panel-'+type);
-  if(p) p.classList.add('active');
-  var m=ASSET_META[type]||{icon:'📈',name:type};
-  document.getElementById('asset-detail-icon').textContent=m.icon;
-  document.getElementById('asset-detail-name').textContent=m.name;
-  document.getElementById('asset-landing').style.display='none';
-  document.getElementById('asset-detail').style.display='flex';
-}
-function goBackToLanding(){
-  document.getElementById('asset-detail').style.display='none';
-  document.getElementById('asset-landing').style.display='flex';
-}
-function clearPanelFilters(panelId){
-  var panel=document.getElementById('asset-panel-'+panelId);
-  if(!panel) return;
-  panel.querySelectorAll('input[type="number"]').forEach(function(inp){inp.value='';});
-  panel.querySelectorAll('.chip.on,.ast-chip.on').forEach(function(c){c.classList.remove('on');});
-}
 var _tvCurrentSym = null;
 
 // ═══════════════════════════════════════════
