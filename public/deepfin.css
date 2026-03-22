@@ -1205,7 +1205,7 @@ tbody tr td { height: 36px; }
 .sbp.active{display:flex;}
 .sbp-back{display:flex;align-items:center;gap:5px;padding:7px 10px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;width:100%;font-family:'Plus Jakarta Sans',sans-serif;flex-shrink:0;transition:color .12s;}
 .sbp-back:hover{color:var(--accent);}
-.sbp-scroll{flex:1;overflow-y:auto;overflow-x:hidden;}
+.sbp-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:4px 2px;}
 .sbp-scroll::-webkit-scrollbar{width:3px;}
 .sbp-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 .sbp-scan-wrap{padding:6px 8px 8px;flex-shrink:0;}
