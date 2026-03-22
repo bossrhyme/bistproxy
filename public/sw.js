@@ -1,5 +1,5 @@
 // DeepFin Service Worker v4 - minimal, sadece offline temel destek
-const CACHE = 'deepfin-v4';
+const CACHE = 'deepfin-v5';
 
 // Install: hızlı geç
 self.addEventListener('install', function(e) {
