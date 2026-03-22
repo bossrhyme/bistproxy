@@ -218,7 +218,364 @@ function _renderKripto(coins, meta) {
 }
 
 
-function runScan(){
+
+var _tvCurrentSym = null;
+
+// ═══════════════════════════════════════════
+// BIST SYMBOLS — Full list (150+ hisse)
+// Finnhub uses SYMBOL.IS format for BIST
+// ═══════════════════════════════════════════
+const BIST_SYMBOLS = [
+  // BIST-100 Ana hisseler
+  {symbol:'THYAO',name:'Türk Hava Yolları'},
+  {symbol:'GARAN',name:'Garanti BBVA'},
+  {symbol:'AKBNK',name:'Akbank'},
+  {symbol:'EREGL',name:'Ereğli Demir Çelik'},
+  {symbol:'KCHOL',name:'Koç Holding'},
+  {symbol:'SAHOL',name:'Sabancı Holding'},
+  {symbol:'SISE',name:'Şişe ve Cam'},
+  {symbol:'ASELS',name:'Aselsan'},
+  {symbol:'FROTO',name:'Ford Otosan'},
+  {symbol:'TOASO',name:'Tofaş Otomobil'},
+  {symbol:'YKBNK',name:'Yapı Kredi Bankası'},
+  {symbol:'PGSUS',name:'Pegasus'},
+  {symbol:'BIMAS',name:'BİM Mağazalar'},
+  {symbol:'TUPRS',name:'Tüpraş'},
+  {symbol:'PETKM',name:'Petkim'},
+  {symbol:'ARCLK',name:'Arçelik'},
+  {symbol:'KRDMD',name:'Kardemir'},
+  {symbol:'TTKOM',name:'Türk Telekom'},
+  {symbol:'TCELL',name:'Turkcell'},
+  {symbol:'ULKER',name:'Ülker Bisküvi'},
+  {symbol:'HEKTS',name:'Hektaş'},
+  {symbol:'GUBRF',name:'Gübre Fabrikaları'},
+  {symbol:'VESTL',name:'Vestel'},
+  {symbol:'MGROS',name:'Migros'},
+  {symbol:'DOHOL',name:'Doğan Holding'},
+  {symbol:'KOZAL',name:'Koza Altın'},
+  {symbol:'ISCTR',name:'İş Bankası'},
+  {symbol:'VAKBN',name:'Vakıfbank'},
+  {symbol:'HALKB',name:'Halkbank'},
+  {symbol:'ALARK',name:'Alarko Holding'},
+  {symbol:'CCOLA',name:'Coca-Cola İçecek'},
+  {symbol:'LOGO',name:'Logo Yazılım'},
+  {symbol:'NETAS',name:'Netaş Telekomünikasyon'},
+  {symbol:'AEFES',name:'Anadolu Efes'},
+  {symbol:'BRISA',name:'Brisa Bridgestone'},
+  {symbol:'EKGYO',name:'Emlak Konut GYO'},
+  {symbol:'ISGYO',name:'İş GYO'},
+  {symbol:'SNGYO',name:'Sinpaş GYO'},
+  {symbol:'ENKAI',name:'Enka İnşaat'},
+  {symbol:'OZRDN',name:'Özerden'},
+  {symbol:'AKSEN',name:'Aksen Enerji'},
+  {symbol:'KOZAA',name:'Koza Anadolu Metal'},
+  {symbol:'ANACM',name:'Anadolu Cam'},
+  {symbol:'TRKCM',name:'Trakya Cam'},
+  {symbol:'SOKM',name:'Şok Marketler'},
+  {symbol:'ODAS',name:'Odaş Elektrik'},
+  {symbol:'TAVHL',name:'TAV Havalimanları'},
+  {symbol:'SASA',name:'Sasa Polyester'},
+  {symbol:'CELHA',name:'Çelik Halat'},
+  {symbol:'KARSN',name:'Karsan Otomotiv'},
+  {symbol:'DOAS',name:'Doğuş Otomotiv'},
+  {symbol:'GESAN',name:'Gedik Seramik'},
+  {symbol:'TKFEN',name:'Tekfen Holding'},
+  {symbol:'ENJSA',name:'Enerjisa Enerji'},
+  {symbol:'AKFGY',name:'Akiş GYO'},
+  {symbol:'MAVI',name:'Mavi Giyim'},
+  {symbol:'BERA',name:'Bera Holding'},
+  {symbol:'CANTE',name:'Çan Tekstil'},
+  {symbol:'ERBOS',name:'Erbosan'},
+  {symbol:'EGEEN',name:'Ege Endüstri'},
+  {symbol:'INDES',name:'İndeks Bilgisayar'},
+  {symbol:'TRGYO',name:'Torunlar GYO'},
+  {symbol:'ISDMR',name:'İskenderun Demir Çelik'},
+  {symbol:'OTKAR',name:'Otokar'},
+  {symbol:'VESBE',name:'Vestel Beyaz Eşya'},
+  {symbol:'KONTR',name:'Kontrolmatik'},
+  {symbol:'KOCMT',name:'Koç Çimento Deva'},
+  {symbol:'POLHO',name:'Polisan Holding'},
+  {symbol:'ALGYO',name:'Alarko GYO'},
+  {symbol:'DEVA',name:'Deva Holding'},
+  {symbol:'SKBNK',name:'Şekerbank'},
+  {symbol:'GLYHO',name:'Global Yatırım Holding'},
+  {symbol:'HLGYO',name:'Halk GYO'},
+  {symbol:'ZRGYO',name:'Ziraat GYO'},
+  {symbol:'ISFIN',name:'İş Finansal Kiralama'},
+  {symbol:'AGHOL',name:'AG Anadolu Grubu'},
+  {symbol:'ARSAN',name:'Arsan Tekstil'},
+  {symbol:'CWENE',name:'CW Enerji'},
+  {symbol:'ATAKP',name:'Ata Kap Girişim'},
+  {symbol:'SELEC',name:'Selçuk Ecza'},
+  {symbol:'KLRHO',name:'Kerevitaş Gıda'},
+  {symbol:'LMKDC',name:'Limaş'},
+  {symbol:'PAGYO',name:'Pera GYO'},
+  {symbol:'YGYO',name:'Yeni Gimat GYO'},
+  {symbol:'SMART',name:'Smart Güneş'},
+  {symbol:'KARTN',name:'Kartonsan'},
+  {symbol:'ADEL',name:'Adel Kalemcilik'},
+  {symbol:'AFYON',name:'Afyon Çimento'},
+  {symbol:'AKGRT',name:'Aksigorta'},
+  {symbol:'AKMGY',name:'Akmerkez GYO'},
+  {symbol:'AKCNS',name:'Akçansa'},
+  {symbol:'ALCTL',name:'Alcatel-Lucent'},
+  {symbol:'ANHYT',name:'Anadolu Hayat'},
+  {symbol:'ANSGR',name:'Anadolu Sigorta'},
+  {symbol:'ARMDA',name:'Armada'},
+  {symbol:'ASUZU',name:'Anadolu Isuzu'},
+  {symbol:'BAGFS',name:'Bagfaş Gübre'},
+  {symbol:'BAKAB',name:'Bak Ambalaj'},
+  {symbol:'BANVT',name:'Banvit'},
+  {symbol:'BARMA',name:'Barmak Maden'},
+  {symbol:'BEYAZ',name:'Beyaz Filo'},
+  {symbol:'BFREN',name:'Bosch Fren'},
+  {symbol:'BIMAS',name:'BİM Mağazalar'},
+  {symbol:'BIZIM',name:'Bizim Toptan'},
+  {symbol:'BMEKS',name:'Bimeks Bilgi İşlem'},
+  {symbol:'BNTAS',name:'Bantaş'},
+  {symbol:'BOSSA',name:'Bossa'},
+  {symbol:'BUCIM',name:'Bursa Çimento'},
+  {symbol:'BURCE',name:'Burçelik'},
+  {symbol:'BURVA',name:'Bursa Çimento Fabrikaları'},
+  {symbol:'CIMBETON',name:'Cimbeton'},
+  {symbol:'CIMSA',name:'Çimsa'},
+  {symbol:'CLEBI',name:'Çelebi Hava Servisi'},
+  {symbol:'CPHO',name:'Çağrı Holding'},
+  {symbol:'DAGI',name:'Dagi Giyim'},
+  {symbol:'DENGE',name:'Denge Yatırım Holding'},
+  {symbol:'DGKLB',name:'Doğanlar Mobilya'},
+  {symbol:'DITAS',name:'Ditaş Doğan'},
+  {symbol:'DYOBY',name:'DYO Boya'},
+  {symbol:'ECILC',name:'Eczacıbaşı İlaç'},
+  {symbol:'EGPRO',name:'EG Pro Enerji'},
+  {symbol:'EMKEL',name:'Emkel'},
+  {symbol:'FENER',name:'Fenerbahçe'},
+  {symbol:'FLAP',name:'Flap Kongre'},
+  {symbol:'GSDDE',name:'GSD Denizcilik'},
+  {symbol:'GSDHO',name:'GSD Holding'},
+  {symbol:'GSRAY',name:'Galatasaray'},
+  {symbol:'HZNDR',name:'Haznedar'},
+  {symbol:'IDEAS',name:'IDEAS'},
+  {symbol:'IKTL',name:'İktisat Yatırım'},
+  {symbol:'IPEKE',name:'İpek Enerji'},
+  {symbol:'ISATR',name:'İş Portföy'},
+  {symbol:'JANTS',name:'Jantsa'},
+  {symbol:'KATMR',name:'Katmerciler'},
+  {symbol:'KERVT',name:'Kerevitaş'},
+  {symbol:'KLNMA',name:'Kalınma Bank'},
+  {symbol:'KNFRT',name:'Konfrut Gıda'},
+  {symbol:'KONKA',name:'Konka'},
+  {symbol:'KONYA',name:'Konya Çimento'},
+  {symbol:'KRPLAS',name:'Kır Plastik'},
+  {symbol:'KUYAS',name:'Kuyaş'},
+  {symbol:'LIDER',name:'Lider Faktoring'},
+  {symbol:'LINK',name:'Link Bilgisayar'},
+  {symbol:'MAALT',name:'Mardin Çimento'},
+  {symbol:'MNDRS',name:'Menderes Tekstil'},
+  {symbol:'MOBTL',name:'Mobiltel'},
+  {symbol:'NBORU',name:'NetBoru'},
+  {symbol:'NTHOL',name:'Net Holding'},
+  {symbol:'ORFIN',name:'Öner Finans'},
+  {symbol:'ORGE',name:'Orge Enerji'},
+  {symbol:'PAPIL',name:'Papilon'},
+  {symbol:'PCILT',name:'Pcilet'},
+  {symbol:'PENGD',name:'Penguen Gıda'},
+  {symbol:'PKART',name:'Plastik Kart'},
+  {symbol:'PRKAB',name:'Türk Prysmian Kablo'},
+  {symbol:'PRKME',name:'Park Elektrik'},
+  {symbol:'PSILO',name:'Ege Seramik'},
+  {symbol:'RHEAG',name:'Rheag'},
+  {symbol:'RTALB',name:'RT Alba'},
+  {symbol:'RUBNS',name:'Rubenis'},
+  {symbol:'SARKY',name:'Sarkuysan'},
+  {symbol:'SILVR',name:'Silver Dilber'},
+  {symbol:'SMART',name:'Smart GES'},
+  {symbol:'SNKRN',name:'Şenkron Teknoloji'},
+  {symbol:'SRVGY',name:'Servet GYO'},
+  {symbol:'TAHEM',name:'TAH Enerji'},
+  {symbol:'TATGD',name:'Tat Gıda'},
+  {symbol:'TDGYO',name:'Trend GYO'},
+  {symbol:'TEKTU',name:'Tek-Art'},
+  {symbol:'TEZOL',name:'Tezol Tekstil'},
+  {symbol:'TKNSA',name:'Teknosa'},
+  {symbol:'TMPOL',name:'Tem Polimer'},
+  {symbol:'TRGYO',name:'Torunlar GYO'},
+  {symbol:'TRILC',name:'Trilyum'},
+  {symbol:'TURSG',name:'Türkiye Sigorta'},
+  {symbol:'TUCLK',name:'Tuçka Uzay'},
+  {symbol:'USAK',name:'Uşak Seramik'},
+  {symbol:'VAKFN',name:'Vakıf Finansal'},
+  {symbol:'VKGYO',name:'Vakıf GYO'},
+  {symbol:'YATAS',name:'Yataş'},
+  {symbol:'YBTAS',name:'Yibitaş'},
+  {symbol:'YESIL',name:'Yeşil Yatırım'},
+  {symbol:'YUNSA',name:'Yünsa'},
+  {symbol:'ZOREN',name:'Zorlu Enerji'},
+];
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+const PROXY_URL = '/api/scan';
+
+// ── EXCHANGE CONFIG ──
+let currentExchange = 'bist';
+const EXCHANGE_META = {
+  bist:   { name: 'BIST',    currency: '₺', currencyCode: 'TRY', flag: '🇹🇷', yahooSuffix: '.IS', filters: [] },
+  nasdaq: { name: 'NASDAQ',  currency: '$',  currencyCode: 'USD', flag: '🇺🇸', yahooSuffix: '',    filters: [{ left: 'exchange', operation: 'equal', right: 'NASDAQ' }] },
+  sp500:  { name: 'S&P 500', currency: '$',  currencyCode: 'USD', flag: '🇺🇸', yahooSuffix: '',    filters: [] },
+  dax:    { name: 'DAX',     currency: '€',  currencyCode: 'EUR', flag: '🇩🇪', yahooSuffix: '.DE', filters: [] },
+  lse:    { name: 'LSE',     currency: '£',  currencyCode: 'GBP', flag: '🇬🇧', yahooSuffix: '.L',  filters: [] },
+  nikkei: { name: 'Nikkei',  currency: '¥',  currencyCode: 'JPY', flag: '🇯🇵', yahooSuffix: '.T',  filters: [] },
+};
+
+let allData = [];
+let filtered = [];
+let searchQ = '';
+let selSym = null;
+let sortSt = {field:'marketCapitalization', dir:'desc'};
+let fxRates = {TRY:44.1, EUR:1.163, GBP:1.333, JPY:0.00633};
+let scanAborted = false;
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+
+
+// ═══════════════════════════════════════════
+// FAVORİLER
+// ═══════════════════════════════════════════
+var favSet = new Set(JSON.parse(localStorage.getItem('df_favs') || '[]'));
+var favFilterActive = false;
+
+function saveFavs() { localStorage.setItem('df_favs', JSON.stringify([...favSet])); }
+
+function toggleFav(sym) {
+  if (favSet.has(sym)) { favSet.delete(sym); showToast('✕ ' + sym + ' favorilerden çıkarıldı'); }
+  else { favSet.add(sym); showToast('★ ' + sym + ' favorilere eklendi'); }
+  saveFavs(); renderTable(); _updateFavBtn();
+}
+
+function _updateFavBtn() {
+  var btn = document.getElementById('fav-filter-btn');
+  if (!btn) return;
+  btn.classList.toggle('on', favFilterActive);
+  btn.textContent = favFilterActive ? '★ Favoriler (' + favSet.size + ')' : '☆ Favoriler';
+}
+
+function toggleFavFilter() {
+  favFilterActive = !favFilterActive;
+  _updateFavBtn(); renderTable();
+}
+
+// ═══════════════════════════════════════════
+// KOLON SEÇİCİ
+// ═══════════════════════════════════════════
+const COL_DEFS = [
+  {key:'name', label:'ŞİRKET ADI', def:true},
+  {key:'price', label:'FİYAT', def:true},
+  {key:'mcap', label:'P.Değeri', def:true},
+  {key:'pe', label:'F/K', def:true},
+  {key:'pb', label:'PD/DD', def:true},
+  {key:'ps', label:'F/S', def:true},
+  {key:'roe', label:'ROE%', def:true},
+  {key:'roa', label:'ROA%', def:true},
+  {key:'margin', label:'MARJ%', def:true},
+  {key:'revg', label:'GELİR↑%', def:true},
+  {key:'epsg', label:'K.BÜY%', def:true},
+  {key:'fscore', label:'F-Score', def:true},
+  {key:'de', label:'B/Ö', def:true},
+  {key:'cr', label:'CARİ', def:true},
+  {key:'div', label:'TEMETTÜ%', def:true},
+  {key:'peg', label:'PEG', def:true},
+  {key:'tech_rating', label:'TV Rating', def:true},
+  {key:'rsi', label:'RSI', def:true},
+  {key:'perf3m', label:'3A Geti%', def:true},
+  {key:'sector', label:'SEKTÖR', def:true},
+];
+var _colVisible = null;
+
+function loadColPrefs() {
+  if (_colVisible) return;
+  try {
+    var saved = localStorage.getItem('df_cols_v3');
+    if (saved) { _colVisible = {}; JSON.parse(saved).forEach(function(k){ _colVisible[k]=true; }); return; }
+  } catch(e) {}
+  // Varsayılan: tüm sütunlar görünür
+  _colVisible = {};
+  COL_DEFS.forEach(function(d){ _colVisible[d.key]=true; });
+}
+
+function saveColPrefs() {
+  localStorage.setItem('df_cols_v3', JSON.stringify(Object.keys(_colVisible).filter(function(k){ return _colVisible[k]; })));
+}
+
+function isColVisible(key) { loadColPrefs(); return !!_colVisible[key]; }
+
+function applyColVisibility() {
+  loadColPrefs();
+  COL_DEFS.forEach(function(d) {
+    var vis = isColVisible(d.key);
+    document.querySelectorAll('[data-col="'+d.key+'"]').forEach(function(el){ el.style.display = vis ? '' : 'none'; });
+  });
+}
+
+function openColPicker() {
+  loadColPrefs();
+  var modal = document.getElementById('col-picker-modal');
+  if (!modal) return;
+  document.getElementById('col-picker-grid').innerHTML = COL_DEFS.map(function(d) {
+    return '<label class="col-pick-item"><input type="checkbox"' + (isColVisible(d.key)?' checked':'')
+      + ' data-ckey="'+d.key+'" onchange="toggleCol(this.dataset.ckey,this.checked)"><span>'+d.label+'</span></label>';
+  }).join('');
+  modal.classList.add('open');
+}
+
+function toggleCol(key, vis) { loadColPrefs(); _colVisible[key]=vis; saveColPrefs(); applyColVisibility(); }
+function closeColPicker() { var m=document.getElementById('col-picker-modal'); if(m) m.classList.remove('open'); }
+function resetColPrefs() { _colVisible=null; loadColPrefs(); saveColPrefs(); openColPicker(); applyColVisibility(); renderTable(); }
+
+// ═══════════════════════════════════════════
+// HABERLER
+// ═══════════════════════════════════════════
+async function fetchNews(sym) {
+  var list = document.getElementById('dnews-list');
+  if (!list) return;
+  list.innerHTML = '<div style="color:var(--muted2);font-size:11px;text-align:center;padding:20px;">Haberler yükleniyor...</div>';
+  try {
+    var res = await fetch('/api/news?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(currentExchange));
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var data = await res.json();
+    var items = data.news || [];
+    if (!items.length) { list.innerHTML = '<div style="color:var(--muted2);font-size:11px;text-align:center;padding:20px;">Haber bulunamadı.</div>'; return; }
+    list.innerHTML = items.slice(0, 10).map(function(n) {
+      var dt = n.published ? new Date(n.published*1000).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric'}) : '';
+      return '<a href="'+(n.url||'#')+'" target="_blank" rel="noopener" class="dnews-item">'
+        + '<div class="dnews-meta"><span class="dnews-src">'+(n.source||'')+'</span><span class="dnews-date">'+dt+'</span></div>'
+        + '<div class="dnews-title">'+(n.headline||n.title||'')+'</div></a>';
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<div style="color:var(--muted2);font-size:11px;text-align:center;padding:20px;">Haber yüklenemedi.</div>';
+  }
+}
+
+function init(){
+  showApp();
+  loadColPrefs();
+  // Not: from= kontrolü DOMContentLoaded'da yapılıyor (DOM hazır olsun diye)
+}
+
+function showApp(){
+  document.getElementById('empty-sub').textContent = '';
+}
+
+// Sleep helper
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// ═══════════════════════════════════════════
+// TRADINGVIEW SCANNER — tek istekte tüm BIST
+// ═══════════════════════════════════════════
+async function runScan(){
   closeMobileDrawer();
   // Disclaimer kontrolü
   if (!disclaimerAccepted && !localStorage.getItem('df_disclaimer_v2')) {
@@ -2351,8 +2708,6 @@ function openDetayliAnaliz(sym, ex) {
 // ANALİZ SAYFASI
 // ═══════════════════════════════════════════
 
-// openDetayliAnaliz yukarıda tanımlı
-
 var _analizEx = 'bist';
 var _analizExFlags = {
   bist: {flag:'tr', label:'BIST'},
@@ -2368,6 +2723,7 @@ function showAnaliz() {
 }
 
 function hideAnalizPage() {}
+
 function onHemenAl(sym, ex) {
   // Affiliate linki — ileride broker bağlantısı eklenecek
   // Şimdilik placeholder
