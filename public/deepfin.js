@@ -2351,6 +2351,8 @@ function openDetayliAnaliz(sym, ex) {
 // ANALİZ SAYFASI
 // ═══════════════════════════════════════════
 
+// openDetayliAnaliz yukarıda tanımlı
+
 var _analizEx = 'bist';
 var _analizExFlags = {
   bist: {flag:'tr', label:'BIST'},
@@ -2366,10 +2368,6 @@ function showAnaliz() {
 }
 
 function hideAnalizPage() {}
-function openDetayliAnaliz(sym, ex) {
-  showProfil(sym, ex || currentExchange);
-}
-
 function onHemenAl(sym, ex) {
   // Affiliate linki — ileride broker bağlantısı eklenecek
   // Şimdilik placeholder
