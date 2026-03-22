@@ -407,6 +407,90 @@ if('serviceWorker' in navigator){
     <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
 
+    <div id="asset-landing" class="asset-landing">
+      <div class="asset-landing-header">
+        <div class="asset-landing-title">Varlık Seç</div>
+        <div class="asset-landing-sub">Taramak istediğin enstrümanı seç</div>
+      </div>
+      <div class="asset-landing-list">
+
+        <button class="asset-landing-btn" onclick="selectAsset('hisse')">
+          <span class="alb-icon">📈</span>
+          <span class="alb-name">Hisse</span>
+          <span class="alb-live"><svg width="8" height="9" viewBox="0 0 8 9" fill="none"><polygon points="0,0 8,4.5 0,9" fill="#3b82f6"/></svg></span>
+        </button>
+
+        <button class="asset-landing-btn alb-soon-btn" onclick="selectAsset('tahvil')">
+          <span class="alb-icon">📜</span>
+          <span class="alb-name">Bono / Tahvil</span>
+          <span class="alb-badge-soon">yakında</span>
+        </button>
+
+        <button class="asset-landing-btn alb-soon-btn" onclick="selectAsset('etf')">
+          <span class="alb-icon">📦</span>
+          <span class="alb-name">ETF</span>
+          <span class="alb-badge-soon">yakında</span>
+        </button>
+
+        <button class="asset-landing-btn alb-soon-btn" onclick="selectAsset('eurobond')">
+          <span class="alb-icon">🌍</span>
+          <span class="alb-name">Eurobond</span>
+          <span class="alb-badge-soon">yakında</span>
+        </button>
+
+        <button class="asset-landing-btn alb-soon-btn" onclick="selectAsset('fon')">
+          <span class="alb-icon">💼</span>
+          <span class="alb-name">Fon</span>
+          <span class="alb-badge-soon">yakında</span>
+        </button>
+
+        <button class="asset-landing-btn alb-soon-btn" onclick="selectAsset('kripto')">
+          <span class="alb-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="8" cy="8" r="8" fill="#F7931A"/>
+              <path d="M10.8 6.9c.2-1.1-.7-1.7-1.9-2.1l.4-1.5-1-.2-.4 1.4-.7-.2.4-1.4-1-.2-.4 1.5-.6-.1v-.1l-1.3-.3-.3 1s.7.2.7.2c.4.1.5.3.4.5L4.7 9c-.1.2-.2.3-.5.2 0 0-.7-.2-.7-.2l-.5 1.1 1.3.3.7.2-.4 1.5 1 .2.4-1.5.7.2-.4 1.5 1 .2.4-1.5c1.7.3 2.9.2 3.4-1.3.4-1.2-.1-1.9-.9-2.3.6-.2 1-.6 1.1-1.5zm-2 2.8c-.3 1.1-2.3.5-2.9.4l.5-2c.6.2 2.7.5 2.4 1.6zm.3-2.8c-.3 1-2 .5-2.6.4l.5-1.8c.6.1 2.4.4 2.1 1.4z" fill="white"/>
+            </svg>
+          </span>
+          <span class="alb-name">Kripto</span>
+          <span class="alb-badge-soon">yakında</span>
+        </button>
+
+        <button class="asset-landing-btn alb-soon-btn" onclick="selectAsset('opsiyon')">
+          <span class="alb-icon">🔧</span>
+          <span class="alb-name">Opsiyon</span>
+          <span class="alb-badge-soon">yakında</span>
+        </button>
+
+        <button class="asset-landing-btn alb-soon-btn" onclick="selectAsset('varant')">
+          <span class="alb-icon">🎯</span>
+          <span class="alb-name">Varant</span>
+          <span class="alb-badge-soon">yakında</span>
+        </button>
+
+        <button class="asset-landing-btn alb-soon-btn" onclick="selectAsset('viop')">
+          <span class="alb-icon">⚡</span>
+          <span class="alb-name">Viop</span>
+          <span class="alb-badge-soon">yakında</span>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- DETAIL -->
+
+    <!-- DETAIL -->
+    <div id="asset-detail" class="asset-detail" style="display:none;">
+
+      <div class="asset-detail-header">
+        <button class="asset-back-btn" onclick="goBackToLanding()">‹</button>
+        <span class="asset-detail-icon" id="asset-detail-icon">📈</span>
+        <span class="asset-detail-name" id="asset-detail-name">Hisse</span>
+      </div>
+
+      <div class="asset-panel active" id="asset-panel-hisse">
+        <div class="asset-panel-scroll">
+
+
       <!-- SIDEBAR TABS -->
       <div class="sb-tabs">
         <button class="sb-tab active" id="sb-tab-basic" onclick="switchSbTab('basic')">⚡ Başlangıç</button>
@@ -654,6 +738,215 @@ if('serviceWorker' in navigator){
 
       </div>
 
+    
+        </div>
+        <div class="ad-slot ad-slot-sidebar" id="ad-hisse"><span>Reklam</span><span class="ad-slot-label">300 × 120 · Carbon Ads / AdSense</span></div>
+        <div class="ast-scan-wrap"><button class="ast-scan-btn" onclick="runScan()">▶ Hisse Tara</button></div>
+      </div>
+
+      <div class="asset-panel" id="asset-panel-fon">
+        <div class="asset-panel-scroll">
+          <div class="filter-group"><div class="filter-group-title">Platform</div><div class="chips"><span class="chip on">🇹🇷 TEFAS</span></div></div>
+                    <button class="ast-clear-btn" onclick="clearPanelFilters('fon')" title="Filtreleri temizle">✕ Filtreleri Temizle</button>
+
+          <div class="filter-group"><div class="filter-group-title">Fon Türü</div><div class="chips"><span class="chip on">Hisse Fonu</span><span class="chip">Borçlanma</span><span class="chip">Para Piyasası</span><span class="chip">Karma</span><span class="chip">Altın</span><span class="chip">Döviz</span><span class="chip">Serbest</span></div></div>
+          <div class="filter-group"><div class="filter-group-title">📈 Performans Stratejisi</div><div class="chips"><span class="chip">1A Lider</span><span class="chip">3A Lider</span><span class="chip on">YTD Lider</span><span class="chip">Sharpe Yüksek</span><span class="chip">Düşük Volatilite</span><span class="chip">Max Drawdown Düşük</span></div><div class="goat-info" style="display:block;">YTD Lider: Yılbaşından en yüksek getiri. Sharpe Yüksek: Riske göre en verimli getiri.</div></div>
+          <div class="filter-group"><div class="filter-group-title">🏛️ Portföy Yapısı</div><div class="chips"><span class="chip">BIST Ağırlıklı</span><span class="chip">Yabancı Hisse</span><span class="chip">Tahvil Ağırlıklı</span><span class="chip">Altın Fonu</span></div></div>
+          <div class="filter-group"><div class="filter-group-title">Filtreler</div>
+            <div class="frow"><div class="flbl">1Y Getiri %</div><div class="finps"><input type="number" placeholder="—"><input type="number" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">Sharpe Oranı</div><div class="finps"><input type="number" placeholder="—" value="1"><input type="number" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">Büyüklük (₺M)</div><div class="finps"><input type="number" placeholder="—" value="50"><input type="number" placeholder="—"></div></div>
+          </div>
+        </div>
+        <div class="ad-slot ad-slot-sidebar" id="ad-fon"><span>Reklam</span><span class="ad-slot-label">300 × 120 · Carbon Ads / AdSense</span></div>
+        <div class="ast-scan-wrap"><button class="ast-scan-btn" onclick="alert('TEFAS API entegrasyonu yakında')">▶ FON TARA</button></div>
+      </div>
+
+<div class="asset-panel" id="asset-panel-etf">
+        <div class="asset-panel-scroll">
+          <div class="filter-group"><div class="filter-group-title">Borsa</div><div class="chips"><span class="chip on">BIST</span><span class="chip">NYSE</span><span class="chip">NASDAQ</span><span class="chip">Avrupa</span></div></div>
+                    <button class="ast-clear-btn" onclick="clearPanelFilters('etf')" title="Filtreleri temizle">✕ Filtreleri Temizle</button>
+
+          <div class="filter-group"><div class="filter-group-title">Kategori</div><div class="chips"><span class="chip on">Hisse Endeks</span><span class="chip">Sektör ETF</span><span class="chip">Emtia</span><span class="chip">Tahvil ETF</span><span class="chip">Kaldıraçlı</span><span class="chip">Ters Endeks</span></div></div>
+          <div class="filter-group"><div class="filter-group-title">📊 ETF Stratejisi</div><div class="chips"><span class="chip">Momentum ETF</span><span class="chip">Düşük Volatilite</span><span class="chip on">Temettü ETF</span><span class="chip">Büyüme ETF</span></div><div class="goat-info" style="display:block;">Temettü ETF: Yüksek temettü verimine sahip ETF'ler. TER %0.5 altı ve AUM $100M+ filtresiyle taranır.</div></div>
+          <div class="filter-group"><div class="filter-group-title">Filtreler</div>
+            <div class="frow"><div class="flbl">TER %</div><div class="finps"><input type="number" placeholder="—" step="0.01"><input type="number" placeholder="—" value="0.5" step="0.01"></div></div>
+            <div class="frow"><div class="flbl">AUM ($M)</div><div class="finps"><input type="number" placeholder="—" value="100"><input type="number" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">Temettü %</div><div class="finps"><input type="number" placeholder="—" value="2"><input type="number" placeholder="—"></div></div>
+          </div>
+        </div>
+        <div class="ad-slot ad-slot-sidebar" id="ad-etf"><span>Reklam</span><span class="ad-slot-label">300 × 120 · Carbon Ads / AdSense</span></div>
+        <div class="ast-scan-wrap"><button class="ast-scan-btn" onclick="alert('ETF tarayıcı yakında')">▶ ETF TARA</button></div>
+      </div>
+
+<div class="asset-panel" id="asset-panel-viop">
+        <div class="asset-panel-scroll">
+          <div class="filter-group"><div class="filter-group-title">Kontrat Türü</div><div class="chips"><span class="chip on">Endeks (BIST30)</span><span class="chip">Hisse Vadeli</span><span class="chip">Döviz</span><span class="chip">Emtia</span><span class="chip">Faiz</span></div></div>
+                    <button class="ast-clear-btn" onclick="clearPanelFilters('viop')" title="Filtreleri temizle">✕ Filtreleri Temizle</button>
+
+          <div class="filter-group"><div class="filter-group-title">⚡ Vadeli Strateji</div><div class="chips"><span class="chip">Rollover Yakın</span><span class="chip on">Hacim Lideri</span><span class="chip">Negatif Baz</span><span class="chip">Pozitif Baz</span><span class="chip">Açık Poz. Artışı</span></div><div class="goat-info" style="display:block;">Negatif Baz: Vadeli fiyat spot'tan düşük — teorik arbitraj fırsatı.</div></div>
+          <div class="filter-group"><div class="filter-group-title">Filtreler</div>
+            <div class="frow"><div class="flbl">Baz %</div><div class="finps"><input type="number" placeholder="—" value="-3"><input type="number" placeholder="—" value="3"></div></div>
+            <div class="frow"><div class="flbl">Hacim (Kontrat)</div><div class="finps"><input type="number" placeholder="—" value="1000"><input type="number" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">Vadeye Kalan Gün</div><div class="finps"><input type="number" placeholder="—"><input type="number" placeholder="—" value="90"></div></div>
+          </div>
+        </div>
+        <div class="ad-slot ad-slot-sidebar" id="ad-viop"><span>Reklam</span><span class="ad-slot-label">300 × 120 · Carbon Ads / AdSense</span></div>
+        <div class="ast-scan-wrap"><button class="ast-scan-btn" onclick="alert('VİOP tarayıcı yakında')">▶ VİOP TARA</button></div>
+      </div>
+
+<div class="asset-panel" id="asset-panel-eurobond">
+        <div class="asset-panel-scroll">
+          <div class="filter-group"><div class="filter-group-title">İhraççı</div><div class="chips"><span class="chip on">Hazine (TR)</span><span class="chip">Bankalar</span><span class="chip">Şirketler</span></div></div>
+                    <button class="ast-clear-btn" onclick="clearPanelFilters('eurobond')" title="Filtreleri temizle">✕ Filtreleri Temizle</button>
+
+          <div class="filter-group"><div class="filter-group-title">Para Birimi</div><div class="chips"><span class="chip on">USD</span><span class="chip">EUR</span><span class="chip">GBP</span></div></div>
+          <div class="filter-group"><div class="filter-group-title">💡 Eurobond Stratejisi</div><div class="chips"><span class="chip">Yüksek Kupon</span><span class="chip on">Yüksek YTM</span><span class="chip">Kısa Vade</span><span class="chip">Uzun Vade</span><span class="chip">İskontolu</span></div><div class="goat-info" style="display:block;">YTM: Vadeye kadar toplam yıllık getiri. İskontolu: Nominal altında işlem gören — vadeye kadar ekstra kazanç.</div></div>
+          <div class="filter-group"><div class="filter-group-title">Filtreler</div>
+            <div class="frow"><div class="flbl">YTM %</div><div class="finps"><input type="number" placeholder="—" value="6"><input type="number" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">Kupon %</div><div class="finps"><input type="number" placeholder="—"><input type="number" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">Vadeye Kalan Yıl</div><div class="finps"><input type="number" placeholder="—" value="1"><input type="number" placeholder="—" value="10"></div></div>
+          </div>
+        </div>
+        <div class="ad-slot ad-slot-sidebar" id="ad-eurobond"><span>Reklam</span><span class="ad-slot-label">300 × 120 · Carbon Ads / AdSense</span></div>
+        <div class="ast-scan-wrap"><button class="ast-scan-btn" onclick="alert('Eurobond tarayıcı yakında')">▶ EUROBOND TARA</button></div>
+      </div>
+
+<div class="asset-panel" id="asset-panel-tahvil">
+        <div class="asset-panel-scroll">
+          <div class="filter-group"><div class="filter-group-title">Enstrüman</div><div class="chips"><span class="chip on">Devlet Tahvili</span><span class="chip">Hazine Bonosu</span><span class="chip">Özel Sektör</span><span class="chip">Sukuk</span></div></div>
+                    <button class="ast-clear-btn" onclick="clearPanelFilters('tahvil')" title="Filtreleri temizle">✕ Filtreleri Temizle</button>
+
+          <div class="filter-group"><div class="filter-group-title">📜 Bono Stratejisi</div><div class="chips"><span class="chip">En Yüksek Faiz</span><span class="chip on">TÜFE Endeksli</span><span class="chip">Değişken Faiz</span><span class="chip">Sabit Kupon</span><span class="chip">Kısa Vade</span></div><div class="goat-info" style="display:block;">TÜFE Endeksli: Enflasyona paralel getiri — reel kazancı korur. TLREF: Faiz artış döneminde avantajlı.</div></div>
+          <div class="filter-group"><div class="filter-group-title">Filtreler</div>
+            <div class="frow"><div class="flbl">Bileşik Getiri %</div><div class="finps"><input type="number" placeholder="—" value="35"><input type="number" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">Vade (Gün)</div><div class="finps"><input type="number" placeholder="—" value="30"><input type="number" placeholder="—" value="1095"></div></div>
+            <div class="frow"><div class="flbl">Kupon %</div><div class="finps"><input type="number" placeholder="—"><input type="number" placeholder="—"></div></div>
+          </div>
+        </div>
+        <div class="ad-slot ad-slot-sidebar" id="ad-tahvil"><span>Reklam</span><span class="ad-slot-label">300 × 120 · Carbon Ads / AdSense</span></div>
+        <div class="ast-scan-wrap"><button class="ast-scan-btn" onclick="alert('Bono/Tahvil tarayıcı yakında')">▶ BONO/TAHVİL TARA</button></div>
+      </div>
+
+<div class="asset-panel" id="asset-panel-kripto">
+        <div class="asset-panel-scroll">
+
+          <div class="filter-group">
+            <div class="filter-group-title">Borsa / Market</div>
+            <div class="chips">
+              <span class="chip on">Tüm Marketler</span>
+              <span class="chip">Binance</span>
+              <span class="chip">Coinbase</span>
+              <span class="chip">Bybit</span>
+              <span class="chip">OKX</span>
+            </div>
+          </div>
+                    <button class="ast-clear-btn" onclick="clearPanelFilters('kripto')" title="Filtreleri temizle">✕ Filtreleri Temizle</button>
+
+
+          <div class="filter-group">
+            <div class="filter-group-title">Kategori</div>
+            <div class="chips">
+              <span class="chip on">Tümü</span>
+              <span class="chip">Layer 1</span>
+              <span class="chip">Layer 2</span>
+              <span class="chip">DeFi</span>
+              <span class="chip">Stablecoin</span>
+              <span class="chip">Meme</span>
+              <span class="chip">AI</span>
+              <span class="chip">Gaming / GameFi</span>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <div class="filter-group-title">⚡ Kripto Stratejisi</div>
+            <div class="chips">
+              <span class="chip on">Hacim Patlaması</span>
+              <span class="chip">RSI Dip</span>
+              <span class="chip">ATH Yakını</span>
+              <span class="chip">Büyük Kapı</span>
+              <span class="chip">Küçük Kapı Gem</span>
+              <span class="chip">Momentum</span>
+              <span class="chip">Düşük Arz</span>
+              <span class="chip">Yüksek TVL</span>
+            </div>
+            <div class="goat-info" style="display:block;">
+              Hacim Patlaması: 24s hacim son 10 güne göre 2x+ arttı — kurumsal ilgi sinyali.
+              Küçük Kapı Gem: Piyasa değeri $50M altı, yüksek hacimli coin'ler.
+              Yüksek TVL: DeFi protokollerinde kilitli toplam değer yüksek — güven göstergesi.
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <div class="filter-group-title">Piyasa</div>
+            <div class="frow"><div class="flbl">Piyasa Değeri ($M)</div><div class="finps"><input type="number" placeholder="—" value="10"><input type="number" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">24s Hacim ($M)</div><div class="finps"><input type="number" placeholder="—" value="1"><input type="number" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">Dolaşımdaki Arz (%)</div><div class="finps"><input type="number" placeholder="—"><input type="number" placeholder="—" value="80"></div></div>
+            <div class="frow"><div class="flbl">FDV / Piyasa Değeri</div><div class="finps"><input type="number" placeholder="—"><input type="number" placeholder="—" value="3"></div></div>
+          </div>
+
+          <div class="filter-group">
+            <div class="filter-group-title">Performans</div>
+            <div class="frow"><div class="flbl">24s Değişim %</div><div class="finps"><input type="number" placeholder="—" value="5"><input type="number" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">7G Değişim %</div><div class="finps"><input type="number" placeholder="—"><input type="number" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">30G Değişim %</div><div class="finps"><input type="number" placeholder="—"><input type="number" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">ATH'dan Uzaklık %</div><div class="finps"><input type="number" placeholder="—"><input type="number" placeholder="—" value="-50"></div></div>
+          </div>
+
+          <div class="filter-group">
+            <div class="filter-group-title">Teknik Analiz</div>
+            <div class="frow"><div class="flbl">RSI (14)</div><div class="finps"><input type="number" placeholder="—"><input type="number" placeholder="—" value="40"></div></div>
+            <div class="frow"><div class="flbl">Volatilite % (30G)</div><div class="finps"><input type="number" placeholder="—"><input type="number" placeholder="—" value="80"></div></div>
+          </div>
+
+          <div class="filter-group">
+            <div class="filter-group-title">On-Chain (Zincir Üstü)</div>
+            <div class="frow"><div class="flbl">Aktif Adres (24s)</div><div class="finps"><input type="number" placeholder="—" value="1000"><input type="number" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">TVL ($M) — DeFi</div><div class="finps"><input type="number" placeholder="—" value="10"><input type="number" placeholder="—"></div></div>
+          </div>
+
+        </div>
+        <div class="ad-slot ad-slot-sidebar" id="ad-kripto"><span>Reklam</span><span class="ad-slot-label">300 × 120 · Carbon Ads / AdSense</span></div>
+        <div class="ast-scan-wrap">
+          <button class="ast-scan-btn" onclick="alert('Kripto tarayıcı yakında — TradingView /crypto/scan entegrasyonu planlanıyor')" style="background:var(--muted);cursor:default;">yakında</button>
+        </div>
+      </div>
+
+<div class="asset-panel" id="asset-panel-varant">
+        <div class="asset-panel-scroll">
+          <div class="filter-group"><div class="filter-group-title">Yön</div><div class="chips"><span class="chip on" style="border-color:var(--green);color:var(--green);">↑ Alım (Call)</span><span class="chip" style="border-color:var(--red);color:var(--red);">↓ Satım (Put)</span></div></div>
+                    <button class="ast-clear-btn" onclick="clearPanelFilters('varant')" title="Filtreleri temizle">✕ Filtreleri Temizle</button>
+
+          <div class="filter-group"><div class="filter-group-title">Dayanak Varlık</div><div class="chips"><span class="chip on">BIST30 Endeks</span><span class="chip">Hisse Varantı</span><span class="chip">Döviz</span><span class="chip">Emtia</span></div></div>
+          <div class="filter-group"><div class="filter-group-title">🎯 Varant Stratejisi</div><div class="chips"><span class="chip">ITM (Karda)</span><span class="chip on">ATM (Başabaş)</span><span class="chip">OTM (Zararda)</span><span class="chip">Yüksek Kaldıraç</span><span class="chip">Yüksek Likidite</span></div><div class="goat-info" style="display:block;">ATM: Kullanım fiyatına yakın — en yüksek zaman değeri. ITM: Dayanak fiyat kullanım fiyatını aştı. OTM: Henüz içsel değer yok — ucuz ama riskli.</div></div>
+          <div class="filter-group"><div class="filter-group-title">Filtreler</div>
+            <div class="frow"><div class="flbl">Kaldıraç Oranı</div><div class="finps"><input type="number" placeholder="—" value="5"><input type="number" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">Vadeye Kalan Gün</div><div class="finps"><input type="number" placeholder="—" value="10"><input type="number" placeholder="—" value="90"></div></div>
+            <div class="frow"><div class="flbl">Delta</div><div class="finps"><input type="number" placeholder="—" value="0.3" step="0.1"><input type="number" placeholder="—" value="0.7" step="0.1"></div></div>
+          </div>
+        </div>
+        <div class="ad-slot ad-slot-sidebar" id="ad-varant"><span>Reklam</span><span class="ad-slot-label">300 × 120 · Carbon Ads / AdSense</span></div>
+        <div class="ast-scan-wrap"><button class="ast-scan-btn" onclick="alert('Varant tarayıcı yakında — BIST veri lisansı araştırılıyor')">▶ VARANT TARA</button></div>
+      </div>
+
+<div class="asset-panel" id="asset-panel-opsiyon">
+        <div class="asset-panel-scroll">
+          <div class="filter-group"><div class="filter-group-title">Tip</div><div class="chips"><span class="chip on" style="border-color:var(--green);color:var(--green);">Call</span><span class="chip" style="border-color:var(--red);color:var(--red);">Put</span></div></div>
+                    <button class="ast-clear-btn" onclick="clearPanelFilters('opsiyon')" title="Filtreleri temizle">✕ Filtreleri Temizle</button>
+
+          <div class="filter-group"><div class="filter-group-title">Dayanak</div><div class="chips"><span class="chip on">XU030 (BIST30)</span><span class="chip">Hisse Opsiyonu</span><span class="chip">Döviz</span></div></div>
+          <div class="filter-group"><div class="filter-group-title">🔧 Opsiyon Stratejisi</div><div class="chips"><span class="chip on">Yüksek Hacim</span><span class="chip">Yüksek IV</span><span class="chip">Covered Call</span><span class="chip">Cash-Secured Put</span><span class="chip">Straddle</span><span class="chip">Iron Condor</span></div><div class="goat-info" style="display:block;">Covered Call: Elindeki hisseye call sat — prim geliri. Cash-Secured Put: Nakit teminatla put sat — hisseyi ucuza alma imkânı. Iron Condor: Düşük volatilitede dört strike ile net prim.</div></div>
+          <div class="filter-group"><div class="filter-group-title">Greek Filtreler</div>
+            <div class="frow"><div class="flbl">Delta</div><div class="finps"><input type="number" placeholder="—" value="0.3" step="0.1"><input type="number" placeholder="—" value="0.7" step="0.1"></div></div>
+            <div class="frow"><div class="flbl">IV %</div><div class="finps"><input type="number" placeholder="—"><input type="number" placeholder="—" value="50"></div></div>
+            <div class="frow"><div class="flbl">DTE (Gün)</div><div class="finps"><input type="number" placeholder="—" value="7"><input type="number" placeholder="—" value="45"></div></div>
+          </div>
+        </div>
+        <div class="ad-slot ad-slot-sidebar" id="ad-opsiyon"><span>Reklam</span><span class="ad-slot-label">300 × 120 · Carbon Ads / AdSense</span></div>
+        <div class="ast-scan-wrap"><button class="ast-scan-btn" onclick="alert('Opsiyon tarayıcı yakında — VİOP lisansı araştırılıyor')">▶ OPSİYON TARA</button></div>
+      </div>
+
+    </div>
     </div>
 
     <!-- CONTENT -->

@@ -1,3 +1,36 @@
+
+// ── Asset Type Switcher ──────────────────────────────────────────────
+var ASSET_META={
+  hisse:{icon:'📈',name:'Hisse'},
+  tahvil:{icon:'📜',name:'Bono / Tahvil'},
+  etf:{icon:'📦',name:'ETF'},
+  eurobond:{icon:'🌍',name:'Eurobond'},
+  fon:{icon:'💼',name:'Fon'},
+  kripto:{icon:'₿',name:'Kripto'},
+  opsiyon:{icon:'🔧',name:'Opsiyon'},
+  varant:{icon:'🎯',name:'Varant'},
+  viop:{icon:'⚡',name:'Viop'}
+};
+function selectAsset(type){
+  document.querySelectorAll('.asset-panel').forEach(function(p){p.classList.remove('active');});
+  var p=document.getElementById('asset-panel-'+type);
+  if(p) p.classList.add('active');
+  var m=ASSET_META[type]||{icon:'📈',name:type};
+  document.getElementById('asset-detail-icon').textContent=m.icon;
+  document.getElementById('asset-detail-name').textContent=m.name;
+  document.getElementById('asset-landing').style.display='none';
+  document.getElementById('asset-detail').style.display='flex';
+}
+function goBackToLanding(){
+  document.getElementById('asset-detail').style.display='none';
+  document.getElementById('asset-landing').style.display='flex';
+}
+function clearPanelFilters(panelId){
+  var panel=document.getElementById('asset-panel-'+panelId);
+  if(!panel) return;
+  panel.querySelectorAll('input[type="number"]').forEach(function(inp){inp.value='';});
+  panel.querySelectorAll('.chip.on,.ast-chip.on').forEach(function(c){c.classList.remove('on');});
+}
 var _tvCurrentSym = null;
 
 // ═══════════════════════════════════════════
