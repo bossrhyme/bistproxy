@@ -104,7 +104,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
-<link rel="stylesheet" href="/deepfin.css?v=6e7c807">
+<link rel="stylesheet" href="/deepfin.css?v=e80128d">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -406,8 +406,45 @@ if('serviceWorker' in navigator){
 
     <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
-      <div class="asset-nav-bar"><button class="anb active" id="anb-hisse" onclick="switchAsset('hisse')">📈<span>Hisse</span></button><button class="anb" id="anb-fon" onclick="switchAsset('fon')">💼<span>Fon</span></button><button class="anb" id="anb-kripto" onclick="switchAsset('kripto')">₿<span>Kripto</span></button><button class="anb soon" id="anb-etf">📦<span>ETF</span><small>yakında</small></button><button class="anb soon" id="anb-eurobond">🌍<span>Eurobond</span><small>yakında</small></button><button class="anb soon" id="anb-tahvil">📜<span>Bono/Tahvil</span><small>yakında</small></button><button class="anb soon" id="anb-viop">⚡<span>Viop</span><small>yakında</small></button><button class="anb soon" id="anb-varant">🎯<span>Varant</span><small>yakında</small></button><button class="anb soon" id="anb-opsiyon">🔧<span>Opsiyon</span><small>yakında</small></button></div>
-<div class="sb-varlık active" id="sbp-hisse"><div class="sb-scroll">
+
+      <!-- VARLIK NAV BAR -->
+      <div class="asset-nav-bar">
+        <button class="anb active" id="anb-hisse" onclick="switchAsset('hisse')">📈<span>Hisse</span></button>
+        <button class="anb" id="anb-fon" onclick="switchAsset('fon')">💼<span>Fon</span></button>
+        <button class="anb" id="anb-kripto" onclick="switchAsset('kripto')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="display:block"><circle cx="8" cy="8" r="8" fill="#F7931A"/><path d="M10.8 6.9c.2-1.1-.7-1.7-1.9-2.1l.4-1.5-1-.2-.4 1.4-.7-.2.4-1.4-1-.2-.4 1.5-.6-.1v-.1l-1.3-.3-.3 1s.7.2.7.2c.4.1.5.3.4.5L4.7 9c-.1.2-.2.3-.5.2l-.7-.2-.5 1.1 1.3.3.7.2-.4 1.5 1 .2.4-1.5.7.2-.4 1.5 1 .2.4-1.5c1.7.3 2.9.2 3.4-1.3.4-1.2-.1-1.9-.9-2.3.6-.2 1-.6 1.1-1.5zm-2 2.8c-.3 1.1-2.3.5-2.9.4l.5-2c.6.2 2.7.5 2.4 1.6zm.3-2.8c-.3 1-2 .5-2.6.4l.5-1.8c.6.1 2.4.4 2.1 1.4z" fill="white"/></svg><span>Kripto</span></button>
+        <button class="anb soon" title="ETF — yakında">📦<span>ETF</span><small>yakında</small></button>
+        <button class="anb soon" title="Eurobond — yakında">🌍<span>Eurobond</span><small>yakında</small></button>
+        <button class="anb soon" title="Bono/Tahvil — yakında">📜<span>Tahvil</span><small>yakında</small></button>
+        <button class="anb soon" title="Viop — yakında">⚡<span>Viop</span><small>yakında</small></button>
+        <button class="anb soon" title="Varant — yakında">🎯<span>Varant</span><small>yakında</small></button>
+        <button class="anb soon" title="Opsiyon — yakında">🔧<span>Opsiyon</span><small>yakında</small></button>
+      </div>
+
+      <!-- LANDING: Varlık seçim ekranı -->
+      <div class="sbp active" id="sbp-landing">
+        <div class="sbp-scroll">
+          <div class="landing-hdr">
+            <div class="landing-title">Varlık Seç</div>
+            <div class="landing-sub">Taramak istediğin enstrümanı seç</div>
+          </div>
+          <div class="landing-list">
+            <button class="li-btn" onclick="selectAsset('hisse')"><span class="li-icon">📈</span><span class="li-name">Hisse</span><svg class="li-arrow" width="7" height="8" viewBox="0 0 7 8" fill="none"><polygon points="0,0 7,4 0,8" fill="#3b82f6"/></svg></button>
+            <button class="li-btn" onclick="selectAsset('fon')"><span class="li-icon">💼</span><span class="li-name">Fon</span><svg class="li-arrow" width="7" height="8" viewBox="0 0 7 8" fill="none"><polygon points="0,0 7,4 0,8" fill="#3b82f6"/></svg></button>
+            <button class="li-btn" onclick="selectAsset('kripto')"><span class="li-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="8" fill="#F7931A"/><path d="M10.8 6.9c.2-1.1-.7-1.7-1.9-2.1l.4-1.5-1-.2-.4 1.4-.7-.2.4-1.4-1-.2-.4 1.5-.6-.1v-.1l-1.3-.3-.3 1s.7.2.7.2c.4.1.5.3.4.5L4.7 9c-.1.2-.2.3-.5.2l-.7-.2-.5 1.1 1.3.3.7.2-.4 1.5 1 .2.4-1.5.7.2-.4 1.5 1 .2.4-1.5c1.7.3 2.9.2 3.4-1.3.4-1.2-.1-1.9-.9-2.3.6-.2 1-.6 1.1-1.5zm-2 2.8c-.3 1.1-2.3.5-2.9.4l.5-2c.6.2 2.7.5 2.4 1.6zm.3-2.8c-.3 1-2 .5-2.6.4l.5-1.8c.6.1 2.4.4 2.1 1.4z" fill="white"/></svg></span><span class="li-name">Kripto</span><svg class="li-arrow" width="7" height="8" viewBox="0 0 7 8" fill="none"><polygon points="0,0 7,4 0,8" fill="#3b82f6"/></svg></button>
+            <div class="li-soon"><span class="li-icon">📦</span><span class="li-name">ETF</span><span class="li-badge">yakında</span></div>
+            <div class="li-soon"><span class="li-icon">🌍</span><span class="li-name">Eurobond</span><span class="li-badge">yakında</span></div>
+            <div class="li-soon"><span class="li-icon">📜</span><span class="li-name">Bono / Tahvil</span><span class="li-badge">yakında</span></div>
+            <div class="li-soon"><span class="li-icon">⚡</span><span class="li-name">Viop</span><span class="li-badge">yakında</span></div>
+            <div class="li-soon"><span class="li-icon">🎯</span><span class="li-name">Varant</span><span class="li-badge">yakında</span></div>
+            <div class="li-soon"><span class="li-icon">🔧</span><span class="li-name">Opsiyon</span><span class="li-badge">yakında</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL: Hisse -->
+      <div class="sbp" id="sbp-hisse">
+        <button class="sbp-back" onclick="goBackToLanding()">← Varlık Listesi</button>
+        <div class="sbp-scroll">
 
       <!-- SIDEBAR TABS -->
       <div class="sb-tabs">
@@ -656,38 +693,89 @@ if('serviceWorker' in navigator){
 
       </div>
 
-    </div>
-        <div class="ad-slot ad-slot-sidebar" id="ad-hisse"><span>Reklam</span><span class="ad-slot-label">300×120 · AdSense</span></div>
-        <div class="ast-scan-wrap"><button class="ast-scan-btn" onclick="runScan()">▶ Hisse Tara</button></div></div><div class="sb-varlık" id="sbp-fon"><div class="sb-scroll"><div class="filter-group"><div class="filter-group-title">Fon Türü</div><div class="chips"><span class="chip on" onclick="chipToggle(this)">Hisse Fonu</span><span class="chip" onclick="chipToggle(this)">Borçlanma</span><span class="chip" onclick="chipToggle(this)">Para Piyasası</span><span class="chip" onclick="chipToggle(this)">Karma</span><span class="chip" onclick="chipToggle(this)">Altın</span><span class="chip" onclick="chipToggle(this)">Döviz</span><span class="chip" onclick="chipToggle(this)">Serbest</span></div></div><div class="filter-group"><div class="filter-group-title">Strateji</div><div class="chips"><span class="chip" data-preset="retYtd" onclick="chipRadio(this)">YTD Lider</span><span class="chip" data-preset="ret1m" onclick="chipRadio(this)">1A Lider</span><span class="chip" data-preset="ret3m" onclick="chipRadio(this)">3A Lider</span><span class="chip" data-preset="sharpe" onclick="chipRadio(this)">Sharpe Yüksek</span><span class="chip" data-preset="volatility" onclick="chipRadio(this)">Düşük Volatilite</span></div></div><div class="filter-group"><div class="filter-group-title">Filtreler</div><div class="frow"><div class="flbl">1Y Getiri %</div><div class="finps"><input type="number" id="fon_ret1y_min" placeholder="—"><input type="number" id="fon_ret1y_max" placeholder="—"></div></div><div class="frow"><div class="flbl">Sharpe Oranı</div><div class="finps"><input type="number" id="fon_sharpe_min" placeholder="—"><input type="number" id="fon_sharpe_max" placeholder="—"></div></div><div class="frow"><div class="flbl">Büyüklük (₺M)</div><div class="finps"><input type="number" id="fon_size_min" placeholder="—"><input type="number" id="fon_size_max" placeholder="—"></div></div></div></div>
-        <div class="ad-slot ad-slot-sidebar" id="ad-fon"><span>Reklam</span><span class="ad-slot-label">300×120 · AdSense</span></div>
-        <div class="ast-scan-wrap"><button class="ast-scan-btn" onclick="runFonScan()">▶ Fon Tara</button></div></div><div class="sb-varlık" id="sbp-kripto"><div class="sb-scroll"><div class="filter-group"><div class="filter-group-title">Kategori</div><div class="chips"><span class="chip on" data-cat="" onclick="chipRadio(this)">Tümü</span><span class="chip" data-cat="layer-1" onclick="chipRadio(this)">Layer 1</span><span class="chip" data-cat="layer-2" onclick="chipRadio(this)">Layer 2</span><span class="chip" data-cat="decentralized-finance-defi" onclick="chipRadio(this)">DeFi</span><span class="chip" data-cat="meme-token" onclick="chipRadio(this)">Meme</span><span class="chip" data-cat="artificial-intelligence" onclick="chipRadio(this)">AI</span><span class="chip" data-cat="gaming" onclick="chipRadio(this)">Gaming</span></div></div><div class="filter-group"><div class="filter-group-title">Strateji</div><div class="chips"><span class="chip" data-preset="hacim_patlamasi" onclick="chipRadio(this)">Hacim Patlaması</span><span class="chip" data-preset="rsi_dip" onclick="chipRadio(this)">RSI Dip</span><span class="chip" data-preset="ath_yakini" onclick="chipRadio(this)">ATH Yakını</span><span class="chip" data-preset="buyuk_kap" onclick="chipRadio(this)">Büyük Kapı</span><span class="chip" data-preset="kucuk_cap_gem" onclick="chipRadio(this)">Küçük Kapı Gem</span><span class="chip" data-preset="momentum" onclick="chipRadio(this)">Momentum</span><span class="chip" data-preset="dusuk_arz" onclick="chipRadio(this)">Düşük Arz</span></div></div><div class="filter-group"><div class="filter-group-title">Filtreler</div><div class="frow"><div class="flbl">Piyasa Değeri ($M)</div><div class="finps"><input type="number" id="k_mcap_min" placeholder="—"><input type="number" id="k_mcap_max" placeholder="—"></div></div><div class="frow"><div class="flbl">24s Hacim ($M)</div><div class="finps"><input type="number" id="k_vol_min" placeholder="—"><input type="number" id="k_vol_max" placeholder="—"></div></div><div class="frow"><div class="flbl">24s Değişim %</div><div class="finps"><input type="number" id="k_chg24h_min" placeholder="—"><input type="number" id="k_chg24h_max" placeholder="—"></div></div><div class="frow"><div class="flbl">RSI (14)</div><div class="finps"><input type="number" id="k_rsi_min" placeholder="—"><input type="number" id="k_rsi_max" placeholder="—"></div></div></div></div>
-        <div class="ad-slot ad-slot-sidebar" id="ad-kripto"><span>Reklam</span><span class="ad-slot-label">300×120 · AdSense</span></div>
-        <div class="ast-scan-wrap"><button class="ast-scan-btn" onclick="runKriptoScan()">▶ Kripto Tara</button></div></div><div class="sb-varlık" id="sbp-etf"><div class="sb-scroll"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:12px;padding:40px 20px;text-align:center">
-        <div style="font-size:32px;opacity:.2">📦</div>
-        <div style="font-size:13px;font-weight:700;color:var(--text2)">ETF</div>
-        <div style="font-size:11px;color:var(--muted);line-height:1.7">Veri kaynağı araştırılıyor.<br>Yakında yayına girecek.</div>
-      </div></div></div><div class="sb-varlık" id="sbp-eurobond"><div class="sb-scroll"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:12px;padding:40px 20px;text-align:center">
-        <div style="font-size:32px;opacity:.2">🌍</div>
-        <div style="font-size:13px;font-weight:700;color:var(--text2)">Eurobond</div>
-        <div style="font-size:11px;color:var(--muted);line-height:1.7">Veri kaynağı araştırılıyor.<br>Yakında yayına girecek.</div>
-      </div></div></div><div class="sb-varlık" id="sbp-tahvil"><div class="sb-scroll"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:12px;padding:40px 20px;text-align:center">
-        <div style="font-size:32px;opacity:.2">📜</div>
-        <div style="font-size:13px;font-weight:700;color:var(--text2)">Bono/Tahvil</div>
-        <div style="font-size:11px;color:var(--muted);line-height:1.7">Veri kaynağı araştırılıyor.<br>Yakında yayına girecek.</div>
-      </div></div></div><div class="sb-varlık" id="sbp-viop"><div class="sb-scroll"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:12px;padding:40px 20px;text-align:center">
-        <div style="font-size:32px;opacity:.2">⚡</div>
-        <div style="font-size:13px;font-weight:700;color:var(--text2)">Viop</div>
-        <div style="font-size:11px;color:var(--muted);line-height:1.7">Veri kaynağı araştırılıyor.<br>Yakında yayına girecek.</div>
-      </div></div></div><div class="sb-varlık" id="sbp-varant"><div class="sb-scroll"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:12px;padding:40px 20px;text-align:center">
-        <div style="font-size:32px;opacity:.2">🎯</div>
-        <div style="font-size:13px;font-weight:700;color:var(--text2)">Varant</div>
-        <div style="font-size:11px;color:var(--muted);line-height:1.7">Veri kaynağı araştırılıyor.<br>Yakında yayına girecek.</div>
-      </div></div></div><div class="sb-varlık" id="sbp-opsiyon"><div class="sb-scroll"><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:12px;padding:40px 20px;text-align:center">
-        <div style="font-size:32px;opacity:.2">🔧</div>
-        <div style="font-size:13px;font-weight:700;color:var(--text2)">Opsiyon</div>
-        <div style="font-size:11px;color:var(--muted);line-height:1.7">Veri kaynağı araştırılıyor.<br>Yakında yayına girecek.</div>
-      </div></div></div>
-    </div>
+        </div><!-- /sbp-scroll hisse -->
+        <div class="ad-slot ad-slot-sidebar" id="ad-hisse-scan"><span>Reklam</span><span class="ad-slot-label">300×120 · AdSense</span></div>
+        <div class="sbp-scan-wrap"><button class="sbp-scan-btn" onclick="runScan()">▶ Hisse Tara</button></div>
+      </div><!-- /sbp-hisse -->
+
+      <!-- PANEL: Fon -->
+      <div class="sbp" id="sbp-fon">
+        <button class="sbp-back" onclick="goBackToLanding()">← Varlık Listesi</button>
+        <div class="sbp-scroll">
+          <div class="filter-group">
+            <div class="filter-group-title">Fon Türü</div>
+            <div class="chips">
+              <span class="chip on" onclick="chipToggle(this)">Hisse Fonu</span>
+              <span class="chip" onclick="chipToggle(this)">Borçlanma</span>
+              <span class="chip" onclick="chipToggle(this)">Para Piyasası</span>
+              <span class="chip" onclick="chipToggle(this)">Karma</span>
+              <span class="chip" onclick="chipToggle(this)">Altın</span>
+              <span class="chip" onclick="chipToggle(this)">Döviz</span>
+              <span class="chip" onclick="chipToggle(this)">Serbest</span>
+            </div>
+          </div>
+          <div class="filter-group">
+            <div class="filter-group-title">Strateji</div>
+            <div class="chips">
+              <span class="chip" data-preset="retYtd"  onclick="chipRadio(this)">YTD Lider</span>
+              <span class="chip" data-preset="ret1m"   onclick="chipRadio(this)">1A Lider</span>
+              <span class="chip" data-preset="ret3m"   onclick="chipRadio(this)">3A Lider</span>
+              <span class="chip" data-preset="sharpe"  onclick="chipRadio(this)">Sharpe Yüksek</span>
+              <span class="chip" data-preset="volatility" onclick="chipRadio(this)">Düşük Volatilite</span>
+            </div>
+          </div>
+          <div class="filter-group">
+            <div class="filter-group-title">Filtreler</div>
+            <div class="frow"><div class="flbl">1Y Getiri %</div><div class="finps"><input type="number" id="fon_ret1y_min" placeholder="—"><input type="number" id="fon_ret1y_max" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">Sharpe Oranı</div><div class="finps"><input type="number" id="fon_sharpe_min" placeholder="—"><input type="number" id="fon_sharpe_max" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">Büyüklük (₺M)</div><div class="finps"><input type="number" id="fon_size_min" placeholder="—"><input type="number" id="fon_size_max" placeholder="—"></div></div>
+          </div>
+        </div><!-- /sbp-scroll fon -->
+        <div class="ad-slot ad-slot-sidebar" id="ad-fon-scan"><span>Reklam</span><span class="ad-slot-label">300×120 · AdSense</span></div>
+        <div class="sbp-scan-wrap"><button class="sbp-scan-btn" onclick="runFonScan()">▶ Fon Tara</button></div>
+      </div><!-- /sbp-fon -->
+
+      <!-- PANEL: Kripto -->
+      <div class="sbp" id="sbp-kripto">
+        <button class="sbp-back" onclick="goBackToLanding()">← Varlık Listesi</button>
+        <div class="sbp-scroll">
+          <div class="filter-group">
+            <div class="filter-group-title">Kategori</div>
+            <div class="chips">
+              <span class="chip on" data-cat=""                             onclick="chipRadio(this)">Tümü</span>
+              <span class="chip" data-cat="layer-1"                        onclick="chipRadio(this)">Layer 1</span>
+              <span class="chip" data-cat="layer-2"                        onclick="chipRadio(this)">Layer 2</span>
+              <span class="chip" data-cat="decentralized-finance-defi"     onclick="chipRadio(this)">DeFi</span>
+              <span class="chip" data-cat="meme-token"                     onclick="chipRadio(this)">Meme</span>
+              <span class="chip" data-cat="artificial-intelligence"        onclick="chipRadio(this)">AI</span>
+              <span class="chip" data-cat="gaming"                         onclick="chipRadio(this)">Gaming</span>
+            </div>
+          </div>
+          <div class="filter-group">
+            <div class="filter-group-title">Strateji</div>
+            <div class="chips">
+              <span class="chip" data-preset="hacim_patlamasi" onclick="chipRadio(this)">Hacim Patlaması</span>
+              <span class="chip" data-preset="rsi_dip"         onclick="chipRadio(this)">RSI Dip</span>
+              <span class="chip" data-preset="ath_yakini"      onclick="chipRadio(this)">ATH Yakını</span>
+              <span class="chip" data-preset="buyuk_kap"       onclick="chipRadio(this)">Büyük Kapı</span>
+              <span class="chip" data-preset="kucuk_cap_gem"   onclick="chipRadio(this)">Küçük Kapı Gem</span>
+              <span class="chip" data-preset="momentum"        onclick="chipRadio(this)">Momentum</span>
+              <span class="chip" data-preset="dusuk_arz"       onclick="chipRadio(this)">Düşük Arz</span>
+            </div>
+          </div>
+          <div class="filter-group">
+            <div class="filter-group-title">Filtreler</div>
+            <div class="frow"><div class="flbl">Piyasa Değeri ($M)</div><div class="finps"><input type="number" id="k_mcap_min" placeholder="—"><input type="number" id="k_mcap_max" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">24s Hacim ($M)</div><div class="finps"><input type="number" id="k_vol_min" placeholder="—"><input type="number" id="k_vol_max" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">24s Değişim %</div><div class="finps"><input type="number" id="k_chg24h_min" placeholder="—"><input type="number" id="k_chg24h_max" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">RSI (14)</div><div class="finps"><input type="number" id="k_rsi_min" placeholder="—"><input type="number" id="k_rsi_max" placeholder="—"></div></div>
+          </div>
+        </div><!-- /sbp-scroll kripto -->
+        <div class="ad-slot ad-slot-sidebar" id="ad-kripto-scan"><span>Reklam</span><span class="ad-slot-label">300×120 · AdSense</span></div>
+        <div class="sbp-scan-wrap"><button class="sbp-scan-btn" onclick="runKriptoScan()">▶ Kripto Tara</button></div>
+      </div><!-- /sbp-kripto -->
+
+    </div><!-- /sidebar -->
 
     <!-- CONTENT -->
     <div class="content">
@@ -799,7 +887,8 @@ if('serviceWorker' in navigator){
       </div>
 
       <div class="twrap" id="twrap" style="display:none">
-        <table>
+        <div id="result-area" style="display:none"></div>
+        <table id="hisse-table">
                               <thead>
             <tr>
               <th style="width:28px;text-align:center;color:var(--muted2);font-size:9px;">#</th>
@@ -1216,6 +1305,6 @@ if('serviceWorker' in navigator){
     </div>
   </div>
 </div>
-<script src="/deepfin.js?v=6e7c807"></script>
+<script src="/deepfin.js?v=e80128d"></script>
 </body>
 </html>

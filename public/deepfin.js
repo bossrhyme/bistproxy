@@ -1,4 +1,8 @@
-// ── Chip fonksiyonları ────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// DeepFin — Varlık Navigasyon Sistemi
+// ═══════════════════════════════════════════════════════════════
+
+// ── Chip seçim fonksiyonları ──────────────────────────────────
 function chipRadio(el) {
   var c = el.closest('.chips') || el.parentElement;
   c.querySelectorAll('.chip').forEach(function(x){ x.classList.remove('on'); });
@@ -6,25 +10,58 @@ function chipRadio(el) {
 }
 function chipToggle(el) { el.classList.toggle('on'); }
 
-// ── Varlık geçişi ─────────────────────────────────────────────────────
-var _currentAsset = 'hisse';
+// ── Durum ─────────────────────────────────────────────────────
+var _activeAsset = null;
 
-function switchAsset(type) {
-  if (_currentAsset === type) return;
-  _currentAsset = type;
+// ── Landing'e dön ─────────────────────────────────────────────
+function goBackToLanding() {
+  _activeAsset = null;
+  document.querySelectorAll('.anb').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.sbp').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('sbp-landing').classList.add('active');
+  _clearContent();
+}
 
+// ── Varlık seç (landing → panel) ─────────────────────────────
+function selectAsset(type) {
+  _activeAsset = type;
+
+  // Nav bar
   document.querySelectorAll('.anb').forEach(function(b){ b.classList.remove('active'); });
   var nb = document.getElementById('anb-' + type);
   if (nb) nb.classList.add('active');
 
-  document.querySelectorAll('.sb-varlık').forEach(function(p){ p.classList.remove('active'); });
+  // Paneller
+  document.querySelectorAll('.sbp').forEach(function(p){ p.classList.remove('active'); });
   var sp = document.getElementById('sbp-' + type);
   if (sp) sp.classList.add('active');
 
-  resetScreener();
+  _clearContent();
+
+  // Hisse için hisse-table göster, result-area gizle
+  // Diğerleri için hisse-table gizle, result-area hazırla
+  var ht = document.getElementById('hisse-table');
+  var ra = document.getElementById('result-area');
+  if (type === 'hisse') {
+    if (ht) ht.style.display = '';
+    if (ra) { ra.style.display = 'none'; ra.innerHTML = ''; }
+  } else {
+    if (ht) ht.style.display = 'none';
+    if (ra) { ra.style.display = 'none'; ra.innerHTML = ''; }
+  }
 }
 
-function resetScreener() {
+// ── Nav bar tıklaması ─────────────────────────────────────────
+function switchAsset(type) {
+  if (_activeAsset === type) {
+    goBackToLanding();
+  } else {
+    selectAsset(type);
+  }
+}
+
+// ── İçerik temizle ────────────────────────────────────────────
+function _clearContent() {
   if (typeof allData !== 'undefined') allData = [];
   if (typeof filtered !== 'undefined') filtered = [];
   var tbody = document.getElementById('tbody');
@@ -33,503 +70,155 @@ function resetScreener() {
   if (twrap) twrap.style.display = 'none';
   var det = document.getElementById('detail');
   if (det) det.classList.remove('open');
-  var cnt = document.getElementById('sb-count');
-  if (cnt) cnt.textContent = '—';
-  var flt = document.getElementById('sb-filtered');
-  if (flt) flt.textContent = '—';
+  ['sb-count','sb-filtered'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.textContent = '—';
+  });
 }
 
-// ── Fon Tarama ────────────────────────────────────────────────────────
+// ── Yardımcı: result-area'ya tablo yaz ───────────────────────
+function _showResultArea(headerHtml, tableHtml, count) {
+  var twrap = document.getElementById('twrap');
+  var ra = document.getElementById('result-area');
+  if (!twrap || !ra) return;
+  twrap.style.display = 'block';
+  ra.style.display = 'block';
+  ra.innerHTML = headerHtml + tableHtml;
+  var cnt = document.getElementById('sb-count');
+  if (cnt) cnt.textContent = count;
+}
+
+// ── Yükleniyor mesajı ─────────────────────────────────────────
+function _showLoading(msg) {
+  var twrap = document.getElementById('twrap');
+  var ra = document.getElementById('result-area');
+  if (!twrap || !ra) return;
+  twrap.style.display = 'block';
+  ra.style.display = 'block';
+  ra.innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted2);font-size:12px">' + msg + '</div>';
+}
+
+// ─────────────────────────────────────────────────────────────
+// FON TARAMA
+// ─────────────────────────────────────────────────────────────
 function runFonScan() {
-  var btn = document.querySelector('#sbp-fon .ast-scan-btn');
+  var btn = document.querySelector('#sbp-fon .sbp-scan-btn');
   if (btn) { btn.textContent = '⏳ Taranıyor...'; btn.disabled = true; }
+  _showLoading('⏳ TEFAS verisi yükleniyor...');
 
   var params = new URLSearchParams({ fontur: 'YAT', sort: 'ret1y', limit: '100' });
+  var sc = document.querySelector('#sbp-fon .chip.on[data-preset]');
+  if (sc) params.set('sort', sc.dataset.preset);
 
-  var stratChip = document.querySelector('#sbp-fon .chip.on[data-preset]');
-  if (stratChip) params.set('sort', stratChip.dataset.preset);
+  var get = function(id){ var el=document.getElementById(id); return el&&el.value?el.value:''; };
+  if (get('fon_ret1y_min'))  params.set('min_ret1y',  get('fon_ret1y_min'));
+  if (get('fon_ret1y_max'))  params.set('max_ret1y',  get('fon_ret1y_max'));
+  if (get('fon_sharpe_min')) params.set('min_sharpe', get('fon_sharpe_min'));
+  if (get('fon_size_min'))   params.set('min_size',   get('fon_size_min'));
 
-  var v = function(id){ var el=document.getElementById(id); return el&&el.value?el.value:''; };
-  if (v('fon_ret1y_min'))  params.set('min_ret1y',  v('fon_ret1y_min'));
-  if (v('fon_ret1y_max'))  params.set('max_ret1y',  v('fon_ret1y_max'));
-  if (v('fon_sharpe_min')) params.set('min_sharpe', v('fon_sharpe_min'));
-  if (v('fon_size_min'))   params.set('min_size',   v('fon_size_min'));
-
-  fetch('/api/fon-scan?' + params.toString())
+  fetch('/api/fon-scan?' + params)
     .then(function(r){ return r.json(); })
-    .then(function(d){ _renderFonTable(d.funds || [], d); })
-    .catch(function(e){ alert('Fon tarama hatası: ' + e.message); })
-    .finally(function(){ if (btn){ btn.textContent='▶ Fon Tara'; btn.disabled=false; } });
+    .then(function(d){ _renderFon(d.funds||[], d); })
+    .catch(function(e){
+      var ra=document.getElementById('result-area');
+      if(ra) ra.innerHTML='<div style="padding:20px;text-align:center;color:var(--red);font-size:12px">Hata: '+e.message+'</div>';
+    })
+    .finally(function(){ if(btn){btn.textContent='▶ Fon Tara';btn.disabled=false;} });
 }
 
-function _renderFonTable(funds, meta) {
-  var twrap = document.getElementById('twrap');
-  if (!twrap) return;
-
-  var fR = function(v, cls){
-    if (v == null) return '<span class="nil">—</span>';
-    return '<span class="' + (v>=0?'up':'dn') + '">' + (v>=0?'+':'') + v.toFixed(1) + '%</span>';
+function _renderFon(funds, meta) {
+  if (!funds.length) {
+    var ra=document.getElementById('result-area');
+    if(ra) ra.innerHTML='<div style="padding:30px;text-align:center;color:var(--muted2);font-size:12px">Eşleşen fon bulunamadı.</div>';
+    return;
+  }
+  var fR=function(v){
+    if(v==null) return '<span style="color:var(--muted2)">—</span>';
+    return '<span style="color:'+(v>=0?'var(--green)':'var(--red)')+'">'+(v>=0?'+':'')+v.toFixed(1)+'%</span>';
   };
-
-  var rows = funds.map(function(f, i){
-    var ver = f.verified ? '<sup style="color:var(--green);font-size:8px">✓</sup>' : '';
-    return '<tr><td class="tc">'+(i+1)+'</td>'
-      +'<td><b style="font-size:11px">'+f.code+ver+'</b>'
+  var rows=funds.map(function(f,i){
+    var ver=f.verified?'<sup style="color:var(--green);font-size:8px">✓</sup>':'';
+    return '<tr>'
+      +'<td class="tc">'+(i+1)+'</td>'
+      +'<td style="padding:7px 6px"><div style="font-size:12px;font-weight:700;color:var(--text)">'+f.code+ver+'</div>'
       +'<div class="tsub" title="'+f.name+'">'+f.name+'</div></td>'
       +'<td class="tn">₺'+(f.price||0).toFixed(4)+'</td>'
       +'<td class="tn">'+fR(f.ret1m)+'</td>'
       +'<td class="tn">'+fR(f.ret3m)+'</td>'
       +'<td class="tn">'+fR(f.ret1y)+'</td>'
       +'<td class="tn">'+(f.sharpe!=null?f.sharpe.toFixed(2):'—')+'</td>'
-      +'<td class="tn">₺'+(f.totalValueM||0).toFixed(0)+'M</td></tr>';
+      +'<td class="tn muted">₺'+(f.totalValueM||0).toFixed(0)+'M</td>'
+      +'</tr>';
   }).join('');
-
-  twrap.style.display = 'block';
-  twrap.innerHTML = '<div class="tbar-meta"><b>TEFAS Fon</b>'
-    +'<span class="tbm-cnt">'+funds.length+' fon</span>'
-    +'<span class="tbm-src">TEFAS · Yahoo Finance</span></div>'
-    +'<table class="rtable"><thead><tr>'
-    +'<th>#</th><th>Fon</th><th>Fiyat</th><th>1A%</th><th>3A%</th><th>1Y%</th><th>Sharpe</th><th>Büyüklük</th>'
+  var hdr='<div class="res-hdr"><b>TEFAS Fon</b><span class="res-cnt">'+funds.length+' fon</span><span class="res-ok">TEFAS · Yahoo Finance</span><span class="res-src" style="margin-left:auto">çapraz doğrulama aktif</span></div>';
+  var tbl='<table><thead><tr>'
+    +'<th>#</th><th>Fon</th><th class="right">Fiyat</th><th class="right">1A%</th><th class="right">3A%</th><th class="right">1Y%</th><th class="right">Sharpe</th><th class="right">Büyüklük</th>'
     +'</tr></thead><tbody>'+rows+'</tbody></table>';
-
-  var cnt = document.getElementById('sb-count');
-  if (cnt) cnt.textContent = funds.length;
+  _showResultArea(hdr, tbl, funds.length);
 }
 
-// ── Kripto Tarama ─────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// KRİPTO TARAMA
+// ─────────────────────────────────────────────────────────────
 function runKriptoScan() {
-  var btn = document.querySelector('#sbp-kripto .ast-scan-btn');
-  if (btn) { btn.textContent = '⏳ Taranıyor...'; btn.disabled = true; }
+  var btn=document.querySelector('#sbp-kripto .sbp-scan-btn');
+  if(btn){btn.textContent='⏳ Taranıyor...';btn.disabled=true;}
+  _showLoading('⏳ CoinGecko + TradingView verisi yükleniyor...');
 
-  var params = new URLSearchParams({ limit: '100', sort: 'market_cap_desc' });
+  var params=new URLSearchParams({limit:'100',sort:'market_cap_desc'});
+  var cat=document.querySelector('#sbp-kripto .chip.on[data-cat]');
+  if(cat&&cat.dataset.cat) params.set('category',cat.dataset.cat);
+  var pre=document.querySelector('#sbp-kripto .chip.on[data-preset]');
+  if(pre&&pre.dataset.preset) params.set('preset',pre.dataset.preset);
 
-  var catChip = document.querySelector('#sbp-kripto .chip.on[data-cat]');
-  if (catChip && catChip.dataset.cat) params.set('category', catChip.dataset.cat);
+  var ids={min_mcap:'k_mcap_min',max_mcap:'k_mcap_max',min_vol24h:'k_vol_min',max_vol24h:'k_vol_max',min_chg24h:'k_chg24h_min',max_chg24h:'k_chg24h_max',min_rsi:'k_rsi_min',max_rsi:'k_rsi_max'};
+  Object.keys(ids).forEach(function(p){var el=document.getElementById(ids[p]);if(el&&el.value)params.set(p,el.value);});
 
-  var preChip = document.querySelector('#sbp-kripto .chip.on[data-preset]');
-  if (preChip && preChip.dataset.preset) params.set('preset', preChip.dataset.preset);
-
-  var ids = {min_mcap:'k_mcap_min',max_mcap:'k_mcap_max',min_vol24h:'k_vol_min',max_vol24h:'k_vol_max',min_chg24h:'k_chg24h_min',max_chg24h:'k_chg24h_max',min_rsi:'k_rsi_min',max_rsi:'k_rsi_max'};
-  Object.keys(ids).forEach(function(p){
-    var el=document.getElementById(ids[p]);
-    if (el&&el.value) params.set(p, el.value);
-  });
-
-  fetch('/api/kripto-scan?' + params.toString())
-    .then(function(r){ return r.json(); })
-    .then(function(d){ _renderKriptoTable(d.coins || [], d); })
-    .catch(function(e){ alert('Kripto tarama hatası: ' + e.message); })
-    .finally(function(){ if (btn){ btn.textContent='▶ Kripto Tara'; btn.disabled=false; } });
+  fetch('/api/kripto-scan?'+params)
+    .then(function(r){return r.json();})
+    .then(function(d){_renderKripto(d.coins||[],d);})
+    .catch(function(e){
+      var ra=document.getElementById('result-area');
+      if(ra) ra.innerHTML='<div style="padding:20px;text-align:center;color:var(--red);font-size:12px">Hata: '+e.message+'</div>';
+    })
+    .finally(function(){if(btn){btn.textContent='▶ Kripto Tara';btn.disabled=false;}});
 }
 
-function _renderKriptoTable(coins, meta) {
-  var twrap = document.getElementById('twrap');
-  if (!twrap) return;
-
-  var fP = function(v){
-    if (!v) return '—';
-    if (v>=1000) return '$'+v.toLocaleString('en',{maximumFractionDigits:0});
-    if (v>=1) return '$'+v.toFixed(2);
-    if (v>=0.01) return '$'+v.toFixed(4);
-    return '$'+v.toFixed(6);
-  };
-  var fM = function(v){
-    if (!v) return '—';
-    if (v>=1e9) return '$'+(v/1e9).toFixed(1)+'B';
-    if (v>=1e6) return '$'+(v/1e6).toFixed(0)+'M';
-    return '$'+v.toFixed(0);
-  };
-  var fC = function(v){
-    if (v==null) return '<span class="nil">—</span>';
-    return '<span class="'+(v>=0?'up':'dn')+'">'+(v>=0?'+':'')+v.toFixed(1)+'%</span>';
-  };
-
-  var rows = coins.map(function(c, i){
-    var ver = c.verified ? '<sup style="color:var(--green);font-size:8px">✓</sup>' : '';
-    var img = c.image ? '<img src="'+c.image+'" width="13" height="13" style="border-radius:50%;vertical-align:middle;margin-right:3px" onerror="this.remove()">' : '';
-    return '<tr><td class="tc">'+(c.rank||i+1)+'</td>'
-      +'<td>'+img+'<b style="font-size:11px">'+c.symbol+ver+'</b>'
+function _renderKripto(coins, meta) {
+  if(!coins.length){
+    var ra=document.getElementById('result-area');
+    if(ra) ra.innerHTML='<div style="padding:30px;text-align:center;color:var(--muted2);font-size:12px">Eşleşen coin bulunamadı.</div>';
+    return;
+  }
+  var fP=function(v){if(!v)return'—';if(v>=1000)return'$'+v.toLocaleString('en',{maximumFractionDigits:0});if(v>=1)return'$'+v.toFixed(2);if(v>=0.01)return'$'+v.toFixed(4);return'$'+v.toFixed(6);};
+  var fM=function(v){if(!v)return'—';if(v>=1e9)return'$'+(v/1e9).toFixed(1)+'B';if(v>=1e6)return'$'+(v/1e6).toFixed(0)+'M';return'$'+v.toFixed(0);};
+  var fC=function(v){if(v==null)return'<span style="color:var(--muted2)">—</span>';return'<span style="color:'+(v>=0?'var(--green)':'var(--red)')+'">'+(v>=0?'+':'')+v.toFixed(1)+'%</span>';};
+  var note=(meta.sources&&meta.sources.note)||'';
+  var rows=coins.map(function(c,i){
+    var ver=c.verified?'<sup style="color:var(--green);font-size:8px">✓</sup>':'';
+    var img=c.image?'<img src="'+c.image+'" width="13" height="13" style="border-radius:50%;vertical-align:middle;margin-right:3px" onerror="this.remove()">':'';
+    return '<tr>'
+      +'<td class="tc">'+(c.rank||i+1)+'</td>'
+      +'<td style="padding:7px 6px">'+img+'<span style="font-size:12px;font-weight:700;color:var(--text)">'+c.symbol+ver+'</span>'
       +'<div class="tsub">'+c.name+'</div></td>'
       +'<td class="tn">'+fP(c.price)+'</td>'
       +'<td class="tn">'+fC(c.change24h)+'</td>'
       +'<td class="tn">'+fC(c.change7d)+'</td>'
       +'<td class="tn">'+fC(c.change30d)+'</td>'
-      +'<td class="tn">'+fM(c.mcap)+'</td>'
-      +'<td class="tn">'+(c.rsi14!=null?c.rsi14.toFixed(0):'—')+'</td></tr>';
+      +'<td class="tn muted">'+fM(c.mcap)+'</td>'
+      +'<td class="tn muted">'+fM(c.volume24h)+'</td>'
+      +'<td class="tn muted">'+(c.rsi14!=null?c.rsi14.toFixed(0):'—')+'</td>'
+      +'</tr>';
   }).join('');
-
-  var note = (meta.sources && meta.sources.note) || '';
-
-  twrap.style.display = 'block';
-  twrap.innerHTML = '<div class="tbar-meta"><b>₿ Kripto</b>'
-    +'<span class="tbm-cnt">'+coins.length+' coin</span>'
-    +'<span class="tbm-src">CoinGecko · TradingView</span>'
-    +(note?'<span class="tbm-note">'+note+'</span>':'')+'</div>'
-    +'<table class="rtable"><thead><tr>'
-    +'<th>#</th><th>Coin</th><th>Fiyat</th><th>24s%</th><th>7G%</th><th>30G%</th><th>Piy.Değ.</th><th>RSI</th>'
+  var hdr='<div class="res-hdr"><b>₿ Kripto</b><span class="res-cnt">'+coins.length+' coin</span>'+(note?'<span class="res-ok">'+note+'</span>':'')+'<span class="res-src">CoinGecko · TradingView</span></div>';
+  var tbl='<table><thead><tr>'
+    +'<th>#</th><th>Coin</th><th class="right">Fiyat</th><th class="right">24s%</th><th class="right">7G%</th><th class="right">30G%</th><th class="right">Piy.Değ.</th><th class="right">Hacim</th><th class="right">RSI</th>'
     +'</tr></thead><tbody>'+rows+'</tbody></table>';
-
-  var cnt = document.getElementById('sb-count');
-  if (cnt) cnt.textContent = coins.length;
+  _showResultArea(hdr, tbl, coins.length);
 }
 
-var _tvCurrentSym = null;
 
-// ═══════════════════════════════════════════
-// BIST SYMBOLS — Full list (150+ hisse)
-// Finnhub uses SYMBOL.IS format for BIST
-// ═══════════════════════════════════════════
-const BIST_SYMBOLS = [
-  // BIST-100 Ana hisseler
-  {symbol:'THYAO',name:'Türk Hava Yolları'},
-  {symbol:'GARAN',name:'Garanti BBVA'},
-  {symbol:'AKBNK',name:'Akbank'},
-  {symbol:'EREGL',name:'Ereğli Demir Çelik'},
-  {symbol:'KCHOL',name:'Koç Holding'},
-  {symbol:'SAHOL',name:'Sabancı Holding'},
-  {symbol:'SISE',name:'Şişe ve Cam'},
-  {symbol:'ASELS',name:'Aselsan'},
-  {symbol:'FROTO',name:'Ford Otosan'},
-  {symbol:'TOASO',name:'Tofaş Otomobil'},
-  {symbol:'YKBNK',name:'Yapı Kredi Bankası'},
-  {symbol:'PGSUS',name:'Pegasus'},
-  {symbol:'BIMAS',name:'BİM Mağazalar'},
-  {symbol:'TUPRS',name:'Tüpraş'},
-  {symbol:'PETKM',name:'Petkim'},
-  {symbol:'ARCLK',name:'Arçelik'},
-  {symbol:'KRDMD',name:'Kardemir'},
-  {symbol:'TTKOM',name:'Türk Telekom'},
-  {symbol:'TCELL',name:'Turkcell'},
-  {symbol:'ULKER',name:'Ülker Bisküvi'},
-  {symbol:'HEKTS',name:'Hektaş'},
-  {symbol:'GUBRF',name:'Gübre Fabrikaları'},
-  {symbol:'VESTL',name:'Vestel'},
-  {symbol:'MGROS',name:'Migros'},
-  {symbol:'DOHOL',name:'Doğan Holding'},
-  {symbol:'KOZAL',name:'Koza Altın'},
-  {symbol:'ISCTR',name:'İş Bankası'},
-  {symbol:'VAKBN',name:'Vakıfbank'},
-  {symbol:'HALKB',name:'Halkbank'},
-  {symbol:'ALARK',name:'Alarko Holding'},
-  {symbol:'CCOLA',name:'Coca-Cola İçecek'},
-  {symbol:'LOGO',name:'Logo Yazılım'},
-  {symbol:'NETAS',name:'Netaş Telekomünikasyon'},
-  {symbol:'AEFES',name:'Anadolu Efes'},
-  {symbol:'BRISA',name:'Brisa Bridgestone'},
-  {symbol:'EKGYO',name:'Emlak Konut GYO'},
-  {symbol:'ISGYO',name:'İş GYO'},
-  {symbol:'SNGYO',name:'Sinpaş GYO'},
-  {symbol:'ENKAI',name:'Enka İnşaat'},
-  {symbol:'OZRDN',name:'Özerden'},
-  {symbol:'AKSEN',name:'Aksen Enerji'},
-  {symbol:'KOZAA',name:'Koza Anadolu Metal'},
-  {symbol:'ANACM',name:'Anadolu Cam'},
-  {symbol:'TRKCM',name:'Trakya Cam'},
-  {symbol:'SOKM',name:'Şok Marketler'},
-  {symbol:'ODAS',name:'Odaş Elektrik'},
-  {symbol:'TAVHL',name:'TAV Havalimanları'},
-  {symbol:'SASA',name:'Sasa Polyester'},
-  {symbol:'CELHA',name:'Çelik Halat'},
-  {symbol:'KARSN',name:'Karsan Otomotiv'},
-  {symbol:'DOAS',name:'Doğuş Otomotiv'},
-  {symbol:'GESAN',name:'Gedik Seramik'},
-  {symbol:'TKFEN',name:'Tekfen Holding'},
-  {symbol:'ENJSA',name:'Enerjisa Enerji'},
-  {symbol:'AKFGY',name:'Akiş GYO'},
-  {symbol:'MAVI',name:'Mavi Giyim'},
-  {symbol:'BERA',name:'Bera Holding'},
-  {symbol:'CANTE',name:'Çan Tekstil'},
-  {symbol:'ERBOS',name:'Erbosan'},
-  {symbol:'EGEEN',name:'Ege Endüstri'},
-  {symbol:'INDES',name:'İndeks Bilgisayar'},
-  {symbol:'TRGYO',name:'Torunlar GYO'},
-  {symbol:'ISDMR',name:'İskenderun Demir Çelik'},
-  {symbol:'OTKAR',name:'Otokar'},
-  {symbol:'VESBE',name:'Vestel Beyaz Eşya'},
-  {symbol:'KONTR',name:'Kontrolmatik'},
-  {symbol:'KOCMT',name:'Koç Çimento Deva'},
-  {symbol:'POLHO',name:'Polisan Holding'},
-  {symbol:'ALGYO',name:'Alarko GYO'},
-  {symbol:'DEVA',name:'Deva Holding'},
-  {symbol:'SKBNK',name:'Şekerbank'},
-  {symbol:'GLYHO',name:'Global Yatırım Holding'},
-  {symbol:'HLGYO',name:'Halk GYO'},
-  {symbol:'ZRGYO',name:'Ziraat GYO'},
-  {symbol:'ISFIN',name:'İş Finansal Kiralama'},
-  {symbol:'AGHOL',name:'AG Anadolu Grubu'},
-  {symbol:'ARSAN',name:'Arsan Tekstil'},
-  {symbol:'CWENE',name:'CW Enerji'},
-  {symbol:'ATAKP',name:'Ata Kap Girişim'},
-  {symbol:'SELEC',name:'Selçuk Ecza'},
-  {symbol:'KLRHO',name:'Kerevitaş Gıda'},
-  {symbol:'LMKDC',name:'Limaş'},
-  {symbol:'PAGYO',name:'Pera GYO'},
-  {symbol:'YGYO',name:'Yeni Gimat GYO'},
-  {symbol:'SMART',name:'Smart Güneş'},
-  {symbol:'KARTN',name:'Kartonsan'},
-  {symbol:'ADEL',name:'Adel Kalemcilik'},
-  {symbol:'AFYON',name:'Afyon Çimento'},
-  {symbol:'AKGRT',name:'Aksigorta'},
-  {symbol:'AKMGY',name:'Akmerkez GYO'},
-  {symbol:'AKCNS',name:'Akçansa'},
-  {symbol:'ALCTL',name:'Alcatel-Lucent'},
-  {symbol:'ANHYT',name:'Anadolu Hayat'},
-  {symbol:'ANSGR',name:'Anadolu Sigorta'},
-  {symbol:'ARMDA',name:'Armada'},
-  {symbol:'ASUZU',name:'Anadolu Isuzu'},
-  {symbol:'BAGFS',name:'Bagfaş Gübre'},
-  {symbol:'BAKAB',name:'Bak Ambalaj'},
-  {symbol:'BANVT',name:'Banvit'},
-  {symbol:'BARMA',name:'Barmak Maden'},
-  {symbol:'BEYAZ',name:'Beyaz Filo'},
-  {symbol:'BFREN',name:'Bosch Fren'},
-  {symbol:'BIMAS',name:'BİM Mağazalar'},
-  {symbol:'BIZIM',name:'Bizim Toptan'},
-  {symbol:'BMEKS',name:'Bimeks Bilgi İşlem'},
-  {symbol:'BNTAS',name:'Bantaş'},
-  {symbol:'BOSSA',name:'Bossa'},
-  {symbol:'BUCIM',name:'Bursa Çimento'},
-  {symbol:'BURCE',name:'Burçelik'},
-  {symbol:'BURVA',name:'Bursa Çimento Fabrikaları'},
-  {symbol:'CIMBETON',name:'Cimbeton'},
-  {symbol:'CIMSA',name:'Çimsa'},
-  {symbol:'CLEBI',name:'Çelebi Hava Servisi'},
-  {symbol:'CPHO',name:'Çağrı Holding'},
-  {symbol:'DAGI',name:'Dagi Giyim'},
-  {symbol:'DENGE',name:'Denge Yatırım Holding'},
-  {symbol:'DGKLB',name:'Doğanlar Mobilya'},
-  {symbol:'DITAS',name:'Ditaş Doğan'},
-  {symbol:'DYOBY',name:'DYO Boya'},
-  {symbol:'ECILC',name:'Eczacıbaşı İlaç'},
-  {symbol:'EGPRO',name:'EG Pro Enerji'},
-  {symbol:'EMKEL',name:'Emkel'},
-  {symbol:'FENER',name:'Fenerbahçe'},
-  {symbol:'FLAP',name:'Flap Kongre'},
-  {symbol:'GSDDE',name:'GSD Denizcilik'},
-  {symbol:'GSDHO',name:'GSD Holding'},
-  {symbol:'GSRAY',name:'Galatasaray'},
-  {symbol:'HZNDR',name:'Haznedar'},
-  {symbol:'IDEAS',name:'IDEAS'},
-  {symbol:'IKTL',name:'İktisat Yatırım'},
-  {symbol:'IPEKE',name:'İpek Enerji'},
-  {symbol:'ISATR',name:'İş Portföy'},
-  {symbol:'JANTS',name:'Jantsa'},
-  {symbol:'KATMR',name:'Katmerciler'},
-  {symbol:'KERVT',name:'Kerevitaş'},
-  {symbol:'KLNMA',name:'Kalınma Bank'},
-  {symbol:'KNFRT',name:'Konfrut Gıda'},
-  {symbol:'KONKA',name:'Konka'},
-  {symbol:'KONYA',name:'Konya Çimento'},
-  {symbol:'KRPLAS',name:'Kır Plastik'},
-  {symbol:'KUYAS',name:'Kuyaş'},
-  {symbol:'LIDER',name:'Lider Faktoring'},
-  {symbol:'LINK',name:'Link Bilgisayar'},
-  {symbol:'MAALT',name:'Mardin Çimento'},
-  {symbol:'MNDRS',name:'Menderes Tekstil'},
-  {symbol:'MOBTL',name:'Mobiltel'},
-  {symbol:'NBORU',name:'NetBoru'},
-  {symbol:'NTHOL',name:'Net Holding'},
-  {symbol:'ORFIN',name:'Öner Finans'},
-  {symbol:'ORGE',name:'Orge Enerji'},
-  {symbol:'PAPIL',name:'Papilon'},
-  {symbol:'PCILT',name:'Pcilet'},
-  {symbol:'PENGD',name:'Penguen Gıda'},
-  {symbol:'PKART',name:'Plastik Kart'},
-  {symbol:'PRKAB',name:'Türk Prysmian Kablo'},
-  {symbol:'PRKME',name:'Park Elektrik'},
-  {symbol:'PSILO',name:'Ege Seramik'},
-  {symbol:'RHEAG',name:'Rheag'},
-  {symbol:'RTALB',name:'RT Alba'},
-  {symbol:'RUBNS',name:'Rubenis'},
-  {symbol:'SARKY',name:'Sarkuysan'},
-  {symbol:'SILVR',name:'Silver Dilber'},
-  {symbol:'SMART',name:'Smart GES'},
-  {symbol:'SNKRN',name:'Şenkron Teknoloji'},
-  {symbol:'SRVGY',name:'Servet GYO'},
-  {symbol:'TAHEM',name:'TAH Enerji'},
-  {symbol:'TATGD',name:'Tat Gıda'},
-  {symbol:'TDGYO',name:'Trend GYO'},
-  {symbol:'TEKTU',name:'Tek-Art'},
-  {symbol:'TEZOL',name:'Tezol Tekstil'},
-  {symbol:'TKNSA',name:'Teknosa'},
-  {symbol:'TMPOL',name:'Tem Polimer'},
-  {symbol:'TRGYO',name:'Torunlar GYO'},
-  {symbol:'TRILC',name:'Trilyum'},
-  {symbol:'TURSG',name:'Türkiye Sigorta'},
-  {symbol:'TUCLK',name:'Tuçka Uzay'},
-  {symbol:'USAK',name:'Uşak Seramik'},
-  {symbol:'VAKFN',name:'Vakıf Finansal'},
-  {symbol:'VKGYO',name:'Vakıf GYO'},
-  {symbol:'YATAS',name:'Yataş'},
-  {symbol:'YBTAS',name:'Yibitaş'},
-  {symbol:'YESIL',name:'Yeşil Yatırım'},
-  {symbol:'YUNSA',name:'Yünsa'},
-  {symbol:'ZOREN',name:'Zorlu Enerji'},
-];
-
-// ═══════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════
-const PROXY_URL = '/api/scan';
-
-// ── EXCHANGE CONFIG ──
-let currentExchange = 'bist';
-const EXCHANGE_META = {
-  bist:   { name: 'BIST',    currency: '₺', currencyCode: 'TRY', flag: '🇹🇷', yahooSuffix: '.IS', filters: [] },
-  nasdaq: { name: 'NASDAQ',  currency: '$',  currencyCode: 'USD', flag: '🇺🇸', yahooSuffix: '',    filters: [{ left: 'exchange', operation: 'equal', right: 'NASDAQ' }] },
-  sp500:  { name: 'S&P 500', currency: '$',  currencyCode: 'USD', flag: '🇺🇸', yahooSuffix: '',    filters: [] },
-  dax:    { name: 'DAX',     currency: '€',  currencyCode: 'EUR', flag: '🇩🇪', yahooSuffix: '.DE', filters: [] },
-  lse:    { name: 'LSE',     currency: '£',  currencyCode: 'GBP', flag: '🇬🇧', yahooSuffix: '.L',  filters: [] },
-  nikkei: { name: 'Nikkei',  currency: '¥',  currencyCode: 'JPY', flag: '🇯🇵', yahooSuffix: '.T',  filters: [] },
-};
-
-let allData = [];
-let filtered = [];
-let searchQ = '';
-let selSym = null;
-let sortSt = {field:'marketCapitalization', dir:'desc'};
-let fxRates = {TRY:44.1, EUR:1.163, GBP:1.333, JPY:0.00633};
-let scanAborted = false;
-
-// ═══════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════
-
-
-// ═══════════════════════════════════════════
-// FAVORİLER
-// ═══════════════════════════════════════════
-var favSet = new Set(JSON.parse(localStorage.getItem('df_favs') || '[]'));
-var favFilterActive = false;
-
-function saveFavs() { localStorage.setItem('df_favs', JSON.stringify([...favSet])); }
-
-function toggleFav(sym) {
-  if (favSet.has(sym)) { favSet.delete(sym); showToast('✕ ' + sym + ' favorilerden çıkarıldı'); }
-  else { favSet.add(sym); showToast('★ ' + sym + ' favorilere eklendi'); }
-  saveFavs(); renderTable(); _updateFavBtn();
-}
-
-function _updateFavBtn() {
-  var btn = document.getElementById('fav-filter-btn');
-  if (!btn) return;
-  btn.classList.toggle('on', favFilterActive);
-  btn.textContent = favFilterActive ? '★ Favoriler (' + favSet.size + ')' : '☆ Favoriler';
-}
-
-function toggleFavFilter() {
-  favFilterActive = !favFilterActive;
-  _updateFavBtn(); renderTable();
-}
-
-// ═══════════════════════════════════════════
-// KOLON SEÇİCİ
-// ═══════════════════════════════════════════
-const COL_DEFS = [
-  {key:'name', label:'ŞİRKET ADI', def:true},
-  {key:'price', label:'FİYAT', def:true},
-  {key:'mcap', label:'P.Değeri', def:true},
-  {key:'pe', label:'F/K', def:true},
-  {key:'pb', label:'PD/DD', def:true},
-  {key:'ps', label:'F/S', def:true},
-  {key:'roe', label:'ROE%', def:true},
-  {key:'roa', label:'ROA%', def:true},
-  {key:'margin', label:'MARJ%', def:true},
-  {key:'revg', label:'GELİR↑%', def:true},
-  {key:'epsg', label:'K.BÜY%', def:true},
-  {key:'fscore', label:'F-Score', def:true},
-  {key:'de', label:'B/Ö', def:true},
-  {key:'cr', label:'CARİ', def:true},
-  {key:'div', label:'TEMETTÜ%', def:true},
-  {key:'peg', label:'PEG', def:true},
-  {key:'tech_rating', label:'TV Rating', def:true},
-  {key:'rsi', label:'RSI', def:true},
-  {key:'perf3m', label:'3A Geti%', def:true},
-  {key:'sector', label:'SEKTÖR', def:true},
-];
-var _colVisible = null;
-
-function loadColPrefs() {
-  if (_colVisible) return;
-  try {
-    var saved = localStorage.getItem('df_cols_v3');
-    if (saved) { _colVisible = {}; JSON.parse(saved).forEach(function(k){ _colVisible[k]=true; }); return; }
-  } catch(e) {}
-  // Varsayılan: tüm sütunlar görünür
-  _colVisible = {};
-  COL_DEFS.forEach(function(d){ _colVisible[d.key]=true; });
-}
-
-function saveColPrefs() {
-  localStorage.setItem('df_cols_v3', JSON.stringify(Object.keys(_colVisible).filter(function(k){ return _colVisible[k]; })));
-}
-
-function isColVisible(key) { loadColPrefs(); return !!_colVisible[key]; }
-
-function applyColVisibility() {
-  loadColPrefs();
-  COL_DEFS.forEach(function(d) {
-    var vis = isColVisible(d.key);
-    document.querySelectorAll('[data-col="'+d.key+'"]').forEach(function(el){ el.style.display = vis ? '' : 'none'; });
-  });
-}
-
-function openColPicker() {
-  loadColPrefs();
-  var modal = document.getElementById('col-picker-modal');
-  if (!modal) return;
-  document.getElementById('col-picker-grid').innerHTML = COL_DEFS.map(function(d) {
-    return '<label class="col-pick-item"><input type="checkbox"' + (isColVisible(d.key)?' checked':'')
-      + ' data-ckey="'+d.key+'" onchange="toggleCol(this.dataset.ckey,this.checked)"><span>'+d.label+'</span></label>';
-  }).join('');
-  modal.classList.add('open');
-}
-
-function toggleCol(key, vis) { loadColPrefs(); _colVisible[key]=vis; saveColPrefs(); applyColVisibility(); }
-function closeColPicker() { var m=document.getElementById('col-picker-modal'); if(m) m.classList.remove('open'); }
-function resetColPrefs() { _colVisible=null; loadColPrefs(); saveColPrefs(); openColPicker(); applyColVisibility(); renderTable(); }
-
-// ═══════════════════════════════════════════
-// HABERLER
-// ═══════════════════════════════════════════
-async function fetchNews(sym) {
-  var list = document.getElementById('dnews-list');
-  if (!list) return;
-  list.innerHTML = '<div style="color:var(--muted2);font-size:11px;text-align:center;padding:20px;">Haberler yükleniyor...</div>';
-  try {
-    var res = await fetch('/api/news?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(currentExchange));
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    var data = await res.json();
-    var items = data.news || [];
-    if (!items.length) { list.innerHTML = '<div style="color:var(--muted2);font-size:11px;text-align:center;padding:20px;">Haber bulunamadı.</div>'; return; }
-    list.innerHTML = items.slice(0, 10).map(function(n) {
-      var dt = n.published ? new Date(n.published*1000).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric'}) : '';
-      return '<a href="'+(n.url||'#')+'" target="_blank" rel="noopener" class="dnews-item">'
-        + '<div class="dnews-meta"><span class="dnews-src">'+(n.source||'')+'</span><span class="dnews-date">'+dt+'</span></div>'
-        + '<div class="dnews-title">'+(n.headline||n.title||'')+'</div></a>';
-    }).join('');
-  } catch(e) {
-    list.innerHTML = '<div style="color:var(--muted2);font-size:11px;text-align:center;padding:20px;">Haber yüklenemedi.</div>';
-  }
-}
-
-function init(){
-  showApp();
-  loadColPrefs();
-  // Not: from= kontrolü DOMContentLoaded'da yapılıyor (DOM hazır olsun diye)
-}
-
-function showApp(){
-  document.getElementById('empty-sub').textContent = '';
-}
-
-// Sleep helper
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-// ═══════════════════════════════════════════
-// TRADINGVIEW SCANNER — tek istekte tüm BIST
-// ═══════════════════════════════════════════
-async function runScan(){
+function runScan(){
   closeMobileDrawer();
   // Disclaimer kontrolü
   if (!disclaimerAccepted && !localStorage.getItem('df_disclaimer_v2')) {

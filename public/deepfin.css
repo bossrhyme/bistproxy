@@ -518,15 +518,7 @@ td:first-child,td:nth-child(2){text-align:left;}
   /* ─────────────────────────────────────────
      TABLO — yatay kaydırılabilir (asıl düzeltme)
   ───────────────────────────────────────── */
-  .twrap {
-    flex: 1;
-    min-height: 0;
-    overflow-x: auto;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    position: relative;
-    -webkit-overflow-scrolling: touch;
-  }
+  /* twrap dup removed */
   table {
     min-width: 860px;              /* tüm kolonlar sığsın */
     width: max-content;            /* içeriğe göre genişle */
@@ -1194,3 +1186,76 @@ tbody tr td { height: 36px; }
 .tc{padding:7px 6px;font-size:10px;color:var(--muted2);}
 .tn{padding:7px 6px;font-family:'Geist Mono',monospace;font-size:11px;text-align:right;}
 .tsub{font-size:9px;color:var(--muted2);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+/* ── Landing varlık listesi ────────────────────────────────────── */
+.landing-header{padding:16px 12px 10px;text-align:center;flex-shrink:0;}
+.landing-title{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.3px;margin-bottom:3px;}
+.landing-sub{font-size:11px;color:var(--text2);}
+.landing-list{padding:4px 8px 12px;display:flex;flex-direction:column;gap:2px;}
+.landing-item{display:flex;align-items:center;gap:9px;padding:10px 12px;border:1px solid var(--border2);border-radius:6px;background:var(--s2);cursor:pointer;font-family:"Plus Jakarta Sans",sans-serif;text-align:left;transition:border-color .12s,background .12s;}
+.landing-item:hover{border-color:var(--accent);background:rgba(59,130,246,.05);}
+.landing-soon{cursor:default;opacity:.38;}
+.landing-soon:hover{border-color:var(--border2) !important;background:var(--s2) !important;}
+.li-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.li-name{font-size:12px;font-weight:700;color:var(--text);flex:1;}
+.li-arrow{flex-shrink:0;display:flex;align-items:center;opacity:.7;}
+.li-badge{font-size:9px;font-weight:700;color:#fff;background:var(--muted);padding:2px 6px;border-radius:10px;flex-shrink:0;text-transform:uppercase;letter-spacing:.04em;}
+
+/* ── Geri butonu (panel → landing) ─────────────────────────────── */
+.sb-back-btn{display:flex;align-items:center;gap:6px;padding:8px 10px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;width:100%;font-family:"Plus Jakarta Sans",sans-serif;flex-shrink:0;}
+.sb-back-btn:hover{background:var(--s2);color:var(--accent);}
+.sb-back-btn svg{flex-shrink:0;}
+
+/* ── Asset Nav Bar ─────────────────────────────────────────────── */
+.sidebar{display:flex !important;flex-direction:column !important;overflow:hidden !important;padding:0 !important;}
+.asset-nav-bar{display:flex;overflow-x:auto;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--s2);scrollbar-width:none;}
+.asset-nav-bar::-webkit-scrollbar{display:none;}
+.anb{display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 8px 5px;border:none;border-bottom:2px solid transparent;background:none;color:var(--muted2);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap;transition:color .12s,border-color .12s;flex-shrink:0;font-size:13px;line-height:1;}
+.anb span{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-top:2px;}
+.anb small{font-size:7px;color:var(--muted);letter-spacing:.03em;}
+.anb:hover:not(.soon){color:var(--text2);}
+.anb.active{color:var(--accent);border-bottom-color:var(--accent);}
+.anb.soon{opacity:.35;cursor:default;}
+
+/* ── Sidebar Panels ─────────────────────────────────────────────── */
+.sbp{display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0;}
+.sbp.active{display:flex;}
+.sbp-back{display:flex;align-items:center;gap:5px;padding:7px 10px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;width:100%;font-family:'Plus Jakarta Sans',sans-serif;flex-shrink:0;transition:color .12s;}
+.sbp-back:hover{color:var(--accent);}
+.sbp-scroll{flex:1;overflow-y:auto;overflow-x:hidden;}
+.sbp-scroll::-webkit-scrollbar{width:3px;}
+.sbp-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.sbp-scan-wrap{padding:6px 8px 8px;flex-shrink:0;}
+.sbp-scan-btn{width:100%;padding:9px;background:var(--accent);border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:.02em;transition:opacity .15s;}
+.sbp-scan-btn:hover{opacity:.85;}
+
+/* ── Landing ekranı ─────────────────────────────────────────────── */
+.landing-hdr{padding:16px 12px 10px;text-align:center;}
+.landing-title{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.3px;margin-bottom:3px;}
+.landing-sub{font-size:11px;color:var(--text2);}
+.landing-list{padding:4px 8px 12px;display:flex;flex-direction:column;gap:2px;}
+.li-btn{display:flex;align-items:center;gap:9px;padding:10px 12px;border:1px solid var(--border2);border-radius:6px;background:var(--s2);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:border-color .12s,background .12s;}
+.li-btn:hover{border-color:var(--accent);background:rgba(59,130,246,.05);}
+.li-soon{display:flex;align-items:center;gap:9px;padding:10px 12px;border:1px solid var(--border2);border-radius:6px;background:var(--s2);opacity:.35;}
+.li-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.li-name{font-size:12px;font-weight:700;color:var(--text);flex:1;text-align:left;}
+.li-arrow{flex-shrink:0;}
+.li-badge{font-size:9px;font-weight:700;color:#fff;background:var(--muted);padding:2px 6px;border-radius:10px;flex-shrink:0;text-transform:uppercase;letter-spacing:.04em;}
+
+/* ── Sonuç alanı (fon/kripto tabloları) ─────────────────────────── */
+#result-area{width:100%;}
+#result-area table{width:100%;border-collapse:collapse;}
+#result-area thead{position:sticky;top:0;z-index:5;}
+#result-area thead th{padding:5px 6px;text-align:left;font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border);background:var(--s1);}
+#result-area thead th.right{text-align:right;}
+#result-area tbody tr{border-bottom:1px solid var(--border2);transition:background .1s;}
+#result-area tbody tr:hover{background:var(--s2);}
+#result-area .tc{padding:7px 6px;font-size:10px;color:var(--muted2);}
+#result-area .tn{padding:7px 6px;font-family:'Geist Mono',monospace;font-size:11px;text-align:right;color:var(--text);}
+#result-area .tn.muted{color:var(--text2);}
+#result-area .tsub{font-size:9px;color:var(--muted2);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#result-area .res-hdr{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--s2);border-bottom:1px solid var(--border);font-size:11px;position:sticky;top:0;z-index:6;}
+#result-area .res-hdr b{color:var(--text);}
+#result-area .res-cnt{color:var(--accent);font-weight:600;}
+#result-area .res-src{color:var(--muted2);font-size:10px;margin-left:auto;}
+#result-area .res-ok{color:var(--green);font-size:10px;}
