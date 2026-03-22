@@ -1,4 +1,17 @@
 
+// ── Chip seçim fonksiyonları ──────────────────────────────────────────
+// Radio: aynı .chips container içinde tek seçim
+function chipRadio(el) {
+  var container = el.closest('.chips') || el.parentElement;
+  container.querySelectorAll('.chip').forEach(function(c) { c.classList.remove('on'); });
+  el.classList.add('on');
+}
+// Toggle: çoklu seçim (checkbox davranışı)
+function chipToggle(el) {
+  el.classList.toggle('on');
+}
+
+
 // ── Fon Tarama ────────────────────────────────────────────────────────
 async function runFonScan() {
   const btn = document.querySelector('#asset-panel-fon .ast-scan-btn');
