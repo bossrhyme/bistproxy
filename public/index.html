@@ -444,7 +444,7 @@ if('serviceWorker' in navigator){
           <span class="alb-badge-soon">yakında</span>
         </button>
 
-        <button class="asset-landing-btn alb-soon-btn" onclick="selectAsset('kripto')">
+        <button class="asset-landing-btn" onclick="selectAsset('kripto')">
           <span class="alb-icon">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="8" cy="8" r="8" fill="#F7931A"/>
@@ -452,7 +452,7 @@ if('serviceWorker' in navigator){
             </svg>
           </span>
           <span class="alb-name">Kripto</span>
-          <span class="alb-badge-soon">yakında</span>
+          <span class="alb-live"><svg width="8" height="9" viewBox="0 0 8 9" fill="none"><polygon points="0,0 8,4.5 0,9" fill="#3b82f6"/></svg></span>
         </button>
 
         <button class="asset-landing-btn alb-soon-btn" onclick="selectAsset('opsiyon')">
@@ -759,7 +759,7 @@ if('serviceWorker' in navigator){
           </div>
         </div>
         <div class="ad-slot ad-slot-sidebar" id="ad-fon"><span>Reklam</span><span class="ad-slot-label">300 × 120 · Carbon Ads / AdSense</span></div>
-        <div class="ast-scan-wrap"><button class="ast-scan-btn" onclick="alert('TEFAS API entegrasyonu yakında')">▶ FON TARA</button></div>
+        <div class="ast-scan-wrap"><button class="ast-scan-btn" onclick="runFonScan()">▶ Fon Tara</button></div>
       </div>
 
 <div class="asset-panel" id="asset-panel-etf">
@@ -908,7 +908,7 @@ if('serviceWorker' in navigator){
         </div>
         <div class="ad-slot ad-slot-sidebar" id="ad-kripto"><span>Reklam</span><span class="ad-slot-label">300 × 120 · Carbon Ads / AdSense</span></div>
         <div class="ast-scan-wrap">
-          <button class="ast-scan-btn" onclick="alert('Kripto tarayıcı yakında — TradingView /crypto/scan entegrasyonu planlanıyor')" style="background:var(--muted);cursor:default;">yakında</button>
+          <button class="ast-scan-btn" onclick="runKriptoScan()">▶ Kripto Tara</button>
         </div>
       </div>
 

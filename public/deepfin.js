@@ -1,4 +1,249 @@
 
+// ── Fon Tarama ────────────────────────────────────────────────────────
+async function runFonScan() {
+  const btn = document.querySelector('#asset-panel-fon .ast-scan-btn');
+  if (btn) { btn.textContent = '⏳ Taranıyor...'; btn.disabled = true; }
+
+  // Panel'den filtre değerlerini topla
+  const panel = document.getElementById('asset-panel-fon');
+  const getVal = (sel) => { const el = panel?.querySelector(sel); return el?.value || ''; };
+
+  const params = new URLSearchParams({
+    fontur:     'YAT',
+    sort:       'ret1y',
+    limit:      '100'
+  });
+  const minRet1y  = getVal('input[placeholder="—"]:nth-of-type(1)');
+  const minSharpe = panel?.querySelectorAll('.filter-group')[4]?.querySelectorAll('input')[0]?.value;
+  const minSize   = panel?.querySelectorAll('.filter-group')[4]?.querySelectorAll('input')[2]?.value;
+  if (minRet1y)  params.set('min_ret1y',  minRet1y);
+  if (minSharpe) params.set('min_sharpe', minSharpe);
+  if (minSize)   params.set('min_size',   minSize);
+
+  try {
+    const r = await fetch('/api/fon-scan?' + params.toString());
+    const data = await r.json();
+
+    if (data.error && !data.funds?.length) {
+      alert('Fon verisi alınamadı: ' + data.error);
+      return;
+    }
+
+    // Sonuçları göster
+    renderFonResults(data.funds || [], data);
+
+  } catch(err) {
+    alert('Fon tarama hatası: ' + err.message);
+  } finally {
+    if (btn) { btn.textContent = '▶ Fon Tara'; btn.disabled = false; }
+  }
+}
+
+function renderFonResults(funds, meta) {
+  // Tarayıcı ekranını aç
+  showScreener();
+
+  // twrap içine fon tablosu yaz
+  const twrap = document.getElementById('twrap');
+  if (!twrap) return;
+
+  const fmt = (v, dec=1) => v != null ? v.toFixed(dec) + '%' : '—';
+  const fmtM = (v) => v != null ? '₺' + v.toFixed(0) + 'M' : '—';
+
+  const rows = funds.map((f, i) => {
+    const retColor = (v) => v == null ? '' : v >= 0 ? 'color:var(--green)' : 'color:var(--red)';
+    const verBadge = f.verified
+      ? '<span style="font-size:8px;color:var(--green);margin-left:4px;">✓CG+TV</span>'
+      : '<span style="font-size:8px;color:var(--muted);margin-left:4px;">CG</span>';
+
+    return `<tr>
+      <td style="padding:8px 10px;font-size:11px;color:var(--muted2)">${i+1}</td>
+      <td style="padding:8px 10px">
+        <div style="font-size:12px;font-weight:700;color:var(--text)">${f.code}${verBadge}</div>
+        <div style="font-size:10px;color:var(--muted2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${f.name}">${f.name}</div>
+      </td>
+      <td style="padding:8px 10px;font-family:'Geist Mono',monospace;font-size:11px;color:var(--text)">₺${f.price?.toFixed(4) || '—'}</td>
+      <td style="padding:8px 10px;font-family:'Geist Mono',monospace;font-size:11px;${retColor(f.ret1m)}">${fmt(f.ret1m)}</td>
+      <td style="padding:8px 10px;font-family:'Geist Mono',monospace;font-size:11px;${retColor(f.ret3m)}">${fmt(f.ret3m)}</td>
+      <td style="padding:8px 10px;font-family:'Geist Mono',monospace;font-size:11px;${retColor(f.ret1y)}">${fmt(f.ret1y)}</td>
+      <td style="padding:8px 10px;font-family:'Geist Mono',monospace;font-size:11px;color:var(--text)">${f.sharpe != null ? f.sharpe.toFixed(2) : '—'}</td>
+      <td style="padding:8px 10px;font-family:'Geist Mono',monospace;font-size:11px;color:var(--text2)">${fmtM(f.totalValueM)}</td>
+    </tr>`;
+  }).join('');
+
+  twrap.style.display = 'block';
+  twrap.innerHTML = `
+    <div style="padding:8px 12px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted2);display:flex;align-items:center;gap:8px;">
+      <span>📊 TEFAS Fon Taraması</span>
+      <span style="color:var(--green)">${funds.length} fon</span>
+      <span>·</span>
+      <span>Kaynak: TEFAS + Yahoo Finance doğrulaması</span>
+      <span style="margin-left:auto;font-size:10px;color:var(--muted)">${meta.updatedAt ? new Date(meta.updatedAt).toLocaleTimeString('tr-TR') : ''}</span>
+    </div>
+    <table style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="border-bottom:1px solid var(--border)">
+          <th style="padding:6px 10px;text-align:left;font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase">#</th>
+          <th style="padding:6px 10px;text-align:left;font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase">Fon</th>
+          <th style="padding:6px 10px;text-align:right;font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase">Fiyat</th>
+          <th style="padding:6px 10px;text-align:right;font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase">1A%</th>
+          <th style="padding:6px 10px;text-align:right;font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase">3A%</th>
+          <th style="padding:6px 10px;text-align:right;font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase">1Y%</th>
+          <th style="padding:6px 10px;text-align:right;font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase">Sharpe</th>
+          <th style="padding:6px 10px;text-align:right;font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase">Büyüklük</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+// ── Kripto Tarama ─────────────────────────────────────────────────────
+async function runKriptoScan() {
+  const btn = document.querySelector('#asset-panel-kripto .ast-scan-btn');
+  if (btn) { btn.textContent = '⏳ Taranıyor...'; btn.disabled = true; }
+
+  const panel = document.getElementById('asset-panel-kripto');
+
+  // Aktif chip'ten kategori belirle
+  const activeChip = panel?.querySelector('.chip.on');
+  const chipText = activeChip?.textContent?.trim() || '';
+  const categoryMap = {
+    'Layer 1': 'layer-1', 'Layer 2': 'layer-2',
+    'DeFi': 'decentralized-finance-defi',
+    'Meme': 'meme-token',
+    'AI': 'artificial-intelligence',
+    'Gaming / GameFi': 'gaming'
+  };
+  const category = categoryMap[chipText] || '';
+
+  // Aktif strateji presetini belirle
+  const stratChip = panel?.querySelectorAll('.filter-group')[1]?.querySelector('.chip.on');
+  const stratText = stratChip?.textContent?.trim() || '';
+  const presetMap = {
+    'Hacim Patlaması': 'hacim_patlamasi',
+    'RSI Dip': 'rsi_dip',
+    'ATH Yakını': 'ath_yakini',
+    'Büyük Kapı': 'buyuk_kap',
+    'Küçük Kapı Gem': 'kucuk_cap_gem',
+    'Momentum': 'momentum',
+    'Düşük Arz': 'dusuk_arz'
+  };
+  const preset = presetMap[stratText] || '';
+
+  // Filtre inputları
+  const filterGroups = panel?.querySelectorAll('.filter-group');
+  const getInput = (groupIdx, inputIdx) => {
+    return filterGroups?.[groupIdx]?.querySelectorAll('input')?.[inputIdx]?.value || '';
+  };
+
+  const params = new URLSearchParams({ limit: '100', sort: 'market_cap_desc' });
+  if (category) params.set('category', category);
+  if (preset)   params.set('preset', preset);
+
+  // Piyasa filtreleri (group index 3)
+  const minMcap = getInput(3, 0); if (minMcap) params.set('min_mcap', minMcap);
+  const minVol  = getInput(3, 2); if (minVol)  params.set('min_vol24h', minVol);
+  // Performans filtreleri (group index 4)
+  const minChg24h = getInput(4, 0); if (minChg24h) params.set('min_chg24h', minChg24h);
+  const minChg7d  = getInput(4, 2); if (minChg7d)  params.set('min_chg7d', minChg7d);
+  // Teknik filtreler (group index 5)
+  const maxRsi = getInput(5, 1); if (maxRsi) params.set('max_rsi', maxRsi);
+
+  try {
+    const r = await fetch('/api/kripto-scan?' + params.toString());
+    const data = await r.json();
+
+    if (data.error && !data.coins?.length) {
+      alert('Kripto verisi alınamadı: ' + data.error);
+      return;
+    }
+
+    renderKriptoResults(data.coins || [], data);
+
+  } catch(err) {
+    alert('Kripto tarama hatası: ' + err.message);
+  } finally {
+    if (btn) { btn.textContent = '▶ Kripto Tara'; btn.disabled = false; }
+  }
+}
+
+function renderKriptoResults(coins, meta) {
+  showScreener();
+  const twrap = document.getElementById('twrap');
+  if (!twrap) return;
+
+  const fmt = (v, dec=2) => v != null ? (v >= 0 ? '+' : '') + v.toFixed(dec) + '%' : '—';
+  const fmtPrice = (v) => {
+    if (v == null) return '—';
+    if (v >= 1000) return '$' + v.toLocaleString('en', {maximumFractionDigits:0});
+    if (v >= 1)    return '$' + v.toFixed(2);
+    if (v >= 0.01) return '$' + v.toFixed(4);
+    return '$' + v.toFixed(6);
+  };
+  const fmtMcap = (v) => {
+    if (!v) return '—';
+    if (v >= 1e9) return '$' + (v/1e9).toFixed(1) + 'B';
+    if (v >= 1e6) return '$' + (v/1e6).toFixed(0) + 'M';
+    return '$' + v.toFixed(0);
+  };
+
+  const rows = coins.map((c, i) => {
+    const chgColor = (v) => v == null ? '' : v >= 0 ? 'color:var(--green)' : 'color:var(--red)';
+    const verBadge = c.verified
+      ? '<span style="font-size:8px;color:var(--green);margin-left:3px">✓</span>'
+      : '';
+    const imgEl = c.image
+      ? `<img src="${c.image}" width="16" height="16" style="border-radius:50%;flex-shrink:0" onerror="this.style.display='none'">`
+      : '';
+
+    return `<tr style="border-bottom:1px solid var(--border2)">
+      <td style="padding:7px 8px;font-size:10px;color:var(--muted2)">${c.rank || i+1}</td>
+      <td style="padding:7px 8px">
+        <div style="display:flex;align-items:center;gap:5px">
+          ${imgEl}
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--text)">${c.symbol}${verBadge}</div>
+            <div style="font-size:9px;color:var(--muted2)">${c.name}</div>
+          </div>
+        </div>
+      </td>
+      <td style="padding:7px 8px;font-family:'Geist Mono',monospace;font-size:11px;color:var(--text);text-align:right">${fmtPrice(c.price)}</td>
+      <td style="padding:7px 8px;font-family:'Geist Mono',monospace;font-size:11px;text-align:right;${chgColor(c.change24h)}">${fmt(c.change24h)}</td>
+      <td style="padding:7px 8px;font-family:'Geist Mono',monospace;font-size:11px;text-align:right;${chgColor(c.change7d)}">${fmt(c.change7d)}</td>
+      <td style="padding:7px 8px;font-family:'Geist Mono',monospace;font-size:11px;text-align:right;${chgColor(c.change30d)}">${fmt(c.change30d)}</td>
+      <td style="padding:7px 8px;font-family:'Geist Mono',monospace;font-size:11px;color:var(--text2);text-align:right">${fmtMcap(c.mcap)}</td>
+      <td style="padding:7px 8px;font-family:'Geist Mono',monospace;font-size:11px;color:var(--text2);text-align:right">${fmtMcap(c.volume24h)}</td>
+      <td style="padding:7px 8px;font-family:'Geist Mono',monospace;font-size:11px;color:var(--text2);text-align:right">${c.rsi14 != null ? c.rsi14.toFixed(0) : '—'}</td>
+    </tr>`;
+  }).join('');
+
+  const verNote = meta.sources?.note || '';
+
+  twrap.style.display = 'block';
+  twrap.innerHTML = `
+    <div style="padding:8px 12px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted2);display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span>₿ Kripto Taraması</span>
+      <span style="color:var(--accent)">${coins.length} coin</span>
+      <span>·</span>
+      <span style="color:var(--green);font-size:10px">${verNote}</span>
+      <span style="margin-left:auto;font-size:10px">${meta.updatedAt ? new Date(meta.updatedAt).toLocaleTimeString('tr-TR') : ''}</span>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:11px">
+      <thead><tr style="border-bottom:1px solid var(--border)">
+        <th style="padding:6px 8px;text-align:left;font-size:9px;color:var(--muted);font-weight:600">#</th>
+        <th style="padding:6px 8px;text-align:left;font-size:9px;color:var(--muted);font-weight:600">Coin</th>
+        <th style="padding:6px 8px;text-align:right;font-size:9px;color:var(--muted);font-weight:600">Fiyat</th>
+        <th style="padding:6px 8px;text-align:right;font-size:9px;color:var(--muted);font-weight:600">24s%</th>
+        <th style="padding:6px 8px;text-align:right;font-size:9px;color:var(--muted);font-weight:600">7G%</th>
+        <th style="padding:6px 8px;text-align:right;font-size:9px;color:var(--muted);font-weight:600">30G%</th>
+        <th style="padding:6px 8px;text-align:right;font-size:9px;color:var(--muted);font-weight:600">Piy.Değ.</th>
+        <th style="padding:6px 8px;text-align:right;font-size:9px;color:var(--muted);font-weight:600">Hacim</th>
+        <th style="padding:6px 8px;text-align:right;font-size:9px;color:var(--muted);font-weight:600">RSI</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
 // ── Asset Type Switcher ──────────────────────────────────────────────
 var ASSET_META={
   hisse:{icon:'📈',name:'Hisse'},
