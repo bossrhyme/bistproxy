@@ -716,9 +716,12 @@ if('serviceWorker' in navigator){
           </div>
           <div class="filter-group">
             <div class="filter-group-title">Filtreler</div>
+            <div class="frow"><div class="flbl">YTD Getiri %</div><div class="finps"><input type="number" id="fon_retYtd_min" placeholder="—"><input type="number" id="fon_retYtd_max" placeholder="—"></div></div>
             <div class="frow"><div class="flbl">1Y Getiri %</div><div class="finps"><input type="number" id="fon_ret1y_min" placeholder="—"><input type="number" id="fon_ret1y_max" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">3A Getiri %</div><div class="finps"><input type="number" id="fon_ret3m_min" placeholder="—"><input type="number" id="fon_ret3m_max" placeholder="—"></div></div>
             <div class="frow"><div class="flbl">Sharpe Oranı</div><div class="finps"><input type="number" id="fon_sharpe_min" placeholder="—"><input type="number" id="fon_sharpe_max" placeholder="—"></div></div>
             <div class="frow"><div class="flbl">Büyüklük (₺M)</div><div class="finps"><input type="number" id="fon_size_min" placeholder="—"><input type="number" id="fon_size_max" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">Yatırımcı Sayısı</div><div class="finps"><input type="number" id="fon_inv_min" placeholder="—"><input type="number" id="fon_inv_max" placeholder="—"></div></div>
           </div>
         </div><!-- /sbp-scroll fon -->
         <div class="ad-slot ad-slot-sidebar" id="ad-fon-scan"><span>Reklam</span><span class="ad-slot-label">300×120 · AdSense</span></div>
@@ -758,7 +761,10 @@ if('serviceWorker' in navigator){
             <div class="frow"><div class="flbl">Piyasa Değeri ($M)</div><div class="finps"><input type="number" id="k_mcap_min" placeholder="—"><input type="number" id="k_mcap_max" placeholder="—"></div></div>
             <div class="frow"><div class="flbl">24s Hacim ($M)</div><div class="finps"><input type="number" id="k_vol_min" placeholder="—"><input type="number" id="k_vol_max" placeholder="—"></div></div>
             <div class="frow"><div class="flbl">24s Değişim %</div><div class="finps"><input type="number" id="k_chg24h_min" placeholder="—"><input type="number" id="k_chg24h_max" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">7G Değişim %</div><div class="finps"><input type="number" id="k_chg7d_min" placeholder="—"><input type="number" id="k_chg7d_max" placeholder="—"></div></div>
             <div class="frow"><div class="flbl">RSI (14)</div><div class="finps"><input type="number" id="k_rsi_min" placeholder="—"><input type="number" id="k_rsi_max" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">ATH'dan Uzaklık %</div><div class="finps"><input type="number" id="k_ath_min" placeholder="—"><input type="number" id="k_ath_max" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">TV Sinyal</div><div class="finps" style="flex:1"><select id="k_tvrating" style="width:100%;background:var(--s2);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:4px 6px;font-size:11px"><option value="">Tümü</option><option value="STRONG_BUY">Güçlü Al</option><option value="BUY">Al</option><option value="NEUTRAL">Nötr</option><option value="SELL">Sat</option><option value="STRONG_SELL">Güçlü Sat</option></select></div></div>
           </div>
         </div><!-- /sbp-scroll kripto -->
         <div class="ad-slot ad-slot-sidebar" id="ad-kripto-scan"><span>Reklam</span><span class="ad-slot-label">300×120 · AdSense</span></div>

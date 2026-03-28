@@ -12,6 +12,12 @@ function chipToggle(el) { el.classList.toggle('on'); }
 
 // ── Durum ─────────────────────────────────────────────────────
 var _activeAsset = null;
+var _fonTicker   = [];
+var _kriptoTicker= [];
+var _fonData     = [];
+var _kriptoData  = [];
+var _fonMeta     = {};
+var _kriptoMeta  = {};
 
 // ── Landing'e dön ─────────────────────────────────────────────
 function goBackToLanding() {
@@ -37,6 +43,7 @@ function selectAsset(type) {
   if (sp) sp.classList.add('active');
 
   _clearContent();
+  _updateSortOptions(type);
 
   // Hisse için hisse-table göster, result-area gizle
   // Diğerleri için hisse-table gizle, result-area hazırla
@@ -49,6 +56,46 @@ function selectAsset(type) {
     if (ht) ht.style.display = 'none';
     if (ra) { ra.style.display = 'none'; ra.innerHTML = ''; }
   }
+}
+
+// ── Asset'e göre sort seçeneklerini güncelle ───────────────
+function _updateSortOptions(type) {
+  var sel = document.getElementById('sortf');
+  if (!sel) return;
+  var opts = {
+    hisse: [
+      {v:'marketCapitalization',l:'Piyasa Değeri'},
+      {v:'peNormalizedAnnual',l:'F/K'},
+      {v:'pbAnnual',l:'PD/DD'},
+      {v:'roeTTM',l:'ROE'},
+      {v:'roaTTM',l:'ROA'},
+      {v:'netProfitMarginTTM',l:'Kar Marjı'},
+      {v:'dividendYieldIndicatedAnnual',l:'Temettü'},
+      {v:'revenueGrowthTTMYoy',l:'Gelir Büyümesi'},
+      {v:'currentRatioAnnual',l:'Cari Oran'}
+    ],
+    fon: [
+      {v:'ret1y',l:'1Y Getiri'},
+      {v:'retYtd',l:'YTD Getiri'},
+      {v:'ret3m',l:'3A Getiri'},
+      {v:'ret1m',l:'1A Getiri'},
+      {v:'sharpe',l:'Sharpe Oranı'},
+      {v:'totalValueM',l:'Büyüklük'},
+      {v:'investors',l:'Yatırımcı Sayısı'}
+    ],
+    kripto: [
+      {v:'mcap',l:'Piyasa Değeri'},
+      {v:'change24h',l:'24s Değişim'},
+      {v:'change7d',l:'7G Değişim'},
+      {v:'volume24h',l:'Hacim (24s)'},
+      {v:'rsi14',l:'RSI (14)'},
+      {v:'athChange',l:"ATH'dan Uzaklık"}
+    ]
+  };
+  var list = opts[type] || opts.hisse;
+  sel.innerHTML = list.map(function(o){ return '<option value="'+o.v+'">'+o.l+'</option>'; }).join('');
+  var dsel = document.getElementById('sortd');
+  if (dsel) dsel.value = 'desc';
 }
 
 // ── Nav bar tıklaması ─────────────────────────────────────────
@@ -118,7 +165,25 @@ function runFonScan() {
 
   fetch('/api/fon-scan?' + params)
     .then(function(r){ return r.json(); })
-    .then(function(d){ _renderFon(d.funds||[], d); })
+    .then(function(d){
+      var funds = d.funds || [];
+      // Client-side extra filters
+      var v = function(id){ var el=document.getElementById(id); return el&&el.value?parseFloat(el.value):null; };
+      var minYtd=v('fon_retYtd_min'), maxYtd=v('fon_retYtd_max');
+      var min3m=v('fon_ret3m_min'),   max3m=v('fon_ret3m_max');
+      var minInv=v('fon_inv_min'),     maxInv=v('fon_inv_max');
+      if(minYtd!=null) funds=funds.filter(function(f){ return f.retYtd!=null&&f.retYtd>=minYtd; });
+      if(maxYtd!=null) funds=funds.filter(function(f){ return f.retYtd!=null&&f.retYtd<=maxYtd; });
+      if(min3m!=null)  funds=funds.filter(function(f){ return f.ret3m!=null&&f.ret3m>=min3m; });
+      if(max3m!=null)  funds=funds.filter(function(f){ return f.ret3m!=null&&f.ret3m<=max3m; });
+      if(minInv!=null) funds=funds.filter(function(f){ return f.investors>=minInv; });
+      if(maxInv!=null) funds=funds.filter(function(f){ return f.investors<=maxInv; });
+      _fonData = funds;
+      _fonMeta = d;
+      _fonTicker = funds.slice(0, 20);
+      _renderFon(funds, d);
+      updateTicker();
+    })
     .catch(function(e){
       var ra=document.getElementById('result-area');
       if(ra) ra.innerHTML='<div style="padding:20px;text-align:center;color:var(--red);font-size:12px">Hata: '+e.message+'</div>';
@@ -143,16 +208,18 @@ function _renderFon(funds, meta) {
       +'<td style="padding:7px 6px"><div style="font-size:12px;font-weight:700;color:var(--text)">'+f.code+ver+'</div>'
       +'<div class="tsub" title="'+f.name+'">'+f.name+'</div></td>'
       +'<td class="tn">₺'+(f.price||0).toFixed(4)+'</td>'
+      +'<td class="tn">'+fR(f.retYtd)+'</td>'
       +'<td class="tn">'+fR(f.ret1m)+'</td>'
       +'<td class="tn">'+fR(f.ret3m)+'</td>'
       +'<td class="tn">'+fR(f.ret1y)+'</td>'
       +'<td class="tn">'+(f.sharpe!=null?f.sharpe.toFixed(2):'—')+'</td>'
       +'<td class="tn muted">₺'+(f.totalValueM||0).toFixed(0)+'M</td>'
+      +'<td class="tn muted">'+(f.investors?f.investors.toLocaleString('tr-TR'):'—')+'</td>'
       +'</tr>';
   }).join('');
   var hdr='<div class="res-hdr"><b>TEFAS Fon</b><span class="res-cnt">'+funds.length+' fon</span><span class="res-ok">TEFAS · Yahoo Finance</span><span class="res-src" style="margin-left:auto">çapraz doğrulama aktif</span></div>';
   var tbl='<table><thead><tr>'
-    +'<th>#</th><th>Fon</th><th class="right">Fiyat</th><th class="right">1A%</th><th class="right">3A%</th><th class="right">1Y%</th><th class="right">Sharpe</th><th class="right">Büyüklük</th>'
+    +'<th>#</th><th>Fon</th><th class="right">Fiyat</th><th class="right">YTD%</th><th class="right">1A%</th><th class="right">3A%</th><th class="right">1Y%</th><th class="right">Sharpe</th><th class="right">Büyüklük</th><th class="right">Yatırımcı</th>'
     +'</tr></thead><tbody>'+rows+'</tbody></table>';
   _showResultArea(hdr, tbl, funds.length);
 }
@@ -176,7 +243,25 @@ function runKriptoScan() {
 
   fetch('/api/kripto-scan?'+params)
     .then(function(r){return r.json();})
-    .then(function(d){_renderKripto(d.coins||[],d);})
+    .then(function(d){
+      var coins = d.coins || [];
+      // Client-side extra filters
+      var v = function(id){ var el=document.getElementById(id); return el&&el.value?parseFloat(el.value):null; };
+      var min7d=v('k_chg7d_min'), max7d=v('k_chg7d_max');
+      var minAth=v('k_ath_min'),  maxAth=v('k_ath_max');
+      var tvSel=document.getElementById('k_tvrating');
+      var tvRat=tvSel&&tvSel.value?tvSel.value:'';
+      if(min7d!=null) coins=coins.filter(function(c){ return c.change7d!=null&&c.change7d>=min7d; });
+      if(max7d!=null) coins=coins.filter(function(c){ return c.change7d!=null&&c.change7d<=max7d; });
+      if(minAth!=null) coins=coins.filter(function(c){ return c.athChange!=null&&c.athChange>=minAth; });
+      if(maxAth!=null) coins=coins.filter(function(c){ return c.athChange!=null&&c.athChange<=maxAth; });
+      if(tvRat) coins=coins.filter(function(c){ return c.tvRating===tvRat; });
+      _kriptoData = coins;
+      _kriptoMeta = d;
+      _kriptoTicker = coins.slice(0, 20);
+      _renderKripto(coins, d);
+      updateTicker();
+    })
     .catch(function(e){
       var ra=document.getElementById('result-area');
       if(ra) ra.innerHTML='<div style="padding:20px;text-align:center;color:var(--red);font-size:12px">Hata: '+e.message+'</div>';
@@ -193,6 +278,7 @@ function _renderKripto(coins, meta) {
   var fP=function(v){if(!v)return'—';if(v>=1000)return'$'+v.toLocaleString('en',{maximumFractionDigits:0});if(v>=1)return'$'+v.toFixed(2);if(v>=0.01)return'$'+v.toFixed(4);return'$'+v.toFixed(6);};
   var fM=function(v){if(!v)return'—';if(v>=1e9)return'$'+(v/1e9).toFixed(1)+'B';if(v>=1e6)return'$'+(v/1e6).toFixed(0)+'M';return'$'+v.toFixed(0);};
   var fC=function(v){if(v==null)return'<span style="color:var(--muted2)">—</span>';return'<span style="color:'+(v>=0?'var(--green)':'var(--red)')+'">'+(v>=0?'+':'')+v.toFixed(1)+'%</span>';};
+  var tvBadge=function(r){var map={STRONG_BUY:['var(--green)','G.AL'],BUY:['var(--green)','AL'],NEUTRAL:['var(--muted2)','NÖT'],SELL:['var(--red)','SAT'],STRONG_SELL:['var(--red)','G.SAT']};if(!r||!map[r])return'<span style="color:var(--muted2)">—</span>';return'<span style="color:'+map[r][0]+';font-size:9px;font-weight:700">'+map[r][1]+'</span>';};
   var note=(meta.sources&&meta.sources.note)||'';
   var rows=coins.map(function(c,i){
     var ver=c.verified?'<sup style="color:var(--green);font-size:8px">✓</sup>':'';
@@ -208,11 +294,13 @@ function _renderKripto(coins, meta) {
       +'<td class="tn muted">'+fM(c.mcap)+'</td>'
       +'<td class="tn muted">'+fM(c.volume24h)+'</td>'
       +'<td class="tn muted">'+(c.rsi14!=null?c.rsi14.toFixed(0):'—')+'</td>'
+      +'<td class="tn">'+fC(c.athChange)+'</td>'
+      +'<td class="tn">'+tvBadge(c.tvRating)+'</td>'
       +'</tr>';
   }).join('');
   var hdr='<div class="res-hdr"><b>₿ Kripto</b><span class="res-cnt">'+coins.length+' coin</span>'+(note?'<span class="res-ok">'+note+'</span>':'')+'<span class="res-src">CoinGecko · TradingView</span></div>';
   var tbl='<table><thead><tr>'
-    +'<th>#</th><th>Coin</th><th class="right">Fiyat</th><th class="right">24s%</th><th class="right">7G%</th><th class="right">30G%</th><th class="right">Piy.Değ.</th><th class="right">Hacim</th><th class="right">RSI</th>'
+    +'<th>#</th><th>Coin</th><th class="right">Fiyat</th><th class="right">24s%</th><th class="right">7G%</th><th class="right">30G%</th><th class="right">Piy.Değ.</th><th class="right">Hacim</th><th class="right">RSI</th><th class="right">ATH%</th><th class="right">TV</th>'
     +'</tr></thead><tbody>'+rows+'</tbody></table>';
   _showResultArea(hdr, tbl, coins.length);
 }
@@ -1463,7 +1551,20 @@ function colSort(f){
 function onSortChange(){
   sortSt.field = document.getElementById('sortf').value;
   sortSt.dir   = document.getElementById('sortd').value;
-  renderTable();
+  if (_activeAsset === 'fon' && _fonData.length) {
+    _renderFon(_sortAsset(_fonData, sortSt.field, sortSt.dir), _fonMeta);
+  } else if (_activeAsset === 'kripto' && _kriptoData.length) {
+    _renderKripto(_sortAsset(_kriptoData, sortSt.field, sortSt.dir), _kriptoMeta);
+  } else {
+    renderTable();
+  }
+}
+function _sortAsset(arr, field, dir) {
+  return arr.slice().sort(function(a, b) {
+    var av = a[field] != null ? a[field] : (dir === 'desc' ? -Infinity : Infinity);
+    var bv = b[field] != null ? b[field] : (dir === 'desc' ? -Infinity : Infinity);
+    return dir === 'desc' ? bv - av : av - bv;
+  });
 }
 function sorted(arr){
   return [...arr].sort((a,b)=>{
@@ -2421,17 +2522,48 @@ function updateStatsBar() {
 
 function updateTicker() {
   var track = document.getElementById('ticker-track');
-  if (!filtered.length) return;
-  var top = filtered.slice(0, 20);
+  if (!track) return;
+  var src;
+  if (_activeAsset === 'fon') src = _fonTicker;
+  else if (_activeAsset === 'kripto') src = _kriptoTicker;
+  else src = (typeof filtered !== 'undefined') ? filtered : [];
+  if (!src || !src.length) return;
+  var top = src.slice(0, 20);
   var items = top.concat(top);
-  track.innerHTML = items.map(function(s) {
-    var chg = s.changePercent;
-    var cls = chg > 0 ? 'up' : (chg < 0 ? 'dn' : '');
-    var arrow = chg > 0 ? '▲' : (chg < 0 ? '▼' : '');
-    var px = s.currentPrice != null ? s.currentPrice.toFixed(2) : '—';
-    var chgStr = chg != null ? arrow + ' ' + Math.abs(chg).toFixed(2) + '%' : '—';
-    return '<span class="ticker-item"><span class="ticker-sym">' + (s.symbol || s.name) + '</span><span class="ticker-px">' + px + '</span><span class="ticker-chg ' + cls + '">' + chgStr + '</span></span>';
-  }).join('');
+
+  if (_activeAsset === 'fon') {
+    track.innerHTML = items.map(function(f) {
+      var ret = f.retYtd != null ? f.retYtd : f.ret1y;
+      var cls = ret > 0 ? 'up' : (ret < 0 ? 'dn' : '');
+      var arrow = ret > 0 ? '▲' : (ret < 0 ? '▼' : '');
+      var retStr = ret != null ? arrow + ' ' + Math.abs(ret).toFixed(1) + '%' : '—';
+      return '<span class="ticker-item"><span class="ticker-sym">'+f.code+'</span>'
+        +'<span class="ticker-px">₺'+(f.price||0).toFixed(2)+'</span>'
+        +'<span class="ticker-chg '+cls+'">'+retStr+'</span></span>';
+    }).join('');
+  } else if (_activeAsset === 'kripto') {
+    var fP = function(v){ if(!v) return '—'; if(v>=1000) return '$'+v.toLocaleString('en',{maximumFractionDigits:0}); if(v>=1) return '$'+v.toFixed(2); if(v>=0.01) return '$'+v.toFixed(4); return '$'+v.toFixed(6); };
+    track.innerHTML = items.map(function(c) {
+      var chg = c.change24h;
+      var cls = chg > 0 ? 'up' : (chg < 0 ? 'dn' : '');
+      var arrow = chg > 0 ? '▲' : (chg < 0 ? '▼' : '');
+      var chgStr = chg != null ? arrow + ' ' + Math.abs(chg).toFixed(2) + '%' : '—';
+      return '<span class="ticker-item"><span class="ticker-sym">'+((c.symbol||'').toUpperCase())+'</span>'
+        +'<span class="ticker-px">'+fP(c.price)+'</span>'
+        +'<span class="ticker-chg '+cls+'">'+chgStr+'</span></span>';
+    }).join('');
+  } else {
+    track.innerHTML = items.map(function(s) {
+      var chg = s.changePercent;
+      var cls = chg > 0 ? 'up' : (chg < 0 ? 'dn' : '');
+      var arrow = chg > 0 ? '▲' : (chg < 0 ? '▼' : '');
+      var px = s.currentPrice != null ? s.currentPrice.toFixed(2) : '—';
+      var chgStr = chg != null ? arrow + ' ' + Math.abs(chg).toFixed(2) + '%' : '—';
+      return '<span class="ticker-item"><span class="ticker-sym">'+(s.symbol||s.name)+'</span>'
+        +'<span class="ticker-px">'+px+'</span>'
+        +'<span class="ticker-chg '+cls+'">'+chgStr+'</span></span>';
+    }).join('');
+  }
 }
 
 function showFooterModal(type) {
