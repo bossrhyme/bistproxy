@@ -141,6 +141,14 @@
     {
       "source": "/api/kripto-scan",
       "destination": "/api/kripto-scan.js"
+    },
+    {
+      "source": "/api/bist-scan",
+      "destination": "/api/bist-scan.js"
+    },
+    {
+      "source": "/api/bist-quote",
+      "destination": "/api/bist-quote.js"
     }
   ],
   "functions": {
@@ -155,6 +163,12 @@
     },
     "api/kripto-scan.js": {
       "maxDuration": 20
+    },
+    "api/bist-scan.js": {
+      "maxDuration": 15
+    },
+    "api/bist-quote.js": {
+      "maxDuration": 10
     }
   }
 }

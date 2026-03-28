@@ -43,10 +43,10 @@ module.exports = async function(req, res) {
           const rates = json.rates || {};
           // Sadece ihtiyacımız olan kurları döndür — tüm kur listesi gizli
           const filtered = {
-            TRY: rates.TRY || 44.1,
-            EUR: rates.EUR || 0.860,
-            GBP: rates.GBP || 0.750,
-            JPY: rates.JPY || 158.0,
+            TRY: rates.TRY || 38.5,
+            EUR: rates.EUR || 0.920,
+            GBP: rates.GBP || 0.790,
+            JPY: rates.JPY || 150.0,
           };
           _cache = filtered;
           _cacheAt = Date.now();
@@ -55,13 +55,13 @@ module.exports = async function(req, res) {
           res.status(200).json(filtered);
         } catch(e) {
           // Hata durumunda fallback
-          res.status(200).json({ TRY: 44.1, EUR: 0.860, GBP: 0.750, JPY: 158.0 });
+          res.status(200).json({ TRY: 38.5, EUR: 0.920, GBP: 0.790, JPY: 150.0 });
         }
         resolve();
       });
     });
     req2.on('error', () => {
-      res.status(200).json({ TRY: 44.1, EUR: 0.860, GBP: 0.750, JPY: 158.0 });
+      res.status(200).json({ TRY: 38.5, EUR: 0.920, GBP: 0.790, JPY: 150.0 });
       resolve();
     });
     req2.end();

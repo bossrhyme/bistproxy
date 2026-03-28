@@ -159,9 +159,18 @@ function calcSharpe(records, riskFreeAnnual = 0.45) {
 }
 
 // ── Ana handler ──────────────────────────────────────────────────────
+const ALLOWED_ORIGINS = [
+  'https://deepfin.vercel.app',
+  'https://bistproxy.vercel.app',
+  'https://www.deepfin.com',
+];
+
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  const origin = req.headers.origin || '';
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Vary', 'Origin');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const url = new URL(req.url, 'https://x');

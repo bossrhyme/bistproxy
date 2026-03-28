@@ -31,10 +31,10 @@ async function kvSet(key, value, ttlSec = 300) {
     const url   = process.env.KV_REST_API_URL;
     const token = process.env.KV_REST_API_TOKEN;
     if (!url || !token) return;
-    await fetch(`${url}/set/${encodeURIComponent(key)}`, {
+    await fetch(`${url}/set/${encodeURIComponent(key)}?ex=${ttlSec}`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ value: JSON.stringify(value), ex: ttlSec })
+      body: JSON.stringify(value)
     });
   } catch { /* silent */ }
 }
@@ -88,7 +88,7 @@ function normalizeRow(row) {
   return out;
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   if (req.method === 'OPTIONS') return res.status(200).end();

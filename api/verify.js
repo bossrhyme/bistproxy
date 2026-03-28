@@ -56,9 +56,20 @@ function tvScan(exchange, symbol) {
 const num = v => (v != null && !isNaN(v)) ? parseFloat(parseFloat(v).toFixed(4)) : null;
 const pct = v => (v != null && !isNaN(v)) ? parseFloat(parseFloat(v).toFixed(2)) : null;
 
+const ALLOWED_ORIGINS = [
+  'https://deepfin.vercel.app',
+  'https://bistproxy.vercel.app',
+  'https://www.deepfin.com',
+];
+
 module.exports = async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin || '';
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Vary', 'Origin');
   res.setHeader('Cache-Control', 'no-store');
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
   const url      = new URL(req.url, 'https://x');
   const sym      = (url.searchParams.get('symbol') || '').toUpperCase()
