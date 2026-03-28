@@ -43,6 +43,7 @@ function selectAsset(type) {
   if (sp) sp.classList.add('active');
 
   _clearContent();
+  _resetPanel('sbp-' + type);
   _updateSortOptions(type);
 
   // Hisse için hisse-table göster, result-area gizle
@@ -111,16 +112,44 @@ function switchAsset(type) {
 function _clearContent() {
   if (typeof allData !== 'undefined') allData = [];
   if (typeof filtered !== 'undefined') filtered = [];
+  _fonData = []; _kriptoData = [];
+  _fonTicker = []; _kriptoTicker = [];
+  _fonMeta = {}; _kriptoMeta = {};
   var tbody = document.getElementById('tbody');
   if (tbody) tbody.innerHTML = '';
   var twrap = document.getElementById('twrap');
   if (twrap) twrap.style.display = 'none';
+  var ra = document.getElementById('result-area');
+  if (ra) { ra.style.display = 'none'; ra.innerHTML = ''; }
+  var statsBar = document.getElementById('stats-bar');
+  if (statsBar) statsBar.style.display = 'none';
+  var toolbar = document.getElementById('toolbar');
+  if (toolbar) toolbar.style.display = 'none';
   var det = document.getElementById('detail');
   if (det) det.classList.remove('open');
   ['sb-count','sb-filtered'].forEach(function(id){
     var el = document.getElementById(id);
     if (el) el.textContent = '—';
   });
+}
+
+// ── Panel chip/input sıfırla ──────────────────────────────────
+function _resetPanel(panelId) {
+  var panel = document.getElementById(panelId);
+  if (!panel) return;
+  panel.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); });
+  panel.querySelectorAll('input[type="number"]').forEach(function(inp){ inp.value = ''; });
+  var tvsel = document.getElementById('k_tvrating');
+  if (tvsel) tvsel.value = '';
+  // Default chip'leri geri aç
+  if (panelId === 'sbp-kripto') {
+    var tumu = panel.querySelector('.chip[data-cat=""]');
+    if (tumu) tumu.classList.add('on');
+  }
+  if (panelId === 'sbp-fon') {
+    var first = panel.querySelector('.chip[onclick="chipToggle(this)"]');
+    if (first) first.classList.add('on');
+  }
 }
 
 // ── Yardımcı: result-area'ya tablo yaz ───────────────────────
@@ -131,8 +160,18 @@ function _showResultArea(headerHtml, tableHtml, count) {
   twrap.style.display = 'block';
   ra.style.display = 'block';
   ra.innerHTML = headerHtml + tableHtml;
-  var cnt = document.getElementById('sb-count');
-  if (cnt) cnt.textContent = count;
+  // Toolbar'ı göster, sayacı güncelle, stats-bar'ı gizle
+  var toolbar = document.getElementById('toolbar');
+  if (toolbar) toolbar.style.display = '';
+  var statsBar = document.getElementById('stats-bar');
+  if (statsBar) statsBar.style.display = 'none';
+  var resn = document.getElementById('resn');
+  var scann = document.getElementById('scann');
+  if (resn) resn.textContent = count;
+  if (scann) scann.textContent = count;
+  var label = document.querySelector('#toolbar .rcount > span');
+  if (label && _activeAsset === 'fon') label.innerHTML = ' / <span id="scann">'+count+'</span> fon';
+  else if (label && _activeAsset === 'kripto') label.innerHTML = ' / <span id="scann">'+count+'</span> coin';
 }
 
 // ── Yükleniyor mesajı ─────────────────────────────────────────

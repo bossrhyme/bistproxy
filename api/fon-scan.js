@@ -183,7 +183,7 @@ module.exports = async function handler(req, res) {
   const limit    = Math.min(parseInt(url.searchParams.get('limit') || '50'), 200);
 
   // Cache key
-  const cacheKey = `df_fon_v1_${fonTur}_${sortBy}_${limit}`;
+  const cacheKey = `df_fon_v2_${fonTur}_${sortBy}_${limit}`;
   if (kvEnabled()) {
     const cached = await kvGet(cacheKey);
     if (cached) {
