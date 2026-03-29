@@ -5,7 +5,10 @@ function makeReq(hostname, path, method, headers, body) {
   return new Promise((resolve, reject) => {
     const opts = {
       hostname, path, method,
-      headers: { ...headers, 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
+      headers: {
+        ...headers,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      }
     };
     if (body) opts.headers['Content-Length'] = Buffer.byteLength(body);
     const req = https.request(opts, (res) => {
@@ -47,21 +50,24 @@ async function kvSet(key, value, ttl) {
   } catch(e) {}
 }
 
-// ── TEFAS — tüm fonları çek ──────────────────────────────────────────
-// POST https://www.tefas.gov.tr/api/DB/BindHistoryInfo
-// fontip: YAT (yatırım fonu) | EMK (emeklilik) | BYF (borsa yatırım fonu)
-// bastarih/bittarih: DD.MM.YYYY
-// fonkod: boş = tümü
+// ── Tarih formatlama (DD.MM.YYYY) ────────────────────────────────────
+function fmtDate(d) {
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yy = d.getFullYear();
+  return `${dd}.${mm}.${yy}`;
+}
 
-async function fetchTefasFunds(fonkod = '') {
-  const today = new Date();
-  const fmt = (d) => d.toLocaleDateString('tr-TR', { day:'2-digit', month:'2-digit', year:'numeric' }).replace(/\//g, '.');
-  const bittarih  = fmt(today);
-  const bastarih  = fmt(new Date(today - 7 * 86400000)); // Son 7 gün
+// ── TEFAS BindHistoryInfo — belirli tarih penceresini çek ────────────
+// FONKODU (değil FONKOD), BORSABULTENFIYAT, KISISAYISI, TEDPAYSAYISI alanları döner
+async function fetchTefasWindow(fonTur, daysBack, windowDays) {
+  const now  = new Date();
+  const bittarih = fmtDate(new Date(now - daysBack * 86400000));
+  const bastarih = fmtDate(new Date(now - (daysBack + windowDays) * 86400000));
 
   const payload = new URLSearchParams({
-    fontip: 'YAT',
-    fonkod: fonkod,
+    fontip:   fonTur,
+    fonkod:   '',
     bastarih,
     bittarih
   }).toString();
@@ -71,20 +77,80 @@ async function fetchTefasFunds(fonkod = '') {
     '/api/DB/BindHistoryInfo',
     'POST',
     {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'X-Requested-With': 'XMLHttpRequest',
-      'Referer': 'https://www.tefas.gov.tr/TarihselVeriler.aspx',
-      'Origin': 'https://www.tefas.gov.tr'
+      'Content-Type':    'application/x-www-form-urlencoded',
+      'X-Requested-With':'XMLHttpRequest',
+      'Referer':         'https://www.tefas.gov.tr/TarihselVeriler.aspx',
+      'Origin':          'https://www.tefas.gov.tr'
     },
     payload
   );
 
   if (r.status !== 200) throw new Error('TEFAS HTTP ' + r.status);
-  return JSON.parse(r.body);
+  const parsed = JSON.parse(r.body);
+  return Array.isArray(parsed.data) ? parsed.data : [];
 }
 
-// ── Yahoo Finance doğrulama: NAV ve fon bilgisi ──────────────────────
-// Yahoo'da TEFAS fonları .IS suffix ile aranabiliyor
+// ── YTD referans: 1 Ocak - 15 Ocak ─────────────────────────────────
+async function fetchYtdRef(fonTur) {
+  const year = new Date().getFullYear();
+  const payload = new URLSearchParams({
+    fontip:   fonTur,
+    fonkod:   '',
+    bastarih: `01.01.${year}`,
+    bittarih: `15.01.${year}`
+  }).toString();
+
+  const r = await makeReq(
+    'www.tefas.gov.tr',
+    '/api/DB/BindHistoryInfo',
+    'POST',
+    {
+      'Content-Type':    'application/x-www-form-urlencoded',
+      'X-Requested-With':'XMLHttpRequest',
+      'Referer':         'https://www.tefas.gov.tr/TarihselVeriler.aspx',
+      'Origin':          'https://www.tefas.gov.tr'
+    },
+    payload
+  );
+
+  if (r.status !== 200) return [];
+  const parsed = JSON.parse(r.body);
+  return Array.isArray(parsed.data) ? parsed.data : [];
+}
+
+// ── Referans pencereden her fon için en güncel fiyatı al ─────────────
+function buildRefMap(records) {
+  const map = {};
+  for (const r of records) {
+    const code  = r.FONKODU;           // Doğru alan adı: FONKODU
+    if (!code || code === 'undefined') continue;
+    const price = parseFloat(r.BORSABULTENFIYAT || r.FIYAT || 0);
+    const date  = parseInt(r.TARIH || 0);
+    if (price > 0 && (!map[code] || date > map[code].date)) {
+      map[code] = { price, date };
+    }
+  }
+  return map;
+}
+
+// ── Sharpe oranı (basit) — 30 günlük pencere yeterli ────────────────
+function calcSharpe(prices, riskFreeAnnual = 0.45) {
+  if (!prices || prices.length < 10) return null;
+  const returns = [];
+  for (let i = 1; i < prices.length; i++) {
+    if (prices[i-1] > 0) returns.push((prices[i] - prices[i-1]) / prices[i-1]);
+  }
+  if (returns.length < 5) return null;
+  const avg = returns.reduce((a, b) => a + b, 0) / returns.length;
+  const variance = returns.reduce((a, b) => a + (b - avg) ** 2, 0) / returns.length;
+  const stdDev = Math.sqrt(variance);
+  if (stdDev === 0) return null;
+  const annualReturn = avg * 252;
+  const annualStd    = stdDev * Math.sqrt(252);
+  return parseFloat(((annualReturn - riskFreeAnnual) / annualStd).toFixed(2));
+}
+
+// ── Yahoo Finance doğrulama (top 5 fon için) ─────────────────────────
 async function verifyWithYahoo(fonkod) {
   try {
     const path = '/v8/finance/chart/' + encodeURIComponent(fonkod + '.IS') +
@@ -97,65 +163,9 @@ async function verifyWithYahoo(fonkod) {
     const j = JSON.parse(r.body);
     const result = j?.chart?.result?.[0];
     if (!result) return null;
-    const quotes = result.indicators.quote[0];
-    const closes = quotes.close.filter(Boolean);
-    return {
-      source: 'yahoo',
-      lastPrice: closes[closes.length - 1],
-      currency: result.meta?.currency || 'TRY'
-    };
+    const closes = result.indicators.quote[0].close.filter(Boolean);
+    return { lastPrice: closes[closes.length - 1] };
   } catch(e) { return null; }
-}
-
-// ── Performans hesapla ───────────────────────────────────────────────
-function calcReturns(records) {
-  // records: [{TARIH, FIYAT, ...}] - en yeniden en eskiye
-  if (!records || records.length < 2) return {};
-  const prices = records
-    .map(r => ({ date: parseInt(r.TARIH), price: parseFloat(r.FIYAT) }))
-    .filter(r => r.price > 0)
-    .sort((a, b) => b.date - a.date);
-
-  const latest = prices[0]?.price;
-  if (!latest) return {};
-
-  const find = (daysAgo) => {
-    const target = Date.now() - daysAgo * 86400000;
-    return prices.find(p => p.date * 1000 <= target)?.price;
-  };
-
-  const ret = (old) => old ? ((latest - old) / old * 100) : null;
-  return {
-    price: latest,
-    ret1m:  ret(find(30)),
-    ret3m:  ret(find(90)),
-    ret6m:  ret(find(180)),
-    ret1y:  ret(find(365)),
-    retYtd: ret(prices[prices.length - 1]?.price),
-  };
-}
-
-// ── Sharpe oranı (basit) ─────────────────────────────────────────────
-function calcSharpe(records, riskFreeAnnual = 0.45) {
-  if (!records || records.length < 20) return null;
-  const prices = records
-    .map(r => parseFloat(r.FIYAT))
-    .filter(p => p > 0);
-  if (prices.length < 10) return null;
-
-  const returns = [];
-  for (let i = 1; i < prices.length; i++) {
-    returns.push((prices[i] - prices[i-1]) / prices[i-1]);
-  }
-
-  const avg = returns.reduce((a, b) => a + b, 0) / returns.length;
-  const variance = returns.reduce((a, b) => a + (b - avg) ** 2, 0) / returns.length;
-  const stdDev = Math.sqrt(variance);
-  if (stdDev === 0) return null;
-
-  const annualReturn = avg * 252;
-  const annualStd = stdDev * Math.sqrt(252);
-  return parseFloat(((annualReturn - riskFreeAnnual) / annualStd).toFixed(2));
 }
 
 // ── Ana handler ──────────────────────────────────────────────────────
@@ -173,17 +183,17 @@ module.exports = async function handler(req, res) {
   res.setHeader('Vary', 'Origin');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const url = new URL(req.url, 'https://x');
-  const fonTur   = url.searchParams.get('fontur')  || 'YAT'; // YAT|EMK|BYF
-  const fonkod   = url.searchParams.get('fonkod')  || '';
-  const minRet1y = parseFloat(url.searchParams.get('min_ret1y') || '0');
-  const minSharpe= parseFloat(url.searchParams.get('min_sharpe')|| '0');
-  const minSize  = parseFloat(url.searchParams.get('min_size')  || '0'); // Min büyüklük ₺M
-  const sortBy   = url.searchParams.get('sort') || 'ret1y';
-  const limit    = Math.min(parseInt(url.searchParams.get('limit') || '50'), 200);
+  const url      = new URL(req.url, 'https://x');
+  const fonTur   = url.searchParams.get('fontur')   || 'YAT';
+  const minRet1y = parseFloat(url.searchParams.get('min_ret1y')  || '-Infinity');
+  const maxRet1y = parseFloat(url.searchParams.get('max_ret1y')  || 'Infinity');
+  const minSharpe= parseFloat(url.searchParams.get('min_sharpe') || '-Infinity');
+  const minSize  = parseFloat(url.searchParams.get('min_size')   || '0');
+  const sortBy   = url.searchParams.get('sort')     || 'ret1y';
+  const limit    = Math.min(parseInt(url.searchParams.get('limit') || '100'), 500);
 
-  // Cache key
-  const cacheKey = `df_fon_v2_${fonTur}_${sortBy}_${limit}`;
+  // Cache — sort client-side yaptığımız için key'de sortBy yok
+  const cacheKey = `df_fon_v3_${fonTur}_${limit}`;
   if (kvEnabled()) {
     const cached = await kvGet(cacheKey);
     if (cached) {
@@ -194,72 +204,100 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    // 1. TEFAS'tan ham veri
-    const tefasRaw = await fetchTefasFunds(fonkod);
-    const records  = tefasRaw?.data || [];
+    // ── 4 paralel TEFAS isteği ────────────────────────────────────
+    // call1: son 30 gün  → anlık fiyat + 1M referans + Sharpe
+    // call2: ~1Y önce    → 1Y referans fiyatı
+    // call3: ~3M önce    → 3M referans fiyatı
+    // call4: Oca başı    → YTD referans fiyatı
+    const [main30, ref1y, ref3m, refYtd] = await Promise.all([
+      fetchTefasWindow(fonTur, 0,   30),
+      fetchTefasWindow(fonTur, 360, 12),
+      fetchTefasWindow(fonTur, 85,  12),
+      fetchYtdRef(fonTur),
+    ]);
 
-    if (!records.length) {
-      return res.status(200).json({ funds: [], total: 0, source: 'tefas', error: 'Veri yok' });
+    if (!main30.length) {
+      return res.status(200).json({ funds: [], total: 0, source: 'tefas', error: 'TEFAS veri döndürmedi' });
     }
 
-    // 2. Fonları grupla (FONKOD bazında son 30 gün kayıt)
+    // ── Referans fiyat haritaları ─────────────────────────────────
+    const map1y  = buildRefMap(ref1y);
+    const map3m  = buildRefMap(ref3m);
+    const mapYtd = buildRefMap(refYtd);
+
+    // ── Ana pencereyi FONKODU bazında grupla ──────────────────────
     const fundMap = {};
-    for (const r of records) {
-      const code = r.FONKOD;
+    for (const r of main30) {
+      const code = r.FONKODU;                    // ← FIX: FONKOD → FONKODU
+      if (!code || code === 'undefined') continue;
       if (!fundMap[code]) fundMap[code] = { info: r, prices: [] };
       fundMap[code].prices.push(r);
     }
 
-    // 3. Her fon için hesapla
+    // ── Her fon için hesapla ──────────────────────────────────────
+    const ret = (cur, ref) =>
+      (cur > 0 && ref > 0) ? parseFloat(((cur - ref) / ref * 100).toFixed(2)) : null;
+
     let funds = Object.entries(fundMap).map(([code, { info, prices }]) => {
-      const perf   = calcReturns(prices);
-      const sharpe = calcSharpe(prices);
-      const totalValue = parseFloat(info.PORTFOYBUYUKLUGU || 0); // ₺
+      // En güncel fiyat: en büyük TARIH değerine sahip kayıt
+      const sorted = prices
+        .map(r => ({ price: parseFloat(r.BORSABULTENFIYAT || r.FIYAT || 0), date: parseInt(r.TARIH || 0) }))
+        .filter(p => p.price > 0)
+        .sort((a, b) => b.date - a.date);
+
+      const curPrice = sorted[0]?.price || 0;
+      const oldPrice = sorted[sorted.length - 1]?.price || 0; // 30 gün önceki (1M)
+
+      // Sharpe: 30 günlük fiyat dizisi
+      const priceArr = sorted.map(p => p.price);
+      const sharpe   = calcSharpe(priceArr);
+
+      // AUM: pay sayısı × fiyat
+      const shares   = parseInt(info.TEDPAYSAYISI || 0);
+      const totalValueM = shares > 0 ? parseFloat((shares * curPrice / 1e6).toFixed(2)) : 0;
 
       return {
         code,
-        name:       info.FONUNVAN || code,
-        category:   info.FONTUR || fonTur,
-        price:      perf.price || parseFloat(info.FIYAT || 0),
-        totalValueM: totalValue / 1e6, // Milyon ₺
-        investors:  parseInt(info.YATIRIMCI_SAYISI || 0),
-        ret1m:      perf.ret1m,
-        ret3m:      perf.ret3m,
-        ret6m:      perf.ret6m,
-        ret1y:      perf.ret1y,
-        retYtd:     perf.retYtd,
+        name:        info.FONUNVAN || code,
+        category:    info.FONTUR   || fonTur,
+        price:       curPrice,
+        totalValueM,
+        investors:   parseInt(info.KISISAYISI || 0),   // ← FIX: YATIRIMCI_SAYISI → KISISAYISI
+        ret1m:       ret(curPrice, oldPrice),           // 30 günlük pencere
+        ret3m:       ret(curPrice, map3m[code]?.price),
+        ret1y:       ret(curPrice, map1y[code]?.price),
+        retYtd:      ret(curPrice, mapYtd[code]?.price),
         sharpe,
-        source:     'tefas',
-        verified:   false
+        source:      'tefas',
+        verified:    false
       };
     });
 
-    // 4. Filtrele
-    if (minRet1y) funds = funds.filter(f => f.ret1y != null && f.ret1y >= minRet1y);
-    if (minSharpe) funds = funds.filter(f => f.sharpe != null && f.sharpe >= minSharpe);
-    if (minSize)   funds = funds.filter(f => f.totalValueM >= minSize);
+    // ── Filtrele ──────────────────────────────────────────────────
+    if (isFinite(minRet1y)) funds = funds.filter(f => f.ret1y != null && f.ret1y >= minRet1y);
+    if (isFinite(maxRet1y)) funds = funds.filter(f => f.ret1y != null && f.ret1y <= maxRet1y);
+    if (isFinite(minSharpe)) funds = funds.filter(f => f.sharpe != null && f.sharpe >= minSharpe);
+    if (minSize > 0)         funds = funds.filter(f => f.totalValueM >= minSize);
 
-    // 5. Sırala
+    // ── Sırala ───────────────────────────────────────────────────
+    const SORT_FIELDS = ['ret1y','retYtd','ret3m','ret1m','sharpe','totalValueM','investors'];
+    const field = SORT_FIELDS.includes(sortBy) ? sortBy : 'ret1y';
     funds.sort((a, b) => {
-      const va = a[sortBy] ?? -Infinity;
-      const vb = b[sortBy] ?? -Infinity;
+      const va = a[field] ?? -Infinity;
+      const vb = b[field] ?? -Infinity;
       return vb - va;
     });
 
     funds = funds.slice(0, limit);
 
-    // 6. İlk 5 fon için Yahoo Finance doğrulama (rate limit için sadece top 5)
-    const top5 = funds.slice(0, 5);
-    await Promise.all(top5.map(async (f) => {
+    // ── İlk 5 fon için Yahoo Finance doğrulama ────────────────────
+    await Promise.all(funds.slice(0, 5).map(async (f) => {
       const ydata = await verifyWithYahoo(f.code);
-      if (ydata && ydata.lastPrice) {
+      if (ydata?.lastPrice) {
         const diff = Math.abs((ydata.lastPrice - f.price) / f.price * 100);
-        f.yahooPrice  = ydata.lastPrice;
-        f.priceMatch  = diff < 2; // %2 tolerans
-        f.verified    = diff < 5;
-        f.verifyNote  = f.priceMatch
-          ? `Yahoo ile uyuşuyor (${diff.toFixed(2)}% fark)`
-          : `Yahoo farkı: ${diff.toFixed(2)}%`;
+        f.yahooPrice = ydata.lastPrice;
+        f.verified   = diff < 5;
+        f.verifyNote = `Yahoo farkı: ${diff.toFixed(2)}%`;
       }
     }));
 
@@ -271,14 +309,14 @@ module.exports = async function handler(req, res) {
       updatedAt: new Date().toISOString()
     };
 
-    // 7. Cache'e yaz (1 saat)
+    // ── Cache: 1 saat ─────────────────────────────────────────────
     if (kvEnabled()) await kvSet(cacheKey, result, 3600);
 
     res.setHeader('Content-Type', 'application/json');
     return res.status(200).end(JSON.stringify(result));
 
   } catch (err) {
-    console.error('fon-scan error:', err);
-    return res.status(500).json({ error: err.message, funds: [] });
+    console.error('fon-scan error:', err.message);
+    return res.status(500).json({ error: err.message, funds: [], total: 0 });
   }
 };
