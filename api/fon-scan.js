@@ -134,7 +134,7 @@ module.exports = async function handler(req, res) {
   const minSize = parseFloat(q.get('min_size') || '0');
 
   // KV Cache
-  const cacheKey = `df_fon_v5_${fonTur}_${limit}`;
+  const cacheKey = `df_fon_v6_${fonTur}_${limit}`;
   if (kvEnabled()) {
     const hit = await kvGet(cacheKey);
     if (hit) { res.setHeader('X-Cache','HIT'); return res.status(200).end(JSON.stringify(hit)); }
@@ -148,9 +148,21 @@ module.exports = async function handler(req, res) {
       return res.status(200).end(JSON.stringify({ funds:[], total:0, source:'tefas', error:'Veri yok' }));
     }
 
-    // 1Y referans: ~365 gün önce, 7 günlük pencere — paralel, hata toleranslı
-    const ref1yData = await tefasFetch(fonTur, 358, 7);
-    const ref1y = refMap(ref1yData);
+    // Referans pencereler — sıralı (rate limiting'den kaçınmak için)
+    const ref1yData  = await tefasFetch(fonTur, 358, 7);   // ~1Y önce
+    const ref3mData  = await tefasFetch(fonTur, 87,  7);   // ~3A önce
+    const ref1mData  = await tefasFetch(fonTur, 28,  7);   // ~1A önce
+
+    // YTD: yılın ilk haftası
+    const now2   = new Date();
+    const jan1   = new Date(now2.getFullYear(), 0, 1);
+    const ytdDb  = Math.floor((now2 - jan1) / 86400000);
+    const refYtdData = await tefasFetch(fonTur, ytdDb, 10); // Oca başı
+
+    const ref1y  = refMap(ref1yData);
+    const ref3m  = refMap(ref3mData);
+    const ref1m  = refMap(ref1mData);
+    const refYtd = refMap(refYtdData);
 
     // ── FONKODU bazında grupla (FONKODU: doğru alan adı!) ─────────
     const fundMap = {};
@@ -184,11 +196,11 @@ module.exports = async function handler(req, res) {
         price:       cur,
         totalValueM: aum,
         investors:   parseInt(info.KISISAYISI || 0),
-        ret1m:       null,          // 7 günlük veriden 1M hesaplanamaz
-        ret3m:       null,
+        ret1m:       pct(cur, ref1m[code]?.price),
+        ret3m:       pct(cur, ref3m[code]?.price),
         ret1y:       pct(cur, ref1y[code]?.price),
-        retYtd:      null,
-        ret7d:       pct(cur, old7), // 7 günlük getiri (bonus)
+        retYtd:      pct(cur, refYtd[code]?.price),
+        ret7d:       pct(cur, old7),
         sharpe:      sharpe(pts.map(p=>p.price)),
         source:      'tefas',
         verified:    false
@@ -199,7 +211,7 @@ module.exports = async function handler(req, res) {
     if (minSize > 0) funds = funds.filter(f => f.totalValueM >= minSize);
 
     // ── Sırala ───────────────────────────────────────────────────
-    const VALID = ['ret1y','ret7d','sharpe','totalValueM','investors','price'];
+    const VALID = ['ret1y','ret3m','ret1m','retYtd','ret7d','sharpe','totalValueM','investors','price'];
     const sf = VALID.includes(sortBy) ? sortBy : 'ret1y';
     funds.sort((a,b) => (b[sf] ?? -Infinity) - (a[sf] ?? -Infinity));
     funds = funds.slice(0, limit);
