@@ -81,7 +81,7 @@ function refMap(records) {
   for (const r of records) {
     const code  = r.FONKODU;
     if (!code || code === 'undefined') continue;
-    const price = parseFloat(r.BORSABULTENFIYAT || r.FIYAT || 0);
+    const price = parseFloat(r.FIYAT) || parseFloat(r.BORSABULTENFIYAT) || 0;
     const date  = parseInt(r.TARIH || 0);
     if (price > 0 && (!map[code] || date > map[code].date))
       map[code] = { price, date };
@@ -134,7 +134,7 @@ module.exports = async function handler(req, res) {
   const minSize = parseFloat(q.get('min_size') || '0');
 
   // KV Cache
-  const cacheKey = `df_fon_v4_${fonTur}_${limit}`;
+  const cacheKey = `df_fon_v5_${fonTur}_${limit}`;
   if (kvEnabled()) {
     const hit = await kvGet(cacheKey);
     if (hit) { res.setHeader('X-Cache','HIT'); return res.status(200).end(JSON.stringify(hit)); }
@@ -167,7 +167,7 @@ module.exports = async function handler(req, res) {
 
     let funds = Object.entries(fundMap).map(([code, { info, recs }]) => {
       const pts = recs
-        .map(r => ({ price: parseFloat(r.BORSABULTENFIYAT || r.FIYAT || 0), date: parseInt(r.TARIH||0) }))
+        .map(r => ({ price: parseFloat(r.FIYAT) || parseFloat(r.BORSABULTENFIYAT) || 0, date: parseInt(r.TARIH||0) }))
         .filter(p => p.price > 0)
         .sort((a,b) => b.date - a.date);
 
