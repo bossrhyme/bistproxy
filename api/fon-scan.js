@@ -130,11 +130,11 @@ module.exports = async function handler(req, res) {
   const q       = new URL(req.url, 'https://x').searchParams;
   const fonTur  = q.get('fontur') || 'YAT';
   const sortBy  = q.get('sort')   || 'ret1y';
-  const limit   = Math.min(parseInt(q.get('limit') || '100'), 500);
+  const limit   = Math.min(parseInt(q.get('limit') || '500'), 1000);
   const minSize = parseFloat(q.get('min_size') || '0');
 
   // KV Cache
-  const cacheKey = `df_fon_v6_${fonTur}_${limit}`;
+  const cacheKey = `df_fon_v7_${fonTur}_${limit}`;
   if (kvEnabled()) {
     const hit = await kvGet(cacheKey);
     if (hit) { res.setHeader('X-Cache','HIT'); return res.status(200).end(JSON.stringify(hit)); }

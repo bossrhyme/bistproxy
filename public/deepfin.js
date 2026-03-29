@@ -192,7 +192,7 @@ function runFonScan() {
   if (btn) { btn.textContent = '⏳ Taranıyor...'; btn.disabled = true; }
   _showLoading('⏳ TEFAS verisi yükleniyor...');
 
-  var params = new URLSearchParams({ fontur: 'YAT', sort: 'ret1y', limit: '100' });
+  var params = new URLSearchParams({ fontur: 'YAT', sort: 'ret1y', limit: '500' });
   var sc = document.querySelector('#sbp-fon .chip.on[data-preset]');
   if (sc) params.set('sort', sc.dataset.preset);
 
@@ -2591,7 +2591,7 @@ function updateTicker() {
 
   if (_activeAsset === 'fon') {
     track.innerHTML = items.map(function(f) {
-      var ret = f.retYtd != null ? f.retYtd : f.ret1y;
+      var ret = f.ret1m != null ? f.ret1m : f.ret1y;
       var cls = ret > 0 ? 'up' : (ret < 0 ? 'dn' : '');
       var arrow = ret > 0 ? '▲' : (ret < 0 ? '▼' : '');
       var retStr = ret != null ? arrow + ' ' + Math.abs(ret).toFixed(1) + '%' : '—';
