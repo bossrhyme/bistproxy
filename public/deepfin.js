@@ -257,10 +257,29 @@ function _renderFon(funds, meta) {
       +'</tr>';
   }).join('');
   var hdr='<div class="res-hdr"><b>TEFAS Fon</b><span class="res-cnt">'+funds.length+' fon</span><span class="res-ok">TEFAS · Yahoo Finance</span><span class="res-src" style="margin-left:auto">çapraz doğrulama aktif</span></div>';
-  var tbl='<table><thead><tr>'
-    +'<th>#</th><th>Fon</th><th class="right">Fiyat</th><th class="right">YTD%</th><th class="right">1A%</th><th class="right">3A%</th><th class="right">1Y%</th><th class="right">Sharpe</th><th class="right">Büyüklük</th><th class="right">Yatırımcı</th>'
-    +'</tr></thead><tbody>'+rows+'</tbody></table>';
+  var sortCols = [
+    {k:'price',l:'Fiyat'},{k:'retYtd',l:'YTD%'},{k:'ret1m',l:'1A%'},{k:'ret3m',l:'3A%'},
+    {k:'ret1y',l:'1Y%'},{k:'sharpe',l:'Sharpe'},{k:'totalValueM',l:'Büyüklük'},{k:'investors',l:'Yatırımcı'}
+  ];
+  var thSort = sortCols.map(function(c){
+    var active = sortSt.field===c.k;
+    var arrow  = active ? (sortSt.dir==='desc'?' ↓':' ↑') : '';
+    return '<th class="right'+(active?' sorted':'')+'" style="cursor:pointer" onclick="_fonSort(\''+c.k+'\')">'
+      +c.l+arrow+'</th>';
+  }).join('');
+  var tbl='<table><thead><tr><th>#</th><th>Fon</th>'+thSort+'</tr></thead><tbody>'+rows+'</tbody></table>';
   _showResultArea(hdr, tbl, funds.length);
+}
+
+function _fonSort(field) {
+  if (sortSt.field === field) sortSt.dir = sortSt.dir === 'desc' ? 'asc' : 'desc';
+  else { sortSt.field = field; sortSt.dir = 'desc'; }
+  // Sync toolbar dropdowns
+  var sf = document.getElementById('sortf');
+  var sd = document.getElementById('sortd');
+  if (sf) sf.value = field;
+  if (sd) sd.value = sortSt.dir;
+  _renderFon(_sortAsset(_fonData, sortSt.field, sortSt.dir), _fonMeta);
 }
 
 // ─────────────────────────────────────────────────────────────
