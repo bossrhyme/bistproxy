@@ -59,63 +59,61 @@ function fmtDate(d) {
 }
 
 // ── TEFAS BindHistoryInfo — belirli tarih penceresini çek ────────────
-// FONKODU (değil FONKOD), BORSABULTENFIYAT, KISISAYISI, TEDPAYSAYISI alanları döner
 async function fetchTefasWindow(fonTur, daysBack, windowDays) {
-  const now  = new Date();
+  const now      = new Date();
   const bittarih = fmtDate(new Date(now - daysBack * 86400000));
   const bastarih = fmtDate(new Date(now - (daysBack + windowDays) * 86400000));
 
   const payload = new URLSearchParams({
-    fontip:   fonTur,
-    fonkod:   '',
-    bastarih,
-    bittarih
+    fontip: fonTur, fonkod: '', bastarih, bittarih
   }).toString();
 
-  const r = await makeReq(
-    'www.tefas.gov.tr',
-    '/api/DB/BindHistoryInfo',
-    'POST',
-    {
-      'Content-Type':    'application/x-www-form-urlencoded',
-      'X-Requested-With':'XMLHttpRequest',
-      'Referer':         'https://www.tefas.gov.tr/TarihselVeriler.aspx',
-      'Origin':          'https://www.tefas.gov.tr'
-    },
-    payload
-  );
-
-  if (r.status !== 200) throw new Error('TEFAS HTTP ' + r.status);
-  const parsed = JSON.parse(r.body);
-  return Array.isArray(parsed.data) ? parsed.data : [];
+  try {
+    const r = await makeReq(
+      'www.tefas.gov.tr', '/api/DB/BindHistoryInfo', 'POST',
+      {
+        'Content-Type':     'application/x-www-form-urlencoded',
+        'X-Requested-With': 'XMLHttpRequest',
+        'Referer':          'https://www.tefas.gov.tr/TarihselVeriler.aspx',
+        'Origin':           'https://www.tefas.gov.tr'
+      },
+      payload
+    );
+    if (r.status !== 200) return [];
+    const parsed = JSON.parse(r.body);
+    return Array.isArray(parsed.data) ? parsed.data : [];
+  } catch (e) {
+    console.error(`fetchTefasWindow(${daysBack}, ${windowDays}) error:`, e.message);
+    return [];
+  }
 }
 
 // ── YTD referans: 1 Ocak - 15 Ocak ─────────────────────────────────
 async function fetchYtdRef(fonTur) {
   const year = new Date().getFullYear();
   const payload = new URLSearchParams({
-    fontip:   fonTur,
-    fonkod:   '',
-    bastarih: `01.01.${year}`,
-    bittarih: `15.01.${year}`
+    fontip: fonTur, fonkod: '',
+    bastarih: `01.01.${year}`, bittarih: `15.01.${year}`
   }).toString();
 
-  const r = await makeReq(
-    'www.tefas.gov.tr',
-    '/api/DB/BindHistoryInfo',
-    'POST',
-    {
-      'Content-Type':    'application/x-www-form-urlencoded',
-      'X-Requested-With':'XMLHttpRequest',
-      'Referer':         'https://www.tefas.gov.tr/TarihselVeriler.aspx',
-      'Origin':          'https://www.tefas.gov.tr'
-    },
-    payload
-  );
-
-  if (r.status !== 200) return [];
-  const parsed = JSON.parse(r.body);
-  return Array.isArray(parsed.data) ? parsed.data : [];
+  try {
+    const r = await makeReq(
+      'www.tefas.gov.tr', '/api/DB/BindHistoryInfo', 'POST',
+      {
+        'Content-Type':     'application/x-www-form-urlencoded',
+        'X-Requested-With': 'XMLHttpRequest',
+        'Referer':          'https://www.tefas.gov.tr/TarihselVeriler.aspx',
+        'Origin':           'https://www.tefas.gov.tr'
+      },
+      payload
+    );
+    if (r.status !== 200) return [];
+    const parsed = JSON.parse(r.body);
+    return Array.isArray(parsed.data) ? parsed.data : [];
+  } catch (e) {
+    console.error('fetchYtdRef error:', e.message);
+    return [];
+  }
 }
 
 // ── Referans pencereden her fon için en güncel fiyatı al ─────────────
@@ -204,15 +202,15 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    // ── 4 paralel TEFAS isteği ────────────────────────────────────
-    // call1: son 30 gün  → anlık fiyat + 1M referans + Sharpe
-    // call2: ~1Y önce    → 1Y referans fiyatı
-    // call3: ~3M önce    → 3M referans fiyatı
-    // call4: Oca başı    → YTD referans fiyatı
-    const [main30, ref1y, ref3m, refYtd] = await Promise.all([
-      fetchTefasWindow(fonTur, 0,   30),
-      fetchTefasWindow(fonTur, 360, 12),
-      fetchTefasWindow(fonTur, 85,  12),
+    // ── TEFAS istekleri: önce ana veri, sonra referanslar paralel ─
+    // main: son 30 gün  → anlık fiyat + 1M ref + Sharpe
+    // ref1y: ~1Y önce  → 1Y referans fiyatı (küçük pencere)
+    // ref3m: ~3M önce  → 3M referans fiyatı (küçük pencere)
+    // refYtd: Oca başı → YTD referans fiyatı
+    const main30 = await fetchTefasWindow(fonTur, 0, 30);
+    const [ref1y, ref3m, refYtd] = await Promise.all([
+      fetchTefasWindow(fonTur, 360, 7),
+      fetchTefasWindow(fonTur, 85,  7),
       fetchYtdRef(fonTur),
     ]);
 
