@@ -221,6 +221,8 @@ function _showResultArea(headerHtml, tableHtml, count) {
   twrap.style.display = 'block';
   ra.style.display = 'block';
   ra.innerHTML = headerHtml + tableHtml;
+  var emptyEl = document.getElementById('empty');
+  if (emptyEl) emptyEl.style.display = 'none';
   // Toolbar'ı göster, sayacı güncelle, stats-bar'ı gizle (fon/kripto için)
   var toolbar = document.getElementById('toolbar');
   if (toolbar) toolbar.style.display = '';
@@ -335,7 +337,7 @@ function _renderFon(funds, meta) {
       +'<td class="tn muted">'+(f.investors?f.investors.toLocaleString('tr-TR'):'—')+'</td>'
       +'</tr>';
   }).join('');
-  var hdr='<div class="res-hdr"><b>TEFAS Fon</b><span class="res-cnt">'+funds.length+' fon</span><span class="res-ok">TEFAS · Yahoo Finance</span><span class="res-src" style="margin-left:auto">çapraz doğrulama aktif</span></div>';
+  var hdr='<div class="res-hdr"><b>TEFAS Fon</b><span class="res-cnt">'+funds.length+' fon</span></div>';
   var sortCols = [
     {k:'price',l:'Fiyat'},{k:'retYtd',l:'YTD%'},{k:'ret1m',l:'1A%'},{k:'ret3m',l:'3A%'},
     {k:'ret1y',l:'1Y%'},{k:'sharpe',l:'Sharpe'},{k:'totalValueM',l:'Büyüklük'},{k:'investors',l:'Yatırımcı'}
