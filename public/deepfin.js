@@ -3274,6 +3274,14 @@ window.addEventListener('popstate', function(e) {
 document.addEventListener('DOMContentLoaded', function(){
   _initWorker();
   _updateOnboarding(null); // Varsayılan: genel onboarding
+  // Tarama sayacını çek
+  fetch('/api/stats').then(function(r){ return r.json(); }).then(function(d){
+    var el = document.getElementById('stat-scan-count');
+    if (!el || !d.scans) return;
+    var n = d.scans;
+    var fmt = n >= 1000 ? (Math.floor(n/1000) + '.000+') : (n + '+');
+    el.textContent = fmt;
+  }).catch(function(){});
   var _p = new URLSearchParams(window.location.search).get('from');
   var _path = window.location.pathname;
   if (_p === 'profile' || _p === 'screener' || _p === 'analiz' || _path === '/screener') {

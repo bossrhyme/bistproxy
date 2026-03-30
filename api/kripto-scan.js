@@ -341,7 +341,11 @@ module.exports = async function handler(req, res) {
     };
 
     // 6. Cache (2 dakika — kripto hızlı değişiyor)
-    if (kvEnabled()) await kvSet(cacheKey, result, 120);
+    if (kvEnabled()) {
+      await kvSet(cacheKey, result, 120);
+      makeReq(new URL(process.env.KV_REST_API_URL).hostname, '/incr/df_total_scans', 'POST',
+        { Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN, 'Content-Length': '0' }, '').catch(()=>{});
+    }
 
     res.setHeader('Content-Type', 'application/json');
     return res.status(200).end(JSON.stringify(result));

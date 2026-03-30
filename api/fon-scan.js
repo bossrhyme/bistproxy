@@ -243,7 +243,11 @@ module.exports = async function handler(req, res) {
     }));
 
     const result = { funds, total: funds.length, source:'tefas', secondary:'yahoo_finance', updatedAt: new Date().toISOString() };
-    if (kvEnabled()) await kvSet(cacheKey, result, 3600);
+    if (kvEnabled()) {
+      await kvSet(cacheKey, result, 3600);
+      makeReq(new URL(process.env.KV_REST_API_URL).hostname, '/incr/df_total_scans', 'POST',
+        { Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN, 'Content-Length': '0' }, '').catch(()=>{});
+    }
     return res.status(200).end(JSON.stringify(result));
 
   } catch(err) {

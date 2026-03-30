@@ -268,6 +268,8 @@ module.exports = async function(req, res) {
           // 3. Cache'e yaz (response'u bloklamaz)
           if (kvEnabled() && parsed.data && parsed.data.length > 0) {
             kvSet(cacheKey, parsed, ttl).catch(() => {});
+            fetchHttp(process.env.KV_REST_API_URL + '/incr/df_total_scans', 'POST',
+              { Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN }).catch(()=>{});
           }
 
           res.status(statusCode).end(JSON.stringify(parsed));
