@@ -31,6 +31,15 @@ function goBackToLanding() {
 // ── Varlık seç (landing → panel) ─────────────────────────────
 // ── Varlığa göre onboarding içeriği ─────────────────────────
 var _ONB = {
+  null: {
+    big: 'DEEPFIN', sub: 'Tarama bizden, karar sizden.',
+    steps: [
+      {icon:'📌', label:'Varlık Seç',    desc:'Hisse senedi, yatırım fonu veya kripto para seç'},
+      {icon:'🎛', label:'Filtrele',      desc:'Strateji, kategori veya özel filtreni uygula'},
+      {icon:'▶',  label:'Tara',          desc:'Saniyeler içinde tüm piyasa taranır'},
+      {icon:'🔎', label:'İncele',        desc:'Sonuçlara tıkla — metrikler ve detaylı analiz'}
+    ]
+  },
   hisse: {
     big: 'HİSSE', sub: 'Binlerce hisse saniyeler içinde filtrelenir.',
     steps: [
@@ -43,25 +52,25 @@ var _ONB = {
   fon: {
     big: 'FON', sub: '800+ Türk yatırım fonu tek ekranda · TEFAS canlı veri.',
     steps: [
-      {icon:'📋', label:'Fon Türü',       desc:'Yatırım, Hisse, Para Piyasası kategorisini seç'},
-      {icon:'📊', label:'Filtrele',       desc:'YTD%, 1Y%, Büyüklük, Yatırımcı sayısına göre'},
-      {icon:'▶',  label:'Fon Tara',       desc:'TEFAS\'tan 800+ fon gerçek zamanlı taranır'},
+      {icon:'📋', label:'Fon Türü',          desc:'Yatırım, Hisse, Para Piyasası kategorisini seç'},
+      {icon:'📊', label:'Filtrele',          desc:'YTD%, 1Y%, Büyüklük, Yatırımcı sayısına göre'},
+      {icon:'▶',  label:'Fon Tara',          desc:'TEFAS\'tan 800+ fon gerçek zamanlı taranır'},
       {icon:'⭐', label:'Favorile & Sırala', desc:'Sütun başlığına tıkla, favorile, kaydet'}
     ]
   },
   kripto: {
     big: 'KRİPTO', sub: 'CoinGecko + TradingView verisiyle coin tara.',
     steps: [
-      {icon:'🌐', label:'Kategori Seç',   desc:'DeFi, Layer 1, GameFi veya tüm coinler'},
-      {icon:'📈', label:'Preset Seç',     desc:'Momentum, RSI Dip, ATH Yakın hazır stratejiler'},
-      {icon:'▶',  label:'Kripto Tara',    desc:'CoinGecko + TradingView verisi çekilir'},
-      {icon:'🔎', label:'Coin İncele',    desc:'Fiyat, RSI, ATH%, TradingView rating\'i gör'}
+      {icon:'🌐', label:'Kategori Seç', desc:'DeFi, Layer 1, GameFi veya tüm coinler'},
+      {icon:'📈', label:'Preset Seç',   desc:'Momentum, RSI Dip, ATH Yakın hazır stratejiler'},
+      {icon:'▶',  label:'Kripto Tara',  desc:'CoinGecko + TradingView verisi çekilir'},
+      {icon:'🔎', label:'Coin İncele',  desc:'Fiyat, RSI, ATH%, TradingView rating\'i gör'}
     ]
   }
 };
 
 function _updateOnboarding(type) {
-  var data = _ONB[type] || _ONB.hisse;
+  var data = _ONB[type] || _ONB['null'];
   var big  = document.getElementById('onb-big');
   var sub  = document.getElementById('onb-sub');
   var cont = document.getElementById('onb-container');
@@ -3263,7 +3272,7 @@ window.addEventListener('popstate', function(e) {
 // ─────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function(){
   _initWorker();
-  _updateOnboarding('hisse'); // Varsayılan: hisse onboarding
+  _updateOnboarding(null); // Varsayılan: genel onboarding
   var _p = new URLSearchParams(window.location.search).get('from');
   var _path = window.location.pathname;
   if (_p === 'profile' || _p === 'screener' || _p === 'analiz' || _path === '/screener') {
