@@ -665,92 +665,197 @@ function prfTab(id, el) {
 
 // ── Adil Fiyat Analizi ──────────────────────────────────────────────────
 function _startFairValue() {
-  var d = _prfData;
-  var errEl     = document.getElementById('fv-error');
-  var kararCard = document.getElementById('fv-karar-card');
-  var detailCard= document.getElementById('fv-detail-card');
+  var d    = _prfData;
+  var el   = document.getElementById('fv-content');
+  if(!el) return;
 
-  function showErr(msg) {
-    if(errEl)     { errEl.style.display='block'; errEl.textContent=msg; }
-    if(kararCard) kararCard.style.display='none';
-    if(detailCard)detailCard.style.display='none';
+  if(!d) {
+    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted2);font-size:12px;">Hisse verisi bulunamadı. Lütfen önce tarama yapın.</div>';
+    return;
   }
 
-  if(!d) return showErr('Hisse verisi bulunamadı. Lütfen önce tarama yapın.');
+  var exMeta = (typeof EXCHANGE_META!=='undefined' && EXCHANGE_META[_prfEx]) || {};
+  var cur    = exMeta.currency || '₺';
+  var price  = d.close || d.price || 0;
 
-  var price = d.close || d.price || 0;
-  var pe    = d.pe_ratio;
-  var pb    = d.price_book_ratio;
-  var exMeta= (typeof EXCHANGE_META!=='undefined' && EXCHANGE_META[_prfEx]) || {};
-  var cur   = exMeta.currency || '₺';
+  el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted2);font-size:12px;">⏳ Taze veriler çekiliyor...</div>';
 
-  if(!price || price <= 0)     return showErr('Fiyat verisi bulunamadı.');
-  if((!pe  || pe  <= 0) && (!pb || pb <= 0))
-    return showErr('F/K ve PD/DD verisi bulunamadı — hesaplama yapılamıyor.');
+  fetch('/api/verify?symbol=' + encodeURIComponent(_prfSym) + '&exchange=' + (_prfEx||'bist'))
+    .then(function(r){ return r.json(); })
+    .then(function(vd){ _renderFV(el, price, cur, d, vd.yahoo||{}); })
+    .catch(function(){  _renderFV(el, price, cur, d, {}); });
+}
 
-  // ── Parametre ───────────────────────────────────────────────
-  var SEKTOR_FK   = 12;   // sektör F/K çarpanı
-  var SEKTOR_PDDD = 1.2;  // sektör PD/DD çarpanı
+function _renderFV(el, price, cur, d, v) {
+  var SEKTOR_FK   = 12;
+  var SEKTOR_PDDD = 1.2;
 
-  // Hisse başı değerler (fiyat üzerinden türetme)
-  var eps    = (pe  && pe  > 0) ? price / pe  : null;  // EPS = Fiyat / F/K
-  var defter = (pb  && pb  > 0) ? price / pb  : null;  // Defter = Fiyat / PD/DD
+  // En iyi veriyi seç: verify > screener
+  var pe  = (v.pe  && v.pe  > 0) ? v.pe  : (d.pe_ratio         && d.pe_ratio         > 0 ? d.pe_ratio         : null);
+  var pb  = (v.pb  && v.pb  > 0) ? v.pb  : (d.price_book_ratio  && d.price_book_ratio  > 0 ? d.price_book_ratio  : null);
+  var roe = v.roe  || (d.roe ? +(d.roe*100).toFixed(1) : null);
+  var nm  = v.netMargin || (d.net_margin ? +(d.net_margin*100).toFixed(1) : null);
+  var eg  = v.epsGrowth  || null;
+  var rg  = v.revenueGrowth || null;
+  var fs  = (v.piotroski != null ? v.piotroski : d.piotroski_f_score) || null;
 
-  var fkTarget   = eps    ? eps    * SEKTOR_FK   : null;
-  var pdddTarget = defter ? defter * SEKTOR_PDDD : null;
+  var f2 = function(v){ return cur+' '+v.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  var f4 = function(v){ return cur+' '+v.toFixed(4); };
+  var p2 = function(v){ return (v>=0?'+':'')+v.toFixed(1)+'%'; };
 
-  // Adil fiyat: mevcut verilere göre ağırlıklı ortalama
-  var adil;
-  var usedBoth = fkTarget && pdddTarget;
-  if(usedBoth)          adil = (fkTarget + pdddTarget) / 2;
-  else if(fkTarget)     adil = fkTarget;
-  else                  adil = pdddTarget;
+  if(!price || price<=0) { el.innerHTML='<div style="padding:24px;text-align:center;color:var(--muted2);font-size:12px;">Fiyat verisi bulunamadı.</div>'; return; }
 
-  var guvenli = adil * 0.7;
+  // Türetilen değerler
+  var eps    = (pe  && pe  > 0) ? price / pe  : null;
+  var defter = (pb  && pb  > 0) ? price / pb  : null;
+  var fkT    = eps    ? +(eps    * SEKTOR_FK  ).toFixed(4) : null;
+  var pdddT  = defter ? +(defter * SEKTOR_PDDD).toFixed(4) : null;
+  var graham = (eps && eps > 0 && defter && defter > 0) ? +Math.sqrt(22.5 * eps * defter).toFixed(4) : null;
 
-  // ── Karar ───────────────────────────────────────────────────
-  var karar, kararColor, kararBg;
-  if     (price < guvenli)    { karar='🟢 GÜÇLÜ AL'; kararColor='#22c55e'; kararBg='rgba(34,197,94,.12)'; }
-  else if(price < adil)       { karar='🟡 AL';        kararColor='#eab308'; kararBg='rgba(234,179,8,.12)';  }
-  else if(price < adil * 1.1) { karar='⚪ TUT';       kararColor='#94a3b8'; kararBg='rgba(148,163,184,.1)'; }
-  else                         { karar='🔴 PAHALII';   kararColor='#ef4444'; kararBg='rgba(239,68,68,.12)';  }
+  var methods = [fkT, pdddT].filter(function(x){ return x && x > 0; });
+  if(!methods.length) {
+    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted2);font-size:12px;">F/K ve PD/DD verisi bulunamadı — bu hisse için hesaplama yapılamıyor.<br><span style="font-size:10px;margin-top:6px;display:block;">İpucu: Zarar eden şirketlerde F/K hesaplanamaz.</span></div>';
+    return;
+  }
 
-  var upsidePct = ((adil - price) / price * 100);
-  var upSign    = upsidePct >= 0 ? '+' : '';
-  var upColor   = upsidePct >= 0 ? 'var(--green)' : 'var(--red)';
+  var adil    = methods.reduce(function(a,b){return a+b;},0) / methods.length;
+  var guvenli = adil * 0.70;
+  var hedef1  = adil * 1.30;
+  var hedef2  = adil * 1.50;
 
-  // ── Render: karar kartı ─────────────────────────────────────
-  document.getElementById('fv-cur-price').textContent  = cur + ' ' + price.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2});
-  document.getElementById('fv-adil').textContent       = cur + ' ' + adil.toFixed(2);
-  document.getElementById('fv-guvenli').textContent    = cur + ' ' + guvenli.toFixed(2);
-  document.getElementById('fv-adil-upside').innerHTML  = '<span style="color:'+upColor+'">'+upSign+upsidePct.toFixed(1)+'% potansiyel</span>';
-  var badgeEl = document.getElementById('fv-karar-badge');
-  badgeEl.textContent = karar;
-  badgeEl.style.cssText += ';color:'+kararColor+';background:'+kararBg+';border:1px solid '+kararColor+'33;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;';
-  kararCard.style.display  = 'block';
+  // Karar
+  var karar, kc, kb;
+  if     (price < guvenli)   { karar='🟢 GÜÇLÜ AL'; kc='#22c55e'; kb='rgba(34,197,94,.13)'; }
+  else if(price < adil)      { karar='🟡 AL';        kc='#eab308'; kb='rgba(234,179,8,.13)';  }
+  else if(price < adil*1.10) { karar='⚪ TUT';       kc='#94a3b8'; kb='rgba(148,163,184,.1)'; }
+  else                        { karar='🔴 PAHALI';    kc='#ef4444'; kb='rgba(239,68,68,.13)';  }
 
-  // ── Render: hesaplama detayları ─────────────────────────────
-  var rows = [
-    { l:'Mevcut Fiyat',         v: cur + ' ' + price.toFixed(2) },
-    { l:'F/K Oranı',            v: pe    ? pe.toFixed(1)+'x'    : '—' },
-    { l:'EPS (Hisse Başı Kaz.)',v: eps   ? cur + ' ' + eps.toFixed(4)  : '—' },
-    { l:'F/K Hedef Fiyat',      v: fkTarget   ? cur + ' ' + fkTarget.toFixed(2)   : '—' },
-    { l:'PD/DD Oranı',          v: pb    ? pb.toFixed(2)+'x'    : '—' },
-    { l:'Defter Değeri/Hisse',  v: defter ? cur + ' ' + defter.toFixed(4)  : '—' },
-    { l:'PD/DD Hedef Fiyat',    v: pdddTarget ? cur + ' ' + pdddTarget.toFixed(2) : '—' },
-    { l:'Adil Fiyat ' + (usedBoth ? '(F/K+PD/DD ort.)' : ''), v: cur + ' ' + adil.toFixed(2) },
-    { l:'Güvenli Alım (×0,70)', v: cur + ' ' + guvenli.toFixed(2) },
+  var upside = (adil - price) / price * 100;
+
+  // Zone bar: 0 → 2× adil
+  var barMax  = adil * 2;
+  var mkPos   = +(Math.min(Math.max(price   / barMax * 100, 1), 99)).toFixed(1);
+  var gvPos   = +(guvenli / barMax * 100).toFixed(1);
+  var adilPos = +(adil    / barMax * 100).toFixed(1);
+  var ovPos   = +((adil*1.10) / barMax * 100).toFixed(1);
+
+  var html = [];
+
+  // ① Veri özeti
+  html.push('<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">');
+  var cards = [
+    {l:'Mevcut Fiyat', v:f2(price),              c:''},
+    {l:'F/K Oranı',    v:pe ? pe.toFixed(1)+'x':'—',  c:pe&&pe<15?'g':pe&&pe<25?'m':'b'},
+    {l:'PD/DD',        v:pb ? pb.toFixed(2)+'x':'—',  c:pb&&pb<2?'g':pb&&pb<4?'m':'b'},
+    {l:'EPS/Hisse',    v:eps    ? f4(eps)    :'—',     c:''},
+    {l:'Defter/Hisse', v:defter ? f4(defter) :'—',     c:''},
+    {l:'Graham Sayısı',v:graham ? f2(graham) :'—',     c:''},
   ];
+  var cmap = {g:'#22c55e',m:'#f59e0b',b:'#ef4444'};
+  cards.forEach(function(c){
+    var vc = c.c ? cmap[c.c]||'var(--text)' : 'var(--text)';
+    html.push('<div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;">');
+    html.push('<div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;">'+c.l+'</div>');
+    html.push('<div style="font-size:12px;font-weight:700;font-family:\'JetBrains Mono\',monospace;color:'+vc+';">'+c.v+'</div>');
+    html.push('</div>');
+  });
+  html.push('</div>');
 
-  document.getElementById('fv-rows').innerHTML = rows.map(function(r){
-    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);">'
-      +'<span style="font-size:11px;color:var(--text2);">'+r.l+'</span>'
-      +'<span style="font-size:11px;font-weight:600;font-family:\'JetBrains Mono\',monospace;color:var(--text);">'+r.v+'</span>'
-      +'</div>';
-  }).join('');
+  // ② Karar banner
+  html.push('<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-radius:10px;border:1px solid '+kc+'44;background:'+kb+';margin-bottom:14px;">');
+  html.push('<div><div style="font-size:17px;font-weight:800;color:'+kc+';">'+karar+'</div>');
+  html.push('<div style="font-size:10px;color:var(--muted2);margin-top:3px;">'+_prfSym+' · '+f2(price)+'</div></div>');
+  html.push('<div style="text-align:right;"><div style="font-size:14px;font-weight:700;color:'+(upside>=0?'#22c55e':'#ef4444')+';">'+p2(upside)+'</div>');
+  html.push('<div style="font-size:10px;color:var(--muted2);">adil fiyata göre</div></div></div>');
 
-  if(errEl)      errEl.style.display = 'none';
-  detailCard.style.display = 'block';
+  // ③ Zone bar
+  html.push('<div style="margin-bottom:18px;">');
+  html.push('<div style="font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Fiyat Bölgesi</div>');
+  html.push('<div style="position:relative;height:14px;border-radius:7px;margin-bottom:10px;background:linear-gradient(to right,#22c55e 0,#22c55e '+gvPos+'%,#eab308 '+gvPos+'%,#eab308 '+adilPos+'%,#94a3b8 '+adilPos+'%,#94a3b8 '+ovPos+'%,#ef4444 '+ovPos+'%,#ef4444 100%);">');
+  html.push('<div style="position:absolute;top:-4px;left:'+mkPos+'%;transform:translateX(-50%);width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid #0b0e13;box-shadow:0 0 0 2px '+kc+';" title="'+f2(price)+'"></div>');
+  html.push('</div>');
+  html.push('<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;font-size:9px;color:var(--muted2);">');
+  html.push('<span>🟢 Güçlü Al &lt; '+f2(guvenli)+'</span>');
+  html.push('<span style="text-align:center;">🟡 Al &lt; '+f2(adil)+'</span>');
+  html.push('<span style="text-align:right;">🔴 Pahalı &gt; '+f2(adil*1.10)+'</span>');
+  html.push('</div></div>');
+
+  // ④ Hedef fiyatlar
+  html.push('<div style="margin-bottom:14px;">');
+  html.push('<div style="font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Hedef Fiyatlar</div>');
+  html.push('<div style="display:flex;flex-direction:column;gap:6px;">');
+  var targets = [
+    {icon:'🔵', label:'Güvenli Alım',  price:guvenli, desc:'Adil fiyatın %70\'i — maksimum güvenlik marjı'},
+    {icon:'🟡', label:'Adil Fiyat',    price:adil,    desc:methods.length===2 ? 'F/K + PD/DD hedefinin ortalaması' : (fkT ? 'F/K bazlı değerleme' : 'PD/DD bazlı değerleme')},
+    graham ? {icon:'📐', label:'Graham Sayısı', price:graham, desc:'√(22,5 × EPS × Defter) — Benjamin Graham formülü'} : null,
+    {icon:'🎯', label:'Hedef 1',       price:hedef1,  desc:'Adil fiyatın %130\'u — kısa vadeli hedef'},
+    {icon:'🚀', label:'Hedef 2',       price:hedef2,  desc:'Adil fiyatın %150\'si — uzun vadeli hedef'},
+  ];
+  targets.forEach(function(t){
+    if(!t) return;
+    var chg = (t.price - price) / price * 100;
+    var cc  = chg >= 0 ? '#22c55e' : '#ef4444';
+    html.push('<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--s2);border:1px solid var(--border);border-radius:8px;">');
+    html.push('<div><div style="font-size:11px;font-weight:600;color:var(--text);">'+t.icon+' '+t.label+'</div>');
+    html.push('<div style="font-size:10px;color:var(--muted2);margin-top:2px;">'+t.desc+'</div></div>');
+    html.push('<div style="text-align:right;"><div style="font-size:13px;font-weight:700;font-family:\'JetBrains Mono\',monospace;color:var(--text);">'+f2(t.price)+'</div>');
+    html.push('<div style="font-size:10px;font-weight:600;color:'+cc+';">'+p2(chg)+'</div></div></div>');
+  });
+  html.push('</div></div>');
+
+  // ⑤ Adım adım hesaplama
+  html.push('<div style="background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px;">');
+  html.push('<div style="font-size:11px;font-weight:600;color:var(--text);margin-bottom:12px;">Adım Adım Hesaplama</div>');
+  html.push('<div style="display:flex;flex-direction:column;gap:4px;">');
+  var steps = [
+    {n:'1', t:'EPS (Hisse Başı Kazanç)',  f: eps    ? f2(price)+' ÷ '+pe.toFixed(1)+'x = '+f4(eps)           : '— (F/K verisi yok)',        ok:!!eps},
+    {n:'2', t:'Defter Değeri / Hisse',     f: defter ? f2(price)+' ÷ '+pb.toFixed(2)+'x = '+f4(defter)        : '— (PD/DD verisi yok)',       ok:!!defter},
+    {n:'3', t:'F/K Hedef Fiyatı',          f: fkT    ? f4(eps)+' × '+SEKTOR_FK+' = '+f2(fkT)                  : '— (hesaplanamadı)',          ok:!!fkT},
+    {n:'4', t:'PD/DD Hedef Fiyatı',        f: pdddT  ? f4(defter)+' × '+SEKTOR_PDDD+' = '+f2(pdddT)           : '— (hesaplanamadı)',          ok:!!pdddT},
+    graham ? {n:'5', t:'Graham Sayısı', f:'√(22,5 × '+f4(eps)+' × '+f4(defter)+') = '+f2(graham), ok:true} : null,
+    {n:'6', t:'Adil Fiyat',               f: '('+methods.map(f2).join(' + ')+') ÷ '+methods.length+' = '+f2(adil),                           ok:true},
+    {n:'7', t:'Güvenli Alım Bölgesi',      f: f2(adil)+' × 0,70 = '+f2(guvenli),                                                              ok:true},
+    {n:'8', t:'Hedef Fiyat 1',             f: f2(adil)+' × 1,30 = '+f2(hedef1),                                                               ok:true},
+    {n:'9', t:'Hedef Fiyat 2',             f: f2(adil)+' × 1,50 = '+f2(hedef2),                                                               ok:true},
+  ];
+  steps.forEach(function(s){
+    if(!s) return;
+    html.push('<div style="display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);">');
+    html.push('<div style="min-width:20px;height:20px;border-radius:50%;background:'+(s.ok?'var(--accent)':'rgba(100,116,139,.3)')+';color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;">'+s.n+'</div>');
+    html.push('<div><div style="font-size:11px;font-weight:600;color:var(--text);">'+s.t+'</div>');
+    html.push('<div style="font-size:10px;color:var(--muted2);margin-top:2px;font-family:\'JetBrains Mono\',monospace;">'+s.f+'</div></div></div>');
+  });
+  html.push('</div></div>');
+
+  // ⑥ Ek göstergeler (varsa)
+  var extras = [
+    roe  != null ? {l:'ROE',          v:(roe>=0?'+':'')+roe+'%',  c:roe>15?'g':roe>8?'m':'b'} : null,
+    nm   != null ? {l:'Net Marj',     v:(nm >=0?'+':'')+nm +'%',  c:nm>10?'g':nm>5?'m':'b'}  : null,
+    eg   != null ? {l:'EPS Büyüme',   v:(eg >=0?'+':'')+eg +'%',  c:eg>10?'g':eg>0?'m':'b'}  : null,
+    rg   != null ? {l:'Gelir Büyüme', v:(rg >=0?'+':'')+rg +'%',  c:rg>10?'g':rg>0?'m':'b'}  : null,
+    fs   != null ? {l:'Piotroski',    v:fs+'/9',                   c:fs>=7?'g':fs>=4?'m':'b'} : null,
+  ].filter(Boolean);
+
+  if(extras.length) {
+    html.push('<div style="margin-bottom:14px;">');
+    html.push('<div style="font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Ek Göstergeler</div>');
+    html.push('<div style="display:grid;grid-template-columns:repeat('+Math.min(extras.length,3)+',1fr);gap:8px;">');
+    extras.forEach(function(e){
+      var ec = cmap[e.c]||'var(--text)';
+      html.push('<div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:10px;">');
+      html.push('<div style="font-size:9px;color:var(--text2);margin-bottom:4px;">'+e.l+'</div>');
+      html.push('<div style="font-size:13px;font-weight:700;color:'+ec+';">'+e.v+'</div></div>');
+    });
+    html.push('</div></div>');
+  }
+
+  // ⑦ Uyarı
+  html.push('<div style="font-size:10px;color:var(--muted2);padding:10px 12px;background:rgba(240,180,41,.05);border:1px solid rgba(240,180,41,.2);border-radius:6px;line-height:1.6;">');
+  html.push('⚠ <b>Metodoloji:</b> EPS = Fiyat÷F/K · Defter = Fiyat÷PD/DD · Adil = Ort(F/K Hedef, PD/DD Hedef) · Graham = √(22,5×EPS×Defter) · Güvenli Alım = Adil×0,70.<br>');
+  html.push('Bu analiz nicel çarpan modelidir; makroekonomi, sektör dinamikleri ve şirkete özgü riskleri yansıtmaz. Yatırım tavsiyesi değildir.');
+  html.push('</div>');
+
+  el.innerHTML = html.join('');
 }
 
 function _startPrfAI() {

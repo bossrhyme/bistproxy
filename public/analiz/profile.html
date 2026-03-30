@@ -250,50 +250,7 @@ if('serviceWorker' in navigator){
         <div id="prf-panel-fairvalue" class="prf-panel">
           <div class="prf-section">
             <div class="prf-sec-title">💰 Adil Fiyat Analizi</div>
-
-            <!-- Karar kartı -->
-            <div id="fv-karar-card" style="display:none;margin-bottom:16px;padding:18px 20px;border-radius:10px;border:1px solid var(--border);background:var(--s2);">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-                <div>
-                  <div style="font-size:11px;color:var(--text2);margin-bottom:4px;">Mevcut Fiyat</div>
-                  <div style="font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;" id="fv-cur-price">—</div>
-                </div>
-                <div id="fv-karar-badge" style="font-size:13px;font-weight:700;padding:8px 16px;border-radius:8px;">—</div>
-              </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                <div style="background:var(--s3);border-radius:8px;padding:12px;">
-                  <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Adil Fiyat</div>
-                  <div style="font-size:17px;font-weight:700;font-family:'JetBrains Mono',monospace;" id="fv-adil">—</div>
-                  <div style="font-size:10px;margin-top:3px;" id="fv-adil-upside">—</div>
-                </div>
-                <div style="background:var(--s3);border-radius:8px;padding:12px;">
-                  <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Güvenli Alım</div>
-                  <div style="font-size:17px;font-weight:700;font-family:'JetBrains Mono',monospace;" id="fv-guvenli">—</div>
-                  <div style="font-size:10px;color:var(--muted2);margin-top:3px;">Adil fiyatın %70'i</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Hesaplama detayları -->
-            <div id="fv-detail-card" style="display:none;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px;">
-              <div style="font-size:11px;font-weight:600;color:var(--text);margin-bottom:12px;">Hesaplama Detayları</div>
-              <div style="display:flex;flex-direction:column;gap:8px;" id="fv-rows"></div>
-            </div>
-
-            <!-- Metodoloji notu -->
-            <div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;">
-              <div style="font-size:10px;font-weight:600;color:var(--text2);margin-bottom:6px;">Metodoloji</div>
-              <div style="font-size:10px;color:var(--muted2);line-height:1.7;">
-                <b>F/K Hedef:</b> Hisse başı kazanç (EPS) × 12 (sektör çarpanı)<br>
-                <b>PD/DD Hedef:</b> Defter değeri × 1,2 (sektör çarpanı)<br>
-                <b>Adil Fiyat:</b> F/K hedefi ve PD/DD hedefinin ortalaması<br>
-                <b>Güvenli Alım:</b> Adil fiyatın %70'i — güvenlik marjı<br>
-                <span style="color:#f0b429;">⚠ EPS = Fiyat ÷ F/K · Defter Değeri = Fiyat ÷ PD/DD · Bu analiz bilgi amaçlıdır.</span>
-              </div>
-            </div>
-
-            <!-- Hata durumu -->
-            <div id="fv-error" style="display:none;padding:20px;text-align:center;color:var(--muted2);font-size:12px;"></div>
+            <div id="fv-content"><div style="padding:30px;text-align:center;color:var(--muted2);font-size:12px;">⏳ Veriler yükleniyor...</div></div>
           </div>
         </div>
 
