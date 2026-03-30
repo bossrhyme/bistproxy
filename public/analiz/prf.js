@@ -660,6 +660,97 @@ function prfTab(id, el) {
   var panel = document.getElementById('prf-panel-'+id);
   if(panel) panel.classList.add('on');
   if(id==='ai' && !_prfAiDone) _startPrfAI();
+  if(id==='fairvalue') _startFairValue();
+}
+
+// ── Adil Fiyat Analizi ──────────────────────────────────────────────────
+function _startFairValue() {
+  var d = _prfData;
+  var errEl     = document.getElementById('fv-error');
+  var kararCard = document.getElementById('fv-karar-card');
+  var detailCard= document.getElementById('fv-detail-card');
+
+  function showErr(msg) {
+    if(errEl)     { errEl.style.display='block'; errEl.textContent=msg; }
+    if(kararCard) kararCard.style.display='none';
+    if(detailCard)detailCard.style.display='none';
+  }
+
+  if(!d) return showErr('Hisse verisi bulunamadı. Lütfen önce tarama yapın.');
+
+  var price = d.close || d.price || 0;
+  var pe    = d.pe_ratio;
+  var pb    = d.price_book_ratio;
+  var exMeta= (typeof EXCHANGE_META!=='undefined' && EXCHANGE_META[_prfEx]) || {};
+  var cur   = exMeta.currency || '₺';
+
+  if(!price || price <= 0)     return showErr('Fiyat verisi bulunamadı.');
+  if((!pe  || pe  <= 0) && (!pb || pb <= 0))
+    return showErr('F/K ve PD/DD verisi bulunamadı — hesaplama yapılamıyor.');
+
+  // ── Parametre ───────────────────────────────────────────────
+  var SEKTOR_FK   = 12;   // sektör F/K çarpanı
+  var SEKTOR_PDDD = 1.2;  // sektör PD/DD çarpanı
+
+  // Hisse başı değerler (fiyat üzerinden türetme)
+  var eps    = (pe  && pe  > 0) ? price / pe  : null;  // EPS = Fiyat / F/K
+  var defter = (pb  && pb  > 0) ? price / pb  : null;  // Defter = Fiyat / PD/DD
+
+  var fkTarget   = eps    ? eps    * SEKTOR_FK   : null;
+  var pdddTarget = defter ? defter * SEKTOR_PDDD : null;
+
+  // Adil fiyat: mevcut verilere göre ağırlıklı ortalama
+  var adil;
+  var usedBoth = fkTarget && pdddTarget;
+  if(usedBoth)          adil = (fkTarget + pdddTarget) / 2;
+  else if(fkTarget)     adil = fkTarget;
+  else                  adil = pdddTarget;
+
+  var guvenli = adil * 0.7;
+
+  // ── Karar ───────────────────────────────────────────────────
+  var karar, kararColor, kararBg;
+  if     (price < guvenli)    { karar='🟢 GÜÇLÜ AL'; kararColor='#22c55e'; kararBg='rgba(34,197,94,.12)'; }
+  else if(price < adil)       { karar='🟡 AL';        kararColor='#eab308'; kararBg='rgba(234,179,8,.12)';  }
+  else if(price < adil * 1.1) { karar='⚪ TUT';       kararColor='#94a3b8'; kararBg='rgba(148,163,184,.1)'; }
+  else                         { karar='🔴 PAHALII';   kararColor='#ef4444'; kararBg='rgba(239,68,68,.12)';  }
+
+  var upsidePct = ((adil - price) / price * 100);
+  var upSign    = upsidePct >= 0 ? '+' : '';
+  var upColor   = upsidePct >= 0 ? 'var(--green)' : 'var(--red)';
+
+  // ── Render: karar kartı ─────────────────────────────────────
+  document.getElementById('fv-cur-price').textContent  = cur + ' ' + price.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('fv-adil').textContent       = cur + ' ' + adil.toFixed(2);
+  document.getElementById('fv-guvenli').textContent    = cur + ' ' + guvenli.toFixed(2);
+  document.getElementById('fv-adil-upside').innerHTML  = '<span style="color:'+upColor+'">'+upSign+upsidePct.toFixed(1)+'% potansiyel</span>';
+  var badgeEl = document.getElementById('fv-karar-badge');
+  badgeEl.textContent = karar;
+  badgeEl.style.cssText += ';color:'+kararColor+';background:'+kararBg+';border:1px solid '+kararColor+'33;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;';
+  kararCard.style.display  = 'block';
+
+  // ── Render: hesaplama detayları ─────────────────────────────
+  var rows = [
+    { l:'Mevcut Fiyat',         v: cur + ' ' + price.toFixed(2) },
+    { l:'F/K Oranı',            v: pe    ? pe.toFixed(1)+'x'    : '—' },
+    { l:'EPS (Hisse Başı Kaz.)',v: eps   ? cur + ' ' + eps.toFixed(4)  : '—' },
+    { l:'F/K Hedef Fiyat',      v: fkTarget   ? cur + ' ' + fkTarget.toFixed(2)   : '—' },
+    { l:'PD/DD Oranı',          v: pb    ? pb.toFixed(2)+'x'    : '—' },
+    { l:'Defter Değeri/Hisse',  v: defter ? cur + ' ' + defter.toFixed(4)  : '—' },
+    { l:'PD/DD Hedef Fiyat',    v: pdddTarget ? cur + ' ' + pdddTarget.toFixed(2) : '—' },
+    { l:'Adil Fiyat ' + (usedBoth ? '(F/K+PD/DD ort.)' : ''), v: cur + ' ' + adil.toFixed(2) },
+    { l:'Güvenli Alım (×0,70)', v: cur + ' ' + guvenli.toFixed(2) },
+  ];
+
+  document.getElementById('fv-rows').innerHTML = rows.map(function(r){
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);">'
+      +'<span style="font-size:11px;color:var(--text2);">'+r.l+'</span>'
+      +'<span style="font-size:11px;font-weight:600;font-family:\'JetBrains Mono\',monospace;color:var(--text);">'+r.v+'</span>'
+      +'</div>';
+  }).join('');
+
+  if(errEl)      errEl.style.display = 'none';
+  detailCard.style.display = 'block';
 }
 
 function _startPrfAI() {
