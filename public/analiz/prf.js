@@ -678,26 +678,22 @@ function _startFairValue() {
   var cur    = exMeta.currency || '₺';
   var price  = d.close || d.price || 0;
 
-  el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted2);font-size:12px;">⏳ Taze veriler çekiliyor...</div>';
-
-  fetch('/api/verify?symbol=' + encodeURIComponent(_prfSym) + '&exchange=' + (_prfEx||'bist'))
-    .then(function(r){ return r.json(); })
-    .then(function(vd){ _renderFV(el, price, cur, d, vd.yahoo||{}); })
-    .catch(function(){  _renderFV(el, price, cur, d, {}); });
+  // Screener verisi zaten yüklü — anında render et, ağ çağrısı yok
+  _renderFV(el, price, cur, d, {});
 }
 
 function _renderFV(el, price, cur, d, v) {
   var SEKTOR_FK   = 12;
   var SEKTOR_PDDD = 1.2;
 
-  // En iyi veriyi seç: verify > screener
-  var pe  = (v.pe  && v.pe  > 0) ? v.pe  : (d.pe_ratio         && d.pe_ratio         > 0 ? d.pe_ratio         : null);
-  var pb  = (v.pb  && v.pb  > 0) ? v.pb  : (d.price_book_ratio  && d.price_book_ratio  > 0 ? d.price_book_ratio  : null);
-  var roe = v.roe  || (d.roe ? +(d.roe*100).toFixed(1) : null);
-  var nm  = v.netMargin || (d.net_margin ? +(d.net_margin*100).toFixed(1) : null);
-  var eg  = v.epsGrowth  || null;
-  var rg  = v.revenueGrowth || null;
-  var fs  = (v.piotroski != null ? v.piotroski : d.piotroski_f_score) || null;
+  // Screener verisinden direkt çek (v boş geçilir artık)
+  var pe  = (d.pe_ratio        && d.pe_ratio        > 0) ? d.pe_ratio        : null;
+  var pb  = (d.price_book_ratio && d.price_book_ratio > 0) ? d.price_book_ratio : null;
+  var roe = d.roe         ? +(d.roe         * 100).toFixed(1) : null;
+  var nm  = d.net_margin  ? +(d.net_margin  * 100).toFixed(1) : null;
+  var eg  = d.eps_growth_ttm_yoy != null ? +d.eps_growth_ttm_yoy : (d.earnings_per_share_change_ttm_yoy != null ? +d.earnings_per_share_change_ttm_yoy : null);
+  var rg  = d.revenue_growth_ttm_yoy != null ? +d.revenue_growth_ttm_yoy : (d.total_revenue_change_ttm_yoy != null ? +d.total_revenue_change_ttm_yoy : null);
+  var fs  = d.piotroski_f_score != null ? d.piotroski_f_score : null;
 
   var f2 = function(v){ return cur+' '+v.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2}); };
   var f4 = function(v){ return cur+' '+v.toFixed(4); };
