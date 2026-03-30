@@ -245,12 +245,17 @@ function _renderFon(funds, meta) {
     if(v==null) return '<span style="color:var(--muted2)">—</span>';
     return '<span style="color:'+(v>=0?'var(--green)':'var(--red)')+'">'+(v>=0?'+':'')+v.toFixed(1)+'%</span>';
   };
+  var truncName = function(n){ return n && n.length > 42 ? n.slice(0,42)+'...' : (n||''); };
   var rows=funds.map(function(f,i){
     var ver=f.verified?'<sup style="color:var(--green);font-size:8px">✓</sup>':'';
+    var isFav=fonFavSet.has(f.code);
     return '<tr>'
-      +'<td class="tc">'+(i+1)+'</td>'
-      +'<td style="padding:7px 6px"><div style="font-size:12px;font-weight:700;color:var(--text)">'+f.code+ver+'</div>'
-      +'<div class="tsub" title="'+f.name+'">'+f.name+'</div></td>'
+      +'<td class="nfav" onclick="event.stopPropagation();toggleFonFav(\''+f.code+'\')" title="'+(isFav?'Favorilerden çıkar':'Favorilere ekle')+'"><span class="fav-icon'+(isFav?' fav-on':'')+'">★</span></td>'
+      +'<td style="padding:7px 6px;white-space:nowrap">'
+        +'<span class="row-num">'+(i+1)+'</span>'
+        +'<span class="sym-wrap"><span class="row-arrow">›</span><span class="sym">'+f.code+'</span>'+ver+'</span>'
+        +'<div class="tsub" title="'+f.name+'">'+truncName(f.name)+'</div>'
+      +'</td>'
       +'<td class="tn">₺'+(f.price||0).toFixed(4)+'</td>'
       +'<td class="tn">'+fR(f.retYtd)+'</td>'
       +'<td class="tn">'+fR(f.ret1m)+'</td>'
@@ -272,7 +277,7 @@ function _renderFon(funds, meta) {
     return '<th class="right'+(active?' sorted':'')+'" style="cursor:pointer" onclick="_fonSort(\''+c.k+'\')">'
       +c.l+arrow+'</th>';
   }).join('');
-  var tbl='<table><thead><tr><th>#</th><th>Fon</th>'+thSort+'</tr></thead><tbody>'+rows+'</tbody></table>';
+  var tbl='<table><thead><tr><th style="width:28px"></th><th>Fon</th>'+thSort+'</tr></thead><tbody>'+rows+'</tbody></table>';
   _showResultArea(hdr, tbl, funds.length);
 }
 
@@ -343,13 +348,18 @@ function _renderKripto(coins, meta) {
   var fC=function(v){if(v==null)return'<span style="color:var(--muted2)">—</span>';return'<span style="color:'+(v>=0?'var(--green)':'var(--red)')+'">'+(v>=0?'+':'')+v.toFixed(1)+'%</span>';};
   var tvBadge=function(r){var map={STRONG_BUY:['var(--green)','G.AL'],BUY:['var(--green)','AL'],NEUTRAL:['var(--muted2)','NÖT'],SELL:['var(--red)','SAT'],STRONG_SELL:['var(--red)','G.SAT']};if(!r||!map[r])return'<span style="color:var(--muted2)">—</span>';return'<span style="color:'+map[r][0]+';font-size:9px;font-weight:700">'+map[r][1]+'</span>';};
   var note=(meta.sources&&meta.sources.note)||'';
+  var truncName = function(n){ return n && n.length > 30 ? n.slice(0,30)+'...' : (n||''); };
   var rows=coins.map(function(c,i){
     var ver=c.verified?'<sup style="color:var(--green);font-size:8px">✓</sup>':'';
-    var img=c.image?'<img src="'+c.image+'" width="13" height="13" style="border-radius:50%;vertical-align:middle;margin-right:3px" onerror="this.remove()">':'';
+    var img=c.image?'<img src="'+c.image+'" width="14" height="14" style="border-radius:50%;vertical-align:middle;margin-right:3px" onerror="this.remove()">':'';
+    var isFav=kriptoFavSet.has(c.symbol);
     return '<tr>'
-      +'<td class="tc">'+(c.rank||i+1)+'</td>'
-      +'<td style="padding:7px 6px">'+img+'<span style="font-size:12px;font-weight:700;color:var(--text)">'+c.symbol+ver+'</span>'
-      +'<div class="tsub">'+c.name+'</div></td>'
+      +'<td class="nfav" onclick="event.stopPropagation();toggleKriptoFav(\''+c.symbol+'\')" title="'+(isFav?'Favorilerden çıkar':'Favorilere ekle')+'"><span class="fav-icon'+(isFav?' fav-on':'')+'">★</span></td>'
+      +'<td style="padding:7px 6px;white-space:nowrap">'
+        +'<span class="row-num">'+(c.rank||i+1)+'</span>'
+        +'<span class="sym-wrap"><span class="row-arrow">›</span>'+img+'<span class="sym">'+(c.symbol||'').toUpperCase()+'</span>'+ver+'</span>'
+        +'<div class="tsub">'+truncName(c.name)+'</div>'
+      +'</td>'
       +'<td class="tn">'+fP(c.price)+'</td>'
       +'<td class="tn">'+fC(c.change24h)+'</td>'
       +'<td class="tn">'+fC(c.change7d)+'</td>'
@@ -372,7 +382,7 @@ function _renderKripto(coins, meta) {
     return '<th class="right'+(active?' sorted':'')+'" style="cursor:pointer" onclick="_kriptoSort(\''+c.k+'\')">'
       +c.l+arrow+'</th>';
   }).join('');
-  var tbl='<table><thead><tr><th>#</th><th>Coin</th>'+kThSort+'<th class="right">TV</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  var tbl='<table><thead><tr><th style="width:28px"></th><th>Coin</th>'+kThSort+'<th class="right">TV</th></tr></thead><tbody>'+rows+'</tbody></table>';
   _showResultArea(hdr, tbl, coins.length);
 }
 
@@ -616,8 +626,25 @@ let scanAborted = false;
 // ═══════════════════════════════════════════
 var favSet = new Set(JSON.parse(localStorage.getItem('df_favs') || '[]'));
 var favFilterActive = false;
+var fonFavSet = new Set(JSON.parse(localStorage.getItem('df_fon_favs') || '[]'));
+var kriptoFavSet = new Set(JSON.parse(localStorage.getItem('df_kripto_favs') || '[]'));
 
 function saveFavs() { localStorage.setItem('df_favs', JSON.stringify([...favSet])); }
+function saveFonFavs() { localStorage.setItem('df_fon_favs', JSON.stringify([...fonFavSet])); }
+function saveKriptoFavs() { localStorage.setItem('df_kripto_favs', JSON.stringify([...kriptoFavSet])); }
+
+function toggleFonFav(code) {
+  if (fonFavSet.has(code)) { fonFavSet.delete(code); showToast('✕ ' + code + ' favorilerden çıkarıldı'); }
+  else { fonFavSet.add(code); showToast('★ ' + code + ' favorilere eklendi'); }
+  saveFonFavs();
+  _renderFon(_sortAsset(_fonData, sortSt.field, sortSt.dir), _fonMeta);
+}
+function toggleKriptoFav(sym) {
+  if (kriptoFavSet.has(sym)) { kriptoFavSet.delete(sym); showToast('✕ ' + sym + ' favorilerden çıkarıldı'); }
+  else { kriptoFavSet.add(sym); showToast('★ ' + sym + ' favorilere eklendi'); }
+  saveKriptoFavs();
+  _renderKripto(_sortAsset(_kriptoData, sortSt.field, sortSt.dir), _kriptoMeta);
+}
 
 function toggleFav(sym) {
   if (favSet.has(sym)) { favSet.delete(sym); showToast('✕ ' + sym + ' favorilerden çıkarıldı'); }

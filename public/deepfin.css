@@ -1021,6 +1021,8 @@ max-width: 480px) {
 
 [data-col="symbol"]{white-space:nowrap;}
 .sym-wrap{display:inline-flex;align-items:center;gap:2px;}
+.tsub{font-size:10px;color:var(--muted2);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px;}
+.sym{font-size:12px;font-weight:700;color:var(--text);}
 
 /* ── Virtual Scroll ── */
 .vs-pad { pointer-events: none; }
