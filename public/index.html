@@ -104,7 +104,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
-<link rel="stylesheet" href="/deepfin.css?v=06f6247">
+<link rel="stylesheet" href="/deepfin.css?v=2967a0b">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -830,42 +830,10 @@ if('serviceWorker' in navigator){
       </div>
 
       <div class="cstate" id="empty">
-        <div class="big">DEEPFIN</div>
-        <p>Tarama bizden, karar sizden.</p>
+        <div class="big" id="onb-big">DEEPFIN</div>
+        <p id="onb-sub">Tarama bizden, karar sizden.</p>
         <small id="empty-sub"></small>
-
-        <div class="onboarding">
-          <div class="onb-title">Nasıl Kullanılır?</div>
-          <div class="onb-steps">
-            <div class="onb-step">
-              <div class="onb-num">1</div>
-              <div class="onb-icon">🌍</div>
-              <div class="onb-label">Borsa Seç</div>
-              <div class="onb-desc">BIST, NASDAQ, S&P 500, DAX, LSE veya Nikkei'yi seç</div>
-            </div>
-            <div class="onb-arrow">→</div>
-            <div class="onb-step">
-              <div class="onb-num">2</div>
-              <div class="onb-icon">🐐</div>
-              <div class="onb-label">Strateji Seç</div>
-              <div class="onb-desc">Buffett, Lynch, Graham gibi bir strateji veya hazır filtre seç</div>
-            </div>
-            <div class="onb-arrow">→</div>
-            <div class="onb-step">
-              <div class="onb-num">3</div>
-              <div class="onb-icon">▶</div>
-              <div class="onb-label">TARA'ya Bas</div>
-              <div class="onb-desc">TARA'ya bas — binlerce hisse saniyeler içinde filtrelenir</div>
-            </div>
-            <div class="onb-arrow">→</div>
-            <div class="onb-step">
-              <div class="onb-num">4</div>
-              <div class="onb-icon">🔎</div>
-              <div class="onb-label">Hisseyi İncele</div>
-              <div class="onb-desc">Hisseye tıkla — detaylı analiz, grafik ve metrikler açılır</div>
-            </div>
-          </div>
-        </div>
+        <div class="onboarding" id="onb-container"></div>
       </div>
       <div class="cstate" id="loading" style="display:none">
         <div class="spinner"></div>
@@ -1303,6 +1271,6 @@ if('serviceWorker' in navigator){
     </div>
   </div>
 </div>
-<script src="/deepfin.js?v=06f6247"></script>
+<script src="/deepfin.js?v=2967a0b"></script>
 </body>
 </html>

@@ -29,6 +29,57 @@ function goBackToLanding() {
 }
 
 // ── Varlık seç (landing → panel) ─────────────────────────────
+// ── Varlığa göre onboarding içeriği ─────────────────────────
+var _ONB = {
+  hisse: {
+    big: 'HİSSE', sub: 'Binlerce hisse saniyeler içinde filtrelenir.',
+    steps: [
+      {icon:'🌍', label:'Borsa Seç',      desc:'BIST, NASDAQ, S&P 500, DAX, LSE veya Nikkei'},
+      {icon:'🐐', label:'Strateji Seç',   desc:'Buffett, Lynch, Graham veya özel filtreni kur'},
+      {icon:'▶',  label:'TARA\'ya Bas',   desc:'Tüm hisseler saniyeler içinde taranır'},
+      {icon:'🔎', label:'Hisseyi İncele', desc:'Tıkla — grafik, metrikler ve detaylı analiz'}
+    ]
+  },
+  fon: {
+    big: 'FON', sub: '800+ Türk yatırım fonu tek ekranda · TEFAS canlı veri.',
+    steps: [
+      {icon:'📋', label:'Fon Türü',       desc:'Yatırım, Hisse, Para Piyasası kategorisini seç'},
+      {icon:'📊', label:'Filtrele',       desc:'YTD%, 1Y%, Büyüklük, Yatırımcı sayısına göre'},
+      {icon:'▶',  label:'Fon Tara',       desc:'TEFAS\'tan 800+ fon gerçek zamanlı taranır'},
+      {icon:'⭐', label:'Favorile & Sırala', desc:'Sütun başlığına tıkla, favorile, kaydet'}
+    ]
+  },
+  kripto: {
+    big: 'KRİPTO', sub: 'CoinGecko + TradingView verisiyle coin tara.',
+    steps: [
+      {icon:'🌐', label:'Kategori Seç',   desc:'DeFi, Layer 1, GameFi veya tüm coinler'},
+      {icon:'📈', label:'Preset Seç',     desc:'Momentum, RSI Dip, ATH Yakın hazır stratejiler'},
+      {icon:'▶',  label:'Kripto Tara',    desc:'CoinGecko + TradingView verisi çekilir'},
+      {icon:'🔎', label:'Coin İncele',    desc:'Fiyat, RSI, ATH%, TradingView rating\'i gör'}
+    ]
+  }
+};
+
+function _updateOnboarding(type) {
+  var data = _ONB[type] || _ONB.hisse;
+  var big  = document.getElementById('onb-big');
+  var sub  = document.getElementById('onb-sub');
+  var cont = document.getElementById('onb-container');
+  if (big)  big.textContent = data.big;
+  if (sub)  sub.textContent = data.sub;
+  if (!cont) return;
+  var stepsHtml = data.steps.map(function(s, i) {
+    return '<div class="onb-step">'
+      + '<div class="onb-num">' + (i+1) + '</div>'
+      + '<div class="onb-icon">' + s.icon + '</div>'
+      + '<div class="onb-label">' + s.label + '</div>'
+      + '<div class="onb-desc">' + s.desc + '</div>'
+      + '</div>'
+      + (i < data.steps.length - 1 ? '<div class="onb-arrow">→</div>' : '');
+  }).join('');
+  cont.innerHTML = '<div class="onb-title">Nasıl Kullanılır?</div><div class="onb-steps">' + stepsHtml + '</div>';
+}
+
 function selectAsset(type) {
   _activeAsset = type;
 
@@ -45,6 +96,7 @@ function selectAsset(type) {
   _clearContent();
   _resetPanel('sbp-' + type);
   _updateSortOptions(type);
+  _updateOnboarding(type);
 
   // Hisse için hisse-table göster, result-area gizle
   // Diğerleri için hisse-table gizle, result-area hazırla
@@ -3211,6 +3263,7 @@ window.addEventListener('popstate', function(e) {
 // ─────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function(){
   _initWorker();
+  _updateOnboarding('hisse'); // Varsayılan: hisse onboarding
   var _p = new URLSearchParams(window.location.search).get('from');
   var _path = window.location.pathname;
   if (_p === 'profile' || _p === 'screener' || _p === 'analiz' || _path === '/screener') {
