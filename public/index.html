@@ -104,7 +104,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
-<link rel="stylesheet" href="/deepfin.css?v=73cc3a4">
+<link rel="stylesheet" href="/deepfin.css?v=b1a666a">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -792,6 +792,8 @@ if('serviceWorker' in navigator){
         <div class="rcount">
           <strong id="resn">0</strong><span> / <span id="scann">0</span> hisse</span>
         </div>
+        <button id="tb-fav-btn" class="sb-fav-btn" onclick="toggleFavFilter()" title="Sadece favorileri göster" style="display:none">☆ Favoriler</button>
+        <button id="tb-col-btn" class="col-btn" onclick="openColPicker()" title="Kolonları özelleştir" style="display:none">⚙ Kolonlar</button>
         <button class="tbl-scroll-btn" id="scroll-left" onclick="tblScroll(-300)" title="Sola kaydır">&#8249;</button>
         <button class="tbl-scroll-btn" id="scroll-right" onclick="tblScroll(300)" title="Sağa kaydır">&#8250;</button>
         <div class="pbar"><div class="pbarfill" id="prog"></div></div>
@@ -1301,6 +1303,6 @@ if('serviceWorker' in navigator){
     </div>
   </div>
 </div>
-<script src="/deepfin.js?v=73cc3a4"></script>
+<script src="/deepfin.js?v=b1a666a"></script>
 </body>
 </html>

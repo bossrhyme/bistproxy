@@ -160,11 +160,16 @@ function _showResultArea(headerHtml, tableHtml, count) {
   twrap.style.display = 'block';
   ra.style.display = 'block';
   ra.innerHTML = headerHtml + tableHtml;
-  // Toolbar'ı göster, sayacı güncelle, stats-bar'ı gizle
+  // Toolbar'ı göster, sayacı güncelle, stats-bar'ı gizle (fon/kripto için)
   var toolbar = document.getElementById('toolbar');
   if (toolbar) toolbar.style.display = '';
   var statsBar = document.getElementById('stats-bar');
   if (statsBar) statsBar.style.display = 'none';
+  // Hisse-only toolbar butonlarını gizle (fon/kripto modunda)
+  var tbFav = document.getElementById('tb-fav-btn');
+  var tbCol = document.getElementById('tb-col-btn');
+  if (tbFav) tbFav.style.display = 'none';
+  if (tbCol) tbCol.style.display = 'none';
   var resn = document.getElementById('resn');
   var scann = document.getElementById('scann');
   if (resn) resn.textContent = count;
@@ -621,10 +626,13 @@ function toggleFav(sym) {
 }
 
 function _updateFavBtn() {
-  var btn = document.getElementById('fav-filter-btn');
-  if (!btn) return;
-  btn.classList.toggle('on', favFilterActive);
-  btn.textContent = favFilterActive ? '★ Favoriler (' + favSet.size + ')' : '☆ Favoriler';
+  var label = favFilterActive ? '★ Favoriler (' + favSet.size + ')' : '☆ Favoriler';
+  ['fav-filter-btn', 'tb-fav-btn'].forEach(function(id) {
+    var btn = document.getElementById(id);
+    if (!btn) return;
+    btn.classList.toggle('on', favFilterActive);
+    btn.textContent = label;
+  });
 }
 
 function toggleFavFilter() {
@@ -2581,7 +2589,13 @@ function selectExchange(el) {
 
 function updateStatsBar() {
   var bar = document.getElementById('stats-bar');
+  bar.style.display = '';      // inline display:none'u temizle
   bar.classList.add('visible');
+  // Toolbar'daki hisse-only butonları göster
+  var tbFav = document.getElementById('tb-fav-btn');
+  var tbCol = document.getElementById('tb-col-btn');
+  if (tbFav) tbFav.style.display = '';
+  if (tbCol) tbCol.style.display = '';
   var upCount = filtered.filter(function(s){ return s.changePercent > 0; }).length;
   var dnCount = filtered.filter(function(s){ return s.changePercent < 0; }).length;
   var ex = (typeof EXCHANGE_META !== 'undefined' ? EXCHANGE_META[currentExchange] : null) || {};
