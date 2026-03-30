@@ -357,13 +357,31 @@ function _renderKripto(coins, meta) {
       +'</tr>';
   }).join('');
   var hdr='<div class="res-hdr"><b>₿ Kripto</b><span class="res-cnt">'+coins.length+' coin</span>'+(note?'<span class="res-ok">'+note+'</span>':'')+'<span class="res-src">CoinGecko · TradingView</span></div>';
-  var tbl='<table><thead><tr>'
-    +'<th>#</th><th>Coin</th><th class="right">Fiyat</th><th class="right">24s%</th><th class="right">7G%</th><th class="right">30G%</th><th class="right">Piy.Değ.</th><th class="right">Hacim</th><th class="right">RSI</th><th class="right">ATH%</th><th class="right">TV</th>'
-    +'</tr></thead><tbody>'+rows+'</tbody></table>';
+  var kCols=[
+    {k:'price',l:'Fiyat'},{k:'change24h',l:'24s%'},{k:'change7d',l:'7G%'},{k:'change30d',l:'30G%'},
+    {k:'mcap',l:'Piy.Değ.'},{k:'volume24h',l:'Hacim'},{k:'rsi14',l:'RSI'},{k:'athChange',l:'ATH%'}
+  ];
+  var kThSort=kCols.map(function(c){
+    var active=sortSt.field===c.k;
+    var arrow=active?(sortSt.dir==='desc'?' ↓':' ↑'):'';
+    return '<th class="right'+(active?' sorted':'')+'" style="cursor:pointer" onclick="_kriptoSort(\''+c.k+'\')">'
+      +c.l+arrow+'</th>';
+  }).join('');
+  var tbl='<table><thead><tr><th>#</th><th>Coin</th>'+kThSort+'<th class="right">TV</th></tr></thead><tbody>'+rows+'</tbody></table>';
   _showResultArea(hdr, tbl, coins.length);
 }
 
 
+
+function _kriptoSort(field) {
+  if (sortSt.field === field) sortSt.dir = sortSt.dir === 'desc' ? 'asc' : 'desc';
+  else { sortSt.field = field; sortSt.dir = 'desc'; }
+  var sf = document.getElementById('sortf');
+  var sd = document.getElementById('sortd');
+  if (sf) sf.value = field;
+  if (sd) sd.value = sortSt.dir;
+  _renderKripto(_sortAsset(_kriptoData, sortSt.field, sortSt.dir), _kriptoMeta);
+}
 
 var _tvCurrentSym = null;
 
