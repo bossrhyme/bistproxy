@@ -208,7 +208,15 @@ function runFonScan() {
   if (get('fon_size_min'))   params.set('min_size',   get('fon_size_min'));
 
   fetch('/api/fon-scan?' + params)
-    .then(function(r){ return r.json(); })
+    .then(function(r){ return r.text(); })
+    .then(function(txt){
+      var d;
+      try { d = JSON.parse(txt); } catch(e) {
+        throw new Error('TEFAS geçici hata — lütfen birkaç saniye bekleyip tekrar deneyin');
+      }
+      if (d.error && !d.funds) throw new Error(d.error);
+      return d;
+    })
     .then(function(d){
       var funds = d.funds || [];
       // Client-side extra filters

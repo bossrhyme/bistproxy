@@ -48,7 +48,9 @@ function fmtDate(d) {
 
 // ── TEFAS BindHistoryInfo ─────────────────────────────────────────────
 // Alan adları: FONKODU, BORSABULTENFIYAT, KISISAYISI, TEDPAYSAYISI, FONUNVAN, TARIH
-async function tefasFetch(fonTur, daysBack, windowDays) {
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function tefasFetch(fonTur, daysBack, windowDays, attempt = 0) {
   const now      = new Date();
   const bittarih = fmtDate(new Date(+now - daysBack * 86400000));
   const bastarih = fmtDate(new Date(+now - (daysBack + windowDays) * 86400000));
@@ -65,8 +67,17 @@ async function tefasFetch(fonTur, daysBack, windowDays) {
       'Origin':           'https://www.tefas.gov.tr'
     }, body);
 
-    if (r.status !== 200) { console.error('TEFAS status', r.status, r.body.slice(0,100)); return []; }
-    if (!r.body.startsWith('{') && !r.body.startsWith('[')) { console.error('TEFAS non-JSON:', r.body.slice(0,100)); return []; }
+    if (r.status !== 200) { console.error('TEFAS status', r.status); return []; }
+    if (!r.body.startsWith('{') && !r.body.startsWith('[')) {
+      // Rate limit veya geçici hata — 1 kez daha dene
+      if (attempt === 0) {
+        console.warn(`TEFAS rate limit (daysBack=${daysBack}), 2s sonra tekrar...`);
+        await sleep(2000);
+        return tefasFetch(fonTur, daysBack, windowDays, 1);
+      }
+      console.error('TEFAS non-JSON (2. deneme):', r.body.slice(0, 80));
+      return [];
+    }
     const parsed = JSON.parse(r.body);
     return Array.isArray(parsed.data) ? parsed.data : [];
   } catch(e) {
@@ -134,7 +145,7 @@ module.exports = async function handler(req, res) {
   const minSize = parseFloat(q.get('min_size') || '0');
 
   // KV Cache
-  const cacheKey = `df_fon_v7_${fonTur}_${limit}`;
+  const cacheKey = `df_fon_v8_${fonTur}_${limit}`;
   if (kvEnabled()) {
     const hit = await kvGet(cacheKey);
     if (hit) { res.setHeader('X-Cache','HIT'); return res.status(200).end(JSON.stringify(hit)); }
@@ -148,15 +159,19 @@ module.exports = async function handler(req, res) {
       return res.status(200).end(JSON.stringify({ funds:[], total:0, source:'tefas', error:'Veri yok' }));
     }
 
-    // Referans pencereler — sıralı (rate limiting'den kaçınmak için)
+    // Referans pencereler — sıralı + 600ms bekleme (rate limit önlemi)
+    await sleep(600);
     const ref1yData  = await tefasFetch(fonTur, 358, 7);   // ~1Y önce
+    await sleep(600);
     const ref3mData  = await tefasFetch(fonTur, 87,  7);   // ~3A önce
+    await sleep(600);
     const ref1mData  = await tefasFetch(fonTur, 28,  7);   // ~1A önce
 
     // YTD: yılın ilk haftası
     const now2   = new Date();
     const jan1   = new Date(now2.getFullYear(), 0, 1);
     const ytdDb  = Math.floor((now2 - jan1) / 86400000);
+    await sleep(600);
     const refYtdData = await tefasFetch(fonTur, ytdDb, 10); // Oca başı
 
     const ref1y  = refMap(ref1yData);

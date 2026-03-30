@@ -159,7 +159,7 @@
       "maxDuration": 15
     },
     "api/fon-scan.js": {
-      "maxDuration": 30
+      "maxDuration": 45
     },
     "api/kripto-scan.js": {
       "maxDuration": 20
