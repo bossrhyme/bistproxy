@@ -3209,6 +3209,7 @@ function _doShowScreener() {
   document.getElementById('screener-layout').style.display = 'flex';
   document.getElementById('nav-home').classList.remove('active');
   document.getElementById('nav-tarama').classList.add('active');
+  if (!_activeAsset) _updateOnboarding('hisse');
   if(window.location.pathname !== '/screener') history.pushState({page:'screener'}, '', '/screener');
 }
 
