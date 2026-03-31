@@ -912,6 +912,8 @@ async function loadYahooData(sym, ex) {
     // TV verisini _prfData'ya merge et — screener verisi yoksa TV'den doldur
     if(!_prfData) _prfData = {};
     var d = _prfData;
+    // Fiyat — en kritik alan, screener yoksa TV'den doldur
+    if(!d.close && q.price) { d.close = q.price; d.currentPrice = q.price; d.price = q.price; }
     // Metrics — screener yoksa TV'den al
     if(!d.pe_ratio         && q.pe)          d.pe_ratio            = q.pe;
     if(!d.price_book_ratio && q.pb)          d.price_book_ratio    = q.pb;
