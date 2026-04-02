@@ -49,18 +49,20 @@ var BIST = [
   {s:'TATGD',n:'Tat Gıda'},{s:'ISDMR',n:'İskenderun Demir Çelik'},{s:'TURSG',n:'Türkiye Sigorta'}
 ];
 
-// Türkçe normalize
+// Türkçe normalize — önce karakter replace, sonra toUpperCase (locale-bağımsız)
 function norm(s) {
-  return (s||'').toUpperCase()
-    .replace(/[ĞG]/g,function(c){return c==='Ğ'?'G':c;})
-    .replace(/Ğ/g,'G').replace(/Ü/g,'U').replace(/Ş/g,'S')
-    .replace(/İ/g,'I').replace(/Ö/g,'O').replace(/Ç/g,'C')
-    .replace(/ğ/g,'G').replace(/ü/g,'U').replace(/ş/g,'S')
-    .replace(/ı/g,'I').replace(/ö/g,'O').replace(/ç/g,'C');
+  return (s || '')
+    .replace(/ğ/g, 'g').replace(/Ğ/g, 'G')
+    .replace(/ü/g, 'u').replace(/Ü/g, 'U')
+    .replace(/ş/g, 's').replace(/Ş/g, 'S')
+    .replace(/ı/g, 'i').replace(/İ/g, 'I')
+    .replace(/ö/g, 'o').replace(/Ö/g, 'O')
+    .replace(/ç/g, 'c').replace(/Ç/g, 'C')
+    .toUpperCase();
 }
 
 // TV exchange mapping
-var TV_EX = {nasdaq:'NASDAQ', sp500:'NYSE', dax:'XETR', lse:'LSE', nikkei:'TSE'};
+var TV_EX = {bist:'BIST', nasdaq:'NASDAQ', sp500:'NYSE', dax:'XETR', lse:'LSE', nikkei:'TSE'};
 
 // ── DROPDOWN ──
 function showDd(items) {
@@ -115,15 +117,38 @@ function onSearchInput() {
 
   if (_ex === 'bist') {
     var qn = norm(q);
-    var res = BIST.filter(function(x) {
+    // 1) Anlık lokal sonuç — gecikme yok
+    var localRes = BIST.filter(function(x) {
       return norm(x.s).indexOf(qn) === 0 || norm(x.n).indexOf(qn) !== -1;
-    }).slice(0, 8);
-    showDd(res);
+    }).slice(0, 10);
+    showDd(localRes.length ? localRes : [{s:'...', n:'Aranıyor...'}]);
+    // 2) TV API ile tüm BIST'i tara, lokal ile merge et
+    clearTimeout(_searchTimer);
+    _searchTimer = setTimeout(function() { tvSearchMerge(q, localRes); }, 350);
   } else {
     clearTimeout(_searchTimer);
-    showDd([{s:'...', n:'Aranıyor...'}]);  // loading
+    showDd([{s:'...', n:'Aranıyor...'}]);
     _searchTimer = setTimeout(function() { tvSearch(q); }, 350);
   }
+}
+
+// BIST hybrid: lokal + TV API merge
+function tvSearchMerge(q, localRes) {
+  var url = 'https://symbol-search.tradingview.com/symbol_search/v3/'
+    + '?text=' + encodeURIComponent(q) + '&type=stock&exchange=BIST&lang=en&domain=production';
+  var localSyms = {};
+  localRes.forEach(function(x) { localSyms[x.s] = true; });
+  fetch(url)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var tvList = (data.symbols || data || [])
+        .filter(function(x) { return x.symbol && !localSyms[x.s]; })
+        .map(function(x) { return {s: x.symbol, n: x.description || x.symbol}; });
+      var merged = localRes.concat(tvList).slice(0, 10);
+      if (merged.length) showDd(merged);
+      else hideDd();
+    })
+    .catch(function() { if (!localRes.length) hideDd(); });
 }
 
 function tvSearch(q) {
