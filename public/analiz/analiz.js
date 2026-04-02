@@ -4,7 +4,8 @@ var _ex = 'bist';
 var _chosen = null;
 var _searchTimer = null;
 var _disclaimerTimer = null;
-var _symCache = {};   // {exchange: [{s,n},...]} — sayfa ömrü boyunca cache
+var _symCache   = {};   // {exchange: [{s,n},...]}
+var _symLoading = {};   // {exchange: [callbacks]} — in-flight fetch takibi
 
 // ── Türkçe normalize — locale-bağımsız ──
 function norm(s) {
@@ -18,18 +19,23 @@ function norm(s) {
     .toUpperCase();
 }
 
-// ── Sembol listesini yükle (KV cache'li sunucu tarafı) ──
+// ── Sembol listesini yükle — tek fetch, callback kuyruğu ──
 function loadSymbolList(ex, onReady) {
   if (_symCache[ex]) { if (onReady) onReady(_symCache[ex]); return; }
+  // Fetch zaten in-flight → callback'i kuyruğa ekle
+  if (_symLoading[ex]) { if (onReady) _symLoading[ex].push(onReady); return; }
+  _symLoading[ex] = onReady ? [onReady] : [];
   fetch('/api/symbol-list?exchange=' + encodeURIComponent(ex))
     .then(function(r) { return r.json(); })
     .then(function(data) {
       _symCache[ex] = data.symbols || [];
-      if (onReady) onReady(_symCache[ex]);
+      var cbs = _symLoading[ex]; delete _symLoading[ex];
+      cbs.forEach(function(cb) { cb(_symCache[ex]); });
     })
     .catch(function() {
       _symCache[ex] = [];
-      if (onReady) onReady([]);
+      var cbs = _symLoading[ex]; delete _symLoading[ex];
+      cbs.forEach(function(cb) { cb([]); });
     });
 }
 
@@ -84,29 +90,32 @@ function onSearchInput() {
 
   var list = _symCache[_ex];
   if (list) {
-    // Liste yüklü — anlık filtrele
     _doSearch(list, qn);
   } else {
-    // Henüz yüklenmedi — loader göster, yükle, sonra filtrele
     showDd([{s:'...', n:'Yükleniyor...'}]);
-    loadSymbolList(_ex, function(loaded) { _doSearch(loaded, qn); });
+    loadSymbolList(_ex, function(loaded) {
+      // Callback gelince input'u tekrar oku — stale qn'i engelle
+      var cur = norm(document.getElementById('sym-input').value.trim());
+      if (cur) _doSearch(loaded, cur);
+    });
   }
 }
 
 function _doSearch(list, qn) {
   if (!qn) { hideDd(); return; }
-  // Sembol başı eşleşmesi önce, isim içi eşleşmesi sonra
-  var symMatch  = [];
-  var nameMatch = [];
+  var symStart = []; // sembol tam başından eşleşme — en önce
+  var symAny   = []; // sembol içinde geçiyor
+  var nameAny  = []; // şirket adında geçiyor
   for (var i = 0; i < list.length; i++) {
     var x  = list[i];
     var ns = norm(x.s);
     var nn = norm(x.n);
-    if (ns.indexOf(qn) === 0)        symMatch.push(x);
-    else if (nn.indexOf(qn) !== -1)  nameMatch.push(x);
-    if (symMatch.length + nameMatch.length >= 12) break; // hız için erken çık
+    if (ns.indexOf(qn) === 0)        symStart.push(x);
+    else if (ns.indexOf(qn) !== -1)  symAny.push(x);
+    else if (nn.indexOf(qn) !== -1)  nameAny.push(x);
+    // Erken çıkış YOK — tüm liste taranır (559 item ~1ms)
   }
-  var res = symMatch.concat(nameMatch).slice(0, 10);
+  var res = symStart.concat(symAny).concat(nameAny).slice(0, 10);
   if (res.length) showDd(res); else hideDd();
 }
 
