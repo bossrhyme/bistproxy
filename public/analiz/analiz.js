@@ -62,7 +62,8 @@ function norm(s) {
 }
 
 // TV exchange mapping
-var TV_EX = {bist:'BIST', nasdaq:'NASDAQ', sp500:'NYSE', dax:'XETR', lse:'LSE', nikkei:'TSE'};
+var TV_EX = {bist:'BIST', nasdaq:'NASDAQ', sp500:'', dax:'XETR', lse:'LSE', nikkei:'TSE'};
+var TV_MARKET = {sp500:'america', nasdaq:'america'};
 
 // ── DROPDOWN ──
 function showDd(items) {
@@ -153,16 +154,20 @@ function tvSearchMerge(q, localRes) {
 
 function tvSearch(q) {
   var ex = TV_EX[_ex] || '';
+  var market = (TV_MARKET && TV_MARKET[_ex]) || '';
   var url = 'https://symbol-search.tradingview.com/symbol_search/v3/'
     + '?text=' + encodeURIComponent(q) + '&type=stock'
-    + (ex ? '&exchange=' + ex : '') + '&lang=en&domain=production';
+    + (ex ? '&exchange=' + ex : '')
+    + (market ? '&market=' + market : '')
+    + '&lang=en&domain=production';
   fetch(url)
     .then(function(r) { return r.json(); })
     .then(function(data) {
-      var list = (data.symbols || data || []).slice(0, 8)
+      var list = (data.symbols || data || [])
         .filter(function(x) { return x.symbol; })
+        .slice(0, 10)
         .map(function(x) { return {s: x.symbol, n: x.description || x.symbol}; });
-      showDd(list);
+      if (list.length) showDd(list); else hideDd();
     })
     .catch(function() { hideDd(); });
 }
