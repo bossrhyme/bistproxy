@@ -178,10 +178,6 @@ function setEx(el) {
   document.querySelectorAll('.ex-chip').forEach(function(c) { c.classList.remove('on'); });
   el.classList.add('on');
   _ex = el.dataset.ex;
-  var flag = document.getElementById('ex-flag');
-  var label = document.getElementById('ex-label');
-  if (flag) flag.src = 'https://flagcdn.com/' + el.dataset.flag + '.svg';
-  if (label) label.textContent = el.dataset.label;
   _chosen = null;
   document.getElementById('sym-input').value = '';
   hideDd();
