@@ -10,12 +10,12 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 *{-webkit-tap-highlight-color:transparent;}
-html,body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans', sans-serif;min-height:100vh;display:flex;flex-direction:column;}
+html,body{background:var(--bg);color:var(--text);font-family:Inter, sans-serif;min-height:100vh;display:flex;flex-direction:column;}
 
 .topbar{display:flex;align-items:center;padding:0 16px;height:48px;border-bottom:1px solid var(--border);background:var(--s1);flex-shrink:0;gap:10px;z-index:10;}
 .tlogo{font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;letter-spacing:-.3px;display:flex;align-items:center;gap:6px;}
 .tlogo-mark{width:22px;height:22px;background:var(--accent);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;}
-.hp-nav-btn{background:transparent;border:none;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;padding:6px 12px;border-radius:6px;transition:all .15s;font-family:'Plus Jakarta Sans', sans-serif;}
+.hp-nav-btn{background:transparent;border:none;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;padding:6px 12px;border-radius:6px;transition:all .15s;font-family:Inter, sans-serif;}
 .hp-nav-btn:hover{background:var(--s2);color:var(--text);}
 .hp-nav-btn.active{color:var(--text);}
 .tlive{font-size:10px;color:var(--green);background:var(--green-bg);border:1px solid rgba(0,192,118,.2);padding:2px 8px;border-radius:4px;font-weight:500;display:flex;align-items:center;gap:4px;}
@@ -38,8 +38,8 @@ html,body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans'
 .ex-picker:hover{color:var(--text);}
 .ex-picker img{border-radius:2px;object-fit:cover;}
 .search-input{flex:1;height:52px;background:transparent;border:none;outline:none;padding:0 16px;font-size:15px;color:var(--text);font-family:'Geist Mono', monospace;letter-spacing:1px;}
-.search-input::placeholder{font-size:12px;letter-spacing:0;color:var(--muted);font-family:'Plus Jakarta Sans', sans-serif;}
-.search-btn{height:52px;padding:0 24px;background:var(--accent);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;font-family:'Plus Jakarta Sans', sans-serif;transition:background .15s;white-space:nowrap;flex-shrink:0;}
+.search-input::placeholder{font-size:12px;letter-spacing:0;color:var(--muted);font-family:Inter, sans-serif;}
+.search-btn{height:52px;padding:0 24px;background:var(--accent);color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:700;font-family:Inter, sans-serif;transition:background .15s;white-space:nowrap;flex-shrink:0;}
 .search-btn:hover{background:#2563eb;}
 
 /* DROPDOWN - search-card dışında, absolute konumlu */
