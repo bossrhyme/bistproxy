@@ -631,7 +631,23 @@ td:first-child,td:nth-child(2){text-align:left;}
   /* ─────────────────────────────────────────
      MODAL
   ───────────────────────────────────────── */
-  .modal { margin: 12px; max-height: calc(100dvh - 80px); overflow-y: auto; border-radius: 12px; }
+  .modal { margin: 10px; max-width: calc(100vw - 20px); max-height: calc(100dvh - 20px); border-radius: 12px; }
+  .modal-body { grid-template-columns: 1fr; gap: 10px; padding: 14px; -webkit-overflow-scrolling: touch; }
+  .modal-close { min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center; }
+  .icat { padding: 12px; }
+  .iitem-name { font-size: 13px; }
+  .preset-info-grid { grid-template-columns: 1fr; }
+  .goat-bank-grid { grid-template-columns: 1fr; }
+  .info-asset-tabs { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 10px; }
+  .info-asset-tabs::-webkit-scrollbar { display: none; }
+  .info-tab { white-space: nowrap; }
+  .info-asset-tab { white-space: nowrap; }
+  .smodal { margin: 8px; max-width: calc(100vw - 16px); }
+  .smodal-title { font-size: 20px; letter-spacing: 2px; }
+  .smodal-body { -webkit-overflow-scrolling: touch; max-height: calc(100dvh - 160px); }
+  .wallet-row { flex-wrap: wrap; gap: 4px; }
+  .wallet-addr { font-size: 8px; min-width: 0; }
+  .copy-btn { font-size: 9px; padding: 6px 8px; }
 
   /* ─────────────────────────────────────────
      ANALİZ SAYFASI
@@ -641,18 +657,6 @@ td:first-child,td:nth-child(2){text-align:left;}
   .analiz-search-wrap { max-width: 100%; }
 }
 
-  /* ── Modal mobil ── */
-  .modal { margin: 8px; max-height: calc(100dvh - 16px); border-radius: 10px; }
-  .modal-body { grid-template-columns: 1fr; gap: 12px; padding: 14px; }
-  .icat { padding: 12px; }
-  .iitem-name { font-size: 13px; }
-  .preset-info-grid { grid-template-columns: 1fr; }
-  .goat-bank-grid { grid-template-columns: 1fr; }
-  .smodal { margin: 8px; }
-  .smodal-title { font-size: 20px; letter-spacing: 2px; }
-  .wallet-row { flex-wrap: wrap; gap: 4px; }
-  .wallet-addr { font-size: 8px; min-width: 0; }
-  .copy-btn { font-size: 9px; padding: 6px 8px; }
 /* ── MOBİL DRAWER ── */
 #drawer-panel {
   position: fixed;

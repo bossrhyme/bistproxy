@@ -2123,14 +2123,16 @@ function openInfo(tab) {
   document.getElementById('infoModal').classList.add('open');
   if (tab) {
     var assetMap = {goat:'hisse',temel:'hisse',teknik:'hisse',sozluk:'hisse','fon-strateji':'fon','fon-filtre':'fon','kripto-strateji':'kripto','kripto-filtre':'kripto'};
-    var assetId = assetMap[tab] || 'hisse';
-    switchAssetTab(assetId, document.querySelector('.info-asset-tab[onclick*="\'' + assetId + '\'"]'));
-    switchInfoTab(tab, document.querySelector('.info-tab[onclick*="\'' + tab + '\'"]'));
+    switchAssetTab(assetMap[tab] || 'hisse');
+    switchInfoTab(tab);
   }
 }
 function switchAssetTab(id, btn) {
   document.querySelectorAll('.info-asset-panel').forEach(function(p){ p.classList.remove('active'); });
-  document.querySelectorAll('.info-asset-tab').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.info-asset-tab').forEach(function(b){
+    b.classList.remove('active');
+    if (!btn && b.getAttribute('onclick') && b.getAttribute('onclick').indexOf("'" + id + "'") !== -1) btn = b;
+  });
   var panel = document.getElementById('asset-panel-' + id);
   if (panel) panel.classList.add('active');
   if (btn) btn.classList.add('active');
@@ -2138,7 +2140,10 @@ function switchAssetTab(id, btn) {
 function switchInfoTab(id, btn) {
   var activeAsset = document.querySelector('.info-asset-panel.active') || document.getElementById('infoModal');
   activeAsset.querySelectorAll('.info-tab-panel').forEach(function(p){ p.classList.remove('active'); });
-  activeAsset.querySelectorAll('.info-tab').forEach(function(b){ b.classList.remove('active'); });
+  activeAsset.querySelectorAll('.info-tab').forEach(function(b){
+    b.classList.remove('active');
+    if (!btn && b.getAttribute('onclick') && b.getAttribute('onclick').indexOf("'" + id + "'") !== -1) btn = b;
+  });
   var panel = document.getElementById('info-panel-' + id);
   if (panel) panel.classList.add('active');
   if (btn) btn.classList.add('active');
