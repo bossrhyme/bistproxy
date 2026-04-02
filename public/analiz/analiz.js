@@ -62,8 +62,7 @@ function norm(s) {
 }
 
 // TV exchange mapping
-var TV_EX = {bist:'BIST', nasdaq:'NASDAQ', sp500:'', dax:'XETR', lse:'LSE', nikkei:'TSE'};
-var TV_MARKET = {sp500:'america', nasdaq:'america'};
+// Exchange → proxy'de işleniyor (/api/symbol-search)
 
 // ── DROPDOWN ──
 function showDd(items) {
@@ -133,18 +132,15 @@ function onSearchInput() {
   }
 }
 
-// BIST hybrid: lokal + TV API merge
+// BIST hybrid: lokal anlık + proxy üzerinden TV API merge
 function tvSearchMerge(q, localRes) {
-  var url = 'https://symbol-search.tradingview.com/symbol_search/v3/'
-    + '?text=' + encodeURIComponent(q) + '&type=stock&exchange=BIST&lang=en&domain=production';
   var localSyms = {};
   localRes.forEach(function(x) { localSyms[x.s] = true; });
-  fetch(url)
+  fetch('/api/symbol-search?q=' + encodeURIComponent(q) + '&exchange=bist')
     .then(function(r) { return r.json(); })
     .then(function(data) {
-      var tvList = (data.symbols || data || [])
-        .filter(function(x) { return x.symbol && !localSyms[x.s]; })
-        .map(function(x) { return {s: x.symbol, n: x.description || x.symbol}; });
+      var tvList = (data.symbols || [])
+        .filter(function(x) { return x.s && !localSyms[x.s]; });
       var merged = localRes.concat(tvList).slice(0, 10);
       if (merged.length) showDd(merged);
       else hideDd();
@@ -153,20 +149,10 @@ function tvSearchMerge(q, localRes) {
 }
 
 function tvSearch(q) {
-  var ex = TV_EX[_ex] || '';
-  var market = (TV_MARKET && TV_MARKET[_ex]) || '';
-  var url = 'https://symbol-search.tradingview.com/symbol_search/v3/'
-    + '?text=' + encodeURIComponent(q) + '&type=stock'
-    + (ex ? '&exchange=' + ex : '')
-    + (market ? '&market=' + market : '')
-    + '&lang=en&domain=production';
-  fetch(url)
+  fetch('/api/symbol-search?q=' + encodeURIComponent(q) + '&exchange=' + encodeURIComponent(_ex))
     .then(function(r) { return r.json(); })
     .then(function(data) {
-      var list = (data.symbols || data || [])
-        .filter(function(x) { return x.symbol; })
-        .slice(0, 10)
-        .map(function(x) { return {s: x.symbol, n: x.description || x.symbol}; });
+      var list = (data.symbols || []).slice(0, 10);
       if (list.length) showDd(list); else hideDd();
     })
     .catch(function() { hideDd(); });
