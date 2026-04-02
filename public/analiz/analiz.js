@@ -1,55 +1,12 @@
 
 // ── STATE ──
 var _ex = 'bist';
-var _chosen = null;   // listeden seçilen sembol — null iken gidiş YOK
+var _chosen = null;
 var _searchTimer = null;
 var _disclaimerTimer = null;
+var _symCache = {};   // {exchange: [{s,n},...]} — sayfa ömrü boyunca cache
 
-// ── BIST LOCAL LIST ──
-var BIST = [
-  {s:'THYAO',n:'Türk Hava Yolları'},{s:'GARAN',n:'Garanti BBVA'},{s:'AKBNK',n:'Akbank'},
-  {s:'EREGL',n:'Ereğli Demir Çelik'},{s:'KCHOL',n:'Koç Holding'},{s:'SAHOL',n:'Sabancı Holding'},
-  {s:'SISE',n:'Şişe ve Cam'},{s:'ASELS',n:'Aselsan'},{s:'FROTO',n:'Ford Otosan'},
-  {s:'TOASO',n:'Tofaş Otomobil'},{s:'YKBNK',n:'Yapı Kredi Bankası'},{s:'PGSUS',n:'Pegasus'},
-  {s:'BIMAS',n:'BİM Mağazalar'},{s:'TUPRS',n:'Tüpraş'},{s:'PETKM',n:'Petkim'},
-  {s:'ARCLK',n:'Arçelik'},{s:'KRDMD',n:'Kardemir'},{s:'TTKOM',n:'Türk Telekom'},
-  {s:'TCELL',n:'Turkcell'},{s:'ULKER',n:'Ülker Bisküvi'},{s:'VESTL',n:'Vestel'},
-  {s:'MGROS',n:'Migros'},{s:'DOHOL',n:'Doğan Holding'},{s:'KOZAL',n:'Koza Altın'},
-  {s:'ISCTR',n:'İş Bankası'},{s:'VAKBN',n:'Vakıfbank'},{s:'HALKB',n:'Halkbank'},
-  {s:'ALARK',n:'Alarko Holding'},{s:'CCOLA',n:'Coca-Cola İçecek'},{s:'LOGO',n:'Logo Yazılım'},
-  {s:'AEFES',n:'Anadolu Efes'},{s:'BRISA',n:'Brisa Bridgestone'},{s:'EKGYO',n:'Emlak Konut GYO'},
-  {s:'ENKAI',n:'Enka İnşaat'},{s:'AKSEN',n:'Aksen Enerji'},{s:'KOZAA',n:'Koza Anadolu Metal'},
-  {s:'ANACM',n:'Anadolu Cam'},{s:'TRKCM',n:'Trakya Cam'},{s:'SOKM',n:'Şok Marketler'},
-  {s:'ODAS',n:'Odaş Elektrik'},{s:'TAVHL',n:'TAV Havalimanları'},{s:'SASA',n:'Sasa Polyester'},
-  {s:'TKFEN',n:'Tekfen Holding'},{s:'ENJSA',n:'Enerjisa Enerji'},{s:'MAVI',n:'Mavi Giyim'},
-  {s:'OTKAR',n:'Otokar'},{s:'DOAS',n:'Doğuş Otomotiv'},{s:'SELEC',n:'Selçuk Ecza'},
-  {s:'TATGD',n:'Tat Gıda'},{s:'TRGYO',n:'Torunlar GYO'},{s:'AKCNS',n:'Akçansa'},
-  {s:'CIMSA',n:'Çimsa'},{s:'BUCIM',n:'Bursa Çimento'},{s:'ZOREN',n:'Zorlu Enerji'},
-  {s:'ISGYO',n:'İş GYO'},{s:'AKGRT',n:'Aksigorta'},{s:'ANSGR',n:'Anadolu Sigorta'},
-  {s:'ANHYT',n:'Anadolu Hayat'},{s:'SKBNK',n:'Şekerbank'},{s:'DEVA',n:'Deva Holding'},
-  {s:'ECILC',n:'Eczacıbaşı İlaç'},{s:'PRKME',n:'Park Elektrik'},{s:'SARKY',n:'Sarkuysan'},
-  {s:'CLEBI',n:'Çelebi Hava Servisi'},{s:'INDES',n:'İndeks Bilgisayar'},{s:'GESAN',n:'Gedik Seramik'},
-  {s:'VESBE',n:'Vestel Beyaz Eşya'},{s:'BANVT',n:'Banvit'},{s:'HLGYO',n:'Halk GYO'},
-  {s:'ZRGYO',n:'Ziraat GYO'},{s:'VKGYO',n:'Vakıf GYO'},{s:'ISFIN',n:'İş Finansal Kiralama'},
-  {s:'AGHOL',n:'AG Anadolu Grubu'},{s:'JANTS',n:'Jantsa'},{s:'KATMR',n:'Katmerciler'},
-  {s:'NETAS',n:'Netaş Telekomünikasyon'},{s:'BFREN',n:'Bosch Fren'},{s:'KERVT',n:'Kerevitaş'},
-  {s:'FENER',n:'Fenerbahçe'},{s:'GSRAY',n:'Galatasaray'},{s:'TKNSA',n:'Teknosa'},
-  {s:'AFYON',n:'Afyon Çimento'},{s:'KONYA',n:'Konya Çimento'},{s:'ARMDA',n:'Armada'},
-  {s:'ASUZU',n:'Anadolu Isuzu'},{s:'BIZIM',n:'Bizim Toptan'},{s:'BURCE',n:'Burçelik'},
-  {s:'CWENE',n:'CW Enerji'},{s:'DAGI',n:'Dagi Giyim'},{s:'DYOBY',n:'DYO Boya'},
-  {s:'EGPRO',n:'EG Pro Enerji'},{s:'EGEEN',n:'Ege Endüstri'},{s:'GUBRF',n:'Gübre Fabrikaları'},
-  {s:'HEKTS',n:'Hektaş'},{s:'ISGYO',n:'İş GYO'},{s:'KARTN',n:'Kartonsan'},
-  {s:'KARSN',n:'Karsan Otomotiv'},{s:'LINK',n:'Link Bilgisayar'},{s:'ORGE',n:'Orge Enerji'},
-  {s:'PRKAB',n:'Türk Prysmian Kablo'},{s:'POLHO',n:'Polisan Holding'},{s:'SMART',n:'Smart Güneş'},
-  {s:'TKFEN',n:'Tekfen Holding'},{s:'TEZOL',n:'Tezol Tekstil'},{s:'USAK',n:'Uşak Seramik'},
-  {s:'YATAS',n:'Yataş'},{s:'YUNSA',n:'Yünsa'},{s:'ADEL',n:'Adel Kalemcilik'},
-  {s:'BAGFS',n:'Bagfaş Gübre'},{s:'BOSSA',n:'Bossa'},{s:'CANTE',n:'Çan Tekstil'},
-  {s:'ERBOS',n:'Erbosan'},{s:'GSDHO',n:'GSD Holding'},{s:'KLNMA',n:'Kalınma Bank'},
-  {s:'MNDRS',n:'Menderes Tekstil'},{s:'NTHOL',n:'Net Holding'},{s:'PENGD',n:'Penguen Gıda'},
-  {s:'TATGD',n:'Tat Gıda'},{s:'ISDMR',n:'İskenderun Demir Çelik'},{s:'TURSG',n:'Türkiye Sigorta'}
-];
-
-// Türkçe normalize — önce karakter replace, sonra toUpperCase (locale-bağımsız)
+// ── Türkçe normalize — locale-bağımsız ──
 function norm(s) {
   return (s || '')
     .replace(/ğ/g, 'g').replace(/Ğ/g, 'G')
@@ -61,12 +18,24 @@ function norm(s) {
     .toUpperCase();
 }
 
-// TV exchange mapping
-// Exchange → proxy'de işleniyor (/api/symbol-search)
+// ── Sembol listesini yükle (KV cache'li sunucu tarafı) ──
+function loadSymbolList(ex, onReady) {
+  if (_symCache[ex]) { if (onReady) onReady(_symCache[ex]); return; }
+  fetch('/api/symbol-list?exchange=' + encodeURIComponent(ex))
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      _symCache[ex] = data.symbols || [];
+      if (onReady) onReady(_symCache[ex]);
+    })
+    .catch(function() {
+      _symCache[ex] = [];
+      if (onReady) onReady([]);
+    });
+}
 
 // ── DROPDOWN ──
 function showDd(items) {
-  var dd = document.getElementById('dd-list');
+  var dd   = document.getElementById('dd-list');
   var card = document.getElementById('search-card');
   dd.innerHTML = '';
   if (!items.length) { dd.classList.remove('open'); card.classList.remove('open'); return; }
@@ -75,10 +44,7 @@ function showDd(items) {
     div.className = 'dd-item';
     div.innerHTML = '<span class="dd-sym">' + esc(item.s) + '</span>'
       + '<span class="dd-name">' + esc(item.n) + '</span>';
-    div.addEventListener('mousedown', function(e) {
-      e.preventDefault();
-      pickItem(item.s, item.n);
-    });
+    div.addEventListener('mousedown', function(e) { e.preventDefault(); pickItem(item.s, item.n); });
     dd.appendChild(div);
   });
   dd.classList.add('open');
@@ -94,7 +60,7 @@ function esc(s) {
   return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-// Kullanıcı listeden bir item seçti
+// ── Listeden seçim ──
 function pickItem(sym, name) {
   _chosen = sym;
   document.getElementById('sym-input').value = sym + (name ? '  —  ' + name : '');
@@ -102,60 +68,46 @@ function pickItem(sym, name) {
   navigate(sym);
 }
 
-// ── NAVIGATE ──
+// ── Navigate ──
 function navigate(sym) {
   var dest = 'profile.html?sym=' + encodeURIComponent(sym)
     + '&ex=' + encodeURIComponent(_ex) + '&from=analiz';
   _showDisclaimer(function() { window.location.href = dest; });
 }
 
-// ── SEARCH INPUT ──
+// ── Arama — tüm hisseler anlık filtreleme ──
 function onSearchInput() {
-  _chosen = null;   // her yazışta seçim sıfırla
+  _chosen = null;
   var q = document.getElementById('sym-input').value.trim();
   if (!q) { hideDd(); return; }
+  var qn = norm(q);
 
-  if (_ex === 'bist') {
-    var qn = norm(q);
-    // 1) Anlık lokal sonuç — gecikme yok
-    var localRes = BIST.filter(function(x) {
-      return norm(x.s).indexOf(qn) === 0 || norm(x.n).indexOf(qn) !== -1;
-    }).slice(0, 10);
-    showDd(localRes.length ? localRes : [{s:'...', n:'Aranıyor...'}]);
-    // 2) TV API ile tüm BIST'i tara, lokal ile merge et
-    clearTimeout(_searchTimer);
-    _searchTimer = setTimeout(function() { tvSearchMerge(q, localRes); }, 350);
+  var list = _symCache[_ex];
+  if (list) {
+    // Liste yüklü — anlık filtrele
+    _doSearch(list, qn);
   } else {
-    clearTimeout(_searchTimer);
-    showDd([{s:'...', n:'Aranıyor...'}]);
-    _searchTimer = setTimeout(function() { tvSearch(q); }, 350);
+    // Henüz yüklenmedi — loader göster, yükle, sonra filtrele
+    showDd([{s:'...', n:'Yükleniyor...'}]);
+    loadSymbolList(_ex, function(loaded) { _doSearch(loaded, qn); });
   }
 }
 
-// BIST hybrid: lokal anlık + proxy üzerinden TV API merge
-function tvSearchMerge(q, localRes) {
-  var localSyms = {};
-  localRes.forEach(function(x) { localSyms[x.s] = true; });
-  fetch('/api/symbol-search?q=' + encodeURIComponent(q) + '&exchange=bist')
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      var tvList = (data.symbols || [])
-        .filter(function(x) { return x.s && !localSyms[x.s]; });
-      var merged = localRes.concat(tvList).slice(0, 10);
-      if (merged.length) showDd(merged);
-      else hideDd();
-    })
-    .catch(function() { if (!localRes.length) hideDd(); });
-}
-
-function tvSearch(q) {
-  fetch('/api/symbol-search?q=' + encodeURIComponent(q) + '&exchange=' + encodeURIComponent(_ex))
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      var list = (data.symbols || []).slice(0, 10);
-      if (list.length) showDd(list); else hideDd();
-    })
-    .catch(function() { hideDd(); });
+function _doSearch(list, qn) {
+  if (!qn) { hideDd(); return; }
+  // Sembol başı eşleşmesi önce, isim içi eşleşmesi sonra
+  var symMatch  = [];
+  var nameMatch = [];
+  for (var i = 0; i < list.length; i++) {
+    var x  = list[i];
+    var ns = norm(x.s);
+    var nn = norm(x.n);
+    if (ns.indexOf(qn) === 0)        symMatch.push(x);
+    else if (nn.indexOf(qn) !== -1)  nameMatch.push(x);
+    if (symMatch.length + nameMatch.length >= 12) break; // hız için erken çık
+  }
+  var res = symMatch.concat(nameMatch).slice(0, 10);
+  if (res.length) showDd(res); else hideDd();
 }
 
 // ── KEYBOARD ──
@@ -224,6 +176,8 @@ function setEx(el) {
   _chosen = null;
   document.getElementById('sym-input').value = '';
   hideDd();
+  // Exchange listeyi önceden yükle (kullanıcı yazmaya başlayınca hazır olsun)
+  loadSymbolList(_ex);
 }
 
 function cycleEx() {
@@ -290,6 +244,9 @@ function copyWallet(btn, addr){
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+  // Varsayılan exchange sembol listesini arka planda yükle
+  loadSymbolList(_ex);
+
   // Dışarı tıklayınca dropdown kapat
   document.addEventListener('click', function(e) {
     if (!e.target.closest('#search-wrap')) hideDd();
