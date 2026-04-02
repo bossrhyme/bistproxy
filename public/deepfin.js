@@ -2121,11 +2121,24 @@ function closeDetail(){
 // ═══════════════════════════════════════════
 function openInfo(tab) {
   document.getElementById('infoModal').classList.add('open');
-  if (tab) switchInfoTab(tab, document.querySelector('.info-tab[onclick*="' + tab + '"]'));
+  if (tab) {
+    var assetMap = {goat:'hisse',temel:'hisse',teknik:'hisse',sozluk:'hisse','fon-strateji':'fon','fon-filtre':'fon','kripto-strateji':'kripto','kripto-filtre':'kripto'};
+    var assetId = assetMap[tab] || 'hisse';
+    switchAssetTab(assetId, document.querySelector('.info-asset-tab[onclick*="\'' + assetId + '\'"]'));
+    switchInfoTab(tab, document.querySelector('.info-tab[onclick*="\'' + tab + '\'"]'));
+  }
+}
+function switchAssetTab(id, btn) {
+  document.querySelectorAll('.info-asset-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.info-asset-tab').forEach(function(b){ b.classList.remove('active'); });
+  var panel = document.getElementById('asset-panel-' + id);
+  if (panel) panel.classList.add('active');
+  if (btn) btn.classList.add('active');
 }
 function switchInfoTab(id, btn) {
-  document.querySelectorAll('.info-tab-panel').forEach(function(p){ p.classList.remove('active'); });
-  document.querySelectorAll('.info-tab').forEach(function(b){ b.classList.remove('active'); });
+  var activeAsset = document.querySelector('.info-asset-panel.active') || document.getElementById('infoModal');
+  activeAsset.querySelectorAll('.info-tab-panel').forEach(function(p){ p.classList.remove('active'); });
+  activeAsset.querySelectorAll('.info-tab').forEach(function(b){ b.classList.remove('active'); });
   var panel = document.getElementById('info-panel-' + id);
   if (panel) panel.classList.add('active');
   if (btn) btn.classList.add('active');
