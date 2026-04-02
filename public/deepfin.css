@@ -631,7 +631,23 @@ td:first-child,td:nth-child(2){text-align:left;}
   /* ─────────────────────────────────────────
      MODAL
   ───────────────────────────────────────── */
-  .modal { margin: 12px; max-height: calc(100dvh - 80px); overflow-y: auto; border-radius: 12px; }
+  .modal { margin: 10px; max-width: calc(100vw - 20px); max-height: calc(100dvh - 20px); border-radius: 12px; }
+  .modal-body { grid-template-columns: 1fr; gap: 10px; padding: 14px; -webkit-overflow-scrolling: touch; }
+  .modal-close { min-width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center; }
+  .icat { padding: 12px; }
+  .iitem-name { font-size: 13px; }
+  .preset-info-grid { grid-template-columns: 1fr; }
+  .goat-bank-grid { grid-template-columns: 1fr; }
+  .info-asset-tabs { overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 10px; }
+  .info-asset-tabs::-webkit-scrollbar { display: none; }
+  .info-tab { white-space: nowrap; }
+  .info-asset-tab { white-space: nowrap; }
+  .smodal { margin: 8px; max-width: calc(100vw - 16px); }
+  .smodal-title { font-size: 20px; letter-spacing: 2px; }
+  .smodal-body { -webkit-overflow-scrolling: touch; max-height: calc(100dvh - 160px); }
+  .wallet-row { flex-wrap: wrap; gap: 4px; }
+  .wallet-addr { font-size: 8px; min-width: 0; }
+  .copy-btn { font-size: 9px; padding: 6px 8px; }
 
   /* ─────────────────────────────────────────
      ANALİZ SAYFASI
@@ -641,18 +657,6 @@ td:first-child,td:nth-child(2){text-align:left;}
   .analiz-search-wrap { max-width: 100%; }
 }
 
-  /* ── Modal mobil ── */
-  .modal { margin: 8px; max-height: calc(100dvh - 16px); border-radius: 10px; }
-  .modal-body { grid-template-columns: 1fr; gap: 12px; padding: 14px; }
-  .icat { padding: 12px; }
-  .iitem-name { font-size: 13px; }
-  .preset-info-grid { grid-template-columns: 1fr; }
-  .goat-bank-grid { grid-template-columns: 1fr; }
-  .smodal { margin: 8px; }
-  .smodal-title { font-size: 20px; letter-spacing: 2px; }
-  .wallet-row { flex-wrap: wrap; gap: 4px; }
-  .wallet-addr { font-size: 8px; min-width: 0; }
-  .copy-btn { font-size: 9px; padding: 6px 8px; }
 /* ── MOBİL DRAWER ── */
 #drawer-panel {
   position: fixed;
@@ -1117,6 +1121,21 @@ tbody tr td { height: 36px; }
 .info-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;}
 .info-tab-panel{display:none;}
 .info-tab-panel.active{display:block;}
+/* ── Bilgi Bankası Varlık Üst Sekmeleri ─────────────────────── */
+.info-asset-tabs{display:flex;gap:4px;padding:0 0 14px;border-bottom:2px solid var(--accent);margin-bottom:14px;flex-wrap:wrap;}
+.info-asset-tab{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;padding:7px 16px;border-radius:20px;border:1.5px solid var(--border2);background:var(--s2);color:var(--text2);cursor:pointer;transition:all .15s;letter-spacing:.02em;display:inline-flex;align-items:center;gap:5px;}
+.info-asset-tab:hover{border-color:var(--accent);color:var(--accent);}
+.info-asset-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.info-asset-tab.yakinda-tab{opacity:.65;}
+.info-asset-tab.yakinda-tab:hover{opacity:1;}
+.info-asset-panel{display:none;}
+.info-asset-panel.active{display:block;}
+.yakinda-badge{font-size:8px;font-weight:800;padding:2px 5px;border-radius:4px;background:var(--border2);color:var(--text3);letter-spacing:.05em;text-transform:uppercase;vertical-align:middle;}
+.info-asset-tab.active .yakinda-badge{background:rgba(255,255,255,.25);color:#fff;}
+.yakinda-panel{padding:48px 20px;text-align:center;}
+.yakinda-panel-icon{font-size:40px;margin-bottom:14px;}
+.yakinda-panel-title{font-size:16px;font-weight:700;color:var(--text1);margin-bottom:8px;}
+.yakinda-panel-desc{font-size:13px;color:var(--text3);line-height:1.6;max-width:320px;margin:0 auto;}
 
 /* ── Bilgi Bankası Sekme Giriş Açıklaması ───────────────────── */
 .icat-desc{font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:16px;padding:10px 12px;background:rgba(59,130,246,.06);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;}

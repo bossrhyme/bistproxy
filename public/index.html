@@ -104,7 +104,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
-<link rel="stylesheet" href="/deepfin.css?v=4aa925d">
+<link rel="stylesheet" href="/deepfin.css?v=f5c62a7">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -969,10 +969,22 @@ if('serviceWorker' in navigator){
       <button class="modal-close" onclick="closeInfo()">✕</button>
     </div>
             <div class="modal-body">
+      <div class="info-asset-tabs">
+        <button class="info-asset-tab active" onclick="switchAssetTab('hisse',this)">📈 Hisse</button>
+        <button class="info-asset-tab" onclick="switchAssetTab('fon',this)">🏦 Fon</button>
+        <button class="info-asset-tab" onclick="switchAssetTab('kripto',this)">₿ Kripto</button>
+        <button class="info-asset-tab yakinda-tab" onclick="switchAssetTab('etf',this)">ETF <span class="yakinda-badge">YAKINDA</span></button>
+        <button class="info-asset-tab yakinda-tab" onclick="switchAssetTab('eurobond',this)">Eurobond <span class="yakinda-badge">YAKINDA</span></button>
+        <button class="info-asset-tab yakinda-tab" onclick="switchAssetTab('bono',this)">Bono/Tahvil <span class="yakinda-badge">YAKINDA</span></button>
+        <button class="info-asset-tab yakinda-tab" onclick="switchAssetTab('viop',this)">Viop <span class="yakinda-badge">YAKINDA</span></button>
+        <button class="info-asset-tab yakinda-tab" onclick="switchAssetTab('varant',this)">Varant <span class="yakinda-badge">YAKINDA</span></button>
+        <button class="info-asset-tab yakinda-tab" onclick="switchAssetTab('opsiyon',this)">Opsiyon <span class="yakinda-badge">YAKINDA</span></button>
+      </div>
+      <div class="info-asset-panel active" id="asset-panel-hisse">
       <div class="info-tabs">
-        <button class="info-tab active" onclick="switchInfoTab('goat',this)">🐐 GOAT</button>
-        <button class="info-tab" onclick="switchInfoTab('temel',this)">📊 Temel Analiz</button>
-        <button class="info-tab" onclick="switchInfoTab('teknik',this)">⚡ Teknik Analiz</button>
+        <button class="info-tab active" onclick="switchInfoTab('goat',this)">🐐 GOAT Stratejiler</button>
+        <button class="info-tab" onclick="switchInfoTab('temel',this)">📊 Temel Filtreler</button>
+        <button class="info-tab" onclick="switchInfoTab('teknik',this)">⚡ Teknik Filtreler</button>
         <button class="info-tab" onclick="switchInfoTab('sozluk',this)">📖 Terimler</button>
       </div>
       <div class="info-tab-panel active" id="info-panel-goat">
@@ -1010,9 +1022,29 @@ if('serviceWorker' in navigator){
           <span class="iitem-tip tip-warn">F/K <15 · B/Ö <%50 · Cari >1.5 · Net marj >%8 · ROE >%10</span>
         </div>
         <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">James O'Shaughnessy — What Works on Wall Street</span></div>
+          <div class="iitem-desc">50 yıllık veriye dayalı nicel yatırım. En güçlü combo: yüksek hissedar getirisi (temettü + geri alım) + fiyat momentumu + düşük değerleme. Value Composite: düşük F/K, PD/DD, F/S kombinasyonu.</div>
+          <span class="iitem-tip tip-warn">F/K <15 · PD/DD <1.5 · 1Y getiri >%15 · Temettü >%1</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Joel Greenblatt — Magic Formula</span></div>
+          <div class="iitem-desc">Sihirli formül: yüksek kazanç getirisi (EBIT/işletme değeri) + yüksek sermaye getirisi (ROIC). Her iki metrikte üst %30'da olan hisseler listeye girer. Basit ama güçlü sistematik yaklaşım.</div>
+          <span class="iitem-tip tip-warn">ROIC >%25 · F/K <15 · B/Ö <%60</span>
+        </div>
+        <div class="iitem">
           <div class="iitem-top"><span class="iitem-name">Mark Minervini — SEPA</span></div>
           <div class="iitem-desc">Süper performanslı büyüme hissesi: kazanç büyümesi>%25, ROE>%17, marj>%10. Zirveye yakın + hacim patlaması. SEPA (Specific Entry Point Analysis) kırılım modeliyle tamamlanır.</div>
           <span class="iitem-tip tip-warn">Kazanç büyümesi >%25 · ROE >%17 · Net marj >%10 · B/Ö <100</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Peter Lynch — GARP</span></div>
+          <div class="iitem-desc">"Yatırım yapabileceğin şeyleri al." PEG oranı <1: büyüme hızına göre ucuz hisse. On-bagger arayışı — günlük hayatta gördüğün büyüme hikayelerini araştır. Ne anladığını al, anlamadığını bırak.</div>
+          <span class="iitem-tip tip-warn">PEG <1 · Kazanç büyümesi >%15 · F/K <25 · B/Ö <%80</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Philip Fisher — Scuttlebutt</span></div>
+          <div class="iitem-desc">Büyüme yatırımının öncüsü. Scuttlebutt: şirketi müşteri, çalışan ve rakiplerden araştır. Güçlü Ar-Ge, yetkin yönetim, geniş büyüme potansiyeli. Uzun vadeli tut — satmak zorunda değilsen satma.</div>
+          <span class="iitem-tip tip-warn">Gelir büyümesi >%15 · Net marj >%10 · ROE >%15 · B/Ö <%60</span>
         </div>
         <div class="iitem">
           <div class="iitem-top"><span class="iitem-name">Piotroski F-Score</span></div>
@@ -1020,9 +1052,24 @@ if('serviceWorker' in navigator){
           <span class="iitem-tip tip-good">✓ 7–9 güçlü alım bölgesi</span><span class="iitem-tip tip-warn">△ 3–6 nötr</span><span class="iitem-tip tip-bad">✕ 0–2 zayıf bilanço</span>
         </div>
         <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Quant Fonlar — Citadel / D.E. Shaw / Millennium</span></div>
+          <div class="iitem-desc">Sistematik/algoritmik yatırım. Çoklu faktör modeli: momentum + kalite + değer + büyüme + düşük volatilite — hepsini eş zamanlı optimize et. Tek faktöre bağlı kalma, sinyal çeşitliliği riskleri dengeler.</div>
+          <span class="iitem-tip tip-warn">TV Rating >0.3 · ROE >%15 · F/K 8–20 · Net marj >%10 · B/Ö <%70</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Seth Klarman — Güvenlik Marjı</span></div>
+          <div class="iitem-desc">Graham'dan daha muhafazakâr değer yatırımı. Sadece ciddi iskontoda al — içsel değerin %40–50 altı. Net-net değerleme (net dönen varlıklar > piyasa değeri). Nakit zenginliği ve varlık iskontosu öncelikli.</div>
+          <span class="iitem-tip tip-warn">PD/DD <1 · F/K <12 · Cari >2 · B/Ö <%40</span>
+        </div>
+        <div class="iitem">
           <div class="iitem-top"><span class="iitem-name">Warren Buffett — Moat</span></div>
           <div class="iitem-desc">Sürdürülebilir rekabet avantajı (moat): ROE>%20, brüt marj>%40, net marj>%20, D/E<%50. Makul fiyat, uzun vadeli tutuş. "Harika şirketi adil fiyata al."</div>
           <span class="iitem-tip tip-warn">F/K 5–25 · ROE >%20 · Brüt marj >%40 · Net marj >%20 · B/Ö <%50</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">William O'Neil — CAN SLIM</span></div>
+          <div class="iitem-desc">C: Cari çeyrek EPS >%25 · A: Yıllık EPS büyümesi >%25 · N: Yeni ürün/yönetim/zirve · S: Arz-talep (hacim kırılımı) · L: Sektör lideri (RS >80) · I: Kurumsal destek · M: Piyasa yönü boğa.</div>
+          <span class="iitem-tip tip-warn">Kazanç büyümesi >%25 · Gelir büyümesi >%20 · ROE >%17 · Zirveden >-%15</span>
         </div>
       </div>
       </div>
@@ -1135,9 +1182,185 @@ if('serviceWorker' in navigator){
         <div class="iitem">
           <div class="iitem-top"><span class="iitem-name">YoY — Yıldan Yıla</span><span class="iitem-eng">Year over Year</span></div>
           <div class="iitem-desc">Bu yılın aynı dönemini geçen yılın aynı dönemiyle kıyaslar. Mevsimsel etkilerden arındırılmış büyümeyi gösterir.</div>
-          
+
         </div>
       </div>
+      </div>
+      </div><!-- /asset-panel-hisse -->
+
+      <!-- ── FON PANELİ ── -->
+      <div class="info-asset-panel" id="asset-panel-fon">
+      <div class="info-tabs">
+        <button class="info-tab active" onclick="switchInfoTab('fon-strateji',this)">🎯 Stratejiler</button>
+        <button class="info-tab" onclick="switchInfoTab('fon-filtre',this)">🔍 Filtreler</button>
+      </div>
+      <div class="info-tab-panel active" id="info-panel-fon-strateji">
+      <div class="icat">
+        <div class="icat-title">🎯 Fon Stratejileri</div>
+        <div class="icat-desc">TEFAS'ta işlem gören yatırım fonlarını taramak için kanıtlanmış stratejiler. Her yaklaşım farklı risk-getiri profiline sahiptir; kendi yatırım hedeflerinize uygun olanı seçin.</div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Büyüme Fonu</span></div>
+          <div class="iitem-desc">YTD ve 1 yıllık getirisi yüksek, büyüme odaklı hisse fonları. Uzun vadeli yatırımcılar için güçlü enflasyon koruması sunar.</div>
+          <span class="iitem-tip tip-warn">YTD >%15 · 1Y >%20 · Fon tipi: Hisse</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Büyük &amp; Güvenli</span></div>
+          <div class="iitem-desc">Yüksek AUM'lu, geniş yatırımcı tabanına sahip, istikrarlı getiri sağlayan fonlar. Sermaye koruma öncelikli konservatif yatırımcılar için.</div>
+          <span class="iitem-tip tip-warn">Büyüklük >500M TL · Sharpe >1 · Yatırımcı sayısı >1000</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Momentum Fonu</span></div>
+          <div class="iitem-desc">Kısa vadede ivme kazanan, 1 ve 3 aylık getirileri yüksek fonlar. Piyasa yükseliş trendlerini yakalamak için kullanılır.</div>
+          <span class="iitem-tip tip-warn">1A >%5 · 3A >%15</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Para Piyasası</span></div>
+          <div class="iitem-desc">Kısa vadeli, düşük riskli, yüksek likidite sunan para piyasası fonları. Nakit parkı için alternatif; mevduat faizine yakın getiri.</div>
+          <span class="iitem-tip tip-warn">Fon tipi: PMF · YTD pozitif · Büyüklük >100M TL</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Sharpe Odaklı</span></div>
+          <div class="iitem-desc">Risk başına en yüksek getiriyi sağlayan fonlar. Sharpe oranı >1.5 olan fonlar hem iyi getiri hem düşük oynaklık sunar.</div>
+          <span class="iitem-tip tip-warn">Sharpe >1.5 · YTD pozitif</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Hisse Ağırlıklı</span></div>
+          <div class="iitem-desc">Portföyünde ağırlıklı olarak hisse senedi barındıran fonlar. Uzun vadede en yüksek büyüme potansiyeline sahip kategori.</div>
+          <span class="iitem-tip tip-warn">Fon tipi: Hisse · 1Y >%10 · Büyüklük >50M TL</span>
+        </div>
+      </div>
+      </div>
+      <div class="info-tab-panel" id="info-panel-fon-filtre">
+      <div class="icat">
+        <div class="icat-title">🔍 Fon Filtre Kriterleri</div>
+        <div class="icat-desc">TEFAS fon taramasında kullanılan filtre göstergelerinin açıklamaları. Bu kriterler fonları performans, risk ve büyüklük bazında karşılaştırmanıza yardımcı olur.</div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">YTD Getiri (%)</span></div>
+          <div class="iitem-desc">Yıl başından bugüne toplam getiri. Fonları aynı yıl içinde adil biçimde karşılaştırmanın en yaygın yolu.</div>
+          <span class="iitem-tip tip-good">✓ >%20 güçlü yıllık performans</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">1 Aylık Getiri (%)</span></div>
+          <div class="iitem-desc">Son 30 gündeki fon performansı. Kısa vadeli momentum ve güncel piyasa tepkisini ölçer.</div>
+          <span class="iitem-tip tip-warn">△ Tek başına yeterli değil, uzun dönemle birlikte değerlendirin</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">3 Aylık Getiri (%)</span></div>
+          <div class="iitem-desc">Son 90 gündeki getiri. Orta vadeli trend tespiti için YTD ile birlikte kullanılır.</div>
+          <span class="iitem-tip tip-warn">△ Mevsimsel etkiler içerebilir</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">1 Yıllık Getiri (%)</span></div>
+          <div class="iitem-desc">Son 52 haftadaki toplam getiri. Fon yöneticisinin uzun vadeli becerilerini ölçmenin en güvenilir metriği.</div>
+          <span class="iitem-tip tip-good">✓ >%30 güçlü uzun vadeli performans</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Fon Büyüklüğü (TL)</span></div>
+          <div class="iitem-desc">Toplam aktif değer. Büyük fonlar daha likit ve istikrarlıdır; küçük fonlar daha agresif büyüme gösterebilir.</div>
+          <span class="iitem-tip tip-warn">△ Çok büyük fonlarda getiri baskılanabilir</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Yatırımcı Sayısı</span></div>
+          <div class="iitem-desc">Fona katılan bireysel yatırımcı adedi. Popülerlik ve kurumsal güveni gösterir; ani çıkış riskini de sinyalleyebilir.</div>
+          <span class="iitem-tip tip-warn">△ Kalabalık ≠ iyi; getiriyi de kontrol edin</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Sharpe Oranı</span></div>
+          <div class="iitem-desc">Risk başına getiri: (Fon getirisi − Risksiz faiz) / Standart sapma. 1 üzeri iyi, 2 üzeri mükemmel kabul edilir.</div>
+          <span class="iitem-tip tip-good">✓ >1 iyi</span><span class="iitem-tip tip-warn">△ 0–1 orta</span><span class="iitem-tip tip-bad">✕ &lt;0 riskli</span>
+        </div>
+      </div>
+      </div>
+      </div><!-- /asset-panel-fon -->
+
+      <!-- ── KRİPTO PANELİ ── -->
+      <div class="info-asset-panel" id="asset-panel-kripto">
+      <div class="info-tabs">
+        <button class="info-tab active" onclick="switchInfoTab('kripto-strateji',this)">🎯 Stratejiler</button>
+        <button class="info-tab" onclick="switchInfoTab('kripto-filtre',this)">🔍 Filtreler</button>
+      </div>
+      <div class="info-tab-panel active" id="info-panel-kripto-strateji">
+      <div class="icat">
+        <div class="icat-title">🎯 Kripto Stratejileri</div>
+        <div class="icat-desc">Kripto piyasasında kanıtlanmış yatırım yaklaşımları. Yüksek volatilite nedeniyle risk yönetimi her stratejinin ayrılmaz parçasıdır. Yalnızca kaybetmeyi göze aldığınız miktarla işlem yapın.</div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">HODL — Uzun Vadeli Tut</span></div>
+          <div class="iitem-desc">Büyük piyasa değerli, köklü coinleri (BTC, ETH, SOL) uzun vadeli tut. Günlük gürültüye aldırma; teknoloji ve ekosisteme inan, 3–5 yıl ufku belirle.</div>
+          <span class="iitem-tip tip-warn">Piyasa değeri >10B$ · 1Y getiri pozitif · TV Puanı >0.3</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">DCA — Düzenli Alım</span></div>
+          <div class="iitem-desc">Sabit periyotlarla sabit miktarda alım yaparak maliyet ortalaması al. Volatiliteyi zamanlamak yerine zamana yay. Psikolojik baskıyı azaltır, uzun vadede etkin maliyet sağlar.</div>
+          <span class="iitem-tip tip-good">✓ Tüm piyasa koşullarında uygulanabilir strateji</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Momentum</span></div>
+          <div class="iitem-desc">Kısa vadede güçlü momentum gösteren coinler. Hacim artışı + fiyat ivmesi birlikteliği güçlü sinyal. Boğa piyasalarında en etkili yaklaşım.</div>
+          <span class="iitem-tip tip-warn">7G >%15 · 30G >%30 · TV Puanı >0.5</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Dip Fırsatı</span></div>
+          <div class="iitem-desc">ATH'den sert düşmüş, temel değerleri sağlam coinlerde kontrarian alım. Panik satışlarından faydalanmak için — ama düşüşün devam edebileceğini unutma.</div>
+          <span class="iitem-tip tip-warn">30G &lt;-%20 · Piyasa değeri >1B$ · TV Puanı &lt;0.3</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Layer 1 / Ekosistem</span></div>
+          <div class="iitem-desc">Blockchain altyapısı sağlayan L1 protokollerine (BTC, ETH, SOL, ADA, AVAX) odaklan. Ekosistem büyüdükçe altyapı coini değer kazanır — en az riskli kripto kategorisi.</div>
+          <span class="iitem-tip tip-warn">Piyasa değeri >5B$ · 1Y getiri >%20</span>
+        </div>
+      </div>
+      </div>
+      <div class="info-tab-panel" id="info-panel-kripto-filtre">
+      <div class="icat">
+        <div class="icat-title">🔍 Kripto Filtre Kriterleri</div>
+        <div class="icat-desc">Kripto taramasında kullanılan göstergelerin açıklamaları. Yüksek volatilite nedeniyle birden fazla kriteri birlikte değerlendirin.</div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">24 Saatlik Değişim (%)</span></div>
+          <div class="iitem-desc">Son 24 saatte fiyat değişimi. Anlık momentum ve haber etkisini ölçer. Kripto piyasasında %5+ günlük hareketler normaldir.</div>
+          <span class="iitem-tip tip-warn">△ Tek başına yanıltıcı olabilir</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">7 Günlük Değişim (%)</span></div>
+          <div class="iitem-desc">Son 7 gündeki getiri. Kısa vadeli trend sinyali; haftalık momentum tespitinde kullanılır.</div>
+          <span class="iitem-tip tip-good">✓ >%10 güçlü haftalık momentum</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">30 Günlük Değişim (%)</span></div>
+          <div class="iitem-desc">Son 30 gündeki getiri. Orta vadeli trend ve momentum gücünü ölçer. Strateji kararlarında en sık kullanılan kripto metriği.</div>
+          <span class="iitem-tip tip-good">✓ >%30 güçlü aylık ivme</span><span class="iitem-tip tip-bad">✕ &lt;-%30 dip araştır</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">Piyasa Değeri ($)</span></div>
+          <div class="iitem-desc">Dolaşımdaki arz × fiyat. Coin büyüklüğü ve güvenilirliğinin en temel göstergesi. Büyük cap = daha istikrarlı, küçük cap = daha volatil.</div>
+          <span class="iitem-tip tip-warn">Large cap >10B$ · Mid cap 1–10B$ · Small cap &lt;1B$</span>
+        </div>
+        <div class="iitem">
+          <div class="iitem-top"><span class="iitem-name">TV Puanı</span></div>
+          <div class="iitem-desc">TradingView teknik analiz konsensüs skoru. RSI, MACD, hareketli ortalamalar dahil 26 indikatörün ortalaması. 0.5 üzeri AL, -0.5 altı SAT sinyali.</div>
+          <span class="iitem-tip tip-good">✓ >0.5 AL sinyali</span><span class="iitem-tip tip-warn">△ -0.5–0.5 nötr</span><span class="iitem-tip tip-bad">✕ &lt;-0.5 SAT</span>
+        </div>
+      </div>
+      </div>
+      </div><!-- /asset-panel-kripto -->
+
+      <!-- ── YAKINDA PANELLERİ ── -->
+      <div class="info-asset-panel" id="asset-panel-etf">
+        <div class="yakinda-panel"><div class="yakinda-panel-icon">📦</div><div class="yakinda-panel-title">ETF Stratejileri Yakında</div><div class="yakinda-panel-desc">Borsa yatırım fonları için GOAT stratejileri ve filtre kriterleri hazırlanıyor. Çok yakında!</div></div>
+      </div>
+      <div class="info-asset-panel" id="asset-panel-eurobond">
+        <div class="yakinda-panel"><div class="yakinda-panel-icon">🌍</div><div class="yakinda-panel-title">Eurobond Stratejileri Yakında</div><div class="yakinda-panel-desc">Döviz cinsinden tahvil yatırımları için strateji ve filtre içerikleri hazırlanıyor.</div></div>
+      </div>
+      <div class="info-asset-panel" id="asset-panel-bono">
+        <div class="yakinda-panel"><div class="yakinda-panel-icon">📜</div><div class="yakinda-panel-title">Bono/Tahvil Stratejileri Yakında</div><div class="yakinda-panel-desc">Devlet ve özel sektör tahvilleri için sabit getiri stratejileri hazırlanıyor.</div></div>
+      </div>
+      <div class="info-asset-panel" id="asset-panel-viop">
+        <div class="yakinda-panel"><div class="yakinda-panel-icon">📊</div><div class="yakinda-panel-title">Viop Stratejileri Yakında</div><div class="yakinda-panel-desc">Vadeli işlem ve opsiyon piyasaları için türev stratejileri hazırlanıyor.</div></div>
+      </div>
+      <div class="info-asset-panel" id="asset-panel-varant">
+        <div class="yakinda-panel"><div class="yakinda-panel-icon">🎯</div><div class="yakinda-panel-title">Varant Stratejileri Yakında</div><div class="yakinda-panel-desc">Yapılandırılmış ürünler ve varant stratejileri için içerikler hazırlanıyor.</div></div>
+      </div>
+      <div class="info-asset-panel" id="asset-panel-opsiyon">
+        <div class="yakinda-panel"><div class="yakinda-panel-icon">⚙️</div><div class="yakinda-panel-title">Opsiyon Stratejileri Yakında</div><div class="yakinda-panel-desc">Covered call, protective put ve diğer opsiyon stratejileri için içerikler geliyor.</div></div>
       </div>
     </div>
   </div>
@@ -1271,6 +1494,6 @@ if('serviceWorker' in navigator){
     </div>
   </div>
 </div>
-<script src="/deepfin.js?v=d821e67"></script>
+<script src="/deepfin.js?v=f5c62a7"></script>
 </body>
 </html>

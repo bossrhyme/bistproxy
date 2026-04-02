@@ -1,5 +1,5 @@
-// DeepFin Service Worker v4 - minimal, sadece offline temel destek
-const CACHE = 'deepfin-v5';
+// DeepFin Service Worker v5 - analiz.js cache-bust
+const CACHE = 'deepfin-v6';
 
 // Install: hızlı geç
 self.addEventListener('install', function(e) {
@@ -27,6 +27,12 @@ self.addEventListener('fetch', function(e) {
   // Sadece GET, sadece same-origin
   if (e.request.method !== 'GET' || url.origin !== self.location.origin) {
     return; // pass-through, SW müdahil olmuyor
+  }
+
+  // Eski analiz.js sürümü: HTTP cache'i bypass et (immutable flag sorunu)
+  if (url.pathname === '/analiz/analiz.js' && url.search === '?v=1191933') {
+    e.respondWith(fetch(e.request, { cache: 'reload' }));
+    return;
   }
 
   // /api/ istekleri: Network First (veri güncel kalsın)
