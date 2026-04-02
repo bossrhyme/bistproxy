@@ -7,15 +7,15 @@
   --blue:#3b82f6;--blue2:#2563d4;
   --gold:#f0b429;--text:#e2e8f0;--text2:#94a3b8;--muted:#4a5568;--muted2:#64748b;
   --accent:#3b82f6;
-  --ff:'Plus Jakarta Sans',sans-serif;
+  --ff:'Inter',sans-serif;
   --ff-mono:'Geist Mono',monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 *{-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;overflow:hidden;touch-action:pan-y;;overflow-x:hidden;
-  font-family:'Plus Jakarta Sans',sans-serif;
+  font-family:'Inter',sans-serif;
 }
-body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans', sans-serif;}
+body{background:var(--bg);color:var(--text);font-family:'Inter', sans-serif;}
 
 /* ── API KEY SETUP SCREEN ── */
 #setup{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:100;background:var(--bg);}
@@ -26,7 +26,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans', san
 .ssub{font-size:13px;color:var(--muted2);margin-bottom:28px;margin-top:8px;}
 .ssteps{margin-bottom:28px;}
 .sstep{display:flex;gap:12px;margin-bottom:14px;align-items:flex-start;}
-.sstep-num{font-family:'Plus Jakarta Sans', sans-serif;font-weight:800;font-size:18px;color:var(--gold);width:22px;flex-shrink:0;line-height:1.3;}
+.sstep-num{font-family:'Inter', sans-serif;font-weight:800;font-size:18px;color:var(--gold);width:22px;flex-shrink:0;line-height:1.3;}
 .sstep-txt{font-family:'Geist Mono', monospace;font-size:10px;color:var(--muted2);line-height:1.7;}
 .sstep-txt a{color:var(--teal);text-decoration:none;}
 .sstep-txt a:hover{text-decoration:underline;}
@@ -762,9 +762,9 @@ max-width: 480px) {
 .hp-title span{color:var(--accent);}
 .hp-sub{font-size:16px;color:var(--text2);max-width:480px;line-height:1.7;margin-bottom:32px;}
 .hp-cta{display:flex;gap:12px;align-items:center;}
-.hp-cta-primary{background:var(--text);color:#000;border:none;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;font-family:'Plus Jakarta Sans', sans-serif;}
+.hp-cta-primary{background:var(--text);color:#000;border:none;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;font-family:'Inter', sans-serif;}
 .hp-cta-primary:hover{background:#d4d4d4;transform:translateY(-1px);}
-.hp-cta-secondary{background:transparent;color:var(--text2);border:1px solid var(--border);padding:12px 22px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;font-family:'Plus Jakarta Sans', sans-serif;}
+.hp-cta-secondary{background:transparent;color:var(--text2);border:1px solid var(--border);padding:12px 22px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;font-family:'Inter', sans-serif;}
 .hp-cta-secondary:hover{border-color:#333;color:var(--text);}
 
 .hp-stats{display:flex;gap:0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
@@ -798,7 +798,7 @@ max-width: 480px) {
 .hp-strategy-desc{font-size:10px;color:var(--muted2);margin-top:2px;}
 .hp-strategy-arrow{color:var(--muted);font-size:14px;}
 
-.hp-nav-btn{background:transparent;border:none;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;padding:6px 12px;border-radius:6px;transition:all .15s;font-family:'Plus Jakarta Sans', sans-serif;}
+.hp-nav-btn{background:transparent;border:none;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;padding:6px 12px;border-radius:6px;transition:all .15s;font-family:'Inter', sans-serif;}
 .hp-nav-btn:hover{background:var(--s2);color:var(--text);}
 .hp-nav-btn.active{color:var(--text);}
 
@@ -838,7 +838,7 @@ max-width: 480px) {
 
 /* ── SIDEBAR TABS ── */
 .sb-tabs{display:flex;gap:2px;padding:8px 8px 0;flex-shrink:0;}
-.sb-tab{flex:1;padding:5px 6px;font-size:10px;font-weight:600;border:1px solid transparent;background:none;color:var(--muted);border-radius:4px;cursor:pointer;transition:all .12s;white-space:nowrap;font-family:'Plus Jakarta Sans',sans-serif;}
+.sb-tab{flex:1;padding:5px 6px;font-size:10px;font-weight:600;border:1px solid transparent;background:none;color:var(--muted);border-radius:4px;cursor:pointer;transition:all .12s;white-space:nowrap;font-family:'Inter',sans-serif;}
 .sb-tab:hover{color:var(--text);border-color:#333;}
 .sb-tab.active{background:var(--s2);color:var(--text);border-color:var(--border2);}
 .sb-advanced-hint{font-size:10px;color:var(--muted2);background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.15);border-radius:5px;padding:7px 10px;margin:10px 10px 4px;line-height:1.5;}
@@ -922,7 +922,7 @@ max-width: 480px) {
   padding: 0 16px; font-size: 14px; color: var(--text); font-family: 'Geist Mono', monospace;
   letter-spacing: 0.5px;
 }
-.analiz-search-input::placeholder { text-transform: none; font-size: 12px; letter-spacing: 0; color: var(--muted); font-family: 'Plus Jakarta Sans', sans-serif; }
+.analiz-search-input::placeholder { text-transform: none; font-size: 12px; letter-spacing: 0; color: var(--muted); font-family: 'Inter', sans-serif; }
 .analiz-dd-item{display:flex;align-items:center;gap:12px;padding:10px 16px;cursor:pointer;transition:background .1s;border-bottom:1px solid var(--border);}
 .analiz-dd-item:last-child{border-bottom:none;}
 .analiz-dd-item:hover,.analiz-dd-item.active{background:var(--s2);}
@@ -932,7 +932,7 @@ max-width: 480px) {
 .analiz-search-btn {
   height: 48px; padding: 0 20px; background: var(--accent); color: #fff;
   border: none; cursor: pointer; font-size: 12px; font-weight: 700;
-  font-family: 'Plus Jakarta Sans', sans-serif; transition: background .15s; white-space: nowrap;
+  font-family: 'Inter', sans-serif; transition: background .15s; white-space: nowrap;
 }
 .analiz-search-btn:hover { background: #2563eb; }
 .analiz-search-hint { font-size: 10px; color: var(--muted); margin-top: 10px; }
@@ -968,14 +968,14 @@ max-width: 480px) {
   flex: 1; height: 36px; background: var(--green); color: #fff;
   border: none; border-radius: 7px; font-size: 12px; font-weight: 700;
   cursor: pointer; transition: all .15s; display: flex; align-items: center;
-  justify-content: center; gap: 6px; font-family: 'Plus Jakarta Sans', sans-serif;
+  justify-content: center; gap: 6px; font-family: 'Inter', sans-serif;
 }
 .dpl-buy:hover { background: #00a864; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,192,118,.3); }
 .dpl-analyze {
   flex: 1; height: 36px; background: var(--accent2); color: var(--accent);
   border: 1px solid rgba(59,130,246,.3); border-radius: 7px; font-size: 12px; font-weight: 700;
   cursor: pointer; transition: all .15s; display: flex; align-items: center;
-  justify-content: center; gap: 6px; font-family: 'Plus Jakarta Sans', sans-serif;
+  justify-content: center; gap: 6px; font-family: 'Inter', sans-serif;
 }
 .dpl-analyze:hover { background: rgba(59,130,246,.2); border-color: var(--accent); transform: translateY(-1px); }
 
@@ -1023,7 +1023,7 @@ max-width: 480px) {
 .sb-search-ico{position:absolute;left:8px;font-size:11px;color:var(--muted2);pointer-events:none;z-index:1;}
 .sb-search-input{background:var(--s1);border:1px solid var(--border);color:var(--text);padding:4px 10px 4px 24px;font-size:11px;outline:none;border-radius:5px;width:160px;font-family:'Geist Mono', monospace;transition:border-color .15s,width .2s;}
 .sb-search-input:focus{border-color:var(--accent);width:200px;}
-.sb-search-input::placeholder{color:var(--muted2);font-family:'Plus Jakarta Sans', sans-serif;font-size:10px;}
+.sb-search-input::placeholder{color:var(--muted2);font-family:'Inter', sans-serif;font-size:10px;}
 
 [data-col="symbol"]{white-space:nowrap;}
 .sym-wrap{display:inline-flex;align-items:center;gap:2px;}
@@ -1116,14 +1116,14 @@ tbody tr td { height: 36px; }
 
 /* ── Bilgi Bankası Sekmeleri ─────────────────────────────────── */
 .info-tabs{display:flex;gap:4px;padding:0 0 14px;border-bottom:1px solid var(--border);margin-bottom:4px;flex-wrap:wrap;}
-.info-tab{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;padding:6px 14px;border-radius:20px;border:1px solid var(--border2);background:var(--s2);color:var(--text2);cursor:pointer;transition:all .15s;letter-spacing:.02em;}
+.info-tab{font-family:'Inter',sans-serif;font-size:11px;font-weight:600;padding:6px 14px;border-radius:20px;border:1px solid var(--border2);background:var(--s2);color:var(--text2);cursor:pointer;transition:all .15s;letter-spacing:.02em;}
 .info-tab:hover{border-color:var(--accent);color:var(--accent);}
 .info-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;}
 .info-tab-panel{display:none;}
 .info-tab-panel.active{display:block;}
 /* ── Bilgi Bankası Varlık Üst Sekmeleri ─────────────────────── */
 .info-asset-tabs{display:flex;gap:4px;padding:0 0 14px;border-bottom:2px solid var(--accent);margin-bottom:14px;flex-wrap:wrap;}
-.info-asset-tab{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;padding:7px 16px;border-radius:20px;border:1.5px solid var(--border2);background:var(--s2);color:var(--text2);cursor:pointer;transition:all .15s;letter-spacing:.02em;display:inline-flex;align-items:center;gap:5px;}
+.info-asset-tab{font-family:'Inter',sans-serif;font-size:12px;font-weight:700;padding:7px 16px;border-radius:20px;border:1.5px solid var(--border2);background:var(--s2);color:var(--text2);cursor:pointer;transition:all .15s;letter-spacing:.02em;display:inline-flex;align-items:center;gap:5px;}
 .info-asset-tab:hover{border-color:var(--accent);color:var(--accent);}
 .info-asset-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;}
 .info-asset-tab.yakinda-tab{opacity:.65;}
@@ -1149,7 +1149,7 @@ tbody tr td { height: 36px; }
 .sidebar{display:flex !important;flex-direction:column !important;overflow:hidden !important;padding:0 !important;}
 .asset-nav-bar{display:flex;overflow-x:auto;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--s2);scrollbar-width:none;}
 .asset-nav-bar::-webkit-scrollbar{display:none;}
-.anb{display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 9px 6px;border:none;border-bottom:2px solid transparent;background:none;color:var(--muted2);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap;transition:color .12s,border-color .12s;flex-shrink:0;font-size:14px;line-height:1;}
+.anb{display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 9px 6px;border:none;border-bottom:2px solid transparent;background:none;color:var(--muted2);cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;transition:color .12s,border-color .12s;flex-shrink:0;font-size:14px;line-height:1;}
 .anb span{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
 .anb small{font-size:7px;color:var(--muted);letter-spacing:.03em;}
 .anb:hover{color:var(--text2);}
@@ -1170,7 +1170,7 @@ tbody tr td { height: 36px; }
 .landing-title{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.3px;margin-bottom:3px;}
 .landing-sub{font-size:11px;color:var(--text2);}
 .landing-list{padding:4px 8px 12px;display:flex;flex-direction:column;gap:2px;}
-.landing-item{display:flex;align-items:center;gap:9px;padding:10px 12px;border:1px solid var(--border2);border-radius:6px;background:var(--s2);cursor:pointer;font-family:"Plus Jakarta Sans",sans-serif;text-align:left;transition:border-color .12s,background .12s;}
+.landing-item{display:flex;align-items:center;gap:9px;padding:10px 12px;border:1px solid var(--border2);border-radius:6px;background:var(--s2);cursor:pointer;font-family:"Inter",sans-serif;text-align:left;transition:border-color .12s,background .12s;}
 .landing-item:hover{border-color:var(--accent);background:rgba(59,130,246,.05);}
 .landing-soon{cursor:default;opacity:.38;}
 .landing-soon:hover{border-color:var(--border2) !important;background:var(--s2) !important;}
@@ -1180,7 +1180,7 @@ tbody tr td { height: 36px; }
 .li-badge{font-size:9px;font-weight:700;color:#fff;background:var(--muted);padding:2px 6px;border-radius:10px;flex-shrink:0;text-transform:uppercase;letter-spacing:.04em;}
 
 /* ── Geri butonu (panel → landing) ─────────────────────────────── */
-.sb-back-btn{display:flex;align-items:center;gap:6px;padding:8px 10px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;width:100%;font-family:"Plus Jakarta Sans",sans-serif;flex-shrink:0;}
+.sb-back-btn{display:flex;align-items:center;gap:6px;padding:8px 10px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;width:100%;font-family:"Inter",sans-serif;flex-shrink:0;}
 .sb-back-btn:hover{background:var(--s2);color:var(--accent);}
 .sb-back-btn svg{flex-shrink:0;}
 
@@ -1188,7 +1188,7 @@ tbody tr td { height: 36px; }
 /* sidebar override duplicate removed */
 .asset-nav-bar{display:flex;overflow-x:auto;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--s2);scrollbar-width:none;}
 .asset-nav-bar::-webkit-scrollbar{display:none;}
-.anb{display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 8px 5px;border:none;border-bottom:2px solid transparent;background:none;color:var(--muted2);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap;transition:color .12s,border-color .12s;flex-shrink:0;font-size:13px;line-height:1;}
+.anb{display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 8px 5px;border:none;border-bottom:2px solid transparent;background:none;color:var(--muted2);cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;transition:color .12s,border-color .12s;flex-shrink:0;font-size:13px;line-height:1;}
 .anb span{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-top:2px;}
 .anb small{font-size:7px;color:var(--muted);letter-spacing:.03em;}
 .anb:hover:not(.soon){color:var(--text2);}
@@ -1198,13 +1198,13 @@ tbody tr td { height: 36px; }
 /* ── Sidebar Panels ─────────────────────────────────────────────── */
 .sbp{display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0;}
 .sbp.active{display:flex;}
-.sbp-back{display:flex;align-items:center;gap:5px;padding:7px 10px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;width:100%;font-family:'Plus Jakarta Sans',sans-serif;flex-shrink:0;transition:color .12s;}
+.sbp-back{display:flex;align-items:center;gap:5px;padding:7px 10px;background:none;border:none;border-bottom:1px solid var(--border);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;width:100%;font-family:'Inter',sans-serif;flex-shrink:0;transition:color .12s;}
 .sbp-back:hover{color:var(--accent);}
 .sbp-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:4px 2px;}
 .sbp-scroll::-webkit-scrollbar{width:3px;}
 .sbp-scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 .sbp-scan-wrap{padding:6px 8px 8px;flex-shrink:0;}
-.sbp-scan-btn{width:100%;padding:9px;background:var(--accent);border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:.02em;transition:opacity .15s;}
+.sbp-scan-btn{width:100%;padding:9px;background:var(--accent);border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:.02em;transition:opacity .15s;}
 .sbp-scan-btn:hover{opacity:.85;}
 
 /* ── Landing ekranı ─────────────────────────────────────────────── */
@@ -1212,7 +1212,7 @@ tbody tr td { height: 36px; }
 .landing-title{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.3px;margin-bottom:3px;}
 .landing-sub{font-size:11px;color:var(--text2);}
 .landing-list{padding:4px 8px 12px;display:flex;flex-direction:column;gap:2px;}
-.li-btn{display:flex;align-items:center;gap:9px;padding:10px 12px;border:1px solid var(--border2);border-radius:6px;background:var(--s2);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:border-color .12s,background .12s;}
+.li-btn{display:flex;align-items:center;gap:9px;padding:10px 12px;border:1px solid var(--border2);border-radius:6px;background:var(--s2);cursor:pointer;font-family:'Inter',sans-serif;transition:border-color .12s,background .12s;}
 .li-btn:hover{border-color:var(--accent);background:rgba(59,130,246,.05);}
 .li-soon{display:flex;align-items:center;gap:9px;padding:10px 12px;border:1px solid var(--border2);border-radius:6px;background:var(--s2);opacity:.35;}
 .li-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
