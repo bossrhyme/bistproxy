@@ -149,6 +149,14 @@
     {
       "source": "/api/bist-quote",
       "destination": "/api/bist-quote.js"
+    },
+    {
+      "source": "/api/symbol-list",
+      "destination": "/api/symbol-list.js"
+    },
+    {
+      "source": "/api/symbol-search",
+      "destination": "/api/symbol-search.js"
     }
   ],
   "functions": {
@@ -168,6 +176,12 @@
       "maxDuration": 15
     },
     "api/bist-quote.js": {
+      "maxDuration": 10
+    },
+    "api/symbol-list.js": {
+      "maxDuration": 15
+    },
+    "api/symbol-search.js": {
       "maxDuration": 10
     }
   }
