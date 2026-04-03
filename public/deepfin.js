@@ -1403,6 +1403,9 @@ function tblScroll(px){
 
 // Tüm seçili chip'lerin filtrelerini merge edip uygula
 function applyAllChips() {
+  // Goat/preset chip'leri hisse için — aktif değilse hisseyi seç
+  if (_activeAsset !== 'hisse') selectAsset('hisse');
+
   var merged = {};
   var specials = [];
 
