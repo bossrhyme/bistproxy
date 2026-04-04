@@ -92,12 +92,10 @@ const EXCHANGE_CONFIG = {
             extraFilters: [
               { left: 'exchange',   operation: 'equal', right: 'NASDAQ' },
               { left: 'is_primary', operation: 'equal', right: true },
-              { left: 'typespecs',  operation: 'has',   right: ['common'] },
             ] },
   sp500:  { tvPath: '/america/scan', yahooSuffix: '',    currency: 'USD',
             extraFilters: [
               { left: 'is_primary', operation: 'equal', right: true },
-              { left: 'typespecs',  operation: 'has',   right: ['common'] },
             ] },
   dax:    { tvPath: '/germany/scan', yahooSuffix: '.DE', currency: 'EUR',
             extraFilters: [
@@ -119,7 +117,6 @@ const EXCHANGE_CONFIG = {
             extraFilters: [
               { left: 'exchange',   operation: 'equal', right: 'NYSE' },
               { left: 'is_primary', operation: 'equal', right: true },
-              { left: 'typespecs',  operation: 'has',   right: ['common'] },
             ] },
 };
 

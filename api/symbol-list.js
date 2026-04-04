@@ -11,12 +11,10 @@ const EXCHANGE_CONFIG = {
             filters: [
               { left: 'exchange',   operation: 'equal', right: 'NASDAQ' },
               { left: 'is_primary', operation: 'equal', right: true },
-              { left: 'typespecs',  operation: 'has',   right: ['common'] },
             ]},
   sp500:  { tvPath: '/america/scan',
             filters: [
               { left: 'is_primary', operation: 'equal', right: true },
-              { left: 'typespecs',  operation: 'has',   right: ['common'] },
             ]},
   dax:    { tvPath: '/germany/scan',
             filters: [
@@ -38,7 +36,6 @@ const EXCHANGE_CONFIG = {
             filters: [
               { left: 'exchange',   operation: 'equal', right: 'NYSE' },
               { left: 'is_primary', operation: 'equal', right: true },
-              { left: 'typespecs',  operation: 'has',   right: ['common'] },
             ]},
 };
 
