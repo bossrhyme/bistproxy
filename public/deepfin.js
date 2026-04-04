@@ -369,15 +369,15 @@ function _fonSort(field) {
 function runKriptoScan() {
   var btn=document.querySelector('#sbp-kripto .sbp-scan-btn');
   if(btn){btn.textContent='⏳ Taranıyor...';btn.disabled=true;}
-  _showLoading('⏳ CoinGecko + TradingView verisi yükleniyor...');
+  _showLoading('⏳ CoinGecko · TradingView · DeFiLlama verisi yükleniyor...');
 
-  var params=new URLSearchParams({limit:'100',sort:'market_cap_desc'});
+  var params=new URLSearchParams({limit:'200',sort:'market_cap_desc'});
   var cat=document.querySelector('#sbp-kripto .chip.on[data-cat]');
   if(cat&&cat.dataset.cat) params.set('category',cat.dataset.cat);
   var pre=document.querySelector('#sbp-kripto .chip.on[data-preset]');
   if(pre&&pre.dataset.preset) params.set('preset',pre.dataset.preset);
 
-  var ids={min_mcap:'k_mcap_min',max_mcap:'k_mcap_max',min_vol24h:'k_vol_min',max_vol24h:'k_vol_max',min_chg24h:'k_chg24h_min',max_chg24h:'k_chg24h_max',min_rsi:'k_rsi_min',max_rsi:'k_rsi_max'};
+  var ids={min_mcap:'k_mcap_min',max_mcap:'k_mcap_max',min_vol24h:'k_vol_min',max_vol24h:'k_vol_max',min_chg24h:'k_chg24h_min',max_chg24h:'k_chg24h_max',min_rsi:'k_rsi_min',max_rsi:'k_rsi_max',min_tvl:'k_tvl_min',max_tvl:'k_tvl_max',max_mc_tvl:'k_mc_tvl_max'};
   Object.keys(ids).forEach(function(p){var el=document.getElementById(ids[p]);if(el&&el.value)params.set(p,el.value);});
 
   fetch('/api/kripto-scan?'+params)
@@ -418,8 +418,15 @@ function _renderKripto(coins, meta) {
   var fM=function(v){if(!v)return'—';if(v>=1e9)return'$'+(v/1e9).toFixed(1)+'B';if(v>=1e6)return'$'+(v/1e6).toFixed(0)+'M';return'$'+v.toFixed(0);};
   var fC=function(v){if(v==null)return'<span style="color:var(--muted2)">—</span>';return'<span style="color:'+(v>=0?'var(--green)':'var(--red)')+'">'+(v>=0?'+':'')+v.toFixed(1)+'%</span>';};
   var tvBadge=function(r){var map={STRONG_BUY:['var(--green)','G.AL'],BUY:['var(--green)','AL'],NEUTRAL:['var(--muted2)','NÖT'],SELL:['var(--red)','SAT'],STRONG_SELL:['var(--red)','G.SAT']};if(!r||!map[r])return'<span style="color:var(--muted2)">—</span>';return'<span style="color:'+map[r][0]+';font-size:9px;font-weight:700">'+map[r][1]+'</span>';};
+  var fTvl=function(tvl,mcTvl){
+    if(!tvl) return '<span style="color:var(--muted2)">—</span>';
+    var tvlTxt=tvl>=1e9?'$'+(tvl/1e9).toFixed(1)+'B':tvl>=1e6?'$'+(tvl/1e6).toFixed(0)+'M':'$'+tvl.toFixed(0);
+    var ratioTxt=mcTvl!=null?'<div style="font-size:9px;color:var(--muted2)">'+mcTvl.toFixed(1)+'x</div>':'';
+    return tvlTxt+ratioTxt;
+  };
   var note=(meta.sources&&meta.sources.note)||'';
   var truncName = function(n){ return n && n.length > 30 ? n.slice(0,30)+'...' : (n||''); };
+  var hasTvl = coins.some(function(c){ return c.tvl != null; });
   var rows=coins.map(function(c,i){
     var ver=c.verified?'<sup style="color:var(--green);font-size:8px">✓</sup>':'';
     var img=c.image?'<img src="'+c.image+'" width="14" height="14" style="border-radius:50%;vertical-align:middle;margin-right:3px" onerror="this.remove()">':'';
@@ -439,14 +446,17 @@ function _renderKripto(coins, meta) {
       +'<td class="tn muted">'+fM(c.volume24h)+'</td>'
       +'<td class="tn muted">'+(c.rsi14!=null?c.rsi14.toFixed(0):'—')+'</td>'
       +'<td class="tn">'+fC(c.athChange)+'</td>'
+      +(hasTvl?'<td class="tn muted">'+fTvl(c.tvl,c.mcTvl)+'</td>':'')
       +'<td class="tn">'+tvBadge(c.tvRating)+'</td>'
       +'</tr>';
   }).join('');
-  var hdr='<div class="res-hdr"><b>₿ Kripto</b><span class="res-cnt">'+coins.length+' coin</span>'+(note?'<span class="res-ok">'+note+'</span>':'')+'<span class="res-src">CoinGecko · TradingView</span></div>';
+  var srcLabel = hasTvl ? 'CoinGecko · TradingView · DeFiLlama' : 'CoinGecko · TradingView';
+  var hdr='<div class="res-hdr"><b>₿ Kripto</b><span class="res-cnt">'+coins.length+' coin</span>'+(note?'<span class="res-ok">'+note+'</span>':'')+'<span class="res-src">'+srcLabel+'</span></div>';
   var kCols=[
     {k:'price',l:'Fiyat'},{k:'change24h',l:'24s%'},{k:'change7d',l:'7G%'},{k:'change30d',l:'30G%'},
     {k:'mcap',l:'Piy.Değ.'},{k:'volume24h',l:'Hacim'},{k:'rsi14',l:'RSI'},{k:'athChange',l:'ATH%'}
   ];
+  if(hasTvl) kCols.push({k:'tvl',l:'TVL'});
   var kThSort=kCols.map(function(c){
     var active=sortSt.field===c.k;
     var arrow=active?(sortSt.dir==='desc'?' ↓':' ↑'):'';

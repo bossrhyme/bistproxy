@@ -754,6 +754,10 @@ if('serviceWorker' in navigator){
               <span class="chip" data-cat="meme-token"                     onclick="chipRadio(this)">Meme</span>
               <span class="chip" data-cat="artificial-intelligence"        onclick="chipRadio(this)">AI</span>
               <span class="chip" data-cat="gaming"                         onclick="chipRadio(this)">Gaming</span>
+              <span class="chip" data-cat="real-world-assets-rwa"          onclick="chipRadio(this)">RWA</span>
+              <span class="chip" data-cat="liquid-staking-tokens"          onclick="chipRadio(this)">Liquid Stake</span>
+              <span class="chip" data-cat="decentralized-exchange"         onclick="chipRadio(this)">DEX</span>
+              <span class="chip" data-cat="yield-aggregator"               onclick="chipRadio(this)">Yield</span>
             </div>
           </div>
           <div class="filter-group">
@@ -766,6 +770,8 @@ if('serviceWorker' in navigator){
               <span class="chip" data-preset="kucuk_cap_gem"   onclick="chipRadio(this)">Küçük Kapı Gem</span>
               <span class="chip" data-preset="momentum"        onclick="chipRadio(this)">Momentum</span>
               <span class="chip" data-preset="dusuk_arz"       onclick="chipRadio(this)">Düşük Arz</span>
+              <span class="chip" data-preset="defi_deger"      onclick="chipRadio(this)">DeFi Değer</span>
+              <span class="chip" data-preset="yeni_ath"        onclick="chipRadio(this)">ATH Kırıcı</span>
             </div>
           </div>
           <div class="filter-group">
@@ -776,6 +782,8 @@ if('serviceWorker' in navigator){
             <div class="frow"><div class="flbl">7G Değişim %</div><div class="finps"><input type="number" id="k_chg7d_min" placeholder="—"><input type="number" id="k_chg7d_max" placeholder="—"></div></div>
             <div class="frow"><div class="flbl">RSI (14)</div><div class="finps"><input type="number" id="k_rsi_min" placeholder="—"><input type="number" id="k_rsi_max" placeholder="—"></div></div>
             <div class="frow"><div class="flbl">ATH'dan Uzaklık %</div><div class="finps"><input type="number" id="k_ath_min" placeholder="—"><input type="number" id="k_ath_max" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">TVL ($M)</div><div class="finps"><input type="number" id="k_tvl_min" placeholder="—"><input type="number" id="k_tvl_max" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">MC/TVL max</div><div class="finps"><input type="number" id="k_mc_tvl_max" placeholder="—" style="width:100%"></div></div>
             <div class="frow"><div class="flbl">TV Sinyal</div><div class="finps" style="flex:1"><select id="k_tvrating" style="width:100%;background:var(--s2);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:4px 6px;font-size:11px"><option value="">Tümü</option><option value="STRONG_BUY">Güçlü Al</option><option value="BUY">Al</option><option value="NEUTRAL">Nötr</option><option value="SELL">Sat</option><option value="STRONG_SELL">Güçlü Sat</option></select></div></div>
           </div>
         </div><!-- /sbp-scroll kripto -->
