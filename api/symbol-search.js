@@ -8,12 +8,14 @@ const EX_MAP = {
   dax:    'XETR',
   lse:    'LSE',
   nikkei: 'TSE',
+  nyse:   'NYSE',
 };
 
 // sp500 ve nasdaq için market parametresi
 const MARKET_MAP = {
   sp500:  'america',
   nasdaq: 'america',
+  nyse:   'america',
 };
 
 const ALLOWED_ORIGINS = [

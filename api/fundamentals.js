@@ -4,10 +4,10 @@
 // type=financials|balance|cashflow → TV'den özet metrics (detaylı tablo mevcut değil)
 const https = require('https');
 
-const SUFFIX = { bist:'.IS', nasdaq:'', sp500:'', dax:'.DE', lse:'.L', nikkei:'.T' };
+const SUFFIX = { bist:'.IS', nasdaq:'', sp500:'', dax:'.DE', lse:'.L', nikkei:'.T', nyse:'' };
 const TV_PATHS = {
   bist:'/turkey/scan', nasdaq:'/america/scan', sp500:'/america/scan',
-  dax:'/germany/scan', lse:'/uk/scan', nikkei:'/japan/scan'
+  dax:'/germany/scan', lse:'/uk/scan', nikkei:'/japan/scan', nyse:'/america/scan'
 };
 
 const TV_FIELDS = [

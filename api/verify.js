@@ -4,7 +4,7 @@ const https = require('https');
 
 const TV_PATHS = {
   bist:'   /turkey/scan', nasdaq:'/america/scan', sp500:'/america/scan',
-  dax:'/germany/scan', lse:'/uk/scan', nikkei:'/japan/scan'
+  dax:'/germany/scan', lse:'/uk/scan', nikkei:'/japan/scan', nyse:'/america/scan'
 };
 
 const FIELDS = [

@@ -58,6 +58,7 @@ function getCacheTTL(exchange) {
     bist:   { open: 7,  close: 14 }, // 10:00-17:00 TRT
     nasdaq: { open: 14, close: 21 }, // 09:30-16:00 ET
     sp500:  { open: 14, close: 21 },
+    nyse:   { open: 14, close: 21 },
     dax:    { open: 8,  close: 16 }, // 09:00-17:30 CET
     lse:    { open: 8,  close: 16 }, // 08:00-16:30 BST
     nikkei: { open: 0,  close: 6  }, // 09:00-15:30 JST
@@ -111,6 +112,12 @@ const EXCHANGE_CONFIG = {
   nikkei: { tvPath: '/japan/scan',   yahooSuffix: '.T',  currency: 'JPY',
             extraFilters: [
               { left: 'exchange',   operation: 'equal', right: 'TSE' },
+              { left: 'is_primary', operation: 'equal', right: true },
+              { left: 'typespecs',  operation: 'has',   right: ['common'] },
+            ] },
+  nyse:   { tvPath: '/america/scan', yahooSuffix: '',    currency: 'USD',
+            extraFilters: [
+              { left: 'exchange',   operation: 'equal', right: 'NYSE' },
               { left: 'is_primary', operation: 'equal', right: true },
               { left: 'typespecs',  operation: 'has',   right: ['common'] },
             ] },

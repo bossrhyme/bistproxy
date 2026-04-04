@@ -34,6 +34,12 @@ const EXCHANGE_CONFIG = {
               { left: 'is_primary', operation: 'equal', right: true },
               { left: 'typespecs',  operation: 'has',   right: ['common'] },
             ]},
+  nyse:   { tvPath: '/america/scan',
+            filters: [
+              { left: 'exchange',   operation: 'equal', right: 'NYSE' },
+              { left: 'is_primary', operation: 'equal', right: true },
+              { left: 'typespecs',  operation: 'has',   right: ['common'] },
+            ]},
 };
 
 const ALLOWED_ORIGINS = [

@@ -20,6 +20,7 @@ const EXCHANGE_CONFIG = {
   dax:    { tvPath: '/germany/scan', currency: '€',  symbolSuffix: '' },
   lse:    { tvPath: '/uk/scan',      currency: 'p',  symbolSuffix: '' },
   nikkei: { tvPath: '/japan/scan',   currency: '¥',  symbolSuffix: '' },
+  nyse:   { tvPath: '/america/scan', currency: '$',  symbolSuffix: '' },
 };
 
 const ALLOWED_ORIGINS = [

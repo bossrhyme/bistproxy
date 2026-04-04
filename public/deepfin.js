@@ -43,7 +43,7 @@ var _ONB = {
   hisse: {
     big: 'HİSSE', sub: 'Binlerce hisse saniyeler içinde filtrelenir.',
     steps: [
-      {icon:'🌍', label:'Borsa Seç',      desc:'BIST, NASDAQ, S&P 500, DAX, LSE veya Nikkei'},
+      {icon:'🌍', label:'Borsa Seç',      desc:'BIST, NASDAQ, NYSE, S&P 500, DAX, LSE veya Nikkei'},
       {icon:'🐐', label:'Strateji Seç',   desc:'Buffett, Lynch, Graham veya özel filtreni kur'},
       {icon:'▶',  label:'TARA\'ya Bas',   desc:'Tüm hisseler saniyeler içinde taranır'},
       {icon:'🔎', label:'Hisseyi İncele', desc:'Tıkla — grafik, metrikler ve detaylı analiz'}
@@ -677,6 +677,7 @@ const EXCHANGE_META = {
   dax:    { name: 'DAX',     currency: '€',  currencyCode: 'EUR', flag: '🇩🇪', yahooSuffix: '.DE', filters: [] },
   lse:    { name: 'LSE',     currency: '£',  currencyCode: 'GBP', flag: '🇬🇧', yahooSuffix: '.L',  filters: [] },
   nikkei: { name: 'Nikkei',  currency: '¥',  currencyCode: 'JPY', flag: '🇯🇵', yahooSuffix: '.T',  filters: [] },
+  nyse:   { name: 'NYSE',   currency: '$',  currencyCode: 'USD', flag: '🇺🇸', yahooSuffix: '',    filters: [{ left: 'exchange', operation: 'equal', right: 'NYSE' }] },
 };
 
 let allData = [];
@@ -929,7 +930,8 @@ async function runScan(){
     sp500:  COLS_US,
     dax:    COLS_GLOBAL,
     lse:    COLS_GLOBAL,
-    nikkei: COLS_GLOBAL
+    nikkei: COLS_GLOBAL,
+    nyse:   COLS_US
   };
   const payload = {
     columns: COLUMNS_BY_EXCHANGE[currentExchange] || COLUMNS_BY_EXCHANGE.default,
@@ -2788,7 +2790,7 @@ function showFooterModal(type) {
   };
   var contents = {
     about: `<p><strong style="color:var(--text)">DeepFin</strong>, Türkiye ve küresel piyasalarda yatırım yapan bireysel yatırımcılar için geliştirilmiş profesyonel bir hisse tarama ve finansal analiz platformudur.</p>
-<p>Platform; BIST, NASDAQ, S&P 500, DAX, LSE ve Nikkei borsalarındaki binlerce hisseyi gerçek zamanlı verilerle tarayarak, Warren Buffett, Benjamin Graham, Peter Lynch, Mark Minervini gibi efsanevi yatırımcıların stratejilerini otomatik olarak uygular.</p>
+<p>Platform; BIST, NASDAQ, NYSE, S&P 500, DAX, LSE ve Nikkei borsalarındaki binlerce hisseyi gerçek zamanlı verilerle tarayarak, Warren Buffett, Benjamin Graham, Peter Lynch, Mark Minervini gibi efsanevi yatırımcıların stratejilerini otomatik olarak uygular.</p>
 <p>DeepFin, karmaşık finansal analizleri herkesin kolayca kullanabileceği bir arayüze dönüştürmeyi hedefler. Kurumsal yatırımcıların kullandığı araçları bireysel yatırımcıya ulaştırmak temel amacımızdır.</p>
 <p style="color:var(--muted2);font-size:11px;margin-top:16px;">Geliştirici iletişim için destek butonunu kullanabilirsiniz.</p>`,
 
@@ -3109,7 +3111,7 @@ function updateExchangeBadge() {}
 // ── TARAMA SÜRESİ TAHMİNİ ──
 let scanStartTime = null;
 let scanEtaTimer  = null;
-const EXCHANGE_ETA = { bist:4, nasdaq:6, sp500:6, dax:5, lse:5, nikkei:5 }; // saniye
+const EXCHANGE_ETA = { bist:4, nasdaq:6, sp500:6, dax:5, lse:5, nikkei:5, nyse:6 }; // saniye
 
 function startScanEta(exchange) {
   const total = EXCHANGE_ETA[exchange] || 5;

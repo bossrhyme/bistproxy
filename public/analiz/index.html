@@ -87,6 +87,9 @@ if('serviceWorker' in navigator){
     <div class="ex-chip" data-ex="nasdaq" data-flag="us" data-label="NASDAQ" onclick="setEx(this)">
       <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjQjIyMjM0Ii8+PHJlY3QgeT0iMS41NCIgd2lkdGg9IjMwIiBoZWlnaHQ9IjEuNTQiIGZpbGw9IiNmZmYiLz48cmVjdCB5PSI0LjYyIiB3aWR0aD0iMzAiIGhlaWdodD0iMS41NCIgZmlsbD0iI2ZmZiIvPjxyZWN0IHk9IjcuNjkiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTAuNzciIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTMuODUiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTYuOTIiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3Qgd2lkdGg9IjEyIiBoZWlnaHQ9IjEwLjc3IiBmaWxsPSIjM0MzQjZFIi8+PC9zdmc+" width="16" height="11">NASDAQ
     </div>
+    <div class="ex-chip" data-ex="nyse" data-flag="us" data-label="NYSE" onclick="setEx(this)">
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjQjIyMjM0Ii8+PHJlY3QgeT0iMS41NCIgd2lkdGg9IjMwIiBoZWlnaHQ9IjEuNTQiIGZpbGw9IiNmZmYiLz48cmVjdCB5PSI0LjYyIiB3aWR0aD0iMzAiIGhlaWdodD0iMS41NCIgZmlsbD0iI2ZmZiIvPjxyZWN0IHk9IjcuNjkiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTAuNzciIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTMuODUiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTYuOTIiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3Qgd2lkdGg9IjEyIiBoZWlnaHQ9IjEwLjc3IiBmaWxsPSIjM0MzQjZFIi8+PC9zdmc+" width="16" height="11">NYSE
+    </div>
     <div class="ex-chip" data-ex="sp500" data-flag="us" data-label="S&amp;P 500" onclick="setEx(this)">
       <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjQjIyMjM0Ii8+PHJlY3QgeT0iMS41NCIgd2lkdGg9IjMwIiBoZWlnaHQ9IjEuNTQiIGZpbGw9IiNmZmYiLz48cmVjdCB5PSI0LjYyIiB3aWR0aD0iMzAiIGhlaWdodD0iMS41NCIgZmlsbD0iI2ZmZiIvPjxyZWN0IHk9IjcuNjkiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTAuNzciIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTMuODUiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3QgeT0iMTYuOTIiIHdpZHRoPSIzMCIgaGVpZ2h0PSIxLjU0IiBmaWxsPSIjZmZmIi8+PHJlY3Qgd2lkdGg9IjEyIiBoZWlnaHQ9IjEwLjc3IiBmaWxsPSIjM0MzQjZFIi8+PC9zdmc+" width="16" height="11">S&amp;P 500
     </div>
@@ -112,6 +115,8 @@ if('serviceWorker' in navigator){
       <div class="pop-chip" onclick="goSym('NVDA','nasdaq')">NVDA</div>
       <div class="pop-chip" onclick="goSym('MSFT','nasdaq')">MSFT</div>
       <div class="pop-chip" onclick="goSym('TSLA','nasdaq')">TSLA</div>
+      <div class="pop-chip" onclick="goSym('JPM','nyse')">JPM</div>
+      <div class="pop-chip" onclick="goSym('KO','nyse')">KO</div>
     </div>
   </div>
 </div>
