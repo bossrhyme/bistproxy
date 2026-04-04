@@ -1,5 +1,5 @@
-// DeepFin Service Worker v5 - analiz.js cache-bust
-const CACHE = 'deepfin-v6';
+// DeepFin Service Worker v6 - prf.js cache-bust
+const CACHE = 'deepfin-v7';
 
 // Install: hızlı geç
 self.addEventListener('install', function(e) {

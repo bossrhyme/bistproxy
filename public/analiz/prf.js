@@ -527,7 +527,7 @@ function _buildPrfHero() {
   var mcTxt = '—';
   if (mc) {
     if (_prfEx === 'bist') {
-      var mcUsd = (mc * 1e6) / (_fxRates.TRY || 38.5);
+      var mcUsd = (mc * 1e6) / (_fxRates.TRY || 44.6);
       mcTxt = '₺ ' + _fmtN(mc*1e6) + ' / $' + _fmtN(mcUsd);
     } else {
       var exMetaMc = EXCHANGE_META[_prfEx] || EXCHANGE_META.bist;
