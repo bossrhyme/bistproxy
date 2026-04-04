@@ -29,12 +29,6 @@ self.addEventListener('fetch', function(e) {
     return; // pass-through, SW müdahil olmuyor
   }
 
-  // Eski analiz.js sürümü: HTTP cache'i bypass et (immutable flag sorunu)
-  if (url.pathname === '/analiz/analiz.js' && url.search === '?v=1191933') {
-    e.respondWith(fetch(e.request, { cache: 'reload' }));
-    return;
-  }
-
   // /api/ istekleri: Network First (veri güncel kalsın)
   if (url.pathname.startsWith('/api/')) {
     e.respondWith(

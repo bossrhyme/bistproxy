@@ -58,8 +58,10 @@ function showDd(items) {
 }
 
 function hideDd() {
-  document.getElementById('dd-list').classList.remove('open');
-  document.getElementById('search-card').classList.remove('open');
+  var dd   = document.getElementById('dd-list');
+  var card = document.getElementById('search-card');
+  if (dd)   dd.classList.remove('open');
+  if (card) card.classList.remove('open');
 }
 
 function esc(s) {

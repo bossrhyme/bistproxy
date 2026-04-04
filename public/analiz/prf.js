@@ -57,7 +57,6 @@ function loadTVWidget(sym, ex) {
           return { time:c.t, open:c.o, high:c.h, low:c.l, close:c.c };
         }).filter(function(c){ return c.open != null && c.close != null; });
         if(!candles.length) return;
-        console.log('[DeepFin] Chart data loaded:', candles.length, 'candles');
         series.setData(candles);
         chart.timeScale().fitContent();
         // Resize - birkaç kez dene
@@ -76,7 +75,6 @@ function loadTVWidget(sym, ex) {
 
     var ld = document.getElementById('prf-live-dot');
     if(ld) ld.style.display = 'flex';
-    console.log('[DeepFin] Chart created. Container:', chartEl ? chartEl.offsetWidth+'x'+chartEl.offsetHeight : 'null');
   }
 
   // LC yüklü mü kontrol et, değilse bekle
@@ -402,6 +400,7 @@ var EXCHANGE_META = {
   dax:    { name: 'DAX',     currency: '€',  currencyCode: 'EUR', yahooSuffix: '.DE', flag: '🇩🇪', tvUrl: 'https://scanner.tradingview.com/germany/scan', filters: [] },
   lse:    { name: 'LSE',     currency: '£',  currencyCode: 'GBP', yahooSuffix: '.L',  flag: '🇬🇧', tvUrl: 'https://scanner.tradingview.com/uk/scan',      filters: [] },
   nikkei: { name: 'Nikkei',  currency: '¥',  currencyCode: 'JPY', yahooSuffix: '.T',  flag: '🇯🇵', tvUrl: 'https://scanner.tradingview.com/japan/scan',   filters: [] },
+  nyse:   { name: 'NYSE',   currency: '$',  currencyCode: 'USD', yahooSuffix: '',    flag: '🇺🇸', tvUrl: 'https://scanner.tradingview.com/america/scan', filters: [{ left: 'exchange', operation: 'equal', right: 'NYSE' }] },
 };
 
 var allData = [];
