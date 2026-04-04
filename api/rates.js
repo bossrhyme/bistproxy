@@ -1,11 +1,11 @@
 // api/rates.js — Döviz kuru proxy
-// Primary: TCMB günlük kapanış kuru (today.xml)
-// Fallback: exchangerate-api.com
+// Primary: Google Finance HTML scrape (USD-TRY gerçek zamanlı)
+// Fallback: open.er-api.com
 const https = require('https');
 
 let _cache = null;
 let _cacheAt = 0;
-const CACHE_MS = 24 * 60 * 60 * 1000; // 24 saat — TCMB günlük yayınlar
+const CACHE_MS = 60 * 60 * 1000; // 1 saat
 
 const ALLOWED_ORIGINS = [
   'https://deepfin.vercel.app',
@@ -13,65 +13,57 @@ const ALLOWED_ORIGINS = [
   'https://www.deepfin.com',
 ];
 
-function fetchRaw(hostname, path) {
+function fetchRaw(hostname, path, extraHeaders) {
   return new Promise((resolve, reject) => {
+    const headers = Object.assign({
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      'Accept-Language': 'en-US,en;q=0.9',
+    }, extraHeaders || {});
     const req = https.request(
-      { hostname, path, method: 'GET', headers: { 'User-Agent': 'Mozilla/5.0', Accept: '*/*' } },
+      { hostname, path, method: 'GET', headers },
       (res) => {
         let data = '';
         res.on('data', c => data += c);
         res.on('end', () => resolve(data));
       }
     );
-    req.setTimeout(8000, () => { req.destroy(); reject(new Error('timeout')); });
+    req.setTimeout(10000, () => { req.destroy(); reject(new Error('timeout')); });
     req.on('error', reject);
     req.end();
   });
 }
 
-// TCMB today.xml'den USD/TRY ve diğer kurları çek
-async function fetchTcmb() {
-  const xml = await fetchRaw('www.tcmb.gov.tr', '/kurlar/today.xml');
+// Google Finance HTML scrape — USD/TRY gerçek zamanlı kur
+async function fetchGoogle() {
+  const html = await fetchRaw('www.google.com', '/finance/quote/USD-TRY');
 
-  function extractRate(code) {
-    // <Currency ... CurrencyCode="USD"> ... <ForexSelling>38.7</ForexSelling>
-    const re = new RegExp(
-      'CurrencyCode="' + code + '"[\\s\\S]*?<ForexSelling>([\\d.]+)<\\/ForexSelling>'
-    );
-    const m = xml.match(re);
-    return m ? parseFloat(m[1]) : null;
-  }
+  // Yöntem 1: <div class="YMlKec fxKbKc">38.75</div>
+  let m = html.match(/class="YMlKec fxKbKc">([0-9,\.]+)</);
+  // Yöntem 2: JSON blob içinde fiyat
+  if (!m) m = html.match(/"USD-TRY"[^}]*?"([0-9]{2,3}[.,][0-9]+)"/);
+  // Yöntem 3: data-last-price attribute
+  if (!m) m = html.match(/data-last-price="([0-9\.]+)"/);
+  // Yöntem 4: genel sayı pattern (USD-TRY sayfasında büyük rakam = kur)
+  if (!m) m = html.match(/\b([3-9][0-9]\.[0-9]{2,4})\b/);
 
-  const usd = extractRate('USD');
-  const eur = extractRate('EUR');
-  const gbp = extractRate('GBP');
-  const jpy = extractRate('JPY');
-
-  if (!usd) throw new Error('TCMB parse failed');
-
-  // rates.js TRY değeri = 1 USD kaç TRY
-  // TCMB ForexSelling: 1 USD = X TRY → doğrudan kullanılabilir
-  return {
-    TRY: usd,                              // 1 USD = X TRY
-    EUR: eur ? usd / eur : 1.08,          // 1 EUR = X/Y TRY → prf.js EUR/USD için
-    GBP: gbp ? usd / gbp : 1.27,
-    JPY: jpy ? jpy / usd : 0.0067,       // 1 JPY = X TRY → ters çevir için
-    source: 'tcmb',
-  };
+  const price = m ? parseFloat(m[1].replace(',', '.')) : null;
+  if (!price || price < 10 || price > 500) throw new Error('Google parse failed: ' + price);
+  return { TRY: price, source: 'google' };
 }
 
-// Fallback: exchangerate-api.com (USD bazlı, TRY/USD = rates.TRY)
-async function fetchExchangeRateApi() {
-  const raw = await fetchRaw('api.exchangerate-api.com', '/v4/latest/USD');
+// Fallback: open.er-api.com — USD bazlı tüm kurlar
+async function fetchOpenEr() {
+  const raw = await fetchRaw('open.er-api.com', '/v6/latest/USD', { Accept: 'application/json' });
   const json = JSON.parse(raw);
-  const r = json.rates || {};
-  if (!r.TRY) throw new Error('exchangerate-api parse failed');
+  if (!json.rates || !json.rates.TRY) throw new Error('open.er-api parse failed');
+  const r = json.rates;
   return {
     TRY: r.TRY,
     EUR: r.EUR || 0.920,
     GBP: r.GBP || 0.790,
     JPY: r.JPY || 150.0,
-    source: 'exchangerate-api',
+    source: 'open.er-api',
   };
 }
 
@@ -85,30 +77,34 @@ module.exports = async function(req, res) {
 
   // Cache geçerli mi?
   if (_cache && (Date.now() - _cacheAt) < CACHE_MS) {
-    res.setHeader('Cache-Control', 'public, max-age=3600'); // client 1 saat cache'lesin
+    res.setHeader('Cache-Control', 'public, max-age=1800');
     return res.status(200).json(_cache);
   }
 
+  let rates = null;
+
+  // 1. Google Finance
   try {
-    // 1. TCMB dene
-    const rates = await fetchTcmb();
-    _cache = rates;
-    _cacheAt = Date.now();
-    res.setHeader('Cache-Control', 'public, max-age=3600');
-    return res.status(200).json(rates);
-  } catch (e1) {
+    const g = await fetchGoogle();
+    // Google sadece TRY veriyor, diğerleri için fallback'ten tamamla
     try {
-      // 2. Fallback: exchangerate-api
-      const rates = await fetchExchangeRateApi();
-      _cache = rates;
-      _cacheAt = Date.now();
-      res.setHeader('Cache-Control', 'public, max-age=3600');
-      return res.status(200).json(rates);
+      const er = await fetchOpenEr();
+      rates = { TRY: g.TRY, EUR: er.EUR, GBP: er.GBP, JPY: er.JPY, source: 'google' };
+    } catch(_) {
+      rates = { TRY: g.TRY, EUR: 0.920, GBP: 0.790, JPY: 150.0, source: 'google' };
+    }
+  } catch (e1) {
+    // 2. open.er-api
+    try {
+      rates = await fetchOpenEr();
     } catch (e2) {
-      // 3. Son fallback sabit değerler
-      const fallback = { TRY: 38.5, EUR: 0.920, GBP: 0.790, JPY: 150.0, source: 'fallback' };
-      res.setHeader('Cache-Control', 'no-cache');
-      return res.status(200).json(fallback);
+      // 3. Sabit fallback
+      rates = { TRY: 38.0, EUR: 0.920, GBP: 0.790, JPY: 150.0, source: 'fallback' };
     }
   }
+
+  _cache = rates;
+  _cacheAt = Date.now();
+  res.setHeader('Cache-Control', 'public, max-age=1800');
+  return res.status(200).json(rates);
 };

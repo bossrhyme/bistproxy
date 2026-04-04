@@ -411,7 +411,7 @@ var _prfData = null;
 var _prfAiDone = false;
 var _sectorAvg = null;
 var _urlParams = new URLSearchParams(window.location.search);
-var _fxRates = { TRY: 38.5, EUR: 0.920, GBP: 0.790, JPY: 150.0 }; // fallback, sayfa yüklenince güncellenir
+var _fxRates = { TRY: 38.0, EUR: 0.920, GBP: 0.790, JPY: 150.0 }; // fallback, sayfa yüklenince /api/rates ile güncellenir
 fetch('/api/rates').then(function(r){ return r.json(); }).then(function(d){ if(d && d.TRY) _fxRates = d; }).catch(function(){});
 
 function _fmtN(v) {
