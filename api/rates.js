@@ -99,7 +99,7 @@ module.exports = async function(req, res) {
       rates = await fetchOpenEr();
     } catch (e2) {
       // 3. Sabit fallback
-      rates = { TRY: 38.0, EUR: 0.920, GBP: 0.790, JPY: 150.0, source: 'fallback' };
+      rates = { TRY: 44.6, EUR: 0.920, GBP: 0.790, JPY: 150.0, source: 'fallback' };
     }
   }
 
