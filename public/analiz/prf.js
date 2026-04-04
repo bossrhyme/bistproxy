@@ -411,6 +411,8 @@ var _prfData = null;
 var _prfAiDone = false;
 var _sectorAvg = null;
 var _urlParams = new URLSearchParams(window.location.search);
+var _fxRates = { TRY: 38.5, EUR: 0.920, GBP: 0.790, JPY: 150.0 }; // fallback, sayfa yüklenince güncellenir
+fetch('/api/rates').then(function(r){ return r.json(); }).then(function(d){ if(d && d.TRY) _fxRates = d; }).catch(function(){});
 
 function _fmtN(v) {
   if(!v || isNaN(v)) return '—';
@@ -522,7 +524,17 @@ function _buildPrfHero() {
   _setScore('prf-sc-peg', peg ? peg.toFixed(2) : '—', peg&&peg<1?'g':peg&&peg<2?'m':'b');
   _setScore('prf-sc-fk',  pe  ? pe.toFixed(1)+'x' : '—', pe&&pe<15?'g':pe&&pe<25?'m':'b');
   _setScore('prf-sc-roe', roe ? (roe*100).toFixed(1)+'%' : '—', roe&&roe*100>15?'g':roe&&roe*100>8?'m':'b');
-  _setScore('prf-sc-mc',  mc  ? _fmtN(mc*1e6) : '—', '');
+  var mcTxt = '—';
+  if (mc) {
+    if (_prfEx === 'bist') {
+      var mcUsd = (mc * 1e6) / (_fxRates.TRY || 38.5);
+      mcTxt = '₺ ' + _fmtN(mc*1e6) + ' / $' + _fmtN(mcUsd);
+    } else {
+      var exMetaMc = EXCHANGE_META[_prfEx] || EXCHANGE_META.bist;
+      mcTxt = exMetaMc.currency + ' ' + _fmtN(mc*1e6);
+    }
+  }
+  _setScore('prf-sc-mc', mcTxt, '');
 
   if(d.sector) document.getElementById('prf-sector-tag').textContent = d.sector;
   if(d.name)   document.getElementById('prf-fullname').textContent   = d.name;
