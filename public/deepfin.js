@@ -262,13 +262,28 @@ function runFonScan() {
 
   var params = new URLSearchParams({ fontur: 'YAT', sort: 'ret1y', limit: '500' });
   var sc = document.querySelector('#sbp-fon .chip.on[data-preset]');
-  if (sc) params.set('sort', sc.dataset.preset);
+  if (sc) {
+    var pv = sc.dataset.preset;
+    var sortFields = ['retYtd','ret1m','ret3m','sharpe','volatility','ret7d','ret1y','totalValueM','investors','price'];
+    if (sortFields.includes(pv)) { params.set('sort', pv); }
+    else                         { params.set('preset', pv); }
+  }
 
   var get = function(id){ var el=document.getElementById(id); return el&&el.value?el.value:''; };
-  if (get('fon_ret1y_min'))  params.set('min_ret1y',  get('fon_ret1y_min'));
-  if (get('fon_ret1y_max'))  params.set('max_ret1y',  get('fon_ret1y_max'));
-  if (get('fon_sharpe_min')) params.set('min_sharpe', get('fon_sharpe_min'));
-  if (get('fon_size_min'))   params.set('min_size',   get('fon_size_min'));
+  if (get('fon_ret1y_min'))    params.set('min_ret1y',   get('fon_ret1y_min'));
+  if (get('fon_ret1y_max'))    params.set('max_ret1y',   get('fon_ret1y_max'));
+  if (get('fon_sharpe_min'))   params.set('min_sharpe',  get('fon_sharpe_min'));
+  if (get('fon_sharpe_max'))   params.set('max_sharpe',  get('fon_sharpe_max'));
+  if (get('fon_size_min'))     params.set('min_size',    get('fon_size_min'));
+  if (get('fon_size_max'))     params.set('max_size',    get('fon_size_max'));
+  if (get('fon_7g_min'))       params.set('min_7g',      get('fon_7g_min'));
+  if (get('fon_7g_max'))       params.set('max_7g',      get('fon_7g_max'));
+  if (get('fon_1m_min'))       params.set('min_1m',      get('fon_1m_min'));
+  if (get('fon_1m_max'))       params.set('max_1m',      get('fon_1m_max'));
+  if (get('fon_price_min'))    params.set('min_price',   get('fon_price_min'));
+  if (get('fon_price_max'))    params.set('max_price',   get('fon_price_max'));
+  if (get('fon_pay_min'))      params.set('min_paycount',get('fon_pay_min'));
+  if (get('fon_pay_max'))      params.set('max_paycount',get('fon_pay_max'));
 
   fetch('/api/fon-scan?' + params)
     .then(function(r){ return r.text(); })
@@ -293,6 +308,13 @@ function runFonScan() {
       if(max3m!=null)  funds=funds.filter(function(f){ return f.ret3m!=null&&f.ret3m<=max3m; });
       if(minInv!=null) funds=funds.filter(function(f){ return f.investors>=minInv; });
       if(maxInv!=null) funds=funds.filter(function(f){ return f.investors<=maxInv; });
+      // Ek client-side filtreler
+      var min1m=v('fon_1m_min'), max1m=v('fon_1m_max');
+      var min7g=v('fon_7g_min'), max7g=v('fon_7g_max');
+      if(min1m!=null) funds=funds.filter(function(f){ return f.ret1m!=null&&f.ret1m>=min1m; });
+      if(max1m!=null) funds=funds.filter(function(f){ return f.ret1m!=null&&f.ret1m<=max1m; });
+      if(min7g!=null) funds=funds.filter(function(f){ return f.ret7d!=null&&f.ret7d>=min7g; });
+      if(max7g!=null) funds=funds.filter(function(f){ return f.ret7d!=null&&f.ret7d<=max7g; });
       _fonData = funds;
       _fonMeta = d;
       _fonTicker = funds.slice(0, 20);
@@ -316,6 +338,14 @@ function _renderFon(funds, meta) {
     if(v==null) return '<span style="color:var(--muted2)">—</span>';
     return '<span style="color:'+(v>=0?'var(--green)':'var(--red)')+'">'+(v>=0?'+':'')+v.toFixed(1)+'%</span>';
   };
+  var fPay=function(v){ if(!v||v<=0) return '—'; if(v>=1e9) return (v/1e9).toFixed(1)+'B'; if(v>=1e6) return (v/1e6).toFixed(0)+'M'; if(v>=1e3) return (v/1e3).toFixed(0)+'K'; return v; };
+  var CAT_LABEL = { YAT:'Hisse', BOR:'Borçl.', PMI:'Para Piy.', KAR:'Karma', ALT:'Altın', DÖV:'Döviz', SRB:'Serbest', GGF:'G.Giriş' };
+  var catBadge = function(cat) {
+    if(!cat) return '';
+    var code = (cat.match(/\(([^)]+)\)/) || [])[1] || cat;
+    var label = CAT_LABEL[code] || code.slice(0,6);
+    return '<span style="font-size:9px;padding:1px 4px;border-radius:3px;background:var(--s3);color:var(--muted2);margin-left:4px">'+label+'</span>';
+  };
   var truncName = function(n){ return n && n.length > 42 ? n.slice(0,42)+'...' : (n||''); };
   var rows=funds.map(function(f,i){
     var ver=f.verified?'<sup style="color:var(--green);font-size:8px">✓</sup>':'';
@@ -324,10 +354,11 @@ function _renderFon(funds, meta) {
       +'<td class="nfav" onclick="event.stopPropagation();toggleFonFav(\''+f.code+'\')" title="'+(isFav?'Favorilerden çıkar':'Favorilere ekle')+'"><span class="fav-icon'+(isFav?' fav-on':'')+'">★</span></td>'
       +'<td style="padding:7px 6px;white-space:nowrap">'
         +'<span class="row-num">'+(i+1)+'</span>'
-        +'<span class="sym-wrap"><span class="row-arrow">›</span><span class="sym">'+f.code+'</span>'+ver+'</span>'
+        +'<span class="sym-wrap"><span class="row-arrow">›</span><span class="sym">'+f.code+'</span>'+ver+catBadge(f.category)+'</span>'
         +'<div class="tsub" title="'+f.name+'">'+truncName(f.name)+'</div>'
       +'</td>'
       +'<td class="tn">₺'+(f.price||0).toFixed(4)+'</td>'
+      +'<td class="tn">'+fR(f.ret7d)+'</td>'
       +'<td class="tn">'+fR(f.retYtd)+'</td>'
       +'<td class="tn">'+fR(f.ret1m)+'</td>'
       +'<td class="tn">'+fR(f.ret3m)+'</td>'
@@ -335,12 +366,13 @@ function _renderFon(funds, meta) {
       +'<td class="tn">'+(f.sharpe!=null?f.sharpe.toFixed(2):'—')+'</td>'
       +'<td class="tn muted">₺'+(f.totalValueM||0).toFixed(0)+'M</td>'
       +'<td class="tn muted">'+(f.investors?f.investors.toLocaleString('tr-TR'):'—')+'</td>'
+      +'<td class="tn muted">'+fPay(f.paycount)+'</td>'
       +'</tr>';
   }).join('');
   var hdr='<div class="res-hdr"><b>TEFAS Fon</b><span class="res-cnt">'+funds.length+' fon</span></div>';
   var sortCols = [
-    {k:'price',l:'Fiyat'},{k:'retYtd',l:'YTD%'},{k:'ret1m',l:'1A%'},{k:'ret3m',l:'3A%'},
-    {k:'ret1y',l:'1Y%'},{k:'sharpe',l:'Sharpe'},{k:'totalValueM',l:'Büyüklük'},{k:'investors',l:'Yatırımcı'}
+    {k:'price',l:'Fiyat'},{k:'ret7d',l:'7G%'},{k:'retYtd',l:'YTD%'},{k:'ret1m',l:'1A%'},{k:'ret3m',l:'3A%'},
+    {k:'ret1y',l:'1Y%'},{k:'sharpe',l:'Sharpe'},{k:'totalValueM',l:'Büyüklük'},{k:'investors',l:'Yatırımcı'},{k:'paycount',l:'Pay Sayısı'}
   ];
   var thSort = sortCols.map(function(c){
     var active = sortSt.field===c.k;

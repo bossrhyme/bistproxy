@@ -719,21 +719,28 @@ if('serviceWorker' in navigator){
           <div class="filter-group">
             <div class="filter-group-title">Strateji</div>
             <div class="chips">
-              <span class="chip" data-preset="retYtd"  onclick="chipRadio(this)">YTD Lider</span>
-              <span class="chip" data-preset="ret1m"   onclick="chipRadio(this)">1A Lider</span>
-              <span class="chip" data-preset="ret3m"   onclick="chipRadio(this)">3A Lider</span>
-              <span class="chip" data-preset="sharpe"  onclick="chipRadio(this)">Sharpe Yüksek</span>
-              <span class="chip" data-preset="volatility" onclick="chipRadio(this)">Düşük Volatilite</span>
+              <span class="chip" data-preset="retYtd"         onclick="chipRadio(this)">YTD Lider</span>
+              <span class="chip" data-preset="ret1m"          onclick="chipRadio(this)">1A Lider</span>
+              <span class="chip" data-preset="ret3m"          onclick="chipRadio(this)">3A Lider</span>
+              <span class="chip" data-preset="sharpe"         onclick="chipRadio(this)">Sharpe Yüksek</span>
+              <span class="chip" data-preset="volatility"     onclick="chipRadio(this)">Düşük Volatilite</span>
+              <span class="chip" data-preset="hizli_yukselis" onclick="chipRadio(this)">Hızlı Yükseliş</span>
+              <span class="chip" data-preset="istikrarli"     onclick="chipRadio(this)">İstikrarlı Büyüme</span>
+              <span class="chip" data-preset="buyuk_guvenli"  onclick="chipRadio(this)">Büyük &amp; Güvenli</span>
             </div>
           </div>
           <div class="filter-group">
             <div class="filter-group-title">Filtreler</div>
+            <div class="frow"><div class="flbl">7G Getiri %</div><div class="finps"><input type="number" id="fon_7g_min" placeholder="—"><input type="number" id="fon_7g_max" placeholder="—"></div></div>
             <div class="frow"><div class="flbl">YTD Getiri %</div><div class="finps"><input type="number" id="fon_retYtd_min" placeholder="—"><input type="number" id="fon_retYtd_max" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">1A Getiri %</div><div class="finps"><input type="number" id="fon_1m_min" placeholder="—"><input type="number" id="fon_1m_max" placeholder="—"></div></div>
             <div class="frow"><div class="flbl">1Y Getiri %</div><div class="finps"><input type="number" id="fon_ret1y_min" placeholder="—"><input type="number" id="fon_ret1y_max" placeholder="—"></div></div>
             <div class="frow"><div class="flbl">3A Getiri %</div><div class="finps"><input type="number" id="fon_ret3m_min" placeholder="—"><input type="number" id="fon_ret3m_max" placeholder="—"></div></div>
             <div class="frow"><div class="flbl">Sharpe Oranı</div><div class="finps"><input type="number" id="fon_sharpe_min" placeholder="—"><input type="number" id="fon_sharpe_max" placeholder="—"></div></div>
             <div class="frow"><div class="flbl">Büyüklük (₺M)</div><div class="finps"><input type="number" id="fon_size_min" placeholder="—"><input type="number" id="fon_size_max" placeholder="—"></div></div>
             <div class="frow"><div class="flbl">Yatırımcı Sayısı</div><div class="finps"><input type="number" id="fon_inv_min" placeholder="—"><input type="number" id="fon_inv_max" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">Fiyat (₺)</div><div class="finps"><input type="number" id="fon_price_min" placeholder="—"><input type="number" id="fon_price_max" placeholder="—"></div></div>
+            <div class="frow"><div class="flbl">Pay Sayısı</div><div class="finps"><input type="number" id="fon_pay_min" placeholder="—"><input type="number" id="fon_pay_max" placeholder="—"></div></div>
           </div>
         </div><!-- /sbp-scroll fon -->
         <div class="ad-slot ad-slot-sidebar" id="ad-fon-scan"><span>Reklam</span><span class="ad-slot-label">300×120 · AdSense</span></div>

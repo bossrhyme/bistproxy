@@ -138,14 +138,36 @@ module.exports = async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
+  const PRESETS = {
+    hizli_yukselis: { sort: 'ret7d' },
+    istikrarli:     { sort: 'sharpe',      minSharpe: 1,   minRet1y: 30 },
+    buyuk_guvenli:  { sort: 'totalValueM', minSize: 500,   minSharpe: 0.8 },
+  };
+
   const q       = new URL(req.url, 'https://x').searchParams;
   const fonTur  = q.get('fontur') || 'YAT';
-  const sortBy  = q.get('sort')   || 'ret1y';
+  const preset  = q.get('preset') || '';
+  const pf      = PRESETS[preset] || {};
+  const sortBy  = pf.sort || q.get('sort') || 'ret1y';
   const limit   = Math.min(parseInt(q.get('limit') || '500'), 1000);
-  const minSize = parseFloat(q.get('min_size') || '0');
+  const minSize = pf.minSize  || parseFloat(q.get('min_size')  || '0');
+  const filters = {
+    minSharpe:    pf.minSharpe  || (q.get('min_sharpe')    ? parseFloat(q.get('min_sharpe'))    : null),
+    maxSharpe:                     q.get('max_sharpe')    ? parseFloat(q.get('max_sharpe'))    : null,
+    minRet1y:     pf.minRet1y   || (q.get('min_ret1y')     ? parseFloat(q.get('min_ret1y'))     : null),
+    maxRet1y:                      q.get('max_ret1y')     ? parseFloat(q.get('max_ret1y'))     : null,
+    minRet7d:                      q.get('min_7g')        ? parseFloat(q.get('min_7g'))        : null,
+    maxRet7d:                      q.get('max_7g')        ? parseFloat(q.get('max_7g'))        : null,
+    minRet1m:                      q.get('min_1m')        ? parseFloat(q.get('min_1m'))        : null,
+    maxRet1m:                      q.get('max_1m')        ? parseFloat(q.get('max_1m'))        : null,
+    minPrice:                      q.get('min_price')     ? parseFloat(q.get('min_price'))     : null,
+    maxPrice:                      q.get('max_price')     ? parseFloat(q.get('max_price'))     : null,
+    minPaycount:                   q.get('min_paycount')  ? parseFloat(q.get('min_paycount'))  : null,
+    maxPaycount:                   q.get('max_paycount')  ? parseFloat(q.get('max_paycount'))  : null,
+  };
 
   // KV Cache
-  const cacheKey = `df_fon_v8_${fonTur}_${limit}`;
+  const cacheKey = `df_fon_v9_${fonTur}_${preset}_${sortBy}_${limit}_${JSON.stringify(filters)}`;
   if (kvEnabled()) {
     const hit = await kvGet(cacheKey);
     if (hit) { res.setHeader('X-Cache','HIT'); return res.status(200).end(JSON.stringify(hit)); }
@@ -210,6 +232,7 @@ module.exports = async function handler(req, res) {
         category:    info.FONTUR   || fonTur,
         price:       cur,
         totalValueM: aum,
+        paycount:    shares,
         investors:   parseInt(info.KISISAYISI || 0),
         ret1m:       pct(cur, ref1m[code]?.price),
         ret3m:       pct(cur, ref3m[code]?.price),
@@ -222,8 +245,20 @@ module.exports = async function handler(req, res) {
       };
     });
 
-    // ── Filtre: min_size ──────────────────────────────────────────
-    if (minSize > 0) funds = funds.filter(f => f.totalValueM >= minSize);
+    // ── Filtreler ─────────────────────────────────────────────────
+    if (minSize > 0)                     funds = funds.filter(f => f.totalValueM >= minSize);
+    if (filters.minSharpe  != null)      funds = funds.filter(f => f.sharpe  != null && f.sharpe  >= filters.minSharpe);
+    if (filters.maxSharpe  != null)      funds = funds.filter(f => f.sharpe  != null && f.sharpe  <= filters.maxSharpe);
+    if (filters.minRet1y   != null)      funds = funds.filter(f => f.ret1y   != null && f.ret1y   >= filters.minRet1y);
+    if (filters.maxRet1y   != null)      funds = funds.filter(f => f.ret1y   != null && f.ret1y   <= filters.maxRet1y);
+    if (filters.minRet7d   != null)      funds = funds.filter(f => f.ret7d   != null && f.ret7d   >= filters.minRet7d);
+    if (filters.maxRet7d   != null)      funds = funds.filter(f => f.ret7d   != null && f.ret7d   <= filters.maxRet7d);
+    if (filters.minRet1m   != null)      funds = funds.filter(f => f.ret1m   != null && f.ret1m   >= filters.minRet1m);
+    if (filters.maxRet1m   != null)      funds = funds.filter(f => f.ret1m   != null && f.ret1m   <= filters.maxRet1m);
+    if (filters.minPrice   != null)      funds = funds.filter(f => f.price >= filters.minPrice);
+    if (filters.maxPrice   != null)      funds = funds.filter(f => f.price <= filters.maxPrice);
+    if (filters.minPaycount != null)     funds = funds.filter(f => f.paycount >= filters.minPaycount);
+    if (filters.maxPaycount != null)     funds = funds.filter(f => f.paycount <= filters.maxPaycount);
 
     // ── Sırala ───────────────────────────────────────────────────
     const VALID = ['ret1y','ret3m','ret1m','retYtd','ret7d','sharpe','totalValueM','investors','price'];
