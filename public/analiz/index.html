@@ -44,13 +44,13 @@ if('serviceWorker' in navigator){
 <body>
 
 <div class="topbar">
-  <div class="tlogo" onclick="window.location.href='/'" style="cursor:pointer">
+  <a href="/" class="tlogo" style="cursor:pointer;text-decoration:none;color:inherit;">
     <div class="tlogo-mark">D</div>DeepFin
-  </div>
+  </a>
   <span class="tlive">Canlı</span>
-  <button class="hp-nav-btn" onclick="window.location.href='/'">Anasayfa</button>
-  <button class="hp-nav-btn" onclick="window.location.href='/?from=profile'">Tarayıcı</button>
-  <button class="hp-nav-btn active">Analiz</button>
+  <a href="/" class="hp-nav-btn">Anasayfa</a>
+  <a href="/" class="hp-nav-btn">Tarayıcı</a>
+  <span class="hp-nav-btn active">Analiz</span>
   <div class="tright">
     <button class="topbarbtn infobtn" onclick="openInfo()">📚 Bilgi Bankası</button>
     <button class="topbarbtn supportbtn" onclick="openSupport()">
@@ -107,16 +107,16 @@ if('serviceWorker' in navigator){
   <div class="popular">
     <div class="popular-title">Popüler Aramalar</div>
     <div class="popular-chips">
-      <div class="pop-chip" onclick="goSym('TUPRS','bist')">TUPRS</div>
-      <div class="pop-chip" onclick="goSym('THYAO','bist')">THYAO</div>
-      <div class="pop-chip" onclick="goSym('SASA','bist')">SASA</div>
-      <div class="pop-chip" onclick="goSym('EREGL','bist')">EREGL</div>
-      <div class="pop-chip" onclick="goSym('AAPL','nasdaq')">AAPL</div>
-      <div class="pop-chip" onclick="goSym('NVDA','nasdaq')">NVDA</div>
-      <div class="pop-chip" onclick="goSym('MSFT','nasdaq')">MSFT</div>
-      <div class="pop-chip" onclick="goSym('TSLA','nasdaq')">TSLA</div>
-      <div class="pop-chip" onclick="goSym('JPM','nyse')">JPM</div>
-      <div class="pop-chip" onclick="goSym('KO','nyse')">KO</div>
+      <a href="profile.html?sym=TUPRS&ex=bist"   class="pop-chip" onclick="event.preventDefault(); goSym('TUPRS','bist')">TUPRS</a>
+      <a href="profile.html?sym=THYAO&ex=bist"   class="pop-chip" onclick="event.preventDefault(); goSym('THYAO','bist')">THYAO</a>
+      <a href="profile.html?sym=SASA&ex=bist"    class="pop-chip" onclick="event.preventDefault(); goSym('SASA','bist')">SASA</a>
+      <a href="profile.html?sym=EREGL&ex=bist"   class="pop-chip" onclick="event.preventDefault(); goSym('EREGL','bist')">EREGL</a>
+      <a href="profile.html?sym=AAPL&ex=nasdaq"  class="pop-chip" onclick="event.preventDefault(); goSym('AAPL','nasdaq')">AAPL</a>
+      <a href="profile.html?sym=NVDA&ex=nasdaq"  class="pop-chip" onclick="event.preventDefault(); goSym('NVDA','nasdaq')">NVDA</a>
+      <a href="profile.html?sym=MSFT&ex=nasdaq"  class="pop-chip" onclick="event.preventDefault(); goSym('MSFT','nasdaq')">MSFT</a>
+      <a href="profile.html?sym=TSLA&ex=nasdaq"  class="pop-chip" onclick="event.preventDefault(); goSym('TSLA','nasdaq')">TSLA</a>
+      <a href="profile.html?sym=JPM&ex=nyse"     class="pop-chip" onclick="event.preventDefault(); goSym('JPM','nyse')">JPM</a>
+      <a href="profile.html?sym=KO&ex=nyse"      class="pop-chip" onclick="event.preventDefault(); goSym('KO','nyse')">KO</a>
     </div>
   </div>
 </div>

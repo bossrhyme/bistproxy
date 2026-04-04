@@ -48,11 +48,11 @@ if('serviceWorker' in navigator){
 <div id="app">
 
   <div class="topbar">
-    <div class="tlogo" onclick="goHome()" style="cursor:pointer"><div class="tlogo-mark">D</div>DeepFin</div>
+    <a href="/" class="tlogo" style="cursor:pointer;text-decoration:none;color:inherit;" onclick="event.preventDefault(); goHome()"><div class="tlogo-mark">D</div>DeepFin</a>
     <span class="tlive">Canlı</span>
-    <button class="hp-nav-btn" onclick="goHome()">Anasayfa</button>
-    <button class="hp-nav-btn" onclick="goScreener()">Tarayıcı</button>
-    <button class="hp-nav-btn active" onclick="goAnaliz()">Analiz</button>
+    <a href="/" class="hp-nav-btn" onclick="event.preventDefault(); goHome()">Anasayfa</a>
+    <a href="/" class="hp-nav-btn" onclick="event.preventDefault(); goScreener()">Tarayıcı</a>
+    <a href="/analiz/" class="hp-nav-btn active" onclick="event.preventDefault(); goAnaliz()">Analiz</a>
     <div class="tright">
       <button class="topbarbtn infobtn" onclick="openInfo()">📚 Bilgi Bankası</button>
       <button class="topbarbtn supportbtn" onclick="openSupport()">

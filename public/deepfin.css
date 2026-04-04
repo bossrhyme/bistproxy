@@ -801,6 +801,10 @@ max-width: 480px) {
 .hp-nav-btn{background:transparent;border:none;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;padding:6px 12px;border-radius:6px;transition:all .15s;font-family:'Inter', sans-serif;}
 .hp-nav-btn:hover{background:var(--s2);color:var(--text);}
 .hp-nav-btn.active{color:var(--text);}
+a.hp-nav-btn{text-decoration:none;color:var(--text2);display:inline-block;}
+a.hp-excard{text-decoration:none;color:inherit;display:flex;}
+a.hp-strategy{text-decoration:none;color:inherit;display:flex;}
+a.pop-chip{text-decoration:none;color:inherit;}
 
 /* ── ADV EXCHANGE BAR ── */
 .adv-exchange-bar{padding:10px 10px 6px;border-bottom:1px solid var(--border);background:var(--s1);}
