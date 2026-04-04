@@ -85,8 +85,7 @@ function makeRequest(hostname, path, method, headers, body, callback) {
 const EXCHANGE_CONFIG = {
   bist:   { tvPath: '/turkey/scan',  yahooSuffix: '.IS', currency: 'TRY',
             extraFilters: [
-              { left: 'typespecs',         operation: 'has',     right: ['common'] },
-              { left: 'market_cap_basic',  operation: 'greater', right: 0 },
+              { left: 'typespecs', operation: 'has', right: ['common'] },
             ] },
   nasdaq: { tvPath: '/america/scan', yahooSuffix: '',    currency: 'USD',
             extraFilters: [

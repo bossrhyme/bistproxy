@@ -4,8 +4,7 @@ const https = require('https');
 const EXCHANGE_CONFIG = {
   bist:   { tvPath: '/turkey/scan',
             filters: [
-              { left: 'typespecs',        operation: 'has',     right: ['common'] },
-              { left: 'market_cap_basic', operation: 'greater', right: 0 },
+              { left: 'typespecs', operation: 'has', right: ['common'] },
             ]},
   nasdaq: { tvPath: '/america/scan',
             filters: [
