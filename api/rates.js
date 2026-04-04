@@ -5,7 +5,7 @@ const https = require('https');
 
 let _cache = null;
 let _cacheAt = 0;
-const CACHE_MS = 60 * 60 * 1000; // 1 saat
+const CACHE_MS = 24 * 60 * 60 * 1000; // 24 saat
 
 const ALLOWED_ORIGINS = [
   'https://deepfin.vercel.app',
@@ -103,6 +103,10 @@ module.exports = async function(req, res) {
     }
   }
 
+  // Önceki cache ile karşılaştır — fark > 0.5 ise logla
+  if (_cache && Math.abs(rates.TRY - _cache.TRY) > 0.5) {
+    console.log('[rates] TRY updated:', _cache.TRY, '→', rates.TRY);
+  }
   _cache = rates;
   _cacheAt = Date.now();
   res.setHeader('Cache-Control', 'public, max-age=1800');
