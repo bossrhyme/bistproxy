@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0b0e13"/>
+      <stop offset="100%" style="stop-color:#111520"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#3b82f6"/>
+      <stop offset="100%" style="stop-color:#6366f1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Grid lines (subtle) -->
+  <line x1="0" y1="210" x2="1200" y2="210" stroke="#1e2432" stroke-width="1"/>
+  <line x1="0" y1="420" x2="1200" y2="420" stroke="#1e2432" stroke-width="1"/>
+  <line x1="400" y1="0" x2="400" y2="630" stroke="#1e2432" stroke-width="1"/>
+  <line x1="800" y1="0" x2="800" y2="630" stroke="#1e2432" stroke-width="1"/>
+
+  <!-- Accent bar top -->
+  <rect x="0" y="0" width="1200" height="5" fill="url(#accent)"/>
+
+  <!-- Logo mark -->
+  <rect x="80" y="180" width="52" height="52" rx="12" fill="url(#accent)"/>
+  <text x="106" y="216" font-family="system-ui, sans-serif" font-size="28" font-weight="900" fill="white" text-anchor="middle">D</text>
+
+  <!-- Main title -->
+  <text x="152" y="216" font-family="system-ui, -apple-system, sans-serif" font-size="52" font-weight="800" fill="white">DeepFin</text>
+
+  <!-- Tagline -->
+  <text x="80" y="285" font-family="system-ui, -apple-system, sans-serif" font-size="26" fill="#94a3b8">
+    Hisse · Fon · Kripto — Tek Ekranda
+  </text>
+
+  <!-- Description -->
+  <text x="80" y="345" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#64748b">
+    11.000+ enstrüman · 100+ filtre · Buffett, Lynch, Graham stratejileri
+  </text>
+
+  <!-- Feature tags -->
+  <rect x="80" y="400" width="130" height="36" rx="8" fill="#1e293b"/>
+  <text x="145" y="423" font-family="system-ui, sans-serif" font-size="14" fill="#3b82f6" text-anchor="middle" font-weight="600">BIST &amp; NYSE</text>
+
+  <rect x="224" y="400" width="130" height="36" rx="8" fill="#1e293b"/>
+  <text x="289" y="423" font-family="system-ui, sans-serif" font-size="14" fill="#10b981" text-anchor="middle" font-weight="600">TEFAS Fonlar</text>
+
+  <rect x="368" y="400" width="130" height="36" rx="8" fill="#1e293b"/>
+  <text x="433" y="423" font-family="system-ui, sans-serif" font-size="14" fill="#f59e0b" text-anchor="middle" font-weight="600">Kripto + DeFi</text>
+
+  <!-- Chart decoration (right side) -->
+  <polyline points="720,480 780,420 840,450 900,350 960,380 1020,300 1080,320 1120,280"
+    fill="none" stroke="#3b82f6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+  <polyline points="720,500 780,470 840,490 900,420 960,445 1020,380 1080,400 1120,360"
+    fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/>
+
+  <!-- URL -->
+  <text x="1120" y="600" font-family="system-ui, sans-serif" font-size="16" fill="#475569" text-anchor="end">deepfin.vercel.app</text>
+</svg>

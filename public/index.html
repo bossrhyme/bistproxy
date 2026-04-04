@@ -13,14 +13,14 @@
 <meta property="og:url" content="https://deepfin.vercel.app/">
 <meta property="og:title" content="DeepFin — Hisse Tarama | Buffett, Lynch, Graham Stratejileri">
 <meta property="og:description" content="Hisse, fon ve kripto — 9 varlık sınıfı tek ekranda. 11.000'den fazla enstrümanı 100+ filtre kriteriyle saniyeler içinde tara, dünyaca ünlü stratejilerle analiz et.">
-<meta property="og:image" content="https://deepfin.vercel.app/og-image.png">
+<meta property="og:image" content="https://deepfin.vercel.app/og-image.svg">
 <meta property="og:site_name" content="DeepFin">
 <meta property="og:locale" content="tr_TR">
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="DeepFin — Hisse Tarama | Buffett, Lynch, Graham Stratejileri">
 <meta name="twitter:description" content="Hisse, fon ve kripto — 9 varlık sınıfı tek ekranda. 11.000'den fazla enstrümanı 100+ filtre kriteriyle saniyeler içinde tara, dünyaca ünlü stratejilerle analiz et.">
-<meta name="twitter:image" content="https://deepfin.vercel.app/og-image.png">
+<meta name="twitter:image" content="https://deepfin.vercel.app/og-image.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
@@ -114,12 +114,23 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="DeepFin">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "DeepFin",
+  "url": "https://deepfin.vercel.app",
+  "description": "Hisse, fon ve kripto — 9 varlık sınıfı tek ekranda. 11.000'den fazla enstrümanı 100+ filtre kriteriyle tara, Buffett, Lynch, Graham stratejileriyle analiz et.",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Web",
+  "inLanguage": "tr",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "TRY" },
+  "publisher": { "@type": "Organization", "name": "DeepFin", "url": "https://deepfin.vercel.app" }
+}
+</script>
 <script>
-// SW devre dışı - cache sorunları
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.getRegistrations().then(function(regs){
-    for(var r of regs) r.unregister();
-  });
+  navigator.serviceWorker.register('/sw.js').catch(function(){});
 }
 </script>
 </head>
@@ -164,7 +175,7 @@ if('serviceWorker' in navigator){
         <div class="tlogo-mark" style="width:36px;height:36px;font-size:20px;border-radius:8px;">D</div>
         <span class="hp-logo-name">DeepFin</span>
       </div>
-      <div class="hp-title">Tarama bizden,<br><span>karar sizden.</span></div>
+      <h1 class="hp-title">Tarama bizden,<br><span>karar sizden.</span></h1>
       <div class="hp-sub">Hisse, fon ve kripto — 9 varlık sınıfı tek ekranda. 11.000'den fazla enstrümanı 100+ filtre kriteriyle saniyeler içinde tara, dünyaca ünlü stratejilerle analiz et.</div>
       <div class="hp-cta">
         <button class="hp-cta-primary" onclick="showScreener()">▶ Taramaya Başla</button>
