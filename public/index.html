@@ -6,7 +6,7 @@
 <title>DeepFin — Hisse Tarama | Buffett, Lynch, Graham Stratejileri</title>
 <meta name="description" content="Hisse, fon ve kripto — 9 varlık sınıfı tek ekranda. 11.000'den fazla enstrümanı 100+ filtre kriteriyle saniyeler içinde tara, dünyaca ünlü stratejilerle analiz et.">
 <meta name="robots" content="index, follow">
-<meta name="theme-color" content="#0b0e13">
+<meta name="theme-color" content="#f8fafc">
 <link rel="canonical" href="https://deepfin.vercel.app/">
 <!-- Open Graph -->
 <meta property="og:type" content="website">
@@ -27,13 +27,13 @@
 <style id="critical-css">
 
 :root{
-  --bg:#0b0e13;--s1:#111519;--s2:#161b22;--s3:#0d1117;
-  --border:#1e2733;--border2:#263040;
-  --green:#00c076;--green2:#00a060;--green-bg:rgba(0,192,118,.08);
-  --red:#f6465d;--red-bg:rgba(246,70,93,.08);
-  --blue:#3b82f6;--blue2:#2563d4;
-  --gold:#f0b429;--text:#e2e8f0;--text2:#94a3b8;--muted:#4a5568;--muted2:#64748b;
-  --accent:#3b82f6;
+  --bg:#f8fafc;--s1:#ffffff;--s2:#f1f5f9;--s3:#e8edf4;
+  --border:#e2e8f0;--border2:#cbd5e1;
+  --green:#059669;--green2:#047857;--green-bg:rgba(5,150,105,.09);
+  --red:#dc2626;--red-bg:rgba(220,38,38,.08);
+  --blue:#0ea5e9;--blue2:#0284c7;
+  --gold:#d97706;--text:#0f172a;--text2:#475569;--muted:#94a3b8;--muted2:#64748b;
+  --accent:#0ea5e9;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 *{-webkit-tap-highlight-color:transparent;}
@@ -42,7 +42,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 
 /* ── API KEY SETUP SCREEN ── */
 #setup{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:100;background:var(--bg);}
-.sbox{position:relative;width:460px;background:var(--s1);border:1px solid var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.5);padding:40px;border-radius:12px;}
+.sbox{position:relative;width:460px;background:var(--s1);border:1px solid var(--border2);box-shadow:0 20px 60px rgba(15,23,42,.12);padding:40px;border-radius:12px;}
 .slogo{font-size:24px;font-weight:800;color:var(--text);letter-spacing:-.5px;display:flex;align-items:center;gap:10px;}
 .slogo-icon{width:36px;height:36px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;}
 .slogo span{color:var(--text2);font-weight:400;font-size:22px;}
@@ -57,7 +57,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .slabel{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;}
 .sinput-wrap{display:flex;gap:8px;}
 .sinput{flex:1;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:10px 14px;font-size:13px;outline:none;transition:all .15s;border-radius:6px;}
-.sinput:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(59,130,246,.15);}
+.sinput:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(14,165,233,.15);}
 .sinput::placeholder{color:var(--muted);letter-spacing:0;}
 .sbtn{background:var(--accent);color:#fff;border:none;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;border-radius:6px;}
 .sbtn:hover{background:var(--blue2);}
@@ -79,7 +79,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
 .tsearch{position:relative;flex:1;max-width:320px;}
 .tsearch input{width:100%;background:var(--s2);border:1px solid var(--border);color:var(--text);padding:6px 12px 6px 32px;font-size:12px;outline:none;transition:border-color .15s;border-radius:6px;}
-.tsearch input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(59,130,246,.15);}
+.tsearch input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(14,165,233,.15);}
 .tsearch input::placeholder{color:var(--muted2);}
 .tsearch-ico{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted2);font-size:13px;pointer-events:none;}
 .tright{margin-left:auto;display:flex;align-items:center;gap:6px;}
@@ -88,18 +88,18 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .tbtn:hover{background:var(--blue2);}
 .tbtn:disabled{opacity:.4;cursor:not-allowed;}
 .infobtn{background:transparent;border:1px solid var(--border2);color:var(--text2);}
-.infobtn:hover{border-color:var(--accent);color:var(--accent);background:rgba(59,130,246,.05);}
-.supportbtn{background:rgba(246,70,93,.08);border:1px solid rgba(246,70,93,.25);color:#f6465d;}
-.supportbtn:hover{background:rgba(246,70,93,.15);border-color:#f6465d;color:#f6465d;}
+.infobtn:hover{border-color:var(--accent);color:var(--accent);background:rgba(14,165,233,.05);}
+.supportbtn{background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.2);color:var(--red);}
+.supportbtn:hover{background:rgba(220,38,38,.12);border-color:var(--red);color:var(--red);}
 
 /* ── LAYOUT ── */
-.hp-hero{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 40px 40px;text-align:center;border-bottom:1px solid var(--border);background:radial-gradient(ellipse at 50% 0%,rgba(59,130,246,.06) 0%,transparent 65%);}
+.hp-hero{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 40px 40px;text-align:center;border-bottom:1px solid var(--border);background:radial-gradient(ellipse at 50% 0%,rgba(14,165,233,.06) 0%,transparent 65%);}
 .hp-title{font-size:52px;font-weight:800;color:var(--text);letter-spacing:-2px;line-height:1.1;margin-bottom:16px;}
 .hp-sub{font-size:16px;color:var(--text2);max-width:480px;line-height:1.7;margin-bottom:32px;}
 .hp-cta{display:flex;gap:12px;align-items:center;}
 .hp-cta-primary{background:var(--text);color:#000;border:none;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;font-family:'Geist',sans-serif;}
 .hp-cta-secondary{background:transparent;color:var(--text2);border:1px solid var(--border);padding:12px 22px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;font-family:'Geist',sans-serif;}
-.hp-badge{font-size:10px;font-weight:600;color:var(--accent);background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);padding:4px 12px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:20px;display:inline-flex;align-items:center;gap:6px;}
+.hp-badge{font-size:10px;font-weight:600;color:var(--accent);background:rgba(14,165,233,.1);border:1px solid rgba(14,165,233,.2);padding:4px 12px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:20px;display:inline-flex;align-items:center;gap:6px;}
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>

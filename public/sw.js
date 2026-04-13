@@ -1,5 +1,5 @@
-// DeepFin Service Worker v6 - prf.js cache-bust
-const CACHE = 'deepfin-v7';
+// DeepFin Service Worker v8 - Arctic light theme
+const CACHE = 'deepfin-v8';
 
 // Install: hızlı geç
 self.addEventListener('install', function(e) {
