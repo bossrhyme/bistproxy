@@ -1121,28 +1121,29 @@ tbody tr td { height: 36px; }
 .fbk-filters{font-size:10px;font-family:"Geist Mono", monospace;color:var(--muted2);background:var(--bg);border:1px solid var(--border2);border-radius:4px;padding:3px 8px;display:inline-block;}
 
 /* ── Bilgi Bankası ───────────────────────────────────────────── */
-.ib-nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+.ib-nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
 .ib-btn{font-size:12px;font-weight:700;padding:7px 16px;border-radius:6px;border:1.5px solid var(--border);background:var(--s2);color:var(--text2);cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif;}
 .ib-btn:hover{border-color:var(--accent);color:var(--accent);}
 .ib-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
-.ib-soon{font-size:10px;color:var(--muted);margin-left:auto;}
+.ib-soon{font-size:10px;color:var(--muted);margin-left:0;width:100%;padding-top:2px;}
 .ib-panel{display:none;}
 .ib-panel.active{display:block;}
-.ib-section{margin-top:24px;}
+.ib-section{margin-top:22px;}
 .ib-section:first-child{margin-top:0;}
-.ib-sec-hdr{font-size:10px;font-weight:700;color:var(--muted2);letter-spacing:.6px;text-transform:uppercase;padding-bottom:8px;border-bottom:1px solid var(--border);margin-bottom:4px;}
-.ib-intro{font-size:11px;color:var(--muted2);line-height:1.6;padding:6px 0 4px;}
-.ib-item{padding:9px 0;border-bottom:1px solid var(--border);}
-.ib-item:last-child{border-bottom:none;}
-.ib-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.ib-sec-hdr{font-size:12px;font-weight:700;color:var(--text);letter-spacing:.3px;border-left:3px solid var(--accent);padding-left:8px;border-bottom:none;margin-bottom:10px;}
+.ib-intro{display:none;}
+.ib-items-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;}
+.ib-item{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:11px 13px;}
+.ib-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px;}
 .ib-eng{font-size:10px;color:var(--muted);font-weight:400;margin-left:6px;}
-.ib-desc{font-size:11px;color:var(--text2);line-height:1.6;margin-bottom:3px;}
-.ib-crit{font-size:10px;color:var(--muted2);font-family:'Geist Mono',monospace;}
-.ib-crit-multi{display:flex;flex-wrap:wrap;gap:4px;}
+.ib-desc{font-size:11px;color:var(--text2);line-height:1.55;margin-bottom:4px;}
+.ib-crit{display:inline-block;font-size:10px;color:var(--gold);font-family:'Geist Mono',monospace;background:rgba(217,119,6,.07);border-radius:4px;padding:2px 6px;margin-top:2px;}
+.ib-crit-multi{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px;}
 .ibt{font-size:9px;padding:2px 7px;border-radius:4px;font-weight:600;}
 .ibt.good{background:var(--green-bg);color:var(--green);}
 .ibt.mid{background:rgba(217,119,6,.08);color:var(--gold);}
 .ibt.bad{background:var(--red-bg);color:var(--red);}
+@media(max-width:640px){.ib-items-grid{grid-template-columns:1fr;}}
 
 /* ── Sidebar Collapse ─── */
 .sidebar.collapsed{width:0;min-width:0;padding:0;overflow:hidden;opacity:0;border-right:none;}

@@ -104,7 +104,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
-<link rel="stylesheet" href="/deepfin.css?v=arctic5">
+<link rel="stylesheet" href="/deepfin.css?v=arctic6">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -1022,7 +1022,9 @@ if('serviceWorker' in navigator){
           <div class="ib-sec-hdr">🐐 GOAT Stratejiler</div>
           <div class="ib-intro">Dünyaca tanınan yatırımcıların formüle ettiği stratejiler. Bir chip seçerek o yatırımcının gözüyle piyasayı tarayabilirsiniz.</div>
 
-          <div class="ib-item">
+          
+          <div class="ib-items-grid">
+<div class="ib-item">
             <div class="ib-name">Benjamin Graham — Derin Değer</div>
             <div class="ib-desc">Değer yatırımının babası. Güvenlik marjı ilkesi: içsel değerin altında al, bekle. En muhafazakâr yatırım felsefesi.</div>
             <div class="ib-crit">F/K &lt;10 · PD/DD &lt;1.5 · Cari &gt;2 · B/Ö &lt;%50 · Temettü &gt;%1</div>
@@ -1118,13 +1120,16 @@ if('serviceWorker' in navigator){
             <div class="ib-crit">Kazanç büyümesi &gt;%25 · Gelir büyümesi &gt;%20 · ROE &gt;%17 · Zirveden &gt;-%15</div>
           </div>
 
+                  </div>
         </div><!-- /GOAT -->
 
         <div class="ib-section">
           <div class="ib-sec-hdr">📊 Temel Filtreler</div>
           <div class="ib-intro">Şirketin finansal tablolarından türetilen hazır filtre setleri. Değer, büyüme, temettü ve kalite odaklı yaklaşımlar.</div>
 
-          <div class="ib-item">
+          
+          <div class="ib-items-grid">
+<div class="ib-item">
             <div class="ib-name">Az Borçlu Şirketler</div>
             <div class="ib-desc">Borçsuz güç: bilanço temiz. Kriz dönemlerinde hayatta kalanlar.</div>
             <div class="ib-crit">B/Ö &lt;%30 · Cari &gt;2</div>
@@ -1160,13 +1165,16 @@ if('serviceWorker' in navigator){
             <div class="ib-crit">Temettü &gt;%4 · B/Ö &lt;%80 · Cari &gt;1.2</div>
           </div>
 
+                  </div>
         </div><!-- /Temel -->
 
         <div class="ib-section">
           <div class="ib-sec-hdr">⚡ Teknik Filtreler</div>
           <div class="ib-intro">Fiyat hareketi, hacim ve momentum göstergelerine dayalı filtre setleri. Kırılım, dip ve trend takibi için.</div>
 
-          <div class="ib-item">
+          
+          <div class="ib-items-grid">
+<div class="ib-item">
             <div class="ib-name">26 İndikatör AL</div>
             <div class="ib-desc">TradingView'in 26 teknik indikatörünü (RSI, MACD, ADX, Stochastic, 15 hareketli ortalama) birleştiren konsensüs skoru yüksek hisseler.</div>
             <div class="ib-crit">TV Rating &gt;0.5</div>
@@ -1226,13 +1234,16 @@ if('serviceWorker' in navigator){
             <div class="ib-crit">Zirveden &gt;-%3 · 3A getiri &gt;%5</div>
           </div>
 
+                  </div>
         </div><!-- /Teknik -->
 
         <div class="ib-section">
           <div class="ib-sec-hdr">📖 Terimler Sözlüğü</div>
           <div class="ib-intro">Platformda sıkça karşılaşılan finansal terimlerin kısa açıklamaları.</div>
 
-          <div class="ib-item">
+          
+          <div class="ib-items-grid">
+<div class="ib-item">
             <div class="ib-name">Piyasa Değeri <span class="ib-eng">Market Capitalization</span></div>
             <div class="ib-desc">Hisse fiyatının toplam hisse adediyle çarpımıdır. Şirketin borsadaki toplam değerini gösterir.</div>
             <div class="ib-crit">Küçük ölçekli hisseler daha volatil olabilir</div>
@@ -1248,6 +1259,7 @@ if('serviceWorker' in navigator){
             <div class="ib-desc">Bu yılın aynı dönemini geçen yılın aynı dönemiyle kıyaslar. Mevsimsel etkilerden arındırılmış büyümeyi gösterir.</div>
           </div>
 
+                  </div>
         </div><!-- /Sozluk -->
 
       </div><!-- /asset-panel-hisse -->
@@ -1259,7 +1271,9 @@ if('serviceWorker' in navigator){
           <div class="ib-sec-hdr">🎯 Fon Stratejileri</div>
           <div class="ib-intro">TEFAS'ta işlem gören yatırım fonlarını taramak için kanıtlanmış stratejiler.</div>
 
-          <div class="ib-item">
+          
+          <div class="ib-items-grid">
+<div class="ib-item">
             <div class="ib-name">Büyüme Fonu</div>
             <div class="ib-desc">YTD ve 1 yıllık getirisi yüksek, büyüme odaklı hisse fonları. Uzun vadeli yatırımcılar için güçlü enflasyon koruması.</div>
             <div class="ib-crit">YTD &gt;%15 · 1Y &gt;%20 · Fon tipi: Hisse</div>
@@ -1295,13 +1309,16 @@ if('serviceWorker' in navigator){
             <div class="ib-crit">Fon tipi: Hisse · 1Y &gt;%10 · Büyüklük &gt;50M TL</div>
           </div>
 
+                  </div>
         </div><!-- /Fon Strateji -->
 
         <div class="ib-section">
           <div class="ib-sec-hdr">🔍 Fon Filtre Kriterleri</div>
           <div class="ib-intro">TEFAS fon taramasında kullanılan filtre göstergelerinin açıklamaları.</div>
 
-          <div class="ib-item">
+          
+          <div class="ib-items-grid">
+<div class="ib-item">
             <div class="ib-name">YTD Getiri (%)</div>
             <div class="ib-desc">Yıl başından bugüne toplam getiri. Fonları aynı yıl içinde adil biçimde karşılaştırmanın en yaygın yolu.</div>
             <div class="ib-crit">&gt;%20 güçlü yıllık performans</div>
@@ -1342,6 +1359,7 @@ if('serviceWorker' in navigator){
             <div class="ib-crit ib-crit-multi"><span class="ibt good">✓ &gt;1 iyi</span><span class="ibt mid">△ 0–1 orta</span><span class="ibt bad">✕ &lt;0 riskli</span></div>
           </div>
 
+                  </div>
         </div><!-- /Fon Filtre -->
 
       </div><!-- /asset-panel-fon -->
@@ -1353,7 +1371,9 @@ if('serviceWorker' in navigator){
           <div class="ib-sec-hdr">🎯 Kripto Stratejileri</div>
           <div class="ib-intro">Kripto piyasasında kanıtlanmış yatırım yaklaşımları. Yüksek volatilite nedeniyle risk yönetimi her stratejinin ayrılmaz parçasıdır.</div>
 
-          <div class="ib-item">
+          
+          <div class="ib-items-grid">
+<div class="ib-item">
             <div class="ib-name">HODL — Uzun Vadeli Tut</div>
             <div class="ib-desc">Büyük piyasa değerli, köklü coinleri uzun vadeli tut. Günlük gürültüye aldırma; 3–5 yıl ufku belirle.</div>
             <div class="ib-crit">Piyasa değeri &gt;10B$ · 1Y getiri pozitif · TV Puanı &gt;0.3</div>
@@ -1383,13 +1403,16 @@ if('serviceWorker' in navigator){
             <div class="ib-crit">Piyasa değeri &gt;5B$ · 1Y getiri &gt;%20</div>
           </div>
 
+                  </div>
         </div><!-- /Kripto Strateji -->
 
         <div class="ib-section">
           <div class="ib-sec-hdr">🔍 Kripto Filtre Kriterleri</div>
           <div class="ib-intro">Kripto taramasında kullanılan göstergelerin açıklamaları. Birden fazla kriteri birlikte değerlendirin.</div>
 
-          <div class="ib-item">
+          
+          <div class="ib-items-grid">
+<div class="ib-item">
             <div class="ib-name">24 Saatlik Değişim (%)</div>
             <div class="ib-desc">Son 24 saatte fiyat değişimi. Anlık momentum ve haber etkisini ölçer. Kripto piyasasında %5+ günlük hareketler normaldir.</div>
             <div class="ib-crit">Tek başına yanıltıcı olabilir</div>
@@ -1419,6 +1442,7 @@ if('serviceWorker' in navigator){
             <div class="ib-crit ib-crit-multi"><span class="ibt good">✓ &gt;0.5 AL</span><span class="ibt mid">△ -0.5–0.5 nötr</span><span class="ibt bad">✕ &lt;-0.5 SAT</span></div>
           </div>
 
+                  </div>
         </div><!-- /Kripto Filtre -->
 
       </div><!-- /asset-panel-kripto -->
