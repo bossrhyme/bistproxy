@@ -1006,403 +1006,427 @@ if('serviceWorker' in navigator){
       <div class="modal-title">BİLGİ <span>BANKASI</span></div>
       <button class="modal-close" onclick="closeInfo()">✕</button>
     </div>
-            <div class="modal-body">
-      <div class="info-asset-tabs">
-        <button class="info-asset-tab active" onclick="switchAssetTab('hisse',this)">📈 Hisse</button>
-        <button class="info-asset-tab" onclick="switchAssetTab('fon',this)">🏦 Fon</button>
-        <button class="info-asset-tab" onclick="switchAssetTab('kripto',this)">₿ Kripto</button>
-        <button class="info-asset-tab yakinda-tab" onclick="switchAssetTab('etf',this)">ETF <span class="yakinda-badge">YAKINDA</span></button>
-        <button class="info-asset-tab yakinda-tab" onclick="switchAssetTab('eurobond',this)">Eurobond <span class="yakinda-badge">YAKINDA</span></button>
-        <button class="info-asset-tab yakinda-tab" onclick="switchAssetTab('bono',this)">Bono/Tahvil <span class="yakinda-badge">YAKINDA</span></button>
-        <button class="info-asset-tab yakinda-tab" onclick="switchAssetTab('viop',this)">Viop <span class="yakinda-badge">YAKINDA</span></button>
-        <button class="info-asset-tab yakinda-tab" onclick="switchAssetTab('varant',this)">Varant <span class="yakinda-badge">YAKINDA</span></button>
-        <button class="info-asset-tab yakinda-tab" onclick="switchAssetTab('opsiyon',this)">Opsiyon <span class="yakinda-badge">YAKINDA</span></button>
-      </div>
-      <div class="info-asset-panel active" id="asset-panel-hisse">
-      <div class="info-tabs">
-        <button class="info-tab active" onclick="switchInfoTab('goat',this)">🐐 GOAT Stratejiler</button>
-        <button class="info-tab" onclick="switchInfoTab('temel',this)">📊 Temel Filtreler</button>
-        <button class="info-tab" onclick="switchInfoTab('teknik',this)">⚡ Teknik Filtreler</button>
-        <button class="info-tab" onclick="switchInfoTab('sozluk',this)">📖 Terimler</button>
-      </div>
-      <div class="info-tab-panel active" id="info-panel-goat">
-      <div class="icat">
-        <div class="icat-title">🐐 GOAT Yatırımcı Stratejileri (A–Z)</div>
-        <div class="icat-desc">Dünyaca tanınan yatırımcıların onlarca yıllık deneyimini formüle eden stratejiler. Her girişte yatırımcının felsefesi, kullandığı kriterler ve aktif filtre değerleri gösterilmektedir. Bir chip seçerek o yatırımcının gözüyle piyasayı tarayabilirsiniz.</div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Benjamin Graham — Derin Değer</span></div>
-          <div class="iitem-desc">Değer yatırımının babası. Güvenlik marjı ilkesi: içsel değerin altında al, bekle. F/K<10, PD/DD<1.5, cari oran>2, borç düşük, temettü geçmişi. En muhafazakâr yatırım felsefesi.</div>
-          <span class="iitem-tip tip-warn">F/K <10 · PD/DD <1.5 · Cari >2 · B/Ö <%50 · Temettü >%1</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Bill Ackman — Activist</span></div>
-          <div class="iitem-desc">Aktivist değer yatırımı. Piyasanın gözden kaçırdığı, katalizör bekleyen kaliteli şirketler. Yüksek ROE, güçlü marj, makul borç. Aktif hissedar olarak yönetim değişikliği veya strateji revizyonu talep eder.</div>
-          <span class="iitem-tip tip-warn">ROE >%15 · Net marj >%10 · B/Ö <%80 · F/K <20</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Carl Icahn — Activist Value</span></div>
-          <div class="iitem-desc">Nakit zengini, düşük borçlu, düşük F/K şirketler. Yönetim baskısıyla değer açığa çıkar — geri alım, temettü artışı, bölünme.</div>
-          <span class="iitem-tip tip-warn">PD/DD <1.5 · F/K <12 · B/Ö <%60 · Temettü >%1</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Cathie Wood / ARK — Disruptive Büyüme</span></div>
-          <div class="iitem-desc">Yıkıcı teknoloji, genomik, AI, fintech. Gelir büyümesi >%30, güçlü kazanç ivmesi. Kârlılık ikincil — büyüme ve adreslenebilir pazar büyüklüğü (TAM) öncelikli.</div>
-          <span class="iitem-tip tip-warn">Gelir büyümesi >%30 · Kazanç büyümesi >%20 · Cari >1</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Charlie Munger — Quality Compounder</span></div>
-          <div class="iitem-desc">"Harika şirketi adil fiyata al." Brüt marj>%50, ROE>%20, neredeyse borçsuz, sektör lideri. Buffett'ın ortağı; kalite odaklı uzun vadeli tutuş.</div>
-          <span class="iitem-tip tip-warn">Brüt marj >%50 · ROE >%20 · B/Ö <%30 · Net marj >%20</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">David Einhorn — Deep Value</span></div>
-          <div class="iitem-desc">Derin değer + kısa satış. Düşük F/K, güçlü nakit, düşük borç, kârlı ama gözden kaçmış şirketler.</div>
-          <span class="iitem-tip tip-warn">F/K <15 · B/Ö <%50 · Cari >1.5 · Net marj >%8 · ROE >%10</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">James O'Shaughnessy — What Works on Wall Street</span></div>
-          <div class="iitem-desc">50 yıllık veriye dayalı nicel yatırım. En güçlü combo: yüksek hissedar getirisi (temettü + geri alım) + fiyat momentumu + düşük değerleme. Value Composite: düşük F/K, PD/DD, F/S kombinasyonu.</div>
-          <span class="iitem-tip tip-warn">F/K <15 · PD/DD <1.5 · 1Y getiri >%15 · Temettü >%1</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Joel Greenblatt — Magic Formula</span></div>
-          <div class="iitem-desc">Sihirli formül: yüksek kazanç getirisi (EBIT/işletme değeri) + yüksek sermaye getirisi (ROIC). Her iki metrikte üst %30'da olan hisseler listeye girer. Basit ama güçlü sistematik yaklaşım.</div>
-          <span class="iitem-tip tip-warn">ROIC >%25 · F/K <15 · B/Ö <%60</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Mark Minervini — SEPA</span></div>
-          <div class="iitem-desc">Süper performanslı büyüme hissesi: kazanç büyümesi>%25, ROE>%17, marj>%10. Zirveye yakın + hacim patlaması. SEPA (Specific Entry Point Analysis) kırılım modeliyle tamamlanır.</div>
-          <span class="iitem-tip tip-warn">Kazanç büyümesi >%25 · ROE >%17 · Net marj >%10 · B/Ö <100</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Peter Lynch — GARP</span></div>
-          <div class="iitem-desc">"Yatırım yapabileceğin şeyleri al." PEG oranı <1: büyüme hızına göre ucuz hisse. On-bagger arayışı — günlük hayatta gördüğün büyüme hikayelerini araştır. Ne anladığını al, anlamadığını bırak.</div>
-          <span class="iitem-tip tip-warn">PEG <1 · Kazanç büyümesi >%15 · F/K <25 · B/Ö <%80</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Philip Fisher — Scuttlebutt</span></div>
-          <div class="iitem-desc">Büyüme yatırımının öncüsü. Scuttlebutt: şirketi müşteri, çalışan ve rakiplerden araştır. Güçlü Ar-Ge, yetkin yönetim, geniş büyüme potansiyeli. Uzun vadeli tut — satmak zorunda değilsen satma.</div>
-          <span class="iitem-tip tip-warn">Gelir büyümesi >%15 · Net marj >%10 · ROE >%15 · B/Ö <%60</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Piotroski F-Score</span></div>
-          <div class="iitem-desc">9 soruluk bilanço sağlığı skoru. Kârlılık (4 puan) + Kaldıraç/Likidite (3 puan) + Operasyonel Verimlilik (2 puan). 7–9 güçlü, 0–2 zayıf.</div>
-          <span class="iitem-tip tip-good">✓ 7–9 güçlü alım bölgesi</span><span class="iitem-tip tip-warn">△ 3–6 nötr</span><span class="iitem-tip tip-bad">✕ 0–2 zayıf bilanço</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Quant Fonlar — Citadel / D.E. Shaw / Millennium</span></div>
-          <div class="iitem-desc">Sistematik/algoritmik yatırım. Çoklu faktör modeli: momentum + kalite + değer + büyüme + düşük volatilite — hepsini eş zamanlı optimize et. Tek faktöre bağlı kalma, sinyal çeşitliliği riskleri dengeler.</div>
-          <span class="iitem-tip tip-warn">TV Rating >0.3 · ROE >%15 · F/K 8–20 · Net marj >%10 · B/Ö <%70</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Seth Klarman — Güvenlik Marjı</span></div>
-          <div class="iitem-desc">Graham'dan daha muhafazakâr değer yatırımı. Sadece ciddi iskontoda al — içsel değerin %40–50 altı. Net-net değerleme (net dönen varlıklar > piyasa değeri). Nakit zenginliği ve varlık iskontosu öncelikli.</div>
-          <span class="iitem-tip tip-warn">PD/DD <1 · F/K <12 · Cari >2 · B/Ö <%40</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Warren Buffett — Moat</span></div>
-          <div class="iitem-desc">Sürdürülebilir rekabet avantajı (moat): ROE>%20, brüt marj>%40, net marj>%20, D/E<%50. Makul fiyat, uzun vadeli tutuş. "Harika şirketi adil fiyata al."</div>
-          <span class="iitem-tip tip-warn">F/K 5–25 · ROE >%20 · Brüt marj >%40 · Net marj >%20 · B/Ö <%50</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">William O'Neil — CAN SLIM</span></div>
-          <div class="iitem-desc">C: Cari çeyrek EPS >%25 · A: Yıllık EPS büyümesi >%25 · N: Yeni ürün/yönetim/zirve · S: Arz-talep (hacim kırılımı) · L: Sektör lideri (RS >80) · I: Kurumsal destek · M: Piyasa yönü boğa.</div>
-          <span class="iitem-tip tip-warn">Kazanç büyümesi >%25 · Gelir büyümesi >%20 · ROE >%17 · Zirveden >-%15</span>
-        </div>
-      </div>
-      </div>
-      <div class="info-tab-panel" id="info-panel-temel">
-      <div class="icat">
-        <div class="icat-title">📊 Temel Analiz Presetleri (A–Z)</div>
-        <div class="icat-desc">Şirketin finansal tablolarından türetilen göstergelere dayalı hazır filtre setleri. Değer, büyüme, temettü ve kalite odaklı yaklaşımları tek tıkla uygulayın. Her preset hangi kriterlerin devreye girdiğini açıkça gösterir.</div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Az Borçlu Şirketler</span></div>
-          <div class="iitem-desc">Borçsuz güç: B/Ö<%30, cari oran>2, bilanço temiz. Kriz dönemlerinde hayatta kalanlar.</div>
-          <span class="iitem-tip tip-warn">B/Ö <%30 · Cari >2</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Büyüme Hisseleri</span></div>
-          <div class="iitem-desc">Hızlı büyüyen şirketler: EPS büyümesi>%20, gelir büyümesi>%15, ROE>%15. Lynch "fast-grower" profili.</div>
-          <span class="iitem-tip tip-warn">Kazanç büyümesi >%20 · Gelir büyümesi >%15 · ROE >%15</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Değer Hisseleri</span></div>
-          <div class="iitem-desc">Piyasanın gözden kaçırdığı ucuz hisseler: F/K<15, PD/DD<2, temettü>%2. Graham-Buffett değer yatırımı temeli.</div>
-          <span class="iitem-tip tip-warn">F/K <15 · PD/DD <2 · Temettü >%2</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Kaliteli Şirketler</span></div>
-          <div class="iitem-desc">Olağanüstü kalite: ROE>%20, net marj>%15, brüt marj>%35, düşük borç, güçlü likidite.</div>
-          <span class="iitem-tip tip-warn">ROE >%20 · Net marj >%15 · Brüt marj >%35 · B/Ö <80 · Cari >1.5</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Momentum Hisseleri</span></div>
-          <div class="iitem-desc">Çift ivme: gelir büyümesi>%20 VE kazanç büyümesi>%20. ARK/Minervini kesişim noktası — hem operasyonel hem hisse güçlü.</div>
-          <span class="iitem-tip tip-warn">Gelir büyümesi >%20 · Kazanç büyümesi >%20</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Temettü Hisseleri</span></div>
-          <div class="iitem-desc">Güçlü ve istikrarlı temettü: verim>%4, B/Ö<%80, cari>1.2. Gelir odaklı uzun vadeli yatırım.</div>
-          <span class="iitem-tip tip-warn">Temettü >%4 · B/Ö <%80 · Cari >1.2</span>
-        </div>
-      </div>
-      </div>
-      <div class="info-tab-panel" id="info-panel-teknik">
-      <div class="icat">
-        <div class="icat-title">⚡ Teknik Analiz Presetleri (A–Z)</div>
-        <div class="icat-desc">Fiyat hareketi, hacim ve momentum göstergelerine dayalı filtre setleri. TradingView'in 26 teknik indikatörünü, RSI, performans ve trend kriterlerini birleştiren presetler. Kırılım, dip ve trend takibi için kullanılır.</div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">26 İndikatör AL</span></div>
-          <div class="iitem-desc">TradingView'in 26 teknik indikatörünü (RSI, MACD, ADX, Stochastic, 15 hareketli ortalama) birleştiren konsensüs skoru 0.5 üzeri olan hisseler.</div>
-          <span class="iitem-tip tip-warn">TV Rating >0.5</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">3 Aylık Lider</span></div>
-          <div class="iitem-desc">Son 3 ayda %15+, 6 ayda %20+ kazanan hisseler. Jegadeesh-Titman momentum anomalisi: geçen dönemin kazananları kazanmaya devam eder.</div>
-          <span class="iitem-tip tip-warn">3A getiri >%15 · 6A getiri >%20</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Dip Fırsatı</span></div>
-          <div class="iitem-desc">Sert düşen, dibine yakın, RSI<35 aşırı satılmış hisseler. Kontrarian yaklaşım — paniği fırsata çevir.</div>
-          <span class="iitem-tip tip-warn">52H zirvesinden >-%20 · RSI <35</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Güçlü Gün</span></div>
-          <div class="iitem-desc">Bugün %2+ yükselen, hacimle desteklenen hisseler. Katalizör sinyali: haber, kırılım veya sektör rotasyonu.</div>
-          <span class="iitem-tip tip-warn">Günlük değişim >%2 · Hacim >0.5M lot</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Güçlü Trendde</span></div>
-          <div class="iitem-desc">52 hafta düşüğünden %25+ yukarıda, 6 aylık getiri pozitif. Minervini Trend Template — sadece yapısal olarak güçlü hisseler.</div>
-          <span class="iitem-tip tip-warn">52H düşüğünden >%25 · 6A getiri >%10</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Kırılım</span></div>
-          <div class="iitem-desc">Zirvesine yakın, hacim destekli, indikatörler AL sinyali. Mark Minervini SEPA kırılım koşulu — güçlü trendlerin başlangıç noktası.</div>
-          <span class="iitem-tip tip-warn">Zirveden >-%5 · Değişim >%1.5 · Hacim >0.5M · TV Rating >0.1</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Kurumsal Hacim</span></div>
-          <div class="iitem-desc">Normalin çok üzerinde hacimle işlem gören, fiyatı artan hisseler. Büyük kurumsal oyuncuların (fon, banka) pozisyon açtığının sinyali.</div>
-          <span class="iitem-tip tip-warn">Hacim >5M lot · Günlük değişim >0</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">RSI Toparlanması</span></div>
-          <div class="iitem-desc">RSI 30–50 bandında: aşırı satımdan çıkmış, henüz aşırı alıma girmemiş hisseler. Dipten toparlanmanın erken aşaması.</div>
-          <span class="iitem-tip tip-warn">RSI 30–50 · 52H düşüğünden >%3</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Sağlıklı Çekilme</span></div>
-          <div class="iitem-desc">Zirveden %10–25 geri çekilen, 6 aylık trendi hâlâ güçlü hisseler. Güçlü trendde pullback alım fırsatı.</div>
-          <span class="iitem-tip tip-warn">Zirveden -%10 ila -%25 · 6A getiri >%10</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Zirveye Yakın</span></div>
-          <div class="iitem-desc">1 aylık zirvesinin %3'ü yakınında, son 3 ayda %5+ kazanmış hisseler. Güçlü trend devam sinyali.</div>
-          <span class="iitem-tip tip-warn">Zirveden >-%3 · 3A getiri >%5</span>
-        </div>
-      </div>
-      </div>
-      <div class="info-tab-panel" id="info-panel-sozluk">
-      <div class="icat">
-        <div class="icat-title">📖 Terimler Sözlüğü (A–Z)</div>
-        <div class="icat-desc">Platformda sıkça karşılaşılan finansal terimlerin kısa açıklamaları. Preset ve stratejilerde ayrıntılı ele alınan göstergeler burada tekrar edilmez; yalnızca diğer bölümlerde geçmeyen temel kavramlar yer alır.</div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Piyasa Değeri</span><span class="iitem-eng">Market Capitalization</span></div>
-          <div class="iitem-desc">Hisse fiyatının toplam hisse adediyle çarpımıdır. Şirketin borsadaki toplam değerini gösterir.</div>
-          <span class="iitem-tip tip-warn">△ Küçük ölçekli hisseler daha volatil olabilir</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">TTM — Son 12 Ay</span><span class="iitem-eng">Trailing Twelve Months</span></div>
-          <div class="iitem-desc">Son 12 aylık kümülatif veriyi ifade eder. Yıllık raporlar yerine en güncel 4 çeyreği toplar.</div>
-          
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">YoY — Yıldan Yıla</span><span class="iitem-eng">Year over Year</span></div>
-          <div class="iitem-desc">Bu yılın aynı dönemini geçen yılın aynı dönemiyle kıyaslar. Mevsimsel etkilerden arındırılmış büyümeyi gösterir.</div>
+    <div class="modal-body">
 
-        </div>
+      <div class="ib-nav">
+        <button class="ib-btn active" onclick="switchAssetTab('hisse',this)">📈 Hisse</button>
+        <button class="ib-btn" onclick="switchAssetTab('fon',this)">🏦 Fon</button>
+        <button class="ib-btn" onclick="switchAssetTab('kripto',this)">₿ Kripto</button>
+        <span class="ib-soon">Yakında: ETF · Eurobond · Bono · Viop · Varant · Opsiyon</span>
       </div>
-      </div>
+
+      <!-- ── HİSSE ── -->
+      <div class="ib-panel active" id="asset-panel-hisse">
+
+        <div class="ib-section">
+          <div class="ib-sec-hdr">🐐 GOAT Stratejiler</div>
+          <div class="ib-intro">Dünyaca tanınan yatırımcıların formüle ettiği stratejiler. Bir chip seçerek o yatırımcının gözüyle piyasayı tarayabilirsiniz.</div>
+
+          <div class="ib-item">
+            <div class="ib-name">Benjamin Graham — Derin Değer</div>
+            <div class="ib-desc">Değer yatırımının babası. Güvenlik marjı ilkesi: içsel değerin altında al, bekle. En muhafazakâr yatırım felsefesi.</div>
+            <div class="ib-crit">F/K &lt;10 · PD/DD &lt;1.5 · Cari &gt;2 · B/Ö &lt;%50 · Temettü &gt;%1</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Bill Ackman — Activist</div>
+            <div class="ib-desc">Aktivist değer yatırımı. Piyasanın gözden kaçırdığı, katalizör bekleyen kaliteli şirketler. Aktif hissedar olarak yönetim değişikliği talep eder.</div>
+            <div class="ib-crit">ROE &gt;%15 · Net marj &gt;%10 · B/Ö &lt;%80 · F/K &lt;20</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Carl Icahn — Activist Value</div>
+            <div class="ib-desc">Nakit zengini, düşük borçlu, düşük F/K şirketler. Yönetim baskısıyla değer açığa çıkar — geri alım, temettü artışı, bölünme.</div>
+            <div class="ib-crit">PD/DD &lt;1.5 · F/K &lt;12 · B/Ö &lt;%60 · Temettü &gt;%1</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Cathie Wood / ARK — Disruptive Büyüme</div>
+            <div class="ib-desc">Yıkıcı teknoloji, genomik, AI, fintech. Kârlılık ikincil — büyüme ve adreslenebilir pazar büyüklüğü öncelikli.</div>
+            <div class="ib-crit">Gelir büyümesi &gt;%30 · Kazanç büyümesi &gt;%20 · Cari &gt;1</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Charlie Munger — Quality Compounder</div>
+            <div class="ib-desc">"Harika şirketi adil fiyata al." Brüt marj &gt;%50, ROE &gt;%20, neredeyse borçsuz, sektör lideri.</div>
+            <div class="ib-crit">Brüt marj &gt;%50 · ROE &gt;%20 · B/Ö &lt;%30 · Net marj &gt;%20</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">David Einhorn — Deep Value</div>
+            <div class="ib-desc">Derin değer + kısa satış. Düşük F/K, güçlü nakit, düşük borç, kârlı ama gözden kaçmış şirketler.</div>
+            <div class="ib-crit">F/K &lt;15 · B/Ö &lt;%50 · Cari &gt;1.5 · Net marj &gt;%8 · ROE &gt;%10</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">James O'Shaughnessy — What Works on Wall Street</div>
+            <div class="ib-desc">50 yıllık veriye dayalı nicel yatırım. En güçlü combo: yüksek hissedar getirisi + fiyat momentumu + düşük değerleme.</div>
+            <div class="ib-crit">F/K &lt;15 · PD/DD &lt;1.5 · 1Y getiri &gt;%15 · Temettü &gt;%1</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Joel Greenblatt — Magic Formula</div>
+            <div class="ib-desc">Sihirli formül: yüksek kazanç getirisi + yüksek sermaye getirisi (ROIC). Her iki metrikte üst %30'da olan hisseler.</div>
+            <div class="ib-crit">ROIC &gt;%25 · F/K &lt;15 · B/Ö &lt;%60</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Mark Minervini — SEPA</div>
+            <div class="ib-desc">Süper performanslı büyüme hissesi: kazanç büyümesi &gt;%25, ROE &gt;%17, marj &gt;%10. Zirveye yakın + hacim patlaması.</div>
+            <div class="ib-crit">Kazanç büyümesi &gt;%25 · ROE &gt;%17 · Net marj &gt;%10 · B/Ö &lt;100</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Peter Lynch — GARP</div>
+            <div class="ib-desc">"Yatırım yapabileceğin şeyleri al." PEG oranı &lt;1: büyüme hızına göre ucuz hisse. On-bagger arayışı.</div>
+            <div class="ib-crit">PEG &lt;1 · Kazanç büyümesi &gt;%15 · F/K &lt;25 · B/Ö &lt;%80</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Philip Fisher — Scuttlebutt</div>
+            <div class="ib-desc">Büyüme yatırımının öncüsü. Güçlü Ar-Ge, yetkin yönetim, geniş büyüme potansiyeli. Uzun vadeli tut.</div>
+            <div class="ib-crit">Gelir büyümesi &gt;%15 · Net marj &gt;%10 · ROE &gt;%15 · B/Ö &lt;%60</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Piotroski F-Score</div>
+            <div class="ib-desc">9 soruluk bilanço sağlığı skoru. Kârlılık + Kaldıraç/Likidite + Operasyonel Verimlilik. 7–9 güçlü, 0–2 zayıf.</div>
+            <div class="ib-crit ib-crit-multi"><span class="ibt good">✓ 7–9 güçlü</span><span class="ibt mid">△ 3–6 nötr</span><span class="ibt bad">✕ 0–2 zayıf</span></div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Quant Fonlar — Citadel / D.E. Shaw / Millennium</div>
+            <div class="ib-desc">Sistematik/algoritmik yatırım. Çoklu faktör modeli: momentum + kalite + değer + büyüme + düşük volatilite.</div>
+            <div class="ib-crit">TV Rating &gt;0.3 · ROE &gt;%15 · F/K 8–20 · Net marj &gt;%10 · B/Ö &lt;%70</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Seth Klarman — Güvenlik Marjı</div>
+            <div class="ib-desc">Graham'dan daha muhafazakâr değer yatırımı. Sadece ciddi iskontoda al — içsel değerin %40–50 altı.</div>
+            <div class="ib-crit">PD/DD &lt;1 · F/K &lt;12 · Cari &gt;2 · B/Ö &lt;%40</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Warren Buffett — Moat</div>
+            <div class="ib-desc">Sürdürülebilir rekabet avantajı: yüksek ROE, güçlü marj, düşük borç. Makul fiyat, uzun vadeli tutuş.</div>
+            <div class="ib-crit">F/K 5–25 · ROE &gt;%20 · Brüt marj &gt;%40 · Net marj &gt;%20 · B/Ö &lt;%50</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">William O'Neil — CAN SLIM</div>
+            <div class="ib-desc">C: Cari çeyrek EPS · A: Yıllık EPS büyümesi · N: Yeni ürün/zirve · S: Hacim kırılımı · L: Sektör lideri · I: Kurumsal destek · M: Boğa piyasası.</div>
+            <div class="ib-crit">Kazanç büyümesi &gt;%25 · Gelir büyümesi &gt;%20 · ROE &gt;%17 · Zirveden &gt;-%15</div>
+          </div>
+
+        </div><!-- /GOAT -->
+
+        <div class="ib-section">
+          <div class="ib-sec-hdr">📊 Temel Filtreler</div>
+          <div class="ib-intro">Şirketin finansal tablolarından türetilen hazır filtre setleri. Değer, büyüme, temettü ve kalite odaklı yaklaşımlar.</div>
+
+          <div class="ib-item">
+            <div class="ib-name">Az Borçlu Şirketler</div>
+            <div class="ib-desc">Borçsuz güç: bilanço temiz. Kriz dönemlerinde hayatta kalanlar.</div>
+            <div class="ib-crit">B/Ö &lt;%30 · Cari &gt;2</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Büyüme Hisseleri</div>
+            <div class="ib-desc">Hızlı büyüyen şirketler. Lynch "fast-grower" profili.</div>
+            <div class="ib-crit">Kazanç büyümesi &gt;%20 · Gelir büyümesi &gt;%15 · ROE &gt;%15</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Değer Hisseleri</div>
+            <div class="ib-desc">Piyasanın gözden kaçırdığı ucuz hisseler. Graham-Buffett değer yatırımı temeli.</div>
+            <div class="ib-crit">F/K &lt;15 · PD/DD &lt;2 · Temettü &gt;%2</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Kaliteli Şirketler</div>
+            <div class="ib-desc">Olağanüstü kalite: yüksek ROE, güçlü marjlar, düşük borç, güçlü likidite.</div>
+            <div class="ib-crit">ROE &gt;%20 · Net marj &gt;%15 · Brüt marj &gt;%35 · B/Ö &lt;80 · Cari &gt;1.5</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Momentum Hisseleri</div>
+            <div class="ib-desc">Çift ivme: hem operasyonel hem hisse güçlü. ARK/Minervini kesişim noktası.</div>
+            <div class="ib-crit">Gelir büyümesi &gt;%20 · Kazanç büyümesi &gt;%20</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Temettü Hisseleri</div>
+            <div class="ib-desc">Güçlü ve istikrarlı temettü. Gelir odaklı uzun vadeli yatırım.</div>
+            <div class="ib-crit">Temettü &gt;%4 · B/Ö &lt;%80 · Cari &gt;1.2</div>
+          </div>
+
+        </div><!-- /Temel -->
+
+        <div class="ib-section">
+          <div class="ib-sec-hdr">⚡ Teknik Filtreler</div>
+          <div class="ib-intro">Fiyat hareketi, hacim ve momentum göstergelerine dayalı filtre setleri. Kırılım, dip ve trend takibi için.</div>
+
+          <div class="ib-item">
+            <div class="ib-name">26 İndikatör AL</div>
+            <div class="ib-desc">TradingView'in 26 teknik indikatörünü (RSI, MACD, ADX, Stochastic, 15 hareketli ortalama) birleştiren konsensüs skoru yüksek hisseler.</div>
+            <div class="ib-crit">TV Rating &gt;0.5</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">3 Aylık Lider</div>
+            <div class="ib-desc">Son aylarda güçlü kazanan hisseler. Momentum anomalisi: geçen dönemin kazananları kazanmaya devam eder.</div>
+            <div class="ib-crit">3A getiri &gt;%15 · 6A getiri &gt;%20</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Dip Fırsatı</div>
+            <div class="ib-desc">Sert düşen, RSI aşırı satılmış hisseler. Kontrarian yaklaşım — paniği fırsata çevir.</div>
+            <div class="ib-crit">52H zirvesinden &gt;-%20 · RSI &lt;35</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Güçlü Gün</div>
+            <div class="ib-desc">Bugün %2+ yükselen, hacimle desteklenen hisseler. Katalizör sinyali: haber, kırılım veya sektör rotasyonu.</div>
+            <div class="ib-crit">Günlük değişim &gt;%2 · Hacim &gt;0.5M lot</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Güçlü Trendde</div>
+            <div class="ib-desc">52 hafta düşüğünden %25+ yukarıda. Minervini Trend Template — sadece yapısal olarak güçlü hisseler.</div>
+            <div class="ib-crit">52H düşüğünden &gt;%25 · 6A getiri &gt;%10</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Kırılım</div>
+            <div class="ib-desc">Zirvesine yakın, hacim destekli, indikatörler AL sinyali. Minervini SEPA kırılım koşulu.</div>
+            <div class="ib-crit">Zirveden &gt;-%5 · Değişim &gt;%1.5 · Hacim &gt;0.5M · TV Rating &gt;0.1</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Kurumsal Hacim</div>
+            <div class="ib-desc">Normalin çok üzerinde hacimle işlem gören, fiyatı artan hisseler. Büyük kurumsal oyuncuların pozisyon açtığının sinyali.</div>
+            <div class="ib-crit">Hacim &gt;5M lot · Günlük değişim &gt;0</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">RSI Toparlanması</div>
+            <div class="ib-desc">RSI 30–50 bandında: aşırı satımdan çıkmış, henüz aşırı alıma girmemiş hisseler. Dipten toparlanmanın erken aşaması.</div>
+            <div class="ib-crit">RSI 30–50 · 52H düşüğünden &gt;%3</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Sağlıklı Çekilme</div>
+            <div class="ib-desc">Zirveden %10–25 geri çekilen, trendi hâlâ güçlü hisseler. Güçlü trendde pullback alım fırsatı.</div>
+            <div class="ib-crit">Zirveden -%10 ila -%25 · 6A getiri &gt;%10</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Zirveye Yakın</div>
+            <div class="ib-desc">1 aylık zirvesinin %3'ü yakınında, son 3 ayda %5+ kazanmış hisseler. Güçlü trend devam sinyali.</div>
+            <div class="ib-crit">Zirveden &gt;-%3 · 3A getiri &gt;%5</div>
+          </div>
+
+        </div><!-- /Teknik -->
+
+        <div class="ib-section">
+          <div class="ib-sec-hdr">📖 Terimler Sözlüğü</div>
+          <div class="ib-intro">Platformda sıkça karşılaşılan finansal terimlerin kısa açıklamaları.</div>
+
+          <div class="ib-item">
+            <div class="ib-name">Piyasa Değeri <span class="ib-eng">Market Capitalization</span></div>
+            <div class="ib-desc">Hisse fiyatının toplam hisse adediyle çarpımıdır. Şirketin borsadaki toplam değerini gösterir.</div>
+            <div class="ib-crit">Küçük ölçekli hisseler daha volatil olabilir</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">TTM — Son 12 Ay <span class="ib-eng">Trailing Twelve Months</span></div>
+            <div class="ib-desc">Son 12 aylık kümülatif veriyi ifade eder. Yıllık raporlar yerine en güncel 4 çeyreği toplar.</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">YoY — Yıldan Yıla <span class="ib-eng">Year over Year</span></div>
+            <div class="ib-desc">Bu yılın aynı dönemini geçen yılın aynı dönemiyle kıyaslar. Mevsimsel etkilerden arındırılmış büyümeyi gösterir.</div>
+          </div>
+
+        </div><!-- /Sozluk -->
+
       </div><!-- /asset-panel-hisse -->
 
-      <!-- ── FON PANELİ ── -->
-      <div class="info-asset-panel" id="asset-panel-fon">
-      <div class="info-tabs">
-        <button class="info-tab active" onclick="switchInfoTab('fon-strateji',this)">🎯 Stratejiler</button>
-        <button class="info-tab" onclick="switchInfoTab('fon-filtre',this)">🔍 Filtreler</button>
-      </div>
-      <div class="info-tab-panel active" id="info-panel-fon-strateji">
-      <div class="icat">
-        <div class="icat-title">🎯 Fon Stratejileri</div>
-        <div class="icat-desc">TEFAS'ta işlem gören yatırım fonlarını taramak için kanıtlanmış stratejiler. Her yaklaşım farklı risk-getiri profiline sahiptir; kendi yatırım hedeflerinize uygun olanı seçin.</div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Büyüme Fonu</span></div>
-          <div class="iitem-desc">YTD ve 1 yıllık getirisi yüksek, büyüme odaklı hisse fonları. Uzun vadeli yatırımcılar için güçlü enflasyon koruması sunar.</div>
-          <span class="iitem-tip tip-warn">YTD >%15 · 1Y >%20 · Fon tipi: Hisse</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Büyük &amp; Güvenli</span></div>
-          <div class="iitem-desc">Yüksek AUM'lu, geniş yatırımcı tabanına sahip, istikrarlı getiri sağlayan fonlar. Sermaye koruma öncelikli konservatif yatırımcılar için.</div>
-          <span class="iitem-tip tip-warn">Büyüklük >500M TL · Sharpe >1 · Yatırımcı sayısı >1000</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Momentum Fonu</span></div>
-          <div class="iitem-desc">Kısa vadede ivme kazanan, 1 ve 3 aylık getirileri yüksek fonlar. Piyasa yükseliş trendlerini yakalamak için kullanılır.</div>
-          <span class="iitem-tip tip-warn">1A >%5 · 3A >%15</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Para Piyasası</span></div>
-          <div class="iitem-desc">Kısa vadeli, düşük riskli, yüksek likidite sunan para piyasası fonları. Nakit parkı için alternatif; mevduat faizine yakın getiri.</div>
-          <span class="iitem-tip tip-warn">Fon tipi: PMF · YTD pozitif · Büyüklük >100M TL</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Sharpe Odaklı</span></div>
-          <div class="iitem-desc">Risk başına en yüksek getiriyi sağlayan fonlar. Sharpe oranı >1.5 olan fonlar hem iyi getiri hem düşük oynaklık sunar.</div>
-          <span class="iitem-tip tip-warn">Sharpe >1.5 · YTD pozitif</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Hisse Ağırlıklı</span></div>
-          <div class="iitem-desc">Portföyünde ağırlıklı olarak hisse senedi barındıran fonlar. Uzun vadede en yüksek büyüme potansiyeline sahip kategori.</div>
-          <span class="iitem-tip tip-warn">Fon tipi: Hisse · 1Y >%10 · Büyüklük >50M TL</span>
-        </div>
-      </div>
-      </div>
-      <div class="info-tab-panel" id="info-panel-fon-filtre">
-      <div class="icat">
-        <div class="icat-title">🔍 Fon Filtre Kriterleri</div>
-        <div class="icat-desc">TEFAS fon taramasında kullanılan filtre göstergelerinin açıklamaları. Bu kriterler fonları performans, risk ve büyüklük bazında karşılaştırmanıza yardımcı olur.</div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">YTD Getiri (%)</span></div>
-          <div class="iitem-desc">Yıl başından bugüne toplam getiri. Fonları aynı yıl içinde adil biçimde karşılaştırmanın en yaygın yolu.</div>
-          <span class="iitem-tip tip-good">✓ >%20 güçlü yıllık performans</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">1 Aylık Getiri (%)</span></div>
-          <div class="iitem-desc">Son 30 gündeki fon performansı. Kısa vadeli momentum ve güncel piyasa tepkisini ölçer.</div>
-          <span class="iitem-tip tip-warn">△ Tek başına yeterli değil, uzun dönemle birlikte değerlendirin</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">3 Aylık Getiri (%)</span></div>
-          <div class="iitem-desc">Son 90 gündeki getiri. Orta vadeli trend tespiti için YTD ile birlikte kullanılır.</div>
-          <span class="iitem-tip tip-warn">△ Mevsimsel etkiler içerebilir</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">1 Yıllık Getiri (%)</span></div>
-          <div class="iitem-desc">Son 52 haftadaki toplam getiri. Fon yöneticisinin uzun vadeli becerilerini ölçmenin en güvenilir metriği.</div>
-          <span class="iitem-tip tip-good">✓ >%30 güçlü uzun vadeli performans</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Fon Büyüklüğü (TL)</span></div>
-          <div class="iitem-desc">Toplam aktif değer. Büyük fonlar daha likit ve istikrarlıdır; küçük fonlar daha agresif büyüme gösterebilir.</div>
-          <span class="iitem-tip tip-warn">△ Çok büyük fonlarda getiri baskılanabilir</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Yatırımcı Sayısı</span></div>
-          <div class="iitem-desc">Fona katılan bireysel yatırımcı adedi. Popülerlik ve kurumsal güveni gösterir; ani çıkış riskini de sinyalleyebilir.</div>
-          <span class="iitem-tip tip-warn">△ Kalabalık ≠ iyi; getiriyi de kontrol edin</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Sharpe Oranı</span></div>
-          <div class="iitem-desc">Risk başına getiri: (Fon getirisi − Risksiz faiz) / Standart sapma. 1 üzeri iyi, 2 üzeri mükemmel kabul edilir.</div>
-          <span class="iitem-tip tip-good">✓ >1 iyi</span><span class="iitem-tip tip-warn">△ 0–1 orta</span><span class="iitem-tip tip-bad">✕ &lt;0 riskli</span>
-        </div>
-      </div>
-      </div>
+      <!-- ── FON ── -->
+      <div class="ib-panel" id="asset-panel-fon">
+
+        <div class="ib-section">
+          <div class="ib-sec-hdr">🎯 Fon Stratejileri</div>
+          <div class="ib-intro">TEFAS'ta işlem gören yatırım fonlarını taramak için kanıtlanmış stratejiler.</div>
+
+          <div class="ib-item">
+            <div class="ib-name">Büyüme Fonu</div>
+            <div class="ib-desc">YTD ve 1 yıllık getirisi yüksek, büyüme odaklı hisse fonları. Uzun vadeli yatırımcılar için güçlü enflasyon koruması.</div>
+            <div class="ib-crit">YTD &gt;%15 · 1Y &gt;%20 · Fon tipi: Hisse</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Büyük &amp; Güvenli</div>
+            <div class="ib-desc">Yüksek AUM'lu, geniş yatırımcı tabanına sahip, istikrarlı getiri sağlayan fonlar. Sermaye koruma öncelikli.</div>
+            <div class="ib-crit">Büyüklük &gt;500M TL · Sharpe &gt;1 · Yatırımcı &gt;1000</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Momentum Fonu</div>
+            <div class="ib-desc">Kısa vadede ivme kazanan fonlar. Piyasa yükseliş trendlerini yakalamak için kullanılır.</div>
+            <div class="ib-crit">1A &gt;%5 · 3A &gt;%15</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Para Piyasası</div>
+            <div class="ib-desc">Kısa vadeli, düşük riskli, yüksek likidite sunan para piyasası fonları. Nakit parkı için alternatif.</div>
+            <div class="ib-crit">Fon tipi: PMF · YTD pozitif · Büyüklük &gt;100M TL</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Sharpe Odaklı</div>
+            <div class="ib-desc">Risk başına en yüksek getiriyi sağlayan fonlar. Hem iyi getiri hem düşük oynaklık sunar.</div>
+            <div class="ib-crit">Sharpe &gt;1.5 · YTD pozitif</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Hisse Ağırlıklı</div>
+            <div class="ib-desc">Portföyünde ağırlıklı olarak hisse senedi barındıran fonlar. Uzun vadede en yüksek büyüme potansiyeli.</div>
+            <div class="ib-crit">Fon tipi: Hisse · 1Y &gt;%10 · Büyüklük &gt;50M TL</div>
+          </div>
+
+        </div><!-- /Fon Strateji -->
+
+        <div class="ib-section">
+          <div class="ib-sec-hdr">🔍 Fon Filtre Kriterleri</div>
+          <div class="ib-intro">TEFAS fon taramasında kullanılan filtre göstergelerinin açıklamaları.</div>
+
+          <div class="ib-item">
+            <div class="ib-name">YTD Getiri (%)</div>
+            <div class="ib-desc">Yıl başından bugüne toplam getiri. Fonları aynı yıl içinde adil biçimde karşılaştırmanın en yaygın yolu.</div>
+            <div class="ib-crit">&gt;%20 güçlü yıllık performans</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">1 Aylık Getiri (%)</div>
+            <div class="ib-desc">Son 30 gündeki fon performansı. Kısa vadeli momentum ve güncel piyasa tepkisini ölçer.</div>
+            <div class="ib-crit">Tek başına yeterli değil, uzun dönemle birlikte değerlendirin</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">3 Aylık Getiri (%)</div>
+            <div class="ib-desc">Son 90 gündeki getiri. Orta vadeli trend tespiti için YTD ile birlikte kullanılır.</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">1 Yıllık Getiri (%)</div>
+            <div class="ib-desc">Son 52 haftadaki toplam getiri. Fon yöneticisinin uzun vadeli becerilerini ölçmenin en güvenilir metriği.</div>
+            <div class="ib-crit">&gt;%30 güçlü uzun vadeli performans</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Fon Büyüklüğü (TL)</div>
+            <div class="ib-desc">Toplam aktif değer. Büyük fonlar daha likit ve istikrarlı; küçük fonlar daha agresif büyüme gösterebilir.</div>
+            <div class="ib-crit">Çok büyük fonlarda getiri baskılanabilir</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Yatırımcı Sayısı</div>
+            <div class="ib-desc">Fona katılan bireysel yatırımcı adedi. Popülerlik ve kurumsal güveni gösterir.</div>
+            <div class="ib-crit">Kalabalık ≠ iyi; getiriyi de kontrol edin</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Sharpe Oranı</div>
+            <div class="ib-desc">Risk başına getiri: (Fon getirisi − Risksiz faiz) / Standart sapma. 1 üzeri iyi, 2 üzeri mükemmel.</div>
+            <div class="ib-crit ib-crit-multi"><span class="ibt good">✓ &gt;1 iyi</span><span class="ibt mid">△ 0–1 orta</span><span class="ibt bad">✕ &lt;0 riskli</span></div>
+          </div>
+
+        </div><!-- /Fon Filtre -->
+
       </div><!-- /asset-panel-fon -->
 
-      <!-- ── KRİPTO PANELİ ── -->
-      <div class="info-asset-panel" id="asset-panel-kripto">
-      <div class="info-tabs">
-        <button class="info-tab active" onclick="switchInfoTab('kripto-strateji',this)">🎯 Stratejiler</button>
-        <button class="info-tab" onclick="switchInfoTab('kripto-filtre',this)">🔍 Filtreler</button>
-      </div>
-      <div class="info-tab-panel active" id="info-panel-kripto-strateji">
-      <div class="icat">
-        <div class="icat-title">🎯 Kripto Stratejileri</div>
-        <div class="icat-desc">Kripto piyasasında kanıtlanmış yatırım yaklaşımları. Yüksek volatilite nedeniyle risk yönetimi her stratejinin ayrılmaz parçasıdır. Yalnızca kaybetmeyi göze aldığınız miktarla işlem yapın.</div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">HODL — Uzun Vadeli Tut</span></div>
-          <div class="iitem-desc">Büyük piyasa değerli, köklü coinleri (BTC, ETH, SOL) uzun vadeli tut. Günlük gürültüye aldırma; teknoloji ve ekosisteme inan, 3–5 yıl ufku belirle.</div>
-          <span class="iitem-tip tip-warn">Piyasa değeri >10B$ · 1Y getiri pozitif · TV Puanı >0.3</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">DCA — Düzenli Alım</span></div>
-          <div class="iitem-desc">Sabit periyotlarla sabit miktarda alım yaparak maliyet ortalaması al. Volatiliteyi zamanlamak yerine zamana yay. Psikolojik baskıyı azaltır, uzun vadede etkin maliyet sağlar.</div>
-          <span class="iitem-tip tip-good">✓ Tüm piyasa koşullarında uygulanabilir strateji</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Momentum</span></div>
-          <div class="iitem-desc">Kısa vadede güçlü momentum gösteren coinler. Hacim artışı + fiyat ivmesi birlikteliği güçlü sinyal. Boğa piyasalarında en etkili yaklaşım.</div>
-          <span class="iitem-tip tip-warn">7G >%15 · 30G >%30 · TV Puanı >0.5</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Dip Fırsatı</span></div>
-          <div class="iitem-desc">ATH'den sert düşmüş, temel değerleri sağlam coinlerde kontrarian alım. Panik satışlarından faydalanmak için — ama düşüşün devam edebileceğini unutma.</div>
-          <span class="iitem-tip tip-warn">30G &lt;-%20 · Piyasa değeri >1B$ · TV Puanı &lt;0.3</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Layer 1 / Ekosistem</span></div>
-          <div class="iitem-desc">Blockchain altyapısı sağlayan L1 protokollerine (BTC, ETH, SOL, ADA, AVAX) odaklan. Ekosistem büyüdükçe altyapı coini değer kazanır — en az riskli kripto kategorisi.</div>
-          <span class="iitem-tip tip-warn">Piyasa değeri >5B$ · 1Y getiri >%20</span>
-        </div>
-      </div>
-      </div>
-      <div class="info-tab-panel" id="info-panel-kripto-filtre">
-      <div class="icat">
-        <div class="icat-title">🔍 Kripto Filtre Kriterleri</div>
-        <div class="icat-desc">Kripto taramasında kullanılan göstergelerin açıklamaları. Yüksek volatilite nedeniyle birden fazla kriteri birlikte değerlendirin.</div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">24 Saatlik Değişim (%)</span></div>
-          <div class="iitem-desc">Son 24 saatte fiyat değişimi. Anlık momentum ve haber etkisini ölçer. Kripto piyasasında %5+ günlük hareketler normaldir.</div>
-          <span class="iitem-tip tip-warn">△ Tek başına yanıltıcı olabilir</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">7 Günlük Değişim (%)</span></div>
-          <div class="iitem-desc">Son 7 gündeki getiri. Kısa vadeli trend sinyali; haftalık momentum tespitinde kullanılır.</div>
-          <span class="iitem-tip tip-good">✓ >%10 güçlü haftalık momentum</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">30 Günlük Değişim (%)</span></div>
-          <div class="iitem-desc">Son 30 gündeki getiri. Orta vadeli trend ve momentum gücünü ölçer. Strateji kararlarında en sık kullanılan kripto metriği.</div>
-          <span class="iitem-tip tip-good">✓ >%30 güçlü aylık ivme</span><span class="iitem-tip tip-bad">✕ &lt;-%30 dip araştır</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">Piyasa Değeri ($)</span></div>
-          <div class="iitem-desc">Dolaşımdaki arz × fiyat. Coin büyüklüğü ve güvenilirliğinin en temel göstergesi. Büyük cap = daha istikrarlı, küçük cap = daha volatil.</div>
-          <span class="iitem-tip tip-warn">Large cap >10B$ · Mid cap 1–10B$ · Small cap &lt;1B$</span>
-        </div>
-        <div class="iitem">
-          <div class="iitem-top"><span class="iitem-name">TV Puanı</span></div>
-          <div class="iitem-desc">TradingView teknik analiz konsensüs skoru. RSI, MACD, hareketli ortalamalar dahil 26 indikatörün ortalaması. 0.5 üzeri AL, -0.5 altı SAT sinyali.</div>
-          <span class="iitem-tip tip-good">✓ >0.5 AL sinyali</span><span class="iitem-tip tip-warn">△ -0.5–0.5 nötr</span><span class="iitem-tip tip-bad">✕ &lt;-0.5 SAT</span>
-        </div>
-      </div>
-      </div>
+      <!-- ── KRİPTO ── -->
+      <div class="ib-panel" id="asset-panel-kripto">
+
+        <div class="ib-section">
+          <div class="ib-sec-hdr">🎯 Kripto Stratejileri</div>
+          <div class="ib-intro">Kripto piyasasında kanıtlanmış yatırım yaklaşımları. Yüksek volatilite nedeniyle risk yönetimi her stratejinin ayrılmaz parçasıdır.</div>
+
+          <div class="ib-item">
+            <div class="ib-name">HODL — Uzun Vadeli Tut</div>
+            <div class="ib-desc">Büyük piyasa değerli, köklü coinleri uzun vadeli tut. Günlük gürültüye aldırma; 3–5 yıl ufku belirle.</div>
+            <div class="ib-crit">Piyasa değeri &gt;10B$ · 1Y getiri pozitif · TV Puanı &gt;0.3</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">DCA — Düzenli Alım</div>
+            <div class="ib-desc">Sabit periyotlarla sabit miktarda alım yaparak maliyet ortalaması al. Volatiliteyi zamanlamak yerine zamana yay.</div>
+            <div class="ib-crit">Tüm piyasa koşullarında uygulanabilir strateji</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Momentum</div>
+            <div class="ib-desc">Kısa vadede güçlü momentum gösteren coinler. Hacim artışı + fiyat ivmesi birlikteliği güçlü sinyal.</div>
+            <div class="ib-crit">7G &gt;%15 · 30G &gt;%30 · TV Puanı &gt;0.5</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Dip Fırsatı</div>
+            <div class="ib-desc">ATH'den sert düşmüş, temel değerleri sağlam coinlerde kontrarian alım. Düşüşün devam edebileceğini unutma.</div>
+            <div class="ib-crit">30G &lt;-%20 · Piyasa değeri &gt;1B$ · TV Puanı &lt;0.3</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Layer 1 / Ekosistem</div>
+            <div class="ib-desc">Blockchain altyapısı sağlayan L1 protokollerine odaklan. Ekosistem büyüdükçe altyapı coini değer kazanır.</div>
+            <div class="ib-crit">Piyasa değeri &gt;5B$ · 1Y getiri &gt;%20</div>
+          </div>
+
+        </div><!-- /Kripto Strateji -->
+
+        <div class="ib-section">
+          <div class="ib-sec-hdr">🔍 Kripto Filtre Kriterleri</div>
+          <div class="ib-intro">Kripto taramasında kullanılan göstergelerin açıklamaları. Birden fazla kriteri birlikte değerlendirin.</div>
+
+          <div class="ib-item">
+            <div class="ib-name">24 Saatlik Değişim (%)</div>
+            <div class="ib-desc">Son 24 saatte fiyat değişimi. Anlık momentum ve haber etkisini ölçer. Kripto piyasasında %5+ günlük hareketler normaldir.</div>
+            <div class="ib-crit">Tek başına yanıltıcı olabilir</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">7 Günlük Değişim (%)</div>
+            <div class="ib-desc">Son 7 gündeki getiri. Kısa vadeli trend sinyali; haftalık momentum tespitinde kullanılır.</div>
+            <div class="ib-crit">&gt;%10 güçlü haftalık momentum</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">30 Günlük Değişim (%)</div>
+            <div class="ib-desc">Son 30 gündeki getiri. Orta vadeli trend ve momentum gücünü ölçer. En sık kullanılan kripto metriği.</div>
+            <div class="ib-crit ib-crit-multi"><span class="ibt good">✓ &gt;%30 güçlü aylık ivme</span><span class="ibt bad">✕ &lt;-%30 dip araştır</span></div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">Piyasa Değeri ($)</div>
+            <div class="ib-desc">Dolaşımdaki arz × fiyat. Coin büyüklüğü ve güvenilirliğinin en temel göstergesi.</div>
+            <div class="ib-crit">Large cap &gt;10B$ · Mid cap 1–10B$ · Small cap &lt;1B$</div>
+          </div>
+
+          <div class="ib-item">
+            <div class="ib-name">TV Puanı</div>
+            <div class="ib-desc">TradingView teknik analiz konsensüs skoru. RSI, MACD, hareketli ortalamalar dahil 26 indikatörün ortalaması.</div>
+            <div class="ib-crit ib-crit-multi"><span class="ibt good">✓ &gt;0.5 AL</span><span class="ibt mid">△ -0.5–0.5 nötr</span><span class="ibt bad">✕ &lt;-0.5 SAT</span></div>
+          </div>
+
+        </div><!-- /Kripto Filtre -->
+
       </div><!-- /asset-panel-kripto -->
 
-      <!-- ── YAKINDA PANELLERİ ── -->
-      <div class="info-asset-panel" id="asset-panel-etf">
-        <div class="yakinda-panel"><div class="yakinda-panel-icon">📦</div><div class="yakinda-panel-title">ETF Stratejileri Yakında</div><div class="yakinda-panel-desc">Borsa yatırım fonları için GOAT stratejileri ve filtre kriterleri hazırlanıyor. Çok yakında!</div></div>
-      </div>
-      <div class="info-asset-panel" id="asset-panel-eurobond">
-        <div class="yakinda-panel"><div class="yakinda-panel-icon">🌍</div><div class="yakinda-panel-title">Eurobond Stratejileri Yakında</div><div class="yakinda-panel-desc">Döviz cinsinden tahvil yatırımları için strateji ve filtre içerikleri hazırlanıyor.</div></div>
-      </div>
-      <div class="info-asset-panel" id="asset-panel-bono">
-        <div class="yakinda-panel"><div class="yakinda-panel-icon">📜</div><div class="yakinda-panel-title">Bono/Tahvil Stratejileri Yakında</div><div class="yakinda-panel-desc">Devlet ve özel sektör tahvilleri için sabit getiri stratejileri hazırlanıyor.</div></div>
-      </div>
-      <div class="info-asset-panel" id="asset-panel-viop">
-        <div class="yakinda-panel"><div class="yakinda-panel-icon">📊</div><div class="yakinda-panel-title">Viop Stratejileri Yakında</div><div class="yakinda-panel-desc">Vadeli işlem ve opsiyon piyasaları için türev stratejileri hazırlanıyor.</div></div>
-      </div>
-      <div class="info-asset-panel" id="asset-panel-varant">
-        <div class="yakinda-panel"><div class="yakinda-panel-icon">🎯</div><div class="yakinda-panel-title">Varant Stratejileri Yakında</div><div class="yakinda-panel-desc">Yapılandırılmış ürünler ve varant stratejileri için içerikler hazırlanıyor.</div></div>
-      </div>
-      <div class="info-asset-panel" id="asset-panel-opsiyon">
-        <div class="yakinda-panel"><div class="yakinda-panel-icon">⚙️</div><div class="yakinda-panel-title">Opsiyon Stratejileri Yakında</div><div class="yakinda-panel-desc">Covered call, protective put ve diğer opsiyon stratejileri için içerikler geliyor.</div></div>
-      </div>
-    </div>
-  </div>
-</div>
+    </div><!-- /modal-body -->
+  </div><!-- /modal -->
+</div><!-- /infoModal -->
+
 
 <!-- ─── SUPPORT MODAL ─── -->
 <div class="smodal-overlay" id="supportModal">
