@@ -1,40 +1,56 @@
-// DeepFin Service Worker v8 - Arctic light theme
-const CACHE = 'deepfin-v8';
+// DeepFin Service Worker v9 - Network First for CSS/JS
+const CACHE = 'deepfin-v9';
 
 // Install: hızlı geç
 self.addEventListener('install', function(e) {
   self.skipWaiting();
 });
 
-// Activate: eski cache'leri temizle
+// Activate: tüm eski cache'leri temizle
 self.addEventListener('activate', function(e) {
   e.waitUntil(
     caches.keys().then(function(keys) {
       return Promise.all(
-        keys.filter(function(k){ return k !== CACHE; })
-            .map(function(k){ return caches.delete(k); })
+        keys.map(function(k){ return caches.delete(k); })
       );
     })
   );
   self.clients.claim();
 });
 
-// Fetch: sadece same-origin GET isteklerini cache'le
-// Harici URL'leri (fonts, CDN) direkt network'e bırak - CSP ile çakışmayı önle
+// Fetch
 self.addEventListener('fetch', function(e) {
   var url = new URL(e.request.url);
 
   // Sadece GET, sadece same-origin
   if (e.request.method !== 'GET' || url.origin !== self.location.origin) {
-    return; // pass-through, SW müdahil olmuyor
+    return;
   }
 
-  // /api/ istekleri: Network First (veri güncel kalsın)
+  // /api/ istekleri: Network First
   if (url.pathname.startsWith('/api/')) {
     e.respondWith(
       fetch(e.request).catch(function() {
         return caches.match(e.request);
       })
+    );
+    return;
+  }
+
+  // CSS ve JS: Network First (her zaman taze versiyon)
+  if (url.pathname.match(/\.(css|js)(\?.*)?$/)) {
+    e.respondWith(
+      fetch(e.request)
+        .then(function(res) {
+          if (res.ok) {
+            var clone = res.clone();
+            caches.open(CACHE).then(function(c){ c.put(e.request, clone); });
+          }
+          return res;
+        })
+        .catch(function() {
+          return caches.match(e.request);
+        })
     );
     return;
   }
@@ -57,7 +73,7 @@ self.addEventListener('fetch', function(e) {
     return;
   }
 
-  // Diğer same-origin statik dosyalar: Cache First
+  // Diğer statik dosyalar (görseller vb.): Cache First
   e.respondWith(
     caches.match(e.request).then(function(cached) {
       if (cached) return cached;
