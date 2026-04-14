@@ -484,7 +484,7 @@ td:first-child,td:nth-child(2){text-align:left;}
 .hp-cta-primary{background:var(--text);color:#000;border:none;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;font-family:Inter, sans-serif;}
 .hp-cta-primary:hover{background:#d4d4d4;transform:translateY(-1px);}
 .hp-cta-secondary{background:transparent;color:var(--text2);border:1px solid var(--border);padding:12px 22px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;font-family:Inter, sans-serif;}
-.hp-cta-secondary:hover{border-color:#333;color:var(--text);}
+.hp-cta-secondary:hover{border-color:var(--border2);color:var(--text);}
 
 .hp-stats{display:flex;gap:0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
 .hp-stat{flex:1;padding:20px 24px;border-right:1px solid var(--border);text-align:center;}
@@ -510,7 +510,7 @@ td:first-child,td:nth-child(2){text-align:left;}
 
 .hp-strategy-list{display:flex;flex-direction:column;gap:8px;}
 .hp-strategy{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:12px 14px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:12px;}
-.hp-strategy:hover{border-color:#333;background:#0a0a0a;}
+.hp-strategy:hover{border-color:var(--accent);background:rgba(14,165,233,.05);}
 .hp-strategy-emoji{font-size:20px;width:28px;text-align:center;}
 .hp-strategy-info{flex:1;}
 .hp-strategy-name{font-size:12px;font-weight:700;color:var(--text);}
@@ -526,7 +526,7 @@ td:first-child,td:nth-child(2){text-align:left;}
 .adv-ex-label{font-size:9px;font-weight:600;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;}
 .adv-ex-pills{display:flex;flex-wrap:wrap;gap:4px;}
 .adv-ex-pill{font-size:10px;font-weight:600;padding:4px 8px;border:1px solid var(--border);border-radius:4px;color:var(--text2);cursor:pointer;transition:all .12s;background:var(--s2);white-space:nowrap;}
-.adv-ex-pill:hover{border-color:#444;color:var(--text);}
+.adv-ex-pill:hover{border-color:var(--border2);color:var(--text);}
 .adv-ex-pill.on{border-color:var(--accent);color:var(--accent);background:rgba(14,165,233,.08);}
 
 /* ── HP DISCLAIMER ── */
@@ -540,7 +540,7 @@ td:first-child,td:nth-child(2){text-align:left;}
 .hp-howto-title{font-size:11px;font-weight:600;color:var(--muted2);letter-spacing:.6px;text-transform:uppercase;margin-bottom:28px;}
 .hp-howto-steps{display:flex;align-items:flex-start;justify-content:center;gap:0;}
 .hp-howto-step{display:flex;flex-direction:column;align-items:center;gap:10px;width:180px;padding:24px 18px;background:var(--s1);border:1px solid var(--border);border-radius:12px;position:relative;transition:border-color .2s;}
-.hp-howto-step:hover{border-color:#333;}
+.hp-howto-step:hover{border-color:var(--border2);}
 .hp-howto-num{position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:24px;height:24px;background:var(--accent);border-radius:50%;font-size:11px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;}
 .hp-howto-icon{font-size:32px;margin-top:6px;}
 .hp-howto-label{font-size:14px;font-weight:700;color:var(--text);}
@@ -556,8 +556,8 @@ td:first-child,td:nth-child(2){text-align:left;}
 /* ── SIDEBAR TABS ── */
 .sb-tabs{display:flex;gap:4px;padding:10px 10px 0;flex-shrink:0;}
 .sb-tab{flex:1;padding:7px 6px;font-size:11px;font-weight:600;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--muted2);cursor:pointer;transition:all .15s;font-family:Inter, sans-serif;letter-spacing:.2px;}
-.sb-tab:hover{color:var(--text);border-color:#333;}
-.sb-tab.active{background:var(--s2);color:var(--text);border-color:#333;}
+.sb-tab:hover{color:var(--text);border-color:var(--border2);}
+.sb-tab.active{background:var(--s2);color:var(--text);border-color:var(--accent);}
 .sb-advanced-hint{font-size:10px;color:var(--muted2);background:rgba(14,165,233,.06);border:1px solid rgba(14,165,233,.15);border-radius:5px;padding:7px 10px;margin:10px 10px 4px;line-height:1.5;}
 
 /* ── ONBOARDING ── */
@@ -565,7 +565,7 @@ td:first-child,td:nth-child(2){text-align:left;}
 .onb-title{font-size:11px;font-weight:600;color:var(--muted2);letter-spacing:.6px;text-transform:uppercase;margin-bottom:20px;}
 .onb-steps{display:flex;align-items:flex-start;gap:0;justify-content:center;}
 .onb-step{display:flex;flex-direction:column;align-items:center;gap:8px;width:160px;padding:20px 16px;background:var(--s1);border:1px solid var(--border);border-radius:10px;position:relative;transition:border-color .2s;}
-.onb-step:hover{border-color:#333;}
+.onb-step:hover{border-color:var(--border2);}
 .onb-num{position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:20px;height:20px;background:var(--accent);border-radius:50%;font-size:10px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Geist Mono', monospace;}
 .onb-icon{font-size:28px;margin-top:4px;}
 .onb-label{font-size:13px;font-weight:700;color:var(--text);}
