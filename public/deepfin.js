@@ -1411,28 +1411,28 @@ const GURUS = {
   },
   piotroski: {
     label: 'Piotroski F-Score',
-    desc: 'Dokuz soruluk bilanço testi: karlılık artıyor mu, nakit güçleniyor mu, borç azalıyor mu, verimlilik yükseliyor mu? Yüksek puan alan şirketlerin bilanço kalitesi hissiyat değil sayılarla kanıtlanmış.',
+    desc: 'Piotroski için hisseyi anlamak 9 soruya bakmak demektir. Kâr etti mi? Nakit artıyor mu? Borç azaldı mı? Verimlilik yükseldi mi? Bu sorulardan yüksek puan alan şirket gerçekten sağlam demektir. Hissiyat yok, tamamen sayılar konuşur.',
     filters: {roe_min:3, cr_min:1, de_max:120},
     special: 'piotroski'
   },
   schloss: {
     label: 'Walter Schloss — Deep Value',
-    desc: 'Borsa değeri varlık değerinin altında, kazancına göre ucuz, borcu çok az, nakit güçlü ve temettü ödeyen şirketler. Beş kriter birlikte en derin değer filtresini oluşturuyor.',
+    desc: 'Schloss için strateji son derece basit: defter değerinin altında, borcu az, temettü ödeyen hisseyi al ve bekle. 45 yılda bunu yaparak yıllık %15'in üzerinde getiri elde etti. Karmaşıklık değil, sabır ve disiplin.',
     filters: {pb_max:1, pe_max:12, de_max:30, div_min:1, cr_min:1.5}
   },
   citadel: {
     label: 'Citadel — Wellington',
-    desc: 'Özkaynak getirisi ve net marjı yüksek, borcu makul, nakit yeterli ve karları büyüyen şirketler. Büyük kurumsal hisse seçim standartlarını karşılayan kalite profili.',
+    desc: 'Citadel için kurumsal kalite standartları geçerlidir. Özkaynak getirisi ve net marjı yüksek, borcu makul, nakit yeterli ve karları büyüyen şirketler taranır. Dünyanın en başarılı hedge fonlarından birinin hisse seçim standartları.',
     filters: {roe_min:15, margin_min:12, de_max:70, cr_min:1.2, earng_min:10}
   },
   deshaw: {
     label: 'D.E. Shaw — Oculus',
-    desc: 'Karları ve satışları birlikte hızla büyüyen, özkaynak getirisi ve net marjı yüksek, nakit dengesi sağlam şirketler. Büyüme, verimlilik ve momentum aynı anda güçlü — algoritmanın aradığı kombinasyon.',
+    desc: 'D.E. Shaw için algoritma üç şeyi aynı anda ister: hızlı büyüme, güçlü karlılık ve fiyat momentumu. Karları ve satışları birlikte hızla büyüyen, özkaynak getirisi ve marjı yüksek şirketler. Üçü birden bulunduğunda güçlü bir kombinasyon ortaya çıkar.',
     filters: {earng_min:20, roe_min:18, margin_min:15, revg_min:15, cr_min:1}
   },
   millennium: {
     label: 'Millennium Management',
-    desc: 'Özkaynak getirisi ve net marjı pozitif, borcu sınırlı, nakit güçlü ve karları istikrarlı büyüyen şirketler. Risk odaklı seçim: borç düşük tutulurken karlılık ve büyüme birlikte aranıyor.',
+    desc: 'Millennium için önce risk, sonra getiri gelir. 1989'dan bu yana hiç zarar etmeden gelen fonun önceliği buydu. Marjı güçlü, borcu az, büyümesi istikrarlı şirketler — volatilite değil, sürdürülebilirlik.',
     filters: {roe_min:12, margin_min:10, de_max:60, cr_min:1.5, earng_min:8}
   }
 
