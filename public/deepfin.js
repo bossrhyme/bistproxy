@@ -817,9 +817,9 @@ function loadColPrefs() {
     var saved = localStorage.getItem('df_cols_v5');
     if (saved) { _colVisible = {}; JSON.parse(saved).forEach(function(k){ _colVisible[k]=true; }); return; }
   } catch(e) {}
-  // Varsayılan: tüm sütunlar görünür
+  // Varsayılan: def:false olan sütunlar gizli
   _colVisible = {};
-  COL_DEFS.forEach(function(d){ _colVisible[d.key]=true; });
+  COL_DEFS.forEach(function(d){ _colVisible[d.key] = d.def !== false; });
 }
 
 function saveColPrefs() {
