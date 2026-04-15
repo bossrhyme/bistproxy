@@ -1289,13 +1289,13 @@ const TECH_PRESETS = {
 
   strongDay: {
     label: 'Güçlü Gün',
-    desc: 'Bugün kayda değer yükselen ve bunu normalin üzerinde hacimle destekleyen hisseler. Hacimli yükseliş rastgele değil, arkasında bir katalizör olduğuna işaret eder.',
+    desc: 'Kısa vadeli takipçi için bugün ciddi miktarda yükselen ve normalden fazla el değiştiren hisse dikkat çeker. Arkasında bir haber, açıklama ya da büyük bir alım olabilir. Ani kısa vadeli bir hareketin başlangıcını yakalamak için.',
     filters: { chg_min: 2, vol_min: 0.5 }
   },
 
   highVolume: {
     label: 'Kurumsal Hacim',
-    desc: 'Çok yüksek hacimle işlem görürken fiyatı da yükselen hisseler. Bu ölçekte hacim genellikle büyük kurumsal alıcıların devrede olduğunu gösterir.',
+    desc: 'Kurumsal akışı izleyen yatırımcı için normalden çok daha fazla işlem hacmi önemli bir sinyal taşır. Bu ölçekte hacim genellikle büyük kurumsal alıcıların pozisyon açtığını gösterir. Akıllı paranın nereye gittiğini izlemek isteyenler için.',
     filters: { vol_min: 5, chg_min: 0 }
   },
 
@@ -1303,25 +1303,25 @@ const TECH_PRESETS = {
 
   techBuy: {
     label: '26 İndikatör AL',
-    desc: 'RSI, MACD, ADX, Stochastic ve hareketli ortalamalar dahil yirmi altı teknik göstergenin çoğunluğu alım sinyali veren hisseler. Tek indikatör değil, teknik tablonun tamamı aynı yönü gösteriyor.',
+    desc: 'Teknik analist için tek bir indikatör yeterli değil, hepsinin aynı yönü göstermesi lazım. RSI, MACD, Stochastic ve hareketli ortalamalar dahil 26 göstergenin büyük çoğunluğu alım sinyali veriyor. En kapsamlı teknik onay.',
     filters: { tech_rating_min: 0.5 }
   },
 
   momentum3m: {
     label: '3 Aylık Lider',
-    desc: 'Son üç ve altı ayda piyasanın önünde giden hisseler. Her iki zaman diliminde de güçlü olan momentum kısa vadeli değil, orta vadede de geçerli demektir.',
+    desc: 'Orta vadeli momentum takipçisi için kısa vadede değil, birkaç aydır güçlü olan hisse daha güvenilir bir sinyal verir. Son üç ve altı ayda piyasanın önünde giden hisseler aranır. Her iki dönemde de güçlü olan momentum devam eder.',
     filters: { perf3m_min: 15, perf6m_min: 20 }
   },
 
   trendFollow: {
     label: 'Güçlü Trendde',
-    desc: 'Yıllık en düşük seviyesinden önemli ölçüde yükseliş yapmış ve bu kazancını koruyan hisseler. Dip geride kaldı, trend yukarı ve güçlü.',
+    desc: 'Trend takipçisi için dip geride kalmış ve trendi yukarı olan hisse en güçlü adaydır. Yıllık en düşük seviyesinden önemli ölçüde yükseliş yapmış ve bu kazancını koruyan hisseler aranır. Düşükten uzak, güçlü kalmaya devam eden profil.',
     filters: { from_low_min: 25, perf6m_min: 10 }
   },
 
   rsiBounce: {
     label: 'RSI Toparlanması',
-    desc: 'Aşırı satılmış bölgeden çıkmış ama henüz pahalı bölgeye girmemiş hisseler. Yıllık dibinden biraz yukarıda — toparlanma başlamış, ivme henüz erken aşamada.',
+    desc: 'Toparlanma avcısı için aşırı satılmış bölgeden çıkmış ama henüz pahalı bölgeye girmemiş hisse iyi bir konumda. Dibi geride bırakmış, fiyatı hâlâ makul seviyede. Toparlanmanın erken aşamasını yakalamak için.',
     filters: { rsi_min: 30, rsi_max: 50, from_low_min: 3 }
   },
 
@@ -1340,22 +1340,22 @@ const GURUS = {
 
   ackman: {
     label: 'Bill Ackman — Activist',
-    desc: 'Özkaynak getirisi ve net marjı yüksek, borcu makul ve nakit yeterli, üstelik kazancına göre makul fiyatlı şirketler. Kaliteli ama piyasanın henüz fark etmediği, katalizör bekleyen profil.',
+    desc: 'Ackman için kalite şart ama piyasanın henüz fark etmemesi de şart. Özkaynak getirisi ve marjı yüksek, borcu makul, fiyatı mantıklı şirketlere büyük hissedar olarak girer ve yönetimi değişime zorlar. İçeriden baskı sonucu gizli değer açığa çıkar.',
     filters: {roe_min:15, margin_min:10, de_max:80, cr_min:1.2, pe_max:20}
   },
   ark: {
     label: 'Cathie Wood / ARK',
-    desc: 'Satışları çok hızlı büyüyen, karları da artan ve kısa vadeli borçlarını karşılayacak nakit bulunduran şirketler. Yüksek büyüme öncelikli, kâr etmeye başlamış olması yeterli.',
+    desc: 'Cathie Wood için bugünkü kâr değil yarınki pazar büyüklüğü önemlidir. Yapay zeka, biyoteknoloji, fintech gibi geleceğin teknolojilerini geliştiren şirketler aranır. Bugün zarar ediyor olabilir ama 5-10 yıl içinde piyasayı dönüştürme potansiyeli taşımalı.',
     filters: {revg_min:30, earng_min:20, cr_min:1}
   },
   buffett: {
     label: 'Warren Buffett',
-    desc: 'Ne aşırı ucuz ne aşırı pahalı — kazancının makul bir katında satılıyor. Hem brüt hem net marjı yüksek, özkaynak getirisi güçlü, borcu sınırlı ve nakit dengeli. Altı kriter aynı anda.',
+    desc: 'Buffett için rakiplerin kolayca kopyalayamadığı iş modeli her şeyden önce gelir. Hem brüt hem net marjı yüksek, özkaynak getirisi güçlü, borcu az — ve fiyatı ne aşırı ucuz ne aşırı pahalı. Hızlı alım-satım değil, sağlam bir şirkete uzun vadeli ortak ol.',
     filters: {pe_min:5, pe_max:25, roe_min:20, margin_min:20, gross_min:40, de_max:50, cr_min:1.5}
   },
   einhorn: {
     label: 'David Einhorn — Deep Value',
-    desc: 'Kazancına göre ucuz, borcu düşük, kısa vadeli nakit yeterli ve net marjı pozitif olan şirketler. Kârlı ama piyasanın gözden kaçırdığı — fiyatın er ya da geç düzeleceği varsayımı.',
+    desc: 'Einhorn için piyasanın görmezden geldiği şirket en büyük fırsattır. Kazancına göre gerçekten ucuz, nakit fazlası var, borcu az ve kârlı. Bu dört şey bir arada olunca fiyatın er ya da geç gerçek değerine dönmesini bekler.',
     filters: {pe_max:15, de_max:50, cr_min:1.5, margin_min:8, roe_min:10}
   },
   fisher: {
