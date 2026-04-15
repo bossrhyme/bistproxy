@@ -1059,7 +1059,7 @@ async function runScan(){
         for (const row of (_bistData.data || [])) {
           if (row.symbol && row.freeFloat != null) _bistFloatMap[row.symbol] = row.freeFloat;
         }
-      } catch(e) { /* sessizce geç */ }
+      } catch(e) { console.warn('[DeepFin] bist-scan float verisi alınamadı:', e.message); }
     }
 
     // Parse TradingView response — index bazlı, sıra garantili
