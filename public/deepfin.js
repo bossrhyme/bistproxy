@@ -1243,17 +1243,17 @@ async function runScan(){
 // ═══════════════════════════════════════════
 const PRESETS = {
   // Klasik değer yatırımı: F/K<15, PD/DD<2, temettü ödeyen
-  value:    { label: 'Değer Hisseleri',    desc: 'Piyasanın gözden kaçırdığı ucuz hisseler: F/K<15, PD/DD<2, temettü>%2. Graham-Buffett değer yatırımı temeli.', filters: {pe_max:15, pb_max:2, div_min:2} },
+  value:    { label: 'Değer Hisseleri',    desc: 'Piyasanın fark etmediği, gerçek değerinin altında fiyatlanmış şirketler. Ucuz hisse arıyorsan başlangıç noktası bu. Fiyat/Kazanç oranı düşük, temettü ödüyor olması istenir.', filters: {pe_max:15, pb_max:2, div_min:2} },
   // Büyüme: kazanç+gelir ivmesi, güçlü özkaynak getirisi
-  growth:   { label: 'Büyüme Hisseleri',   desc: 'Hızlı büyüyen, ivmesi artan şirketler: EPS büyümesi>%20, gelir büyümesi>%15, ROE>%15. Lynch "fast-grower" profili.', filters: {earng_min:20, revg_min:15, roe_min:15} },
+  growth:   { label: 'Büyüme Hisseleri',   desc: 'Her yıl hem satışları hem karı hızla artan şirketler. Bugün küçük ama yarın çok daha büyük olabilir. Kısa vadede fiyat düşüşleri olabilir, asıl kazanç uzun vadede gelir.', filters: {earng_min:20, revg_min:15, roe_min:15} },
   // Temettü: yüksek verim, sürdürülebilir ödeme kapasitesi
-  dividend: { label: 'Temettü Hisseleri',  desc: 'Güçlü ve istikrarlı temettü: verim>%4, borç/özkaynak<%80, current ratio>1.2. Gelir odaklı uzun vadeli yatırım.', filters: {div_min:4, de_max:80, cr_min:1.2} },
+  dividend: { label: 'Temettü Hisseleri',  desc: 'Düzenli olarak hissedarlara nakit ödeyen şirketler. Hisse fiyatı oynamasa bile yılda %4+ kazanırsın. Borcu makul, parası ödemeye yeter durumda olan şirketler taranır.', filters: {div_min:4, de_max:80, cr_min:1.2} },
   // Kalite: Buffett/Munger "wonderful company at fair price"
-  quality:  { label: 'Kaliteli Şirketler', desc: 'Olağanüstü kalite: ROE>%20, net marj>%15, brüt marj>%35, borç<özkaynak, güçlü likidite. "Wonderful company at fair price."', filters: {roe_min:20, margin_min:15, gross_min:35, de_max:80, cr_min:1.5} },
+  quality:  { label: 'Kaliteli Şirketler', desc: 'Her açıdan sağlam şirketler. Karlılığı yüksek, borcu az, nakit durumu güçlü. Piyasa düşse bile ayakta kalan, uzun vadede değer biriktiren şirket profili.', filters: {roe_min:20, margin_min:15, gross_min:35, de_max:80, cr_min:1.5} },
   // Az borçlu: Buffett "borçsuz şirket" prensibi
-  lowdebt:  { label: 'Az Borçlu Şirketler', desc: 'Borçsuz güç: D/E<%30, current ratio>2, bilanço temiz. Kriz dönemlerinde hayatta kalanlar. Buffett "borçlu şirketten uzak dur" prensibi.', filters: {de_max:30, cr_min:2} },
+  lowdebt:  { label: 'Az Borçlu Şirketler', desc: 'Borcu çok az ya da hiç olmayan şirketler. Ekonomi kötüye gidince borçlu şirketler sıkışır, borçsuzlar ayakta kalır. Güvenli liman arıyorsan bu filtre için.', filters: {de_max:30, cr_min:2} },
   // Momentum: güçlü ivme, hem büyüme hem fiyat güç
-  momentum: { label: 'Momentum Hisseleri', desc: 'Çift ivme: gelir büyümesi>%20 VE kazanç büyümesi>%20. ARK/Minervini kesişim noktası — hem operasyonel hem hisse güçlü.', filters: {revg_min:20, earng_min:20} }
+  momentum: { label: 'Momentum Hisseleri', desc: 'Hem satışları hem de karı aynı anda hızla artan şirketler. Bu ikisi birlikte artıyorsa şirket gerçekten ivme kazanıyor demektir. Piyasa bunu fark edince hisse de yükselir.', filters: {revg_min:20, earng_min:20} }
 };
 
 // Teknik Analiz Presetleri
@@ -1265,37 +1265,37 @@ const TECH_PRESETS = {
 
   breakout: {
     label: 'Kırılım',
-    desc: 'Zirvesine yakın, güçlü artışla kapanan, hacim destekli VE indikatörler AL sinyali veren hisseler. Minervini SEPA kırılım koşulu.',
+    desc: 'Uzun süre dar bir aralıkta kalan hisse, güçlü bir yükselişle o aralığı geçiyor. Hacimin de artması bu hareketin sahte olmadığının işareti. Trendin başlangıcını yakalamak için kullanılır.',
     filters: { from_high_max: -5, chg_min: 1.5, vol_min: 0.5, tech_rating_min: 0.1 }
   },
 
   oversold: {
     label: 'Dip Fırsatı',
-    desc: 'Sert düşen, dibine yakın VE RSI 35 altında gerçekten aşırı satılmış hisseler. Kontrarian yaklaşım.',
+    desc: 'Çok sert düşmüş, teknik göstergeler aşırı satıldı diyen hisseler. Herkesin sattığı sırada almak riskli ama fırsat da olabilir. Temel değerleri hâlâ sağlamsa toparlanma potansiyeli var.',
     filters: { from_high_max: -20, chg_min: 0, rsi_max: 35 }
   },
 
   nearHigh: {
     label: 'Zirveye Yakın',
-    desc: '1 aylık zirvesinin %3 yakınında VE son 3 ayda en az %5 kazanmış hisseler. Güçlü trend devam sinyali.',
+    desc: 'Son 1 ayın en yüksek fiyatına çok yakın olan hisseler. Zirveye yakın olmak genellikle trendin devam ettiğini gösterir. Güçlü trendde olanları takip etmek isteyenler için.',
     filters: { from_high_max: -3, perf3m_min: 5 }
   },
 
   pullback: {
     label: 'Sağlıklı Çekilme',
-    desc: 'Zirveden %10-25 geri çekilen VE son 6 ayda en az %10 kazanmış hisseler. Güçlü trendde alım fırsatı.',
+    desc: 'Genel trendi yukarı olan ama son dönemde biraz geri çekilen hisseler. Güçlü bir yükseliş trendinin içinde kısa süreli düşüşler alım fırsatı olabilir. Hem trend güçlü hem fiyat daha makul.',
     filters: { from_high_max: -10, from_low_min: 10, perf6m_min: 10 }
   },
 
   strongDay: {
     label: 'Güçlü Gün',
-    desc: 'Bugün %2+ yükselen VE hacimle desteklenen hisseler. Katalizör: haber, kırılım veya sektör rotasyonu.',
+    desc: 'Bugün ciddi miktarda yükselen ve normalden fazla el değiştiren hisseler. Arkasında bir haber, açıklama ya da büyük alım olabilir. Kısa vadeli hareketin başlangıcını yakalamak için.',
     filters: { chg_min: 2, vol_min: 0.5 }
   },
 
   highVolume: {
     label: 'Kurumsal Hacim',
-    desc: 'Normalin çok üzerinde hacimle işlem gören VE fiyat artan hisseler. Büyük oyuncuların alım yaptığı hisseler.',
+    desc: 'Normalden çok daha fazla alım-satım olan ve fiyatı yükselen hisseler. Bu kadar hacim genellikle büyük kurumların pozisyon açtığının işareti. Akıllı para nereye gidiyor diye bakıyorsan bu filtre.',
     filters: { vol_min: 5, chg_min: 0 }
   },
 
@@ -1303,25 +1303,25 @@ const TECH_PRESETS = {
 
   techBuy: {
     label: '26 İndikatör AL',
-    desc: 'TradingView\'nin 26 teknik indikatörünün (RSI, MACD, ADX, Stochastic, 15 hareketli ortalama…) çoğunluğu AL sinyali veriyor. En güçlü teknik onay.',
+    desc: '26 farklı teknik analiz aracının büyük çoğunluğu bu hisse için \'al\' diyor. Tek bir göstergeye güvenmek yerine hepsini birden değerlendiren en kapsamlı teknik filtre.',
     filters: { tech_rating_min: 0.5 }
   },
 
   momentum3m: {
     label: '3 Aylık Lider',
-    desc: 'Son 3 ayda %15+, 6 ayda %20+ kazanan hisseler. Jegadeesh-Titman momentum stratejisi: geçen dönemin kazananları kazanmaya devam eder.',
+    desc: 'Son 3 ve 6 ayda en çok değerlenen hisseler. Araştırmalar gösteriyor ki güçlü bir dönem geçiren hisseler sıklıkla güçlü kalmaya devam ediyor. Momentumu takip etmek için.',
     filters: { perf3m_min: 15, perf6m_min: 20 }
   },
 
   trendFollow: {
     label: 'Güçlü Trendde',
-    desc: '52 hafta düşüğünden %25+ yukarıda, 6 ay getirisini koruyan hisseler. Minervini Trend Template kriteri.',
+    desc: 'Yıllık en düşük seviyesinden önemli ölçüde yükseliş yapmış ve bu seviyeyi koruyan hisseler. Trend takibinin özü: düşükten uzak, güçlü kalmaya devam eden hisseler.',
     filters: { from_low_min: 25, perf6m_min: 10 }
   },
 
   rsiBounce: {
     label: 'RSI Toparlanması',
-    desc: 'RSI 30-50 arasında — aşırı satımdan çıkmış, henüz aşırı alıma girmemiş hisseler. Dipten toparlanma erken aşaması.',
+    desc: 'Aşırı satılmış bölgeden çıkmış ama henüz pahalıya girmemiş hisseler. Dibi geride bırakmış ama fiyatı hâlâ makul. Toparlanmanın erken aşamasını yakalamak için iyi bir bölge.',
     filters: { rsi_min: 30, rsi_max: 50, from_low_min: 3 }
   },
 
@@ -1340,99 +1340,99 @@ const GURUS = {
 
   ackman: {
     label: 'Bill Ackman — Activist',
-    desc: 'Aktivist değer: yüksek ROE, güçlü marj, makul borç. Piyasanın gözden kaçırdığı, katalizör bekleyen kaliteli şirketler. "Yönetimi değiştir, değeri aç." 20Y+ ~%20/yıl.',
+    desc: 'Kaliteli ama potansiyeli değerlendirilmemiş şirketler. Ackman bu şirketlerin büyük hissedarı olup yönetimi değişime zorlar. İçeriden baskı sonucu değer açığa çıkar.',
     filters: {roe_min:15, margin_min:10, de_max:80, cr_min:1.2, pe_max:20}
   },
   ark: {
     label: 'Cathie Wood / ARK',
-    desc: 'Disruptive büyüme: yıkıcı teknoloji, genomik, AI, fintech. Gelir büyümesi >%30, güçlü kazanç ivmesi. Kârlılık ikincil — pazar liderliği önce gelir.',
+    desc: 'Yapay zeka, biyoteknoloji, fintech gibi geleceğin teknolojilerini geliştiren şirketler. Bugün kâr etmiyor olabilirler ama 5-10 yıl içinde piyasayı değiştirme potansiyeli taşıyorlar. Yüksek risk, yüksek getiri potansiyeli.',
     filters: {revg_min:30, earng_min:20, cr_min:1}
   },
   buffett: {
     label: 'Warren Buffett',
-    desc: 'Sürdürülebilir rekabet avantajı (moat): ROE>%20, brüt marj>%40, net marj>%20, D/E<%50. Makul fiyat, uzun vadeli tutuş. "Harika şirketi adil fiyata al."',
+    desc: "Buffett'ın aradığı şirket: rakipler kolayca kopyalayamıyor, karlılık yüksek, borç az. Fiyatı mantıklıysa uzun vadeli tut. Hızlı alım-satım değil, sağlam şirkete ortak ol mantığı.",
     filters: {pe_min:5, pe_max:25, roe_min:20, margin_min:20, gross_min:40, de_max:50, cr_min:1.5}
   },
   einhorn: {
     label: 'David Einhorn — Deep Value',
-    desc: 'Derin değer + kısa satış: düşük F/K, güçlü nakit, düşük borç, kârlı ama gözden kaçmış şirketler. "Piyasa geçici yanılıyor." Greenlight Capital.',
+    desc: 'Gerçekten ucuz olduğu hâlde piyasanın görmezden geldiği şirketler. Düşük fiyat/kazanç oranı, nakit fazlası ve düşük borç bir arada olunca fiyatın er ya da geç düzelmesi beklenir.',
     filters: {pe_max:15, de_max:50, cr_min:1.5, margin_min:8, roe_min:10}
   },
   fisher: {
     label: 'Philip Fisher — Scuttlebutt',
-    desc: "Uzun vadeli büyüme: gelir>%15, kazanç>%15, brüt marj>%35, net marj>%12. \"Harika şirketi asla satma.\" Buffett ve Lynch'in ilham kaynağı.",
+    desc: "Yıllar içinde istikrarlı şekilde büyüyen, karlılığını koruyan şirketler. Fisher'ın stratejisi: gerçekten iyi şirketi bul, al ve uzun yıllar elinde tut. Buffett'ı en çok etkileyen yatırımcılardan biri.",
     filters: {revg_min:15, earng_min:15, gross_min:35, margin_min:12, de_max:60}
   },
   graham: {
     label: 'Benjamin Graham',
-    desc: 'Derin değer & güvenlik marjı: F/K<10, PD/DD<1.5, cari>2, B/Ö<%50, temettü geçmişi. En muhafazakâr yatırım felsefesi. "Akıllı Yatırımcı."',
+    desc: 'Değer yatırımının kurucusu. Sadece çok ucuz, borcu az, nakit durumu güçlü ve temettü ödeyen şirketler. En muhafazakâr filtre: hata payı büyük, risk düşük.',
     filters: {pe_max:10, pb_max:1.5, de_max:50, cr_min:2, div_min:1}
   },
   greenblatt: {
     label: 'Joel Greenblatt — Magic Formula',
-    desc: "Magic Formula: iyi şirketi (yüksek ROIC) ucuza al (yüksek kazanç verimi). ROE>%25, F/K<15. 17 yılda S&P'yi yıllık %18 geçti. \"İki kural yeterli.\"",
+    desc: 'İki kural: şirket iyi mi, fiyatı makul mu? İkisi de tutuyorsa al. Greenblatt bu basit formülle yıllarca piyasa ortalamasını geçti. Karlılığı yüksek ama pahalı olmayan şirketler hedef.',
     filters: {roe_min:25, pe_max:15, de_max:80, cr_min:1}
   },
   icahn: {
     label: 'Carl Icahn — Activist Value',
-    desc: 'Nakit zengini, düşük borç, düşük F/K — yönetim baskısıyla değer açığa çıkar. Hissedar dostu adımlar: geri alım, temettü, satış. "Savaşçı yatırımcı."',
+    desc: 'Bol nakdi olan ama düşük değerlenen şirketler. Icahn büyük hissedar olup yönetimi hissedara para dağıtmaya zorlar. Temettü artışı ya da geri alım duyurulunca fiyat atlar.',
     filters: {pb_max:1.5, pe_max:12, de_max:60, cr_min:1.5, div_min:1}
   },
   klarman: {
     label: 'Seth Klarman — Margin of Safety',
-    desc: "Güvenlik marjı: piyasanın görmezden geldiği hisseler. F/K<10, PD/DD<1.2, B/Ö<%40, nakit güçlü. \"Ucuzu al, bilanço yanlış fiyatlanmışsa bekle.\" 40Y ~%20/yıl.",
+    desc: "Graham'dan bile daha temkinli bir yaklaşım. Gerçek değerinden çok daha ucuza satılan şirketler. Fiyat düşük, bilanço güçlü olunca beklemeye değer. Hata payı büyük olmak şart.",
     filters: {pe_max:10, pb_max:1.2, de_max:40, cr_min:2, margin_min:5}
   },
   lynch: {
     label: 'Peter Lynch — GARP',
-    desc: "PEG<1 altın fırsat: büyüme hızına göre ucuz. Kazanç büyümesi>%15, makul borç. \"Anlayabildiğin şirketi al, sayıları kontrol et.\" 13Y %29/yıl.",
+    desc: "Hem büyüyen hem de buna göre ucuz kalan şirketler. Lynch'in formülü: büyüme hızı fiyat/kazanç oranından yüksekse iyi fırsattır. Tanıdığın, anladığın şirkete bak tavsiyesiyle ünlü.",
     filters: {pe_min:5, pe_max:35, earng_min:15, de_max:80, cr_min:1},
     special: 'peg'
   },
   minervini: {
     label: 'Mark Minervini — SEPA',
-    desc: 'SEPA büyüme traderı: kazanç büyümesi>%25, ROE>%17, marj>%10, borç makul. Zirveye yakın + hacim patlamasıyla tamamlanır. ABD şampiyonu.',
+    desc: 'Hem temel analizi güçlü hem de teknik olarak yukarı kırılım yapmak üzere olan hisseler. Kar hızla artıyor, bilanço sağlam ve hisse zirveye yakın. İki sinyal birlikte güçlü alım işareti.',
     filters: {earng_min:25, roe_min:17, margin_min:10, de_max:100, cr_min:1}
   },
   munger: {
     label: 'Charlie Munger — Quality Compounder',
-    desc: '"Harika şirketi adil fiyata al." Brüt marj>%50, ROE>%20, neredeyse borçsuz, sektör lideri. Buffett\'ın ortağı — kaliteyi daha da katı filtreler.',
+    desc: "Buffett'ın ortağı Munger'ın bakış açısı daha da katı: sektörünün en karlı, en az borçlu, en güçlü şirketi. Adil fiyata bul, uzun yıllar tut. Büyüme değil, sürdürülebilir kalite önde.",
     filters: {gross_min:50, roe_min:20, de_max:30, margin_min:20, cr_min:1.5}
   },
   oneil: {
     label: "William O'Neil — CAN SLIM",
-    desc: "CAN SLIM: EPS büyümesi>%25, gelir ivmesi>%15, ROE>%17. 52H zirvesine yakın hisseler. Temel+teknik hibrit. IBD kurucusu.",
+    desc: "Hem temelleri güçlü hem de fiyatı yükselen hisseler. O'Neil'in sistemi şunu arar: karı hızla artan, kurumların aldığı, zirvesine yakın olan hisseler. Temel ve teknik analizi birleştirir.",
     filters: {earng_min:25, revg_min:15, roe_min:17, de_max:100, cr_min:1}
   },
   oshaughnessy: {
     label: "O'Shaughnessy — What Works on Wall St.",
-    desc: "50 yıllık backtest kazananı: F/S<1.5, temettü>%1, gelir büyümesi>%10. Ucuz+istikrarlı+büyüyen = uzun vadede piyasayı geçer.",
+    desc: '50 yıllık veriye dayalı bir strateji. Ucuz, büyüyen ve temettü ödeyen şirketler uzun vadede piyasayı sürekli geçmiş. Herhangi bir guru görüşü değil, tarihin verdiği yanıt.',
     filters: {ps_max:1.5, div_min:1, revg_min:10, roe_min:10}
   },
   piotroski: {
     label: 'Piotroski F-Score',
-    desc: 'F-Score 8-9: bilanço güçlü, karlılık artıyor, borç azalıyor, verimlilik yükseliyor. 9 kriterli sistematik kalite taraması.',
+    desc: 'Bir şirketi 9 farklı soru ile sorgula: Kar etti mi? Nakit artıyor mu? Borç azaldı mı? 9 üzerinden 8-9 alan şirketler gerçekten sağlam demektir. Hissiyattan uzak, tamamen sayılara dayalı.',
     filters: {roe_min:3, cr_min:1, de_max:120},
     special: 'piotroski'
   },
   schloss: {
     label: 'Walter Schloss — Deep Value',
-    desc: "Graham'ın öğrencisi, 45 yılda %15+/yıl. Sadece PD/DD<1, çok az borç, temettü ödeyen, gözden düşmüş hisseler. \"Ucuz al, sabırla bekle.\"",
+    desc: 'Çok basit ama güçlü bir strateji: defter değerinin altında, borcu az, temettü ödeyen hisseler al ve bekle. Schloss 45 yılda bunu yaparak yıllık %15 üzeri getiri elde etti.',
     filters: {pb_max:1, pe_max:12, de_max:30, div_min:1, cr_min:1.5}
   },
   citadel: {
     label: 'Citadel — Wellington',
-    desc: "1990'dan beri net %19.2/yıl — tarihin en karlı hedge fonu. Yüksek ROE, güçlü karlılık, düşük borç, kazanç büyümesi. Sektör rotasyonu + volatilite avantajı.",
+    desc: "Dünyanın en başarılı hedge fonlarından biri. Bu filtre Citadel'in hisse tarafındaki kriterlerini taklit ediyor: yüksek karlılık, düşük borç, büyüyen kazanç. Kurumsal kalite standardı.",
     filters: {roe_min:15, margin_min:12, de_max:70, cr_min:1.2, earng_min:10}
   },
   deshaw: {
     label: 'D.E. Shaw — Oculus',
-    desc: "2004'ten beri hiç kayıp yılı yok. Sistematik algoritmalar + makro. Hisse tarafı: yüksek büyüme + güçlü karlılık + momentum kombinasyonu.",
+    desc: "Algoritmik yatırımın öncüsü D.E. Shaw'ın hisse kriterleri. Hem hızla büyüyen hem de karlı olan ve fiyat momentumu taşıyan şirketler. Üçü birden olunca güçlü bir kombinasyon.",
     filters: {earng_min:20, roe_min:18, margin_min:15, revg_min:15, cr_min:1}
   },
   millennium: {
     label: 'Millennium Management',
-    desc: "1989'dan beri sürekli pozitif getiri. 300+ portföy yöneticisi, risk-adjusted öncelikli. Kalite odaklı: güçlü marj, düşük borç, istikrarlı büyüme.",
+    desc: '1989\'dan bu yana hiç zarar etmeden gelen hedge fon. Millennium\'un önceliği risk yönetimi. Marjı güçlü, borcu az, büyümesi istikrarlı şirketler tercih ediliyor.',
     filters: {roe_min:12, margin_min:10, de_max:60, cr_min:1.5, earng_min:8}
   }
 
