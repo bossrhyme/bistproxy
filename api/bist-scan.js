@@ -102,7 +102,7 @@ module.exports = async function handler(req, res) {
   res.setHeader('Vary', 'Origin');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const cacheKey = 'bist_enrichment_v1';
+  const cacheKey = 'bist_enrichment_v3';
 
   // Cache kontrolü
   const cached = await kvGet(cacheKey);

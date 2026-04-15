@@ -807,14 +807,14 @@ const COL_DEFS = [
   {key:'chg1w', label:'1H Geti%', def:true},
   {key:'perf3m', label:'3A Geti%', def:true},
   {key:'float_pct', label:'H.Açık%', def:false},
-  {key:'sector', label:'SEKTÖR', def:true},
+  {key:'sector', label:'SEKTÖR', def:false},
 ];
 var _colVisible = null;
 
 function loadColPrefs() {
   if (_colVisible) return;
   try {
-    var saved = localStorage.getItem('df_cols_v5');
+    var saved = localStorage.getItem('df_cols_v6');
     if (saved) { _colVisible = {}; JSON.parse(saved).forEach(function(k){ _colVisible[k]=true; }); return; }
   } catch(e) {}
   // Varsayılan: def:false olan sütunlar gizli
@@ -823,7 +823,7 @@ function loadColPrefs() {
 }
 
 function saveColPrefs() {
-  localStorage.setItem('df_cols_v5', JSON.stringify(Object.keys(_colVisible).filter(function(k){ return _colVisible[k]; })));
+  localStorage.setItem('df_cols_v6', JSON.stringify(Object.keys(_colVisible).filter(function(k){ return _colVisible[k]; })));
 }
 
 function isColVisible(key) { loadColPrefs(); return !!_colVisible[key]; }
