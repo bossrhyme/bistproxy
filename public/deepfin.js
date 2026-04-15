@@ -1243,17 +1243,17 @@ async function runScan(){
 // ═══════════════════════════════════════════
 const PRESETS = {
   // Klasik değer yatırımı: F/K<15, PD/DD<2, temettü ödeyen
-  value:    { label: 'Değer Hisseleri',    desc: 'Fiyatın kazanca oranı düşük, borsa değeri defter değerine yakın ve temettü ödeyen şirketler. Üç filtre birlikte piyasanın gözden kaçırdığı, ucuz ama gelir getiren hisseleri süzer.', filters: {pe_max:15, pb_max:2, div_min:2} },
+  value:    { label: 'Değer Hisseleri',    desc: 'Değer yatırımcısı için asıl mesele şirketin gerçek değeri ile piyasa fiyatı arasındaki açığı bulmaktır. Kazancına göre ucuz, borsa değeri defter değerine yakın ve temettü ödeyen şirketler aranır. Piyasa bu farkı er ya da geç kapatır — sabır şart.', filters: {pe_max:15, pb_max:2, div_min:2} },
   // Büyüme: kazanç+gelir ivmesi, güçlü özkaynak getirisi
-  growth:   { label: 'Büyüme Hisseleri',   desc: 'Hem karı hem satışları hızla büyüyen, özkaynaklarını verimli kullanan şirketler. Büyüme yalnızca satışta değil karlılığa da yansımalı — üçü birden güçlü olmalı.', filters: {earng_min:20, revg_min:15, roe_min:15} },
+  growth:   { label: 'Büyüme Hisseleri',   desc: 'Büyüme yatırımcısı için bugünkü fiyat değil yarınki büyüklük önemlidir. Hem satışları hem karları hızla artan, özkaynaklarını verimli kullanan şirketler aranır. Kısa vadede pahalı görünebilir ama büyüme sürdüğü sürece fiyat da onu takip eder.', filters: {earng_min:20, revg_min:15, roe_min:15} },
   // Temettü: yüksek verim, sürdürülebilir ödeme kapasitesi
-  dividend: { label: 'Temettü Hisseleri',  desc: 'Yılda yüksek temettü dağıtan, borcu makul ve kısa vadeli nakit yeterliliği olan şirketler. Fiyat oynamasa bile düzenli yıllık gelir arayan yatırımcılar için.', filters: {div_min:4, de_max:80, cr_min:1.2} },
+  dividend: { label: 'Temettü Hisseleri',  desc: 'Temettü yatırımcısı için hisse fiyatının dalgalanması değil, düzenli nakit akışı önemlidir. Yüksek temettü dağıtan, borcu makul, ödeme kapasitesi güçlü şirketler aranır. Hisse değer kazanmasa bile temettü geliri başlı başına bir getiridir.', filters: {div_min:4, de_max:80, cr_min:1.2} },
   // Kalite: Buffett/Munger "wonderful company at fair price"
-  quality:  { label: 'Kaliteli Şirketler', desc: 'Özkaynak getirisi yüksek, hem brüt hem net marjı güçlü, borcu az ve nakit dengesi sağlam şirketler. Dört farklı kalite kriteri aynı anda sağlanmalı.', filters: {roe_min:20, margin_min:15, gross_min:35, de_max:80, cr_min:1.5} },
+  quality:  { label: 'Kaliteli Şirketler', desc: 'Kalite yatırımcısı için hangi piyasada olursa olsun ayakta kalan şirket önemlidir. Özkaynak getirisi yüksek, hem brüt hem net marjı güçlü, borcu az şirketler aranır. Kriz dönemlerinde bu tür şirketler en az hasar görür.', filters: {roe_min:20, margin_min:15, gross_min:35, de_max:80, cr_min:1.5} },
   // Az borçlu: Buffett "borçsuz şirket" prensibi
-  lowdebt:  { label: 'Az Borçlu Şirketler', desc: 'Toplam borcu özkaynaklarının küçük bir kısmı olan ve elinde bol nakit bulunduran şirketler. Finansal kaldıraç riski minimum — kriz dönemlerinde en dayanıklı profil.', filters: {de_max:30, cr_min:2} },
+  lowdebt:  { label: 'Az Borçlu Şirketler', desc: 'Borç düşmanı yatırımcı için ekonomi kötüye gittiğinde en başta borçlu şirketler çöker. Toplam borcu özkaynaklarının küçük bir kısmı olan, elinde bol nakit bulunduran şirketler aranır. Faiz baskısı yok, kriz dayanımı yüksek.', filters: {de_max:30, cr_min:2} },
   // Momentum: güçlü ivme, hem büyüme hem fiyat güç
-  momentum: { label: 'Momentum Hisseleri', desc: 'Satışları ve karları aynı anda yüksek oranda büyüyen şirketler. Yalnızca biri değil ikisi birlikte güçlü olmalı — bu birliktelik gerçek operasyonel ivmeyi gösterir.', filters: {revg_min:20, earng_min:20} }
+  momentum: { label: 'Momentum Hisseleri', desc: 'Momentum yatırımcısı için hem satışları hem karları aynı anda hızlanan şirket nadir ve değerlidir. İkisi birlikte artıyorsa şirket gerçekten ivme kazanıyor demektir. Piyasa bunu fark edince fiyat da bunu yansıtmaya başlar.', filters: {revg_min:20, earng_min:20} }
 };
 
 // Teknik Analiz Presetleri
@@ -1265,25 +1265,25 @@ const TECH_PRESETS = {
 
   breakout: {
     label: 'Kırılım',
-    desc: 'Son zirvesine çok yakın, bugün güçlü yükselen ve normalin üzerinde hacim gören hisseler. Üstüne teknik indikatörlerin çoğu da alım sinyali veriyor — dört kriter aynı anda örtüşüyor.',
+    desc: 'Kırılım takipçisi için uzun süre dar bir aralıkta sıkışan ve ardından güçlü bir hareketle o aralığı kıran hisse ilgi çeker. Hacimin de artması bu kırılımın sahte olmadığının işareti. Trendin tam başlangıç noktasını yakalamak için.',
     filters: { from_high_max: -5, chg_min: 1.5, vol_min: 0.5, tech_rating_min: 0.1 }
   },
 
   oversold: {
     label: 'Dip Fırsatı',
-    desc: 'Son zirvesinden sert düşüş yaşamış ve teknik göstergeler aşırı satılmış bölgeye girmiş hisseler. Satış baskısı zirvede — toparlanma potansiyeli yüksek, risk de var.',
+    desc: 'Dip avcısı için herkes satarken almak cesaret ister ama fırsat da getirir. Sert bir düşüşün ardından teknik göstergeler aşırı satılmış bölgesine giren hisseler aranır. Temel değerleri hâlâ sağlamsa toparlanma potansiyeli taşır.',
     filters: { from_high_max: -20, chg_min: 0, rsi_max: 35 }
   },
 
   nearHigh: {
     label: 'Zirveye Yakın',
-    desc: 'Aylık zirvesine çok yakın ve son üç ayda kazanmış hisseler. Zirveye bu kadar yakın olmak trendin devam ettiğinin işareti.',
+    desc: 'Trend takipçisi için zirvesine yakın olmak genellikle trendin devam ettiğinin işareti. Son bir ayın en yüksek fiyatına çok yakın, orta vadede de kazanmış hisseler aranır. Güçlü trendde olan hisseyi yakalamak isteyenler için.',
     filters: { from_high_max: -3, perf3m_min: 5 }
   },
 
   pullback: {
     label: 'Sağlıklı Çekilme',
-    desc: 'Zirveden sınırlı geri çekilmiş, yıllık dibinden ise uzaklaşmış ve altı aylık getirisi pozitif olan hisseler. Güçlü trende daha makul fiyattan girme fırsatı.',
+    desc: 'Düzeltme avcısı için güçlü bir trendin içindeki kısa süreli geri çekilme, hem trend güçlü hem fiyat daha makul anlamına gelir. Zirveden sınırlı geri çekilmiş, yıllık dibinden ise uzaklaşmış hisseler aranır. Trende daha iyi fiyattan girmek için.',
     filters: { from_high_max: -10, from_low_min: 10, perf6m_min: 10 }
   },
 
