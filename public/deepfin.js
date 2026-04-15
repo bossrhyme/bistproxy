@@ -995,12 +995,16 @@ async function runScan(){
     if (currentExchange === 'dax')    payload.range = [0, 500];
     if (currentExchange === 'lse')    payload.range = [0, 2000];
     if (currentExchange === 'nikkei') payload.range = [0, 4000];
-  // Proxy üzerinden — kaynak gizli
-  const res = await fetch('/api/scan?exchange=' + currentExchange, {
+  // Proxy üzerinden — kaynak gizli; BIST için halka açıklık verisi paralel çekilir
+  const _isBist = currentExchange === 'bist';
+  const [res, _bistFloatRes] = await Promise.all([
+    fetch('/api/scan?exchange=' + currentExchange, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
-    });
+    }),
+    _isBist ? fetch('/api/bist-scan') : Promise.resolve(null)
+  ]);
 
     document.getElementById('prog').style.width = '70%';
 
@@ -1046,6 +1050,17 @@ async function runScan(){
     }
 
     document.getElementById('prog').style.width = '100%';
+
+    // BIST: İş Yatırım'dan halka açıklık oranlarını al (TV'de genellikle null)
+    const _bistFloatMap = {};
+    if (_isBist && _bistFloatRes && _bistFloatRes.ok) {
+      try {
+        const _bistData = await _bistFloatRes.json();
+        for (const row of (_bistData.data || [])) {
+          if (row.symbol && row.freeFloat != null) _bistFloatMap[row.symbol] = row.freeFloat;
+        }
+      } catch(e) { /* sessizce geç */ }
+    }
 
     // Parse TradingView response — index bazlı, sıra garantili
     const results = [];
@@ -1203,7 +1218,7 @@ async function runScan(){
         perf6m:     perf6m     !== null ? perf6m     : null,
         perfY:      perfY      !== null ? perfY      : null,
         perfW:      perfW      !== null ? perfW      : null,
-        floatPct:   floatPct   !== null ? floatPct   : null,
+        floatPct:   floatPct   !== null ? floatPct   : (_bistFloatMap[symbol] ?? null),
         rsi14:      rsi14      !== null ? rsi14      : null,
         peg: (function() {
           if (pe && epsG && epsG > 0) return pe / epsG;
