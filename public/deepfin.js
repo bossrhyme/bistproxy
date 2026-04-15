@@ -804,6 +804,9 @@ const COL_DEFS = [
   {key:'tech_rating', label:'TV Rating', def:true},
   {key:'rsi', label:'RSI', def:true},
   {key:'perf3m', label:'3A Geti%', def:true},
+  {key:'chg1d', label:'Günlük%', def:true},
+  {key:'chg1w', label:'1H Geti%', def:true},
+  {key:'float_pct', label:'H.Açık%', def:false},
   {key:'sector', label:'SEKTÖR', def:true},
 ];
 var _colVisible = null;
@@ -811,7 +814,7 @@ var _colVisible = null;
 function loadColPrefs() {
   if (_colVisible) return;
   try {
-    var saved = localStorage.getItem('df_cols_v3');
+    var saved = localStorage.getItem('df_cols_v4');
     if (saved) { _colVisible = {}; JSON.parse(saved).forEach(function(k){ _colVisible[k]=true; }); return; }
   } catch(e) {}
   // Varsayılan: tüm sütunlar görünür
@@ -820,7 +823,7 @@ function loadColPrefs() {
 }
 
 function saveColPrefs() {
-  localStorage.setItem('df_cols_v3', JSON.stringify(Object.keys(_colVisible).filter(function(k){ return _colVisible[k]; })));
+  localStorage.setItem('df_cols_v4', JSON.stringify(Object.keys(_colVisible).filter(function(k){ return _colVisible[k]; })));
 }
 
 function isColVisible(key) { loadColPrefs(); return !!_colVisible[key]; }
@@ -937,7 +940,8 @@ async function runScan(){
     'dividends_yield','debt_to_equity_fq','current_ratio_fq',
     'sector','High.1M','Low.1M','piotroski_f_score',
     'Recommend.All','Recommend.MA','Recommend.Other',
-    'Perf.3M','Perf.6M','Perf.Y','RSI'
+    'Perf.3M','Perf.6M','Perf.Y','Perf.W','RSI',
+    'float_shares_outstanding_percent'
   ];
   const COLS_US = [
     'name','description','close','change','volume','market_cap_basic',
@@ -951,7 +955,8 @@ async function runScan(){
     'total_debt_to_equity','debt_to_equity_fq','current_ratio','current_ratio_fq',
     'sector','High.1M','Low.1M','piotroski_f_score',
     'Recommend.All','Recommend.MA','Recommend.Other',
-    'Perf.3M','Perf.6M','Perf.Y','RSI'
+    'Perf.3M','Perf.6M','Perf.Y','Perf.W','RSI',
+    'float_shares_outstanding_percent'
   ];
   const COLS_GLOBAL = [
     'name','description','close','change','volume','market_cap_basic',
@@ -964,7 +969,8 @@ async function runScan(){
     'total_debt_to_equity','debt_to_equity_fq','current_ratio','current_ratio_fq',
     'sector','High.1M','Low.1M','piotroski_f_score',
     'Recommend.All','Recommend.MA','Recommend.Other',
-    'Perf.3M','Perf.6M','Perf.Y','RSI'
+    'Perf.3M','Perf.6M','Perf.Y','Perf.W','RSI',
+    'float_shares_outstanding_percent'
   ];
   const COLUMNS_BY_EXCHANGE = {
     bist:   COLS_BIST,
@@ -1081,6 +1087,8 @@ async function runScan(){
       const perf3m     = g('Perf.3M');
       const perf6m     = g('Perf.6M');
       const perfY      = g('Perf.Y');
+      const perfW      = g('Perf.W');
+      const floatPct   = g('float_shares_outstanding_percent');
       const rsi14      = g('RSI');
 
       // TradingView sembol formatı: "BIST:THYAO" → "THYAO"
@@ -1194,6 +1202,8 @@ async function runScan(){
         perf3m:     perf3m     !== null ? perf3m     : null,
         perf6m:     perf6m     !== null ? perf6m     : null,
         perfY:      perfY      !== null ? perfY      : null,
+        perfW:      perfW      !== null ? perfW      : null,
+        floatPct:   floatPct   !== null ? floatPct   : null,
         rsi14:      rsi14      !== null ? rsi14      : null,
         peg: (function() {
           if (pe && epsG && epsG > 0) return pe / epsG;
@@ -1990,6 +2000,9 @@ function _vsRowHtml(s, idx) {
       <td data-col="tech_rating" style="${cv('tech_rating')}">${s.techRating!=null?fTechRating(s.techRating):nil}</td>
       <td data-col="rsi" style="${cv('rsi')}">${s.rsi14!=null?fRsi(s.rsi14):nil}</td>
       <td data-col="perf3m" style="${cv('perf3m')}">${s.perf3m!=null?fPerf(s.perf3m):nil}</td>
+      <td data-col="chg1d" style="${cv('chg1d')}">${s.changePercent!=null?fPerf(s.changePercent):nil}</td>
+      <td data-col="chg1w" style="${cv('chg1w')}">${s.perfW!=null?fPerf(s.perfW):nil}</td>
+      <td data-col="float_pct" style="${cv('float_pct')}">${s.floatPct!=null?fv(s.floatPct,1,true):nil}</td>
       <td data-col="sector" style="${cv('sector')}font-size:10px;color:var(--muted2)">${s.sector||'—'}</td>
     </tr>`;
 }function renderTable(){

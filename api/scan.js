@@ -188,8 +188,9 @@ module.exports = async function(req, res) {
       'earnings_per_share_diluted_yoy_growth_ttm','earnings_per_share_change_ttm_yoy',
       'earnings_per_share_diluted_ttm',
       'Recommend.All','Recommend.MA','Recommend.Other',
-      'Perf.3M','Perf.6M','Perf.Y',
+      'Perf.3M','Perf.6M','Perf.Y','Perf.W',
       'RSI',
+      'float_shares_outstanding_percent',
       'is_primary','typespecs','exchange','index',
     ]);
     const rawCols = clientPayload.columns || ['name','close','change','volume','market_cap_basic'];
@@ -214,6 +215,7 @@ module.exports = async function(req, res) {
       'piotroski_f_score','revenue_growth_ttm_yoy','total_revenue_change_ttm_yoy',
       'earnings_per_share_diluted_yoy_growth_ttm','earnings_per_share_change_ttm_yoy',
       'earnings_per_share_diluted_ttm',
+      'Perf.W','float_shares_outstanding_percent',
       'is_primary','typespecs','exchange','index',
     ]);
     const ALLOWED_OPS = new Set(['greater','less','egreater','eless','equal','nequal','in_range','not_in_range','has','has_none_of']);
