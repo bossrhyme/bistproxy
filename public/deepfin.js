@@ -1360,7 +1360,7 @@ const GURUS = {
   },
   fisher: {
     label: 'Philip Fisher — Scuttlebutt',
-    desc: 'Fisher için gerçekten iyi şirketi bulmak zordur ama bulunca satmak gerekmez. Satışları ve karları istikrarlı büyüyen, hem brüt hem net marjı güçlü, borcu kontrollü şirketler arar. Al ve yıllarca elinde tut — Buffett'ı en çok etkileyen yatırımcı.',
+    desc: 'Fisher için gerçekten iyi şirketi bulmak zordur ama bulunca satmak gerekmez. Satışları ve karları istikrarlı büyüyen, hem brüt hem net marjı güçlü, borcu kontrollü şirketler arar. Al ve yıllarca elinde tut — Buffett\'ı en çok etkileyen yatırımcı.',
     filters: {revg_min:15, earng_min:15, gross_min:35, margin_min:12, de_max:60}
   },
   graham: {
@@ -1380,7 +1380,7 @@ const GURUS = {
   },
   klarman: {
     label: 'Seth Klarman — Margin of Safety',
-    desc: 'Klarman için hata payı büyük olmak şarttır — Graham'dan bile daha temkinli. Kazancına ve varlıklarına göre çok ucuz, borcu minimal, nakit güçlü şirketler arar. Fiyat düşük, bilanço sağlam olunca beklemeye değer; acele etmek gerekmez.',
+    desc: 'Klarman için hata payı büyük olmak şarttır — Graham\'dan bile daha temkinli. Kazancına ve varlıklarına göre çok ucuz, borcu minimal, nakit güçlü şirketler arar. Fiyat düşük, bilanço sağlam olunca beklemeye değer; acele etmek gerekmez.',
     filters: {pe_max:10, pb_max:1.2, de_max:40, cr_min:2, margin_min:5}
   },
   lynch: {
@@ -1401,12 +1401,12 @@ const GURUS = {
   },
   oneil: {
     label: "William O'Neil — CAN SLIM",
-    desc: 'O'Neil için hem temeller hem de fiyat aynı yönde hareket etmeli. Karları ve satışları hızla büyüyen, özkaynak getirisi güçlü şirketler arar. Temel tablonun güçlü olması şart — teknik kırılım ve kurumsal alım buna eklenir.',
+    desc: "O'Neil için hem temeller hem de fiyat aynı yönde hareket etmeli. Karları ve satışları hızla büyüyen, özkaynak getirisi güçlü şirketler arar. Temel tablonun güçlü olması şart — teknik kırılım ve kurumsal alım buna eklenir.",
     filters: {earng_min:25, revg_min:15, roe_min:17, de_max:100, cr_min:1}
   },
   oshaughnessy: {
     label: "O'Shaughnessy — What Works on Wall St.",
-    desc: 'O'Shaughnessy için his değil, 50 yıllık veri konuşur. Satışlarına göre ucuz, temettü ödeyen, satışları büyüyen ve özkaynak getirisi pozitif şirketler uzun vadede piyasayı sürekli geçmiş. Tarihin verdiği yanıt, herhangi bir guru görüşünden daha güvenilir.',
+    desc: "O'Shaughnessy için his değil, 50 yıllık veri konuşur. Satışlarına göre ucuz, temettü ödeyen, satışları büyüyen ve özkaynak getirisi pozitif şirketler uzun vadede piyasayı sürekli geçmiş. Tarihin verdiği yanıt, herhangi bir guru görüşünden daha güvenilir.",
     filters: {ps_max:1.5, div_min:1, revg_min:10, roe_min:10}
   },
   piotroski: {
@@ -1417,7 +1417,7 @@ const GURUS = {
   },
   schloss: {
     label: 'Walter Schloss — Deep Value',
-    desc: 'Schloss için strateji son derece basit: defter değerinin altında, borcu az, temettü ödeyen hisseyi al ve bekle. 45 yılda bunu yaparak yıllık %15'in üzerinde getiri elde etti. Karmaşıklık değil, sabır ve disiplin.',
+    desc: 'Schloss için strateji son derece basit: defter değerinin altında, borcu az, temettü ödeyen hisseyi al ve bekle. 45 yılda bunu yaparak yıllık %15\'in üzerinde getiri elde etti. Karmaşıklık değil, sabır ve disiplin.',
     filters: {pb_max:1, pe_max:12, de_max:30, div_min:1, cr_min:1.5}
   },
   citadel: {
@@ -1432,7 +1432,7 @@ const GURUS = {
   },
   millennium: {
     label: 'Millennium Management',
-    desc: 'Millennium için önce risk, sonra getiri gelir. 1989'dan bu yana hiç zarar etmeden gelen fonun önceliği buydu. Marjı güçlü, borcu az, büyümesi istikrarlı şirketler — volatilite değil, sürdürülebilirlik.',
+    desc: 'Millennium için önce risk, sonra getiri gelir. 1989\'dan bu yana hiç zarar etmeden gelen fonun önceliği buydu. Marjı güçlü, borcu az, büyümesi istikrarlı şirketler — volatilite değil, sürdürülebilirlik.',
     filters: {roe_min:12, margin_min:10, de_max:60, cr_min:1.5, earng_min:8}
   }
 
