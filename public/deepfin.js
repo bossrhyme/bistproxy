@@ -1249,7 +1249,7 @@ const PRESETS = {
   // Temettü: yüksek verim, sürdürülebilir ödeme kapasitesi
   dividend: { label: 'Temettü Hisseleri',  desc: 'Temettü yatırımcısı için hisse fiyatının dalgalanması değil, düzenli nakit akışı önemlidir. Yüksek temettü dağıtan, borcu makul, ödeme kapasitesi güçlü şirketler aranır. Hisse değer kazanmasa bile temettü geliri başlı başına bir getiridir.', filters: {div_min:4, de_max:80, cr_min:1.2} },
   // Kalite: Buffett/Munger "wonderful company at fair price"
-  quality:  { label: 'Kaliteli Şirketler', desc: 'Kalite yatırımcısı için hangi piyasada olursa olsun ayakta kalan şirket önemlidir. Özkaynak getirisi yüksek, hem brüt hem net marjı güçlü, borcu az şirketler aranır. Kriz dönemlerinde bu tür şirketler en az hasar görür.', filters: {roe_min:20, margin_min:15, gross_min:35, de_max:80, cr_min:1.5} },
+  quality:  { label: 'Kaliteli Şirketler', desc: 'Kalite yatırımcısı için hangi piyasada olursa olsun ayakta kalan şirket önemlidir. Özkaynak getirisi yüksek, hem brüt hem net kar marjı güçlü, borcu az şirketler aranır. Kriz dönemlerinde bu tür şirketler en az hasar görür.', filters: {roe_min:20, margin_min:15, gross_min:35, de_max:80, cr_min:1.5} },
   // Az borçlu: Buffett "borçsuz şirket" prensibi
   lowdebt:  { label: 'Az Borçlu Şirketler', desc: 'Borç düşmanı yatırımcı için ekonomi kötüye gittiğinde en başta borçlu şirketler çöker. Toplam borcu özkaynaklarının küçük bir kısmı olan, elinde bol nakit bulunduran şirketler aranır. Faiz baskısı yok, kriz dayanımı yüksek.', filters: {de_max:30, cr_min:2} },
   // Momentum: güçlü ivme, hem büyüme hem fiyat güç
@@ -1340,7 +1340,7 @@ const GURUS = {
 
   ackman: {
     label: 'Bill Ackman — Activist',
-    desc: 'Ackman için kalite şart ama piyasanın henüz fark etmemesi de şart. Özkaynak getirisi ve marjı yüksek, borcu makul, fiyatı mantıklı şirketlere büyük hissedar olarak girer ve yönetimi değişime zorlar. İçeriden baskı sonucu gizli değer açığa çıkar.',
+    desc: 'Ackman için kalite şart ama piyasanın henüz fark etmemesi de şart. Özkaynak getirisi ve net kar marjı yüksek, borcu makul, kazancına göre ucuz kalmış şirketlere yatırım yapar.',
     filters: {roe_min:15, margin_min:10, de_max:80, cr_min:1.2, pe_max:20}
   },
   ark: {
@@ -1350,17 +1350,17 @@ const GURUS = {
   },
   buffett: {
     label: 'Warren Buffett',
-    desc: 'Buffett için rakiplerin kolayca kopyalayamadığı iş modeli her şeyden önce gelir. Hem brüt hem net marjı yüksek, özkaynak getirisi güçlü, borcu az — ve fiyatı ne aşırı ucuz ne aşırı pahalı. Hızlı alım-satım değil, sağlam bir şirkete uzun vadeli ortak ol.',
+    desc: 'Buffett için rakiplerin kolayca kopyalayamadığı iş modeli her şeyden önce gelir. Hem brüt hem net kar marjı yüksek, özkaynak getirisi güçlü, borcu az — ve fiyatı ne aşırı ucuz ne aşırı pahalı. Hızlı alım-satım değil, sağlam bir şirkete uzun vadeli ortak ol.',
     filters: {pe_min:5, pe_max:25, roe_min:20, margin_min:20, gross_min:40, de_max:50, cr_min:1.5}
   },
   einhorn: {
     label: 'David Einhorn — Deep Value',
-    desc: 'Einhorn için piyasanın görmezden geldiği şirket en büyük fırsattır. Kazancına göre gerçekten ucuz, nakit fazlası var, borcu az ve kârlı. Bu dört şey bir arada olunca fiyatın er ya da geç gerçek değerine dönmesini bekler.',
+    desc: 'Einhorn için piyasanın görmezden geldiği şirket en büyük fırsattır. Kazancına göre gerçekten ucuz, nakit fazlası var, borcu az ve kârlı şirketlere yatırım yapar.',
     filters: {pe_max:15, de_max:50, cr_min:1.5, margin_min:8, roe_min:10}
   },
   fisher: {
     label: 'Philip Fisher — Scuttlebutt',
-    desc: 'Fisher için gerçekten iyi şirketi bulmak zordur ama bulunca satmak gerekmez. Satışları ve karları istikrarlı büyüyen, hem brüt hem net marjı güçlü, borcu kontrollü şirketler arar. Al ve yıllarca elinde tut — Buffett\'ı en çok etkileyen yatırımcı.',
+    desc: 'Fisher için gerçekten iyi şirketi bulmak zordur ama bulunca satmak gerekmez. Satışları ve karları istikrarlı büyüyen, hem brüt hem net kar marjı güçlü, borcu kontrollü şirketlere yatırım yapar.',
     filters: {revg_min:15, earng_min:15, gross_min:35, margin_min:12, de_max:60}
   },
   graham: {
@@ -1375,33 +1375,33 @@ const GURUS = {
   },
   icahn: {
     label: 'Carl Icahn — Activist Value',
-    desc: 'Icahn için nakit bol ama fiyat düşükse harekete geçme zamanıdır. Borsa değeri defter değerine yakın, kazancına göre ucuz, borcu düşük, nakit güçlü şirketlere büyük hissedar olarak girer ve yönetimi hissedara para dağıtmaya zorlar. Temettü artışı ya da geri alım duyurusunda fiyat atlar.',
+    desc: 'Icahn için nakit bol ama fiyat düşükse harekete geçme zamanıdır. Borsa değeri defter değerine yakın, kazancına göre ucuz, borcu düşük, nakit güçlü ve temettü ödeyen şirketlere yatırım yapar.',
     filters: {pb_max:1.5, pe_max:12, de_max:60, cr_min:1.5, div_min:1}
   },
   klarman: {
     label: 'Seth Klarman — Margin of Safety',
-    desc: 'Klarman için hata payı büyük olmak şarttır — Graham\'dan bile daha temkinli. Kazancına ve varlıklarına göre çok ucuz, borcu minimal, nakit güçlü şirketler arar. Fiyat düşük, bilanço sağlam olunca beklemeye değer; acele etmek gerekmez.',
+    desc: 'Klarman için hata payı büyük olmak şarttır — Graham\'dan bile daha temkinli. Kazancına ve defter değerine göre çok ucuz, borcu minimal, nakit güçlü şirketlere yatırım yapar.',
     filters: {pe_max:10, pb_max:1.2, de_max:40, cr_min:2, margin_min:5}
   },
   lynch: {
     label: 'Peter Lynch — GARP',
-    desc: 'Lynch için büyüyen ama buna rağmen hâlâ ucuz olan şirket nadir ve değerlidir. Büyüme hızı fiyat/kazanç oranını geçiyorsa iyi bir fırsat — yani büyümesine göre ucuz. Tanıdığın, anladığın şirkete bak tavsiyesiyle ünlü.',
+    desc: 'Lynch için büyüyen ama buna rağmen hâlâ ucuz olan şirket nadir ve değerlidir. Büyüme hızı fiyat/kazanç oranını geçiyorsa iyi fırsat — büyümesine göre ucuz şirketlere yatırım yapar.',
     filters: {pe_min:5, pe_max:35, earng_min:15, de_max:80, cr_min:1},
     special: 'peg'
   },
   minervini: {
     label: 'Mark Minervini — SEPA',
-    desc: 'Minervini için hem temel hem teknik aynı anda güçlü olmalı. Karı hızla artıyor, özkaynak getirisi ve marjı güçlü, borcu kontrollü — temel tablo hazır. Üstüne bir de teknik kırılım gelince giriş zamanı.',
+    desc: 'Minervini için hem temel hem teknik aynı anda güçlü olmalı. Karı hızla artıyor, özkaynak getirisi ve net kar marjı güçlü, borcu kontrollü şirketlere yatırım yapar.',
     filters: {earng_min:25, roe_min:17, margin_min:10, de_max:100, cr_min:1}
   },
   munger: {
     label: 'Charlie Munger — Quality Compounder',
-    desc: 'Munger için adil fiyata mükemmel şirket, ucuz fiyata vasat şirketten çok daha iyidir. Brüt ve net marjı çok yüksek, özkaynak getirisi güçlü, neredeyse borçsuz şirketler arar. Büyüme değil, sürdürülebilir kalite önde.',
+    desc: 'Munger için adil fiyata mükemmel şirket, ucuz fiyata vasat şirketten çok daha iyidir. Brüt ve net kar marjı çok yüksek, özkaynak getirisi güçlü, neredeyse borçsuz şirketler arar. Büyüme değil, sürdürülebilir kalite önde.',
     filters: {gross_min:50, roe_min:20, de_max:30, margin_min:20, cr_min:1.5}
   },
   oneil: {
     label: "William O'Neil — CAN SLIM",
-    desc: "O'Neil için hem temeller hem de fiyat aynı yönde hareket etmeli. Karları ve satışları hızla büyüyen, özkaynak getirisi güçlü şirketler arar. Temel tablonun güçlü olması şart — teknik kırılım ve kurumsal alım buna eklenir.",
+    desc: "O'Neil için hem temeller hem de fiyat aynı yönde hareket etmeli. Karları ve satışları hızla büyüyen, özkaynak getirisi güçlü şirketlere yatırım yapar.",
     filters: {earng_min:25, revg_min:15, roe_min:17, de_max:100, cr_min:1}
   },
   oshaughnessy: {
@@ -1422,17 +1422,17 @@ const GURUS = {
   },
   citadel: {
     label: 'Citadel — Wellington',
-    desc: 'Citadel için kurumsal kalite standartları geçerlidir. Özkaynak getirisi ve net marjı yüksek, borcu makul, nakit yeterli ve karları büyüyen şirketler taranır. Dünyanın en başarılı hedge fonlarından birinin hisse seçim standartları.',
+    desc: 'Citadel için kurumsal kalite standartları geçerlidir. Özkaynak getirisi ve net kar marjı yüksek, borcu makul, nakit yeterli ve karları büyüyen şirketlere yatırım yapar.',
     filters: {roe_min:15, margin_min:12, de_max:70, cr_min:1.2, earng_min:10}
   },
   deshaw: {
     label: 'D.E. Shaw — Oculus',
-    desc: 'D.E. Shaw için algoritma üç şeyi aynı anda ister: hızlı büyüme, güçlü karlılık ve fiyat momentumu. Karları ve satışları birlikte hızla büyüyen, özkaynak getirisi ve marjı yüksek şirketler. Üçü birden bulunduğunda güçlü bir kombinasyon ortaya çıkar.',
+    desc: 'D.E. Shaw için algoritma üç şeyi aynı anda ister: hızlı büyüme, güçlü karlılık ve fiyat momentumu. Karları ve satışları birlikte hızla büyüyen, özkaynak getirisi ve net kar marjı yüksek şirketlere yatırım yapar.',
     filters: {earng_min:20, roe_min:18, margin_min:15, revg_min:15, cr_min:1}
   },
   millennium: {
     label: 'Millennium Management',
-    desc: 'Millennium için önce risk, sonra getiri gelir. 1989\'dan bu yana hiç zarar etmeden gelen fonun önceliği buydu. Marjı güçlü, borcu az, büyümesi istikrarlı şirketler — volatilite değil, sürdürülebilirlik.',
+    desc: 'Millennium için önce risk, sonra getiri gelir. 1989\'dan bu yana hiç zarar etmeden gelen fonun önceliği buydu. Net kar marjı güçlü, borcu az, büyümesi istikrarlı şirketlere yatırım yapar.',
     filters: {roe_min:12, margin_min:10, de_max:60, cr_min:1.5, earng_min:8}
   }
 
