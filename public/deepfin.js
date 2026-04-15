@@ -1542,23 +1542,21 @@ function countSelectedChips() {
   return document.querySelectorAll('.goat-chip.on, #presets .chip.on, #tech-presets .chip.on').length;
 }
 
-// GOAT chip'leri — tek seçim: yeni chip seçince diğerleri kapanır
-function toggleGoatChip(chip) {
-  var wasOn = chip.classList.contains('on');
-  // Tüm goat chip'lerini kapat
-  document.querySelectorAll('.goat-chip').forEach(function(c){ c.classList.remove('on'); });
-  // Kapalıysa aç, açıksa kapalı bırak (toggle davranışı)
-  if (!wasOn) chip.classList.add('on');
-  applyAllChips();
-}
+// GOAT chip'leri
 document.getElementById('goat-chips').addEventListener('click', function(e) {
   var chip = e.target.closest('.goat-chip'); if (!chip) return;
-  toggleGoatChip(chip);
+  var wasOn = chip.classList.contains('on');
+  if (!wasOn && countSelectedChips() >= 5) return;
+  chip.classList.toggle('on');
+  applyAllChips();
   if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
 });
 document.getElementById('goat-fund-chips').addEventListener('click', function(e) {
   var chip = e.target.closest('.goat-chip'); if (!chip) return;
-  toggleGoatChip(chip);
+  var wasOn = chip.classList.contains('on');
+  if (!wasOn && countSelectedChips() >= 5) return;
+  chip.classList.toggle('on');
+  applyAllChips();
   if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
 });
 
