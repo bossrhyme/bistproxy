@@ -1243,17 +1243,17 @@ async function runScan(){
 // ═══════════════════════════════════════════
 const PRESETS = {
   // Klasik değer yatırımı: F/K<15, PD/DD<2, temettü ödeyen
-  value:    { label: 'Değer Hisseleri',    desc: 'Kazancının 15 katından (F/K<15) ve varlıklarının 2 katından (PD/DD<2) ucuza satılıyor. Üstüne bir de yılda %2+ temettü ödüyor. Hem ucuz hem gelir getiren hisseler.', filters: {pe_max:15, pb_max:2, div_min:2} },
+  value:    { label: 'Değer Hisseleri',    desc: 'Fiyatın kazanca oranı düşük, borsa değeri defter değerine yakın ve temettü ödeyen şirketler. Üç filtre birlikte piyasanın gözden kaçırdığı, ucuz ama gelir getiren hisseleri süzer.', filters: {pe_max:15, pb_max:2, div_min:2} },
   // Büyüme: kazanç+gelir ivmesi, güçlü özkaynak getirisi
-  growth:   { label: 'Büyüme Hisseleri',   desc: 'Karı yıldan yıla %20+, satışları %15+ artıyor. Her 100 TL özkaynaktan 15 TL+ kar üretiyor (ROE>%15). Hem büyüyen hem verimli çalışan şirketler.', filters: {earng_min:20, revg_min:15, roe_min:15} },
+  growth:   { label: 'Büyüme Hisseleri',   desc: 'Hem karı hem satışları hızla büyüyen, özkaynaklarını verimli kullanan şirketler. Büyüme yalnızca satışta değil karlılığa da yansımalı — üçü birden güçlü olmalı.', filters: {earng_min:20, revg_min:15, roe_min:15} },
   // Temettü: yüksek verim, sürdürülebilir ödeme kapasitesi
-  dividend: { label: 'Temettü Hisseleri',  desc: 'Hisse değerinin %4\'ünü+ yılda nakit olarak dağıtıyor. Borcu özkaynaklarının %80\'inden az, kısa vadeli borçlarını rahatlıkla karşılıyor (Cari>1.2). Fiyat oynamasa da yıllık gelir var.', filters: {div_min:4, de_max:80, cr_min:1.2} },
+  dividend: { label: 'Temettü Hisseleri',  desc: 'Yılda yüksek temettü dağıtan, borcu makul ve kısa vadeli nakit yeterliliği olan şirketler. Fiyat oynamasa bile düzenli yıllık gelir arayan yatırımcılar için.', filters: {div_min:4, de_max:80, cr_min:1.2} },
   // Kalite: Buffett/Munger "wonderful company at fair price"
-  quality:  { label: 'Kaliteli Şirketler', desc: 'Her 100 TL özkaynaktan 20 TL+ kar (ROE>%20). 100 TL satıştan 15 TL+ net, 35 TL+ brüt kar kalıyor. Borcu az, nakit güçlü. Dört cephede birden sağlam şirket profili.', filters: {roe_min:20, margin_min:15, gross_min:35, de_max:80, cr_min:1.5} },
+  quality:  { label: 'Kaliteli Şirketler', desc: 'Özkaynak getirisi yüksek, hem brüt hem net marjı güçlü, borcu az ve nakit dengesi sağlam şirketler. Dört farklı kalite kriteri aynı anda sağlanmalı.', filters: {roe_min:20, margin_min:15, gross_min:35, de_max:80, cr_min:1.5} },
   // Az borçlu: Buffett "borçsuz şirket" prensibi
-  lowdebt:  { label: 'Az Borçlu Şirketler', desc: 'Borcu özkaynaklarının yalnızca %30\'u kadar — son derece az borçlu. Kısa vadeli borçlarının 2 katı nakit var (Cari>2). Kriz dönemlerinde en sağlam ayakta kalan şirket profili.', filters: {de_max:30, cr_min:2} },
+  lowdebt:  { label: 'Az Borçlu Şirketler', desc: 'Toplam borcu özkaynaklarının küçük bir kısmı olan ve elinde bol nakit bulunduran şirketler. Finansal kaldıraç riski minimum — kriz dönemlerinde en dayanıklı profil.', filters: {de_max:30, cr_min:2} },
   // Momentum: güçlü ivme, hem büyüme hem fiyat güç
-  momentum: { label: 'Momentum Hisseleri', desc: 'Satışlar %20+, karlar %20+ büyüyor — ikisi de aynı anda. Sadece biri büyüyen şirketler bu filtreye girmez; operasyonel ivme tüm tablolara yansımalı.', filters: {revg_min:20, earng_min:20} }
+  momentum: { label: 'Momentum Hisseleri', desc: 'Satışları ve karları aynı anda yüksek oranda büyüyen şirketler. Yalnızca biri değil ikisi birlikte güçlü olmalı — bu birliktelik gerçek operasyonel ivmeyi gösterir.', filters: {revg_min:20, earng_min:20} }
 };
 
 // Teknik Analiz Presetleri
@@ -1265,37 +1265,37 @@ const TECH_PRESETS = {
 
   breakout: {
     label: 'Kırılım',
-    desc: 'Son zirvesinden en fazla %5 uzakta — zirveye çok yakın. Bugün %1.5+ yükselmiş, 500K lot+ hacim var. 26 teknik indikatörün çoğu AL sinyali veriyor. Dört sinyal aynı anda örtüşüyor.',
+    desc: 'Son zirvesine çok yakın, bugün güçlü yükselen ve normalin üzerinde hacim gören hisseler. Üstüne teknik indikatörlerin çoğu da alım sinyali veriyor — dört kriter aynı anda örtüşüyor.',
     filters: { from_high_max: -5, chg_min: 1.5, vol_min: 0.5, tech_rating_min: 0.1 }
   },
 
   oversold: {
     label: 'Dip Fırsatı',
-    desc: 'Son zirvesinden %20+ düşmüş — sert bir satış dalgası var. RSI 35 altında: teknik olarak aşırı satılmış bölgede. Alıcılar panikte sattı; toparlanma potansiyeli yüksek.',
+    desc: 'Son zirvesinden sert düşüş yaşamış ve teknik göstergeler aşırı satılmış bölgeye girmiş hisseler. Satış baskısı zirvede — toparlanma potansiyeli yüksek, risk de var.',
     filters: { from_high_max: -20, chg_min: 0, rsi_max: 35 }
   },
 
   nearHigh: {
     label: 'Zirveye Yakın',
-    desc: '1 aylık zirvesinden yalnızca %3 uzakta. Son 3 ayda %5+ kazanmış — trend güçlü ve devam ediyor. Zirveye bu kadar yakın olmak genellikle baskının satıcıdan alıcıya geçtiğini gösterir.',
+    desc: 'Aylık zirvesine çok yakın ve son üç ayda kazanmış hisseler. Zirveye bu kadar yakın olmak trendin devam ettiğinin işareti.',
     filters: { from_high_max: -3, perf3m_min: 5 }
   },
 
   pullback: {
     label: 'Sağlıklı Çekilme',
-    desc: 'Zirvesinden %10 geri çekilmiş — küçük bir düzeltme. 52 hafta dibinden %10+ yukarıda (ana trend bozulmadı). 6 ayda %10+ getiri var. Güçlü trend içinde alım noktası.',
+    desc: 'Zirveden sınırlı geri çekilmiş, yıllık dibinden ise uzaklaşmış ve altı aylık getirisi pozitif olan hisseler. Güçlü trende daha makul fiyattan girme fırsatı.',
     filters: { from_high_max: -10, from_low_min: 10, perf6m_min: 10 }
   },
 
   strongDay: {
     label: 'Güçlü Gün',
-    desc: 'Bugün %2+ yükselmiş. 500K lot+ hacimle desteklenmiş. Bu iki kriter birlikte olunca rastgele hareket değil, arkasında haber veya büyük alım var demektir.',
+    desc: 'Bugün kayda değer yükselen ve bunu normalin üzerinde hacimle destekleyen hisseler. Hacimli yükseliş rastgele değil, arkasında bir katalizör olduğuna işaret eder.',
     filters: { chg_min: 2, vol_min: 0.5 }
   },
 
   highVolume: {
     label: 'Kurumsal Hacim',
-    desc: '5M lot+ hacim — normalin çok üzerinde. Fiyat da yükseliyor. Bu seviyede hacim genellikle büyük kurumların pozisyon açtığının işaretidir.',
+    desc: 'Çok yüksek hacimle işlem görürken fiyatı da yükselen hisseler. Bu ölçekte hacim genellikle büyük kurumsal alıcıların devrede olduğunu gösterir.',
     filters: { vol_min: 5, chg_min: 0 }
   },
 
@@ -1303,25 +1303,25 @@ const TECH_PRESETS = {
 
   techBuy: {
     label: '26 İndikatör AL',
-    desc: 'RSI, MACD, ADX, Stochastic ve 15 hareketli ortalama dahil 26 indikatörün çoğunluğu AL sinyali veriyor (TV Puanı >0.5). Teknik tablonun tamamı aynı yönü gösteriyor.',
+    desc: 'RSI, MACD, ADX, Stochastic ve hareketli ortalamalar dahil yirmi altı teknik göstergenin çoğunluğu alım sinyali veren hisseler. Tek indikatör değil, teknik tablonun tamamı aynı yönü gösteriyor.',
     filters: { tech_rating_min: 0.5 }
   },
 
   momentum3m: {
     label: '3 Aylık Lider',
-    desc: 'Son 3 ayda %15+, 6 ayda %20+ kazanmış. Hem kısa hem orta vadeli momentum güçlü. İki zaman diliminde de lider olan hisseler.',
+    desc: 'Son üç ve altı ayda piyasanın önünde giden hisseler. Her iki zaman diliminde de güçlü olan momentum kısa vadeli değil, orta vadede de geçerli demektir.',
     filters: { perf3m_min: 15, perf6m_min: 20 }
   },
 
   trendFollow: {
     label: 'Güçlü Trendde',
-    desc: '52 hafta en düşüğünden %25+ yukarıda — dip çok geride kaldı. 6 ayda %10+ getiri var. Yapısal olarak güçlü trend içindeki hisseler.',
+    desc: 'Yıllık en düşük seviyesinden önemli ölçüde yükseliş yapmış ve bu kazancını koruyan hisseler. Dip geride kaldı, trend yukarı ve güçlü.',
     filters: { from_low_min: 25, perf6m_min: 10 }
   },
 
   rsiBounce: {
     label: 'RSI Toparlanması',
-    desc: 'RSI 30–50 arasında: aşırı satılmış bölgeden (RSI<30) çıkmış, aşırı alım bölgesine (RSI>70) henüz girmemiş. 52H dibinden %3+ yukarıda. Toparlanma başlamış ama erken aşamada.',
+    desc: 'Aşırı satılmış bölgeden çıkmış ama henüz pahalı bölgeye girmemiş hisseler. Yıllık dibinden biraz yukarıda — toparlanma başlamış, ivme henüz erken aşamada.',
     filters: { rsi_min: 30, rsi_max: 50, from_low_min: 3 }
   },
 
@@ -1340,99 +1340,99 @@ const GURUS = {
 
   ackman: {
     label: 'Bill Ackman — Activist',
-    desc: 'Her 100 TL özkaynaktan 15 TL+ kar (ROE>%15). 100 TL satıştan 10 TL+ net kalıyor (Marj>%10). Borcu özkaynaklarının %80\'inden az, nakit yeterli. Kazancının 20 katından ucuz (F/K<20). Kaliteli ama hâlâ makul fiyatlı.',
+    desc: 'Özkaynak getirisi ve net marjı yüksek, borcu makul ve nakit yeterli, üstelik kazancına göre makul fiyatlı şirketler. Kaliteli ama piyasanın henüz fark etmediği, katalizör bekleyen profil.',
     filters: {roe_min:15, margin_min:10, de_max:80, cr_min:1.2, pe_max:20}
   },
   ark: {
     label: 'Cathie Wood / ARK',
-    desc: 'Satışlar yılda %30+ büyüyor. Karlar %20+ artıyor. Kısa vadeli borçlarını karşılayacak nakit var (Cari>1). Hızlı büyüyen, kâr etmeye başlamış şirketler.',
+    desc: 'Satışları çok hızlı büyüyen, karları da artan ve kısa vadeli borçlarını karşılayacak nakit bulunduran şirketler. Yüksek büyüme öncelikli, kâr etmeye başlamış olması yeterli.',
     filters: {revg_min:30, earng_min:20, cr_min:1}
   },
   buffett: {
     label: 'Warren Buffett',
-    desc: 'Kazancının 5–25 katı arasında satılıyor (ne ucuz çöp ne pahalı balon). Her 100 TL özkaynaktan 20 TL+ kar. Satışının %20\'si net kara, %40\'ı brüt kara dönüşüyor. Borcu özkaynaklarının yarısından az. Nakit güçlü.',
+    desc: 'Ne aşırı ucuz ne aşırı pahalı — kazancının makul bir katında satılıyor. Hem brüt hem net marjı yüksek, özkaynak getirisi güçlü, borcu sınırlı ve nakit dengeli. Altı kriter aynı anda.',
     filters: {pe_min:5, pe_max:25, roe_min:20, margin_min:20, gross_min:40, de_max:50, cr_min:1.5}
   },
   einhorn: {
     label: 'David Einhorn — Deep Value',
-    desc: 'Kazancının 15 katından ucuz (F/K<15). Borcu özkaynaklarının yarısından az. Kısa vadeli borçlarının 1.5 katı nakit var. 100 TL satıştan 8 TL+ net kar kalıyor. Kârlı ama gözden kaçmış.',
+    desc: 'Kazancına göre ucuz, borcu düşük, kısa vadeli nakit yeterli ve net marjı pozitif olan şirketler. Kârlı ama piyasanın gözden kaçırdığı — fiyatın er ya da geç düzeleceği varsayımı.',
     filters: {pe_max:15, de_max:50, cr_min:1.5, margin_min:8, roe_min:10}
   },
   fisher: {
     label: 'Philip Fisher — Scuttlebutt',
-    desc: 'Satışlar ve karlar yılda %15+ büyüyor — ikisi birlikte. Brüt marj %35+, net marj %12+: hem üretim hem operasyon verimli. Borcu özkaynaklarının %60\'ından az. İstikrarlı büyüme, güçlü karlılık.',
+    desc: 'Satışları ve karları birlikte büyüyen, hem brüt hem net marjı güçlü, borcu kontrollü şirketler. İstikrarlı büyüme ile güçlü karlılığın aynı anda bulunması şart.',
     filters: {revg_min:15, earng_min:15, gross_min:35, margin_min:12, de_max:60}
   },
   graham: {
     label: 'Benjamin Graham',
-    desc: 'Kazancının 10 katından ucuz (F/K<10). Borsa değeri varlıklarının 1.5 katından az (PD/DD<1.5). Borcu özkaynaklarının yarısından az. Kısa vadeli borçlarının 2 katı nakit var. Yılda %1+ temettü ödüyor. Beş kriterin hepsi aynı anda.',
+    desc: 'Beş güvenlik filtresi aynı anda: fiyat kazancının on katından ucuz, borsa değeri defter değerine yakın, borç düşük, kısa vadeli nakit iki kat güçlü ve temettü ödeyen. Hepsini birden geçen hisse azdır — en muhafazakâr filtre.',
     filters: {pe_max:10, pb_max:1.5, de_max:50, cr_min:2, div_min:1}
   },
   greenblatt: {
     label: 'Joel Greenblatt — Magic Formula',
-    desc: 'Her 100 TL özkaynaktan 25 TL+ kar üretiyor (ROE>%25) — operasyonel güç yüksek. Kazancının 15 katından ucuz (F/K<15) — fiyatı makul. Yüksek karlılığı ucuz fiyatla bir arada bulmak.',
+    desc: 'Özkaynak getirisi çok yüksek — şirket gerçekten iyi. Kazancına göre de makul fiyatlı — pahalı değil. İki kriter birlikte sağlandığında yüksek kaliteyi ucuza almak mümkün.',
     filters: {roe_min:25, pe_max:15, de_max:80, cr_min:1}
   },
   icahn: {
     label: 'Carl Icahn — Activist Value',
-    desc: 'Borsa değeri varlıklarının 1.5 katından az (PD/DD<1.5). Kazancının 12 katından ucuz (F/K<12). Borcu az, kısa vadeli nakit güçlü. Temettü de ödüyor. Nakit zengini ama düşük değerlenen şirketler.',
+    desc: 'Borsa değeri defter değerine yakın, kazancına göre ucuz, borcu düşük, nakit güçlü ve temettü ödeyen şirketler. Nakit zengini ama düşük değerlenen — aktivist baskıyla değer açığa çıkar.',
     filters: {pb_max:1.5, pe_max:12, de_max:60, cr_min:1.5, div_min:1}
   },
   klarman: {
     label: 'Seth Klarman — Margin of Safety',
-    desc: 'Kazancının 10 katından ucuz (F/K<10). Borsa değeri varlıklarının 1.2 katından bile az (PD/DD<1.2). Borcu özkaynaklarının %40\'ından az. Kısa vadeli borçlarının 2 katı nakit. 100 TL satıştan 5 TL+ net kar. En katı güvenlik marjı.',
+    desc: 'Kazancına ve varlıklarına göre çok ucuz, borcu minimal, nakit çok güçlü ve net marjı pozitif şirketler. Beş kriterin hepsi aynı anda — en katı güvenlik marjı filtresi.',
     filters: {pe_max:10, pb_max:1.2, de_max:40, cr_min:2, margin_min:5}
   },
   lynch: {
     label: 'Peter Lynch — GARP',
-    desc: 'Karlar %15+ büyüyor. Kazancının 5–35 katı arasında satılıyor. PEG oranı <1: büyüme hızı fiyat/kazanç oranından daha yüksek — büyümesine göre ucuz demek. Borcu makul, nakit yeterli.',
+    desc: 'Karları hızla büyüyen ama büyümesine kıyasla fiyatı hâlâ ucuz olan şirketler. Büyüme hızı fiyat/kazanç oranını geçiyor — yani büyümesine göre ucuz. Borcu makul, nakit yeterli.',
     filters: {pe_min:5, pe_max:35, earng_min:15, de_max:80, cr_min:1},
     special: 'peg'
   },
   minervini: {
     label: 'Mark Minervini — SEPA',
-    desc: 'Karlar %25+ büyüyor — güçlü ivme. Her 100 TL özkaynaktan 17 TL+ kar (ROE>%17). 100 TL satıştan 10 TL+ net kalıyor. Borç kontrollü, nakit var. Operasyonel tablo güçlü, teknik kırılım için hazır.',
+    desc: 'Karları çok hızlı büyüyen, özkaynak getirisi ve net marjı güçlü, borcu kontrollü şirketler. Temel tablo güçlü olmalı — teknik kırılım bunun üzerine geldiğinde sinyal tamamlanır.',
     filters: {earng_min:25, roe_min:17, margin_min:10, de_max:100, cr_min:1}
   },
   munger: {
     label: 'Charlie Munger — Quality Compounder',
-    desc: 'Satışının %50\'si+ brüt kara dönüşüyor — olağanüstü iş modeli. Her 100 TL özkaynaktan 20 TL+ kar, net marj da %20+. Borcu özkaynaklarının yalnızca %30\'u kadar — neredeyse borçsuz. En katı kalite filtresi.',
+    desc: 'Brüt ve net marjı çok yüksek, özkaynak getirisi güçlü, neredeyse borçsuz ve nakit dengeli şirketler. Dört kalite kriteri çok katı tutulmuş — en güçlü iş modellerini süzer.',
     filters: {gross_min:50, roe_min:20, de_max:30, margin_min:20, cr_min:1.5}
   },
   oneil: {
     label: "William O'Neil — CAN SLIM",
-    desc: "Karlar %25+, satışlar %15+ büyüyor — hem kazanç hem gelir ivmesi var. Her 100 TL özkaynaktan 17 TL+ kar. Borç kontrollü, nakit yeterli. Güçlü temel tablo, teknik kırılım ve kurumsal destek aynı anda.",
+    desc: 'Karları ve satışları hızla büyüyen, özkaynak getirisi güçlü, borcu kontrollü şirketler. Temel tablonun güçlü olması şart — teknik kırılım ve kurumsal alım buna eklenir.',
     filters: {earng_min:25, revg_min:15, roe_min:17, de_max:100, cr_min:1}
   },
   oshaughnessy: {
     label: "O'Shaughnessy — What Works on Wall St.",
-    desc: 'Yıllık satışlarının yalnızca 1.5 katına satılıyor (F/S<1.5) — satış bazında ucuz. Yılda %1+ temettü dağıtıyor. Satışlar %10+ büyüyor. Her 100 TL özkaynaktan 10 TL+ kar. Ucuz, büyüyen, gelir getiren.',
+    desc: 'Yıllık satışlarına göre ucuz, temettü ödeyen, satışları büyüyen ve özkaynak getirisi pozitif şirketler. Dört farklı kriterin birlikte sağlanması uzun vadede güvenilir getiri veriyor.',
     filters: {ps_max:1.5, div_min:1, revg_min:10, roe_min:10}
   },
   piotroski: {
     label: 'Piotroski F-Score',
-    desc: '9 kriterlik bilanço testi: kârlılık artıyor mu, nakit artıyor mu, borç azalıyor mu, verimlilik yükseliyor mu? Bu filtre 9 üzerinden 7+ alan şirketleri getirir. Sayılar iyi, tablo temiz.',
+    desc: 'Dokuz soruluk bilanço testi: karlılık artıyor mu, nakit güçleniyor mu, borç azalıyor mu, verimlilik yükseliyor mu? Yüksek puan alan şirketlerin bilanço kalitesi hissiyat değil sayılarla kanıtlanmış.',
     filters: {roe_min:3, cr_min:1, de_max:120},
     special: 'piotroski'
   },
   schloss: {
     label: 'Walter Schloss — Deep Value',
-    desc: 'Borsa değeri varlıklarından daha az (PD/DD<1) — varlıkları bedavaya geliyor. Kazancının 12 katından ucuz (F/K<12). Borcu özkaynaklarının %30\'ından az. Temettü ödüyor. Nakit güçlü. En derin değer filtresi.',
+    desc: 'Borsa değeri varlık değerinin altında, kazancına göre ucuz, borcu çok az, nakit güçlü ve temettü ödeyen şirketler. Beş kriter birlikte en derin değer filtresini oluşturuyor.',
     filters: {pb_max:1, pe_max:12, de_max:30, div_min:1, cr_min:1.5}
   },
   citadel: {
     label: 'Citadel — Wellington',
-    desc: 'Her 100 TL özkaynaktan 15 TL+ kar. 100 TL satıştan 12 TL+ net kalıyor. Borcu makul, nakit yeterli (Cari>1.2). Karlar %10+ büyüyor. Büyük kurumun hisse seçim standardı.',
+    desc: 'Özkaynak getirisi ve net marjı yüksek, borcu makul, nakit yeterli ve karları büyüyen şirketler. Büyük kurumsal hisse seçim standartlarını karşılayan kalite profili.',
     filters: {roe_min:15, margin_min:12, de_max:70, cr_min:1.2, earng_min:10}
   },
   deshaw: {
     label: 'D.E. Shaw — Oculus',
-    desc: 'Karlar %20+, satışlar %15+ büyüyor. Her 100 TL özkaynaktan 18 TL+ kar. Net marj %15+. Hem büyüme hem verimlilik hem de momentum aynı anda güçlü. Algoritmanın aradığı kombinasyon.',
+    desc: 'Karları ve satışları birlikte hızla büyüyen, özkaynak getirisi ve net marjı yüksek, nakit dengesi sağlam şirketler. Büyüme, verimlilik ve momentum aynı anda güçlü — algoritmanın aradığı kombinasyon.',
     filters: {earng_min:20, roe_min:18, margin_min:15, revg_min:15, cr_min:1}
   },
   millennium: {
     label: 'Millennium Management',
-    desc: 'Her 100 TL özkaynaktan 12 TL+ kar. Net marj %10+. Borcu özkaynaklarının %60\'ından az. Nakit güçlü (Cari>1.5). Karlar %8+ büyüyor. Risk odaklı: borç düşük, karlılık istikrarlı.',
+    desc: 'Özkaynak getirisi ve net marjı pozitif, borcu sınırlı, nakit güçlü ve karları istikrarlı büyüyen şirketler. Risk odaklı seçim: borç düşük tutulurken karlılık ve büyüme birlikte aranıyor.',
     filters: {roe_min:12, margin_min:10, de_max:60, cr_min:1.5, earng_min:8}
   }
 
