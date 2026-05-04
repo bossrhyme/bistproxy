@@ -724,6 +724,7 @@ const EXCHANGE_META = {
   moex:   { name: 'MOEX',   currency: '₽',  currencyCode: 'RUB', flag: '🇷🇺', yahooSuffix: '.ME', filters: [] },
   france:    { name: 'Euronext Paris',     currency: '€', currencyCode: 'EUR', flag: '🇫🇷', yahooSuffix: '.PA', filters: [] },
   amsterdam: { name: 'Euronext Amsterdam', currency: '€', currencyCode: 'EUR', flag: '🇳🇱', yahooSuffix: '.AS', filters: [] },
+  brussels:  { name: 'Euronext Brussels',  currency: '€', currencyCode: 'EUR', flag: '🇧🇪', yahooSuffix: '.BR', filters: [] },
 };
 
 let allData = [];
@@ -990,6 +991,7 @@ async function runScan(){
     moex:   COLS_GLOBAL,
     france:    COLS_GLOBAL,
     amsterdam: COLS_GLOBAL,
+    brussels:  COLS_GLOBAL,
   };
   const payload = {
     columns: COLUMNS_BY_EXCHANGE[currentExchange] || COLUMNS_BY_EXCHANGE.default,
@@ -1149,7 +1151,7 @@ async function runScan(){
           else if(currentExchange === 'nikkei') val = val * fxRates.JPY;     // JPY → USD
           else if(currentExchange === 'krx')    val = val * fxRates.KRW;     // KRW → USD
           else if(currentExchange === 'moex')   val = val / fxRates.RUB;     // RUB → USD
-          else if(currentExchange === 'france' || currentExchange === 'amsterdam') val = val * fxRates.EUR; // EUR → USD
+          else if(currentExchange === 'france' || currentExchange === 'amsterdam' || currentExchange === 'brussels') val = val * fxRates.EUR; // EUR → USD
           // nasdaq/sp500: zaten USD
           return val / 1e6; // milyon USD olarak sakla
         })() : null,
@@ -3180,7 +3182,7 @@ function updateExchangeBadge() {}
 // ── TARAMA SÜRESİ TAHMİNİ ──
 let scanStartTime = null;
 let scanEtaTimer  = null;
-const EXCHANGE_ETA = { bist:4, nasdaq:6, sp500:6, dax:5, lse:5, nikkei:5, nyse:6, moex:5, france:5, amsterdam:5 }; // saniye
+const EXCHANGE_ETA = { bist:4, nasdaq:6, sp500:6, dax:5, lse:5, nikkei:5, nyse:6, moex:5, france:5, amsterdam:5, brussels:5 }; // saniye
 
 function startScanEta(exchange) {
   const total = EXCHANGE_ETA[exchange] || 5;
