@@ -173,7 +173,6 @@ const EXCHANGE_CONFIG = {
             ] },
   milan:  { tvPath: '/italy/scan',   yahooSuffix: '.MI', currency: 'EUR',
             extraFilters: [
-              { left: 'exchange',   operation: 'equal', right: 'EURONEXT' },
               { left: 'is_primary', operation: 'equal', right: true },
               { left: 'typespecs',  operation: 'has',   right: ['common'] },
             ] },
