@@ -117,6 +117,12 @@ const EXCHANGE_CONFIG = {
               { left: 'exchange',   operation: 'equal', right: 'NYSE' },
               { left: 'is_primary', operation: 'equal', right: true },
             ] },
+  krx:    { tvPath: '/korea/scan',   yahooSuffix: '.KS', currency: 'KRW',
+            extraFilters: [
+              { left: 'exchange',   operation: 'equal', right: 'KRX' },
+              { left: 'is_primary', operation: 'equal', right: true },
+              { left: 'typespecs',  operation: 'has',   right: ['common'] },
+            ] },
 };
 
 module.exports = async function(req, res) {
