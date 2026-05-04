@@ -407,6 +407,7 @@ var EXCHANGE_META = {
   amsterdam: { name: 'Euronext Amsterdam', currency: '€', currencyCode: 'EUR', yahooSuffix: '.AS', flag: '🇳🇱', tvUrl: 'https://scanner.tradingview.com/netherlands/scan', filters: [] },
   brussels:  { name: 'Euronext Brussels',  currency: '€', currencyCode: 'EUR', yahooSuffix: '.BR', flag: '🇧🇪', tvUrl: 'https://scanner.tradingview.com/belgium/scan',      filters: [] },
   lisbon:    { name: 'Euronext Lisbon',    currency: '€', currencyCode: 'EUR', yahooSuffix: '.LS', flag: '🇵🇹', tvUrl: 'https://scanner.tradingview.com/portugal/scan',    filters: [] },
+  dublin:    { name: 'Euronext Dublin',   currency: '€', currencyCode: 'EUR', yahooSuffix: '.IR', flag: '🇮🇪', tvUrl: 'https://scanner.tradingview.com/ireland/scan',     filters: [] },
 };
 
 var allData = [];
@@ -450,7 +451,7 @@ function showProfil(sym, ex) {
   var _logoEl = document.getElementById('prf-logo');
   if(_logoEl) {
     // TradingView logo CDN - birden fazla format denenir
-    var _tvPfxMap = { bist:'BIST', nasdaq:'NASDAQ', sp500:'NYSE', dax:'XETR', lse:'LSE', nikkei:'TSE', krx:'KRX', moex:'MOEX', france:'EURONEXT', amsterdam:'EURONEXT', brussels:'EURONEXT', lisbon:'EURONEXT' };
+    var _tvPfxMap = { bist:'BIST', nasdaq:'NASDAQ', sp500:'NYSE', dax:'XETR', lse:'LSE', nikkei:'TSE', krx:'KRX', moex:'MOEX', france:'EURONEXT', amsterdam:'EURONEXT', brussels:'EURONEXT', lisbon:'EURONEXT', dublin:'EURONEXT' };
     var _tvPfx = _tvPfxMap[_prfEx] || 'BIST';
     var _symLow = sym.toLowerCase();
     // TV logo URL formatları (öncelik sırasıyla):
