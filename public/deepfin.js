@@ -727,6 +727,7 @@ const EXCHANGE_META = {
   brussels:  { name: 'Euronext Brussels',  currency: '€', currencyCode: 'EUR', flag: '🇧🇪', yahooSuffix: '.BR', filters: [] },
   lisbon:    { name: 'Euronext Lisbon',    currency: '€', currencyCode: 'EUR', flag: '🇵🇹', yahooSuffix: '.LS', filters: [] },
   dublin:    { name: 'Euronext Dublin',    currency: '€', currencyCode: 'EUR', flag: '🇮🇪', yahooSuffix: '.IR', filters: [] },
+  oslo:      { name: 'Oslo Bors',          currency: 'kr', currencyCode: 'NOK', flag: '🇳🇴', yahooSuffix: '.OL', filters: [] },
 };
 
 let allData = [];
@@ -734,7 +735,7 @@ let filtered = [];
 let searchQ = '';
 let selSym = null;
 let sortSt = {field:'marketCapitalization', dir:'desc'};
-let fxRates = {TRY:44.1, EUR:1.163, GBP:1.333, JPY:0.00633, KRW:0.00074, RUB:89.0};
+let fxRates = {TRY:44.1, EUR:1.163, GBP:1.333, JPY:0.00633, KRW:0.00074, RUB:89.0, NOK:0.090};
 let scanAborted = false;
 
 // ═══════════════════════════════════════════
@@ -917,6 +918,7 @@ async function runScan(){
       if(r.JPY) fxRates.JPY = 1 / r.JPY;
       if(r.KRW) fxRates.KRW = 1 / r.KRW;
       if(r.RUB) fxRates.RUB = r.RUB;
+      if(r.NOK) fxRates.NOK = 1 / r.NOK;
     }
   } catch(e) { /* fallback kurlar kullanılır */ }
   const btn = document.getElementById('scanbtn');
@@ -996,6 +998,7 @@ async function runScan(){
     brussels:  COLS_GLOBAL,
     lisbon:    COLS_GLOBAL,
     dublin:    COLS_GLOBAL,
+    oslo:      COLS_GLOBAL,
   };
   const payload = {
     columns: COLUMNS_BY_EXCHANGE[currentExchange] || COLUMNS_BY_EXCHANGE.default,
@@ -1156,6 +1159,7 @@ async function runScan(){
           else if(currentExchange === 'krx')    val = val * fxRates.KRW;     // KRW → USD
           else if(currentExchange === 'moex')   val = val / fxRates.RUB;     // RUB → USD
           else if(['france','amsterdam','brussels','lisbon','dublin'].includes(currentExchange)) val = val * fxRates.EUR; // EUR → USD
+          else if(currentExchange === 'oslo') val = val * fxRates.NOK;         // NOK → USD
           // nasdaq/sp500: zaten USD
           return val / 1e6; // milyon USD olarak sakla
         })() : null,
@@ -3186,7 +3190,7 @@ function updateExchangeBadge() {}
 // ── TARAMA SÜRESİ TAHMİNİ ──
 let scanStartTime = null;
 let scanEtaTimer  = null;
-const EXCHANGE_ETA = { bist:4, nasdaq:6, sp500:6, dax:5, lse:5, nikkei:5, nyse:6, moex:5, france:5, amsterdam:5, brussels:5, lisbon:5, dublin:5 }; // saniye
+const EXCHANGE_ETA = { bist:4, nasdaq:6, sp500:6, dax:5, lse:5, nikkei:5, nyse:6, moex:5, france:5, amsterdam:5, brussels:5, lisbon:5, dublin:5, oslo:5 }; // saniye
 
 function startScanEta(exchange) {
   const total = EXCHANGE_ETA[exchange] || 5;

@@ -65,6 +65,7 @@ async function fetchOpenEr() {
     JPY: r.JPY || 150.0,
     KRW: r.KRW || 1350.0,
     RUB: r.RUB || 89.0,
+    NOK: r.NOK || 10.7,
     source: 'open.er-api',
   };
 }
@@ -91,9 +92,9 @@ module.exports = async function(req, res) {
     // Google sadece TRY veriyor, diğerleri için fallback'ten tamamla
     try {
       const er = await fetchOpenEr();
-      rates = { TRY: g.TRY, EUR: er.EUR, GBP: er.GBP, JPY: er.JPY, KRW: er.KRW, RUB: er.RUB, source: 'google' };
+      rates = { TRY: g.TRY, EUR: er.EUR, GBP: er.GBP, JPY: er.JPY, KRW: er.KRW, RUB: er.RUB, NOK: er.NOK, source: 'google' };
     } catch(_) {
-      rates = { TRY: g.TRY, EUR: 0.920, GBP: 0.790, JPY: 150.0, KRW: 1350.0, RUB: 89.0, source: 'google' };
+      rates = { TRY: g.TRY, EUR: 0.920, GBP: 0.790, JPY: 150.0, KRW: 1350.0, RUB: 89.0, NOK: 10.7, source: 'google' };
     }
   } catch (e1) {
     // 2. open.er-api
@@ -101,7 +102,7 @@ module.exports = async function(req, res) {
       rates = await fetchOpenEr();
     } catch (e2) {
       // 3. Sabit fallback
-      rates = { TRY: 44.6, EUR: 0.920, GBP: 0.790, JPY: 150.0, KRW: 1350.0, RUB: 89.0, source: 'fallback' };
+      rates = { TRY: 44.6, EUR: 0.920, GBP: 0.790, JPY: 150.0, KRW: 1350.0, RUB: 89.0, NOK: 10.7, source: 'fallback' };
     }
   }
 
