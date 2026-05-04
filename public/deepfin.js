@@ -721,6 +721,7 @@ const EXCHANGE_META = {
   nikkei: { name: 'Nikkei',  currency: '¥',  currencyCode: 'JPY', flag: '🇯🇵', yahooSuffix: '.T',  filters: [] },
   nyse:   { name: 'NYSE',   currency: '$',  currencyCode: 'USD', flag: '🇺🇸', yahooSuffix: '',    filters: [{ left: 'exchange', operation: 'equal', right: 'NYSE' }] },
   krx:    { name: 'KRX',    currency: '₩',  currencyCode: 'KRW', flag: '🇰🇷', yahooSuffix: '.KS', filters: [] },
+  moex:   { name: 'MOEX',   currency: '₽',  currencyCode: 'RUB', flag: '🇷🇺', yahooSuffix: '.ME', filters: [] },
 };
 
 let allData = [];
@@ -728,7 +729,7 @@ let filtered = [];
 let searchQ = '';
 let selSym = null;
 let sortSt = {field:'marketCapitalization', dir:'desc'};
-let fxRates = {TRY:44.1, EUR:1.163, GBP:1.333, JPY:0.00633, KRW:0.00074};
+let fxRates = {TRY:44.1, EUR:1.163, GBP:1.333, JPY:0.00633, KRW:0.00074, RUB:89.0};
 let scanAborted = false;
 
 // ═══════════════════════════════════════════
@@ -910,6 +911,7 @@ async function runScan(){
       if(r.GBP) fxRates.GBP = 1 / r.GBP;
       if(r.JPY) fxRates.JPY = 1 / r.JPY;
       if(r.KRW) fxRates.KRW = 1 / r.KRW;
+      if(r.RUB) fxRates.RUB = r.RUB;
     }
   } catch(e) { /* fallback kurlar kullanılır */ }
   const btn = document.getElementById('scanbtn');
@@ -983,6 +985,7 @@ async function runScan(){
     nikkei: COLS_GLOBAL,
     nyse:   COLS_US,
     krx:    COLS_GLOBAL,
+    moex:   COLS_GLOBAL,
   };
   const payload = {
     columns: COLUMNS_BY_EXCHANGE[currentExchange] || COLUMNS_BY_EXCHANGE.default,
@@ -999,6 +1002,7 @@ async function runScan(){
     if (currentExchange === 'lse')    payload.range = [0, 2000];
     if (currentExchange === 'nikkei') payload.range = [0, 4000];
     if (currentExchange === 'krx')    payload.range = [0, 3000];
+    if (currentExchange === 'moex')   payload.range = [0, 500];
   // Proxy üzerinden — kaynak gizli; BIST için halka açıklık verisi paralel çekilir
   const _isBist = currentExchange === 'bist';
   const [res, _bistFloatRes] = await Promise.all([
@@ -1140,6 +1144,7 @@ async function runScan(){
           else if(currentExchange === 'lse') val = val * fxRates.GBP / 100;  // GBX (pence) → USD
           else if(currentExchange === 'nikkei') val = val * fxRates.JPY;     // JPY → USD
           else if(currentExchange === 'krx')    val = val * fxRates.KRW;     // KRW → USD
+          else if(currentExchange === 'moex')   val = val / fxRates.RUB;     // RUB → USD
           // nasdaq/sp500: zaten USD
           return val / 1e6; // milyon USD olarak sakla
         })() : null,
@@ -3170,7 +3175,7 @@ function updateExchangeBadge() {}
 // ── TARAMA SÜRESİ TAHMİNİ ──
 let scanStartTime = null;
 let scanEtaTimer  = null;
-const EXCHANGE_ETA = { bist:4, nasdaq:6, sp500:6, dax:5, lse:5, nikkei:5, nyse:6 }; // saniye
+const EXCHANGE_ETA = { bist:4, nasdaq:6, sp500:6, dax:5, lse:5, nikkei:5, nyse:6, moex:5 }; // saniye
 
 function startScanEta(exchange) {
   const total = EXCHANGE_ETA[exchange] || 5;

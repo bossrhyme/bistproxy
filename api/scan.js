@@ -62,6 +62,7 @@ function getCacheTTL(exchange) {
     dax:    { open: 8,  close: 16 }, // 09:00-17:30 CET
     lse:    { open: 8,  close: 16 }, // 08:00-16:30 BST
     nikkei: { open: 0,  close: 6  }, // 09:00-15:30 JST
+    moex:   { open: 7,  close: 16 }, // 09:50-18:45 MSK (UTC+3)
   };
   const h = hours[exchange] || { open: 8, close: 16 };
   return (hour >= h.open && hour < h.close) ? 300 : 1800; // açık:5dk kapalı:30dk
@@ -120,6 +121,12 @@ const EXCHANGE_CONFIG = {
   krx:    { tvPath: '/korea/scan',   yahooSuffix: '.KS', currency: 'KRW',
             extraFilters: [
               { left: 'exchange',   operation: 'equal', right: 'KRX' },
+              { left: 'is_primary', operation: 'equal', right: true },
+              { left: 'typespecs',  operation: 'has',   right: ['common'] },
+            ] },
+  moex:   { tvPath: '/russia/scan',  yahooSuffix: '.ME', currency: 'RUB',
+            extraFilters: [
+              { left: 'exchange',   operation: 'equal', right: 'MOEX' },
               { left: 'is_primary', operation: 'equal', right: true },
               { left: 'typespecs',  operation: 'has',   right: ['common'] },
             ] },

@@ -316,6 +316,14 @@ if('serviceWorker' in navigator){
               <div class="hp-excard-count">~3000 hisse</div>
             </div>
           </a>
+          <a href="/?ex=moex" class="hp-excard" onclick="event.preventDefault(); selectExchangeAndGo('moex')">
+            <div class="hp-excard-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjRDUyQjFFIi8+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjEzLjMzIiBmaWxsPSIjMDAzREE1Ii8+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjYuNjciIGZpbGw9IiNmZmYiLz48L3N2Zz4=" width="28" height="20" alt="" style="border-radius:3px;object-fit:cover;display:block;"></div>
+            <div class="hp-excard-info">
+              <div class="hp-excard-name">MOEX</div>
+              <div class="hp-excard-desc">Moskova</div>
+              <div class="hp-excard-count">~300 hisse</div>
+            </div>
+          </a>
         </div>
       </div>
 
@@ -509,6 +517,9 @@ if('serviceWorker' in navigator){
             <div class="exbtn" data-exchange="krx" onclick="selectExchange(this)">
               <span class="exbtn-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTE1LDVhNSw1LDAsMCwxLDAsMTBhMi41LDIuNSwwLDAsMSwwLTVhMi41LDIuNSwwLDAsMCwwLTV6IiBmaWxsPSIjQ0QyRTNBIi8+PHBhdGggZD0iTTE1LDE1YTUsNSwwLDAsMSwwLTEwYTIuNSwyLjUsMCwwLDEsMCw1YTIuNSwyLjUsMCwwLDAsMCw1eiIgZmlsbD0iIzAwNDdBMCIvPjwvc3ZnPg==" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">KRX</span><span class="exbtn-sub">Seul</span>
             </div>
+            <div class="exbtn" data-exchange="moex" onclick="selectExchange(this)">
+              <span class="exbtn-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjRDUyQjFFIi8+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjEzLjMzIiBmaWxsPSIjMDAzREE1Ii8+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjYuNjciIGZpbGw9IiNmZmYiLz48L3N2Zz4=" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">MOEX</span><span class="exbtn-sub">Moskova</span>
+            </div>
           </div>
         </div>
 
@@ -621,6 +632,7 @@ if('serviceWorker' in navigator){
             <div class="exbtn"    data-exchange="lse"    onclick="advSelectExchange(this)"><span class="exbtn-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjMDEyMTY5Ii8+PHBhdGggZD0iTTAsMCBMMzAsMjAgTTMwLDAgTDAsMjAiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI0Ii8+PHBhdGggZD0iTTAsMCBMMzAsMjAgTTMwLDAgTDAsMjAiIHN0cm9rZT0iI0M4MTAyRSIgc3Ryb2tlLXdpZHRoPSIyLjUiLz48cGF0aCBkPSJNMTUsMCBWMjAgTTAsMTAgSDMwIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iNiIvPjxwYXRoIGQ9Ik0xNSwwIFYyMCBNMCwxMCBIMzAiIHN0cm9rZT0iI0M4MTAyRSIgc3Ryb2tlLXdpZHRoPSI0Ii8+PC9zdmc+" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">LSE</span><span class="exbtn-sub">Londra</span></div>
             <div class="exbtn"    data-exchange="nikkei" onclick="advSelectExchange(this)"><span class="exbtn-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjZmZmIi8+PGNpcmNsZSBjeD0iMTUiIGN5PSIxMCIgcj0iNiIgZmlsbD0iI0JDMDAyRCIvPjwvc3ZnPg==" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">Nikkei</span><span class="exbtn-sub">Tokyo</span></div>
             <div class="exbtn"    data-exchange="krx"    onclick="advSelectExchange(this)"><span class="exbtn-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTE1LDVhNSw1LDAsMCwxLDAsMTBhMi41LDIuNSwwLDAsMSwwLTVhMi41LDIuNSwwLDAsMCwwLTV6IiBmaWxsPSIjQ0QyRTNBIi8+PHBhdGggZD0iTTE1LDE1YTUsNSwwLDAsMSwwLTEwYTIuNSwyLjUsMCwwLDEsMCw1YTIuNSwyLjUsMCwwLDAsMCw1eiIgZmlsbD0iIzAwNDdBMCIvPjwvc3ZnPg==" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">KRX</span><span class="exbtn-sub">Seul</span></div>
+            <div class="exbtn"    data-exchange="moex"   onclick="advSelectExchange(this)"><span class="exbtn-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjRDUyQjFFIi8+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjEzLjMzIiBmaWxsPSIjMDAzREE1Ii8+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjYuNjciIGZpbGw9IiNmZmYiLz48L3N2Zz4=" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">MOEX</span><span class="exbtn-sub">Moskova</span></div>
           </div>
         </div>
 
@@ -1595,6 +1607,6 @@ if('serviceWorker' in navigator){
     </div>
   </div>
 </div>
-<script src="/deepfin.js?v=11"></script>
+<script src="/deepfin.js?v=12"></script>
 </body>
 </html>

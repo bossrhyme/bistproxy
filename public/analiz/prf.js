@@ -402,6 +402,7 @@ var EXCHANGE_META = {
   nikkei: { name: 'Nikkei',  currency: '¥',  currencyCode: 'JPY', yahooSuffix: '.T',  flag: '🇯🇵', tvUrl: 'https://scanner.tradingview.com/japan/scan',   filters: [] },
   nyse:   { name: 'NYSE',   currency: '$',  currencyCode: 'USD', yahooSuffix: '',    flag: '🇺🇸', tvUrl: 'https://scanner.tradingview.com/america/scan', filters: [{ left: 'exchange', operation: 'equal', right: 'NYSE' }] },
   krx:    { name: 'KRX',   currency: '₩',  currencyCode: 'KRW', yahooSuffix: '.KS', flag: '🇰🇷', tvUrl: 'https://scanner.tradingview.com/korea/scan',   filters: [] },
+  moex:   { name: 'MOEX',  currency: '₽',  currencyCode: 'RUB', yahooSuffix: '.ME', flag: '🇷🇺', tvUrl: 'https://scanner.tradingview.com/russia/scan',  filters: [] },
 };
 
 var allData = [];
@@ -412,7 +413,7 @@ var _prfData = null;
 var _prfAiDone = false;
 var _sectorAvg = null;
 var _urlParams = new URLSearchParams(window.location.search);
-var _fxRates = { TRY: 44.6, EUR: 0.920, GBP: 0.790, JPY: 150.0, KRW: 1350.0 }; // fallback, sayfa yüklenince /api/rates ile güncellenir
+var _fxRates = { TRY: 44.6, EUR: 0.920, GBP: 0.790, JPY: 150.0, KRW: 1350.0, RUB: 89.0 }; // fallback, sayfa yüklenince /api/rates ile güncellenir
 fetch('/api/rates').then(function(r){ return r.json(); }).then(function(d){ if(d && d.TRY) _fxRates = d; }).catch(function(){});
 
 function _fmtN(v) {
@@ -445,7 +446,7 @@ function showProfil(sym, ex) {
   var _logoEl = document.getElementById('prf-logo');
   if(_logoEl) {
     // TradingView logo CDN - birden fazla format denenir
-    var _tvPfxMap = { bist:'BIST', nasdaq:'NASDAQ', sp500:'NYSE', dax:'XETR', lse:'LSE', nikkei:'TSE', krx:'KRX' };
+    var _tvPfxMap = { bist:'BIST', nasdaq:'NASDAQ', sp500:'NYSE', dax:'XETR', lse:'LSE', nikkei:'TSE', krx:'KRX', moex:'MOEX' };
     var _tvPfx = _tvPfxMap[_prfEx] || 'BIST';
     var _symLow = sym.toLowerCase();
     // TV logo URL formatları (öncelik sırasıyla):
