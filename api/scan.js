@@ -163,19 +163,17 @@ const EXCHANGE_CONFIG = {
             ] },
   moex:   { tvPath: '/russia/scan',  yahooSuffix: '.ME', currency: 'RUB',
             extraFilters: [
-              { left: 'exchange',   operation: 'equal', right: 'MOEX' },
               { left: 'is_primary', operation: 'equal', right: true },
               { left: 'typespecs',  operation: 'has',   right: ['common'] },
             ] },
   oslo:   { tvPath: '/norway/scan',  yahooSuffix: '.OL', currency: 'NOK',
             extraFilters: [
-              { left: 'exchange',   operation: 'equal', right: 'OSE' },
               { left: 'is_primary', operation: 'equal', right: true },
               { left: 'typespecs',  operation: 'has',   right: ['common'] },
             ] },
   milan:  { tvPath: '/italy/scan',   yahooSuffix: '.MI', currency: 'EUR',
             extraFilters: [
-              { left: 'exchange',   operation: 'equal', right: 'MTA' },
+              { left: 'exchange',   operation: 'equal', right: 'EURONEXT' },
               { left: 'is_primary', operation: 'equal', right: true },
               { left: 'typespecs',  operation: 'has',   right: ['common'] },
             ] },
