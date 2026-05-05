@@ -230,8 +230,9 @@ const EXCHANGE_CONFIG = {
               { left: 'is_primary', operation: 'equal', right: true },
               { left: 'typespecs',  operation: 'has',   right: ['common'] },
             ] },
-  southafrica: { tvPath: '/south_africa/scan', yahooSuffix: '.JO', currency: 'ZAR',
+  southafrica: { tvPath: '/global/scan',        yahooSuffix: '.JO', currency: 'ZAR',
             extraFilters: [
+              { left: 'exchange',   operation: 'equal', right: 'JSE' },
               { left: 'is_primary', operation: 'equal', right: true },
               { left: 'typespecs',  operation: 'has',   right: ['common'] },
             ] },
