@@ -77,6 +77,7 @@ function getCacheTTL(exchange) {
     china:  { open: 1,  close: 7  }, // 09:30-15:00 CST (UTC+8)
     saudi:       { open: 7,  close: 12 }, // 10:00-15:00 AST (UTC+3), Pzr-Per
     switzerland: { open: 8,  close: 16 }, // 09:00-17:30 CET (UTC+1)
+    australia:   { open: 0,  close: 6  }, // 10:00-16:00 AEST (UTC+10)
   };
   const h = hours[exchange] || { open: 8, close: 16 };
   return (hour >= h.open && hour < h.close) ? 300 : 1800; // açık:5dk kapalı:30dk
@@ -219,6 +220,12 @@ const EXCHANGE_CONFIG = {
             ] },
   switzerland: { tvPath: '/switzerland/scan', yahooSuffix: '.SW', currency: 'CHF',
             extraFilters: [
+              { left: 'is_primary', operation: 'equal', right: true },
+              { left: 'typespecs',  operation: 'has',   right: ['common'] },
+            ] },
+  australia:   { tvPath: '/australia/scan',   yahooSuffix: '.AX', currency: 'AUD',
+            extraFilters: [
+              { left: 'exchange',   operation: 'equal', right: 'ASX' },
               { left: 'is_primary', operation: 'equal', right: true },
               { left: 'typespecs',  operation: 'has',   right: ['common'] },
             ] },
