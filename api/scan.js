@@ -235,6 +235,23 @@ const EXCHANGE_CONFIG = {
               { left: 'is_primary', operation: 'equal', right: true },
               { left: 'typespecs',  operation: 'has',   right: ['common'] },
             ] },
+  sweden:      { tvPath: '/sweden/scan',       yahooSuffix: '.ST', currency: 'SEK',
+            extraFilters: [
+              { left: 'exchange',   operation: 'equal', right: 'OMXSTO' },
+              { left: 'is_primary', operation: 'equal', right: true },
+              { left: 'typespecs',  operation: 'has',   right: ['common'] },
+            ] },
+  india:       { tvPath: '/india/scan',         yahooSuffix: '.NS', currency: 'INR',
+            extraFilters: [
+              { left: 'exchange',   operation: 'equal', right: 'NSE' },
+              { left: 'is_primary', operation: 'equal', right: true },
+              { left: 'typespecs',  operation: 'has',   right: ['common'] },
+            ] },
+  uae:         { tvPath: '/global/scan',        yahooSuffix: '.DU', currency: 'AED',
+            extraFilters: [
+              { left: 'exchange',   operation: 'equal', right: 'DFM' },
+              { left: 'is_primary', operation: 'equal', right: true },
+            ] },
 };
 
 module.exports = async function(req, res) {
