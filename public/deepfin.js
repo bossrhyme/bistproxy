@@ -738,7 +738,7 @@ const EXCHANGE_META = {
   switzerland: { name: 'SIX',             currency: 'Fr',  currencyCode: 'CHF', flag: '🇨🇭', yahooSuffix: '.SW', filters: [] },
   australia:   { name: 'ASX',             currency: 'A$',  currencyCode: 'AUD', flag: '🇦🇺', yahooSuffix: '.AX', filters: [] },
   southafrica: { name: 'JSE',             currency: 'R',   currencyCode: 'ZAR', flag: '🇿🇦', yahooSuffix: '.JO', filters: [] },
-  sweden:      { name: 'Nasdaq Stockholm', currency: 'kr', currencyCode: 'SEK', flag: '🇸🇪', yahooSuffix: '.ST', filters: [] },
+  sweden:      { name: 'Nasdaq S.', currency: 'kr', currencyCode: 'SEK', flag: '🇸🇪', yahooSuffix: '.ST', filters: [] },
 };
 
 let allData = [];
