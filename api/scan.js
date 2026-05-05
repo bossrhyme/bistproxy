@@ -211,8 +211,9 @@ const EXCHANGE_CONFIG = {
               { left: 'is_primary', operation: 'equal', right: true },
               { left: 'typespecs',  operation: 'has',   right: ['common'] },
             ] },
-  saudi:  { tvPath: '/saudi_arabia/scan', yahooSuffix: '.SR', currency: 'SAR',
+  saudi:  { tvPath: '/global/scan', yahooSuffix: '.SR', currency: 'SAR',
             extraFilters: [
+              { left: 'exchange',   operation: 'equal', right: 'TADAWUL' },
               { left: 'is_primary', operation: 'equal', right: true },
             ] },
 };
