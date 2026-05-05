@@ -1,6 +1,23 @@
 const https = require('https');
 
 // ─────────────────────────────────────────────
+// In-memory fallback cache (aynı serverless instance içinde KV down olunca devreye girer)
+// ─────────────────────────────────────────────
+const _memCache = new Map();
+function memGet(key) {
+  const e = _memCache.get(key);
+  if (!e) return null;
+  if (Date.now() > e.exp) { _memCache.delete(key); return null; }
+  return e.data;
+}
+function memSet(key, data, ttlSeconds) {
+  if (_memCache.size >= 60) { // bellek sınırı: ~60 entry
+    _memCache.delete(_memCache.keys().next().value);
+  }
+  _memCache.set(key, { data, exp: Date.now() + ttlSeconds * 1000 });
+}
+
+// ─────────────────────────────────────────────
 // Vercel KV Cache — scan action için
 // Env variables: KV_REST_API_URL, KV_REST_API_TOKEN
 // Vercel dashboard > Storage > KV'den otomatik inject edilir
@@ -90,14 +107,18 @@ function getCacheTTL(exchange) {
 // ─────────────────────────────────────────────
 // HTTP helper
 // ─────────────────────────────────────────────
-function makeRequest(hostname, path, method, headers, body, callback) {
+function makeRequest(hostname, path, method, headers, body, callback, timeoutMs = 8000) {
   const options = { hostname, path, method, headers };
+  let done = false;
   const req = https.request(options, (res) => {
     let data = '';
     res.on('data', chunk => data += chunk);
-    res.on('end', () => callback(null, data, res.statusCode));
+    res.on('end', () => { if (!done) { done = true; callback(null, data, res.statusCode); } });
   });
-  req.on('error', (err) => callback(err));
+  req.setTimeout(timeoutMs, () => {
+    if (!done) { done = true; req.destroy(); callback(new Error('timeout')); }
+  });
+  req.on('error', (err) => { if (!done) { done = true; callback(err); } });
   if (body) req.write(body);
   req.end();
 }
@@ -375,12 +396,18 @@ module.exports = async function(req, res) {
     const cacheKey = 'df_v4_' + exchange + '_' + colHash; // v4: country-specific paths for india/sweden/uae
     const ttl      = getCacheTTL(exchange);
 
-    // 1. Cache HIT?
+    // 1. Cache HIT? — önce KV, yoksa in-memory fallback
+    const memHit = memGet(cacheKey);
+    if (memHit) {
+      if (!memHit.columns) memHit.columns = safeCols;
+      res.setHeader('Content-Type', 'application/json');
+      return res.status(200).end(JSON.stringify(memHit));
+    }
     if (kvEnabled()) {
       const cached = await kvGet(cacheKey);
       if (cached) {
-        // Cache'e yazılırken columns eklenmemişse safeCols'tan ekle
         if (!cached.columns) cached.columns = safeCols;
+        memSet(cacheKey, cached, Math.min(ttl, 300)); // in-memory'ye de al
         res.setHeader('Content-Type', 'application/json');
         return res.status(200).end(JSON.stringify(cached));
       }
@@ -402,21 +429,27 @@ module.exports = async function(req, res) {
         'sec-fetch-site':  'same-site',
       };
       makeRequest('scanner.tradingview.com', cfg.tvPath, 'POST', headers, payload, async (err, data, statusCode) => {
-        if (err) { res.status(500).json({ error: 'Veri alınamadı' }); return resolve(); }
+        if (err) {
+          const msg = err.message === 'timeout' ? 'İstek zaman aşımına uğradı' : 'Veri alınamadı';
+          res.status(504).json({ error: msg });
+          return resolve();
+        }
 
         res.setHeader('Content-Type', 'application/json');
         try {
           const parsed = JSON.parse(data);
-          // Sadece client'ın ihtiyacı olan meta — kaynak detayları gizli
           parsed._exchange  = exchange;
           parsed._currency  = cfg.currency;
-          parsed.columns    = merged.columns; // client CI map için gerçek sıra
+          parsed.columns    = merged.columns;
 
-          // 3. Cache'e yaz (response'u bloklamaz)
-          if (kvEnabled() && parsed.data && parsed.data.length > 0) {
-            kvSet(cacheKey, parsed, ttl).catch(() => {});
-            fetchHttp(process.env.KV_REST_API_URL + '/incr/df_total_scans', 'POST',
-              { Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN }).catch(()=>{});
+          // 3. Cache'e yaz — KV + in-memory
+          if (parsed.data && parsed.data.length > 0) {
+            memSet(cacheKey, parsed, Math.min(ttl, 300));
+            if (kvEnabled()) {
+              kvSet(cacheKey, parsed, ttl).catch(() => {});
+              fetchHttp(process.env.KV_REST_API_URL + '/incr/df_total_scans', 'POST',
+                { Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN }).catch(()=>{});
+            }
           }
 
           res.status(statusCode).end(JSON.stringify(parsed));
