@@ -214,7 +214,6 @@ const EXCHANGE_CONFIG = {
   saudi:  { tvPath: '/saudi_arabia/scan', yahooSuffix: '.SR', currency: 'SAR',
             extraFilters: [
               { left: 'is_primary', operation: 'equal', right: true },
-              { left: 'typespecs',  operation: 'has',   right: ['common'] },
             ] },
 };
 
