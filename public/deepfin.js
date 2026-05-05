@@ -739,6 +739,7 @@ const EXCHANGE_META = {
   australia:   { name: 'ASX',             currency: 'A$',  currencyCode: 'AUD', flag: '🇦🇺', yahooSuffix: '.AX', filters: [] },
   southafrica: { name: 'JSE',             currency: 'R',   currencyCode: 'ZAR', flag: '🇿🇦', yahooSuffix: '.JO', filters: [] },
   sweden:      { name: 'Nasdaq S.', currency: 'kr', currencyCode: 'SEK', flag: '🇸🇪', yahooSuffix: '.ST', filters: [] },
+  india:       { name: 'NSE',       currency: '₹',  currencyCode: 'INR', flag: '🇮🇳', yahooSuffix: '.NS', filters: [] },
 };
 
 let allData = [];
@@ -746,7 +747,7 @@ let filtered = [];
 let searchQ = '';
 let selSym = null;
 let sortSt = {field:'marketCapitalization', dir:'desc'};
-let fxRates = {TRY:44.1, EUR:1.163, GBP:1.333, JPY:0.00633, KRW:0.00074, RUB:89.0, NOK:0.090, CAD:0.73, TWD:32.0, BRL:5.70, HKD:7.78, CNY:7.25, SAR:3.75, CHF:1.12, AUD:0.633, ZAR:18.5, SEK:0.095};
+let fxRates = {TRY:44.1, EUR:1.163, GBP:1.333, JPY:0.00633, KRW:0.00074, RUB:89.0, NOK:0.090, CAD:0.73, TWD:32.0, BRL:5.70, HKD:7.78, CNY:7.25, SAR:3.75, CHF:1.12, AUD:0.633, ZAR:18.5, SEK:0.095, INR:0.012};
 let scanAborted = false;
 
 // ═══════════════════════════════════════════
@@ -940,6 +941,7 @@ async function runScan(){
       if(r.AUD) fxRates.AUD = 1 / r.AUD;
       if(r.ZAR) fxRates.ZAR = r.ZAR;
       if(r.SEK) fxRates.SEK = 1 / r.SEK;
+      if(r.INR) fxRates.INR = 1 / r.INR;
     }
   } catch(e) { /* fallback kurlar kullanılır */ }
   const btn = document.getElementById('scanbtn');
@@ -1031,6 +1033,7 @@ async function runScan(){
     australia:   COLS_GLOBAL,
     southafrica: COLS_GLOBAL,
     sweden:      COLS_GLOBAL,
+    india:       COLS_GLOBAL,
   };
   const payload = {
     columns: COLUMNS_BY_EXCHANGE[currentExchange] || COLUMNS_BY_EXCHANGE.default,
@@ -1202,6 +1205,7 @@ async function runScan(){
           else if(currentExchange === 'australia')   val = val * fxRates.AUD;         // AUD → USD
           else if(currentExchange === 'southafrica') val = val / fxRates.ZAR;         // ZAR → USD
           else if(currentExchange === 'sweden')      val = val * fxRates.SEK;         // SEK → USD
+          else if(currentExchange === 'india')       val = val * fxRates.INR;         // INR → USD
           // nasdaq/sp500: zaten USD
           return val / 1e6; // milyon USD olarak sakla
         })() : null,
@@ -3232,7 +3236,7 @@ function updateExchangeBadge() {}
 // ── TARAMA SÜRESİ TAHMİNİ ──
 let scanStartTime = null;
 let scanEtaTimer  = null;
-const EXCHANGE_ETA = { bist:4, nasdaq:6, sp500:6, dax:5, lse:5, nikkei:5, nyse:6, moex:5, france:5, amsterdam:5, brussels:5, lisbon:5, dublin:5, oslo:5, milan:5, tsx:6, twse:5, b3:5, hkex:6, china:6, saudi:5, switzerland:5, australia:5, southafrica:5, sweden:5 }; // saniye
+const EXCHANGE_ETA = { bist:4, nasdaq:6, sp500:6, dax:5, lse:5, nikkei:5, nyse:6, moex:5, france:5, amsterdam:5, brussels:5, lisbon:5, dublin:5, oslo:5, milan:5, tsx:6, twse:5, b3:5, hkex:6, china:6, saudi:5, switzerland:5, australia:5, southafrica:5, sweden:5, india:5 }; // saniye
 
 function startScanEta(exchange) {
   const total = EXCHANGE_ETA[exchange] || 5;
