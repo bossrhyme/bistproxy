@@ -418,6 +418,7 @@ var EXCHANGE_META = {
   saudi:       { name: 'Tadawul',        currency: '﷼',   currencyCode: 'SAR', yahooSuffix: '.SR', flag: '🇸🇦', tvUrl: 'https://scanner.tradingview.com/saudi_arabia/scan', filters: [] },
   switzerland: { name: 'SIX',            currency: 'Fr',  currencyCode: 'CHF', yahooSuffix: '.SW', flag: '🇨🇭', tvUrl: 'https://scanner.tradingview.com/switzerland/scan',    filters: [] },
   australia:   { name: 'ASX',            currency: 'A$',  currencyCode: 'AUD', yahooSuffix: '.AX', flag: '🇦🇺', tvUrl: 'https://scanner.tradingview.com/australia/scan',       filters: [] },
+  southafrica: { name: 'JSE',            currency: 'R',   currencyCode: 'ZAR', yahooSuffix: '.JO', flag: '🇿🇦', tvUrl: 'https://scanner.tradingview.com/south_africa/scan',    filters: [] },
 };
 
 var allData = [];
@@ -428,7 +429,7 @@ var _prfData = null;
 var _prfAiDone = false;
 var _sectorAvg = null;
 var _urlParams = new URLSearchParams(window.location.search);
-var _fxRates = { TRY: 44.6, EUR: 0.920, GBP: 0.790, JPY: 150.0, KRW: 1350.0, RUB: 89.0, NOK: 10.7, CAD: 1.37, TWD: 32.0, BRL: 5.70, HKD: 7.78, CNY: 7.25, SAR: 3.75, CHF: 0.895, AUD: 1.58 }; // fallback, sayfa yüklenince /api/rates ile güncellenir
+var _fxRates = { TRY: 44.6, EUR: 0.920, GBP: 0.790, JPY: 150.0, KRW: 1350.0, RUB: 89.0, NOK: 10.7, CAD: 1.37, TWD: 32.0, BRL: 5.70, HKD: 7.78, CNY: 7.25, SAR: 3.75, CHF: 0.895, AUD: 1.58, ZAR: 18.5 }; // fallback, sayfa yüklenince /api/rates ile güncellenir
 fetch('/api/rates').then(function(r){ return r.json(); }).then(function(d){ if(d && d.TRY) _fxRates = d; }).catch(function(){});
 
 function _fmtN(v) {
@@ -461,7 +462,7 @@ function showProfil(sym, ex) {
   var _logoEl = document.getElementById('prf-logo');
   if(_logoEl) {
     // TradingView logo CDN - birden fazla format denenir
-    var _tvPfxMap = { bist:'BIST', nasdaq:'NASDAQ', sp500:'NYSE', dax:'XETR', lse:'LSE', nikkei:'TSE', krx:'KRX', moex:'MOEX', france:'EURONEXT', amsterdam:'EURONEXT', brussels:'EURONEXT', lisbon:'EURONEXT', dublin:'EURONEXT', oslo:'OSE', milan:'MTA', tsx:'TSX', twse:'TWSE', b3:'BMFBOVESPA', hkex:'HKEX', china:'SSE', saudi:'TADAWUL', switzerland:'SIX', australia:'ASX' };
+    var _tvPfxMap = { bist:'BIST', nasdaq:'NASDAQ', sp500:'NYSE', dax:'XETR', lse:'LSE', nikkei:'TSE', krx:'KRX', moex:'MOEX', france:'EURONEXT', amsterdam:'EURONEXT', brussels:'EURONEXT', lisbon:'EURONEXT', dublin:'EURONEXT', oslo:'OSE', milan:'MTA', tsx:'TSX', twse:'TWSE', b3:'BMFBOVESPA', hkex:'HKEX', china:'SSE', saudi:'TADAWUL', switzerland:'SIX', australia:'ASX', southafrica:'JSE' };
     var _tvPfx = _tvPfxMap[_prfEx] || 'BIST';
     var _symLow = sym.toLowerCase();
     // TV logo URL formatları (öncelik sırasıyla):
