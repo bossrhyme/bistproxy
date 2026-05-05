@@ -390,7 +390,13 @@ module.exports = async function(req, res) {
     const rangeMap    = { '240': '30d', 'D': '6mo', 'W': '2y' };
     const yhInterval  = intervalMap[interval] || '1h';
     const yhRange     = rangeMap[interval]    || '30d';
-    const yhSym       = symbol + suffix;
+
+    // Çin hisseleri: 6 ile başlayanlar SSE (.SS), diğerleri SZSE (.SZ)
+    let activeSuffix = suffix;
+    if (suffix === '.SS' && !/^6/.test(symbol)) activeSuffix = '.SZ';
+    if (suffix === '.SZ' && /^6/.test(symbol))  activeSuffix = '.SS';
+    const altSuffix = activeSuffix === '.SS' ? '.SZ' : activeSuffix === '.SZ' ? '.SS' : null;
+    const yhSym = symbol + activeSuffix;
 
     const fetchChart = (sym) => new Promise((resolve, reject) => {
       const path = '/v8/finance/chart/' + encodeURIComponent(sym) + '?interval=' + yhInterval + '&range=' + yhRange + '&includePrePost=false';
@@ -399,7 +405,20 @@ module.exports = async function(req, res) {
       });
     });
 
-    if (currency === 'USD' && suffix === '.IS') {
+    // Veriyi parse eder, başarısızsa null döner
+    function parseCandles(raw) {
+      try {
+        const result = JSON.parse(raw).chart.result[0];
+        if (!result || !result.timestamp) return null;
+        const q = result.indicators.quote[0];
+        const candles = result.timestamp.map((t, i) => ({
+          t, o: q.open[i], h: q.high[i], l: q.low[i], c: q.close[i], v: q.volume[i] || 0
+        })).filter(c => c.o != null && c.c != null);
+        return candles.length > 0 ? candles : null;
+      } catch(_) { return null; }
+    }
+
+    if (currency === 'USD' && activeSuffix === '.IS') {
       return new Promise(async (resolve) => {
         try {
           const [stockRaw, fxRaw] = await Promise.all([fetchChart(yhSym), fetchChart('USDTRY=X')]);
@@ -424,13 +443,18 @@ module.exports = async function(req, res) {
 
     return new Promise(async (resolve) => {
       try {
-        const raw    = await fetchChart(yhSym);
-        const result = JSON.parse(raw).chart.result[0];
-        const q      = result.indicators.quote[0];
-        const candles = result.timestamp.map((t, i) => ({
-          t, o: q.open[i], h: q.high[i], l: q.low[i], c: q.close[i], v: q.volume[i]||0
-        })).filter(c => c.o != null && c.c != null);
-        res.status(200).json({ s: 'ok', candles });
+        const raw = await fetchChart(yhSym);
+        let candles = parseCandles(raw);
+        // Başarısızsa alternatif suffix ile tekrar dene (SSE ↔ SZSE)
+        if (!candles && altSuffix) {
+          const raw2 = await fetchChart(symbol + altSuffix);
+          candles = parseCandles(raw2);
+        }
+        if (candles) {
+          res.status(200).json({ s: 'ok', candles });
+        } else {
+          res.status(200).json({ s: 'no_data', candles: [] });
+        }
       } catch(e) { res.status(500).json({ error: e.message }); }
       resolve();
     });
