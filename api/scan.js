@@ -75,7 +75,10 @@ function getCacheTTL(exchange) {
     b3:     { open: 13, close: 21 }, // 10:00-17:55 BRT (UTC-3)
     hkex:   { open: 1,  close: 8  }, // 09:30-16:00 HKT (UTC+8)
     china:  { open: 1,  close: 7  }, // 09:30-15:00 CST (UTC+8)
-    saudi:       { open: 7,  close: 12 }, // 10:00-15:00 AST (UTC+3), Pzr-Per
+    saudi:       { open: 7,  close: 12 }, // 10:00-15:00 AST (UTC+3)
+    sweden:      { open: 8,  close: 16 }, // 09:00-17:30 CET (UTC+1)
+    india:       { open: 4,  close: 10 }, // 09:15-15:30 IST (UTC+5:30)
+    uae:         { open: 6,  close: 12 }, // 10:00-14:00 GST (UTC+4)
     switzerland: { open: 8,  close: 16 }, // 09:00-17:30 CET (UTC+1)
     australia:    { open: 0,  close: 6  }, // 10:00-16:00 AEST (UTC+10)
     southafrica:  { open: 7,  close: 15 }, // 09:00-17:00 SAST (UTC+2)
@@ -234,23 +237,18 @@ const EXCHANGE_CONFIG = {
             extraFilters: [
               { left: 'exchange',   operation: 'equal', right: 'JSE' },
               { left: 'is_primary', operation: 'equal', right: true },
-              { left: 'typespecs',  operation: 'has',   right: ['common'] },
             ] },
-  sweden:      { tvPath: '/global/scan',        yahooSuffix: '.ST', currency: 'SEK',
+  sweden:      { tvPath: '/sweden/scan',        yahooSuffix: '.ST', currency: 'SEK',
             extraFilters: [
-              { left: 'exchange',   operation: 'equal', right: 'OMXSTO' },
               { left: 'is_primary', operation: 'equal', right: true },
-              { left: 'typespecs',  operation: 'has',   right: ['common'] },
             ] },
-  india:       { tvPath: '/global/scan',         yahooSuffix: '.NS', currency: 'INR',
+  india:       { tvPath: '/india/scan',          yahooSuffix: '.NS', currency: 'INR',
             extraFilters: [
               { left: 'exchange',   operation: 'equal', right: 'NSE' },
               { left: 'is_primary', operation: 'equal', right: true },
-              { left: 'typespecs',  operation: 'has',   right: ['common'] },
             ] },
-  uae:         { tvPath: '/global/scan',        yahooSuffix: '.DU', currency: 'AED',
+  uae:         { tvPath: '/uae/scan',           yahooSuffix: '.DU', currency: 'AED',
             extraFilters: [
-              { left: 'exchange',   operation: 'equal', right: 'DFM' },
               { left: 'is_primary', operation: 'equal', right: true },
             ] },
 };
@@ -370,7 +368,7 @@ module.exports = async function(req, res) {
 
     // Cache key: borsa + kolon listesi
     const colHash  = Buffer.from((merged.columns || []).join(',')).toString('base64').slice(0, 20);
-    const cacheKey = 'df_v3_' + exchange + '_' + colHash; // v3: global/scan for new exchanges
+    const cacheKey = 'df_v4_' + exchange + '_' + colHash; // v4: country-specific paths for india/sweden/uae
     const ttl      = getCacheTTL(exchange);
 
     // 1. Cache HIT?
