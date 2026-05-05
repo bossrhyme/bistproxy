@@ -274,23 +274,27 @@ module.exports = async function(req, res) {
   const cfg      = EXCHANGE_CONFIG[exchange] || EXCHANGE_CONFIG.bist;
 
   // ── RATE LIMIT: IP başına dakikada 60 istek ──
-  const clientIp = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
+  // Vercel'in x-real-ip header'ı gerçek client IP'sini verir (manipüle edilemez)
+  // Yoksa x-forwarded-for zincirinin son geçerli IP'si alınır
+  const xForwardedFor = req.headers['x-forwarded-for'] || '';
+  const xRealIp = req.headers['x-real-ip'] || '';
+  const clientIp = xRealIp || xForwardedFor.split(',').map(s => s.trim()).filter(Boolean).pop() || 'unknown';
   if (kvEnabled()) {
     try {
-      const rlKey = 'rl_' + clientIp.replace(/[^a-zA-Z0-9.]/g, '_') + '_' + Math.floor(Date.now() / 60000);
+      const rlKey = 'rl_' + clientIp.replace(/[^a-zA-Z0-9.:]/g, '_') + '_' + Math.floor(Date.now() / 60000);
+      // SET NX EX atomik olarak key'i oluşturur ve TTL'yi tek seferde ayarlar
+      await fetchHttp(
+        process.env.KV_REST_API_URL + '/set/' + encodeURIComponent(rlKey) + '?nx=true&ex=60',
+        'POST',
+        { Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN, 'Content-Type': 'application/json' },
+        JSON.stringify(0)
+      ).catch(() => {});
       const rlRaw = await fetchHttp(
         process.env.KV_REST_API_URL + '/incr/' + encodeURIComponent(rlKey),
         'POST', { Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN }
       );
       const rlJson = JSON.parse(rlRaw);
       const rlCount = rlJson.result || 0;
-      if (rlCount === 1) {
-        // İlk istek — TTL ayarla
-        await fetchHttp(
-          process.env.KV_REST_API_URL + '/expire/' + encodeURIComponent(rlKey) + '/60',
-          'POST', { Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN }
-        );
-      }
       if (rlCount > 60) {
         res.setHeader('Retry-After', '60');
         return res.status(429).json({ error: 'Çok fazla istek. Lütfen bir dakika bekleyin.' });
@@ -366,8 +370,8 @@ module.exports = async function(req, res) {
       merged.filter = [...baseFilters, ...clientFilters];
     }
 
-    // Cache key: borsa + kolon listesi
-    const colHash  = Buffer.from((merged.columns || []).join(',')).toString('base64').slice(0, 20);
+    // Cache key: borsa + kolon listesi (sıralanmış — client farklı sıra gönderse de aynı cache'e düşer)
+    const colHash  = Buffer.from([...(merged.columns || [])].sort().join(',')).toString('base64').slice(0, 20);
     const cacheKey = 'df_v4_' + exchange + '_' + colHash; // v4: country-specific paths for india/sweden/uae
     const ttl      = getCacheTTL(exchange);
 
@@ -386,12 +390,16 @@ module.exports = async function(req, res) {
     const payload = JSON.stringify(merged);
     return new Promise((resolve) => {
       const headers = {
-        'Content-Type':   'application/json',
-        'Content-Length': Buffer.byteLength(payload),
-        'User-Agent':     'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-        'Origin':         'https://www.tradingview.com',
-        'Referer':        'https://www.tradingview.com/',
-        'Accept':         'application/json',
+        'Content-Type':    'application/json',
+        'Content-Length':  Buffer.byteLength(payload),
+        'User-Agent':      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        'Origin':          'https://www.tradingview.com',
+        'Referer':         'https://www.tradingview.com/',
+        'Accept':          'application/json, text/plain, */*',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'sec-fetch-dest':  'empty',
+        'sec-fetch-mode':  'cors',
+        'sec-fetch-site':  'same-site',
       };
       makeRequest('scanner.tradingview.com', cfg.tvPath, 'POST', headers, payload, async (err, data, statusCode) => {
         if (err) { res.status(500).json({ error: 'Veri alınamadı' }); return resolve(); }
