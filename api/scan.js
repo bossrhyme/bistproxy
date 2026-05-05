@@ -70,6 +70,7 @@ function getCacheTTL(exchange) {
     moex:   { open: 7,  close: 16 }, // 09:50-18:45 MSK (UTC+3)
     oslo:   { open: 8,  close: 16 }, // 09:00-17:30 CET
     milan:  { open: 8,  close: 16 }, // 09:00-17:30 CET
+    tsx:    { open: 14, close: 21 }, // 09:30-16:00 EST
   };
   const h = hours[exchange] || { open: 8, close: 16 };
   return (hour >= h.open && hour < h.close) ? 300 : 1800; // açık:5dk kapalı:30dk
@@ -173,6 +174,12 @@ const EXCHANGE_CONFIG = {
             ] },
   milan:  { tvPath: '/italy/scan',   yahooSuffix: '.MI', currency: 'EUR',
             extraFilters: [
+              { left: 'is_primary', operation: 'equal', right: true },
+              { left: 'typespecs',  operation: 'has',   right: ['common'] },
+            ] },
+  tsx:    { tvPath: '/canada/scan',  yahooSuffix: '.TO', currency: 'CAD',
+            extraFilters: [
+              { left: 'exchange',   operation: 'equal', right: 'TSX' },
               { left: 'is_primary', operation: 'equal', right: true },
               { left: 'typespecs',  operation: 'has',   right: ['common'] },
             ] },
