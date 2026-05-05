@@ -74,6 +74,7 @@ function getCacheTTL(exchange) {
     twse:   { open: 1,  close: 6  }, // 09:00-13:30 TST (UTC+8)
     b3:     { open: 13, close: 21 }, // 10:00-17:55 BRT (UTC-3)
     hkex:   { open: 1,  close: 8  }, // 09:30-16:00 HKT (UTC+8)
+    china:  { open: 1,  close: 7  }, // 09:30-15:00 CST (UTC+8)
   };
   const h = hours[exchange] || { open: 8, close: 16 };
   return (hour >= h.open && hour < h.close) ? 300 : 1800; // açık:5dk kapalı:30dk
@@ -201,6 +202,11 @@ const EXCHANGE_CONFIG = {
   hkex:   { tvPath: '/hongkong/scan', yahooSuffix: '.HK', currency: 'HKD',
             extraFilters: [
               { left: 'exchange',   operation: 'equal', right: 'HKEX' },
+              { left: 'is_primary', operation: 'equal', right: true },
+              { left: 'typespecs',  operation: 'has',   right: ['common'] },
+            ] },
+  china:  { tvPath: '/china/scan',    yahooSuffix: '.SS', currency: 'CNY',
+            extraFilters: [
               { left: 'is_primary', operation: 'equal', right: true },
               { left: 'typespecs',  operation: 'has',   right: ['common'] },
             ] },
