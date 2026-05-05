@@ -73,6 +73,7 @@ function getCacheTTL(exchange) {
     tsx:    { open: 14, close: 21 }, // 09:30-16:00 EST
     twse:   { open: 1,  close: 6  }, // 09:00-13:30 TST (UTC+8)
     b3:     { open: 13, close: 21 }, // 10:00-17:55 BRT (UTC-3)
+    hkex:   { open: 1,  close: 8  }, // 09:30-16:00 HKT (UTC+8)
   };
   const h = hours[exchange] || { open: 8, close: 16 };
   return (hour >= h.open && hour < h.close) ? 300 : 1800; // açık:5dk kapalı:30dk
@@ -194,6 +195,12 @@ const EXCHANGE_CONFIG = {
   b3:     { tvPath: '/brazil/scan',  yahooSuffix: '.SA', currency: 'BRL',
             extraFilters: [
               { left: 'exchange',   operation: 'equal', right: 'BMFBOVESPA' },
+              { left: 'is_primary', operation: 'equal', right: true },
+              { left: 'typespecs',  operation: 'has',   right: ['common'] },
+            ] },
+  hkex:   { tvPath: '/hongkong/scan', yahooSuffix: '.HK', currency: 'HKD',
+            extraFilters: [
+              { left: 'exchange',   operation: 'equal', right: 'HKEX' },
               { left: 'is_primary', operation: 'equal', right: true },
               { left: 'typespecs',  operation: 'has',   right: ['common'] },
             ] },

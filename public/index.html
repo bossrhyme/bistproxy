@@ -404,6 +404,14 @@ if('serviceWorker' in navigator){
               <div class="hp-excard-count">~400 hisse</div>
             </div>
           </a>
+          <a href="/?ex=hkex" class="hp-excard" onclick="event.preventDefault(); selectExchangeAndGo('hkex')">
+            <div class="hp-excard-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjREUyOTEwIi8+PGcgZmlsbD0iI2ZmZiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTUsMTApIj48ZWxsaXBzZSByeD0iMS41IiByeT0iNCIgdHJhbnNmb3JtPSJyb3RhdGUoMCkiLz48ZWxsaXBzZSByeD0iMS41IiByeT0iNCIgdHJhbnNmb3JtPSJyb3RhdGUoNzIpIi8+PGVsbGlwc2Ugcng9IjEuNSIgcnk9IjQiIHRyYW5zZm9ybT0icm90YXRlKDE0NCkiLz48ZWxsaXBzZSByeD0iMS41IiByeT0iNCIgdHJhbnNmb3JtPSJyb3RhdGUoMjE2KSIvPjxlbGxpcHNlIHJ4PSIxLjUiIHJ5PSI0IiB0cmFuc2Zvcm09InJvdGF0ZSgyODgpIi8+PC9nPjxjaXJjbGUgY3g9IjE1IiBjeT0iMTAiIHI9IjEuNSIgZmlsbD0iI0RFMjkxMCIvPjwvc3ZnPg==" width="28" height="20" alt="" style="border-radius:3px;object-fit:cover;display:block;"></div>
+            <div class="hp-excard-info">
+              <div class="hp-excard-name">HKEX</div>
+              <div class="hp-excard-desc">Hong Kong</div>
+              <div class="hp-excard-count">~2500 hisse</div>
+            </div>
+          </a>
         </div>
       </div>
 
@@ -630,6 +638,9 @@ if('serviceWorker' in navigator){
             <div class="exbtn" data-exchange="b3" onclick="selectExchange(this)">
               <span class="exbtn-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjMDA5QzNCIi8+PHBvbHlnb24gcG9pbnRzPSIxNSwyIDI4LDEwIDE1LDE4IDIsMTAiIGZpbGw9IiNGRkRGMDAiLz48Y2lyY2xlIGN4PSIxNSIgY3k9IjEwIiByPSI0LjUiIGZpbGw9IiMwMDI3NzYiLz48L3N2Zz4=" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">B3</span><span class="exbtn-sub">São Paulo</span>
             </div>
+            <div class="exbtn" data-exchange="hkex" onclick="selectExchange(this)">
+              <span class="exbtn-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjREUyOTEwIi8+PGcgZmlsbD0iI2ZmZiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTUsMTApIj48ZWxsaXBzZSByeD0iMS41IiByeT0iNCIgdHJhbnNmb3JtPSJyb3RhdGUoMCkiLz48ZWxsaXBzZSByeD0iMS41IiByeT0iNCIgdHJhbnNmb3JtPSJyb3RhdGUoNzIpIi8+PGVsbGlwc2Ugcng9IjEuNSIgcnk9IjQiIHRyYW5zZm9ybT0icm90YXRlKDE0NCkiLz48ZWxsaXBzZSByeD0iMS41IiByeT0iNCIgdHJhbnNmb3JtPSJyb3RhdGUoMjE2KSIvPjxlbGxpcHNlIHJ4PSIxLjUiIHJ5PSI0IiB0cmFuc2Zvcm09InJvdGF0ZSgyODgpIi8+PC9nPjxjaXJjbGUgY3g9IjE1IiBjeT0iMTAiIHI9IjEuNSIgZmlsbD0iI0RFMjkxMCIvPjwvc3ZnPg==" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">HKEX</span><span class="exbtn-sub">Hong Kong</span>
+            </div>
           </div>
         </div>
 
@@ -753,6 +764,7 @@ if('serviceWorker' in navigator){
             <div class="exbtn"    data-exchange="tsx"       onclick="advSelectExchange(this)"><span class="exbtn-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjZmZmIi8+PHJlY3Qgd2lkdGg9IjcuNSIgaGVpZ2h0PSIyMCIgZmlsbD0iI0ZGMDAwMCIvPjxyZWN0IHg9IjIyLjUiIHdpZHRoPSI3LjUiIGhlaWdodD0iMjAiIGZpbGw9IiNGRjAwMDAiLz48cGF0aCBkPSJNMTUsMi41IEwxNiw2IEwxOSw1IEwxNy41LDggTDIxLDkgTDE4LDEwIEwxOSwxMy41IEwxNSwxMiBMMTEsMTMuNSBMMTIsMTAgTDksOSBMMTIuNSw4IEwxMSw1IEwxNCw2IFoiIGZpbGw9IiNGRjAwMDAiLz48L3N2Zz4=" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">TSX</span><span class="exbtn-sub">Toronto</span></div>
             <div class="exbtn"    data-exchange="twse"      onclick="advSelectExchange(this)"><span class="exbtn-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjRkUwMDAwIi8+PHJlY3Qgd2lkdGg9IjE1IiBoZWlnaHQ9IjEwIiBmaWxsPSIjMDAwMDk1Ii8+PGNpcmNsZSBjeD0iNy41IiBjeT0iNSIgcj0iMy4yIiBmaWxsPSIjZmZmIi8+PGNpcmNsZSBjeD0iNy41IiBjeT0iNSIgcj0iMS42IiBmaWxsPSIjMDAwMDk1Ii8+PGxpbmUgeDE9IjcuNSIgeTE9IjEuNSIgeDI9IjcuNSIgeTI9IjguNSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjAuNSIvPjxsaW5lIHgxPSI0IiB5MT0iNSIgeDI9IjExIiB5Mj0iNSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjAuNSIvPjxsaW5lIHgxPSI1IiB5MT0iMi41IiB4Mj0iMTAiIHkyPSI3LjUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIwLjUiLz48bGluZSB4MT0iMTAiIHkxPSIyLjUiIHgyPSI1IiB5Mj0iNy41IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMC41Ii8+PC9zdmc+" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">TWSE</span><span class="exbtn-sub">Tayvan</span></div>
             <div class="exbtn"    data-exchange="b3"        onclick="advSelectExchange(this)"><span class="exbtn-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjMDA5QzNCIi8+PHBvbHlnb24gcG9pbnRzPSIxNSwyIDI4LDEwIDE1LDE4IDIsMTAiIGZpbGw9IiNGRkRGMDAiLz48Y2lyY2xlIGN4PSIxNSIgY3k9IjEwIiByPSI0LjUiIGZpbGw9IiMwMDI3NzYiLz48L3N2Zz4=" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">B3</span><span class="exbtn-sub">São Paulo</span></div>
+            <div class="exbtn"    data-exchange="hkex"      onclick="advSelectExchange(this)"><span class="exbtn-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMCAyMCI+PHJlY3Qgd2lkdGg9IjMwIiBoZWlnaHQ9IjIwIiBmaWxsPSIjREUyOTEwIi8+PGcgZmlsbD0iI2ZmZiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTUsMTApIj48ZWxsaXBzZSByeD0iMS41IiByeT0iNCIgdHJhbnNmb3JtPSJyb3RhdGUoMCkiLz48ZWxsaXBzZSByeD0iMS41IiByeT0iNCIgdHJhbnNmb3JtPSJyb3RhdGUoNzIpIi8+PGVsbGlwc2Ugcng9IjEuNSIgcnk9IjQiIHRyYW5zZm9ybT0icm90YXRlKDE0NCkiLz48ZWxsaXBzZSByeD0iMS41IiByeT0iNCIgdHJhbnNmb3JtPSJyb3RhdGUoMjE2KSIvPjxlbGxpcHNlIHJ4PSIxLjUiIHJ5PSI0IiB0cmFuc2Zvcm09InJvdGF0ZSgyODgpIi8+PC9nPjxjaXJjbGUgY3g9IjE1IiBjeT0iMTAiIHI9IjEuNSIgZmlsbD0iI0RFMjkxMCIvPjwvc3ZnPg==" width="22" height="16" style="border-radius:2px;object-fit:cover;display:block;"></span><span class="exbtn-name">HKEX</span><span class="exbtn-sub">Hong Kong</span></div>
           </div>
         </div>
 
@@ -1727,6 +1739,6 @@ if('serviceWorker' in navigator){
     </div>
   </div>
 </div>
-<script src="/deepfin.js?v=22"></script>
+<script src="/deepfin.js?v=23"></script>
 </body>
 </html>
