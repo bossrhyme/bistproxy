@@ -1600,7 +1600,7 @@ function applyAllChips() {
   var allInfos = [];
   document.querySelectorAll('.goat-chip.on').forEach(function(c) {
     var g = GURUS[c.dataset.goat];
-    if (g) allInfos.push({ label: g.label, desc: g.desc, infoId: c.closest('[id]') ? c.closest('[id]').id === 'goat-chips' ? 'goat-info' : 'goat-fund-info' : 'goat-info' });
+    if (g) allInfos.push({ label: g.label, desc: g.desc, infoId: 'goat-info' });
   });
   document.querySelectorAll('#presets .chip.on').forEach(function(c) {
     var p = PRESETS[c.dataset.preset];
@@ -1612,7 +1612,7 @@ function applyAllChips() {
   });
 
   // Tüm info div'leri gizle
-  ['goat-info','goat-fund-info','preset-info','tech-preset-info'].forEach(function(id){
+  ['goat-info','preset-info','tech-preset-info'].forEach(function(id){
     var el = document.getElementById(id); if (el) el.style.display = 'none'; el && (el.innerHTML = '');
   });
 
@@ -1644,14 +1644,6 @@ function countSelectedChips() {
 
 // GOAT chip'leri
 document.getElementById('goat-chips').addEventListener('click', function(e) {
-  var chip = e.target.closest('.goat-chip'); if (!chip) return;
-  var wasOn = chip.classList.contains('on');
-  if (!wasOn && countSelectedChips() >= 5) return;
-  chip.classList.toggle('on');
-  applyAllChips();
-  if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
-});
-document.getElementById('goat-fund-chips').addEventListener('click', function(e) {
   var chip = e.target.closest('.goat-chip'); if (!chip) return;
   var wasOn = chip.classList.contains('on');
   if (!wasOn && countSelectedChips() >= 5) return;
@@ -1696,7 +1688,7 @@ function clearFilters(resetChips=true){
   document.querySelectorAll('.finps input').forEach(i=>i.value='');
   const sf = document.getElementById('sector_filter'); if(sf) sf.value = '';
   const sfAdv = document.getElementById('sector_filter_adv'); if(sfAdv) sfAdv.value = '';
-  if(resetChips) { document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on')); ['goat-info','goat-fund-info','preset-info','tech-preset-info'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.display='none';el.innerHTML='';}});}  
+  if(resetChips) { document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on')); ['goat-info','preset-info','tech-preset-info'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.display='none';el.innerHTML='';}});}  
   updateClrBtn();
   if(allData.length) applyAndRender();
 }
