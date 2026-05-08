@@ -1458,6 +1458,11 @@ const GURUS = {
     desc: 'Einhorn için piyasanın görmezden geldiği şirket en büyük fırsattır. Kazancına göre gerçekten ucuz, nakit fazlası var, borcu az ve kârlı şirketlere yatırım yapar.',
     filters: {pe_max:15, de_max:50, cr_min:1.5, margin_min:8, roe_min:10}
   },
+  marks: {
+    label: 'Howard Marks — Risk Yönetimi',
+    desc: 'Marks için ucuz olmak yetmez — piyasanın neden ucuz bıraktığını anlamak şart. Döngünün geç aşamasında herkesin kötümser olduğu, gerçek değerinin altında fiyatlanmış, nakit akışı güçlü şirketleri arar. İkinci seviye düşünce: konsensüs neyi göremiyor? Oaktree Capital kurucusu, 2008–2024 ~%19/yıl.',
+    filters: {pe_max:18, pb_max:2, de_max:80, cr_min:1.2, margin_min:8}
+  },
   fisher: {
     label: 'Philip Fisher — Scuttlebutt',
     desc: 'Fisher için gerçekten iyi şirketi bulmak zordur ama bulunca satmak gerekmez. Satışları ve karları istikrarlı büyüyen, hem brüt hem net kar marjı güçlü, borcu kontrollü şirketlere yatırım yapar.',

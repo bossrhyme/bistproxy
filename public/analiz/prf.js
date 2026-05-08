@@ -2,7 +2,7 @@
 function openTradingView() {
   var ex = _prfEx || 'bist';
   var sym = _prfSym || '';
-  var prefixes = {bist:'BIST',nasdaq:'NASDAQ',sp500:'NYSE',dax:'XETR',lse:'LSE',nikkei:'TSE'};
+  var prefixes = {bist:'BIST',nasdaq:'NASDAQ',sp500:'NYSE',dax:'XETR',lse:'LSE',nikkei:'TSE',sweden:'NASDAQ',india:'NSE',uae:'DFM',southafrica:'JSE',krx:'KRX',moex:'MOEX',hkex:'HKEX',saudi:'TADAWUL',australia:'ASX'};
   var pfx = prefixes[ex] || 'BIST';
   window.open('https://www.tradingview.com/chart/?symbol='+pfx+'%3A'+sym, '_blank');
 }
@@ -53,9 +53,12 @@ function loadTVWidget(sym, ex) {
           if(chartEl) chartEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#64748b;font-size:12px;">Grafik verisi bulunamadı</div>';
           return;
         }
+        var seen = {};
         var candles = data.candles.map(function(c){
           return { time:c.t, open:c.o, high:c.h, low:c.l, close:c.c };
-        }).filter(function(c){ return c.open != null && c.close != null; });
+        }).filter(function(c){ return c.open != null && c.close != null; })
+          .sort(function(a,b){ return a.time - b.time; })
+          .filter(function(c){ if(seen[c.time]) return false; seen[c.time]=1; return true; });
         if(!candles.length) return;
         series.setData(candles);
         chart.timeScale().fitContent();
@@ -419,6 +422,9 @@ var EXCHANGE_META = {
   switzerland: { name: 'SIX',            currency: 'Fr',  currencyCode: 'CHF', yahooSuffix: '.SW', flag: '🇨🇭', tvUrl: 'https://scanner.tradingview.com/switzerland/scan',    filters: [] },
   australia:   { name: 'ASX',            currency: 'A$',  currencyCode: 'AUD', yahooSuffix: '.AX', flag: '🇦🇺', tvUrl: 'https://scanner.tradingview.com/australia/scan',       filters: [] },
   southafrica: { name: 'JSE',            currency: 'R',   currencyCode: 'ZAR', yahooSuffix: '.JO', flag: '🇿🇦', tvUrl: 'https://scanner.tradingview.com/south_africa/scan',    filters: [] },
+  sweden:      { name: 'Nasdaq Stockholm', currency: 'kr', currencyCode: 'SEK', yahooSuffix: '.ST', flag: '🇸🇪', tvUrl: 'https://scanner.tradingview.com/sweden/scan',           filters: [] },
+  india:       { name: 'NSE',            currency: '₹',   currencyCode: 'INR', yahooSuffix: '.NS', flag: '🇮🇳', tvUrl: 'https://scanner.tradingview.com/india/scan',            filters: [] },
+  uae:         { name: 'DFM/ADX',        currency: 'د.إ', currencyCode: 'AED', yahooSuffix: '.DU', flag: '🇦🇪', tvUrl: 'https://scanner.tradingview.com/uae/scan',              filters: [] },
 };
 
 var allData = [];
@@ -462,7 +468,7 @@ function showProfil(sym, ex) {
   var _logoEl = document.getElementById('prf-logo');
   if(_logoEl) {
     // TradingView logo CDN - birden fazla format denenir
-    var _tvPfxMap = { bist:'BIST', nasdaq:'NASDAQ', sp500:'NYSE', dax:'XETR', lse:'LSE', nikkei:'TSE', krx:'KRX', moex:'MOEX', france:'EURONEXT', amsterdam:'EURONEXT', brussels:'EURONEXT', lisbon:'EURONEXT', dublin:'EURONEXT', oslo:'OSE', milan:'MTA', tsx:'TSX', twse:'TWSE', b3:'BMFBOVESPA', hkex:'HKEX', china:'SSE', saudi:'TADAWUL', switzerland:'SIX', australia:'ASX', southafrica:'JSE' };
+    var _tvPfxMap = { bist:'BIST', nasdaq:'NASDAQ', sp500:'NYSE', dax:'XETR', lse:'LSE', nikkei:'TSE', krx:'KRX', moex:'MOEX', france:'EURONEXT', amsterdam:'EURONEXT', brussels:'EURONEXT', lisbon:'EURONEXT', dublin:'EURONEXT', oslo:'OSE', milan:'MTA', tsx:'TSX', twse:'TWSE', b3:'BMFBOVESPA', hkex:'HKEX', china:'SSE', saudi:'TADAWUL', switzerland:'SIX', australia:'ASX', southafrica:'JSE', sweden:'NASDAQ', india:'NSE', uae:'DFM' };
     var _tvPfx = _tvPfxMap[_prfEx] || 'BIST';
     var _symLow = sym.toLowerCase();
     // TV logo URL formatları (öncelik sırasıyla):
@@ -638,6 +644,13 @@ function _buildPrfGuru() {
       {t:'Karlılık 4/4', p:fs>=6},
       {t:'Kaldıraç 3/3', p:fs>=8},
       {t:'Verimlilik 2/2',p:fs>=7},
+    ]},
+    {emoji:'🔮', name:'Howard Marks', sub:'Risk Yönetimi', crits:[
+      {t:'F/K < 18 → '+(pe?pe.toFixed(1)+'x':'—'),      p:pe&&pe>0&&pe<18},
+      {t:'PD/DD < 2 → '+(pb?pb.toFixed(2)+'x':'—'),     p:pb&&pb<2},
+      {t:'Borç/Öz < 80% → '+(de?de.toFixed(1)+'%':'—'), p:de!==undefined&&de<80},
+      {t:'Cari Oran > 1.2 → '+(cr?cr.toFixed(2):'—'),   p:cr&&cr>1.2},
+      {t:'Net Marj > 8% → '+nm.toFixed(1)+'%',           p:nm>8},
     ]},
   ];
   document.getElementById('prf-ggrid').innerHTML = gurus.map(function(g){
