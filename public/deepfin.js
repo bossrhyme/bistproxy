@@ -1525,6 +1525,11 @@ const GURUS = {
     desc: 'Schloss için strateji son derece basit: defter değerinin altında, borcu az, temettü ödeyen hisseyi al ve bekle. 45 yılda bunu yaparak yıllık %15\'in üzerinde getiri elde etti. Karmaşıklık değil, sabır ve disiplin.',
     filters: {pb_max:1, pe_max:12, de_max:30, div_min:1, cr_min:1.5}
   },
+  dalio: {
+    label: 'Ray Dalio — All Weather',
+    desc: 'Dalio için piyasayı tahmin etmeye çalışmak değil, her senaryoya hazır olmak önemlidir. Büyüme, daralma, enflasyon, deflasyon — hepsine dayanıklı hisse profili: düzenli temettü (nakit akışı güvencesi), düşük borç (kriz dayanımı), güçlü kâr marjı (her koşulda ayakta kalma), likit bilanço. Orijinal strateji düşük beta arar; tarayıcıda beta filtresi olmadığından defansif sektör kontrolü önerilir. Bridgewater kurucusu, 1991–2023 ~%11.4/yıl.',
+    filters: {div_min:2, de_max:60, cr_min:1.3, margin_min:8, roe_min:10, pe_max:25}
+  },
   citadel: {
     label: 'Citadel — Wellington',
     desc: 'Citadel için kurumsal kalite standartları geçerlidir. Özkaynak getirisi ve net kar marjı yüksek, borcu makul, nakit yeterli ve karları büyüyen şirketlere yatırım yapar.',

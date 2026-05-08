@@ -645,6 +645,14 @@ function _buildPrfGuru() {
       {t:'Kaldıraç 3/3', p:fs>=8},
       {t:'Verimlilik 2/2',p:fs>=7},
     ]},
+    {emoji:'🌦️', name:'Ray Dalio', sub:'All Weather', crits:[
+      {t:'F/K < 25 → '+(pe?pe.toFixed(1)+'x':'—'),      p:pe&&pe>0&&pe<25},
+      {t:'Temettü > 2% → '+dy.toFixed(1)+'%',            p:dy>2},
+      {t:'Borç/Öz < 60% → '+(de?de.toFixed(1)+'%':'—'), p:de!==undefined&&de<60},
+      {t:'Cari Oran > 1.3 → '+(cr?cr.toFixed(2):'—'),   p:cr&&cr>1.3},
+      {t:'Net Marj > 8% → '+nm.toFixed(1)+'%',           p:nm>8},
+      {t:'ROE > 10% → '+roe.toFixed(1)+'%',              p:roe>10},
+    ]},
     {emoji:'🔮', name:'Howard Marks', sub:'Risk Yönetimi', crits:[
       {t:'F/K < 18 → '+(pe?pe.toFixed(1)+'x':'—'),      p:pe&&pe>0&&pe<18},
       {t:'PD/DD < 2 → '+(pb?pb.toFixed(2)+'x':'—'),     p:pb&&pb<2},
