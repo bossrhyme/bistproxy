@@ -1279,7 +1279,15 @@ async function runScan(){
             'Textiles': 'Tekstil',
             'Holding Companies': 'Holding',
           };
-          return SECTOR_TR[sector] || sector;
+          var mapped = SECTOR_TR[sector] || sector;
+          // Uzay şirketlerini isim bazında ayır
+          var nm = (name || '').toUpperCase();
+          var spaceSectors = ['Havacılık & Savunma', 'Sanayi', 'Teknoloji', 'Elektronik Teknoloji', 'Endüstriyel Hizmetler'];
+          if (spaceSectors.indexOf(mapped) !== -1) {
+            var spaceWords = ['SPACE', 'ROCKET', 'GALACTIC', 'SATELLITE', 'COSMOS', 'SPACEFLIGHT', 'ORBIT', 'LAUNCHER', 'SPACEPORT'];
+            if (spaceWords.some(function(w){ return nm.indexOf(w) !== -1; })) return 'Uzay';
+          }
+          return mapped;
         })(),
         '52WeekHigh': high1m || null,
         '52WeekLow': low1m || null,
