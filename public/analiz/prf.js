@@ -645,6 +645,12 @@ function _buildPrfGuru() {
       {t:'Kaldıraç 3/3', p:fs>=8},
       {t:'Verimlilik 2/2',p:fs>=7},
     ]},
+    {emoji:'🌀', name:'George Soros', sub:'Reflexivity', crits:[
+      {t:'3A Getiri > 10% → '+(d.perf3m!=null?d.perf3m.toFixed(1)+'%':'—'),                                          p:d.perf3m!=null&&d.perf3m>10},
+      {t:'6A Getiri > 15% → '+(d.perf6m!=null?d.perf6m.toFixed(1)+'%':'—'),                                          p:d.perf6m!=null&&d.perf6m>15},
+      {t:'Gelir Büyümesi > 15% → '+(d.revenueGrowthTTMYoy!=null?d.revenueGrowthTTMYoy.toFixed(1)+'%':'—'),           p:d.revenueGrowthTTMYoy!=null&&d.revenueGrowthTTMYoy>15},
+      {t:'Kazanç Büyümesi > 10% → '+(d.epsGrowthTTMYoy!=null?d.epsGrowthTTMYoy.toFixed(1)+'%':'—'),                  p:d.epsGrowthTTMYoy!=null&&d.epsGrowthTTMYoy>10},
+    ]},
     {emoji:'🌦️', name:'Ray Dalio', sub:'All Weather', crits:[
       {t:'F/K < 25 → '+(pe?pe.toFixed(1)+'x':'—'),      p:pe&&pe>0&&pe<25},
       {t:'Temettü > 2% → '+dy.toFixed(1)+'%',            p:dy>2},

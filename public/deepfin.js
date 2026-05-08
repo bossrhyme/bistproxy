@@ -1525,6 +1525,11 @@ const GURUS = {
     desc: 'Schloss için strateji son derece basit: defter değerinin altında, borcu az, temettü ödeyen hisseyi al ve bekle. 45 yılda bunu yaparak yıllık %15\'in üzerinde getiri elde etti. Karmaşıklık değil, sabır ve disiplin.',
     filters: {pb_max:1, pe_max:12, de_max:30, div_min:1, cr_min:1.5}
   },
+  soros: {
+    label: 'George Soros — Reflexivity',
+    desc: 'Soros için piyasa her zaman yanlış fiyatlar — mesele kendini besleyen döngüyü erken görmek. Reflexivity: güçlü fiyat hareketi beklentileri değiştirir, beklentiler piyasayı, piyasa da temel verileri etkiler. Döngü başladığında trende bin, kırılım sinyali gelince çık. Hisse uyarlaması: güçlü 3–6 aylık fiyat trendi + gelir büyümesi (makro rüzgar) + teknik onay. Kalite/borç kriteri yok — tema oturmuşsa bilanço ikinci plandadır. Quantum Fund, 1969–2011 ~%20/yıl.',
+    filters: {perf3m_min:10, perf6m_min:15, revg_min:15, earng_min:10, tech_rating_min:0.2}
+  },
   dalio: {
     label: 'Ray Dalio — All Weather',
     desc: 'Dalio için piyasayı tahmin etmeye çalışmak değil, her senaryoya hazır olmak önemlidir. Büyüme, daralma, enflasyon, deflasyon — hepsine dayanıklı hisse profili: düzenli temettü (nakit akışı güvencesi), düşük borç (kriz dayanımı), güçlü kâr marjı (her koşulda ayakta kalma), likit bilanço. Orijinal strateji düşük beta arar; tarayıcıda beta filtresi olmadığından defansif sektör kontrolü önerilir. Bridgewater kurucusu, 1991–2023 ~%11.4/yıl.',
