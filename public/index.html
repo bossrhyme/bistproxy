@@ -738,33 +738,75 @@ if('serviceWorker' in navigator){
           <div class="filter-group-title">🏭 Sektör</div>
           <select id="sector_filter" onchange="syncSectorAndFilter('basic')" style="width:100%;background:var(--s2);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:5px 8px;font-size:11px;cursor:pointer;">
             <option value="">— Tümü —</option>
+            <optgroup label="── Teknoloji ──">
             <option value="Teknoloji">Teknoloji</option>
+            <option value="Elektronik Teknoloji">Elektronik Teknoloji</option>
+            <option value="Yazılım">Yazılım</option>
+            <option value="Donanım">Donanım</option>
+            <option value="Yarı İletkenler">Yarı İletkenler</option>
+            <option value="Biyoteknoloji">Biyoteknoloji</option>
+            </optgroup>
+            <optgroup label="── Finans ──">
             <option value="Finans">Finans</option>
             <option value="Finansal Hizmetler">Finansal Hizmetler</option>
-            <option value="Sağlık">Sağlık</option>
-            <option value="Sağlık Teknolojisi">Sağlık Teknolojisi</option>
-            <option value="Enerji">Enerji</option>
-            <option value="Enerji &amp; Maden">Enerji &amp; Maden</option>
-            <option value="Uzay">Uzay</option>
-            <option value="Havacılık &amp; Savunma">Havacılık &amp; Savunma</option>
-            <option value="Sanayi">Sanayi</option>
-            <option value="Üretim Sanayi">Üretim Sanayi</option>
-            <option value="Döngüsel Tüketim">Döngüsel Tüketim</option>
-            <option value="Savunmacı Tüketim">Savunmacı Tüketim</option>
-            <option value="Gayrimenkul">Gayrimenkul</option>
-            <option value="Temel Malzemeler">Temel Malzemeler</option>
-            <option value="İletişim Hizmetleri">İletişim Hizmetleri</option>
-            <option value="Kamu Hizmetleri">Kamu Hizmetleri</option>
-            <option value="Ulaşım">Ulaşım</option>
-            <option value="Holding">Holding</option>
             <option value="Bankacılık">Bankacılık</option>
             <option value="Sigorta">Sigorta</option>
+            <option value="Yatırım Fonu">Yatırım Fonu</option>
+            </optgroup>
+            <optgroup label="── Sağlık ──">
+            <option value="Sağlık">Sağlık</option>
+            <option value="Sağlık Teknolojisi">Sağlık Teknolojisi</option>
+            <option value="Sağlık Hizmetleri">Sağlık Hizmetleri</option>
             <option value="İlaç">İlaç</option>
+            </optgroup>
+            <optgroup label="── Enerji ──">
+            <option value="Enerji">Enerji</option>
+            <option value="Enerji &amp; Maden">Enerji &amp; Maden</option>
+            <option value="Enerji Dışı Madenler">Enerji Dışı Madenler</option>
+            <option value="Madencilik">Madencilik</option>
+            </optgroup>
+            <optgroup label="── Uzay &amp; Savunma ──">
+            <option value="Uzay">Uzay</option>
+            <option value="Havacılık &amp; Savunma">Havacılık &amp; Savunma</option>
+            </optgroup>
+            <optgroup label="── Sanayi ──">
+            <option value="Sanayi">Sanayi</option>
+            <option value="Üretim Sanayi">Üretim Sanayi</option>
+            <option value="Endüstriyel Hizmetler">Endüstriyel Hizmetler</option>
+            <option value="Proses Endüstrisi">Proses Endüstrisi</option>
+            <option value="Otomotiv">Otomotiv</option>
+            </optgroup>
+            <optgroup label="── Tüketim ──">
+            <option value="Döngüsel Tüketim">Döngüsel Tüketim</option>
+            <option value="Savunmacı Tüketim">Savunmacı Tüketim</option>
+            <option value="Dayanıklı Tüketim">Dayanıklı Tüketim</option>
+            <option value="Dayanıksız Tüketim">Dayanıksız Tüketim</option>
+            <option value="Tüketici Hizmetleri">Tüketici Hizmetleri</option>
+            <option value="Perakende">Perakende</option>
+            <option value="Gıda &amp; İçecek">Gıda &amp; İçecek</option>
+            <option value="Gıda İşleme">Gıda İşleme</option>
+            </optgroup>
+            <optgroup label="── Hizmetler ──">
+            <option value="Ticari Hizmetler">Ticari Hizmetler</option>
+            <option value="Dağıtım Hizmetleri">Dağıtım Hizmetleri</option>
+            <option value="İletişim Hizmetleri">İletişim Hizmetleri</option>
+            <option value="İletişim">İletişim</option>
+            <option value="Kamu Hizmetleri">Kamu Hizmetleri</option>
+            <option value="Ulaşım">Ulaşım</option>
+            </optgroup>
+            <optgroup label="── Malzeme ──">
+            <option value="Temel Malzemeler">Temel Malzemeler</option>
+            <option value="Malzemeler">Malzemeler</option>
             <option value="Kimya">Kimya</option>
+            </optgroup>
+            <optgroup label="── Diğer ──">
+            <option value="Gayrimenkul">Gayrimenkul</option>
             <option value="İnşaat">İnşaat</option>
             <option value="Tekstil">Tekstil</option>
-            <option value="Gıda &amp; İçecek">Gıda &amp; İçecek</option>
-            <option value="Perakende">Perakende</option>
+            <option value="Holding">Holding</option>
+            <option value="Kamu">Kamu</option>
+            <option value="Diğer">Diğer</option>
+            </optgroup>
           </select>
         </div>
 
@@ -870,33 +912,75 @@ if('serviceWorker' in navigator){
           <div class="filter-group-title">🏭 Sektör</div>
           <select id="sector_filter_adv" onchange="syncSectorAndFilter('adv')" style="width:100%;background:var(--s2);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:5px 8px;font-size:11px;cursor:pointer;">
             <option value="">— Tümü —</option>
+            <optgroup label="── Teknoloji ──">
             <option value="Teknoloji">Teknoloji</option>
+            <option value="Elektronik Teknoloji">Elektronik Teknoloji</option>
+            <option value="Yazılım">Yazılım</option>
+            <option value="Donanım">Donanım</option>
+            <option value="Yarı İletkenler">Yarı İletkenler</option>
+            <option value="Biyoteknoloji">Biyoteknoloji</option>
+            </optgroup>
+            <optgroup label="── Finans ──">
             <option value="Finans">Finans</option>
             <option value="Finansal Hizmetler">Finansal Hizmetler</option>
-            <option value="Sağlık">Sağlık</option>
-            <option value="Sağlık Teknolojisi">Sağlık Teknolojisi</option>
-            <option value="Enerji">Enerji</option>
-            <option value="Enerji &amp; Maden">Enerji &amp; Maden</option>
-            <option value="Uzay">Uzay</option>
-            <option value="Havacılık &amp; Savunma">Havacılık &amp; Savunma</option>
-            <option value="Sanayi">Sanayi</option>
-            <option value="Üretim Sanayi">Üretim Sanayi</option>
-            <option value="Döngüsel Tüketim">Döngüsel Tüketim</option>
-            <option value="Savunmacı Tüketim">Savunmacı Tüketim</option>
-            <option value="Gayrimenkul">Gayrimenkul</option>
-            <option value="Temel Malzemeler">Temel Malzemeler</option>
-            <option value="İletişim Hizmetleri">İletişim Hizmetleri</option>
-            <option value="Kamu Hizmetleri">Kamu Hizmetleri</option>
-            <option value="Ulaşım">Ulaşım</option>
-            <option value="Holding">Holding</option>
             <option value="Bankacılık">Bankacılık</option>
             <option value="Sigorta">Sigorta</option>
+            <option value="Yatırım Fonu">Yatırım Fonu</option>
+            </optgroup>
+            <optgroup label="── Sağlık ──">
+            <option value="Sağlık">Sağlık</option>
+            <option value="Sağlık Teknolojisi">Sağlık Teknolojisi</option>
+            <option value="Sağlık Hizmetleri">Sağlık Hizmetleri</option>
             <option value="İlaç">İlaç</option>
+            </optgroup>
+            <optgroup label="── Enerji ──">
+            <option value="Enerji">Enerji</option>
+            <option value="Enerji &amp; Maden">Enerji &amp; Maden</option>
+            <option value="Enerji Dışı Madenler">Enerji Dışı Madenler</option>
+            <option value="Madencilik">Madencilik</option>
+            </optgroup>
+            <optgroup label="── Uzay &amp; Savunma ──">
+            <option value="Uzay">Uzay</option>
+            <option value="Havacılık &amp; Savunma">Havacılık &amp; Savunma</option>
+            </optgroup>
+            <optgroup label="── Sanayi ──">
+            <option value="Sanayi">Sanayi</option>
+            <option value="Üretim Sanayi">Üretim Sanayi</option>
+            <option value="Endüstriyel Hizmetler">Endüstriyel Hizmetler</option>
+            <option value="Proses Endüstrisi">Proses Endüstrisi</option>
+            <option value="Otomotiv">Otomotiv</option>
+            </optgroup>
+            <optgroup label="── Tüketim ──">
+            <option value="Döngüsel Tüketim">Döngüsel Tüketim</option>
+            <option value="Savunmacı Tüketim">Savunmacı Tüketim</option>
+            <option value="Dayanıklı Tüketim">Dayanıklı Tüketim</option>
+            <option value="Dayanıksız Tüketim">Dayanıksız Tüketim</option>
+            <option value="Tüketici Hizmetleri">Tüketici Hizmetleri</option>
+            <option value="Perakende">Perakende</option>
+            <option value="Gıda &amp; İçecek">Gıda &amp; İçecek</option>
+            <option value="Gıda İşleme">Gıda İşleme</option>
+            </optgroup>
+            <optgroup label="── Hizmetler ──">
+            <option value="Ticari Hizmetler">Ticari Hizmetler</option>
+            <option value="Dağıtım Hizmetleri">Dağıtım Hizmetleri</option>
+            <option value="İletişim Hizmetleri">İletişim Hizmetleri</option>
+            <option value="İletişim">İletişim</option>
+            <option value="Kamu Hizmetleri">Kamu Hizmetleri</option>
+            <option value="Ulaşım">Ulaşım</option>
+            </optgroup>
+            <optgroup label="── Malzeme ──">
+            <option value="Temel Malzemeler">Temel Malzemeler</option>
+            <option value="Malzemeler">Malzemeler</option>
             <option value="Kimya">Kimya</option>
+            </optgroup>
+            <optgroup label="── Diğer ──">
+            <option value="Gayrimenkul">Gayrimenkul</option>
             <option value="İnşaat">İnşaat</option>
             <option value="Tekstil">Tekstil</option>
-            <option value="Gıda &amp; İçecek">Gıda &amp; İçecek</option>
-            <option value="Perakende">Perakende</option>
+            <option value="Holding">Holding</option>
+            <option value="Kamu">Kamu</option>
+            <option value="Diğer">Diğer</option>
+            </optgroup>
           </select>
         </div>
 
@@ -1835,6 +1919,6 @@ if('serviceWorker' in navigator){
     </div>
   </div>
 </div>
-<script src="/deepfin.js?v=35"></script>
+<script src="/deepfin.js?v=36"></script>
 </body>
 </html>
