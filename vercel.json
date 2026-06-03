@@ -160,20 +160,14 @@
       "source": "/api/bist-quote",
       "destination": "/api/bist-quote.js"
     },
-    {
-      "source": "/api/symbol-list",
-      "destination": "/api/symbol-list.js"
-    },
-    {
-      "source": "/api/symbol-search",
-      "destination": "/api/symbol-search.js"
-    },
-    { "source": "/api/auth/google",   "destination": "/api/auth/google.js" },
-    { "source": "/api/auth/callback", "destination": "/api/auth/callback.js" },
-    { "source": "/api/auth/me",       "destination": "/api/auth/me.js" },
-    { "source": "/api/auth/logout",   "destination": "/api/auth/logout.js" },
-    { "source": "/api/watchlists/:path*", "destination": "/api/watchlists.js" },
-    { "source": "/api/watchlists",    "destination": "/api/watchlists.js" },
+    { "source": "/api/symbol-list",   "destination": "/api/symbols.js" },
+    { "source": "/api/symbol-search", "destination": "/api/symbols.js" },
+    { "source": "/api/auth/google",        "destination": "/api/user.js" },
+    { "source": "/api/auth/callback",      "destination": "/api/user.js" },
+    { "source": "/api/auth/me",            "destination": "/api/user.js" },
+    { "source": "/api/auth/logout",        "destination": "/api/user.js" },
+    { "source": "/api/watchlists/:path*",  "destination": "/api/user.js" },
+    { "source": "/api/watchlists",         "destination": "/api/user.js" },
     { "source": "/profil",            "destination": "/profil/index.html" },
     { "source": "/profil/",           "destination": "/profil/index.html" }
   ],
@@ -196,16 +190,7 @@
     "api/bist-quote.js": {
       "maxDuration": 10
     },
-    "api/symbol-list.js": {
-      "maxDuration": 15
-    },
-    "api/symbol-search.js": {
-      "maxDuration": 10
-    },
-    "api/auth/google.js": { "maxDuration": 5 },
-    "api/auth/callback.js": { "maxDuration": 10 },
-    "api/auth/me.js": { "maxDuration": 5 },
-    "api/auth/logout.js": { "maxDuration": 5 },
-    "api/watchlists.js": { "maxDuration": 10 }
+    "api/symbols.js": { "maxDuration": 15 },
+    "api/user.js": { "maxDuration": 10 }
   }
 }
