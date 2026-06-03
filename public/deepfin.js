@@ -1280,8 +1280,8 @@ async function runScan(){
             'Holding Companies': 'Holding',
           };
           var mapped = SECTOR_TR[sector] || sector;
-          // Uzay şirketlerini isim bazında ayır
-          var nm = (name || '').toUpperCase();
+          // Uzay şirketlerini isim bazında ayır (ticker + tam şirket adı)
+          var nm = ((name || '') + ' ' + (description || '')).toUpperCase();
           var spaceSectors = ['Havacılık & Savunma', 'Sanayi', 'Teknoloji', 'Elektronik Teknoloji', 'Endüstriyel Hizmetler'];
           if (spaceSectors.indexOf(mapped) !== -1) {
             var spaceWords = ['SPACE', 'ROCKET', 'GALACTIC', 'SATELLITE', 'COSMOS', 'SPACEFLIGHT', 'ORBIT', 'LAUNCHER', 'SPACEPORT'];
@@ -1704,7 +1704,9 @@ function updateClrBtn() {
   const hasChip = document.querySelector('.chip.on');
   const sectorSel = (document.getElementById('sector_filter') || {}).value || '';
   const hasInput = sectorSel !== '' || Array.from(document.querySelectorAll('.finps input')).some(i => i.value !== '');
-  btn.style.display = (hasChip || hasInput) ? 'block' : 'none';
+  const show = (hasChip || hasInput) ? 'block' : 'none';
+  btn.style.display = show;
+  if (btnAdv) btnAdv.style.display = show;
 }
 
 function clearFilters(resetChips=true){
