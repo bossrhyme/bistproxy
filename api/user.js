@@ -135,6 +135,74 @@ async function handleMe(req, res) {
   }
 }
 
+async function handleEmailAuth(req, res) {
+  if (req.method !== 'POST') { jsonRes(res, 405, { error: 'Method not allowed' }); return; }
+  const body  = await readBody(req);
+  const email = (body.email || '').trim().toLowerCase();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    jsonRes(res, 400, { error: 'Geçerli bir e-posta adresi girin' }); return;
+  }
+  const resendKey = process.env.RESEND_API_KEY;
+  if (!resendKey) { jsonRes(res, 500, { error: 'E-posta servisi yapılandırılmamış' }); return; }
+
+  const token = crypto.randomBytes(32).toString('hex');
+  await kvSet('magic:' + token, { email, expiresAt: Date.now() + 15 * 60 * 1000 }, 900);
+
+  const proto = req.headers['x-forwarded-proto'] || 'https';
+  const host  = req.headers['x-forwarded-host'] || req.headers['host'] || '';
+  const magicLink = proto + '://' + host + '/api/auth/verify?token=' + token;
+
+  try {
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + resendKey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: 'DeepFin <onboarding@resend.dev>',
+        to: [email],
+        subject: 'DeepFin Giriş Linki',
+        html: '<div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;padding:32px 24px;">' +
+          '<h2 style="margin:0 0 8px;font-size:18px;">DeepFin\'e Giriş</h2>' +
+          '<p style="color:#666;font-size:14px;margin:0 0 24px;line-height:1.5;">Giriş yapmak için aşağıdaki bağlantıya tıklayın. Link 15 dakika geçerlidir.</p>' +
+          '<a href="' + magicLink + '" style="display:inline-block;background:#0ea5e9;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Giriş Yap</a>' +
+          '<p style="color:#999;font-size:12px;margin:24px 0 0;">Bu bağlantıyı siz istemediyseniz dikkate almayın.</p>' +
+          '</div>'
+      })
+    });
+    if (!r.ok) { const e = await r.json().catch(() => ({})); console.error('Resend error:', e); jsonRes(res, 500, { error: 'E-posta gönderilemedi' }); return; }
+  } catch(e) { jsonRes(res, 500, { error: 'E-posta gönderilemedi' }); return; }
+
+  jsonRes(res, 200, { ok: true });
+}
+
+async function handleEmailVerify(req, res) {
+  const qs    = new URLSearchParams((req.url || '').split('?')[1] || '');
+  const token = qs.get('token');
+  if (!token) { redirect(res, '/?auth_error=no_token'); return; }
+
+  const magic = await kvGet('magic:' + token);
+  if (!magic || !magic.email || magic.expiresAt < Date.now()) {
+    redirect(res, '/profil?auth_error=link_expired'); return;
+  }
+  await kvDel('magic:' + token);
+
+  const email  = magic.email;
+  const userId = 'em_' + email;
+  const existing = await kvGet('usr:' + userId);
+  const user = {
+    id: userId, email,
+    name: existing ? existing.name : email.split('@')[0],
+    picture: '',
+    createdAt: existing ? existing.createdAt : Date.now()
+  };
+  await kvSet('usr:' + userId, user);
+
+  const sessionToken = crypto.randomBytes(32).toString('hex');
+  const ttl = 30 * 24 * 60 * 60;
+  await kvSet('sess:' + sessionToken, { userId, expiresAt: Date.now() + ttl * 1000 }, ttl);
+  res.setHeader('Set-Cookie', 'df_sess=' + sessionToken + '; Path=/; Max-Age=' + ttl + '; HttpOnly; Secure; SameSite=Lax');
+  redirect(res, '/profil');
+}
+
 async function handleLogout(req, res) {
   const token = parseCookie(req, 'df_sess');
   if (token) await kvDel('sess:' + token);
@@ -225,6 +293,8 @@ module.exports = async function handler(req, res) {
   if (path === '/api/auth/callback') return handleCallback(req, res);
   if (path === '/api/auth/me')       return handleMe(req, res);
   if (path === '/api/auth/logout')   return handleLogout(req, res);
+  if (path === '/api/auth/email')    return handleEmailAuth(req, res);
+  if (path === '/api/auth/verify')   return handleEmailVerify(req, res);
   if (path.startsWith('/api/watchlists')) return handleWatchlists(req, res);
 
   jsonRes(res, 404, { error: 'Not found' });

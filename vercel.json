@@ -166,6 +166,8 @@
     { "source": "/api/auth/callback",      "destination": "/api/user.js" },
     { "source": "/api/auth/me",            "destination": "/api/user.js" },
     { "source": "/api/auth/logout",        "destination": "/api/user.js" },
+    { "source": "/api/auth/email",         "destination": "/api/user.js" },
+    { "source": "/api/auth/verify",        "destination": "/api/user.js" },
     { "source": "/api/watchlists/:path*",  "destination": "/api/user.js" },
     { "source": "/api/watchlists",         "destination": "/api/user.js" },
     { "source": "/profil",            "destination": "/profil/index.html" },

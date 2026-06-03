@@ -26,6 +26,11 @@ async function init() {
 function showLogin() {
   document.getElementById('pf-loading').style.display = 'none';
   document.getElementById('pf-login').style.display = 'block';
+  var authErr = new URLSearchParams(location.search).get('auth_error');
+  if (authErr) {
+    var msg = authErr === 'link_expired' ? 'Giriş linki süresi dolmuş. Lütfen tekrar isteyin.' : 'Giriş hatası: ' + authErr;
+    document.getElementById('pf-email-err').textContent = msg;
+  }
 }
 
 function showUser() {
@@ -246,6 +251,35 @@ function toast(msg) {
 }
 
 window.switchList = switchList;
+
+window.sendMagicLink = async function() {
+  var email = (document.getElementById('pf-email-input').value || '').trim();
+  var errEl = document.getElementById('pf-email-err');
+  errEl.textContent = '';
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errEl.textContent = 'Geçerli bir e-posta adresi girin.'; return;
+  }
+  var btn = document.getElementById('pf-email-btn');
+  btn.disabled = true; btn.textContent = 'Gönderiliyor...';
+  try {
+    var r = await fetch('/api/auth/email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    });
+    var d = await r.json();
+    if (d.ok) {
+      document.getElementById('pf-email-form').style.display = 'none';
+      document.getElementById('pf-email-sent').style.display = 'block';
+    } else {
+      errEl.textContent = d.error || 'Hata oluştu. Tekrar deneyin.';
+      btn.disabled = false; btn.textContent = 'Link Gönder';
+    }
+  } catch(e) {
+    errEl.textContent = 'Bağlantı hatası. Tekrar deneyin.';
+    btn.disabled = false; btn.textContent = 'Link Gönder';
+  }
+};
 
 init();
 })();
