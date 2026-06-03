@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Profilim — DeepFin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/deepfin.css?v=arctic6">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;}
+body{overflow-y:auto;}
+
+/* Topbar */
+.pf-topbar{display:flex;align-items:center;gap:12px;padding:0 20px;height:48px;border-bottom:1px solid var(--border);background:var(--s1);position:sticky;top:0;z-index:10;}
+.pf-back{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted2);text-decoration:none;background:var(--s2);border:1px solid var(--border);padding:4px 10px;border-radius:6px;transition:all .15s;}
+.pf-back:hover{color:var(--accent);border-color:var(--accent);}
+.pf-logo{font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;}
+.pf-logo-mark{width:22px;height:22px;background:var(--accent);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;}
+
+/* Main layout */
+.pf-main{max-width:760px;margin:0 auto;padding:32px 20px 60px;}
+
+/* Loading */
+#pf-loading{display:flex;align-items:center;justify-content:center;padding:80px 20px;gap:10px;color:var(--muted2);font-size:13px;}
+.pf-spin{width:16px;height:16px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Login state */
+#pf-login{display:none;text-align:center;padding:80px 20px;}
+.pf-login-icon{font-size:48px;margin-bottom:16px;}
+.pf-login-title{font-size:20px;font-weight:700;margin-bottom:8px;}
+.pf-login-sub{font-size:13px;color:var(--muted2);margin-bottom:28px;line-height:1.6;}
+.pf-google-btn{display:inline-flex;align-items:center;gap:10px;background:var(--s1);border:1px solid var(--border2);color:var(--text);padding:11px 22px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;transition:all .15s;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+.pf-google-btn:hover{border-color:var(--accent);box-shadow:0 2px 8px rgba(14,165,233,.15);}
+.pf-google-btn svg{flex-shrink:0;}
+
+/* User section */
+#pf-user{display:none;}
+.pf-user-card{display:flex;align-items:center;gap:16px;background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:28px;}
+.pf-avatar{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid var(--border2);background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:var(--accent);flex-shrink:0;overflow:hidden;}
+.pf-avatar img{width:100%;height:100%;object-fit:cover;}
+.pf-user-name{font-size:15px;font-weight:700;margin-bottom:2px;}
+.pf-user-email{font-size:12px;color:var(--muted2);}
+.pf-logout-btn{margin-left:auto;font-size:11px;font-weight:500;color:var(--muted2);background:transparent;border:1px solid var(--border);padding:5px 12px;border-radius:6px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.pf-logout-btn:hover{border-color:var(--red);color:var(--red);}
+
+/* Section */
+.pf-section{margin-bottom:32px;}
+.pf-section-title{font-size:11px;font-weight:700;color:var(--muted2);letter-spacing:.6px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+
+/* Watchlists */
+.pf-list-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
+.pf-list-tab{font-size:12px;font-weight:500;padding:5px 12px;border-radius:6px;cursor:pointer;border:1px solid var(--border);background:var(--s1);color:var(--text2);transition:all .15s;white-space:nowrap;}
+.pf-list-tab:hover{border-color:var(--accent);color:var(--accent);}
+.pf-list-tab.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;}
+.pf-new-list-btn{font-size:12px;font-weight:600;padding:5px 10px;border-radius:6px;cursor:pointer;border:1px dashed var(--border2);background:transparent;color:var(--muted2);transition:all .15s;display:flex;align-items:center;gap:4px;}
+.pf-new-list-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+/* List panel */
+.pf-list-panel{background:var(--s1);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.pf-list-header{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);}
+.pf-list-name-input{font-size:13px;font-weight:600;background:transparent;border:none;color:var(--text);outline:none;flex:1;min-width:0;}
+.pf-list-name-input:focus{background:var(--s2);border-radius:4px;padding:2px 6px;}
+.pf-list-del-btn{font-size:11px;color:var(--muted2);background:transparent;border:1px solid var(--border);padding:3px 8px;border-radius:5px;cursor:pointer;transition:all .15s;}
+.pf-list-del-btn:hover{border-color:var(--red);color:var(--red);}
+.pf-scan-btn{font-size:11px;font-weight:600;color:var(--accent);background:rgba(14,165,233,.08);border:1px solid rgba(14,165,233,.25);padding:4px 10px;border-radius:5px;cursor:pointer;text-decoration:none;transition:all .15s;}
+.pf-scan-btn:hover{background:rgba(14,165,233,.15);}
+
+/* Stock table */
+.pf-stock-table{width:100%;border-collapse:collapse;font-size:12px;}
+.pf-stock-table th{text-align:left;padding:8px 12px;font-size:10px;font-weight:700;color:var(--muted2);letter-spacing:.4px;text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--s2);}
+.pf-stock-table td{padding:9px 12px;border-bottom:1px solid rgba(0,0,0,.04);vertical-align:middle;}
+.pf-stock-table tr:last-child td{border-bottom:none;}
+.pf-stock-table tr:hover td{background:var(--s2);}
+.pf-sym{font-weight:600;color:var(--text);letter-spacing:.3px;}
+.pf-ex-badge{font-size:10px;color:var(--muted2);background:var(--s3);padding:1px 5px;border-radius:3px;font-weight:500;text-transform:uppercase;}
+.pf-note-input{font-size:11px;background:transparent;border:none;color:var(--muted2);outline:none;width:100%;min-width:60px;}
+.pf-note-input:focus{background:var(--s2);border-radius:3px;padding:2px 4px;}
+.pf-remove-btn{font-size:14px;color:var(--muted2);background:transparent;border:none;cursor:pointer;padding:2px 4px;border-radius:3px;line-height:1;transition:color .15s;}
+.pf-remove-btn:hover{color:var(--red);}
+.pf-empty{text-align:center;padding:28px 16px;color:var(--muted2);font-size:12px;}
+
+/* Add stock form */
+.pf-add-form{display:flex;gap:8px;padding:12px 16px;background:var(--s2);border-top:1px solid var(--border);flex-wrap:wrap;}
+.pf-add-form input{flex:1;min-width:100px;background:var(--s1);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--text);outline:none;font-family:inherit;}
+.pf-add-form input:focus{border-color:var(--accent);}
+.pf-add-form select{background:var(--s1);border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-size:11px;color:var(--text);outline:none;cursor:pointer;}
+.pf-add-form select:focus{border-color:var(--accent);}
+.pf-add-btn{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.pf-add-btn:hover{background:var(--blue2);}
+.pf-add-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* Portfolio placeholder */
+.pf-coming-soon{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:28px;text-align:center;}
+.pf-coming-badge{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:600;color:var(--accent);background:rgba(14,165,233,.08);border:1px solid rgba(14,165,233,.2);padding:3px 10px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:12px;}
+.pf-coming-title{font-size:15px;font-weight:700;margin-bottom:6px;}
+.pf-coming-desc{font-size:12px;color:var(--muted2);line-height:1.6;}
+
+/* New list modal */
+.pf-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;display:flex;align-items:center;justify-content:center;display:none;}
+.pf-modal{background:var(--s1);border:1px solid var(--border2);border-radius:10px;padding:24px;width:320px;max-width:90vw;}
+.pf-modal-title{font-size:14px;font-weight:700;margin-bottom:16px;}
+.pf-modal input{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:13px;color:var(--text);outline:none;font-family:inherit;margin-bottom:12px;}
+.pf-modal input:focus{border-color:var(--accent);}
+.pf-modal-btns{display:flex;gap:8px;justify-content:flex-end;}
+.pf-modal-cancel{background:transparent;border:1px solid var(--border);border-radius:6px;padding:7px 14px;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;}
+.pf-modal-ok{background:var(--accent);border:none;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;}
+
+/* Toast */
+.pf-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(40px);background:var(--text);color:var(--bg);padding:8px 18px;border-radius:6px;font-size:12px;font-weight:500;z-index:200;opacity:0;transition:all .25s;pointer-events:none;}
+.pf-toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+</style>
+</head>
+<body>
+<div class="pf-topbar">
+  <a href="/" class="pf-back">← Tarayıcı</a>
+  <div class="pf-logo"><div class="pf-logo-mark">D</div>DeepFin</div>
+</div>
+
+<div class="pf-main">
+  <div id="pf-loading"><div class="pf-spin"></div>Yükleniyor...</div>
+
+  <div id="pf-login">
+    <div class="pf-login-icon">🔐</div>
+    <div class="pf-login-title">Profiline giriş yap</div>
+    <div class="pf-login-sub">Takip listelerini kaydet, cihazlar arası senkronize et,<br>portföyünü takip et.</div>
+    <a href="/api/auth/google" class="pf-google-btn">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+      Google ile Giriş Yap
+    </a>
+  </div>
+
+  <div id="pf-user">
+    <div class="pf-user-card">
+      <div class="pf-avatar" id="pf-avatar-wrap">
+        <span id="pf-initials">?</span>
+      </div>
+      <div>
+        <div class="pf-user-name" id="pf-name">—</div>
+        <div class="pf-user-email" id="pf-email">—</div>
+      </div>
+      <a href="/api/auth/logout" class="pf-logout-btn" onclick="return confirm('Çıkış yapılsın mı?')">Çıkış Yap</a>
+    </div>
+
+    <!-- Watchlists -->
+    <div class="pf-section">
+      <div class="pf-section-title">⭐ Takip Listelerim</div>
+      <div class="pf-list-tabs" id="pf-list-tabs"></div>
+      <div class="pf-list-panel" id="pf-list-panel">
+        <div class="pf-empty">Listeler yükleniyor...</div>
+      </div>
+    </div>
+
+    <!-- Portfolio placeholder -->
+    <div class="pf-section">
+      <div class="pf-section-title">📊 Portföyüm</div>
+      <div class="pf-coming-soon">
+        <div class="pf-coming-badge">✦ Yakında</div>
+        <div class="pf-coming-title">Portföy takibi geliyor</div>
+        <div class="pf-coming-desc">Pozisyon aç, maliyet gir, kâr/zarar izle.<br>Her borsadan hisse, fon ve kripto tek ekranda.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- New list modal -->
+<div class="pf-modal-bg" id="pf-modal-bg">
+  <div class="pf-modal">
+    <div class="pf-modal-title">Yeni Liste Oluştur</div>
+    <input type="text" id="pf-modal-input" placeholder="Liste adı (örn. Teknoloji Hisseleri)" maxlength="40"/>
+    <div class="pf-modal-btns">
+      <button class="pf-modal-cancel" onclick="closeModal()">İptal</button>
+      <button class="pf-modal-ok" onclick="createList()">Oluştur</button>
+    </div>
+  </div>
+</div>
+
+<div class="pf-toast" id="pf-toast"></div>
+
+<script src="/profil/profil.js?v=1"></script>
+</body>
+</html>

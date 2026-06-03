@@ -759,6 +759,7 @@ let scanAborted = false;
 // ═══════════════════════════════════════════
 // FAVORİLER
 // ═══════════════════════════════════════════
+var _dfUser = null; // oturum açık kullanıcı
 var favSet = new Set(JSON.parse(localStorage.getItem('df_favs') || '[]'));
 var favFilterActive = false;
 var fonFavSet = new Set(JSON.parse(localStorage.getItem('df_fon_favs') || '[]'));
@@ -782,9 +783,42 @@ function toggleKriptoFav(sym) {
 }
 
 function toggleFav(sym) {
-  if (favSet.has(sym)) { favSet.delete(sym); showToast('✕ ' + sym + ' favorilerden çıkarıldı'); }
-  else { favSet.add(sym); showToast('★ ' + sym + ' favorilere eklendi'); }
+  var adding = !favSet.has(sym);
+  if (adding) { favSet.add(sym); showToast('★ ' + sym + ' favorilere eklendi'); }
+  else { favSet.delete(sym); showToast('✕ ' + sym + ' favorilerden çıkarıldı'); }
   saveFavs(); renderTable(); _updateFavBtn();
+  // Giriş yapıldıysa "Favorilerim" watchlist'ini de senkronize et
+  if (_dfUser) _syncFavToWatchlist(sym, adding);
+}
+
+function _syncFavToWatchlist(sym, add) {
+  var ex = currentExchange || 'bist';
+  if (add) {
+    fetch('/api/watchlists').then(function(r){ return r.json(); }).then(function(d) {
+      var lists = d.watchlists || [];
+      var favList = lists.find(function(l){ return l.name === 'Favorilerim' || l.id === 'wl_default'; });
+      if (!favList && lists.length) favList = lists[0];
+      if (!favList) return;
+      fetch('/api/watchlists/item', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ listId: favList.id, symbol: sym, exchange: ex })
+      }).catch(function(){});
+    }).catch(function(){});
+  } else {
+    fetch('/api/watchlists').then(function(r){ return r.json(); }).then(function(d) {
+      var lists = d.watchlists || [];
+      lists.forEach(function(l) {
+        if (l.items && l.items.find(function(i){ return i.symbol === sym; })) {
+          fetch('/api/watchlists/item', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ listId: l.id, symbol: sym })
+          }).catch(function(){});
+        }
+      });
+    }).catch(function(){});
+  }
 }
 
 function _updateFavBtn() {
@@ -2622,6 +2656,72 @@ function abortScan(){
 
 // Boot
 init();
+
+// Kullanıcı oturum kontrolü
+(function() {
+  fetch('/api/auth/me', { credentials: 'same-origin' })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (!d.user) return;
+      _dfUser = d.user;
+      var btn = document.getElementById('profile-btn');
+      if (!btn) return;
+      btn.classList.add('logged-in');
+      btn.title = d.user.name || d.user.email;
+      var inner = document.getElementById('profile-btn-inner');
+      if (inner) {
+        if (d.user.picture) {
+          inner.innerHTML = '<img class="pf-av" src="' + d.user.picture + '" alt="">';
+        } else {
+          inner.textContent = (d.user.name || '?')[0].toUpperCase();
+        }
+      }
+    })
+    .catch(function() {});
+
+  // ?wl= parametresi: belirtilen watchlist'i tablo filtresi olarak uygula
+  var wlId = new URLSearchParams(location.search).get('wl');
+  if (wlId) {
+    fetch('/api/watchlists', { credentials: 'same-origin' })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        var list = (d.watchlists || []).find(function(l) { return l.id === wlId; });
+        if (!list || !list.items || !list.items.length) return;
+        var syms = list.items.map(function(i) { return i.symbol.toUpperCase(); });
+        // Tarama bitince filtre uygula
+        var origRender = window.applyAndRender;
+        if (typeof origRender === 'function') {
+          window._wlFilter = syms;
+          var origFiltered = filtered;
+        }
+        // Mevcut veri varsa hemen filtrele, yoksa tarama bekleniyor
+        function applyWlFilter() {
+          if (!allData || !allData.length) return;
+          var ex = list.items[0] ? list.items[0].exchange : null;
+          if (ex && ex !== currentExchange) return;
+          filtered = allData.filter(function(s) {
+            return syms.indexOf((s.symbol || '').replace('.IS','').toUpperCase()) !== -1;
+          });
+          renderTable(); updateStatsBar();
+          showToast('★ ' + list.name + ' listesi (' + filtered.length + ' hisse)');
+        }
+        // Sayfa yüklendiğinde tarama otomatik başlasın
+        if (typeof runScan === 'function') {
+          // Tarama bittikten sonra wl filtresini uygula
+          var origApply = window.applyAndRender;
+          window.applyAndRender = function(special) {
+            origApply(special);
+            setTimeout(applyWlFilter, 0);
+            window.applyAndRender = origApply; // bir kez çalıştır
+          };
+          showHomepage && showHomepage();
+          showScreener && showScreener();
+          runScan();
+        }
+      })
+      .catch(function() {});
+  }
+})();
 
 // ── CHART TAB LISTENERS ──
 document.getElementById('chart-tabs').addEventListener('click', e => {
