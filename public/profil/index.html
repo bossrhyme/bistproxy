@@ -116,6 +116,32 @@ body{overflow-y:auto;}
 .pf-modal-cancel{background:transparent;border:1px solid var(--border);border-radius:6px;padding:7px 14px;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;}
 .pf-modal-ok{background:var(--accent);border:none;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;}
 
+/* Price cells */
+.pf-price-cell{font-size:12px;font-weight:600;color:var(--text);}
+.pf-chg-cell{font-size:11px;font-weight:600;min-width:52px;}
+.pf-up{color:#22c55e;}
+.pf-dn{color:#ef4444;}
+
+/* Autocomplete */
+.pf-ac-dropdown{position:fixed;z-index:9999;background:var(--s1);border:1px solid var(--border2);border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.18);max-height:220px;overflow-y:auto;}
+.pf-ac-item{padding:8px 12px;cursor:pointer;display:flex;gap:10px;align-items:baseline;}
+.pf-ac-item:hover{background:var(--s2);}
+.pf-ac-sym{font-size:12px;font-weight:700;color:var(--text);min-width:55px;flex-shrink:0;}
+.pf-ac-name{font-size:11px;color:var(--muted2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* Portfolio */
+.pf-pf-total{padding:10px 16px;font-size:12px;color:var(--muted2);border-bottom:1px solid var(--border);display:none;}
+.pf-pf-total.has-data{display:block;}
+
+/* Settings */
+.pf-settings-toggle{cursor:pointer;user-select:none;}
+.pf-settings-toggle:hover{color:var(--text);}
+.pf-settings-input{background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:12px;color:var(--text);outline:none;font-family:inherit;flex:1;min-width:0;}
+.pf-settings-input:focus{border-color:var(--accent);}
+.pf-settings-group{padding:16px;border-bottom:1px solid var(--border);}
+.pf-settings-group:last-child{border-bottom:none;}
+.pf-settings-label{font-size:10px;font-weight:700;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;}
+
 /* Toast */
 .pf-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(40px);background:var(--text);color:var(--bg);padding:8px 18px;border-radius:6px;font-size:12px;font-weight:500;z-index:200;opacity:0;transition:all .25s;pointer-events:none;}
 .pf-toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
@@ -168,13 +194,59 @@ body{overflow-y:auto;}
       </div>
     </div>
 
-    <!-- Portfolio placeholder -->
+    <!-- Portfolio -->
     <div class="pf-section">
       <div class="pf-section-title">📊 Portföyüm</div>
-      <div class="pf-coming-soon">
-        <div class="pf-coming-badge">✦ Yakında</div>
-        <div class="pf-coming-title">Portföy takibi geliyor</div>
-        <div class="pf-coming-desc">Pozisyon aç, maliyet gir, kâr/zarar izle.<br>Her borsadan hisse, fon ve kripto tek ekranda.</div>
+      <div class="pf-list-panel">
+        <div class="pf-pf-total" id="pf-pf-total"></div>
+        <table class="pf-stock-table">
+          <thead><tr><th>Sembol</th><th>Borsa</th><th>Adet</th><th>Maliyet</th><th>Fiyat</th><th>Değer</th><th>K/Z</th><th></th></tr></thead>
+          <tbody id="pf-pf-body"><tr><td colspan="8"><div class="pf-empty">Yükleniyor...</div></td></tr></tbody>
+        </table>
+        <div class="pf-add-form" style="flex-wrap:wrap">
+          <div style="position:relative;flex:1;min-width:110px;">
+            <input type="text" id="pf-pos-sym" placeholder="Sembol" style="text-transform:uppercase;width:100%" maxlength="20"
+                   oninput="onSymInput(this,'pf-pos-ex',selectPosSym)" onblur="delayHideAC()" onkeydown="if(event.key==='Enter')addPosition()">
+          </div>
+          <select id="pf-pos-ex" onchange="clearAC()">
+            <option value="bist">BIST</option><option value="nasdaq">NASDAQ</option>
+            <option value="sp500">S&P 500</option><option value="nyse">NYSE</option>
+            <option value="dax">DAX</option><option value="lse">LSE</option><option value="nikkei">Nikkei</option>
+          </select>
+          <input type="number" id="pf-pos-qty"  placeholder="Adet"    min="0.001" step="any" style="width:80px">
+          <input type="number" id="pf-pos-cost" placeholder="Maliyet" min="0"     step="any" style="width:90px">
+          <button class="pf-add-btn" id="pf-pos-add-btn" onclick="addPosition()">+ Ekle</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="pf-section">
+      <div class="pf-section-title pf-settings-toggle" onclick="toggleSettings()">
+        ⚙ Hesap Ayarları <span id="pf-settings-chev" style="font-size:10px;margin-left:4px;">▼</span>
+      </div>
+      <div id="pf-settings-body" style="display:none;">
+        <div class="pf-list-panel" style="margin-bottom:10px;">
+          <div class="pf-settings-group">
+            <div class="pf-settings-label">İsim</div>
+            <div style="display:flex;gap:8px;">
+              <input type="text" id="pf-name-input" class="pf-settings-input" placeholder="Adınız" maxlength="60">
+              <button class="pf-add-btn" id="pf-save-name-btn" onclick="saveName()">Kaydet</button>
+            </div>
+          </div>
+        </div>
+        <div class="pf-list-panel">
+          <div class="pf-settings-group">
+            <div class="pf-settings-label">Şifre Değiştir</div>
+            <div style="display:flex;flex-direction:column;gap:8px;max-width:300px;">
+              <input type="password" id="pf-pw-cur"  class="pf-settings-input" placeholder="Mevcut şifre"   autocomplete="current-password">
+              <input type="password" id="pf-pw-new"  class="pf-settings-input" placeholder="Yeni şifre"     autocomplete="new-password">
+              <input type="password" id="pf-pw-conf" class="pf-settings-input" placeholder="Şifreyi onayla" autocomplete="new-password">
+              <div class="pf-auth-err" id="pf-pw-err"></div>
+              <button class="pf-add-btn" id="pf-pw-btn" onclick="changePassword()" style="align-self:flex-start">Güncelle</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

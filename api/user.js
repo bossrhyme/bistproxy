@@ -221,15 +221,112 @@ async function handleWatchlists(req, res) {
   jsonRes(res, 405, { error: 'Method not allowed' });
 }
 
+// ── portfolio helpers ─────────────────────────
+async function getPortfolio(userId) {
+  const positions = await kvGet('pf:' + userId);
+  return Array.isArray(positions) ? positions : [];
+}
+async function savePortfolio(userId, positions) {
+  await kvSet('pf:' + userId, positions);
+}
+
+async function handlePortfolio(req, res) {
+  const user = await getUser(req);
+  if (!user) { jsonRes(res, 401, { error: 'Unauthorized' }); return; }
+  const method  = req.method;
+  const urlPath = (req.url || '').split('?')[0];
+  const isItem  = urlPath.endsWith('/item');
+
+  if (method === 'GET') {
+    jsonRes(res, 200, { positions: await getPortfolio(user.id) }); return;
+  }
+  if (method === 'POST' && isItem) {
+    const { symbol, exchange, quantity, avgCost } = await readBody(req);
+    if (!symbol || !exchange || quantity == null || avgCost == null) {
+      jsonRes(res, 400, { error: 'symbol, exchange, quantity, avgCost required' }); return;
+    }
+    const qty  = parseFloat(quantity);
+    const cost = parseFloat(avgCost);
+    if (isNaN(qty) || qty <= 0 || isNaN(cost) || cost < 0) {
+      jsonRes(res, 400, { error: 'Geçersiz adet veya maliyet' }); return;
+    }
+    const positions = await getPortfolio(user.id);
+    const sym = symbol.toString().toUpperCase();
+    const existing = positions.find(p => p.symbol === sym && p.exchange === exchange);
+    if (existing) {
+      const totalQty    = existing.quantity + qty;
+      existing.avgCost  = (existing.avgCost * existing.quantity + cost * qty) / totalQty;
+      existing.quantity = totalQty;
+    } else {
+      positions.push({ id: 'pos_' + Date.now(), symbol: sym, exchange, quantity: qty, avgCost: cost, addedAt: Date.now() });
+    }
+    await savePortfolio(user.id, positions);
+    jsonRes(res, 200, { positions }); return;
+  }
+  if (method === 'PUT' && isItem) {
+    const { id, quantity, avgCost } = await readBody(req);
+    if (!id) { jsonRes(res, 400, { error: 'id required' }); return; }
+    const positions = await getPortfolio(user.id);
+    const pos = positions.find(p => p.id === id);
+    if (!pos) { jsonRes(res, 404, { error: 'Position not found' }); return; }
+    if (quantity != null) pos.quantity = parseFloat(quantity);
+    if (avgCost  != null) pos.avgCost  = parseFloat(avgCost);
+    await savePortfolio(user.id, positions);
+    jsonRes(res, 200, { positions }); return;
+  }
+  if (method === 'DELETE' && isItem) {
+    const { id } = await readBody(req);
+    if (!id) { jsonRes(res, 400, { error: 'id required' }); return; }
+    const positions = (await getPortfolio(user.id)).filter(p => p.id !== id);
+    await savePortfolio(user.id, positions);
+    jsonRes(res, 200, { positions }); return;
+  }
+  jsonRes(res, 405, { error: 'Method not allowed' });
+}
+
+async function handleChangePassword(req, res) {
+  if (req.method !== 'POST') { jsonRes(res, 405, { error: 'Method not allowed' }); return; }
+  const user = await getUser(req);
+  if (!user) { jsonRes(res, 401, { error: 'Unauthorized' }); return; }
+  const { currentPassword, newPassword } = await readBody(req);
+  if (!currentPassword || !newPassword)  { jsonRes(res, 400, { error: 'Mevcut ve yeni şifre gerekli' }); return; }
+  if (newPassword.length < 8)            { jsonRes(res, 400, { error: 'Yeni şifre en az 8 karakter olmalı' }); return; }
+  const full = await kvGet('usr:' + user.id);
+  if (!full || !full.passwordHash) { jsonRes(res, 400, { error: 'Şifre değiştirilemedi' }); return; }
+  let ok = false;
+  try { ok = verifyPassword(currentPassword, full.passwordHash); } catch(e) {}
+  if (!ok) { jsonRes(res, 401, { error: 'Mevcut şifre hatalı' }); return; }
+  full.passwordHash = hashPassword(newPassword);
+  await kvSet('usr:' + user.id, full);
+  jsonRes(res, 200, { ok: true });
+}
+
+async function handleUpdateProfile(req, res) {
+  if (req.method !== 'POST') { jsonRes(res, 405, { error: 'Method not allowed' }); return; }
+  const user = await getUser(req);
+  if (!user) { jsonRes(res, 401, { error: 'Unauthorized' }); return; }
+  const { name } = await readBody(req);
+  const newName = (name || '').trim();
+  if (!newName || newName.length > 60) { jsonRes(res, 400, { error: 'Geçerli bir isim girin' }); return; }
+  const full = await kvGet('usr:' + user.id);
+  if (!full) { jsonRes(res, 404, { error: 'Kullanıcı bulunamadı' }); return; }
+  full.name = newName;
+  await kvSet('usr:' + user.id, full);
+  jsonRes(res, 200, { ok: true, name: newName });
+}
+
 // ── main router ───────────────────────────────
 module.exports = async function handler(req, res) {
   const path = (req.url || '').split('?')[0];
 
-  if (path === '/api/auth/register') return handleRegister(req, res);
-  if (path === '/api/auth/login')    return handleLogin(req, res);
-  if (path === '/api/auth/me')       return handleMe(req, res);
-  if (path === '/api/auth/logout')   return handleLogout(req, res);
-  if (path.startsWith('/api/watchlists')) return handleWatchlists(req, res);
+  if (path === '/api/auth/register')        return handleRegister(req, res);
+  if (path === '/api/auth/login')           return handleLogin(req, res);
+  if (path === '/api/auth/me')              return handleMe(req, res);
+  if (path === '/api/auth/logout')          return handleLogout(req, res);
+  if (path === '/api/auth/change-password') return handleChangePassword(req, res);
+  if (path === '/api/auth/update-profile')  return handleUpdateProfile(req, res);
+  if (path.startsWith('/api/portfolio'))    return handlePortfolio(req, res);
+  if (path.startsWith('/api/watchlists'))   return handleWatchlists(req, res);
 
   jsonRes(res, 404, { error: 'Not found' });
 };
