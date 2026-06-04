@@ -101,14 +101,6 @@ async function handleRegister(req, res) {
     passwordHash
   };
   await kvSet('usr:' + userId, user);
-
-  // Verify storage worked — KV env vars might not be configured
-  const saved = await kvGet('usr:' + userId);
-  if (!saved) {
-    jsonRes(res, 503, { error: 'Depolama hatası: KV yapılandırması eksik olabilir. Vercel → Storage → KV bağlantısını kontrol edin.' });
-    return;
-  }
-
   const { token, ttl } = await createSession(userId);
   res.setHeader('Set-Cookie', 'df_sess=' + token + '; Path=/; Max-Age=' + ttl + '; HttpOnly; Secure; SameSite=Lax');
   jsonRes(res, 200, { user: { id: user.id, email: user.email, name: user.name, picture: user.picture } });
@@ -137,19 +129,23 @@ async function handleLogin(req, res) {
 }
 
 async function handleMe(req, res) {
-  const user = await getUser(req);
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Cache-Control', 'no-store');
-  if (user) {
-    res.status(200).json({ user: { id: user.id, email: user.email, name: user.name, picture: user.picture } });
-  } else {
+  try {
+    const user = await getUser(req);
+    if (user) {
+      res.status(200).json({ user: { id: user.id, email: user.email, name: user.name, picture: user.picture } });
+    } else {
+      res.status(200).json({ user: null });
+    }
+  } catch (e) {
     res.status(200).json({ user: null });
   }
 }
 
 async function handleLogout(req, res) {
   const token = parseCookie(req, 'df_sess');
-  if (token) await kvDel('sess:' + token);
+  if (token) { try { await kvDel('sess:' + token); } catch(e) {} }
   res.setHeader('Set-Cookie', 'df_sess=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax');
   redirect(res, '/');
 }
@@ -327,14 +323,27 @@ async function handleUpdateProfile(req, res) {
 module.exports = async function handler(req, res) {
   const path = (req.url || '').split('?')[0];
 
-  if (path === '/api/auth/register')        return handleRegister(req, res);
-  if (path === '/api/auth/login')           return handleLogin(req, res);
-  if (path === '/api/auth/me')              return handleMe(req, res);
-  if (path === '/api/auth/logout')          return handleLogout(req, res);
-  if (path === '/api/auth/change-password') return handleChangePassword(req, res);
-  if (path === '/api/auth/update-profile')  return handleUpdateProfile(req, res);
-  if (path.startsWith('/api/portfolio'))    return handlePortfolio(req, res);
-  if (path.startsWith('/api/watchlists'))   return handleWatchlists(req, res);
+  try {
+    if (path === '/api/auth/register')        return await handleRegister(req, res);
+    if (path === '/api/auth/login')           return await handleLogin(req, res);
+    if (path === '/api/auth/me')              return await handleMe(req, res);
+    if (path === '/api/auth/logout')          return await handleLogout(req, res);
+    if (path === '/api/auth/change-password') return await handleChangePassword(req, res);
+    if (path === '/api/auth/update-profile')  return await handleUpdateProfile(req, res);
+    if (path.startsWith('/api/portfolio'))    return await handlePortfolio(req, res);
+    if (path.startsWith('/api/watchlists'))   return await handleWatchlists(req, res);
 
-  jsonRes(res, 404, { error: 'Not found' });
+    jsonRes(res, 404, { error: 'Not found' });
+  } catch (e) {
+    console.error('[user.js] handler error:', path, e.message);
+    const isKvErr = e.message && (e.message.includes('KV_REST_API') || e.message.includes('KV GET') || e.message.includes('KV SET'));
+    if (isKvErr) {
+      jsonRes(res, 503, {
+        error: 'Veritabanı bağlantı hatası. Vercel → Storage → deepfin-cache KV\'yi bistproxy projesine bağlayın.',
+        detail: e.message
+      });
+    } else {
+      jsonRes(res, 500, { error: 'Sunucu hatası: ' + e.message });
+    }
+  }
 };
