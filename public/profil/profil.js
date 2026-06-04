@@ -26,11 +26,6 @@ async function init() {
 function showLogin() {
   document.getElementById('pf-loading').style.display = 'none';
   document.getElementById('pf-login').style.display = 'block';
-  var authErr = new URLSearchParams(location.search).get('auth_error');
-  if (authErr) {
-    var msg = authErr === 'link_expired' ? 'Giriş linki süresi dolmuş. Lütfen tekrar isteyin.' : 'Giriş hatası: ' + authErr;
-    document.getElementById('pf-email-err').textContent = msg;
-  }
 }
 
 function showUser() {
@@ -252,32 +247,60 @@ function toast(msg) {
 
 window.switchList = switchList;
 
-window.sendMagicLink = async function() {
-  var email = (document.getElementById('pf-email-input').value || '').trim();
-  var errEl = document.getElementById('pf-email-err');
+// ── Auth ─────────────────────────────────────
+var _authMode = 'login';
+
+window.toggleAuthMode = function() {
+  _authMode = _authMode === 'login' ? 'register' : 'login';
+  var isReg = _authMode === 'register';
+  document.getElementById('pf-auth-title').textContent    = isReg ? 'Hesap Oluştur' : 'Profiline giriş yap';
+  document.getElementById('pf-auth-btn').textContent      = isReg ? 'Kayıt Ol' : 'Giriş Yap';
+  document.getElementById('pf-auth-name').style.display   = isReg ? 'block' : 'none';
+  document.getElementById('pf-switch-text').textContent   = isReg ? 'Zaten hesabın var mı?' : 'Hesabın yok mu?';
+  document.getElementById('pf-switch-btn').textContent    = isReg ? 'Giriş Yap' : 'Kayıt Ol';
+  document.getElementById('pf-auth-password').setAttribute('autocomplete', isReg ? 'new-password' : 'current-password');
+  document.getElementById('pf-auth-err').textContent = '';
+};
+
+window.submitAuth = async function(e) {
+  if (e) e.preventDefault();
+  var email    = (document.getElementById('pf-auth-email').value    || '').trim();
+  var password = (document.getElementById('pf-auth-password').value || '');
+  var name     = (document.getElementById('pf-auth-name').value     || '').trim();
+  var errEl    = document.getElementById('pf-auth-err');
   errEl.textContent = '';
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    errEl.textContent = 'Geçerli bir e-posta adresi girin.'; return;
-  }
-  var btn = document.getElementById('pf-email-btn');
-  btn.disabled = true; btn.textContent = 'Gönderiliyor...';
+  if (!email || !password) { errEl.textContent = 'E-posta ve şifre gerekli.'; return; }
+  if (_authMode === 'register' && password.length < 8) { errEl.textContent = 'Şifre en az 8 karakter olmalı.'; return; }
+
+  var btn = document.getElementById('pf-auth-btn');
+  btn.disabled = true;
+  btn.textContent = _authMode === 'login' ? 'Giriş yapılıyor...' : 'Kaydediliyor...';
+
+  var endpoint = _authMode === 'login' ? '/api/auth/login' : '/api/auth/register';
+  var body = { email: email, password: password };
+  if (_authMode === 'register' && name) body.name = name;
+
   try {
-    var r = await fetch('/api/auth/email', {
+    var r = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email })
+      body: JSON.stringify(body)
     });
     var d = await r.json();
-    if (d.ok) {
-      document.getElementById('pf-email-form').style.display = 'none';
-      document.getElementById('pf-email-sent').style.display = 'block';
+    if (d.user) {
+      _user = d.user;
+      document.getElementById('pf-login').style.display = 'none';
+      showUser();
+      await loadWatchlists();
     } else {
-      errEl.textContent = d.error || 'Hata oluştu. Tekrar deneyin.';
-      btn.disabled = false; btn.textContent = 'Link Gönder';
+      errEl.textContent = d.error || 'Hata oluştu.';
+      btn.disabled = false;
+      btn.textContent = _authMode === 'login' ? 'Giriş Yap' : 'Kayıt Ol';
     }
-  } catch(e) {
+  } catch(err) {
     errEl.textContent = 'Bağlantı hatası. Tekrar deneyin.';
-    btn.disabled = false; btn.textContent = 'Link Gönder';
+    btn.disabled = false;
+    btn.textContent = _authMode === 'login' ? 'Giriş Yap' : 'Kayıt Ol';
   }
 };
 
