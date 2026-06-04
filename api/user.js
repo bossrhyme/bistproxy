@@ -102,6 +102,13 @@ async function handleRegister(req, res) {
   };
   await kvSet('usr:' + userId, user);
 
+  // Verify storage worked — KV env vars might not be configured
+  const saved = await kvGet('usr:' + userId);
+  if (!saved) {
+    jsonRes(res, 503, { error: 'Depolama hatası: KV yapılandırması eksik olabilir. Vercel → Storage → KV bağlantısını kontrol edin.' });
+    return;
+  }
+
   const { token, ttl } = await createSession(userId);
   res.setHeader('Set-Cookie', 'df_sess=' + token + '; Path=/; Max-Age=' + ttl + '; HttpOnly; Secure; SameSite=Lax');
   jsonRes(res, 200, { user: { id: user.id, email: user.email, name: user.name, picture: user.picture } });
@@ -117,11 +124,12 @@ async function handleLogin(req, res) {
 
   const userId = 'em_' + email;
   const user   = await kvGet('usr:' + userId);
-  if (!user || !user.passwordHash) { jsonRes(res, 401, { error: 'E-posta veya şifre hatalı' }); return; }
+  if (!user)              { jsonRes(res, 401, { error: 'Bu e-posta ile kayıtlı hesap bulunamadı' }); return; }
+  if (!user.passwordHash) { jsonRes(res, 401, { error: 'Hesap verisi eksik, lütfen tekrar kayıt olun' }); return; }
 
   let ok = false;
-  try { ok = verifyPassword(password, user.passwordHash); } catch(e) {}
-  if (!ok) { jsonRes(res, 401, { error: 'E-posta veya şifre hatalı' }); return; }
+  try { ok = verifyPassword(password, user.passwordHash); } catch(e) { console.error('[login] verifyPassword error:', e.message); }
+  if (!ok) { jsonRes(res, 401, { error: 'Şifre hatalı' }); return; }
 
   const { token, ttl } = await createSession(userId);
   res.setHeader('Set-Cookie', 'df_sess=' + token + '; Path=/; Max-Age=' + ttl + '; HttpOnly; Secure; SameSite=Lax');
