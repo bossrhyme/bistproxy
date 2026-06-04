@@ -984,6 +984,13 @@ a.pop-chip{text-decoration:none;color:inherit;}
   justify-content: center; gap: 6px; font-family: 'Inter', sans-serif;
 }
 .dpl-analyze:hover { background: rgba(14,165,233,.2); border-color: var(--accent); transform: translateY(-1px); }
+.dpl-wladd {
+  height: 36px; background: var(--bg3); color: var(--text2);
+  border: 1px solid var(--border); border-radius: 7px; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all .15s; padding: 0 12px;
+  font-family: 'Inter', sans-serif; white-space: nowrap;
+}
+.dpl-wladd:hover { background: var(--hover); color: var(--accent); border-color: var(--accent); transform: translateY(-1px); }
 
 @media (max-width: 768px) {
   .analiz-hero { padding: 32px 20px 28px; }
@@ -996,10 +1003,12 @@ a.pop-chip{text-decoration:none;color:inherit;}
 .goat-tip,.chip-tip,.th-tip{display:none!important;}
 
 /* ── FAV İKONU ── */
-.nfav{width:28px;text-align:center;cursor:pointer;padding:0 4px;user-select:none;}
-.fav-icon{font-size:14px;color:var(--muted);transition:color .15s,transform .15s;display:inline-block;}
+.nfav{width:42px;text-align:center;padding:0 2px;user-select:none;}
+.fav-icon{font-size:14px;color:var(--muted);transition:color .15s,transform .15s;display:inline-block;cursor:pointer;}
 .fav-icon:hover{color:var(--gold);transform:scale(1.2);}
 .fav-icon.fav-on{color:var(--gold);}
+.wl-add-icon{font-size:13px;color:var(--muted);display:inline-block;cursor:pointer;margin-left:2px;transition:color .15s,transform .15s;line-height:1;}
+.wl-add-icon:hover{color:var(--accent);transform:scale(1.2);}
 .sb-fav-btn{background:transparent;border:1px solid var(--border);color:var(--muted2);font-size:11px;font-weight:600;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all .15s;margin-right:4px;}
 .sb-fav-btn:hover,.sb-fav-btn.on{border-color:var(--gold);color:var(--gold);background:rgba(240,180,41,.08);}
 

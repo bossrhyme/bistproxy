@@ -760,6 +760,7 @@ let scanAborted = false;
 // FAVORİLER
 // ═══════════════════════════════════════════
 var _dfUser = null; // oturum açık kullanıcı
+var _dfWatchlists = []; // önbelleğe alınmış watchlist'ler
 var favSet = new Set(JSON.parse(localStorage.getItem('df_favs') || '[]'));
 var favFilterActive = false;
 var fonFavSet = new Set(JSON.parse(localStorage.getItem('df_fon_favs') || '[]'));
@@ -2120,7 +2121,7 @@ function _vsRowHtml(s, idx) {
   var cv = function(key) { return isColVisible(key) ? '' : 'display:none;'; };
   var isFav = favSet.has(s.symbol);
   return `<tr onclick="showDetail('${s.symbol}')" class="${selSym===s.symbol?'selrow':''}">
-      <td class="nfav" onclick="event.stopPropagation();toggleFav('${s.symbol}')" title="${isFav?'Favorilerden çıkar':'Favorilere ekle'}"><span class="fav-icon${isFav?' fav-on':''}">★</span></td>
+      <td class="nfav"><span class="fav-icon${isFav?' fav-on':''}" onclick="event.stopPropagation();toggleFav('${s.symbol}')" title="${isFav?'Favorilerden çıkar':'Favorilere ekle'}">★</span>${_dfUser?`<span class="wl-add-icon" onclick="showWlPicker(event,'${s.symbol}','${currentExchange}')" title="Listeye ekle">⊕</span>`:''}</td>
       <td data-col="symbol" style="display:table-cell;"><span class="row-num">${idx+1}</span><span class="sym-wrap"><span class="row-arrow">›</span><span class="sym">${s.symbol}</span></span></td>
       <td data-col="name" style="${cv('name')}font-size:11px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.name}">${s.name}</td>
       <td data-col="price" style="${cv('price')}">${s.currentPrice!=null?(s.currentPrice.toFixed(2)+' '+(EXCHANGE_META[currentExchange]||EXCHANGE_META.bist).currency):nil}</td>
@@ -2193,7 +2194,10 @@ function buildProfile(s) {
   metaParts.push(exMeta.flag + ' ' + exMeta.name);
   metaEl.textContent = metaParts.join('  ·  ');
 
-  // Hemen Al + Detaylı Analiz butonları
+  // Hemen Al + Detaylı Analiz + Listeye Ekle butonları
+  var wlBtn = _dfUser
+    ? '<button class="dpl-wladd" onclick="showWlPicker(event,\'' + sym + '\',\'' + ex + '\')" title="Listeye ekle">⊕ Listeye Ekle</button>'
+    : '';
   linksEl.innerHTML = [
     '<div class="dpl-action-row">',
       '<button class="dpl-buy" onclick="onHemenAl(\'' + sym + '\',\'' + ex + '\')" title="Broker\'da işlem aç">',
@@ -2202,6 +2206,7 @@ function buildProfile(s) {
       '<button class="dpl-analyze" onclick="openDetayliAnaliz(\'' + symClean + '\',\'' + ex + '\')">',
         '📊 Detaylı Analiz',
       '</button>',
+      wlBtn,
     '</div>'
   ].join('');
 
@@ -2654,6 +2659,83 @@ function abortScan(){
   document.getElementById('scanbtn').disabled = false;
 }
 
+// ═══════════════════════════════════════════
+// LİSTEYE EKLE (Watchlist Picker)
+// ═══════════════════════════════════════════
+
+function showWlPicker(evt, sym, ex) {
+  evt.stopPropagation();
+  var existing = document.getElementById('df-wl-picker');
+  if (existing) { existing.remove(); return; }
+  if (!_dfUser) { showToast('Listeye eklemek için giriş yapın'); return; }
+  if (!_dfWatchlists.length) {
+    fetch('/api/watchlists', { credentials: 'same-origin' })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        _dfWatchlists = d.watchlists || [];
+        _renderWlPicker(evt, sym, ex);
+      }).catch(function() {});
+    return;
+  }
+  _renderWlPicker(evt, sym, ex);
+}
+
+function _renderWlPicker(evt, sym, ex) {
+  var rect = evt.target.getBoundingClientRect();
+  var div = document.createElement('div');
+  div.id = 'df-wl-picker';
+  div.style.cssText = [
+    'position:fixed;z-index:9999',
+    'background:var(--bg2)',
+    'border:1px solid var(--border)',
+    'border-radius:6px',
+    'box-shadow:0 4px 16px rgba(0,0,0,.5)',
+    'min-width:160px',
+    'padding:4px 0',
+    'left:' + Math.min(rect.left, window.innerWidth - 170) + 'px',
+    'top:' + (rect.bottom + 4) + 'px'
+  ].join(';');
+
+  if (!_dfWatchlists.length) {
+    div.innerHTML = '<div style="padding:8px 12px;color:var(--text2);font-size:12px">Henüz liste yok</div>';
+  } else {
+    _dfWatchlists.forEach(function(list) {
+      var item = document.createElement('div');
+      item.style.cssText = 'padding:7px 14px;cursor:pointer;font-size:12px;color:var(--text1);white-space:nowrap';
+      item.textContent = list.name;
+      item.onmouseenter = function() { item.style.background = 'var(--hover)'; };
+      item.onmouseleave = function() { item.style.background = ''; };
+      item.onclick = function(e) {
+        e.stopPropagation();
+        div.remove();
+        document.removeEventListener('click', outsideHandler);
+        addToWatchlistDirect(list.id, sym, ex);
+      };
+      div.appendChild(item);
+    });
+  }
+
+  document.body.appendChild(div);
+  function outsideHandler(e) {
+    if (!div.contains(e.target)) { div.remove(); document.removeEventListener('click', outsideHandler); }
+  }
+  setTimeout(function() { document.addEventListener('click', outsideHandler); }, 0);
+}
+
+function addToWatchlistDirect(listId, sym, ex) {
+  fetch('/api/watchlists/item', {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ listId: listId, symbol: sym, exchange: ex || currentExchange })
+  }).then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.error) { showToast('Hata: ' + d.error); return; }
+      showToast('✓ ' + sym + ' listeye eklendi');
+      if (d.watchlists) _dfWatchlists = d.watchlists;
+    }).catch(function() { showToast('Bağlantı hatası'); });
+}
+
 // Boot
 init();
 
@@ -2664,6 +2746,10 @@ init();
     .then(function(d) {
       if (!d.user) return;
       _dfUser = d.user;
+      fetch('/api/watchlists', { credentials: 'same-origin' })
+        .then(function(r) { return r.json(); })
+        .then(function(wd) { _dfWatchlists = wd.watchlists || []; })
+        .catch(function() {});
       var btn = document.getElementById('profile-btn');
       if (!btn) return;
       btn.classList.add('logged-in');
