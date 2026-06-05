@@ -220,21 +220,10 @@ body{overflow-y:auto;}
 
     <!-- Portfolio -->
     <div class="pf-section">
-      <div class="pf-section-title">📊 Portföyüm</div>
-      <div class="pf-list-panel">
-        <div class="pf-pf-total" id="pf-pf-total"></div>
-        <table class="pf-stock-table">
-          <thead><tr><th>Sembol</th><th>Borsa</th><th>Adet</th><th>Maliyet</th><th>Fiyat</th><th>Değer</th><th>K/Z</th><th></th></tr></thead>
-          <tbody id="pf-pf-body"><tr><td colspan="8"><div class="pf-empty">Yükleniyor...</div></td></tr></tbody>
-        </table>
-        <div class="pf-add-form" style="flex-wrap:wrap">
-          <button class="pf-sym-pick-btn" id="pf-pos-sym-btn" onclick="openSymPicker('portfolio')">🔍 Hisse Seç</button>
-          <input type="number" id="pf-pos-qty"  placeholder="Adet"    min="0.001" step="any" style="width:80px">
-          <input type="number" id="pf-pos-cost" placeholder="Maliyet" min="0"     step="any" style="width:90px">
-          <button class="pf-add-btn" id="pf-pos-add-btn" onclick="addPosition()" disabled>+ Ekle</button>
-          <input type="hidden" id="pf-pos-sym">
-          <input type="hidden" id="pf-pos-ex" value="bist">
-        </div>
+      <div class="pf-section-title">📊 Portföylerim</div>
+      <div class="pf-list-tabs" id="pf-pf-tabs"></div>
+      <div class="pf-list-panel" id="pf-pf-panel">
+        <div class="pf-empty">Portföyler yükleniyor...</div>
       </div>
     </div>
 
@@ -273,11 +262,11 @@ body{overflow-y:auto;}
 <!-- New list modal -->
 <div class="pf-modal-bg" id="pf-modal-bg">
   <div class="pf-modal">
-    <div class="pf-modal-title">Yeni Liste Oluştur</div>
-    <input type="text" id="pf-modal-input" placeholder="Liste adı (örn. Teknoloji Hisseleri)" maxlength="40"/>
+    <div class="pf-modal-title" id="pf-modal-title">Yeni Liste Oluştur</div>
+    <input type="text" id="pf-modal-input" placeholder="Liste adı" maxlength="40"/>
     <div class="pf-modal-btns">
       <button class="pf-modal-cancel" onclick="closeModal()">İptal</button>
-      <button class="pf-modal-ok" onclick="createList()">Oluştur</button>
+      <button class="pf-modal-ok" onclick="createFromModal()">Oluştur</button>
     </div>
   </div>
 </div>

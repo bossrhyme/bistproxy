@@ -226,12 +226,22 @@ async function handleWatchlists(req, res) {
 }
 
 // ── portfolio helpers ─────────────────────────
-async function getPortfolio(userId) {
-  const positions = await kvGet('pf:' + userId);
-  return Array.isArray(positions) ? positions : [];
+function makeDefaultPortfolio(legacyPositions) {
+  return [{ id: 'pf_default', name: 'Portföyüm', icon: '📊', createdAt: Date.now(), positions: legacyPositions || [] }];
 }
-async function savePortfolio(userId, positions) {
-  await kvSet('pf:' + userId, positions);
+
+async function getPortfolios(userId) {
+  const data = await kvGet('pf:' + userId);
+  if (!data) return makeDefaultPortfolio();
+  // Migration: old format was a flat positions array
+  if (Array.isArray(data) && (data.length === 0 || (data[0] && data[0].symbol))) {
+    return makeDefaultPortfolio(data);
+  }
+  return Array.isArray(data) && data.length ? data : makeDefaultPortfolio();
+}
+
+async function savePortfolios(userId, portfolios) {
+  await kvSet('pf:' + userId, portfolios);
 }
 
 async function handlePortfolio(req, res) {
@@ -241,50 +251,101 @@ async function handlePortfolio(req, res) {
   const urlPath = (req.url || '').split('?')[0];
   const isItem  = urlPath.endsWith('/item');
 
+  // GET — list portfolios
   if (method === 'GET') {
-    jsonRes(res, 200, { positions: await getPortfolio(user.id) }); return;
+    const portfolios = await getPortfolios(user.id);
+    jsonRes(res, 200, { portfolios }); return;
   }
+
+  // POST /api/portfolio — create portfolio
+  if (method === 'POST' && !isItem) {
+    const { name, icon } = await readBody(req);
+    if (!name || !name.trim()) { jsonRes(res, 400, { error: 'name required' }); return; }
+    const portfolios = await getPortfolios(user.id);
+    portfolios.push({ id: 'pf_' + Date.now(), name: name.trim(), icon: icon || '📊', createdAt: Date.now(), positions: [] });
+    await savePortfolios(user.id, portfolios);
+    jsonRes(res, 200, { portfolios }); return;
+  }
+
+  // PUT /api/portfolio — rename portfolio
+  if (method === 'PUT' && !isItem) {
+    const { id, name, icon } = await readBody(req);
+    if (!id) { jsonRes(res, 400, { error: 'id required' }); return; }
+    const portfolios = await getPortfolios(user.id);
+    const pf = portfolios.find(p => p.id === id);
+    if (!pf) { jsonRes(res, 404, { error: 'Portfolio not found' }); return; }
+    if (name !== undefined) pf.name = name.trim();
+    if (icon !== undefined) pf.icon = icon;
+    await savePortfolios(user.id, portfolios);
+    jsonRes(res, 200, { portfolios }); return;
+  }
+
+  // DELETE /api/portfolio — delete portfolio
+  if (method === 'DELETE' && !isItem) {
+    const { id } = await readBody(req);
+    if (!id) { jsonRes(res, 400, { error: 'id required' }); return; }
+    const portfolios = await getPortfolios(user.id);
+    if (portfolios.length <= 1) { jsonRes(res, 400, { error: 'Son portföy silinemez' }); return; }
+    const filtered = portfolios.filter(p => p.id !== id);
+    if (filtered.length === portfolios.length) { jsonRes(res, 404, { error: 'Portfolio not found' }); return; }
+    await savePortfolios(user.id, filtered);
+    jsonRes(res, 200, { portfolios: filtered }); return;
+  }
+
+  // POST /api/portfolio/item — add position
   if (method === 'POST' && isItem) {
-    const { symbol, exchange, quantity, avgCost } = await readBody(req);
+    const { portfolioId, symbol, exchange, quantity, avgCost } = await readBody(req);
     if (!symbol || !exchange || quantity == null || avgCost == null) {
-      jsonRes(res, 400, { error: 'symbol, exchange, quantity, avgCost required' }); return;
+      jsonRes(res, 400, { error: 'portfolioId, symbol, exchange, quantity, avgCost required' }); return;
     }
     const qty  = parseFloat(quantity);
     const cost = parseFloat(avgCost);
     if (isNaN(qty) || qty <= 0 || isNaN(cost) || cost < 0) {
       jsonRes(res, 400, { error: 'Geçersiz adet veya maliyet' }); return;
     }
-    const positions = await getPortfolio(user.id);
+    const portfolios = await getPortfolios(user.id);
+    const pf = portfolios.find(p => p.id === (portfolioId || portfolios[0].id));
+    if (!pf) { jsonRes(res, 404, { error: 'Portfolio not found' }); return; }
     const sym = symbol.toString().toUpperCase();
-    const existing = positions.find(p => p.symbol === sym && p.exchange === exchange);
+    const existing = pf.positions.find(p => p.symbol === sym && p.exchange === exchange);
     if (existing) {
-      const totalQty    = existing.quantity + qty;
+      const totalQty   = existing.quantity + qty;
       existing.avgCost  = (existing.avgCost * existing.quantity + cost * qty) / totalQty;
       existing.quantity = totalQty;
     } else {
-      positions.push({ id: 'pos_' + Date.now(), symbol: sym, exchange, quantity: qty, avgCost: cost, addedAt: Date.now() });
+      pf.positions.push({ id: 'pos_' + Date.now(), symbol: sym, exchange, quantity: qty, avgCost: cost, addedAt: Date.now() });
     }
-    await savePortfolio(user.id, positions);
-    jsonRes(res, 200, { positions }); return;
+    await savePortfolios(user.id, portfolios);
+    jsonRes(res, 200, { portfolios }); return;
   }
+
+  // PUT /api/portfolio/item — edit position
   if (method === 'PUT' && isItem) {
-    const { id, quantity, avgCost } = await readBody(req);
+    const { portfolioId, id, quantity, avgCost } = await readBody(req);
     if (!id) { jsonRes(res, 400, { error: 'id required' }); return; }
-    const positions = await getPortfolio(user.id);
-    const pos = positions.find(p => p.id === id);
+    const portfolios = await getPortfolios(user.id);
+    const pf = portfolios.find(p => p.id === (portfolioId || portfolios[0].id));
+    if (!pf) { jsonRes(res, 404, { error: 'Portfolio not found' }); return; }
+    const pos = pf.positions.find(p => p.id === id);
     if (!pos) { jsonRes(res, 404, { error: 'Position not found' }); return; }
     if (quantity != null) pos.quantity = parseFloat(quantity);
     if (avgCost  != null) pos.avgCost  = parseFloat(avgCost);
-    await savePortfolio(user.id, positions);
-    jsonRes(res, 200, { positions }); return;
+    await savePortfolios(user.id, portfolios);
+    jsonRes(res, 200, { portfolios }); return;
   }
+
+  // DELETE /api/portfolio/item — remove position
   if (method === 'DELETE' && isItem) {
-    const { id } = await readBody(req);
+    const { portfolioId, id } = await readBody(req);
     if (!id) { jsonRes(res, 400, { error: 'id required' }); return; }
-    const positions = (await getPortfolio(user.id)).filter(p => p.id !== id);
-    await savePortfolio(user.id, positions);
-    jsonRes(res, 200, { positions }); return;
+    const portfolios = await getPortfolios(user.id);
+    const pf = portfolios.find(p => p.id === (portfolioId || portfolios[0].id));
+    if (!pf) { jsonRes(res, 404, { error: 'Portfolio not found' }); return; }
+    pf.positions = pf.positions.filter(p => p.id !== id);
+    await savePortfolios(user.id, portfolios);
+    jsonRes(res, 200, { portfolios }); return;
   }
+
   jsonRes(res, 405, { error: 'Method not allowed' });
 }
 

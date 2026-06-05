@@ -5,7 +5,6 @@
 var _user         = null;
 var _lists        = [];
 var _activeListId = null;
-var _portfolio    = [];
 var _authMode     = 'login';
 var _acEl         = null;
 var _acTimer      = null;
@@ -65,7 +64,7 @@ function renderTabs() {
   tabs.innerHTML = _lists.map(function(l) {
     return '<button class="pf-list-tab' + (l.id === _activeListId ? ' active' : '') +
       '" onclick="switchList(\'' + l.id + '\')">' + esc(l.icon || '⭐') + ' ' + esc(l.name) + '</button>';
-  }).join('') + '<button class="pf-new-list-btn" onclick="openModal()">+ Yeni</button>';
+  }).join('') + '<button class="pf-new-list-btn" onclick="openModal(\'watchlist\')">+ Yeni</button>';
 }
 
 window.switchList = function(id) {
@@ -271,9 +270,23 @@ window.deleteList = async function(listId) {
   } catch(e) {}
 };
 
-// ── Yeni Liste Modal ───────────────────────────
-window.openModal  = function() { document.getElementById('pf-modal-bg').style.display='flex'; document.getElementById('pf-modal-input').value=''; document.getElementById('pf-modal-input').focus(); };
-window.closeModal = function() { document.getElementById('pf-modal-bg').style.display='none'; };
+// ── Modal (watchlist ve portföy için ortak) ────
+var _modalMode = 'watchlist';
+window.openModal = function(mode) {
+  _modalMode = mode || 'watchlist';
+  var titles = { watchlist: 'Yeni Takip Listesi', portfolio: 'Yeni Portföy' };
+  document.getElementById('pf-modal-title').textContent = titles[_modalMode] || 'Yeni';
+  document.getElementById('pf-modal-input').value = '';
+  document.getElementById('pf-modal-bg').style.display = 'flex';
+  document.getElementById('pf-modal-input').focus();
+};
+window.closeModal = function() { document.getElementById('pf-modal-bg').style.display = 'none'; };
+window.createFromModal = async function() {
+  var name = (document.getElementById('pf-modal-input').value || '').trim();
+  if (!name) return; closeModal();
+  if (_modalMode === 'portfolio') { await createPortfolio(name); return; }
+  await createList(name);
+};
 
 // ── Hisse Picker Modal ────────────────────────
 var _spTimer = null;
@@ -357,37 +370,53 @@ document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') { closeModal(); closeSymPicker(); }
 });
 
-window.createList = async function() {
-  var name = (document.getElementById('pf-modal-input').value || '').trim();
-  if (!name) return; closeModal();
+async function createList(name) {
   try {
     var r = await fetch('/api/watchlists', { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ name: name }) });
     var d = await r.json();
     if (d.watchlists) { _lists = d.watchlists; _activeListId = _lists[_lists.length-1].id; renderTabs(); renderListPanel(); toast('✓ "' + name + '" oluşturuldu'); }
   } catch(e) {}
-};
+}
 
 // ── Portföy ───────────────────────────────────
+var _portfolios   = [];
+var _activePfId   = null;
+
 async function loadPortfolio() {
   try {
     var r = await fetch('/api/portfolio');
     if (!r.ok) return;
     var d = await r.json();
-    _portfolio = d.positions || [];
-    renderPortfolio();
+    _portfolios = d.portfolios || [];
+    if (_portfolios.length && !_activePfId) _activePfId = _portfolios[0].id;
+    renderPfTabs();
+    renderPfPanel();
   } catch(e) {}
 }
 
-function renderPortfolio() {
-  var body = document.getElementById('pf-pf-body');
-  if (!body) return;
-  if (!_portfolio.length) {
-    body.innerHTML = '<tr><td colspan="8"><div class="pf-empty">Henüz pozisyon yok — aşağıdan ekle.</div></td></tr>';
-    var te = document.getElementById('pf-pf-total'); if (te) { te.textContent = ''; te.classList.remove('has-data'); }
-    return;
-  }
-  body.innerHTML = _portfolio.map(function(pos) {
+function renderPfTabs() {
+  var tabs = document.getElementById('pf-pf-tabs');
+  if (!tabs) return;
+  tabs.innerHTML = _portfolios.map(function(pf) {
+    return '<button class="pf-list-tab' + (pf.id === _activePfId ? ' active' : '') +
+      '" onclick="switchPf(\'' + pf.id + '\')">' + esc(pf.icon || '📊') + ' ' + esc(pf.name) + '</button>';
+  }).join('') + '<button class="pf-new-list-btn" onclick="openModal(\'portfolio\')">+ Yeni</button>';
+}
+
+window.switchPf = function(id) {
+  _activePfId = id; renderPfTabs(); renderPfPanel();
+};
+
+function renderPfPanel() {
+  var pf    = _portfolios.find(function(p) { return p.id === _activePfId; });
+  var panel = document.getElementById('pf-pf-panel');
+  if (!pf || !panel) return;
+
+  var canDel    = _portfolios.length > 1;
+  var positions = pf.positions || [];
+
+  var rows = positions.map(function(pos) {
     return '<tr>' +
       '<td><span class="pf-sym">' + esc(pos.symbol) + '</span></td>' +
       '<td><span class="pf-ex-badge">' + esc(pos.exchange) + '</span></td>' +
@@ -396,24 +425,47 @@ function renderPortfolio() {
       '<td id="pfp-' + pos.id + '">—</td>' +
       '<td id="pfv-' + pos.id + '">—</td>' +
       '<td id="pfpnl-' + pos.id + '">—</td>' +
-      '<td><button class="pf-remove-btn" onclick="removePosition(\'' + pos.id + '\')" title="Çıkar">×</button></td>' +
+      '<td><button class="pf-remove-btn" onclick="removePosition(\'' + pf.id + '\',\'' + pos.id + '\')" title="Çıkar">×</button></td>' +
     '</tr>';
   }).join('');
-  fetchPortfolioPrices();
+
+  panel.innerHTML =
+    '<div class="pf-list-header">' +
+      '<input class="pf-list-name-input" value="' + esc(pf.name) +
+        '" onblur="renamePf(\'' + pf.id + '\',this.value)" maxlength="40">' +
+      '<div class="pf-pf-total" id="pf-pf-total"></div>' +
+      (canDel ? '<button class="pf-list-del-btn" onclick="deletePf(\'' + pf.id + '\')">Sil</button>' : '') +
+    '</div>' +
+    '<table class="pf-stock-table"><thead><tr>' +
+      '<th>Sembol</th><th>Borsa</th><th>Adet</th><th>Maliyet</th><th>Fiyat</th><th>Değer</th><th>K/Z</th><th></th>' +
+    '</tr></thead><tbody>' +
+      (rows || '<tr><td colspan="8"><div class="pf-empty">Henüz pozisyon yok — aşağıdan ekle.</div></td></tr>') +
+    '</tbody></table>' +
+    '<div class="pf-add-form" style="flex-wrap:wrap">' +
+      '<button class="pf-sym-pick-btn" id="pf-pos-sym-btn" onclick="openSymPicker(\'portfolio\')">🔍 Hisse Seç</button>' +
+      '<input type="number" id="pf-pos-qty"  placeholder="Adet"    min="0.001" step="any" style="width:80px">' +
+      '<input type="number" id="pf-pos-cost" placeholder="Maliyet" min="0"     step="any" style="width:90px">' +
+      '<button class="pf-add-btn" id="pf-pos-add-btn" onclick="addPosition()" disabled>+ Ekle</button>' +
+      '<input type="hidden" id="pf-pos-sym">' +
+      '<input type="hidden" id="pf-pos-ex" value="bist">' +
+    '</div>';
+
+  if (positions.length) fetchPortfolioPrices(pf);
 }
 
-async function fetchPortfolioPrices() {
+async function fetchPortfolioPrices(pf) {
+  var positions = pf.positions || [];
   var total = 0, totalCost = 0;
-  await batchFetch(_portfolio, function(pos, data) {
+  await batchFetch(positions, function(pos, data) {
     var price = data.price;
     var value = price * pos.quantity;
     var cost  = pos.avgCost * pos.quantity;
     var pnl   = value - cost;
     var pct   = pos.avgCost > 0 ? (price / pos.avgCost - 1) * 100 : 0;
     total += value; totalCost += cost;
-    var pe = document.getElementById('pfp-' + pos.id);
-    var ve = document.getElementById('pfv-' + pos.id);
-    var pe2= document.getElementById('pfpnl-' + pos.id);
+    var pe  = document.getElementById('pfp-'   + pos.id);
+    var ve  = document.getElementById('pfv-'   + pos.id);
+    var pe2 = document.getElementById('pfpnl-' + pos.id);
     if (pe)  pe.textContent = fmtPrice(price);
     if (ve)  ve.textContent = fmtPrice(value);
     if (pe2) pe2.innerHTML  = '<span class="' + (pnl >= 0 ? 'pf-up' : 'pf-dn') + '">' +
@@ -422,9 +474,8 @@ async function fetchPortfolioPrices() {
   var te = document.getElementById('pf-pf-total');
   if (te && total > 0) {
     var pnlTotal = total - totalCost;
-    te.innerHTML = 'Toplam: <b>' + fmtPrice(total) + '</b> <span class="' + (pnlTotal >= 0 ? 'pf-up' : 'pf-dn') + '">' +
+    te.innerHTML = 'Toplam: <b>' + fmtPrice(total) + '</b>&nbsp;<span class="' + (pnlTotal >= 0 ? 'pf-up' : 'pf-dn') + '">' +
       '(' + (pnlTotal >= 0 ? '+' : '') + fmtPrice(pnlTotal) + ')</span>';
-    te.classList.add('has-data');
   }
 }
 
@@ -438,31 +489,65 @@ window.addPosition = async function() {
   var addBtn = document.getElementById('pf-pos-add-btn'); addBtn.disabled = true;
   try {
     var r = await fetch('/api/portfolio/item', { method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ symbol: sym, exchange: ex, quantity: qty, avgCost: cost }) });
+      body: JSON.stringify({ portfolioId: _activePfId, symbol: sym, exchange: ex, quantity: qty, avgCost: cost }) });
     var d = await r.json();
-    if (d.positions) {
-      _portfolio = d.positions;
-      document.getElementById('pf-pos-sym').value  = '';
-      document.getElementById('pf-pos-ex').value   = 'bist';
-      document.getElementById('pf-pos-qty').value  = '';
-      document.getElementById('pf-pos-cost').value = '';
+    if (d.portfolios) {
+      _portfolios = d.portfolios;
       var pickBtn = document.getElementById('pf-pos-sym-btn');
       if (pickBtn) { pickBtn.textContent = '🔍 Hisse Seç'; pickBtn.classList.remove('selected'); }
-      addBtn.disabled = true;
-      renderPortfolio(); toast('✓ ' + sym + ' eklendi');
+      renderPfTabs(); renderPfPanel(); toast('✓ ' + sym + ' eklendi');
     }
-  } catch(e) { toast('Hata oluştu'); }
+  } catch(e) { toast('Hata oluştu'); addBtn.disabled = false; }
 };
 
-window.removePosition = async function(id) {
+window.removePosition = async function(pfId, posId) {
   if (!confirm('Bu pozisyonu silmek istediğine emin misin?')) return;
   try {
     var r = await fetch('/api/portfolio/item', { method:'DELETE', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ id: id }) });
+      body: JSON.stringify({ portfolioId: pfId, id: posId }) });
     var d = await r.json();
-    if (d.positions) { _portfolio = d.positions; renderPortfolio(); toast('Pozisyon silindi'); }
+    if (d.portfolios) { _portfolios = d.portfolios; renderPfTabs(); renderPfPanel(); toast('Pozisyon silindi'); }
   } catch(e) {}
 };
+
+window.renamePf = async function(pfId, name) {
+  name = (name || '').trim();
+  var pf = _portfolios.find(function(p) { return p.id === pfId; });
+  if (!pf || pf.name === name || !name) return;
+  try {
+    var r = await fetch('/api/portfolio', { method:'PUT', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ id: pfId, name: name }) });
+    var d = await r.json();
+    if (d.portfolios) { _portfolios = d.portfolios; renderPfTabs(); }
+  } catch(e) {}
+};
+
+window.deletePf = async function(pfId) {
+  if (!confirm('Bu portföyü silmek istediğine emin misin?')) return;
+  try {
+    var r = await fetch('/api/portfolio', { method:'DELETE', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ id: pfId }) });
+    var d = await r.json();
+    if (d.portfolios) {
+      _portfolios = d.portfolios;
+      _activePfId = _portfolios[0] ? _portfolios[0].id : null;
+      renderPfTabs(); renderPfPanel(); toast('Portföy silindi');
+    }
+  } catch(e) {}
+};
+
+async function createPortfolio(name) {
+  try {
+    var r = await fetch('/api/portfolio', { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ name: name }) });
+    var d = await r.json();
+    if (d.portfolios) {
+      _portfolios = d.portfolios;
+      _activePfId = _portfolios[_portfolios.length-1].id;
+      renderPfTabs(); renderPfPanel(); toast('✓ "' + name + '" oluşturuldu');
+    }
+  } catch(e) {}
+}
 
 // ── Ayarlar ───────────────────────────────────
 window.toggleSettings = function() {
