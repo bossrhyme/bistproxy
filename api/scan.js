@@ -274,79 +274,6 @@ const EXCHANGE_CONFIG = {
             ] },
 };
 
-// ─── MARKET PULSE (market-pulse.js'den taşındı) ───────────────────────────
-const PULSE_TV_PATH = {
-  bist:'turkey',nasdaq:'america',nyse:'america',sp500:'america',dax:'germany',
-  lse:'uk',nikkei:'japan',krx:'korea',france:'france',amsterdam:'netherlands',
-  brussels:'belgium',lisbon:'portugal',dublin:'ireland',oslo:'norway',
-  milan:'italy',tsx:'canada',twse:'taiwan',b3:'brazil',hkex:'hongkong',
-  china:'china',saudi:'global',switzerland:'switzerland',australia:'australia',
-  southafrica:'global',sweden:'sweden',india:'india',uae:'uae',moex:'russia',
-};
-
-function pulseKvKey(ex) {
-  const m = PULSE_TV_PATH[ex]; return m ? 'market-pulse:' + m : null;
-}
-
-async function fetchPulseBreadth(market) {
-  const payload = JSON.stringify({
-    columns: ['change','volume','average_volume_10d_calc','sector'],
-    range:[0,2000], sort:{sortBy:'market_cap_basic',sortOrder:'desc'},
-    ignore_unknown_fields:true,
-  });
-  const r = await fetch(`https://scanner.tradingview.com/${market}/scan`, {
-    method:'POST',
-    headers:{'Content-Type':'application/json','Origin':'https://www.tradingview.com',
-      'Referer':'https://www.tradingview.com/','User-Agent':'Mozilla/5.0'},
-    body:payload, signal:AbortSignal.timeout(12000),
-  });
-  if (!r.ok) throw new Error('TV scan HTTP ' + r.status);
-  return r.json();
-}
-
-function computePulse(raw) {
-  const stocks = (raw.data||[]).map(s=>{const d=s.d||[];return{change:d[0],volume:d[1],avgVol:d[2],sector:d[3]};})
-    .filter(s=>s.change!=null&&isFinite(s.change));
-  const total=stocks.length; if(!total) return null;
-  const up=stocks.filter(s=>s.change>0).length, down=stocks.filter(s=>s.change<0).length, unch=total-up-down;
-  const secMap={};
-  stocks.forEach(s=>{if(!s.sector)return;if(!secMap[s.sector])secMap[s.sector]={sum:0,n:0};secMap[s.sector].sum+=s.change;secMap[s.sector].n+=1;});
-  let topS=null,topC=-Infinity,botS=null,botC=Infinity;
-  Object.entries(secMap).forEach(([sec,v])=>{if(v.n<2)return;const avg=v.sum/v.n;if(avg>topC){topC=avg;topS=sec;}if(avg<botC){botC=avg;botS=sec;}});
-  const totV=stocks.reduce((a,s)=>a+(s.volume||0),0), totA=stocks.reduce((a,s)=>a+(s.avgVol||0),0);
-  const vr=totA>1000?+(totV/totA).toFixed(2):null;
-  let score=Math.round(((up-down)/total)*40+50);
-  if(vr&&vr>1.3)score=50+Math.round((score-50)*1.15);
-  score=Math.max(5,Math.min(95,score));
-  const label=score<20?'Aşırı Korku':score<40?'Korku':score<60?'Nötr':score<80?'Açgözlülük':'Aşırı Açgözlülük';
-  const color=score<20?'#ef4444':score<40?'#f97316':score<60?'#eab308':score<80?'#22c55e':'#10b981';
-  return{total,up,down,unch,topSector:topS?{name:topS,change:+topC.toFixed(2)}:null,
-    botSector:botS?{name:botS,change:+botC.toFixed(2)}:null,volumeRatio:vr,
-    sentiment:{score,label,color},updatedAt:Date.now()};
-}
-
-async function handlePulse(req, res) {
-  res.setHeader('Cache-Control','public, s-maxage=300, stale-while-revalidate=60');
-  const pUrl = new URL(req.url,'http://localhost');
-  const ex   = (pUrl.searchParams.get('ex')||'bist').toLowerCase();
-  const market = PULSE_TV_PATH[ex];
-  if (!market) return res.status(400).json({ok:false,error:'Bilinmeyen borsa: '+ex});
-  const key = pulseKvKey(ex);
-  const cached = key ? await kvGet(key) : null;
-  const age = cached ? (Date.now()-cached.updatedAt) : Infinity;
-  if (cached && age < 300000) return res.json({ok:true,...cached,fromCache:true});
-  try {
-    const raw=await fetchPulseBreadth(market);
-    const pulse=computePulse(raw);
-    if(!pulse) return res.status(503).json({ok:false,error:'Veri işlenemedi'});
-    if(key) await kvSet(key,pulse,300);
-    return res.json({ok:true,...pulse});
-  } catch(err) {
-    if(cached) return res.json({ok:true,...cached,fromCache:true,stale:true});
-    return res.status(503).json({ok:false,error:err.message});
-  }
-}
-
 module.exports = async function(req, res) {
   // ── CORS: sadece kendi domain'imize izin ver ──
   const ALLOWED_ORIGINS = [
@@ -363,7 +290,6 @@ module.exports = async function(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const url      = new URL(req.url, 'http://localhost');
-  if (url.pathname.includes('market-pulse')) return handlePulse(req, res);
   const action   = url.searchParams.get('action') || 'scan';
   const exchange = (url.searchParams.get('exchange') || 'bist').toLowerCase();
   const cfg      = EXCHANGE_CONFIG[exchange] || EXCHANGE_CONFIG.bist;
