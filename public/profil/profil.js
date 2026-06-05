@@ -112,13 +112,8 @@ function renderListPanel() {
     '</tr></thead><tbody>' +
       (rows || '<tr><td colspan="7"><div class="pf-empty">Liste boş — aşağıdan hisse ekle.</div></td></tr>') +
     '</tbody></table>' +
-    '<div class="pf-add-form" style="flex-wrap:wrap">' +
-      '<div style="position:relative;flex:1;min-width:110px;">' +
-        '<input type="text" id="pf-add-sym" placeholder="Sembol" style="text-transform:uppercase;width:100%" maxlength="20"' +
-          ' oninput="onSymInput(this,\'pf-add-ex\')" onblur="delayHideAC()" onkeydown="if(event.key===\'Enter\')addItem()">' +
-      '</div>' +
-      '<select id="pf-add-ex" onchange="clearAC()">' + exOpts() + '</select>' +
-      '<button class="pf-add-btn" id="pf-add-btn" onclick="addItem()">+ Ekle</button>' +
+    '<div class="pf-add-form">' +
+      '<button class="pf-add-btn" onclick="openSymPicker()">🔍 Hisse Ekle</button>' +
     '</div>';
 
   if (items.length) fetchWatchlistPrices(items);
@@ -165,7 +160,7 @@ async function fetchWatchlistPrices(items) {
   });
 }
 
-// ── Autocomplete ──────────────────────────────
+// ── Autocomplete (portföy için) ───────────────
 function getACEl() {
   if (!_acEl) {
     _acEl = document.createElement('div');
@@ -176,8 +171,8 @@ function getACEl() {
   return _acEl;
 }
 
-window.onSymInput = function(input, exId) {
-  _acActive = { input: input, exId: exId };
+window.onSymInput = function(input, exId, onSelectFn) {
+  _acActive = { input: input, exId: exId, onSelect: onSelectFn };
   clearTimeout(_acTimer);
   var q = (input.value || '').trim();
   if (q.length < 1) { clearAC(); return; }
@@ -198,14 +193,17 @@ function showACDropdown(symbols, input) {
   var rect = input.getBoundingClientRect();
   el.style.cssText = 'display:block;left:' + rect.left + 'px;top:' + (rect.bottom + 2) + 'px;width:' + Math.max(200, rect.width) + 'px;';
   el.innerHTML = symbols.map(function(s) {
-    return '<div class="pf-ac-item" onmousedown="pickAC(\'' + esc(s.s) + '\')">' +
+    return '<div class="pf-ac-item" onmousedown="pickAC(\'' + esc(s.s) + '\',\'' + esc(s.ex || '') + '\')">' +
       '<span class="pf-ac-sym">' + esc(s.s) + '</span>' +
       '<span class="pf-ac-name">' + esc(s.n) + '</span></div>';
   }).join('');
 }
 
-window.pickAC = function(sym) {
-  if (_acActive) _acActive.input.value = sym;
+window.pickAC = function(sym, ex) {
+  if (_acActive) {
+    _acActive.input.value = sym;
+    if (_acActive.onSelect) _acActive.onSelect(sym, ex);
+  }
   clearAC();
 };
 window.clearAC = function() {
@@ -273,10 +271,77 @@ window.deleteList = async function(listId) {
   } catch(e) {}
 };
 
-// ── Modal ─────────────────────────────────────
+// ── Yeni Liste Modal ───────────────────────────
 window.openModal  = function() { document.getElementById('pf-modal-bg').style.display='flex'; document.getElementById('pf-modal-input').value=''; document.getElementById('pf-modal-input').focus(); };
 window.closeModal = function() { document.getElementById('pf-modal-bg').style.display='none'; };
-document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
+
+// ── Hisse Picker Modal ────────────────────────
+var _spTimer = null;
+
+window.openSymPicker = function() {
+  var bg = document.getElementById('pf-sym-picker-bg');
+  bg.style.display = 'flex';
+  var inp = document.getElementById('pf-sym-search');
+  inp.value = '';
+  document.getElementById('pf-sym-results').innerHTML = '<div class="pf-empty">Aramak için yazmaya başlayın…</div>';
+  setTimeout(function() { inp.focus(); }, 50);
+};
+
+window.closeSymPicker = function() {
+  document.getElementById('pf-sym-picker-bg').style.display = 'none';
+  clearTimeout(_spTimer);
+};
+
+window.onSymSearch = function(input) {
+  clearTimeout(_spTimer);
+  var q = input.value.trim();
+  if (!q) {
+    document.getElementById('pf-sym-results').innerHTML = '<div class="pf-empty">Aramak için yazmaya başlayın…</div>';
+    return;
+  }
+  document.getElementById('pf-sym-results').innerHTML = '<div class="pf-empty pf-sp-loading">Aranıyor…</div>';
+  _spTimer = setTimeout(function() {
+    var ex = document.getElementById('pf-sym-ex').value;
+    fetch('/api/symbol-search?q=' + encodeURIComponent(q) + '&exchange=' + ex)
+      .then(function(r) { return r.json(); })
+      .then(function(d) { renderSymResults(d.symbols || [], ex); })
+      .catch(function() {
+        document.getElementById('pf-sym-results').innerHTML = '<div class="pf-empty">Hata oluştu</div>';
+      });
+  }, 280);
+};
+
+function renderSymResults(symbols, ex) {
+  var el = document.getElementById('pf-sym-results');
+  if (!symbols.length) { el.innerHTML = '<div class="pf-empty">Sonuç bulunamadı</div>'; return; }
+  el.innerHTML = symbols.map(function(s) {
+    var symEx = s.ex || ex;
+    return '<div class="pf-sp-row" onclick="addFromPicker(\'' + esc(s.s) + '\',\'' + esc(symEx) + '\')">' +
+      '<span class="pf-sym">' + esc(s.s) + '</span>' +
+      '<span class="pf-sp-name">' + esc(s.n || '') + '</span>' +
+      '<span class="pf-ex-badge">' + esc(symEx) + '</span>' +
+      '<span class="pf-sp-add">+ Ekle</span>' +
+    '</div>';
+  }).join('');
+}
+
+window.addFromPicker = async function(sym, ex) {
+  closeSymPicker();
+  try {
+    var r = await fetch('/api/watchlists/item', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ listId: _activeListId, symbol: sym, exchange: ex })
+    });
+    var d = await r.json();
+    if (d.watchlists) { _lists = d.watchlists; renderTabs(); renderListPanel(); toast('✓ ' + sym + ' eklendi'); }
+    else if (d.error) toast('Hata: ' + d.error);
+  } catch(e) { toast('Bağlantı hatası'); }
+};
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') { closeModal(); closeSymPicker(); }
+});
 
 window.createList = async function() {
   var name = (document.getElementById('pf-modal-input').value || '').trim();

@@ -145,6 +145,27 @@ body{overflow-y:auto;}
 /* Toast */
 .pf-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(40px);background:var(--text);color:var(--bg);padding:8px 18px;border-radius:6px;font-size:12px;font-weight:500;z-index:200;opacity:0;transition:all .25s;pointer-events:none;}
 .pf-toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+/* Hisse Picker Modal */
+.pf-sym-picker-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-start;justify-content:center;padding-top:60px;}
+.pf-sym-picker{background:var(--s1);border:1px solid var(--border2);border-radius:12px;width:480px;max-width:95vw;max-height:75vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.4);}
+.pf-sp-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 0;}
+.pf-sp-header-title{font-size:14px;font-weight:700;}
+.pf-sp-close{background:transparent;border:none;font-size:18px;color:var(--muted2);cursor:pointer;line-height:1;padding:2px 6px;}
+.pf-sp-close:hover{color:var(--text);}
+.pf-sp-controls{display:flex;gap:8px;padding:14px 18px 10px;}
+.pf-sp-search{flex:1;background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--text);outline:none;font-family:inherit;}
+.pf-sp-search:focus{border-color:var(--accent);}
+.pf-sp-ex{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:10px 10px;font-size:12px;color:var(--text);outline:none;cursor:pointer;}
+.pf-sp-ex:focus{border-color:var(--accent);}
+#pf-sym-results{flex:1;overflow-y:auto;padding:4px 0;}
+.pf-sp-row{display:flex;align-items:center;gap:10px;padding:10px 18px;cursor:pointer;transition:background .1s;}
+.pf-sp-row:hover{background:var(--s2);}
+.pf-sp-row:hover .pf-sp-add{opacity:1;}
+.pf-sp-name{flex:1;font-size:11px;color:var(--muted2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pf-sp-add{font-size:11px;font-weight:600;color:var(--accent);opacity:0;transition:opacity .15s;white-space:nowrap;}
+.pf-sp-loading{animation:pulse 1s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 </style>
 </head>
 <body>
@@ -260,6 +281,30 @@ body{overflow-y:auto;}
     <div class="pf-modal-btns">
       <button class="pf-modal-cancel" onclick="closeModal()">İptal</button>
       <button class="pf-modal-ok" onclick="createList()">Oluştur</button>
+    </div>
+  </div>
+</div>
+
+<!-- Hisse Picker Modal -->
+<div class="pf-sym-picker-bg" id="pf-sym-picker-bg" onclick="if(event.target===this)closeSymPicker()">
+  <div class="pf-sym-picker">
+    <div class="pf-sp-header">
+      <span class="pf-sp-header-title">Hisse Ara &amp; Ekle</span>
+      <button class="pf-sp-close" onclick="closeSymPicker()">✕</button>
+    </div>
+    <div class="pf-sp-controls">
+      <input type="text" id="pf-sym-search" class="pf-sp-search" placeholder="Sembol veya şirket adı ara…" autocomplete="off" oninput="onSymSearch(this)">
+      <select id="pf-sym-ex" class="pf-sp-ex" onchange="onSymSearch(document.getElementById('pf-sym-search'))">
+        <option value="bist">BIST</option>
+        <option value="nasdaq">NASDAQ</option>
+        <option value="sp500">S&amp;P 500</option>
+        <option value="nyse">NYSE</option>
+        <option value="dax">DAX</option>
+        <option value="lse">LSE</option>
+      </select>
+    </div>
+    <div id="pf-sym-results">
+      <div class="pf-empty">Aramak için yazmaya başlayın…</div>
     </div>
   </div>
 </div>
