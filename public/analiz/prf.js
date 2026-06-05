@@ -7,100 +7,168 @@ function openTradingView() {
   window.open('https://www.tradingview.com/chart/?symbol='+pfx+'%3A'+sym, '_blank');
 }
 
-function loadTVWidget(sym, ex) {
-  var container = document.getElementById('prf-tv-widget');
-  if(!container) return;
+// ── Chart state ──────────────────────────────────────────────────────────
+var _chartInst  = null;
+var _chartSer   = null;
+var _chartType  = 'candle'; // 'candle' | 'line'
+var _chartIval  = 'D';      // 'D' | 'W' | 'M'
+var _chartRange = '1y';     // '1m'|'3m'|'6m'|'1y'|'all'
+var _chartPct   = false;
+var _chartData  = [];
+var _chartSym2  = '';
+var _chartEx2   = '';
 
+function _tbHtml() {
+  var b = function(id, label, on, fn) {
+    var bd = on ? '1px solid #0ea5e9' : '1px solid #e2e8f0';
+    var bg = on ? 'rgba(14,165,233,.1)' : 'transparent';
+    var cl = on ? '#0ea5e9' : '#94a3b8';
+    return '<button id="' + id + '" onclick="' + fn + '" style="padding:3px 9px;font-size:10px;font-weight:600;border-radius:4px;cursor:pointer;border:' + bd + ';background:' + bg + ';color:' + cl + ';transition:all .15s;white-space:nowrap;font-family:Inter,sans-serif;line-height:1.5;">' + label + '</button>';
+  };
+  var sp = '<div style="width:1px;height:14px;background:#e2e8f0;margin:0 3px;flex-shrink:0;"></div>';
+  var T = _chartType, I = _chartIval, R = _chartRange, P = _chartPct;
+  return '<div style="display:flex;align-items:center;gap:3px;padding:7px 12px;border-bottom:1px solid #e2e8f0;background:#fff;flex-wrap:wrap;row-gap:4px;">' +
+    b('ct-c', 'Mum',    T==='candle', "setChartType('candle')") +
+    b('ct-l', 'Çizgi',  T==='line',   "setChartType('line')") +
+    sp +
+    b('ci-D', 'Günlük',   I==='D', "setChartInterval('D')") +
+    b('ci-W', 'Haftalık', I==='W', "setChartInterval('W')") +
+    b('ci-M', 'Aylık',    I==='M', "setChartInterval('M')") +
+    sp +
+    b('cr-1m',  '1A',   R==='1m',  "setChartRange('1m')") +
+    b('cr-3m',  '3A',   R==='3m',  "setChartRange('3m')") +
+    b('cr-6m',  '6A',   R==='6m',  "setChartRange('6m')") +
+    b('cr-1y',  '1Y',   R==='1y',  "setChartRange('1y')") +
+    b('cr-all', 'Tümü', R==='all', "setChartRange('all')") +
+    sp +
+    b('cp-pct', '%', P, 'setChartPct()') +
+  '</div>';
+}
+
+function _tbSet(id, on) {
+  var btn = document.getElementById(id);
+  if (!btn) return;
+  btn.style.border     = on ? '1px solid #0ea5e9' : '1px solid #e2e8f0';
+  btn.style.background = on ? 'rgba(14,165,233,.1)' : 'transparent';
+  btn.style.color      = on ? '#0ea5e9' : '#94a3b8';
+}
+function _tbGroup(prefix, vals, active) {
+  vals.forEach(function(v) { _tbSet(prefix + v, v === active); });
+}
+
+function _chartFiltered() {
+  if (_chartRange === 'all') return _chartData;
+  var days = { '1m': 30, '3m': 91, '6m': 182, '1y': 365 }[_chartRange] || 365;
+  var since = Math.floor(Date.now() / 1000) - days * 86400;
+  return _chartData.filter(function(c) { return c.time >= since; });
+}
+
+function _chartApply() {
+  if (!_chartInst || !_chartSer || !_chartData.length) return;
+  var data = _chartFiltered();
+  if (!data.length) return;
+  _chartSer.setData(_chartType === 'line'
+    ? data.map(function(c) { return { time: c.time, value: c.close }; })
+    : data
+  );
+  _chartInst.timeScale().fitContent();
+}
+
+function setChartType(type) {
+  if (type === _chartType) return;
+  _chartType = type;
+  _tbGroup('ct-', ['c','l'], type === 'candle' ? 'c' : 'l');
+  if (!_chartInst) return;
+  try { _chartInst.removeSeries(_chartSer); } catch(e) {}
+  _chartSer = type === 'line'
+    ? _chartInst.addLineSeries({ color: '#0ea5e9', lineWidth: 2, crosshairMarkerRadius: 4, priceLineVisible: false })
+    : _chartInst.addCandlestickSeries({ upColor:'#10b981',downColor:'#f43f5e',borderUpColor:'#10b981',borderDownColor:'#f43f5e',wickUpColor:'#10b981',wickDownColor:'#f43f5e' });
+  _chartApply();
+}
+
+function setChartInterval(ival) {
+  if (ival === _chartIval) return;
+  _chartIval = ival;
+  _tbGroup('ci-', ['D','W','M'], ival);
+  _fetchChart(_chartSym2, _chartEx2);
+}
+
+function setChartRange(range) {
+  _chartRange = range;
+  _tbGroup('cr-', ['1m','3m','6m','1y','all'], range);
+  _chartApply();
+}
+
+function setChartPct() {
+  _chartPct = !_chartPct;
+  _tbSet('cp-pct', _chartPct);
+  if (_chartInst) _chartInst.priceScale('right').applyOptions({ mode: _chartPct ? 2 : 0 });
+}
+
+function _fetchChart(sym, ex) {
   var exMeta = EXCHANGE_META[ex] || EXCHANGE_META.bist;
   var suffix = encodeURIComponent(exMeta.yahooSuffix || '');
-  var url    = '/api/scan?action=chart&symbol=' + sym + '&interval=D&currency=TL&suffix=' + suffix;
+  var url = '/api/scan?action=chart&symbol=' + sym + '&interval=' + _chartIval + '&currency=TL&suffix=' + suffix;
+  fetch(url)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (!data || data.s !== 'ok' || !data.candles || !data.candles.length) return;
+      var seen = {};
+      _chartData = data.candles
+        .map(function(c) { return { time: c.t, open: c.o, high: c.h, low: c.l, close: c.c }; })
+        .filter(function(c) { return c.open != null && c.close != null; })
+        .sort(function(a, b) { return a.time - b.time; })
+        .filter(function(c) { if (seen[c.time]) return false; seen[c.time] = 1; return true; });
+      _chartApply();
+      setTimeout(function() {
+        var el = document.getElementById('prf-chart-inner');
+        if (el && _chartInst) {
+          var w = el.offsetWidth || (el.parentElement && el.parentElement.offsetWidth) || 600;
+          if (w > 50) { _chartInst.resize(w, 256); _chartInst.timeScale().fitContent(); }
+        }
+      }, 120);
+    })
+    .catch(function(e) { console.error('Chart error:', e); });
+}
 
-  // Placeholder gizle, chart container oluştur
+function loadTVWidget(sym, ex) {
+  _chartSym2 = sym; _chartEx2 = ex;
+  _chartData = []; _chartInst = null; _chartSer = null; _chartPct = false;
+
+  var container = document.getElementById('prf-tv-widget');
+  if (!container) return;
   var ph = document.getElementById('prf-tv-placeholder');
-  if(ph) ph.style.display = 'none';
-  container.innerHTML = '<div id="prf-chart-inner" style="width:100%;height:260px;background:#f8fafc;"></div>';
+  if (ph) ph.style.display = 'none';
 
-  function _drawChart() {
+  container.innerHTML = _tbHtml() + '<div id="prf-chart-inner" style="width:100%;height:256px;background:#f8fafc;"></div>';
+
+  function _init() {
     var chartEl = document.getElementById('prf-chart-inner');
-    if(!chartEl || !window.LightweightCharts) {
-      if(chartEl) chartEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:12px;">Grafik kütüphanesi yüklenemedi</div>';
+    if (!chartEl || !window.LightweightCharts) {
+      if (chartEl) chartEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:12px;">Grafik kütüphanesi yüklenemedi</div>';
       return;
     }
-
-    var _initW = chartEl.offsetWidth || chartEl.parentElement && chartEl.parentElement.offsetWidth || 600;
-    var chart = LightweightCharts.createChart(chartEl, {
-      width:  _initW > 50 ? _initW : 600,
-      height: 260,
-      layout: {
-        background: { color: '#f8fafc' },
-        textColor:  '#94a3b8',
-        fontSize:   11,
-        fontFamily: 'Inter, sans-serif',
-      },
-      grid: {
-        vertLines: { color: '#edf2f7', style: 1 },
-        horzLines: { color: '#edf2f7', style: 1 },
-      },
-      crosshair: {
-        mode: LightweightCharts.CrosshairMode.Normal,
-        vertLine: { color: '#cbd5e1', labelBackgroundColor: '#64748b' },
-        horzLine: { color: '#cbd5e1', labelBackgroundColor: '#64748b' },
-      },
+    var w0 = chartEl.offsetWidth || (chartEl.parentElement && chartEl.parentElement.offsetWidth) || 600;
+    _chartInst = LightweightCharts.createChart(chartEl, {
+      width: w0 > 50 ? w0 : 600, height: 256,
+      layout: { background: { color: '#f8fafc' }, textColor: '#94a3b8', fontSize: 11, fontFamily: 'Inter, sans-serif' },
+      grid:   { vertLines: { color: '#edf2f7', style: 1 }, horzLines: { color: '#edf2f7', style: 1 } },
+      crosshair: { mode: LightweightCharts.CrosshairMode.Normal, vertLine: { color: '#cbd5e1', labelBackgroundColor: '#64748b' }, horzLine: { color: '#cbd5e1', labelBackgroundColor: '#64748b' } },
       rightPriceScale: { borderColor: '#e2e8f0', textColor: '#94a3b8' },
       timeScale:       { borderColor: '#e2e8f0', textColor: '#94a3b8', timeVisible: true, secondsVisible: false },
       handleScroll: true, handleScale: true,
     });
-    var series = chart.addCandlestickSeries({
-      upColor:         '#10b981',
-      downColor:       '#f43f5e',
-      borderUpColor:   '#10b981',
-      borderDownColor: '#f43f5e',
-      wickUpColor:     '#10b981',
-      wickDownColor:   '#f43f5e',
-    });
-
-    fetch(url)
-      .then(function(r){ return r.json(); })
-      .then(function(data){
-        if(!data || data.s !== 'ok' || !data.candles || !data.candles.length){
-          if(chartEl) chartEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:12px;">Grafik verisi bulunamadı</div>';
-          return;
-        }
-        var seen = {};
-        var candles = data.candles.map(function(c){
-          return { time:c.t, open:c.o, high:c.h, low:c.l, close:c.c };
-        }).filter(function(c){ return c.open != null && c.close != null; })
-          .sort(function(a,b){ return a.time - b.time; })
-          .filter(function(c){ if(seen[c.time]) return false; seen[c.time]=1; return true; });
-        if(!candles.length) return;
-        series.setData(candles);
-        chart.timeScale().fitContent();
-        function _tryResize(n) {
-          var el = document.getElementById('prf-chart-inner');
-          if(!el) return;
-          var w = el.offsetWidth || el.parentElement && el.parentElement.offsetWidth || 600;
-          if(w > 50) { chart.resize(w, 260); chart.timeScale().fitContent(); }
-          else if(n > 0) setTimeout(function(){ _tryResize(n-1); }, 100);
-        }
-        setTimeout(function(){ _tryResize(5); }, 100);
-      })
-      .catch(function(e){
-        console.error('Chart error:', e);
-      });
-
+    _chartSer = _chartInst.addCandlestickSeries({ upColor:'#10b981',downColor:'#f43f5e',borderUpColor:'#10b981',borderDownColor:'#f43f5e',wickUpColor:'#10b981',wickDownColor:'#f43f5e' });
+    _fetchChart(sym, ex);
     var ld = document.getElementById('prf-live-dot');
-    if(ld) ld.style.display = 'flex';
+    if (ld) ld.style.display = 'flex';
   }
 
-  // LC yüklü mü kontrol et, değilse bekle
-  function _waitAndDraw(attempts) {
-    if(window.LightweightCharts) {
-      _drawChart();
-    } else if(attempts > 0) {
-      setTimeout(function(){ _waitAndDraw(attempts - 1); }, 100);
-    }
+  function _wait(n) {
+    if (window.LightweightCharts) { _init(); }
+    else if (n > 0) { setTimeout(function() { _wait(n - 1); }, 100); }
   }
-  _waitAndDraw(20); // max 2 saniye bekle
+  _wait(20);
 }
 
 function _mkSparkline(containerId, color, trend) {
