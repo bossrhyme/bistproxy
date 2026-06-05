@@ -3573,6 +3573,7 @@ function showToast(msg) {
 }
 function showHomepage() {
   _doShowHomepage();
+  loadMarketPulse();
 }
 function _doShowHomepage() {
   hideAnalizPage();
@@ -3584,6 +3585,69 @@ function _doShowHomepage() {
   var na = document.getElementById('nav-analiz'); if(na) na.classList.remove('active');
   clearFilters();
   if(window.location.pathname !== '/') history.pushState({page:'home'}, '', '/');
+}
+
+var _pulseLoaded = false;
+function loadMarketPulse() {
+  if (_pulseLoaded) return; // sayfa başına bir kez yükle
+  _pulseLoaded = true;
+  fetch('/api/market-pulse', { credentials: 'same-origin' })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (!d.ok) return;
+      var el = function(id) { return document.getElementById(id); };
+
+      // Breadth bar
+      var total = d.total || 1;
+      var upPct   = (d.up   / total * 100).toFixed(1);
+      var unchPct = (d.unch / total * 100).toFixed(1);
+      var dnPct   = (d.down / total * 100).toFixed(1);
+      if (el('hpb-up'))   el('hpb-up').style.width   = upPct   + '%';
+      if (el('hpb-unch')) el('hpb-unch').style.width  = unchPct + '%';
+      if (el('hpb-dn'))   el('hpb-dn').style.width    = dnPct   + '%';
+      if (el('hpbn-up'))   el('hpbn-up').textContent   = d.up;
+      if (el('hpbn-unch')) el('hpbn-unch').textContent = d.unch;
+      if (el('hpbn-dn'))   el('hpbn-dn').textContent   = d.down;
+
+      // Lider sektör
+      if (d.topSector && el('hpm-sector')) {
+        var chgSign = d.topSector.change >= 0 ? '+' : '';
+        el('hpm-sector').textContent = d.topSector.name + ' ' + chgSign + d.topSector.change + '%';
+        el('hpm-sector').className   = 'hp-pm-val ' + (d.topSector.change >= 0 ? 'up' : 'dn');
+      }
+
+      // Hacim
+      if (d.volumeRatio && el('hpm-vol')) {
+        var vr = d.volumeRatio;
+        var volLabel = vr.toFixed(1) + 'x normal';
+        el('hpm-vol').textContent = volLabel;
+        el('hpm-vol').className   = 'hp-pm-val ' + (vr > 1.3 ? 'up' : vr < 0.7 ? 'dn' : '');
+      }
+
+      // Duygu
+      if (d.sentiment && el('hpm-sent')) {
+        el('hpm-sent').textContent = d.sentiment.label + ' (' + d.sentiment.score + ')';
+        el('hpm-sent').style.color = d.sentiment.color;
+        var needle = el('hpm-needle');
+        if (needle) {
+          needle.style.left       = d.sentiment.score + '%';
+          needle.style.background = d.sentiment.color;
+        }
+      }
+
+      // Zaman damgası
+      if (el('hp-pulse-ts') && d.updatedAt) {
+        var dt = new Date(d.updatedAt);
+        var hh = dt.getHours().toString().padStart(2,'0');
+        var mm = dt.getMinutes().toString().padStart(2,'0');
+        el('hp-pulse-ts').textContent = hh + ':' + mm + ' itibarıyla' + (d.fromCache ? '' : ' ·  canlı');
+      }
+
+      // Skeleton kaldır
+      var pEl = document.getElementById('hp-pulse');
+      if (pEl) pEl.classList.remove('hp-pulse-skeleton');
+    })
+    .catch(function() { _pulseLoaded = false; }); // hata olursa tekrar denenebilsin
 }
 
 // ── DISCLAIMER POPUP ──
