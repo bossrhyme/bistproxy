@@ -2273,7 +2273,7 @@ function buildProfile(s) {
   if(!profileEl) return;
 
   const sym = s.symbol;
-  const ex = currentExchange;
+  const ex = s.exchangeId || currentExchange;
   const isBist = ex === 'bist';
   const isUS = ex === 'nasdaq' || ex === 'sp500';
   const symClean = sym.replace('.IS','');
@@ -2927,34 +2927,68 @@ init();
     })
     .catch(function() {});
 
-  // ?wl= parametresi: belirtilen watchlist'i tablo filtresi olarak uygula
+  // ?wl= parametresi: watchlist'teki tüm hisseleri borsa farkı gözetmeksizin getir
   var wlId = new URLSearchParams(location.search).get('wl');
   if (wlId) {
     fetch('/api/watchlists', { credentials: 'same-origin' })
       .then(function(r) { return r.json(); })
       .then(function(d) {
         var list = (d.watchlists || []).find(function(l) { return l.id === wlId; });
-        if (!list || !list.items) return;
-        var syms = list.items.map(function(i) { return (i.symbol || '').replace('.IS','').toUpperCase(); });
-        // Tarama bittikten sonra filtre uygula (applyAndRender override)
-        function applyWlFilter() {
-          if (!allData || !allData.length) return;
-          filtered = allData.filter(function(s) {
-            return syms.indexOf((s.symbol || '').replace('.IS','').toUpperCase()) !== -1;
-          });
-          renderTable(); updateStatsBar();
-          if (syms.length) showToast('★ ' + list.name + ' (' + filtered.length + ' hisse)');
-        }
-        if (typeof applyAndRender === 'function') {
-          var origApply = applyAndRender;
-          window.applyAndRender = function(special) {
-            origApply(special);
-            setTimeout(applyWlFilter, 0);
-            window.applyAndRender = origApply;
-          };
-        }
-        // Veri zaten varsa hemen uygula
-        if (allData && allData.length) applyWlFilter();
+        if (!list || !list.items || !list.items.length) return;
+
+        var promises = list.items.map(function(item) {
+          var sym = (item.symbol || '').toUpperCase();
+          var ex  = (item.exchange || 'bist').toLowerCase();
+          return fetch('/api/quote?sym=' + encodeURIComponent(sym) + '&ex=' + encodeURIComponent(ex), { credentials: 'same-origin' })
+            .then(function(r) { return r.json(); })
+            .then(function(q) {
+              if (!q || q.error || q.close == null) return null;
+              return {
+                symbol:                       sym,
+                name:                         q.name || q.description || sym,
+                currentPrice:                 q.close || q.price || null,
+                previousClose:                (q.close && q.changePct != null) ? q.close / (1 + q.changePct / 100) : null,
+                changePercent:                q.changePct != null ? q.changePct : null,
+                volume:                       q.volume  || null,
+                exchangeId:                   ex,
+                sector:                       q.sector  || null,
+                peNormalizedAnnual:           q.pe      || null,
+                pbAnnual:                     q.pb      || null,
+                psTTM:                        q.ps      || null,
+                peg:                          q.peg     || null,
+                roeTTM:                       q.roe     || null,
+                roaTTM:                       q.roa     || null,
+                netProfitMarginTTM:           q.netMargin    || null,
+                grossMarginTTM:               q.grossMargin  || null,
+                dividendYieldIndicatedAnnual: q.dividendYield || null,
+                'totalDebt/totalEquityAnnual': q.debtToEquity || null,
+                currentRatioAnnual:           q.currentRatio || null,
+                marketCapitalization:         null,
+                piotroski:                    q.piotroski  || null,
+                beta:                         q.beta       || null,
+                high52:                       q.high52     || null,
+                low52:                        q.low52      || null,
+                perfW:                        q.perfW      || null,
+                perf1M:                       q.perf1M     || null,
+                perfY:                        q.perfY      || null,
+                rsi14:                        null,
+                techRating:                   null,
+              };
+            })
+            .catch(function() { return null; });
+        });
+
+        Promise.all(promises).then(function(results) {
+          var items = results.filter(Boolean);
+          if (!items.length) return;
+          allData  = items;
+          filtered = items.slice();
+          showState('twrap');
+          renderTable();
+          if (typeof updateStatsBar === 'function') updateStatsBar();
+          document.getElementById('scann').textContent = items.length;
+          showToast('★ ' + list.name + ' (' + items.length + ' hisse)');
+        });
       })
       .catch(function() {});
   }
@@ -3900,7 +3934,7 @@ document.addEventListener('DOMContentLoaded', function(){
   var _hasWl = !!_sp.get('wl');
   if (_p === 'profile' || _p === 'screener' || _p === 'analiz' || _path === '/screener' || _hasWl) {
     showScreener();
-    if (allData.length === 0) runScan();
+    if (allData.length === 0 && !_hasWl) runScan();
   } else {
     showHomepage();
   }
