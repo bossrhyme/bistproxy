@@ -107,7 +107,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
-<link rel="stylesheet" href="/deepfin.css?v=arctic7">
+<link rel="stylesheet" href="/deepfin.css?v=arctic8">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -189,6 +189,40 @@ if('serviceWorker' in navigator){
       </div>
     </div>
 
+    <!-- BIST PIYASA NABZI — hero'nun hemen altında -->
+    <div id="hp-pulse" class="hp-pulse-full hp-pulse-skeleton">
+      <div class="hp-pulse-full-left">
+        <div class="hp-pf-title">BIST Piyasa Nabzı <span class="hp-pulse-ts" id="hp-pulse-ts"></span></div>
+        <div class="hp-breadth-bar">
+          <div class="hp-breadth-up"   id="hpb-up"   style="width:0%"></div>
+          <div class="hp-breadth-unch" id="hpb-unch"  style="width:0%"></div>
+          <div class="hp-breadth-dn"   id="hpb-dn"    style="width:0%"></div>
+        </div>
+        <div class="hp-pf-nums">
+          <span class="hp-bn hp-bn-up">  <span class="hp-bn-count" id="hpbn-up">—</span><span class="hp-bn-icon"> yükseliyor</span></span>
+          <span class="hp-bn hp-bn-unch"><span class="hp-bn-count" id="hpbn-unch">—</span><span class="hp-bn-icon"> değişmedi</span></span>
+          <span class="hp-bn hp-bn-dn">  <span class="hp-bn-count" id="hpbn-dn">—</span><span class="hp-bn-icon"> düşüyor</span></span>
+        </div>
+      </div>
+      <div class="hp-pulse-full-right">
+        <div class="hp-pf-metric">
+          <div class="hp-pm-label">Lider Sektör</div>
+          <div class="hp-pm-val" id="hpm-sector">—</div>
+        </div>
+        <div class="hp-pf-metric">
+          <div class="hp-pm-label">Hacim</div>
+          <div class="hp-pm-val" id="hpm-vol">—</div>
+        </div>
+        <div class="hp-pf-metric">
+          <div class="hp-pm-label">Piyasa Duygusu</div>
+          <div class="hp-pm-val" id="hpm-sent">—</div>
+          <div class="hp-sent-bar" style="margin-top:5px">
+            <div class="hp-sent-needle" id="hpm-needle" style="left:50%;background:#eab308"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- NASIL KULLANILIR -->
     <div class="hp-howto">
       <div class="hp-howto-title">Nasıl Kullanılır?</div>
@@ -250,40 +284,6 @@ if('serviceWorker' in navigator){
       <div class="hp-stat">
         <div class="hp-stat-val">50<span>+</span></div>
         <div class="hp-stat-label"><span data-strat-count>44</span> strateji · 34 filtre kriteri</div>
-      </div>
-    </div>
-
-    <!-- BIST PIYASA NABZI — full width, stats altında -->
-    <div id="hp-pulse" class="hp-pulse-full hp-pulse-skeleton">
-      <div class="hp-pulse-full-left">
-        <div class="hp-pf-title">BIST Piyasa Nabzı <span class="hp-pulse-ts" id="hp-pulse-ts"></span></div>
-        <div class="hp-breadth-bar">
-          <div class="hp-breadth-up"   id="hpb-up"   style="width:0%"></div>
-          <div class="hp-breadth-unch" id="hpb-unch"  style="width:0%"></div>
-          <div class="hp-breadth-dn"   id="hpb-dn"    style="width:0%"></div>
-        </div>
-        <div class="hp-pf-nums">
-          <span class="hp-bn hp-bn-up">  <span class="hp-bn-count" id="hpbn-up">—</span><span class="hp-bn-icon"> yükseliyor</span></span>
-          <span class="hp-bn hp-bn-unch"><span class="hp-bn-count" id="hpbn-unch">—</span><span class="hp-bn-icon"> değişmedi</span></span>
-          <span class="hp-bn hp-bn-dn">  <span class="hp-bn-count" id="hpbn-dn">—</span><span class="hp-bn-icon"> düşüyor</span></span>
-        </div>
-      </div>
-      <div class="hp-pulse-full-right">
-        <div class="hp-pf-metric">
-          <div class="hp-pm-label">Lider Sektör</div>
-          <div class="hp-pm-val" id="hpm-sector">—</div>
-        </div>
-        <div class="hp-pf-metric">
-          <div class="hp-pm-label">Hacim</div>
-          <div class="hp-pm-val" id="hpm-vol">—</div>
-        </div>
-        <div class="hp-pf-metric">
-          <div class="hp-pm-label">Piyasa Duygusu</div>
-          <div class="hp-pm-val" id="hpm-sent">—</div>
-          <div class="hp-sent-bar" style="margin-top:5px">
-            <div class="hp-sent-needle" id="hpm-needle" style="left:50%;background:#eab308"></div>
-          </div>
-        </div>
       </div>
     </div>
 
