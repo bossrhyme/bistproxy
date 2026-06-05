@@ -2934,38 +2934,27 @@ init();
       .then(function(r) { return r.json(); })
       .then(function(d) {
         var list = (d.watchlists || []).find(function(l) { return l.id === wlId; });
-        if (!list || !list.items || !list.items.length) return;
-        var syms = list.items.map(function(i) { return i.symbol.toUpperCase(); });
-        // Tarama bitince filtre uygula
-        var origRender = window.applyAndRender;
-        if (typeof origRender === 'function') {
-          window._wlFilter = syms;
-          var origFiltered = filtered;
-        }
-        // Mevcut veri varsa hemen filtrele, yoksa tarama bekleniyor
+        if (!list || !list.items) return;
+        var syms = list.items.map(function(i) { return (i.symbol || '').replace('.IS','').toUpperCase(); });
+        // Tarama bittikten sonra filtre uygula (applyAndRender override)
         function applyWlFilter() {
           if (!allData || !allData.length) return;
-          var ex = list.items[0] ? list.items[0].exchange : null;
-          if (ex && ex !== currentExchange) return;
           filtered = allData.filter(function(s) {
             return syms.indexOf((s.symbol || '').replace('.IS','').toUpperCase()) !== -1;
           });
           renderTable(); updateStatsBar();
-          showToast('★ ' + list.name + ' listesi (' + filtered.length + ' hisse)');
+          if (syms.length) showToast('★ ' + list.name + ' (' + filtered.length + ' hisse)');
         }
-        // Sayfa yüklendiğinde tarama otomatik başlasın
-        if (typeof runScan === 'function') {
-          // Tarama bittikten sonra wl filtresini uygula
-          var origApply = window.applyAndRender;
+        if (typeof applyAndRender === 'function') {
+          var origApply = applyAndRender;
           window.applyAndRender = function(special) {
             origApply(special);
             setTimeout(applyWlFilter, 0);
-            window.applyAndRender = origApply; // bir kez çalıştır
+            window.applyAndRender = origApply;
           };
-          showHomepage && showHomepage();
-          showScreener && showScreener();
-          runScan();
         }
+        // Veri zaten varsa hemen uygula
+        if (allData && allData.length) applyWlFilter();
       })
       .catch(function() {});
   }
@@ -3801,9 +3790,11 @@ document.addEventListener('DOMContentLoaded', function(){
     var fmt = n >= 1000 ? (Math.floor(n/1000) + '.000+') : (n + '+');
     el.textContent = fmt;
   }).catch(function(){});
-  var _p = new URLSearchParams(window.location.search).get('from');
+  var _sp   = new URLSearchParams(window.location.search);
+  var _p    = _sp.get('from');
   var _path = window.location.pathname;
-  if (_p === 'profile' || _p === 'screener' || _p === 'analiz' || _path === '/screener') {
+  var _hasWl = !!_sp.get('wl');
+  if (_p === 'profile' || _p === 'screener' || _p === 'analiz' || _path === '/screener' || _hasWl) {
     showScreener();
     if (allData.length === 0) runScan();
   } else {

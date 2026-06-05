@@ -83,7 +83,7 @@ function renderListPanel() {
 
   var items    = list.items || [];
   var canDel   = _lists.length > 1;
-  var scanUrl  = '/?wl=' + encodeURIComponent(list.id);
+  var scanUrl  = '/?from=screener&wl=' + encodeURIComponent(list.id);
 
   var rows = items.map(function(item) {
     var sym = esc(item.symbol);
