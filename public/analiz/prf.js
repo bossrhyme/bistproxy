@@ -18,39 +18,52 @@ function loadTVWidget(sym, ex) {
   // Placeholder gizle, chart container oluştur
   var ph = document.getElementById('prf-tv-placeholder');
   if(ph) ph.style.display = 'none';
-  container.innerHTML = '<div id="prf-chart-inner" style="width:100%;height:300px;background:#0d1117;"></div>';
+  container.innerHTML = '<div id="prf-chart-inner" style="width:100%;height:260px;background:#f8fafc;"></div>';
 
   function _drawChart() {
     var chartEl = document.getElementById('prf-chart-inner');
     if(!chartEl || !window.LightweightCharts) {
-      // LC yüklenmedi - hata göster
-      if(chartEl) chartEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#64748b;font-size:12px;">Grafik kütüphanesi yüklenemedi</div>';
+      if(chartEl) chartEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:12px;">Grafik kütüphanesi yüklenemedi</div>';
       return;
     }
 
-    // Sabit width ile başlat, sonra gerçek width ile resize
     var _initW = chartEl.offsetWidth || chartEl.parentElement && chartEl.parentElement.offsetWidth || 600;
     var chart = LightweightCharts.createChart(chartEl, {
       width:  _initW > 50 ? _initW : 600,
-      height: 300,
-      layout:     { background:{ color:'#0d1117' }, textColor:'#6a8fa8' },
-      grid:       { vertLines:{ color:'#1c2d40' }, horzLines:{ color:'#1c2d40' } },
-      crosshair:  { mode: LightweightCharts.CrosshairMode.Normal },
-      rightPriceScale: { borderColor:'#1c2d40' },
-      timeScale:  { borderColor:'#1c2d40', timeVisible:true, secondsVisible:false },
+      height: 260,
+      layout: {
+        background: { color: '#f8fafc' },
+        textColor:  '#94a3b8',
+        fontSize:   11,
+        fontFamily: 'Inter, sans-serif',
+      },
+      grid: {
+        vertLines: { color: '#edf2f7', style: 1 },
+        horzLines: { color: '#edf2f7', style: 1 },
+      },
+      crosshair: {
+        mode: LightweightCharts.CrosshairMode.Normal,
+        vertLine: { color: '#cbd5e1', labelBackgroundColor: '#64748b' },
+        horzLine: { color: '#cbd5e1', labelBackgroundColor: '#64748b' },
+      },
+      rightPriceScale: { borderColor: '#e2e8f0', textColor: '#94a3b8' },
+      timeScale:       { borderColor: '#e2e8f0', textColor: '#94a3b8', timeVisible: true, secondsVisible: false },
       handleScroll: true, handleScale: true,
     });
     var series = chart.addCandlestickSeries({
-      upColor:'#00c076', downColor:'#f6465d',
-      borderUpColor:'#00c076', borderDownColor:'#f6465d',
-      wickUpColor:'#00c076', wickDownColor:'#f6465d',
+      upColor:         '#10b981',
+      downColor:       '#f43f5e',
+      borderUpColor:   '#10b981',
+      borderDownColor: '#f43f5e',
+      wickUpColor:     '#10b981',
+      wickDownColor:   '#f43f5e',
     });
 
     fetch(url)
       .then(function(r){ return r.json(); })
       .then(function(data){
         if(!data || data.s !== 'ok' || !data.candles || !data.candles.length){
-          if(chartEl) chartEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#64748b;font-size:12px;">Grafik verisi bulunamadı</div>';
+          if(chartEl) chartEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:12px;">Grafik verisi bulunamadı</div>';
           return;
         }
         var seen = {};
@@ -62,12 +75,11 @@ function loadTVWidget(sym, ex) {
         if(!candles.length) return;
         series.setData(candles);
         chart.timeScale().fitContent();
-        // Resize - birkaç kez dene
         function _tryResize(n) {
           var el = document.getElementById('prf-chart-inner');
           if(!el) return;
           var w = el.offsetWidth || el.parentElement && el.parentElement.offsetWidth || 600;
-          if(w > 50) { chart.resize(w, 300); chart.timeScale().fitContent(); }
+          if(w > 50) { chart.resize(w, 260); chart.timeScale().fitContent(); }
           else if(n > 0) setTimeout(function(){ _tryResize(n-1); }, 100);
         }
         setTimeout(function(){ _tryResize(5); }, 100);
