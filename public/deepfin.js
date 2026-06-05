@@ -1972,8 +1972,13 @@ function applyAndRender(special){
   if (zeroEl) zeroEl.style.display = 'none';
 
   showState('twrap');
-  // Virtual scroll render
-  _vsData = sorted(filtered);
+  // Virtual scroll render — liste filtresi aktifse uygula
+  var _base = filtered;
+  if (_dfUser && _dfListFilter) {
+    var _lsyms = _dfListFilter.symbols;
+    _base = filtered.filter(function(s) { return _lsyms.indexOf((s.symbol||'').replace('.IS','').toUpperCase()) !== -1; });
+  }
+  _vsData = sorted(_base);
   _vsStart = 0;
   var _wrap = document.getElementById('twrap');
   if (_wrap) _wrap.scrollTop = 0;
