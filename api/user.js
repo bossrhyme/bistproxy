@@ -320,16 +320,24 @@ async function handleUpdateProfile(req, res) {
 }
 
 async function handlePing(req, res) {
+  // Hangi env var'ların set edildiğini bul
+  const candidates = [
+    'KV_REST_API_URL','KV_REST_API_TOKEN',
+    'UPSTASH_REDIS_REST_URL','UPSTASH_REDIS_REST_TOKEN',
+    'STORAGE_URL','STORAGE_TOKEN',
+    'STORAGE_REST_API_URL','STORAGE_REST_API_TOKEN',
+  ];
+  const found = {};
+  candidates.forEach(k => { if (process.env[k]) found[k] = process.env[k].slice(0, 20) + '…'; });
+
   const testKey = 'ping:test:' + Date.now();
-  const url   = process.env.KV_REST_API_URL   || process.env.UPSTASH_REDIS_REST_URL   || null;
-  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || null;
   try {
     await kvSet(testKey, { ok: true }, 60);
     const val = await kvGet(testKey);
     await kvDel(testKey);
-    jsonRes(res, 200, { ok: true, kv: !!val, url: url ? url.slice(0, 30) + '…' : null, token: token ? token.slice(0, 8) + '…' : null });
+    jsonRes(res, 200, { ok: true, kv: !!val, found });
   } catch (e) {
-    jsonRes(res, 200, { ok: false, error: e.message, url: url ? url.slice(0, 30) + '…' : null, token: !!token });
+    jsonRes(res, 200, { ok: false, error: e.message, found });
   }
 }
 
