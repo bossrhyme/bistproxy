@@ -382,10 +382,7 @@ function _fetchChart(sym, ex) {
       _chartIndCache={};
       Object.keys(_chartInds).forEach(function(k){if(_chartInds[k])_removeIndSeries(k);});
       _chartApply();
-      setTimeout(function(){
-        var el=document.getElementById('prf-chart-inner');
-        if(el&&_chartInst){var w=el.offsetWidth||(el.parentElement&&el.parentElement.offsetWidth)||600;if(w>50){_chartInst.resize(w,256);_chartInst.timeScale().fitContent();}}
-      },120);
+
     })
     .catch(function(e){console.error('Chart error:',e);});
 }
@@ -408,9 +405,8 @@ function loadTVWidget(sym, ex) {
       if(chartEl) chartEl.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:12px;">Grafik kütüphanesi yüklenemedi</div>';
       return;
     }
-    var w0 = chartEl.offsetWidth||(chartEl.parentElement&&chartEl.parentElement.offsetWidth)||600;
     _chartInst = LightweightCharts.createChart(chartEl, {
-      width: w0>50?w0:600, height:256,
+      autoSize: true,
       layout:{background:{color:'#f8fafc'},textColor:'#94a3b8',fontSize:11,fontFamily:'Inter, sans-serif'},
       grid:{vertLines:{color:'#edf2f7',style:1},horzLines:{color:'#edf2f7',style:1}},
       crosshair:{mode:LightweightCharts.CrosshairMode.Normal,vertLine:{color:'#cbd5e1',labelBackgroundColor:'#64748b'},horzLine:{color:'#cbd5e1',labelBackgroundColor:'#64748b'}},
@@ -707,24 +703,35 @@ function _buildFinancials(d) {
   if(finDebt){ finDebt.closest('.prf-section').style.display='none'; }
 
   // Tooltip - native title yeterli değilse özel tooltip
-  finSum && finSum.querySelectorAll('.fin-dot[data-tip]').forEach(function(el) {
-    el.addEventListener('mouseenter', function(e) {
-      var tip = el.getAttribute('data-tip');
-      if(!tip) return;
+  if (finSum) {
+    var _ttRaf = null;
+    finSum.addEventListener('mousemove', function(e) {
+      var dot = e.target.closest ? e.target.closest('.fin-dot[data-tip]') : null;
+      if (!dot) return;
+      if (_ttRaf) return;
+      _ttRaf = requestAnimationFrame(function() {
+        _ttRaf = null;
+        var tt = document.getElementById('fin-tt');
+        if (tt) { tt.style.left=(e.clientX+12)+'px'; tt.style.top=(e.clientY-8)+'px'; }
+      });
+    });
+    finSum.addEventListener('mouseover', function(e) {
+      var dot = e.target.closest ? e.target.closest('.fin-dot[data-tip]') : null;
+      if (!dot) return;
+      var tip = dot.getAttribute('data-tip');
+      if (!tip) return;
       var tt = document.getElementById('fin-tt');
-      if(!tt){ tt=document.createElement('div'); tt.id='fin-tt'; tt.className='fin-tt'; document.body.appendChild(tt); }
+      if (!tt) { tt=document.createElement('div'); tt.id='fin-tt'; tt.className='fin-tt'; document.body.appendChild(tt); }
       tt.textContent = tip;
       tt.style.display = 'block';
     });
-    el.addEventListener('mousemove', function(e) {
+    finSum.addEventListener('mouseout', function(e) {
+      var dot = e.target.closest ? e.target.closest('.fin-dot[data-tip]') : null;
+      if (!dot) return;
       var tt = document.getElementById('fin-tt');
-      if(tt){ tt.style.left=(e.clientX+12)+'px'; tt.style.top=(e.clientY-8)+'px'; }
+      if (tt) tt.style.display = 'none';
     });
-    el.addEventListener('mouseleave', function() {
-      var tt = document.getElementById('fin-tt');
-      if(tt) tt.style.display='none';
-    });
-  });
+  }
 }
 
 
@@ -1056,13 +1063,17 @@ function showProfil(sym, ex) {
 
   _buildPrfHero();
   _buildPrfMetrics();
-  _buildPrfPiotroski();
-  _buildPrfGuru();
-  _buildPrfSide();
-  _buildDeepFinScore();
-  _buildTrend(_prfData);
-  _buildFinancials(_prfData);
   prfTab('overview', document.querySelector('.prf-tab'));
+  requestAnimationFrame(function(){
+    _buildPrfPiotroski();
+    _buildDeepFinScore();
+    _buildTrend(_prfData);
+    setTimeout(function(){
+      _buildPrfGuru();
+      _buildPrfSide();
+      _buildFinancials(_prfData);
+    }, 0);
+  });
   _prfAiDone = false;
   // RAF: browser layout tamamlandıktan sonra chart çiz
   requestAnimationFrame(function() {
@@ -1542,15 +1553,19 @@ async function loadYahooData(sym, ex) {
     if(!d.sector  && q.sector)  d.sector  = q.sector;
     if(!d.name    && q.name)    d.name    = q.name;
 
-    // Metrics'i yeniden çiz (TV verisiyle dolu)
-    _buildPrfMetrics();
+    // Metrics'i yeniden çiz (TV verisiyle dolu) — deferred to avoid blocking chart
     _buildPrfHero();
-    _buildPrfPiotroski();
-    _buildPrfGuru();
-    _buildPrfSide();
-    _buildDeepFinScore();
-    _buildTrend(_prfData);
-    _buildFinancials(_prfData);
+    _buildPrfMetrics();
+    requestAnimationFrame(function(){
+      _buildPrfPiotroski();
+      _buildDeepFinScore();
+      _buildTrend(_prfData);
+      setTimeout(function(){
+        _buildPrfGuru();
+        _buildPrfSide();
+        _buildFinancials(_prfData);
+      }, 0);
+    });
 
     // Şirket adı + sektör
     if(q.name)   document.getElementById('prf-fullname').textContent   = q.name;
