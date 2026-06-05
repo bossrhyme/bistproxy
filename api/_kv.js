@@ -20,8 +20,9 @@ function kvHeaders() {
 
 async function kvGet(key) {
   const res  = await fetch(kvUrl() + '/get/' + encodeURIComponent(key), { headers: kvHeaders() });
-  if (!res.ok) throw new Error('KV GET ' + res.status);
   const json = await res.json();
+  if (json.error) throw new Error('KV: ' + json.error);
+  if (!res.ok)    throw new Error('KV GET HTTP ' + res.status);
   return json.result ? JSON.parse(json.result) : null;
 }
 
@@ -32,15 +33,18 @@ async function kvSet(key, value, ttlSeconds) {
     headers: { ...kvHeaders(), 'Content-Type': 'application/json' },
     body: JSON.stringify(value)
   });
-  if (!res.ok) throw new Error('KV SET ' + res.status);
+  const json = await res.json();
+  if (json.error) throw new Error('KV: ' + json.error);
+  if (!res.ok)    throw new Error('KV SET HTTP ' + res.status);
 }
 
 async function kvDel(key) {
-  const res = await fetch(kvUrl() + '/del/' + encodeURIComponent(key), {
+  const res  = await fetch(kvUrl() + '/del/' + encodeURIComponent(key), {
     method: 'POST',
     headers: kvHeaders()
   });
-  if (!res.ok) throw new Error('KV DEL ' + res.status);
+  const json = await res.json().catch(() => ({}));
+  if (json.error) throw new Error('KV: ' + json.error);
 }
 
 module.exports = { kvGet, kvSet, kvDel };
