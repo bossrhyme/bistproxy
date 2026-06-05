@@ -22,6 +22,7 @@ var _chartIndS  = {};
 var _drawMode   = null;
 var _drawPts    = [];
 var _drawings   = [];
+var _drawPreviewSer = null;
 
 function _tbHtml() {
   var b = function(id, label, on, fn) {
@@ -128,15 +129,23 @@ function toggleInd(key) {
 }
 
 // ── Drawing tools ─────────────────────────────────────────────────────────
+function _clearDrawPreview() {
+  if (_drawPreviewSer&&_chartInst) { try{_chartInst.removeSeries(_drawPreviewSer);}catch(e){} }
+  _drawPreviewSer = null;
+  if (_chartSer) { try{_chartSer.setMarkers([]);}catch(e){} }
+}
+
 function setDrawMode(mode) {
   _drawMode = (_drawMode===mode) ? null : mode;
   ['trend','ray','horizontal'].forEach(function(m){ _tbSet('draw-'+m, _drawMode===m); });
   _drawPts = [];
+  _clearDrawPreview();
   var el = document.getElementById('prf-chart-inner');
   if (el) el.style.cursor = _drawMode ? 'crosshair' : 'default';
 }
 
 function clearDrawings() {
+  _clearDrawPreview();
   _drawings.forEach(function(d) {
     if (d&&d._pl) { try{_chartSer.removePriceLine(d._pl);}catch(e){} }
     else if (d&&_chartInst) { try{_chartInst.removeSeries(d);}catch(e){} }
@@ -156,9 +165,15 @@ function _onChartClick(param) {
     _drawings.push({_pl:pl}); return;
   }
   _drawPts.push({time:param.time, value:price});
+  if (_drawPts.length===1) {
+    _chartSer.setMarkers([{time:param.time, position:'inBar', color:'#8b5cf6', shape:'circle', size:1}]);
+    _drawPreviewSer = _chartInst.addLineSeries({ color:'#8b5cf6', lineWidth:1, lineStyle:1, priceLineVisible:false, lastValueVisible:false, crosshairMarkerVisible:false });
+    _drawPreviewSer.setData([{time:param.time, value:price}]);
+  }
   if (_drawPts.length===2) {
     var p1=_drawPts[0], p2=_drawPts[1];
     if (p1.time===p2.time) { _drawPts=[]; return; }
+    _clearDrawPreview();
     var pts = [p1,p2].sort(function(a,b){return a.time-b.time;});
     if (_drawMode==='ray') {
       var last=_chartData[_chartData.length-1];
@@ -243,7 +258,7 @@ function _fetchChart(sym, ex) {
 function loadTVWidget(sym, ex) {
   _chartSym2=sym; _chartEx2=ex;
   _chartData=[]; _chartInst=null; _chartSer=null; _chartPct=false;
-  _drawMode=null; _drawPts=[]; _drawings=[]; _chartIndS={};
+  _drawMode=null; _drawPts=[]; _drawings=[]; _drawPreviewSer=null; _chartIndS={};
 
   var container = document.getElementById('prf-tv-widget');
   if (!container) return;
@@ -270,6 +285,17 @@ function loadTVWidget(sym, ex) {
     });
     _chartSer = _chartInst.addCandlestickSeries({upColor:'#10b981',downColor:'#f43f5e',borderUpColor:'#10b981',borderDownColor:'#f43f5e',wickUpColor:'#10b981',wickDownColor:'#f43f5e'});
     _chartInst.subscribeClick(_onChartClick);
+    _chartInst.subscribeCrosshairMove(function(param) {
+      if (!_drawPreviewSer||!_drawPts.length||!param.time) return;
+      var px = null;
+      if (param.seriesData) { var sd2=param.seriesData.get(_chartSer); if(sd2) px=sd2.close!==undefined?sd2.close:sd2.value; }
+      if (px==null) { var cx=_chartData.find(function(x){return x.time===param.time;}); if(cx) px=cx.close; }
+      if (px==null) return;
+      var p1=_drawPts[0];
+      if (!p1||p1.time===param.time) return;
+      var pts2=[p1,{time:param.time,value:px}].sort(function(a,b){return a.time-b.time;});
+      try{_drawPreviewSer.setData([{time:pts2[0].time,value:pts2[0].value},{time:pts2[1].time,value:pts2[1].value}]);}catch(e){}
+    });
     _fetchChart(sym, ex);
     var ld = document.getElementById('prf-live-dot');
     if (ld) ld.style.display='flex';
