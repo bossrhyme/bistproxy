@@ -3,14 +3,23 @@
 // ─────────────────────────────────────────────
 
 function kvUrl() {
-  const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-  if (!url) throw new Error('KV_REST_API_URL veya UPSTASH_REDIS_REST_URL env değişkeni tanımlı değil');
+  const url =
+    process.env.KV_REST_API_URL ||
+    process.env.UPSTASH_REDIS_REST_URL ||
+    process.env.UPSTASH_REDIS_REST_REDIS_URL ||
+    process.env.UPSTASH_REDIS_REST_KV_REST_API_URL ||
+    process.env.STORAGE_URL;
+  if (!url) throw new Error('Redis URL env değişkeni bulunamadı');
   return url;
 }
 
 function kvToken() {
-  const tok = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
-  if (!tok) throw new Error('KV_REST_API_TOKEN veya UPSTASH_REDIS_REST_TOKEN env değişkeni tanımlı değil');
+  const tok =
+    process.env.KV_REST_API_TOKEN ||
+    process.env.UPSTASH_REDIS_REST_TOKEN ||
+    process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ||
+    process.env.STORAGE_TOKEN;
+  if (!tok) throw new Error('Redis Token env değişkeni bulunamadı');
   return tok;
 }
 
