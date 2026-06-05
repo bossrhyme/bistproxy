@@ -3,14 +3,14 @@
 // ─────────────────────────────────────────────
 
 function kvUrl() {
-  const url = process.env.KV_REST_API_URL;
-  if (!url) throw new Error('KV_REST_API_URL env değişkeni tanımlı değil');
+  const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+  if (!url) throw new Error('KV_REST_API_URL veya UPSTASH_REDIS_REST_URL env değişkeni tanımlı değil');
   return url;
 }
 
 function kvToken() {
-  const tok = process.env.KV_REST_API_TOKEN;
-  if (!tok) throw new Error('KV_REST_API_TOKEN env değişkeni tanımlı değil');
+  const tok = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!tok) throw new Error('KV_REST_API_TOKEN veya UPSTASH_REDIS_REST_TOKEN env değişkeni tanımlı değil');
   return tok;
 }
 
