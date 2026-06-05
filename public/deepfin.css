@@ -851,7 +851,7 @@ a.pop-chip{text-decoration:none;color:inherit;}
 .hp-sent-bar{height:5px;border-radius:3px;background:linear-gradient(to right,#ef4444,#f97316,#eab308,#22c55e,#10b981);position:relative;}
 .hp-sent-needle{position:absolute;top:-3px;width:11px;height:11px;border-radius:50%;border:2px solid var(--s1);transform:translateX(-50%);transition:left .5s ease;}
 
-/* section içi pulse panel */
+/* section içi pulse panel (artık kullanılmıyor ama kalabilir) */
 .hp-sec-pulse{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:16px;}
 .hp-sec-pulse-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
 .hp-sec-pulse-title{font-size:10px;font-weight:700;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;}
@@ -859,6 +859,21 @@ a.pop-chip{text-decoration:none;color:inherit;}
 .hp-sec-pulse-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:8px;}
 .hp-sec-pulse-sep{flex:1;height:1px;background:var(--border);min-width:12px;}
 .hp-pm-inl{display:inline-flex;align-items:center;gap:4px;}
+
+/* FULL WIDTH pulse (stats altında) */
+.hp-pulse-full{display:flex;gap:0;border-top:1px solid var(--border);border-bottom:3px solid var(--border);background:var(--s1);}
+.hp-pulse-full-left{flex:1;padding:20px 32px;border-right:1px solid var(--border);}
+.hp-pulse-full-right{display:flex;gap:0;align-items:stretch;}
+.hp-pf-title{font-size:10px;font-weight:700;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.hp-pf-nums{display:flex;gap:20px;margin-top:10px;flex-wrap:wrap;}
+.hp-pf-metric{padding:20px 24px;border-right:1px solid var(--border);min-width:120px;display:flex;flex-direction:column;gap:4px;}
+.hp-pf-metric:last-child{border-right:none;}
+@media(max-width:768px){
+  .hp-pulse-full{flex-direction:column;}
+  .hp-pulse-full-left{border-right:none;border-bottom:1px solid var(--border);padding:16px 20px;}
+  .hp-pulse-full-right{flex-wrap:wrap;}
+  .hp-pf-metric{flex:1;min-width:100px;padding:14px 16px;}
+}
 
 .hp-pulse-skeleton .hp-bn-count,.hp-pulse-skeleton .hp-pm-val{color:var(--border2) !important;animation:sk-pulse 1.2s ease-in-out infinite;}
 @keyframes sk-pulse{0%,100%{opacity:.4}50%{opacity:1}}

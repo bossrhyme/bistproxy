@@ -234,6 +234,7 @@ if('serviceWorker' in navigator){
 
     <!-- STATS -->
     <div class="hp-stats">
+
       <div class="hp-stat">
         <div class="hp-stat-val">9 <span>varlık</span></div>
         <div class="hp-stat-label">Hisse · Kripto · ETF · Fon · Eurobond · Bono/Tahvil · Viop · Varant · Opsiyon</div>
@@ -252,39 +253,45 @@ if('serviceWorker' in navigator){
       </div>
     </div>
 
+    <!-- BIST PIYASA NABZI — full width, stats altında -->
+    <div id="hp-pulse" class="hp-pulse-full hp-pulse-skeleton">
+      <div class="hp-pulse-full-left">
+        <div class="hp-pf-title">BIST Piyasa Nabzı <span class="hp-pulse-ts" id="hp-pulse-ts"></span></div>
+        <div class="hp-breadth-bar">
+          <div class="hp-breadth-up"   id="hpb-up"   style="width:0%"></div>
+          <div class="hp-breadth-unch" id="hpb-unch"  style="width:0%"></div>
+          <div class="hp-breadth-dn"   id="hpb-dn"    style="width:0%"></div>
+        </div>
+        <div class="hp-pf-nums">
+          <span class="hp-bn hp-bn-up">  <span class="hp-bn-count" id="hpbn-up">—</span><span class="hp-bn-icon"> yükseliyor</span></span>
+          <span class="hp-bn hp-bn-unch"><span class="hp-bn-count" id="hpbn-unch">—</span><span class="hp-bn-icon"> değişmedi</span></span>
+          <span class="hp-bn hp-bn-dn">  <span class="hp-bn-count" id="hpbn-dn">—</span><span class="hp-bn-icon"> düşüyor</span></span>
+        </div>
+      </div>
+      <div class="hp-pulse-full-right">
+        <div class="hp-pf-metric">
+          <div class="hp-pm-label">Lider Sektör</div>
+          <div class="hp-pm-val" id="hpm-sector">—</div>
+        </div>
+        <div class="hp-pf-metric">
+          <div class="hp-pm-label">Hacim</div>
+          <div class="hp-pm-val" id="hpm-vol">—</div>
+        </div>
+        <div class="hp-pf-metric">
+          <div class="hp-pm-label">Piyasa Duygusu</div>
+          <div class="hp-pm-val" id="hpm-sent">—</div>
+          <div class="hp-sent-bar" style="margin-top:5px">
+            <div class="hp-sent-needle" id="hpm-needle" style="left:50%;background:#eab308"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- BODY -->
     <div class="hp-body">
       <!-- Borsalar + Piyasa Nabzı -->
       <div class="hp-section">
         <div class="hp-section-title">Borsalar</div>
-
-        <!-- BIST Piyasa Nabzı — kartların üstünde -->
-        <div id="hp-pulse" class="hp-sec-pulse hp-pulse-skeleton">
-          <div class="hp-sec-pulse-header">
-            <span class="hp-sec-pulse-title">BIST Piyasa Nabzı</span>
-            <span class="hp-pulse-ts" id="hp-pulse-ts">yükleniyor...</span>
-          </div>
-          <div class="hp-breadth-bar" style="margin-bottom:8px">
-            <div class="hp-breadth-up"   id="hpb-up"   style="width:0%"></div>
-            <div class="hp-breadth-unch" id="hpb-unch"  style="width:0%"></div>
-            <div class="hp-breadth-dn"   id="hpb-dn"    style="width:0%"></div>
-          </div>
-          <div class="hp-sec-pulse-row">
-            <span class="hp-bn hp-bn-up">  <span class="hp-bn-count" id="hpbn-up">—</span><span class="hp-bn-icon">▲</span></span>
-            <span class="hp-bn hp-bn-unch"><span class="hp-bn-count" id="hpbn-unch">—</span><span class="hp-bn-icon">—</span></span>
-            <span class="hp-bn hp-bn-dn">  <span class="hp-bn-count" id="hpbn-dn">—</span><span class="hp-bn-icon">▼</span></span>
-            <span class="hp-sec-pulse-sep"></span>
-            <span class="hp-pm-inl"><span class="hp-pm-label">Lider</span> <span class="hp-pm-val" id="hpm-sector">—</span></span>
-            <span class="hp-pm-inl"><span class="hp-pm-label">Hacim</span> <span class="hp-pm-val" id="hpm-vol">—</span></span>
-            <span class="hp-pm-inl">
-              <span class="hp-pm-val" id="hpm-sent">—</span>
-              <span class="hp-sent-bar" style="width:70px;display:inline-block;vertical-align:middle;margin-left:4px">
-                <div class="hp-sent-needle" id="hpm-needle" style="left:50%;background:#eab308"></div>
-              </span>
-            </span>
-          </div>
-        </div>
-
         <div class="hp-exchange-grid">
           <a href="/?ex=bist" class="hp-excard" onclick="event.preventDefault(); selectExchangeAndGo('bist')">
             <div class="hp-excard-flag"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGlkPSJmbGFnLWljb25zLXRyIiB2aWV3Qm94PSIwIDAgNjQwIDQ4MCI+PGcgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBmaWxsPSIjZTMwYTE3IiBkPSJNMCAwaDY0MHY0ODBIMHoiLz48cGF0aCBmaWxsPSIjZmZmIiBkPSJNNDA3IDI0Ny41YzAgNjYuMi01NC42IDExOS45LTEyMiAxMTkuOXMtMTIyLTUzLjctMTIyLTEyMCA1NC42LTExOS44IDEyMi0xMTkuOCAxMjIgNTMuNyAxMjIgMTE5LjkiLz48cGF0aCBmaWxsPSIjZTMwYTE3IiBkPSJNNDEzIDI0Ny41YzAgNTMtNDMuNiA5NS45LTk3LjUgOTUuOXMtOTcuNi00My05Ny42LTk2IDQzLjctOTUuOCA5Ny42LTk1LjggOTcuNiA0Mi45IDk3LjYgOTUuOXoiLz48cGF0aCBmaWxsPSIjZmZmIiBkPSJtNDMwLjcgMTkxLjUtMSA0NC4zLTQxLjMgMTEuMiA0MC44IDE0LjUtMSA0MC43IDI2LjUtMzEuOCA0MC4yIDE0LTIzLjItMzQuMSAyOC4zLTMzLjktNDMuNSAxMi0yNS44LTM3eiIvPjwvZz48L3N2Zz4=" width="28" height="20" alt="" style="border-radius:3px;object-fit:cover;display:block;"></div>
