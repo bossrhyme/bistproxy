@@ -1,8 +1,49 @@
-// api/market-pulse.js — BIST piyasa nabzı (breadth, sektör, hacim, duygu)
+// api/market-pulse.js — Piyasa nabzı (breadth, sektör, hacim, duygu)
+// ?ex=EXCHANGE_NAME → o borsa için hesaplar; varsayılan: bist
 // Sonuçlar 5 dakika KV'de önbelleğe alınır
 
-const CACHE_KEY = 'market-pulse:bist';
-const CACHE_TTL = 300; // saniye
+const CACHE_TTL = 300;
+
+// exchange → TradingView scan path (scan.js ile senkronize)
+const TV_PATH = {
+  bist:        '/turkey/scan',
+  nasdaq:      '/america/scan',
+  nyse:        '/america/scan',
+  sp500:       '/america/scan',
+  dax:         '/germany/scan',
+  lse:         '/uk/scan',
+  nikkei:      '/japan/scan',
+  krx:         '/korea/scan',
+  france:      '/france/scan',
+  amsterdam:   '/netherlands/scan',
+  brussels:    '/belgium/scan',
+  lisbon:      '/portugal/scan',
+  dublin:      '/ireland/scan',
+  oslo:        '/norway/scan',
+  milan:       '/italy/scan',
+  tsx:         '/canada/scan',
+  twse:        '/taiwan/scan',
+  b3:          '/brazil/scan',
+  hkex:        '/hongkong/scan',
+  china:       '/china/scan',
+  saudi:       '/global/scan',
+  switzerland: '/switzerland/scan',
+  australia:   '/australia/scan',
+  southafrica: '/global/scan',
+  sweden:      '/sweden/scan',
+  india:       '/india/scan',
+  uae:         '/uae/scan',
+  moex:        '/russia/scan',
+};
+
+// Aynı TV path'i paylaşan borsalar → ortak cache key
+function cacheKey(ex) {
+  const path = TV_PATH[ex];
+  if (!path) return null;
+  // path → /turkey/scan → turkey
+  const market = path.replace('/','').replace('/scan','');
+  return 'market-pulse:' + market;
+}
 
 function kvUrl() {
   return process.env.KV_REST_API_URL ||
@@ -44,15 +85,15 @@ async function kvSet(key, value, ttl = CACHE_TTL) {
   } catch { /* silent */ }
 }
 
-async function fetchBistBreadth() {
+async function fetchBreadth(tvPath) {
   const payload = JSON.stringify({
     columns: ['change', 'volume', 'average_volume_10d_calc', 'sector'],
-    range: [0, 600],
+    range: [0, 2000],
     sort: { sortBy: 'market_cap_basic', sortOrder: 'desc' },
     ignore_unknown_fields: true
   });
 
-  const res = await fetch('https://scanner.tradingview.com/turkey/scan', {
+  const res = await fetch(`https://scanner.tradingview.com${tvPath}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -94,7 +135,7 @@ function computePulse(raw) {
   let topSector = null, topChg = -Infinity;
   let botSector = null, botChg =  Infinity;
   Object.entries(secMap).forEach(([sec, v]) => {
-    if (v.n < 2) return; // en az 2 hisse olan sektör
+    if (v.n < 2) return;
     const avg = v.sum / v.n;
     if (avg > topChg) { topChg = avg; topSector = sec; }
     if (avg < botChg) { botChg = avg; botSector = sec; }
@@ -105,9 +146,8 @@ function computePulse(raw) {
   const totalAvgVol = stocks.reduce((a, s) => a + (s.avgVol  || 0), 0);
   const volumeRatio = totalAvgVol > 1000 ? +(totalVol / totalAvgVol).toFixed(2) : null;
 
-  // Duygu skoru (breadth bazlı, 0-100)
+  // Duygu skoru 0-100
   let score = Math.round(((up - down) / total) * 40 + 50);
-  // Yüksek hacim → duygu daha belirgin
   if (volumeRatio && volumeRatio > 1.3) {
     score = 50 + Math.round((score - 50) * 1.15);
   }
@@ -138,7 +178,13 @@ function computePulse(raw) {
 module.exports = async function handler(req, res) {
   res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=60');
 
-  const cached = await kvGet(CACHE_KEY);
+  const url = new URL(req.url, 'http://localhost');
+  const ex  = url.searchParams.get('ex') || 'bist';
+  const tvPath = TV_PATH[ex];
+  if (!tvPath) return res.status(400).json({ ok: false, error: 'Bilinmeyen borsa: ' + ex });
+
+  const key    = cacheKey(ex);
+  const cached = await kvGet(key);
   const age    = cached ? (Date.now() - cached.updatedAt) : Infinity;
 
   if (cached && age < CACHE_TTL * 1000) {
@@ -146,10 +192,10 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const raw   = await fetchBistBreadth();
+    const raw   = await fetchBreadth(tvPath);
     const pulse = computePulse(raw);
     if (!pulse) return res.status(503).json({ ok: false, error: 'Veri işlenemedi' });
-    await kvSet(CACHE_KEY, pulse);
+    await kvSet(key, pulse);
     return res.json({ ok: true, ...pulse });
   } catch (err) {
     if (cached) return res.json({ ok: true, ...cached, fromCache: true, stale: true });

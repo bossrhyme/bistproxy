@@ -3588,66 +3588,106 @@ function _doShowHomepage() {
 }
 
 var _pulseLoaded = false;
+
+function _renderBistPulse(d) {
+  var el = function(id) { return document.getElementById(id); };
+  var total = d.total || 1;
+  var upPct   = (d.up   / total * 100).toFixed(1);
+  var unchPct = (d.unch / total * 100).toFixed(1);
+  var dnPct   = (d.down / total * 100).toFixed(1);
+  if (el('hpb-up'))    el('hpb-up').style.width    = upPct   + '%';
+  if (el('hpb-unch'))  el('hpb-unch').style.width   = unchPct + '%';
+  if (el('hpb-dn'))    el('hpb-dn').style.width     = dnPct   + '%';
+  if (el('hpbn-up'))   el('hpbn-up').textContent    = d.up;
+  if (el('hpbn-unch')) el('hpbn-unch').textContent  = d.unch;
+  if (el('hpbn-dn'))   el('hpbn-dn').textContent    = d.down;
+  if (d.topSector && el('hpm-sector')) {
+    var s = d.topSector.change >= 0 ? '+' : '';
+    el('hpm-sector').textContent = d.topSector.name + ' ' + s + d.topSector.change + '%';
+    el('hpm-sector').className   = 'hp-pm-val ' + (d.topSector.change >= 0 ? 'up' : 'dn');
+  }
+  if (d.volumeRatio && el('hpm-vol')) {
+    var vr = d.volumeRatio;
+    el('hpm-vol').textContent = vr.toFixed(1) + 'x normal';
+    el('hpm-vol').className   = 'hp-pm-val ' + (vr > 1.3 ? 'up' : vr < 0.7 ? 'dn' : '');
+  }
+  if (d.sentiment && el('hpm-sent')) {
+    el('hpm-sent').textContent = d.sentiment.label + ' (' + d.sentiment.score + ')';
+    el('hpm-sent').style.color = d.sentiment.color;
+    var needle = el('hpm-needle');
+    if (needle) { needle.style.left = d.sentiment.score + '%'; needle.style.background = d.sentiment.color; }
+  }
+  if (el('hp-pulse-ts') && d.updatedAt) {
+    var dt = new Date(d.updatedAt);
+    el('hp-pulse-ts').textContent = dt.getHours().toString().padStart(2,'0') + ':' +
+      dt.getMinutes().toString().padStart(2,'0') + ' itibarıyla';
+  }
+  var pEl = document.getElementById('hp-pulse');
+  if (pEl) pEl.classList.remove('hp-pulse-skeleton');
+}
+
+function _renderCardPulse(card, d) {
+  var total = d.total || 1;
+  var upPct   = (d.up   / total * 100).toFixed(1);
+  var unchPct = (d.unch / total * 100).toFixed(1);
+  var dnPct   = (d.down / total * 100).toFixed(1);
+  // Mevcut pulse div'i güncelle ya da oluştur
+  var pulse = card.querySelector('.hp-excard-pulse');
+  if (!pulse) {
+    pulse = document.createElement('div');
+    pulse.className = 'hp-excard-pulse';
+    pulse.innerHTML =
+      '<div class="hp-excard-pbar">' +
+        '<div class="hp-excard-pbar-up"></div>' +
+        '<div class="hp-excard-pbar-unch"></div>' +
+        '<div class="hp-excard-pbar-dn"></div>' +
+      '</div>' +
+      '<div class="hp-excard-pnums">' +
+        '<span class="hp-excard-pup"></span>' +
+        '<span class="hp-excard-pdn"></span>' +
+        '<span class="hp-excard-psent"></span>' +
+      '</div>';
+    card.appendChild(pulse);
+  }
+  pulse.querySelector('.hp-excard-pbar-up').style.width   = upPct   + '%';
+  pulse.querySelector('.hp-excard-pbar-unch').style.width = unchPct + '%';
+  pulse.querySelector('.hp-excard-pbar-dn').style.width   = dnPct   + '%';
+  pulse.querySelector('.hp-excard-pup').textContent  = '▲' + d.up;
+  pulse.querySelector('.hp-excard-pdn').textContent  = ' ▼' + d.down;
+  var sentEl = pulse.querySelector('.hp-excard-psent');
+  if (sentEl && d.sentiment) {
+    sentEl.textContent  = d.sentiment.label;
+    sentEl.style.color  = d.sentiment.color;
+  }
+}
+
 function loadMarketPulse() {
-  if (_pulseLoaded) return; // sayfa başına bir kez yükle
+  if (_pulseLoaded) return;
   _pulseLoaded = true;
-  fetch('/api/market-pulse', { credentials: 'same-origin' })
+
+  // BIST detay widget'ı
+  fetch('/api/market-pulse?ex=bist')
     .then(function(r) { return r.json(); })
-    .then(function(d) {
-      if (!d.ok) return;
-      var el = function(id) { return document.getElementById(id); };
+    .then(function(d) { if (d.ok) _renderBistPulse(d); })
+    .catch(function() {});
 
-      // Breadth bar
-      var total = d.total || 1;
-      var upPct   = (d.up   / total * 100).toFixed(1);
-      var unchPct = (d.unch / total * 100).toFixed(1);
-      var dnPct   = (d.down / total * 100).toFixed(1);
-      if (el('hpb-up'))   el('hpb-up').style.width   = upPct   + '%';
-      if (el('hpb-unch')) el('hpb-unch').style.width  = unchPct + '%';
-      if (el('hpb-dn'))   el('hpb-dn').style.width    = dnPct   + '%';
-      if (el('hpbn-up'))   el('hpbn-up').textContent   = d.up;
-      if (el('hpbn-unch')) el('hpbn-unch').textContent = d.unch;
-      if (el('hpbn-dn'))   el('hpbn-dn').textContent   = d.down;
-
-      // Lider sektör
-      if (d.topSector && el('hpm-sector')) {
-        var chgSign = d.topSector.change >= 0 ? '+' : '';
-        el('hpm-sector').textContent = d.topSector.name + ' ' + chgSign + d.topSector.change + '%';
-        el('hpm-sector').className   = 'hp-pm-val ' + (d.topSector.change >= 0 ? 'up' : 'dn');
-      }
-
-      // Hacim
-      if (d.volumeRatio && el('hpm-vol')) {
-        var vr = d.volumeRatio;
-        var volLabel = vr.toFixed(1) + 'x normal';
-        el('hpm-vol').textContent = volLabel;
-        el('hpm-vol').className   = 'hp-pm-val ' + (vr > 1.3 ? 'up' : vr < 0.7 ? 'dn' : '');
-      }
-
-      // Duygu
-      if (d.sentiment && el('hpm-sent')) {
-        el('hpm-sent').textContent = d.sentiment.label + ' (' + d.sentiment.score + ')';
-        el('hpm-sent').style.color = d.sentiment.color;
-        var needle = el('hpm-needle');
-        if (needle) {
-          needle.style.left       = d.sentiment.score + '%';
-          needle.style.background = d.sentiment.color;
-        }
-      }
-
-      // Zaman damgası
-      if (el('hp-pulse-ts') && d.updatedAt) {
-        var dt = new Date(d.updatedAt);
-        var hh = dt.getHours().toString().padStart(2,'0');
-        var mm = dt.getMinutes().toString().padStart(2,'0');
-        el('hp-pulse-ts').textContent = hh + ':' + mm + ' itibarıyla' + (d.fromCache ? '' : ' ·  canlı');
-      }
-
-      // Skeleton kaldır
-      var pEl = document.getElementById('hp-pulse');
-      if (pEl) pEl.classList.remove('hp-pulse-skeleton');
-    })
-    .catch(function() { _pulseLoaded = false; }); // hata olursa tekrar denenebilsin
+  // Tüm borsa kartları için mini pulse — sadece aynı TV path'i bir kez çek
+  var cards = document.querySelectorAll('.hp-excard[href]');
+  var fetched = {}; // tvPath → Promise
+  cards.forEach(function(card) {
+    var href = card.getAttribute('href') || '';
+    var m = href.match(/ex=([a-z0-9]+)/);
+    if (!m) return;
+    var ex = m[1];
+    var url = '/api/market-pulse?ex=' + ex;
+    // Aynı borsa grubunu (ör. nasdaq/nyse/sp500) tek fetch ile karşıla
+    if (!fetched[url]) {
+      fetched[url] = fetch(url).then(function(r) { return r.json(); });
+    }
+    fetched[url]
+      .then(function(d) { if (d.ok) _renderCardPulse(card, d); })
+      .catch(function() {});
+  });
 }
 
 // ── DISCLAIMER POPUP ──

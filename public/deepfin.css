@@ -804,7 +804,16 @@ max-width: 480px) {
 .hp-nav-btn:hover{background:var(--s2);color:var(--text);}
 .hp-nav-btn.active{color:var(--text);}
 a.hp-nav-btn{text-decoration:none;color:var(--text2);display:inline-block;}
-a.hp-excard{text-decoration:none;color:inherit;display:flex;}
+a.hp-excard{text-decoration:none;color:inherit;display:flex;flex-wrap:wrap;}
+.hp-excard-pulse{flex:0 0 100%;margin-top:8px;display:flex;flex-direction:column;gap:4px;}
+.hp-excard-pbar{height:4px;border-radius:2px;overflow:hidden;display:flex;background:var(--s3);}
+.hp-excard-pbar-up  {background:var(--green);transition:width .4s ease;}
+.hp-excard-pbar-unch{background:var(--border2);transition:width .4s ease;}
+.hp-excard-pbar-dn  {background:var(--red);transition:width .4s ease;}
+.hp-excard-pnums{display:flex;align-items:center;gap:6px;font-size:10px;font-family:'Geist Mono',monospace;}
+.hp-excard-pup  {color:var(--green);font-weight:600;}
+.hp-excard-pdn  {color:var(--red);font-weight:600;}
+.hp-excard-psent{margin-left:auto;font-size:9px;font-weight:600;}
 a.hp-strategy{text-decoration:none;color:inherit;display:flex;}
 a.pop-chip{text-decoration:none;color:inherit;}
 
