@@ -324,8 +324,9 @@ async function handlePing(req, res) {
   const candidates = [
     'KV_REST_API_URL','KV_REST_API_TOKEN',
     'UPSTASH_REDIS_REST_URL','UPSTASH_REDIS_REST_TOKEN',
+    'UPSTASH_REDIS_REST_KV_REST_API_URL','UPSTASH_REDIS_REST_KV_REST_API_TOKEN',
+    'UPSTASH_REDIS_REST_KV_URL','UPSTASH_REDIS_REST_REDIS_URL',
     'STORAGE_URL','STORAGE_TOKEN',
-    'STORAGE_REST_API_URL','STORAGE_REST_API_TOKEN',
   ];
   const found = {};
   candidates.forEach(k => { if (process.env[k]) found[k] = process.env[k].slice(0, 20) + '…'; });

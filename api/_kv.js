@@ -3,13 +3,15 @@
 // ─────────────────────────────────────────────
 
 function kvUrl() {
+  // UPSTASH_REDIS_REST_REDIS_URL = native rediss:// protokolü, REST için kullanılamaz
+  // UPSTASH_REDIS_REST_KV_REST_API_URL = https:// REST endpoint, doğru olan bu
   const url =
     process.env.KV_REST_API_URL ||
     process.env.UPSTASH_REDIS_REST_URL ||
-    process.env.UPSTASH_REDIS_REST_REDIS_URL ||
     process.env.UPSTASH_REDIS_REST_KV_REST_API_URL ||
+    process.env.UPSTASH_REDIS_REST_KV_URL ||
     process.env.STORAGE_URL;
-  if (!url) throw new Error('Redis URL env değişkeni bulunamadı');
+  if (!url) throw new Error('Redis REST URL env değişkeni bulunamadı');
   return url;
 }
 
