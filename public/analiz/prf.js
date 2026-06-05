@@ -451,6 +451,188 @@ function _setScore(id, val, cls) {
   if(el){ el.textContent=val; el.className='prf-score-val '+(cls||''); }
 }
 
+// ── DeepFin Skoru ────────────────────────────────────────────────────────
+var _DF_W_KEY = 'df_score_weights';
+var _DF_W_DEF = { temel: 35, teknik: 25, deger: 25, mom: 15 };
+
+function _dfW(save) {
+  if (save) { localStorage.setItem(_DF_W_KEY, JSON.stringify(save)); return save; }
+  try {
+    var s = JSON.parse(localStorage.getItem(_DF_W_KEY) || 'null');
+    if (s && typeof s.temel === 'number') return s;
+  } catch(e) {}
+  return { temel: 35, teknik: 25, deger: 25, mom: 15 };
+}
+
+function _sRange(val, bad, good) {
+  if (val == null || isNaN(val)) return null;
+  if (good === bad) return 50;
+  return Math.max(0, Math.min(100, (val - bad) / (good - bad) * 100));
+}
+function _sInv(val, cheap, expensive) { return _sRange(val, expensive, cheap); }
+
+function _calcDFScore(d) {
+  if (!d) return null;
+  var n = function(v) { return (v != null && !isNaN(+v)) ? +v : null; };
+
+  // Temel
+  var roe = n(d.roe);
+  var nm  = n(d.net_margin);
+  var gm  = n(d.gross_margin);
+  var rg  = n(d.total_revenue_change_ttm_yoy != null ? d.total_revenue_change_ttm_yoy : d.revenue_growth_ttm_yoy);
+  var eg  = n(d.earnings_per_share_change_ttm_yoy != null ? d.earnings_per_share_change_ttm_yoy : d.eps_growth_ttm_yoy);
+  var fs  = n(d.piotroski_f_score);
+  var tp  = [];
+  if (roe != null) tp.push(_sRange(roe * 100, 0, 25));
+  if (nm  != null) tp.push(_sRange(nm  * 100, 0, 15));
+  if (gm  != null) tp.push(_sRange(gm  * 100, 10, 45));
+  if (rg  != null) tp.push(_sRange(rg,  -10, 25));
+  if (eg  != null) tp.push(_sRange(eg,  -10, 30));
+  if (fs  != null) tp.push(fs / 9 * 100);
+  var sTemel = tp.length ? tp.reduce(function(a,b){return a+b;},0)/tp.length : null;
+
+  // Teknik (perf-based, tech rating not always available)
+  var p1m = n(d.Perf_1M != null ? d.Perf_1M : d.perf1M);
+  var pw  = n(d.Perf_W  != null ? d.Perf_W  : d.perfW);
+  var py  = n(d.Perf_Y  != null ? d.Perf_Y  : d.perfY);
+  var tk  = [];
+  if (p1m != null) tk.push(_sRange(p1m, -20, 20));
+  if (pw  != null) tk.push(_sRange(pw,  -10, 15));
+  if (py  != null) tk.push(_sRange(py,  -30, 60) * 0.5);
+  var sTeknik = tk.length ? Math.max(0, Math.min(100, tk.reduce(function(a,b){return a+b;},0)/tk.length)) : null;
+
+  // Değerleme
+  var pe  = n(d.pe_ratio);
+  var pb  = n(d.price_book_ratio);
+  var ps  = n(d.price_sales);
+  var vp  = [];
+  if (pe != null && pe > 0)  vp.push(_sInv(pe,  8, 50));
+  if (pb != null && pb > 0)  vp.push(_sInv(pb,  1,  6));
+  if (ps != null && ps > 0)  vp.push(_sInv(ps, 0.5, 10));
+  var sDeger = vp.length ? vp.reduce(function(a,b){return a+b;},0)/vp.length : null;
+
+  // Momentum
+  var mp = [];
+  if (pw  != null) mp.push(_sRange(pw,  -10, 15));
+  if (p1m != null) mp.push(_sRange(p1m, -15, 20));
+  if (py  != null) mp.push(_sRange(py,  -20, 50));
+  var sMom = mp.length ? mp.reduce(function(a,b){return a+b;},0)/mp.length : null;
+
+  // Weighted total
+  var w = _dfW();
+  var total = 0, wSum = 0;
+  [{ s: sTemel, wk:'temel' }, { s: sTeknik, wk:'teknik' }, { s: sDeger, wk:'deger' }, { s: sMom, wk:'mom' }]
+    .forEach(function(c) { if (c.s != null) { total += c.s * w[c.wk]; wSum += w[c.wk]; } });
+
+  return {
+    total:  wSum > 0 ? Math.round(total / wSum) : null,
+    temel:  sTemel  != null ? Math.round(sTemel)  : null,
+    teknik: sTeknik != null ? Math.round(sTeknik) : null,
+    deger:  sDeger  != null ? Math.round(sDeger)  : null,
+    mom:    sMom    != null ? Math.round(sMom)     : null,
+  };
+}
+
+function _dfScoreColor(v) {
+  if (v == null) return 'var(--muted)';
+  if (v >= 70) return '#00c076';
+  if (v >= 50) return '#f0b429';
+  return '#f6465d';
+}
+
+function _dfScoreLbl(v) {
+  if (v == null) return 'Veri Yok';
+  if (v >= 75) return 'Güçlü';
+  if (v >= 60) return 'İyi';
+  if (v >= 45) return 'Orta';
+  return 'Zayıf';
+}
+
+function _buildDeepFinScore() {
+  var sc  = _calcDFScore(_prfData);
+  var w   = _dfW();
+  var CIRC = 251.3;
+  var arcEl = document.getElementById('df-sc-arc');
+  var numEl = document.getElementById('df-sc-num');
+  var lblEl = document.getElementById('df-sc-sublbl');
+
+  if (sc && sc.total != null) {
+    var col = _dfScoreColor(sc.total);
+    if (arcEl) { arcEl.style.strokeDashoffset = (CIRC * (1 - sc.total / 100)).toFixed(1); arcEl.style.stroke = col; }
+    if (numEl) { numEl.textContent = sc.total; numEl.style.color = col; }
+    if (lblEl) { lblEl.textContent = _dfScoreLbl(sc.total); }
+  } else {
+    if (arcEl) { arcEl.style.strokeDashoffset = CIRC; arcEl.style.stroke = 'var(--muted)'; }
+    if (numEl) { numEl.textContent = '—'; numEl.style.color = 'var(--muted)'; }
+    if (lblEl) { lblEl.textContent = _prfData ? 'Yetersiz Veri' : 'Bekliyor'; }
+  }
+
+  var subsEl = document.getElementById('df-sc-subs');
+  if (subsEl) {
+    var subs = [
+      { lbl:'Temel',     v: sc ? sc.temel  : null, wk:'temel'  },
+      { lbl:'Teknik',    v: sc ? sc.teknik : null, wk:'teknik' },
+      { lbl:'Değerleme', v: sc ? sc.deger  : null, wk:'deger'  },
+      { lbl:'Momentum',  v: sc ? sc.mom    : null, wk:'mom'    },
+    ];
+    subsEl.innerHTML = subs.map(function(s) {
+      var col  = _dfScoreColor(s.v);
+      var barW = s.v != null ? s.v + '%' : '0%';
+      return '<div class="df-sc-sub-row">'+
+        '<span class="df-sc-sub-lbl">'+s.lbl+'</span>'+
+        '<div class="df-sc-sub-track"><div class="df-sc-sub-fill" style="width:'+barW+';background:'+col+'"></div></div>'+
+        '<span class="df-sc-sub-val" style="color:'+col+'">'+(s.v != null ? s.v : '—')+'</span>'+
+        '<span class="df-sc-sub-w">%'+w[s.wk]+'</span>'+
+      '</div>';
+    }).join('');
+  }
+
+  _dfUpdateSliders(w);
+}
+
+function _dfUpdateSliders(w) {
+  ['temel','teknik','deger','mom'].forEach(function(k) {
+    var sl = document.getElementById('dfs-' + k);
+    var vl = document.getElementById('dfsv-' + k);
+    if (sl) sl.value = w[k];
+    if (vl) vl.textContent = w[k] + '%';
+  });
+}
+
+function toggleDfScoreSliders() {
+  var el = document.getElementById('df-sc-sliders');
+  if (!el) return;
+  var hidden = el.style.display === 'none' || !el.style.display;
+  el.style.display = hidden ? 'block' : 'none';
+  if (hidden) _dfUpdateSliders(_dfW());
+}
+
+function onDfSlider(key, rawVal) {
+  var val  = parseInt(rawVal, 10);
+  var w    = _dfW();
+  var keys = ['temel','teknik','deger','mom'];
+  var others = keys.filter(function(k) { return k !== key; });
+  var otherSum = others.reduce(function(s, k) { return s + (w[k] || 0); }, 0);
+  var remain   = 100 - val;
+  if (remain <= 0 || otherSum <= 0) {
+    others.forEach(function(k) { w[k] = 0; });
+  } else {
+    var used = 0;
+    others.forEach(function(k, i) {
+      if (i < others.length - 1) {
+        w[k] = Math.round((w[k] / otherSum) * remain);
+        used += w[k];
+      }
+    });
+    w[others[others.length - 1]] = remain - used;
+    others.forEach(function(k) { w[k] = Math.max(0, w[k]); });
+  }
+  w[key] = val;
+  _dfW(w);
+  _dfUpdateSliders(w);
+  _buildDeepFinScore();
+}
+
 function showProfil(sym, ex) {
   _prfSym = sym;
   _prfEx  = ex || 'bist';
@@ -515,6 +697,7 @@ function showProfil(sym, ex) {
   _buildPrfPiotroski();
   _buildPrfGuru();
   _buildPrfSide();
+  _buildDeepFinScore();
   _buildTrend(_prfData);
   _buildFinancials(_prfData);
   prfTab('overview', document.querySelector('.prf-tab'));
@@ -1003,6 +1186,7 @@ async function loadYahooData(sym, ex) {
     _buildPrfPiotroski();
     _buildPrfGuru();
     _buildPrfSide();
+    _buildDeepFinScore();
     _buildTrend(_prfData);
     _buildFinancials(_prfData);
 

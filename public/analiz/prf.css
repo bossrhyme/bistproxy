@@ -918,3 +918,31 @@ html,body{height:100%;overflow:hidden;}
 .fin-legend-hint{margin-left:4px;font-style:italic;opacity:.6;}
 .fin-dot{cursor:help;}
 .fin-tt{position:fixed;z-index:9999;background:var(--s1);color:var(--text2);font-size:11px;padding:6px 10px;border-radius:6px;border:1px solid var(--border2);pointer-events:none;display:none;max-width:220px;line-height:1.4;box-shadow:var(--shadow-md);}
+
+/* ── DeepFin Skoru ─────────────────────────────────────────── */
+#prf-score-sside{}
+.df-sc-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.df-sc-title{font-size:10px;font-weight:700;color:var(--text);letter-spacing:.6px;text-transform:uppercase;}
+.df-sc-wbtn{background:none;border:1px solid var(--border2);color:var(--text2);font-size:9px;padding:3px 8px;border-radius:4px;cursor:pointer;transition:all .2s;}
+.df-sc-wbtn:hover{border-color:var(--accent);color:var(--accent);}
+.df-sc-ring-wrap{display:flex;justify-content:center;margin-bottom:14px;}
+.df-sc-ring{position:relative;width:96px;height:96px;}
+.df-sc-svg{width:100%;height:100%;}
+.df-sc-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.df-sc-num{font-size:24px;font-weight:800;color:var(--text);font-family:"Geist Mono",monospace;line-height:1;}
+.df-sc-lbl{font-size:9px;color:var(--text2);font-weight:600;letter-spacing:.3px;margin-top:3px;}
+.df-sc-subs{display:flex;flex-direction:column;gap:7px;}
+.df-sc-sub-row{display:flex;align-items:center;gap:6px;}
+.df-sc-sub-lbl{font-size:10px;color:var(--text2);width:56px;flex-shrink:0;}
+.df-sc-sub-track{flex:1;height:4px;background:var(--s3);border-radius:2px;overflow:hidden;}
+.df-sc-sub-fill{height:100%;border-radius:2px;transition:width .6s ease;}
+.df-sc-sub-val{font-size:10px;font-weight:700;font-family:"Geist Mono",monospace;width:22px;text-align:right;flex-shrink:0;}
+.df-sc-sub-w{font-size:9px;color:var(--muted);width:24px;text-align:right;flex-shrink:0;}
+.df-sc-sliders{display:none;border-top:1px solid var(--border);margin-top:12px;padding-top:12px;}
+.df-sc-slider-hint{font-size:9px;color:var(--muted);margin-bottom:8px;letter-spacing:.3px;}
+.df-sl-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.df-sl-lbl{font-size:10px;color:var(--text2);width:58px;flex-shrink:0;}
+.df-sl-row input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:3px;border-radius:2px;background:var(--s3);outline:none;cursor:pointer;}
+.df-sl-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--s1);}
+.df-sl-row input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;background:var(--accent);cursor:pointer;border:2px solid var(--s1);}
+.df-sl-val{font-size:10px;font-weight:700;color:var(--text);width:28px;text-align:right;font-family:"Geist Mono",monospace;flex-shrink:0;}

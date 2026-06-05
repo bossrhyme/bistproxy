@@ -23,7 +23,7 @@
 <meta name="twitter:image" content="https://deepfin.vercel.app/og-image.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="/analiz/prf.css?v=arctic5">
+<link rel="stylesheet" href="/analiz/prf.css?v=arctic6">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
 
 
@@ -300,6 +300,34 @@ if('serviceWorker' in navigator){
       </div>
 
       <div class="prf-side">
+        <div class="prf-sside" id="prf-score-sside">
+          <div class="df-sc-hdr">
+            <span class="df-sc-title">DeepFin Skoru</span>
+            <button class="df-sc-wbtn" onclick="toggleDfScoreSliders()">⚙ Ağırlık</button>
+          </div>
+          <div class="df-sc-ring-wrap">
+            <div class="df-sc-ring">
+              <svg viewBox="0 0 100 100" class="df-sc-svg">
+                <circle cx="50" cy="50" r="40" fill="none" stroke="var(--s3)" stroke-width="10"/>
+                <circle id="df-sc-arc" cx="50" cy="50" r="40" fill="none" stroke="var(--muted)" stroke-width="10"
+                  stroke-linecap="round" stroke-dasharray="251.3 251.3" stroke-dashoffset="251.3"
+                  transform="rotate(-90 50 50)" style="transition:stroke-dashoffset .8s ease,stroke .4s;"/>
+              </svg>
+              <div class="df-sc-inner">
+                <div class="df-sc-num" id="df-sc-num">—</div>
+                <div class="df-sc-lbl" id="df-sc-sublbl">Bekliyor</div>
+              </div>
+            </div>
+          </div>
+          <div class="df-sc-subs" id="df-sc-subs"></div>
+          <div class="df-sc-sliders" id="df-sc-sliders">
+            <div class="df-sc-slider-hint">Ağırlıklar toplamı = %100</div>
+            <div class="df-sl-row"><span class="df-sl-lbl">Temel</span><input type="range" id="dfs-temel" min="0" max="100" step="5" oninput="onDfSlider('temel',this.value)"><span class="df-sl-val" id="dfsv-temel">35%</span></div>
+            <div class="df-sl-row"><span class="df-sl-lbl">Teknik</span><input type="range" id="dfs-teknik" min="0" max="100" step="5" oninput="onDfSlider('teknik',this.value)"><span class="df-sl-val" id="dfsv-teknik">25%</span></div>
+            <div class="df-sl-row"><span class="df-sl-lbl">Değerleme</span><input type="range" id="dfs-deger" min="0" max="100" step="5" oninput="onDfSlider('deger',this.value)"><span class="df-sl-val" id="dfsv-deger">25%</span></div>
+            <div class="df-sl-row"><span class="df-sl-lbl">Momentum</span><input type="range" id="dfs-mom" min="0" max="100" step="5" oninput="onDfSlider('mom',this.value)"><span class="df-sl-val" id="dfsv-mom">15%</span></div>
+          </div>
+        </div>
         <div class="prf-sside">
           <button class="prf-buy-btn" id="prf-buy-btn" onclick="onHemenAl('','')">🛒 Hemen Al</button>
           <div class="ad-slot" style="width:100%;height:250px;margin-top:10px;border-radius:8px;">
@@ -354,6 +382,6 @@ if('serviceWorker' in navigator){
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
-<script src="/analiz/prf.js?v=9546686"></script>
+<script src="/analiz/prf.js?v=9546687"></script>
 </body>
 </html>
