@@ -19,6 +19,8 @@ var _chartSym2  = '';
 var _chartEx2   = '';
 var _chartInds  = { sma20: false, sma50: false, sma200: false, bb: false, vol: false };
 var _chartIndS  = {};
+var _chartDataIdx = {};
+var _chartIndCache = {};
 var _drawMode   = null;
 var _drawPts    = [];
 var _drawings   = [];
@@ -68,67 +70,96 @@ function _chartFiltered() {
   return _chartData.filter(function(c) { return c.time >= since; });
 }
 
-// ── Indicators ────────────────────────────────────────────────────────────
+// ── Indicators ──────────────────────────────────────────────────────────
 function _calcSMA(data, period) {
-  var result = [];
-  for (var i = period-1; i < data.length; i++) {
-    var sum = 0;
-    for (var j = i-period+1; j <= i; j++) sum += data[j].close;
-    result.push({ time: data[i].time, value: sum/period });
+  var result=[], sum=0;
+  for(var i=0;i<data.length;i++){
+    sum+=data[i].close;
+    if(i>=period) sum-=data[i-period].close;
+    if(i>=period-1) result.push({time:data[i].time,value:sum/period});
   }
   return result;
 }
 
 function _calcBB(data, period, mult) {
-  var result = [];
-  for (var i = period-1; i < data.length; i++) {
-    var sum = 0, j;
-    for (j = i-period+1; j <= i; j++) sum += data[j].close;
-    var mean = sum/period, variance = 0;
-    for (j = i-period+1; j <= i; j++) variance += Math.pow(data[j].close - mean, 2);
-    var std = Math.sqrt(variance/period);
-    result.push({ time: data[i].time, upper: mean+mult*std, middle: mean, lower: mean-mult*std });
+  var result=[], sumX=0, sumX2=0;
+  for(var i=0;i<data.length;i++){
+    var c=data[i].close;
+    sumX+=c; sumX2+=c*c;
+    if(i>=period){var old=data[i-period].close;sumX-=old;sumX2-=old*old;}
+    if(i>=period-1){
+      var mean=sumX/period;
+      var std=Math.sqrt(Math.max(0,sumX2/period-mean*mean));
+      result.push({time:data[i].time,upper:mean+mult*std,middle:mean,lower:mean-mult*std});
+    }
   }
   return result;
 }
 
 function _addIndSeries(key, data) {
+  if(!_chartInst) return;
   data = data || _chartFiltered();
-  if (!_chartInst || !data.length) return;
-  var mkL = function(color, w, dash) {
-    return _chartInst.addLineSeries({ color:color, lineWidth:w||1, lineStyle:dash||0, priceLineVisible:false, lastValueVisible:false, crosshairMarkerVisible:false });
+  if(!data.length) return;
+  var mkL=function(color,w,dash){
+    return _chartInst.addLineSeries({color:color,lineWidth:w||1,lineStyle:dash||0,priceLineVisible:false,lastValueVisible:false,crosshairMarkerVisible:false});
   };
-  if (key==='sma20')  { _chartIndS.sma20  = mkL('#3b82f6',1);   _chartIndS.sma20.setData(_calcSMA(data,20)); }
-  if (key==='sma50')  { _chartIndS.sma50  = mkL('#f59e0b',1);   _chartIndS.sma50.setData(_calcSMA(data,50)); }
-  if (key==='sma200') { _chartIndS.sma200 = mkL('#ef4444',1.5); _chartIndS.sma200.setData(_calcSMA(data,200)); }
-  if (key==='bb') {
-    var bb = _calcBB(data, 20, 2);
-    _chartIndS.bb_u = mkL('#8b5cf6',1,1); _chartIndS.bb_u.setData(bb.map(function(d){return{time:d.time,value:d.upper};}));
-    _chartIndS.bb_m = mkL('#8b5cf6',1,2); _chartIndS.bb_m.setData(bb.map(function(d){return{time:d.time,value:d.middle};}));
-    _chartIndS.bb_l = mkL('#8b5cf6',1,1); _chartIndS.bb_l.setData(bb.map(function(d){return{time:d.time,value:d.lower};}));
+  var full=_chartData.length?_chartData:data;
+  var rng=data.length?{min:data[0].time,max:data[data.length-1].time}:null;
+  var fil=rng?function(d){return d.time>=rng.min&&d.time<=rng.max;}:function(){return true;};
+  function trySet(ser, d){try{ser.setData(d);}catch(e){return false;} return true;}
+  if(key==='sma20'){
+    if(!_chartIndCache.sma20) _chartIndCache.sma20=_calcSMA(full,20);
+    if(!_chartIndS.sma20) _chartIndS.sma20=mkL('#3b82f6',1);
+    if(!trySet(_chartIndS.sma20,_chartIndCache.sma20.filter(fil))){_chartIndS.sma20=mkL('#3b82f6',1);_chartIndS.sma20.setData(_chartIndCache.sma20.filter(fil));}
   }
-  if (key==='vol') {
-    _chartIndS.vol = _chartInst.addHistogramSeries({ priceFormat:{type:'volume'}, priceScaleId:'vol' });
-    _chartInst.priceScale('vol').applyOptions({ scaleMargins:{top:0.8,bottom:0} });
-    _chartIndS.vol.setData(data.map(function(d){return{time:d.time,value:d.volume||0,color:d.close>=d.open?'rgba(16,185,129,.35)':'rgba(244,63,94,.3)'};}));
+  if(key==='sma50'){
+    if(!_chartIndCache.sma50) _chartIndCache.sma50=_calcSMA(full,50);
+    if(!_chartIndS.sma50) _chartIndS.sma50=mkL('#f59e0b',1);
+    if(!trySet(_chartIndS.sma50,_chartIndCache.sma50.filter(fil))){_chartIndS.sma50=mkL('#f59e0b',1);_chartIndS.sma50.setData(_chartIndCache.sma50.filter(fil));}
+  }
+  if(key==='sma200'){
+    if(!_chartIndCache.sma200) _chartIndCache.sma200=_calcSMA(full,200);
+    if(!_chartIndS.sma200) _chartIndS.sma200=mkL('#ef4444',1.5);
+    if(!trySet(_chartIndS.sma200,_chartIndCache.sma200.filter(fil))){_chartIndS.sma200=mkL('#ef4444',1.5);_chartIndS.sma200.setData(_chartIndCache.sma200.filter(fil));}
+  }
+  if(key==='bb'){
+    if(!_chartIndCache.bb) _chartIndCache.bb=_calcBB(full,20,2);
+    if(!_chartIndS.bb_u) _chartIndS.bb_u=mkL('#8b5cf6',1,1);
+    if(!_chartIndS.bb_m) _chartIndS.bb_m=mkL('#8b5cf6',1,2);
+    if(!_chartIndS.bb_l) _chartIndS.bb_l=mkL('#8b5cf6',1,1);
+    var bbf=_chartIndCache.bb.filter(fil);
+    try{_chartIndS.bb_u.setData(bbf.map(function(d){return{time:d.time,value:d.upper};}));}catch(e){}
+    try{_chartIndS.bb_m.setData(bbf.map(function(d){return{time:d.time,value:d.middle};}));}catch(e){}
+    try{_chartIndS.bb_l.setData(bbf.map(function(d){return{time:d.time,value:d.lower};}));}catch(e){}
+  }
+  if(key==='vol'){
+    if(!_chartIndS.vol){
+      _chartIndS.vol=_chartInst.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:'vol'});
+      _chartInst.priceScale('vol').applyOptions({scaleMargins:{top:0.8,bottom:0}});
+    }
+    var vd=data.map(function(d){return{time:d.time,value:d.volume||0,color:d.close>=d.open?'rgba(16,185,129,.35)':'rgba(244,63,94,.3)'};});
+    try{_chartIndS.vol.setData(vd);}catch(e){
+      _chartIndS.vol=_chartInst.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:'vol'});
+      _chartInst.priceScale('vol').applyOptions({scaleMargins:{top:0.8,bottom:0}});
+      _chartIndS.vol.setData(vd);
+    }
   }
 }
 
 function _removeIndSeries(key) {
-  var rm = function(k) { if(_chartIndS[k]&&_chartInst){try{_chartInst.removeSeries(_chartIndS[k]);}catch(e){} _chartIndS[k]=null;} };
-  if (key==='bb') { rm('bb_u'); rm('bb_m'); rm('bb_l'); } else rm(key);
+  var rm=function(k){if(_chartIndS[k]&&_chartInst){try{_chartInst.removeSeries(_chartIndS[k]);}catch(e){}_chartIndS[k]=null;}};
+  if(key==='bb'){rm('bb_u');rm('bb_m');rm('bb_l');}else rm(key);
 }
 
 function _redrawInds(data) {
-  Object.keys(_chartInds).forEach(function(k){ if(_chartInds[k]){_removeIndSeries(k);_addIndSeries(k,data);} });
+  Object.keys(_chartInds).forEach(function(k){if(_chartInds[k]) _addIndSeries(k,data);});
 }
 
 function toggleInd(key) {
   _chartInds[key] = !_chartInds[key];
   _tbSet('ind-'+key, _chartInds[key]);
-  if (_chartInds[key]) _addIndSeries(key); else _removeIndSeries(key);
+  if(_chartInds[key]) _addIndSeries(key); else _removeIndSeries(key);
 }
-
 // ── Drawing tools ─────────────────────────────────────────
 function _segDist(px,py,x1,y1,x2,y2){
   var dx=x2-x1,dy=y2-y1,l2=dx*dx+dy*dy;
@@ -258,7 +289,7 @@ function _onChartClick(param){
   }
   var price=null;
   if(param.seriesData){var sd=param.seriesData.get(_chartSer);if(sd)price=sd.close!==undefined?sd.close:sd.value;}
-  if(price==null){var c=_chartData.find(function(x){return x.time===param.time;});if(c)price=c.close;}
+  if(price==null){price=_chartDataIdx[param.time]||null;}
   if(price==null) return;
   if(_drawMode==='horizontal'){
     var pl=_chartSer.createPriceLine({price:price,color:'#8b5cf6',lineWidth:1,lineStyle:2,axisLabelVisible:true,title:price.toFixed(2)});
@@ -346,6 +377,10 @@ function _fetchChart(sym, ex) {
         .filter(function(c){return c.open!=null&&c.close!=null;})
         .sort(function(a,b){return a.time-b.time;})
         .filter(function(c){if(seen[c.time])return false;seen[c.time]=1;return true;});
+      _chartDataIdx={};
+      _chartData.forEach(function(c){_chartDataIdx[c.time]=c.close;});
+      _chartIndCache={};
+      Object.keys(_chartInds).forEach(function(k){if(_chartInds[k])_removeIndSeries(k);});
       _chartApply();
       setTimeout(function(){
         var el=document.getElementById('prf-chart-inner');
@@ -358,7 +393,7 @@ function _fetchChart(sym, ex) {
 function loadTVWidget(sym, ex) {
   _chartSym2=sym; _chartEx2=ex;
   _chartData=[]; _chartInst=null; _chartSer=null; _chartPct=false;
-  _drawMode=null; _drawPts=[]; _drawings=[]; _drawPreviewSer=null; _selectedDrawing=null; _chartIndS={};
+  _drawMode=null; _drawPts=[]; _drawings=[]; _drawPreviewSer=null; _selectedDrawing=null; _chartIndS={}; _chartDataIdx={}; _chartIndCache={};
 
   var container = document.getElementById('prf-tv-widget');
   if (!container) return;
@@ -389,7 +424,7 @@ function loadTVWidget(sym, ex) {
       if (!_drawPreviewSer||!_drawPts.length||!param.time) return;
       var px = null;
       if (param.seriesData) { var sd2=param.seriesData.get(_chartSer); if(sd2) px=sd2.close!==undefined?sd2.close:sd2.value; }
-      if (px==null) { var cx=_chartData.find(function(x){return x.time===param.time;}); if(cx) px=cx.close; }
+      if(px==null){ px=_chartDataIdx[param.time]||null; }
       if (px==null) return;
       var p1=_drawPts[0];
       if (!p1||p1.time===param.time) return;
