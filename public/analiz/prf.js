@@ -10,39 +10,42 @@ function openTradingView() {
 // ── Chart state ──────────────────────────────────────────────────────────
 var _chartInst  = null;
 var _chartSer   = null;
-var _chartType  = 'candle'; // 'candle' | 'line'
-var _chartIval  = 'D';      // 'D' | 'W' | 'M'
-var _chartRange = '1y';     // '1m'|'3m'|'6m'|'1y'|'all'
+var _chartType  = 'candle';
+var _chartIval  = 'D';
+var _chartRange = '1y';
 var _chartPct   = false;
 var _chartData  = [];
 var _chartSym2  = '';
 var _chartEx2   = '';
+var _chartInds  = { sma20: false, sma50: false, sma200: false, bb: false, vol: false };
+var _chartIndS  = {};
+var _drawMode   = null;
+var _drawPts    = [];
+var _drawings   = [];
 
 function _tbHtml() {
   var b = function(id, label, on, fn) {
     var bd = on ? '1px solid #0ea5e9' : '1px solid #e2e8f0';
     var bg = on ? 'rgba(14,165,233,.1)' : 'transparent';
     var cl = on ? '#0ea5e9' : '#94a3b8';
-    return '<button id="' + id + '" onclick="' + fn + '" style="padding:3px 9px;font-size:10px;font-weight:600;border-radius:4px;cursor:pointer;border:' + bd + ';background:' + bg + ';color:' + cl + ';transition:all .15s;white-space:nowrap;font-family:Inter,sans-serif;line-height:1.5;">' + label + '</button>';
+    return '<button id="'+id+'" onclick="'+fn+'" style="padding:3px 8px;font-size:10px;font-weight:600;border-radius:4px;cursor:pointer;border:'+bd+';background:'+bg+';color:'+cl+';transition:all .15s;white-space:nowrap;font-family:Inter,sans-serif;line-height:1.5;">'+label+'</button>';
   };
-  var sp = '<div style="width:1px;height:14px;background:#e2e8f0;margin:0 3px;flex-shrink:0;"></div>';
+  var sp = '<div style="width:1px;height:13px;background:#e2e8f0;margin:0 2px;flex-shrink:0;"></div>';
   var T = _chartType, I = _chartIval, R = _chartRange, P = _chartPct;
-  return '<div style="display:flex;align-items:center;gap:3px;padding:7px 12px;border-bottom:1px solid #e2e8f0;background:#fff;flex-wrap:wrap;row-gap:4px;">' +
-    b('ct-c', 'Mum',    T==='candle', "setChartType('candle')") +
-    b('ct-l', 'Çizgi',  T==='line',   "setChartType('line')") +
-    sp +
-    b('ci-D', 'Günlük',   I==='D', "setChartInterval('D')") +
-    b('ci-W', 'Haftalık', I==='W', "setChartInterval('W')") +
-    b('ci-M', 'Aylık',    I==='M', "setChartInterval('M')") +
-    sp +
-    b('cr-1m',  '1A',   R==='1m',  "setChartRange('1m')") +
-    b('cr-3m',  '3A',   R==='3m',  "setChartRange('3m')") +
-    b('cr-6m',  '6A',   R==='6m',  "setChartRange('6m')") +
-    b('cr-1y',  '1Y',   R==='1y',  "setChartRange('1y')") +
-    b('cr-all', 'Tümü', R==='all', "setChartRange('all')") +
-    sp +
-    b('cp-pct', '%', P, 'setChartPct()') +
-  '</div>';
+  var Ids = _chartInds, Dm = _drawMode;
+  var row1 =
+    b('ct-c','Mum',T==='candle',"setChartType('candle')")+b('ct-l','Çizgi',T==='line',"setChartType('line')")+sp+
+    b('ci-D','G',I==='D',"setChartInterval('D')")+b('ci-W','H',I==='W',"setChartInterval('W')")+b('ci-M','A',I==='M',"setChartInterval('M')")+sp+
+    b('cr-1m','1A',R==='1m',"setChartRange('1m')")+b('cr-3m','3A',R==='3m',"setChartRange('3m')")+b('cr-6m','6A',R==='6m',"setChartRange('6m')")+b('cr-1y','1Y',R==='1y',"setChartRange('1y')")+b('cr-all','Tümü',R==='all',"setChartRange('all')")+sp+
+    b('cp-pct','%',P,'setChartPct()');
+  var row2 =
+    b('ind-sma20','SMA 20',Ids.sma20,"toggleInd('sma20')")+b('ind-sma50','SMA 50',Ids.sma50,"toggleInd('sma50')")+b('ind-sma200','SMA 200',Ids.sma200,"toggleInd('sma200')")+b('ind-bb','BB',Ids.bb,"toggleInd('bb')")+b('ind-vol','Hacim',Ids.vol,"toggleInd('vol')")+sp+
+    b('draw-trend','↗ Trend',Dm==='trend',"setDrawMode('trend')")+b('draw-ray','→ ışın',Dm==='ray',"setDrawMode('ray')")+b('draw-horizontal','— Yatay',Dm==='horizontal',"setDrawMode('horizontal')")+sp+
+    '<button onclick="clearDrawings()" style="padding:3px 8px;font-size:10px;font-weight:600;border-radius:4px;cursor:pointer;border:1px solid #fecdd3;background:transparent;color:#f43f5e;transition:all .15s;white-space:nowrap;font-family:Inter,sans-serif;line-height:1.5;">✕ Temizle</button>';
+  return '<div style="padding:7px 12px;border-bottom:1px solid #e2e8f0;background:#fff;">'+
+    '<div style="display:flex;align-items:center;gap:3px;flex-wrap:wrap;row-gap:4px;">'+row1+'</div>'+
+    '<div style="display:flex;align-items:center;gap:3px;flex-wrap:wrap;row-gap:4px;margin-top:6px;padding-top:6px;border-top:1px solid #f1f5f9;">'+row2+'</div>'+
+    '</div>';
 }
 
 function _tbSet(id, on) {
@@ -53,123 +56,232 @@ function _tbSet(id, on) {
   btn.style.color      = on ? '#0ea5e9' : '#94a3b8';
 }
 function _tbGroup(prefix, vals, active) {
-  vals.forEach(function(v) { _tbSet(prefix + v, v === active); });
+  vals.forEach(function(v) { _tbSet(prefix+v, v===active); });
 }
 
 function _chartFiltered() {
   if (_chartRange === 'all') return _chartData;
-  var days = { '1m': 30, '3m': 91, '6m': 182, '1y': 365 }[_chartRange] || 365;
-  var since = Math.floor(Date.now() / 1000) - days * 86400;
+  var days = {'1m':30,'3m':91,'6m':182,'1y':365}[_chartRange] || 365;
+  var since = Math.floor(Date.now()/1000) - days*86400;
   return _chartData.filter(function(c) { return c.time >= since; });
 }
 
+// ── Indicators ────────────────────────────────────────────────────────────
+function _calcSMA(data, period) {
+  var result = [];
+  for (var i = period-1; i < data.length; i++) {
+    var sum = 0;
+    for (var j = i-period+1; j <= i; j++) sum += data[j].close;
+    result.push({ time: data[i].time, value: sum/period });
+  }
+  return result;
+}
+
+function _calcBB(data, period, mult) {
+  var result = [];
+  for (var i = period-1; i < data.length; i++) {
+    var sum = 0, j;
+    for (j = i-period+1; j <= i; j++) sum += data[j].close;
+    var mean = sum/period, variance = 0;
+    for (j = i-period+1; j <= i; j++) variance += Math.pow(data[j].close - mean, 2);
+    var std = Math.sqrt(variance/period);
+    result.push({ time: data[i].time, upper: mean+mult*std, middle: mean, lower: mean-mult*std });
+  }
+  return result;
+}
+
+function _addIndSeries(key, data) {
+  data = data || _chartFiltered();
+  if (!_chartInst || !data.length) return;
+  var mkL = function(color, w, dash) {
+    return _chartInst.addLineSeries({ color:color, lineWidth:w||1, lineStyle:dash||0, priceLineVisible:false, lastValueVisible:false, crosshairMarkerVisible:false });
+  };
+  if (key==='sma20')  { _chartIndS.sma20  = mkL('#3b82f6',1);   _chartIndS.sma20.setData(_calcSMA(data,20)); }
+  if (key==='sma50')  { _chartIndS.sma50  = mkL('#f59e0b',1);   _chartIndS.sma50.setData(_calcSMA(data,50)); }
+  if (key==='sma200') { _chartIndS.sma200 = mkL('#ef4444',1.5); _chartIndS.sma200.setData(_calcSMA(data,200)); }
+  if (key==='bb') {
+    var bb = _calcBB(data, 20, 2);
+    _chartIndS.bb_u = mkL('#8b5cf6',1,1); _chartIndS.bb_u.setData(bb.map(function(d){return{time:d.time,value:d.upper};}));
+    _chartIndS.bb_m = mkL('#8b5cf6',1,2); _chartIndS.bb_m.setData(bb.map(function(d){return{time:d.time,value:d.middle};}));
+    _chartIndS.bb_l = mkL('#8b5cf6',1,1); _chartIndS.bb_l.setData(bb.map(function(d){return{time:d.time,value:d.lower};}));
+  }
+  if (key==='vol') {
+    _chartIndS.vol = _chartInst.addHistogramSeries({ priceFormat:{type:'volume'}, priceScaleId:'vol' });
+    _chartInst.priceScale('vol').applyOptions({ scaleMargins:{top:0.8,bottom:0} });
+    _chartIndS.vol.setData(data.map(function(d){return{time:d.time,value:d.volume||0,color:d.close>=d.open?'rgba(16,185,129,.35)':'rgba(244,63,94,.3)'};}));
+  }
+}
+
+function _removeIndSeries(key) {
+  var rm = function(k) { if(_chartIndS[k]&&_chartInst){try{_chartInst.removeSeries(_chartIndS[k]);}catch(e){} _chartIndS[k]=null;} };
+  if (key==='bb') { rm('bb_u'); rm('bb_m'); rm('bb_l'); } else rm(key);
+}
+
+function _redrawInds(data) {
+  Object.keys(_chartInds).forEach(function(k){ if(_chartInds[k]){_removeIndSeries(k);_addIndSeries(k,data);} });
+}
+
+function toggleInd(key) {
+  _chartInds[key] = !_chartInds[key];
+  _tbSet('ind-'+key, _chartInds[key]);
+  if (_chartInds[key]) _addIndSeries(key); else _removeIndSeries(key);
+}
+
+// ── Drawing tools ─────────────────────────────────────────────────────────
+function setDrawMode(mode) {
+  _drawMode = (_drawMode===mode) ? null : mode;
+  ['trend','ray','horizontal'].forEach(function(m){ _tbSet('draw-'+m, _drawMode===m); });
+  _drawPts = [];
+  var el = document.getElementById('prf-chart-inner');
+  if (el) el.style.cursor = _drawMode ? 'crosshair' : 'default';
+}
+
+function clearDrawings() {
+  _drawings.forEach(function(d) {
+    if (d&&d._pl) { try{_chartSer.removePriceLine(d._pl);}catch(e){} }
+    else if (d&&_chartInst) { try{_chartInst.removeSeries(d);}catch(e){} }
+  });
+  _drawings=[]; _drawPts=[];
+}
+
+function _onChartClick(param) {
+  if (!_drawMode||!param.time||!_chartInst||!_chartSer) return;
+  var price = null;
+  if (param.seriesData) { var sd = param.seriesData.get(_chartSer); if(sd) price = sd.close!==undefined?sd.close:sd.value; }
+  if (price==null) { var c=_chartData.find(function(x){return x.time===param.time;}); if(c) price=c.close; }
+  if (price==null) return;
+
+  if (_drawMode==='horizontal') {
+    var pl = _chartSer.createPriceLine({ price:price, color:'#8b5cf6', lineWidth:1, lineStyle:2, axisLabelVisible:true, title:price.toFixed(2) });
+    _drawings.push({_pl:pl}); return;
+  }
+  _drawPts.push({time:param.time, value:price});
+  if (_drawPts.length===2) {
+    var p1=_drawPts[0], p2=_drawPts[1];
+    if (p1.time===p2.time) { _drawPts=[]; return; }
+    var pts = [p1,p2].sort(function(a,b){return a.time-b.time;});
+    if (_drawMode==='ray') {
+      var last=_chartData[_chartData.length-1];
+      if (last&&last.time>pts[1].time) {
+        var slope=(pts[1].value-pts[0].value)/(pts[1].time-pts[0].time);
+        pts[1]={time:last.time, value:pts[0].value+slope*(last.time-pts[0].time)};
+      }
+    }
+    var ls = _chartInst.addLineSeries({ color:'#8b5cf6', lineWidth:1.5, priceLineVisible:false, lastValueVisible:false, crosshairMarkerVisible:false });
+    ls.setData([{time:pts[0].time,value:pts[0].value},{time:pts[1].time,value:pts[1].value}]);
+    _drawings.push(ls); _drawPts=[];
+  }
+}
+
+// ── Chart core ────────────────────────────────────────────────────────────
 function _chartApply() {
-  if (!_chartInst || !_chartSer || !_chartData.length) return;
+  if (!_chartInst||!_chartSer||!_chartData.length) return;
   var data = _chartFiltered();
   if (!data.length) return;
-  _chartSer.setData(_chartType === 'line'
-    ? data.map(function(c) { return { time: c.time, value: c.close }; })
+  _chartSer.setData(_chartType==='line'
+    ? data.map(function(c){return{time:c.time,value:c.close};})
     : data
   );
+  _redrawInds(data);
   _chartInst.timeScale().fitContent();
 }
 
 function setChartType(type) {
-  if (type === _chartType) return;
+  if (type===_chartType) return;
   _chartType = type;
-  _tbGroup('ct-', ['c','l'], type === 'candle' ? 'c' : 'l');
+  _tbGroup('ct-',['c','l'], type==='candle'?'c':'l');
   if (!_chartInst) return;
-  try { _chartInst.removeSeries(_chartSer); } catch(e) {}
-  _chartSer = type === 'line'
-    ? _chartInst.addLineSeries({ color: '#0ea5e9', lineWidth: 2, crosshairMarkerRadius: 4, priceLineVisible: false })
-    : _chartInst.addCandlestickSeries({ upColor:'#10b981',downColor:'#f43f5e',borderUpColor:'#10b981',borderDownColor:'#f43f5e',wickUpColor:'#10b981',wickDownColor:'#f43f5e' });
+  try{_chartInst.removeSeries(_chartSer);}catch(e){}
+  _chartSer = type==='line'
+    ? _chartInst.addLineSeries({color:'#0ea5e9',lineWidth:2,crosshairMarkerRadius:4,priceLineVisible:false})
+    : _chartInst.addCandlestickSeries({upColor:'#10b981',downColor:'#f43f5e',borderUpColor:'#10b981',borderDownColor:'#f43f5e',wickUpColor:'#10b981',wickDownColor:'#f43f5e'});
   _chartApply();
 }
 
 function setChartInterval(ival) {
-  if (ival === _chartIval) return;
+  if (ival===_chartIval) return;
   _chartIval = ival;
-  _tbGroup('ci-', ['D','W','M'], ival);
+  _tbGroup('ci-',['D','W','M'], ival);
   _fetchChart(_chartSym2, _chartEx2);
 }
 
 function setChartRange(range) {
   _chartRange = range;
-  _tbGroup('cr-', ['1m','3m','6m','1y','all'], range);
+  _tbGroup('cr-',['1m','3m','6m','1y','all'], range);
   _chartApply();
 }
 
 function setChartPct() {
   _chartPct = !_chartPct;
   _tbSet('cp-pct', _chartPct);
-  if (_chartInst) _chartInst.priceScale('right').applyOptions({ mode: _chartPct ? 2 : 0 });
+  if (_chartInst) _chartInst.priceScale('right').applyOptions({mode: _chartPct?2:0});
 }
 
 function _fetchChart(sym, ex) {
-  var exMeta = EXCHANGE_META[ex] || EXCHANGE_META.bist;
-  var suffix = encodeURIComponent(exMeta.yahooSuffix || '');
-  var url = '/api/scan?action=chart&symbol=' + sym + '&interval=' + _chartIval + '&currency=TL&suffix=' + suffix;
+  var exMeta = EXCHANGE_META[ex]||EXCHANGE_META.bist;
+  var suffix = encodeURIComponent(exMeta.yahooSuffix||'');
+  var url = '/api/scan?action=chart&symbol='+sym+'&interval='+_chartIval+'&currency=TL&suffix='+suffix;
   fetch(url)
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      if (!data || data.s !== 'ok' || !data.candles || !data.candles.length) return;
+    .then(function(r){return r.json();})
+    .then(function(data){
+      if (!data||data.s!=='ok'||!data.candles||!data.candles.length) return;
       var seen = {};
       _chartData = data.candles
-        .map(function(c) { return { time: c.t, open: c.o, high: c.h, low: c.l, close: c.c }; })
-        .filter(function(c) { return c.open != null && c.close != null; })
-        .sort(function(a, b) { return a.time - b.time; })
-        .filter(function(c) { if (seen[c.time]) return false; seen[c.time] = 1; return true; });
+        .map(function(c){return{time:c.t,open:c.o,high:c.h,low:c.l,close:c.c,volume:c.v||0};})
+        .filter(function(c){return c.open!=null&&c.close!=null;})
+        .sort(function(a,b){return a.time-b.time;})
+        .filter(function(c){if(seen[c.time])return false;seen[c.time]=1;return true;});
       _chartApply();
-      setTimeout(function() {
-        var el = document.getElementById('prf-chart-inner');
-        if (el && _chartInst) {
-          var w = el.offsetWidth || (el.parentElement && el.parentElement.offsetWidth) || 600;
-          if (w > 50) { _chartInst.resize(w, 256); _chartInst.timeScale().fitContent(); }
-        }
-      }, 120);
+      setTimeout(function(){
+        var el=document.getElementById('prf-chart-inner');
+        if(el&&_chartInst){var w=el.offsetWidth||(el.parentElement&&el.parentElement.offsetWidth)||600;if(w>50){_chartInst.resize(w,256);_chartInst.timeScale().fitContent();}}
+      },120);
     })
-    .catch(function(e) { console.error('Chart error:', e); });
+    .catch(function(e){console.error('Chart error:',e);});
 }
 
 function loadTVWidget(sym, ex) {
-  _chartSym2 = sym; _chartEx2 = ex;
-  _chartData = []; _chartInst = null; _chartSer = null; _chartPct = false;
+  _chartSym2=sym; _chartEx2=ex;
+  _chartData=[]; _chartInst=null; _chartSer=null; _chartPct=false;
+  _drawMode=null; _drawPts=[]; _drawings=[]; _chartIndS={};
 
   var container = document.getElementById('prf-tv-widget');
   if (!container) return;
   var ph = document.getElementById('prf-tv-placeholder');
-  if (ph) ph.style.display = 'none';
+  if (ph) ph.style.display='none';
 
-  container.innerHTML = _tbHtml() + '<div id="prf-chart-inner" style="width:100%;height:256px;background:#f8fafc;"></div>';
+  container.innerHTML = _tbHtml()+'<div id="prf-chart-inner" style="width:100%;height:256px;background:#f8fafc;"></div>';
 
   function _init() {
     var chartEl = document.getElementById('prf-chart-inner');
-    if (!chartEl || !window.LightweightCharts) {
-      if (chartEl) chartEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:12px;">Grafik kütüphanesi yüklenemedi</div>';
+    if (!chartEl||!window.LightweightCharts) {
+      if(chartEl) chartEl.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:12px;">Grafik kütüphanesi yüklenemedi</div>';
       return;
     }
-    var w0 = chartEl.offsetWidth || (chartEl.parentElement && chartEl.parentElement.offsetWidth) || 600;
+    var w0 = chartEl.offsetWidth||(chartEl.parentElement&&chartEl.parentElement.offsetWidth)||600;
     _chartInst = LightweightCharts.createChart(chartEl, {
-      width: w0 > 50 ? w0 : 600, height: 256,
-      layout: { background: { color: '#f8fafc' }, textColor: '#94a3b8', fontSize: 11, fontFamily: 'Inter, sans-serif' },
-      grid:   { vertLines: { color: '#edf2f7', style: 1 }, horzLines: { color: '#edf2f7', style: 1 } },
-      crosshair: { mode: LightweightCharts.CrosshairMode.Normal, vertLine: { color: '#cbd5e1', labelBackgroundColor: '#64748b' }, horzLine: { color: '#cbd5e1', labelBackgroundColor: '#64748b' } },
-      rightPriceScale: { borderColor: '#e2e8f0', textColor: '#94a3b8' },
-      timeScale:       { borderColor: '#e2e8f0', textColor: '#94a3b8', timeVisible: true, secondsVisible: false },
-      handleScroll: true, handleScale: true,
+      width: w0>50?w0:600, height:256,
+      layout:{background:{color:'#f8fafc'},textColor:'#94a3b8',fontSize:11,fontFamily:'Inter, sans-serif'},
+      grid:{vertLines:{color:'#edf2f7',style:1},horzLines:{color:'#edf2f7',style:1}},
+      crosshair:{mode:LightweightCharts.CrosshairMode.Normal,vertLine:{color:'#cbd5e1',labelBackgroundColor:'#64748b'},horzLine:{color:'#cbd5e1',labelBackgroundColor:'#64748b'}},
+      rightPriceScale:{borderColor:'#e2e8f0',textColor:'#94a3b8'},
+      timeScale:{borderColor:'#e2e8f0',textColor:'#94a3b8',timeVisible:true,secondsVisible:false},
+      handleScroll:true, handleScale:true,
     });
-    _chartSer = _chartInst.addCandlestickSeries({ upColor:'#10b981',downColor:'#f43f5e',borderUpColor:'#10b981',borderDownColor:'#f43f5e',wickUpColor:'#10b981',wickDownColor:'#f43f5e' });
+    _chartSer = _chartInst.addCandlestickSeries({upColor:'#10b981',downColor:'#f43f5e',borderUpColor:'#10b981',borderDownColor:'#f43f5e',wickUpColor:'#10b981',wickDownColor:'#f43f5e'});
+    _chartInst.subscribeClick(_onChartClick);
     _fetchChart(sym, ex);
     var ld = document.getElementById('prf-live-dot');
-    if (ld) ld.style.display = 'flex';
+    if (ld) ld.style.display='flex';
   }
 
   function _wait(n) {
     if (window.LightweightCharts) { _init(); }
-    else if (n > 0) { setTimeout(function() { _wait(n - 1); }, 100); }
+    else if (n>0) { setTimeout(function(){_wait(n-1);},100); }
   }
   _wait(20);
 }
+
 
 function _mkSparkline(containerId, color, trend) {
   // trend: 'up' | 'down' | 'flat'
