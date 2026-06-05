@@ -319,11 +319,26 @@ async function handleUpdateProfile(req, res) {
   jsonRes(res, 200, { ok: true, name: newName });
 }
 
+async function handlePing(req, res) {
+  const testKey = 'ping:test:' + Date.now();
+  const url   = process.env.KV_REST_API_URL   || process.env.UPSTASH_REDIS_REST_URL   || null;
+  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || null;
+  try {
+    await kvSet(testKey, { ok: true }, 60);
+    const val = await kvGet(testKey);
+    await kvDel(testKey);
+    jsonRes(res, 200, { ok: true, kv: !!val, url: url ? url.slice(0, 30) + '…' : null, token: token ? token.slice(0, 8) + '…' : null });
+  } catch (e) {
+    jsonRes(res, 200, { ok: false, error: e.message, url: url ? url.slice(0, 30) + '…' : null, token: !!token });
+  }
+}
+
 // ── main router ───────────────────────────────
 module.exports = async function handler(req, res) {
   const path = (req.url || '').split('?')[0];
 
   try {
+    if (path === '/api/auth/ping')            return await handlePing(req, res);
     if (path === '/api/auth/register')        return await handleRegister(req, res);
     if (path === '/api/auth/login')           return await handleLogin(req, res);
     if (path === '/api/auth/me')              return await handleMe(req, res);
