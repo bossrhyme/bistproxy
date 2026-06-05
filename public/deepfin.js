@@ -761,6 +761,7 @@ let scanAborted = false;
 // ═══════════════════════════════════════════
 var _dfUser = null; // oturum açık kullanıcı
 var _dfWatchlists = []; // önbelleğe alınmış watchlist'ler
+var _dfPortfolios = []; // önbelleğe alınmış portföyler
 var favSet = new Set(JSON.parse(localStorage.getItem('df_favs') || '[]'));
 var favFilterActive = false;
 var fonFavSet = new Set(JSON.parse(localStorage.getItem('df_fon_favs') || '[]'));
@@ -2699,35 +2700,82 @@ function _renderWlPicker(evt, sym, ex) {
   var rect = evt.target.getBoundingClientRect();
   var div = document.createElement('div');
   div.id = 'df-wl-picker';
-  div.style.cssText = [
-    'position:fixed;z-index:9999',
-    'background:var(--bg2)',
-    'border:1px solid var(--border)',
-    'border-radius:6px',
-    'box-shadow:0 4px 16px rgba(0,0,0,.5)',
-    'min-width:160px',
-    'padding:4px 0',
-    'left:' + Math.min(rect.left, window.innerWidth - 170) + 'px',
-    'top:' + (rect.bottom + 4) + 'px'
-  ].join(';');
+  var left = Math.min(rect.left, window.innerWidth - 210);
+  var top  = rect.bottom + 4;
+  div.style.cssText = 'position:fixed;z-index:9999;background:var(--s1);border:1px solid var(--border);border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.18);min-width:200px;max-width:240px;padding:6px 0;left:' + left + 'px;top:' + top + 'px;font-family:Inter,sans-serif';
 
-  if (!_dfWatchlists.length) {
-    div.innerHTML = '<div style="padding:8px 12px;color:var(--text2);font-size:12px">Henüz liste yok</div>';
-  } else {
+  function sectionLabel(text) {
+    var lbl = document.createElement('div');
+    lbl.style.cssText = 'padding:4px 12px 2px;font-size:10px;font-weight:700;color:var(--text2);letter-spacing:.5px;text-transform:uppercase';
+    lbl.textContent = text;
+    div.appendChild(lbl);
+  }
+
+  function makeRow(icon, name, onclick) {
+    var row = document.createElement('div');
+    row.style.cssText = 'padding:7px 12px;cursor:pointer;font-size:12px;color:var(--text);display:flex;align-items:center;gap:8px;white-space:nowrap;overflow:hidden';
+    row.innerHTML = '<span style="font-size:13px">' + icon + '</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis">' + name + '</span>';
+    row.onmouseenter = function() { row.style.background = 'var(--s2)'; };
+    row.onmouseleave = function() { row.style.background = ''; };
+    row.onclick = onclick;
+    return row;
+  }
+
+  // ── Takip Listeleri ──
+  if (_dfWatchlists.length) {
+    sectionLabel('Takip Listeleri');
     _dfWatchlists.forEach(function(list) {
-      var item = document.createElement('div');
-      item.style.cssText = 'padding:7px 14px;cursor:pointer;font-size:12px;color:var(--text1);white-space:nowrap';
-      item.textContent = list.name;
-      item.onmouseenter = function() { item.style.background = 'var(--hover)'; };
-      item.onmouseleave = function() { item.style.background = ''; };
-      item.onclick = function(e) {
+      div.appendChild(makeRow(list.icon || '⭐', list.name, function(e) {
         e.stopPropagation();
-        div.remove();
-        document.removeEventListener('click', outsideHandler);
+        div.remove(); document.removeEventListener('click', outsideHandler);
         addToWatchlistDirect(list.id, sym, ex);
-      };
-      div.appendChild(item);
+      }));
     });
+  }
+
+  // ── Portföyler ──
+  if (_dfPortfolios.length) {
+    var sep = document.createElement('div');
+    sep.style.cssText = 'height:1px;background:var(--border);margin:4px 0';
+    div.appendChild(sep);
+    sectionLabel('Portföyler');
+    _dfPortfolios.forEach(function(pf) {
+      var row = makeRow(pf.icon || '📊', pf.name, null);
+      // Portföy satırına tıklayınca qty/cost formu açılır
+      row.onclick = function(e) {
+        e.stopPropagation();
+        // Mevcut form varsa kaldır
+        var existing = div.querySelector('.df-pf-form');
+        if (existing && existing.dataset.pfid === pf.id) { existing.remove(); return; }
+        if (existing) existing.remove();
+        var form = document.createElement('div');
+        form.className = 'df-pf-form';
+        form.dataset.pfid = pf.id;
+        form.style.cssText = 'padding:8px 12px;background:var(--s2);display:flex;flex-direction:column;gap:6px';
+        form.innerHTML =
+          '<div style="font-size:11px;color:var(--text2);font-weight:600">' + sym + ' → ' + pf.name + '</div>' +
+          '<div style="display:flex;gap:6px">' +
+            '<input id="df-pf-qty" type="number" placeholder="Adet" min="0.001" step="any" style="flex:1;width:0;background:var(--s1);border:1px solid var(--border);border-radius:5px;padding:5px 7px;font-size:11px;color:var(--text);outline:none">' +
+            '<input id="df-pf-cost" type="number" placeholder="Maliyet" min="0" step="any" style="flex:1;width:0;background:var(--s1);border:1px solid var(--border);border-radius:5px;padding:5px 7px;font-size:11px;color:var(--text);outline:none">' +
+          '</div>' +
+          '<button style="background:var(--accent);color:#fff;border:none;border-radius:5px;padding:5px;font-size:11px;font-weight:700;cursor:pointer">+ Ekle</button>';
+        form.querySelector('button').onclick = function(e) {
+          e.stopPropagation();
+          var qty  = parseFloat(form.querySelector('#df-pf-qty').value);
+          var cost = parseFloat(form.querySelector('#df-pf-cost').value);
+          if (isNaN(qty) || qty <= 0 || isNaN(cost) || cost < 0) { showToast('Adet ve maliyet girin'); return; }
+          div.remove(); document.removeEventListener('click', outsideHandler);
+          addToPortfolioDirect(pf.id, sym, ex, qty, cost);
+        };
+        row.insertAdjacentElement('afterend', form);
+        setTimeout(function() { form.querySelector('#df-pf-qty').focus(); }, 50);
+      };
+      div.appendChild(row);
+    });
+  }
+
+  if (!_dfWatchlists.length && !_dfPortfolios.length) {
+    div.innerHTML = '<div style="padding:10px 14px;color:var(--text2);font-size:12px">Profil sayfasından liste oluşturun</div>';
   }
 
   document.body.appendChild(div);
@@ -2735,6 +2783,20 @@ function _renderWlPicker(evt, sym, ex) {
     if (!div.contains(e.target)) { div.remove(); document.removeEventListener('click', outsideHandler); }
   }
   setTimeout(function() { document.addEventListener('click', outsideHandler); }, 0);
+}
+
+function addToPortfolioDirect(pfId, sym, ex, qty, cost) {
+  fetch('/api/portfolio/item', {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ portfolioId: pfId, symbol: sym, exchange: ex || currentExchange, quantity: qty, avgCost: cost })
+  }).then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.error) { showToast('Hata: ' + d.error); return; }
+      showToast('✓ ' + sym + ' portföye eklendi');
+      if (d.portfolios) _dfPortfolios = d.portfolios;
+    }).catch(function() { showToast('Bağlantı hatası'); });
 }
 
 function addToWatchlistDirect(listId, sym, ex) {
@@ -2764,6 +2826,10 @@ init();
       fetch('/api/watchlists', { credentials: 'same-origin' })
         .then(function(r) { return r.json(); })
         .then(function(wd) { _dfWatchlists = wd.watchlists || []; })
+        .catch(function() {});
+      fetch('/api/portfolio', { credentials: 'same-origin' })
+        .then(function(r) { return r.json(); })
+        .then(function(pd) { _dfPortfolios = pd.portfolios || []; })
         .catch(function() {});
       var btn = document.getElementById('profile-btn');
       if (!btn) return;
