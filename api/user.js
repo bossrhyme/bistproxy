@@ -319,35 +319,11 @@ async function handleUpdateProfile(req, res) {
   jsonRes(res, 200, { ok: true, name: newName });
 }
 
-async function handlePing(req, res) {
-  // Hangi env var'ların set edildiğini bul
-  const candidates = [
-    'KV_REST_API_URL','KV_REST_API_TOKEN',
-    'UPSTASH_REDIS_REST_URL','UPSTASH_REDIS_REST_TOKEN',
-    'UPSTASH_REDIS_REST_KV_REST_API_URL','UPSTASH_REDIS_REST_KV_REST_API_TOKEN',
-    'UPSTASH_REDIS_REST_KV_URL','UPSTASH_REDIS_REST_REDIS_URL',
-    'STORAGE_URL','STORAGE_TOKEN',
-  ];
-  const found = {};
-  candidates.forEach(k => { if (process.env[k]) found[k] = process.env[k].slice(0, 20) + '…'; });
-
-  const testKey = 'ping:test:' + Date.now();
-  try {
-    await kvSet(testKey, { ok: true }, 60);
-    const val = await kvGet(testKey);
-    await kvDel(testKey);
-    jsonRes(res, 200, { ok: true, kv: !!val, found });
-  } catch (e) {
-    jsonRes(res, 200, { ok: false, error: e.message, found });
-  }
-}
-
 // ── main router ───────────────────────────────
 module.exports = async function handler(req, res) {
   const path = (req.url || '').split('?')[0];
 
   try {
-    if (path === '/api/auth/ping')            return await handlePing(req, res);
     if (path === '/api/auth/register')        return await handleRegister(req, res);
     if (path === '/api/auth/login')           return await handleLogin(req, res);
     if (path === '/api/auth/me')              return await handleMe(req, res);

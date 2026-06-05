@@ -162,7 +162,6 @@
     },
     { "source": "/api/symbol-list",   "destination": "/api/symbols.js" },
     { "source": "/api/symbol-search", "destination": "/api/symbols.js" },
-    { "source": "/api/auth/ping",             "destination": "/api/user.js" },
     { "source": "/api/auth/register",         "destination": "/api/user.js" },
     { "source": "/api/auth/login",            "destination": "/api/user.js" },
     { "source": "/api/auth/me",               "destination": "/api/user.js" },
