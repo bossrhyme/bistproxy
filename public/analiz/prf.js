@@ -23,6 +23,7 @@ var _drawMode   = null;
 var _drawPts    = [];
 var _drawings   = [];
 var _drawPreviewSer = null;
+var _selectedDrawing = null;
 
 function _tbHtml() {
   var b = function(id, label, on, fn) {
@@ -128,66 +129,165 @@ function toggleInd(key) {
   if (_chartInds[key]) _addIndSeries(key); else _removeIndSeries(key);
 }
 
-// ── Drawing tools ─────────────────────────────────────────────────────────
-function _clearDrawPreview() {
-  if (_drawPreviewSer&&_chartInst) { try{_chartInst.removeSeries(_drawPreviewSer);}catch(e){} }
-  _drawPreviewSer = null;
-  if (_chartSer) { try{_chartSer.setMarkers([]);}catch(e){} }
+// ── Drawing tools ─────────────────────────────────────────
+function _segDist(px,py,x1,y1,x2,y2){
+  var dx=x2-x1,dy=y2-y1,l2=dx*dx+dy*dy;
+  if(!l2) return Math.sqrt((px-x1)*(px-x1)+(py-y1)*(py-y1));
+  var t=Math.max(0,Math.min(1,((px-x1)*dx+(py-y1)*dy)/l2));
+  return Math.sqrt(Math.pow(px-x1-t*dx,2)+Math.pow(py-y1-t*dy,2));
 }
 
-function setDrawMode(mode) {
-  _drawMode = (_drawMode===mode) ? null : mode;
-  ['trend','ray','horizontal'].forEach(function(m){ _tbSet('draw-'+m, _drawMode===m); });
-  _drawPts = [];
-  _clearDrawPreview();
-  var el = document.getElementById('prf-chart-inner');
-  if (el) el.style.cursor = _drawMode ? 'crosshair' : 'default';
+function _findNearDrawing(px,py){
+  if(!_chartInst||!_chartSer) return -1;
+  var best=-1,bestD=14;
+  _drawings.forEach(function(d,i){
+    try{
+      if(d._pl){
+        var ly=_chartSer.priceToCoordinate(d._price);
+        if(ly!==null&&Math.abs(py-ly)<bestD){bestD=Math.abs(py-ly);best=i;}
+      } else if(d._ser&&d._pts){
+        var x1=_chartInst.timeScale().timeToCoordinate(d._pts[0].time);
+        var y1=_chartSer.priceToCoordinate(d._pts[0].value);
+        var x2=_chartInst.timeScale().timeToCoordinate(d._pts[1].time);
+        var y2=_chartSer.priceToCoordinate(d._pts[1].value);
+        if(x1!==null&&y1!==null&&x2!==null&&y2!==null){
+          var dist=_segDist(px,py,x1,y1,x2,y2);
+          if(dist<bestD){bestD=dist;best=i;}
+        }
+      }
+    }catch(e){}
+  });
+  return best;
 }
 
-function clearDrawings() {
+function _hideDeleteBtn(){
+  var btn=document.getElementById('draw-del-btn');
+  if(btn) btn.style.display='none';
+}
+
+function _showDeleteBtn(d){
+  var el=document.getElementById('prf-chart-inner');
+  if(!el||!_chartInst||!_chartSer) return;
+  var btn=document.getElementById('draw-del-btn');
+  if(!btn){
+    btn=document.createElement('div');
+    btn.id='draw-del-btn';
+    btn.innerHTML='<svg width="10" height="10" viewBox="0 0 10 10"><line x1="1" y1="1" x2="9" y2="9" stroke="#fff" stroke-width="2"/><line x1="9" y1="1" x2="1" y2="9" stroke="#fff" stroke-width="2"/></svg>';
+    btn.title='Sil (Delete)';
+    btn.style.cssText='position:absolute;background:#f43f5e;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:50;box-shadow:0 2px 8px rgba(244,63,94,.4);user-select:none;right:40px;top:8px;';
+    btn.onclick=function(e){e.stopPropagation();deleteSelectedDrawing();};
+    el.appendChild(btn);
+  }
+  btn.style.display='flex';
+}
+
+function _deselectDrawing(){
+  if(_selectedDrawing===null) return;
+  var d=_drawings[_selectedDrawing];
+  if(d){
+    if(d._ser){try{d._ser.applyOptions({color:'#8b5cf6',lineWidth:1.5});}catch(e){} try{d._ser.setMarkers([]);}catch(e){}}
+    if(d._pl){try{d._pl.applyOptions({color:'#8b5cf6',lineWidth:1});}catch(e){}}
+  }
+  _selectedDrawing=null;
+  _hideDeleteBtn();
+}
+
+function _selectDrawing(idx){
+  if(_selectedDrawing===idx){_deselectDrawing();return;}
+  _deselectDrawing();
+  _selectedDrawing=idx;
+  var d=_drawings[idx];
+  if(!d) return;
+  if(d._ser){
+    try{d._ser.applyOptions({color:'#a78bfa',lineWidth:2.5});}catch(e){}
+    try{d._ser.setMarkers([
+      {time:d._pts[0].time,position:'inBar',color:'#7c3aed',shape:'circle',size:1},
+      {time:d._pts[1].time,position:'inBar',color:'#7c3aed',shape:'circle',size:1}
+    ]);}catch(e){}
+  }
+  if(d._pl){try{d._pl.applyOptions({color:'#a78bfa',lineWidth:2});}catch(e){}}
+  _showDeleteBtn(d);
+}
+
+function deleteSelectedDrawing(){
+  if(_selectedDrawing===null) return;
+  var d=_drawings[_selectedDrawing];
+  if(d){
+    if(d._pl){try{_chartSer.removePriceLine(d._pl);}catch(e){}}
+    else if(d._ser){try{_chartInst.removeSeries(d._ser);}catch(e){}}
+  }
+  _drawings.splice(_selectedDrawing,1);
+  _selectedDrawing=null;
+  _hideDeleteBtn();
+}
+
+function _clearDrawPreview(){
+  if(_drawPreviewSer&&_chartInst){try{_chartInst.removeSeries(_drawPreviewSer);}catch(e){}}
+  _drawPreviewSer=null;
+  if(_chartSer){try{_chartSer.setMarkers([]);}catch(e){}}
+}
+
+function setDrawMode(mode){
+  _drawMode=(_drawMode===mode)?null:mode;
+  ['trend','ray','horizontal'].forEach(function(m){_tbSet('draw-'+m,_drawMode===m);});
+  _drawPts=[];
   _clearDrawPreview();
-  _drawings.forEach(function(d) {
-    if (d&&d._pl) { try{_chartSer.removePriceLine(d._pl);}catch(e){} }
-    else if (d&&_chartInst) { try{_chartInst.removeSeries(d);}catch(e){} }
+  _deselectDrawing();
+  var el=document.getElementById('prf-chart-inner');
+  if(el) el.style.cursor=_drawMode?'crosshair':'default';
+}
+
+function clearDrawings(){
+  _deselectDrawing();
+  _clearDrawPreview();
+  _drawings.forEach(function(d){
+    if(d._pl){try{_chartSer.removePriceLine(d._pl);}catch(e){}}
+    else if(d._ser){try{_chartInst.removeSeries(d._ser);}catch(e){}}
   });
   _drawings=[]; _drawPts=[];
+  var btn=document.getElementById('draw-del-btn');
+  if(btn) btn.remove();
 }
 
-function _onChartClick(param) {
-  if (!_drawMode||!param.time||!_chartInst||!_chartSer) return;
-  var price = null;
-  if (param.seriesData) { var sd = param.seriesData.get(_chartSer); if(sd) price = sd.close!==undefined?sd.close:sd.value; }
-  if (price==null) { var c=_chartData.find(function(x){return x.time===param.time;}); if(c) price=c.close; }
-  if (price==null) return;
-
-  if (_drawMode==='horizontal') {
-    var pl = _chartSer.createPriceLine({ price:price, color:'#8b5cf6', lineWidth:1, lineStyle:2, axisLabelVisible:true, title:price.toFixed(2) });
-    _drawings.push({_pl:pl}); return;
+function _onChartClick(param){
+  if(!param.time||!_chartInst||!_chartSer) return;
+  if(!_drawMode){
+    var pt=param.point;
+    if(pt){var nIdx=_findNearDrawing(pt.x,pt.y); if(nIdx>=0)_selectDrawing(nIdx); else _deselectDrawing();}
+    return;
   }
-  _drawPts.push({time:param.time, value:price});
-  if (_drawPts.length===1) {
-    _chartSer.setMarkers([{time:param.time, position:'inBar', color:'#8b5cf6', shape:'circle', size:1}]);
-    _drawPreviewSer = _chartInst.addLineSeries({ color:'#8b5cf6', lineWidth:1, lineStyle:1, priceLineVisible:false, lastValueVisible:false, crosshairMarkerVisible:false });
-    _drawPreviewSer.setData([{time:param.time, value:price}]);
+  var price=null;
+  if(param.seriesData){var sd=param.seriesData.get(_chartSer);if(sd)price=sd.close!==undefined?sd.close:sd.value;}
+  if(price==null){var c=_chartData.find(function(x){return x.time===param.time;});if(c)price=c.close;}
+  if(price==null) return;
+  if(_drawMode==='horizontal'){
+    var pl=_chartSer.createPriceLine({price:price,color:'#8b5cf6',lineWidth:1,lineStyle:2,axisLabelVisible:true,title:price.toFixed(2)});
+    _drawings.push({_pl:pl,_price:price}); return;
   }
-  if (_drawPts.length===2) {
-    var p1=_drawPts[0], p2=_drawPts[1];
-    if (p1.time===p2.time) { _drawPts=[]; return; }
+  _drawPts.push({time:param.time,value:price});
+  if(_drawPts.length===1){
+    _chartSer.setMarkers([{time:param.time,position:'inBar',color:'#8b5cf6',shape:'circle',size:1}]);
+    _drawPreviewSer=_chartInst.addLineSeries({color:'#8b5cf6',lineWidth:1,lineStyle:1,priceLineVisible:false,lastValueVisible:false,crosshairMarkerVisible:false});
+    _drawPreviewSer.setData([{time:param.time,value:price}]);
+  }
+  if(_drawPts.length===2){
+    var p1=_drawPts[0],p2=_drawPts[1];
+    if(p1.time===p2.time){_drawPts=[];return;}
     _clearDrawPreview();
-    var pts = [p1,p2].sort(function(a,b){return a.time-b.time;});
-    if (_drawMode==='ray') {
+    var pts=[p1,p2].sort(function(a,b){return a.time-b.time;});
+    if(_drawMode==='ray'){
       var last=_chartData[_chartData.length-1];
-      if (last&&last.time>pts[1].time) {
+      if(last&&last.time>pts[1].time){
         var slope=(pts[1].value-pts[0].value)/(pts[1].time-pts[0].time);
-        pts[1]={time:last.time, value:pts[0].value+slope*(last.time-pts[0].time)};
+        pts[1]={time:last.time,value:pts[0].value+slope*(last.time-pts[0].time)};
       }
     }
-    var ls = _chartInst.addLineSeries({ color:'#8b5cf6', lineWidth:1.5, priceLineVisible:false, lastValueVisible:false, crosshairMarkerVisible:false });
+    var ls=_chartInst.addLineSeries({color:'#8b5cf6',lineWidth:1.5,priceLineVisible:false,lastValueVisible:false,crosshairMarkerVisible:false});
     ls.setData([{time:pts[0].time,value:pts[0].value},{time:pts[1].time,value:pts[1].value}]);
-    _drawings.push(ls); _drawPts=[];
+    _drawings.push({_ser:ls,_pts:[{time:pts[0].time,value:pts[0].value},{time:pts[1].time,value:pts[1].value}],_type:_drawMode});
+    _drawPts=[];
   }
 }
-
 // ── Chart core ────────────────────────────────────────────────────────────
 function _chartApply() {
   if (!_chartInst||!_chartSer||!_chartData.length) return;
@@ -258,14 +358,14 @@ function _fetchChart(sym, ex) {
 function loadTVWidget(sym, ex) {
   _chartSym2=sym; _chartEx2=ex;
   _chartData=[]; _chartInst=null; _chartSer=null; _chartPct=false;
-  _drawMode=null; _drawPts=[]; _drawings=[]; _drawPreviewSer=null; _chartIndS={};
+  _drawMode=null; _drawPts=[]; _drawings=[]; _drawPreviewSer=null; _selectedDrawing=null; _chartIndS={};
 
   var container = document.getElementById('prf-tv-widget');
   if (!container) return;
   var ph = document.getElementById('prf-tv-placeholder');
   if (ph) ph.style.display='none';
 
-  container.innerHTML = _tbHtml()+'<div id="prf-chart-inner" style="width:100%;height:256px;background:#f8fafc;"></div>';
+  container.innerHTML = _tbHtml()+'<div id="prf-chart-inner" style="width:100%;height:256px;background:#f8fafc;position:relative;"></div>';
 
   function _init() {
     var chartEl = document.getElementById('prf-chart-inner');
@@ -296,6 +396,15 @@ function loadTVWidget(sym, ex) {
       var pts2=[p1,{time:param.time,value:px}].sort(function(a,b){return a.time-b.time;});
       try{_drawPreviewSer.setData([{time:pts2[0].time,value:pts2[0].value},{time:pts2[1].time,value:pts2[1].value}]);}catch(e){}
     });
+    if(window._drawKeyH) document.removeEventListener('keydown',window._drawKeyH);
+    window._drawKeyH=function(e){
+      if((e.key==='Delete'||e.key==='Backspace')&&_selectedDrawing!==null){
+        var ae=document.activeElement;
+        if(!ae||ae.tagName!=='INPUT'){deleteSelectedDrawing();e.preventDefault();}
+      }
+      if(e.key==='Escape'){if(_selectedDrawing!==null)_deselectDrawing();else if(_drawMode)setDrawMode(_drawMode);}
+    };
+    document.addEventListener('keydown',window._drawKeyH);
     _fetchChart(sym, ex);
     var ld = document.getElementById('prf-live-dot');
     if (ld) ld.style.display='flex';
