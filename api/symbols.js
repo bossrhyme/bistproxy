@@ -12,7 +12,22 @@ const ALLOWED_ORIGINS = [
 ];
 
 function kvEnabled() {
-  return !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
+  return !!(
+    process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_KV_REST_API_URL ||
+    process.env.UPSTASH_REDIS_REST_URL
+  );
+}
+
+function kvUrl() {
+  return process.env.KV_REST_API_URL ||
+    process.env.UPSTASH_REDIS_REST_KV_REST_API_URL ||
+    process.env.UPSTASH_REDIS_REST_URL || '';
+}
+
+function kvToken() {
+  return process.env.KV_REST_API_TOKEN ||
+    process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN ||
+    process.env.UPSTASH_REDIS_REST_TOKEN || '';
 }
 
 function fetchHttp(urlStr, method, headers, body) {
@@ -32,8 +47,8 @@ function fetchHttp(urlStr, method, headers, body) {
 
 async function kvGet(key) {
   try {
-    const raw  = await fetchHttp(process.env.KV_REST_API_URL + '/get/' + encodeURIComponent(key),
-      'GET', { Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN });
+    const raw  = await fetchHttp(kvUrl() + '/get/' + encodeURIComponent(key),
+      'GET', { Authorization: 'Bearer ' + kvToken() });
     const json = JSON.parse(raw);
     return json.result ? JSON.parse(json.result) : null;
   } catch(e) { return null; }
@@ -41,8 +56,8 @@ async function kvGet(key) {
 
 async function kvSet(key, value, ttl) {
   try {
-    await fetchHttp(process.env.KV_REST_API_URL + '/set/' + encodeURIComponent(key) + '?ex=' + ttl,
-      'POST', { Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN, 'Content-Type': 'application/json' },
+    await fetchHttp(kvUrl() + '/set/' + encodeURIComponent(key) + '?ex=' + ttl,
+      'POST', { Authorization: 'Bearer ' + kvToken(), 'Content-Type': 'application/json' },
       JSON.stringify(value));
   } catch(e) {}
 }
@@ -98,40 +113,61 @@ async function handleList(req, res) {
 const EX_MAP    = { bist: 'BIST', nasdaq: 'NASDAQ', sp500: '', dax: 'XETR', lse: 'LSE', nikkei: 'TSE', nyse: 'NYSE' };
 const MARKET_MAP = { sp500: 'america', nasdaq: 'america', nyse: 'america' };
 
+function parseTvSearchResponse(raw) {
+  try {
+    const parsed = JSON.parse(raw);
+    // v3 format: { symbols: [...] }  or  v1 format: [...]
+    const arr = Array.isArray(parsed) ? parsed : (parsed.symbols || parsed.data || []);
+    return arr.filter(x => x && (x.symbol || x.s)).slice(0, 15).map(x => ({
+      s: x.symbol || x.s,
+      n: x.description || x.full_name || x.name || x.symbol || '',
+      ex: (x.exchange || '').toUpperCase()
+    }));
+  } catch(e) { return null; }
+}
+
+function tvSearchRequest(path, resolve, onSymbols) {
+  const req = https.request({
+    hostname: 'symbol-search.tradingview.com', path, method: 'GET',
+    headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'Accept': 'application/json', 'Origin': 'https://www.tradingview.com', 'Referer': 'https://www.tradingview.com/' }
+  }, (tvRes) => {
+    let data = '';
+    tvRes.on('data', c => data += c);
+    tvRes.on('end', () => { onSymbols(parseTvSearchResponse(data)); resolve(); });
+  });
+  req.on('error', () => { onSymbols(null); resolve(); });
+  req.setTimeout(5000, () => { req.destroy(); onSymbols(null); resolve(); });
+  req.end();
+  return req;
+}
+
 async function handleSearch(req, res) {
   const url   = new URL(req.url, 'http://localhost');
   const q     = (url.searchParams.get('q') || '').trim().substring(0, 60);
   const exKey = (url.searchParams.get('exchange') || 'bist').toLowerCase();
-  if (!q) return res.status(400).json({ symbols: [] });
+  if (!q) return res.status(200).json({ symbols: [] });
 
   const tvEx     = EX_MAP[exKey] !== undefined ? EX_MAP[exKey] : exKey.toUpperCase();
   const tvMarket = MARKET_MAP[exKey] || '';
-  const tvUrl    = 'https://symbol-search.tradingview.com/symbol_search/v3/?text=' + encodeURIComponent(q)
-    + '&lang=en&domain=production'
-    + (tvEx     ? '&exchange=' + encodeURIComponent(tvEx)     : '')
+  const qs = '?text=' + encodeURIComponent(q) + '&lang=en&domain=production'
+    + (tvEx     ? '&exchange=' + encodeURIComponent(tvEx) : '')
     + (tvMarket ? '&market='   + encodeURIComponent(tvMarket) : '');
 
+  // Try v3 first, fall back to v1
   return new Promise((resolve) => {
-    const u = new URL(tvUrl);
-    const tvReq = https.request({ hostname: u.hostname, path: u.pathname + u.search, method: 'GET',
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DeepFin/1.0)', 'Accept': 'application/json' }
-    }, (tvRes) => {
-      let data = '';
-      tvRes.on('data', c => data += c);
-      tvRes.on('end', () => {
-        try {
-          const parsed  = JSON.parse(data);
-          const symbols = (parsed.symbols || parsed || []).filter(x => x && x.symbol).slice(0, 15)
-            .map(x => ({ s: x.symbol, n: x.description || x.symbol, ex: x.exchange || '' }));
+    tvSearchRequest('/symbol_search/v3/' + qs, resolve, function(symbols) {
+      if (symbols && symbols.length > 0) {
+        res.setHeader('Cache-Control', 'public, s-maxage=300');
+        return res.status(200).json({ symbols });
+      }
+      // v3 returned nothing — try v1
+      new Promise((resolve2) => {
+        tvSearchRequest('/symbol_search/' + qs, resolve2, function(symbols2) {
           res.setHeader('Cache-Control', 'public, s-maxage=300');
-          res.status(200).json({ symbols });
-        } catch(e) { res.status(200).json({ symbols: [], error: e.message }); }
-        resolve();
+          res.status(200).json({ symbols: symbols2 || [] });
+        });
       });
     });
-    tvReq.on('error', (e) => { res.status(200).json({ symbols: [], error: e.message }); resolve(); });
-    tvReq.setTimeout(5000, () => { tvReq.destroy(); res.status(200).json({ symbols: [] }); resolve(); });
-    tvReq.end();
   });
 }
 

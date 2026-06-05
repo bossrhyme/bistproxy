@@ -277,8 +277,10 @@ window.closeModal = function() { document.getElementById('pf-modal-bg').style.di
 
 // ── Hisse Picker Modal ────────────────────────
 var _spTimer = null;
+var _spMode  = 'watchlist'; // 'watchlist' | 'portfolio'
 
-window.openSymPicker = function() {
+window.openSymPicker = function(mode) {
+  _spMode = mode || 'watchlist';
   var bg = document.getElementById('pf-sym-picker-bg');
   bg.style.display = 'flex';
   var inp = document.getElementById('pf-sym-search');
@@ -327,6 +329,18 @@ function renderSymResults(symbols, ex) {
 
 window.addFromPicker = async function(sym, ex) {
   closeSymPicker();
+  if (_spMode === 'portfolio') {
+    // Portföy modunda: sadece alanları doldur, kullanıcı qty+cost girer
+    document.getElementById('pf-pos-sym').value  = sym;
+    document.getElementById('pf-pos-ex').value   = ex;
+    var btn = document.getElementById('pf-pos-sym-btn');
+    if (btn) { btn.textContent = '✓ ' + sym + ' (' + ex.toUpperCase() + ')'; btn.classList.add('selected'); }
+    var addBtn = document.getElementById('pf-pos-add-btn');
+    if (addBtn) addBtn.disabled = false;
+    setTimeout(function() { var q = document.getElementById('pf-pos-qty'); if (q) q.focus(); }, 50);
+    return;
+  }
+  // Watchlist modu
   try {
     var r = await fetch('/api/watchlists/item', {
       method: 'POST',
@@ -419,22 +433,25 @@ window.addPosition = async function() {
   var ex   =  document.getElementById('pf-pos-ex').value;
   var qty  = parseFloat(document.getElementById('pf-pos-qty').value);
   var cost = parseFloat(document.getElementById('pf-pos-cost').value);
-  if (!sym || isNaN(qty) || qty <= 0 || isNaN(cost) || cost < 0) { toast('Tüm alanları doldurun'); return; }
-  clearAC();
-  var btn = document.getElementById('pf-pos-add-btn'); btn.disabled = true;
+  if (!sym || !ex) { toast('Önce hisse seçin'); return; }
+  if (isNaN(qty) || qty <= 0 || isNaN(cost) || cost < 0) { toast('Adet ve maliyet girin'); return; }
+  var addBtn = document.getElementById('pf-pos-add-btn'); addBtn.disabled = true;
   try {
     var r = await fetch('/api/portfolio/item', { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ symbol: sym, exchange: ex, quantity: qty, avgCost: cost }) });
     var d = await r.json();
     if (d.positions) {
       _portfolio = d.positions;
-      document.getElementById('pf-pos-sym').value = '';
-      document.getElementById('pf-pos-qty').value = '';
+      document.getElementById('pf-pos-sym').value  = '';
+      document.getElementById('pf-pos-ex').value   = 'bist';
+      document.getElementById('pf-pos-qty').value  = '';
       document.getElementById('pf-pos-cost').value = '';
+      var pickBtn = document.getElementById('pf-pos-sym-btn');
+      if (pickBtn) { pickBtn.textContent = '🔍 Hisse Seç'; pickBtn.classList.remove('selected'); }
+      addBtn.disabled = true;
       renderPortfolio(); toast('✓ ' + sym + ' eklendi');
     }
   } catch(e) { toast('Hata oluştu'); }
-  btn.disabled = false;
 };
 
 window.removePosition = async function(id) {
