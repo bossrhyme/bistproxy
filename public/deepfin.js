@@ -764,6 +764,7 @@ var _dfWatchlists = []; // önbelleğe alınmış watchlist'ler
 var _dfPortfolios = []; // önbelleğe alınmış portföyler
 var favSet = new Set(JSON.parse(localStorage.getItem('df_favs') || '[]'));
 var favFilterActive = false;
+var _dfListFilter   = null; // { id, name, symbols:[] } — logged-in liste filtresi
 var fonFavSet = new Set(JSON.parse(localStorage.getItem('df_fon_favs') || '[]'));
 var kriptoFavSet = new Set(JSON.parse(localStorage.getItem('df_kripto_favs') || '[]'));
 
@@ -824,18 +825,90 @@ function _syncFavToWatchlist(sym, add) {
 }
 
 function _updateFavBtn() {
-  var label = favFilterActive ? '★ Favoriler (' + favSet.size + ')' : '☆ Favoriler';
+  var label, active;
+  if (_dfUser) {
+    active = !!_dfListFilter;
+    label  = active ? '★ ' + _dfListFilter.name + ' (' + _dfListFilter.symbols.length + ')' : '☆ Listelerim';
+  } else {
+    active = favFilterActive;
+    label  = active ? '★ Favoriler (' + favSet.size + ')' : '☆ Favoriler';
+  }
   ['fav-filter-btn', 'tb-fav-btn'].forEach(function(id) {
     var btn = document.getElementById(id);
     if (!btn) return;
-    btn.classList.toggle('on', favFilterActive);
+    btn.classList.toggle('on', active);
     btn.textContent = label;
   });
 }
 
-function toggleFavFilter() {
-  favFilterActive = !favFilterActive;
-  _updateFavBtn(); renderTable();
+function toggleFavFilter(evt) {
+  if (_dfUser) {
+    if (_dfListFilter) { _dfListFilter = null; _updateFavBtn(); renderTable(); return; }
+    _showListFilterPicker(evt || window.event);
+  } else {
+    favFilterActive = !favFilterActive;
+    _updateFavBtn(); renderTable();
+  }
+}
+
+function _showListFilterPicker(evt) {
+  var existing = document.getElementById('df-list-filter-picker');
+  if (existing) { existing.remove(); return; }
+
+  var btn  = (evt && evt.currentTarget) || document.getElementById('fav-filter-btn');
+  var rect = btn ? btn.getBoundingClientRect() : { left: 8, bottom: 48 };
+  var div  = document.createElement('div');
+  div.id   = 'df-list-filter-picker';
+  div.style.cssText = 'position:fixed;z-index:9999;background:var(--s1);border:1px solid var(--border);border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.18);min-width:200px;max-width:240px;padding:6px 0;left:' + Math.max(4, rect.left) + 'px;top:' + (rect.bottom + 4) + 'px;font-family:Inter,sans-serif';
+
+  function secLabel(txt) {
+    var l = document.createElement('div');
+    l.style.cssText = 'padding:4px 12px 2px;font-size:10px;font-weight:700;color:var(--text2);letter-spacing:.5px;text-transform:uppercase';
+    l.textContent = txt; div.appendChild(l);
+  }
+  function makeRow(icon, name, onclick) {
+    var row = document.createElement('div');
+    row.style.cssText = 'padding:7px 12px;cursor:pointer;font-size:12px;color:var(--text);display:flex;align-items:center;gap:8px;white-space:nowrap;overflow:hidden';
+    row.innerHTML = '<span>' + icon + '</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis">' + name + '</span>';
+    row.onmouseenter = function() { row.style.background = 'var(--s2)'; };
+    row.onmouseleave = function() { row.style.background = ''; };
+    row.onclick = onclick; return row;
+  }
+
+  if (_dfWatchlists.length) {
+    secLabel('Takip Listeleri');
+    _dfWatchlists.forEach(function(list) {
+      var syms = (list.items || []).map(function(i) { return (i.symbol || '').replace('.IS','').toUpperCase(); });
+      div.appendChild(makeRow(list.icon || '⭐', list.name + ' (' + syms.length + ')', function(e) {
+        e.stopPropagation(); div.remove(); document.removeEventListener('click', outside);
+        _dfListFilter = { id: list.id, name: list.name, symbols: syms };
+        _updateFavBtn(); renderTable();
+      }));
+    });
+  }
+
+  if (_dfPortfolios.length) {
+    var sep = document.createElement('div');
+    sep.style.cssText = 'height:1px;background:var(--border);margin:4px 0';
+    div.appendChild(sep);
+    secLabel('Portföyler');
+    _dfPortfolios.forEach(function(pf) {
+      var syms = (pf.positions || []).map(function(p) { return (p.symbol || '').replace('.IS','').toUpperCase(); });
+      div.appendChild(makeRow(pf.icon || '📊', pf.name + ' (' + syms.length + ')', function(e) {
+        e.stopPropagation(); div.remove(); document.removeEventListener('click', outside);
+        _dfListFilter = { id: pf.id, name: pf.name, symbols: syms };
+        _updateFavBtn(); renderTable();
+      }));
+    });
+  }
+
+  if (!_dfWatchlists.length && !_dfPortfolios.length) {
+    div.innerHTML = '<div style="padding:10px 14px;color:var(--text2);font-size:12px">Profil sayfasından liste oluşturun</div>';
+  }
+
+  document.body.appendChild(div);
+  function outside(e) { if (!div.contains(e.target)) { div.remove(); document.removeEventListener('click', outside); } }
+  setTimeout(function() { document.addEventListener('click', outside); }, 0);
 }
 
 // ═══════════════════════════════════════════
@@ -2174,7 +2247,14 @@ function _vsRowHtml(s, idx) {
     }
   });
 
-  _vsData = sorted(favFilterActive ? filtered.filter(function(s){ return favSet.has(s.symbol); }) : filtered);
+  var base = filtered;
+  if (_dfUser && _dfListFilter) {
+    var syms = _dfListFilter.symbols;
+    base = filtered.filter(function(s) { return syms.indexOf((s.symbol || '').replace('.IS','').toUpperCase()) !== -1; });
+  } else if (!_dfUser && favFilterActive) {
+    base = filtered.filter(function(s) { return favSet.has(s.symbol); });
+  }
+  _vsData = sorted(base);
   _vsInit();
   _vsRender();
   setTimeout(applyColVisibility, 0);
@@ -2825,12 +2905,13 @@ init();
       _dfUser = d.user;
       fetch('/api/watchlists', { credentials: 'same-origin' })
         .then(function(r) { return r.json(); })
-        .then(function(wd) { _dfWatchlists = wd.watchlists || []; })
+        .then(function(wd) { _dfWatchlists = wd.watchlists || []; _updateFavBtn(); })
         .catch(function() {});
       fetch('/api/portfolio', { credentials: 'same-origin' })
         .then(function(r) { return r.json(); })
         .then(function(pd) { _dfPortfolios = pd.portfolios || []; })
         .catch(function() {});
+      _updateFavBtn();
       var btn = document.getElementById('profile-btn');
       if (!btn) return;
       btn.classList.add('logged-in');
