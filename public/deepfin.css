@@ -1003,12 +1003,10 @@ a.pop-chip{text-decoration:none;color:inherit;}
 .goat-tip,.chip-tip,.th-tip{display:none!important;}
 
 /* ── FAV İKONU ── */
-.nfav{width:42px;text-align:center;padding:0 2px;user-select:none;}
+.nfav{width:28px;text-align:center;padding:0 4px;user-select:none;}
 .fav-icon{font-size:14px;color:var(--muted);transition:color .15s,transform .15s;display:inline-block;cursor:pointer;}
 .fav-icon:hover{color:var(--gold);transform:scale(1.2);}
 .fav-icon.fav-on{color:var(--gold);}
-.wl-add-icon{font-size:13px;color:var(--muted);display:inline-block;cursor:pointer;margin-left:2px;transition:color .15s,transform .15s;line-height:1;}
-.wl-add-icon:hover{color:var(--accent);transform:scale(1.2);}
 .sb-fav-btn{background:transparent;border:1px solid var(--border);color:var(--muted2);font-size:11px;font-weight:600;padding:3px 10px;border-radius:5px;cursor:pointer;transition:all .15s;margin-right:4px;}
 .sb-fav-btn:hover,.sb-fav-btn.on{border-color:var(--gold);color:var(--gold);background:rgba(240,180,41,.08);}
 

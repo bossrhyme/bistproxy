@@ -2116,12 +2116,27 @@ function _vsInit() {
 
 
 
+function isInAnyList(sym) {
+  return _dfWatchlists.some(function(l) {
+    return l.items && l.items.some(function(i) { return i.symbol === sym; });
+  });
+}
+
 function _vsRowHtml(s, idx) {
   // Inline display style — scroll sonrası da korunur
   var cv = function(key) { return isColVisible(key) ? '' : 'display:none;'; };
-  var isFav = favSet.has(s.symbol);
+  var isFav, favClick, favTitle;
+  if (_dfUser) {
+    isFav     = isInAnyList(s.symbol);
+    favClick  = "showWlPicker(event,'" + s.symbol + "','" + currentExchange + "')";
+    favTitle  = isFav ? 'Listede var — başka listeye ekle' : 'Listeye ekle';
+  } else {
+    isFav     = favSet.has(s.symbol);
+    favClick  = "event.stopPropagation();toggleFav('" + s.symbol + "')";
+    favTitle  = isFav ? 'Favorilerden çıkar' : 'Favorilere ekle';
+  }
   return `<tr onclick="showDetail('${s.symbol}')" class="${selSym===s.symbol?'selrow':''}">
-      <td class="nfav"><span class="fav-icon${isFav?' fav-on':''}" onclick="event.stopPropagation();toggleFav('${s.symbol}')" title="${isFav?'Favorilerden çıkar':'Favorilere ekle'}">★</span>${_dfUser?`<span class="wl-add-icon" onclick="showWlPicker(event,'${s.symbol}','${currentExchange}')" title="Listeye ekle">⊕</span>`:''}</td>
+      <td class="nfav"><span class="fav-icon${isFav?' fav-on':''}" onclick="${favClick}" title="${favTitle}">★</span></td>
       <td data-col="symbol" style="display:table-cell;"><span class="row-num">${idx+1}</span><span class="sym-wrap"><span class="row-arrow">›</span><span class="sym">${s.symbol}</span></span></td>
       <td data-col="name" style="${cv('name')}font-size:11px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.name}">${s.name}</td>
       <td data-col="price" style="${cv('price')}">${s.currentPrice!=null?(s.currentPrice.toFixed(2)+' '+(EXCHANGE_META[currentExchange]||EXCHANGE_META.bist).currency):nil}</td>
@@ -2196,7 +2211,7 @@ function buildProfile(s) {
 
   // Hemen Al + Detaylı Analiz + Listeye Ekle butonları
   var wlBtn = _dfUser
-    ? '<button class="dpl-wladd" onclick="showWlPicker(event,\'' + sym + '\',\'' + ex + '\')" title="Listeye ekle">⊕ Listeye Ekle</button>'
+    ? '<button class="dpl-wladd" onclick="showWlPicker(event,\'' + sym + '\',\'' + ex + '\')" title="Listeye ekle">📋 Listeye Ekle</button>'
     : '';
   linksEl.innerHTML = [
     '<div class="dpl-action-row">',
@@ -2732,7 +2747,7 @@ function addToWatchlistDirect(listId, sym, ex) {
     .then(function(d) {
       if (d.error) { showToast('Hata: ' + d.error); return; }
       showToast('✓ ' + sym + ' listeye eklendi');
-      if (d.watchlists) _dfWatchlists = d.watchlists;
+      if (d.watchlists) { _dfWatchlists = d.watchlists; renderTable(); }
     }).catch(function() { showToast('Bağlantı hatası'); });
 }
 
