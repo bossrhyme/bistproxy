@@ -1858,7 +1858,6 @@ function updateClrBtn() {
 function clearFilters(resetChips=true){
   document.querySelectorAll('.finps input').forEach(i=>i.value='');
   const sf = document.getElementById('sector_filter'); if(sf) sf.value = '';
-  const sfAdv = document.getElementById('sector_filter_adv'); if(sfAdv) sfAdv.value = '';
   if(resetChips) { document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on')); ['goat-info','preset-info','tech-preset-info'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.display='none';el.innerHTML='';}});}  
   updateClrBtn();
   if(allData.length) applyAndRender();
@@ -3215,10 +3214,6 @@ function selectExchange(el) {
   document.querySelectorAll('.exbtn').forEach(b => b.classList.remove('on'));
   el.classList.add('on');
   currentExchange = el.dataset.exchange;
-  // Adv panel grid sync
-  document.querySelectorAll('#adv-ex-grid .exbtn').forEach(p => {
-    p.classList.toggle('on', p.dataset.exchange === currentExchange);
-  });
   // Veri sıfırla
   allData = []; filtered = []; selSym = null;
   closeDetail();
@@ -3471,49 +3466,6 @@ function closeFooterModal() {
   document.getElementById('footerModal').classList.remove('open');
 }
 // Footer scroll reveal — kaldırıldı
-
-// ── ADV EXCHANGE SYNC ──
-function advSelectExchange(el) {
-  // Update adv grid UI
-  document.querySelectorAll('#adv-ex-grid .exbtn').forEach(b => b.classList.remove('on'));
-  el.classList.add('on');
-  // Sync with Başlangıç tab exchange buttons
-  const exKey = el.dataset.exchange;
-  const mainBtn = document.querySelector('#sb-panel-basic .exbtn[data-exchange="' + exKey + '"]');
-  if (mainBtn) selectExchange(mainBtn);
-}
-
-// Keep adv pills in sync when main exchange changes
-const _origSelectExchange = typeof selectExchange === 'function' ? selectExchange : null;
-
-// ── SIDEBAR TABS ──
-function switchSbTab(tab) {
-  // Sync adv exchange pill to current exchange on tab switch
-  if (tab === 'advanced') {
-    const cur = document.querySelector('.exbtn.on');
-    if (cur) {
-      const exKey = cur.dataset.exchange;
-      document.querySelectorAll('#adv-ex-grid .exbtn').forEach(p => {
-        p.classList.toggle('on', p.dataset.exchange === exKey);
-      });
-    }
-  }
-  document.getElementById('sb-panel-basic').style.display    = tab === 'basic'    ? '' : 'none';
-  document.getElementById('sb-panel-advanced').style.display = tab === 'advanced' ? '' : 'none';
-  document.getElementById('sb-tab-basic').classList.toggle('active',    tab === 'basic');
-  document.getElementById('sb-tab-advanced').classList.toggle('active', tab === 'advanced');
-}
-
-
-// ── SECTOR SYNC ──
-function syncSectorAndFilter(source) {
-  const basic = document.getElementById('sector_filter');
-  const adv   = document.getElementById('sector_filter_adv');
-  if (!basic || !adv) return;
-  if (source === 'adv') { basic.value = adv.value; }
-  else                  { adv.value = basic.value; }
-  liveFilter();
-}
 
 // Patch basic sector select to also sync
 // ── HOMEPAGE / SCREENER NAV ──
