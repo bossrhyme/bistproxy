@@ -2284,26 +2284,18 @@ function buildProfile(s) {
 
   const sym = s.symbol;
   const ex = s.exchangeId || currentExchange;
-  const isBist = ex === 'bist';
-  const isUS = ex === 'nasdaq' || ex === 'sp500';
   const symClean = sym.replace('.IS','');
 
-  // Şirket adı
-  // Tam şirket adı — TradingView'dan gelen name field
   nameEl.textContent = s.name || sym;
   nameEl.title = s.name || sym;
 
-  // Meta — sektör + borsa
   const exMeta = EXCHANGE_META[ex] || EXCHANGE_META.bist;
   var metaParts = [];
   if(s.sector) metaParts.push(s.sector);
   metaParts.push(exMeta.flag + ' ' + exMeta.name);
   metaEl.textContent = metaParts.join('  ·  ');
 
-  // Hemen Al + Detaylı Analiz + Listeye Ekle butonları
-  var wlBtn = _dfUser
-    ? '<button class="dpl-wladd" onclick="showWlPicker(event,\'' + sym + '\',\'' + ex + '\')" title="Listeye ekle">📋 Listeye Ekle</button>'
-    : '';
+  // Hemen Al + Detaylı Analiz butonları
   linksEl.innerHTML = [
     '<div class="dpl-action-row">',
       '<button class="dpl-buy" onclick="onHemenAl(\'' + sym + '\',\'' + ex + '\')" title="Broker\'da işlem aç">',
@@ -2312,13 +2304,88 @@ function buildProfile(s) {
       '<button class="dpl-analyze" onclick="openDetayliAnaliz(\'' + symClean + '\',\'' + ex + '\')">',
         '📊 Detaylı Analiz',
       '</button>',
-      wlBtn,
     '</div>'
   ].join('');
 
   profileEl.style.display = 'block';
   var adDetail = document.getElementById('ad-detail');
   if(adDetail) adDetail.style.display = 'flex';
+
+  // Takip listeleri ve portföyler bölümü
+  _renderDetailLists(sym, ex);
+}
+
+function _renderDetailLists(sym, ex) {
+  var el = document.getElementById('dprofile-lists');
+  if (!el) return;
+  if (!_dfUser) { el.innerHTML = ''; return; }
+
+  function _doRender() {
+    var symKey = sym.replace('.IS','').toUpperCase();
+    var html = '';
+
+    if (_dfWatchlists.length) {
+      html += '<div class="dpl-list-sec"><div class="dpl-list-hdr">TAKİP LİSTELERİ<button class="dpl-list-add-btn" onclick="showWlPicker(event,\'' + sym + '\',\'' + ex + '\')" title="Listeye ekle">+</button></div>';
+      _dfWatchlists.forEach(function(list) {
+        var items = (list.items || []).map(function(i){ return (i.symbol||'').replace('.IS','').toUpperCase(); });
+        var inList = items.indexOf(symKey) !== -1;
+        html += '<div class="dpl-list-row ' + (inList ? 'dpl-list-on' : '') + '" onclick="_toggleWlItem(\'' + list.id + '\',\'' + sym + '\',\'' + ex + '\')">' +
+          '<span class="dpl-list-icon">' + (list.icon || '⭐') + '</span>' +
+          '<span class="dpl-list-name">' + list.name + '</span>' +
+          '<span class="dpl-list-check">' + (inList ? '✓' : '+') + '</span>' +
+          '</div>';
+      });
+      html += '</div>';
+    }
+
+    if (_dfPortfolios.length) {
+      html += '<div class="dpl-list-sec"><div class="dpl-list-hdr">PORTFÖYLER</div>';
+      _dfPortfolios.forEach(function(pf) {
+        var items = (pf.positions || []).map(function(p){ return (p.symbol||'').replace('.IS','').toUpperCase(); });
+        var inPf = items.indexOf(symKey) !== -1;
+        html += '<div class="dpl-list-row ' + (inPf ? 'dpl-list-on' : '') + '" onclick="showWlPicker(event,\'' + sym + '\',\'' + ex + '\')">' +
+          '<span class="dpl-list-icon">' + (pf.icon || '📊') + '</span>' +
+          '<span class="dpl-list-name">' + pf.name + '</span>' +
+          '<span class="dpl-list-check">' + (inPf ? '✓' : '+') + '</span>' +
+          '</div>';
+      });
+      html += '</div>';
+    }
+
+    if (!_dfWatchlists.length && !_dfPortfolios.length) {
+      html = '<div class="dpl-list-sec"><div style="padding:8px 0;color:var(--muted2);font-size:11px;">Profil sayfasından liste oluşturun</div></div>';
+    }
+
+    el.innerHTML = html;
+  }
+
+  if (!_dfWatchlists.length && !_dfPortfolios.length) {
+    Promise.all([
+      fetch('/api/watchlists', { credentials:'same-origin' }).then(function(r){ return r.json(); }).then(function(d){ _dfWatchlists = d.watchlists || []; }).catch(function(){}),
+      fetch('/api/portfolio',  { credentials:'same-origin' }).then(function(r){ return r.json(); }).then(function(d){ _dfPortfolios = d.portfolios || []; }).catch(function(){})
+    ]).then(_doRender);
+  } else {
+    _doRender();
+  }
+}
+
+function _toggleWlItem(listId, sym, ex) {
+  if (!_dfUser) return;
+  var symKey = sym.replace('.IS','').toUpperCase();
+  var list = _dfWatchlists.find(function(l){ return l.id === listId; });
+  if (!list) return;
+  var items = (list.items || []).map(function(i){ return (i.symbol||'').replace('.IS','').toUpperCase(); });
+  var inList = items.indexOf(symKey) !== -1;
+  var method = inList ? 'DELETE' : 'POST';
+  fetch('/api/watchlists/item', {
+    method: method, credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ listId: listId, symbol: sym, exchange: ex })
+  }).then(function(r){ return r.json(); }).then(function(d) {
+    if (d.watchlists) { _dfWatchlists = d.watchlists; renderTable(); }
+    _renderDetailLists(sym, ex);
+    showToast(inList ? '✕ ' + sym + ' listeden çıkarıldı' : '✓ ' + sym + ' listeye eklendi');
+  }).catch(function() {});
 }
 
 function showDetail(sym){

@@ -997,6 +997,20 @@ a.pop-chip{text-decoration:none;color:inherit;}
 }
 .dpl-wladd:hover { background: var(--hover); color: var(--accent); border-color: var(--accent); transform: translateY(-1px); }
 
+/* Detay paneli — gömülü TAKİP LİSTELERİ / PORTFÖYLER bölümü */
+.dprofile-lists { border-top: 1px solid var(--border); margin-top: 2px; padding-top: 2px; }
+.dpl-list-sec { padding: 8px 0 4px; }
+.dpl-list-hdr { font-size: 9px; font-weight: 700; color: var(--muted2); letter-spacing: .6px; text-transform: uppercase; padding: 0 16px 6px; display: flex; align-items: center; justify-content: space-between; }
+.dpl-list-add-btn { background: none; border: 1px solid var(--border); color: var(--muted2); border-radius: 4px; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; line-height: 1; transition: all .12s; }
+.dpl-list-add-btn:hover { border-color: var(--accent); color: var(--accent); }
+.dpl-list-row { display: flex; align-items: center; gap: 8px; padding: 6px 16px; cursor: pointer; transition: background .1s; border-radius: 0; }
+.dpl-list-row:hover { background: var(--s2); }
+.dpl-list-icon { font-size: 13px; flex-shrink: 0; }
+.dpl-list-name { font-size: 12px; color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dpl-list-check { font-size: 11px; font-weight: 700; color: var(--muted); flex-shrink: 0; width: 14px; text-align: center; }
+.dpl-list-on .dpl-list-name { color: var(--accent); font-weight: 500; }
+.dpl-list-on .dpl-list-check { color: var(--green); }
+
 @media (max-width: 768px) {
   .analiz-hero { padding: 32px 20px 28px; }
   .analiz-hero-title { font-size: 20px; }
