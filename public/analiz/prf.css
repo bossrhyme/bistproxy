@@ -812,8 +812,24 @@ td:first-child,td:nth-child(2){text-align:left;}
 .prf-sim-name{font-size:11px;color:var(--text2);flex:1;}
 .prf-sim-chg{font-family:"Geist Mono", monospace;font-size:11px;font-weight:600;}
 @media(max-width:768px){
-  .prf-layout{grid-template-columns:1fr;}
-  .prf-side{display:none;}
+  /* Yan panel gizlenmek yerine ana içeriğin altına taşınıyor */
+  .prf-layout{
+    grid-template-columns:1fr;
+    grid-template-rows:1fr auto;
+    overflow-y:auto;
+    overflow-x:hidden;
+  }
+  .prf-main{
+    border-right:none;
+    border-bottom:1px solid var(--border);
+    overflow-y:visible;
+    min-height:0;
+  }
+  .prf-side{
+    display:block;
+    overflow-y:visible;
+    border-top:none;
+  }
   .prf-mgrid{grid-template-columns:repeat(2,1fr);}
   .prf-fgrid{grid-template-columns:1fr;}
   .prf-ggrid{grid-template-columns:1fr;}

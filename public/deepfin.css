@@ -14,7 +14,7 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 *{-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;overflow:hidden;touch-action:pan-y;;overflow-x:hidden;
+html,body{height:100%;overflow:hidden;touch-action:auto;overflow-x:hidden;
   font-family:'Inter',sans-serif;
 }
 body{background:var(--bg);color:var(--text);font-family:'Inter', sans-serif;}
@@ -136,7 +136,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter', sans-serif;}
 @keyframes spin{to{transform:rotate(360deg);}}
 
 /* ── TABLE ── */
-.twrap{flex:1;overflow:auto;position:relative;}
+.twrap{flex:1;overflow:auto;position:relative;touch-action:pan-x pan-y;overscroll-behavior:contain;}
 .tbl-scroll-btn{background:var(--s2);border:1px solid var(--border);color:var(--text2);width:24px;height:24px;border-radius:4px;cursor:pointer;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;transition:background .15s,color .15s;}
 .tbl-scroll-btn:hover{background:var(--border2);color:var(--text);}
 .twrap::-webkit-scrollbar{width:5px;height:5px;}
@@ -723,6 +723,12 @@ td:first-child,td:nth-child(2){text-align:left;}
   .hp-stat-grid { grid-template-columns: 1fr !important; }
   .hp-howto-step { max-width: 100%; }
   .hp-cta-primary, .hp-cta-secondary { font-size: 13px; padding: 12px 16px; }
+}
+
+/* iOS auto-zoom önleme: tüm input/select/textarea 16px altında olunca
+   iOS Safari sayfayı zoom'luyor — mobilde minimum 16px zorunlu */
+@media (max-width: 768px) {
+  input, textarea, select { font-size: 16px !important; }
 }
 
 /* ── TICKER TAPE ── */
