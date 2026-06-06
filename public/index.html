@@ -91,9 +91,10 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .infobtn:hover{border-color:var(--accent);color:var(--accent);background:rgba(14,165,233,.05);}
 .supportbtn{background:rgba(220,38,38,.06);border:1px solid rgba(220,38,38,.2);color:var(--red);}
 .supportbtn:hover{background:rgba(220,38,38,.12);border-color:var(--red);color:var(--red);}
-.profile-topbtn{padding:4px 8px;text-decoration:none;font-size:14px;}
+.profile-topbtn{padding:4px 10px;text-decoration:none;font-size:12px;gap:5px;display:inline-flex;align-items:center;}
 .profile-topbtn.logged-in{border-color:var(--accent);color:var(--accent);}
-.profile-topbtn .pf-av{width:22px;height:22px;border-radius:50%;object-fit:cover;vertical-align:middle;}
+.profile-topbtn .pf-av{width:20px;height:20px;border-radius:50%;object-fit:cover;}
+.prf-btn-lbl{font-size:12px;font-weight:500;}
 
 /* ── LAYOUT ── */
 .hp-hero{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 40px 40px;text-align:center;border-bottom:1px solid var(--border);background:radial-gradient(ellipse at 50% 0%,rgba(14,165,233,.06) 0%,transparent 65%);}
@@ -154,7 +155,7 @@ if('serviceWorker' in navigator){
     <div class="tright">
 
       <a href="/profil" id="profile-btn" class="topbarbtn infobtn profile-topbtn" title="Profilim">
-        <span id="profile-btn-inner">👤</span>
+        <span id="profile-btn-inner">👤</span><span class="prf-btn-lbl">Profil</span>
       </a>
       <button class="topbarbtn infobtn" onclick="openInfo()">Bilgi Bankası</button>
       <button class="topbarbtn supportbtn" onclick="openSupport()">

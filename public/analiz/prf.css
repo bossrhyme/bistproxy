@@ -66,6 +66,10 @@ body{background:var(--bg);color:var(--text);font-family:Inter, sans-serif;}
 .tbtn:disabled{opacity:.4;cursor:not-allowed;}
 .infobtn{background:transparent;border:1px solid var(--border2);color:var(--text2);}
 .infobtn:hover{border-color:var(--accent);color:var(--accent);background:rgba(14,165,233,.05);}
+.profile-topbtn{padding:4px 10px;text-decoration:none;font-size:12px;gap:5px;display:inline-flex;align-items:center;}
+.profile-topbtn.logged-in{border-color:var(--accent);color:var(--accent);}
+.profile-topbtn .pf-av{width:20px;height:20px;border-radius:50%;object-fit:cover;}
+.prf-btn-lbl{font-size:12px;font-weight:500;}
 .supportbtn{background:rgba(246,70,93,.08);border:1px solid rgba(246,70,93,.25);color:#f6465d;}
 .supportbtn:hover{background:rgba(246,70,93,.15);border-color:#f6465d;color:#f6465d;}
 #scantime{font-size:11px;color:var(--muted2);}

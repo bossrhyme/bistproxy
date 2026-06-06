@@ -800,6 +800,10 @@ max-width: 480px) {
 .hp-strategy-desc{font-size:10px;color:var(--muted2);margin-top:2px;}
 .hp-strategy-arrow{color:var(--muted);font-size:14px;}
 
+.profile-topbtn{padding:4px 10px;text-decoration:none;font-size:12px;gap:5px;display:inline-flex;align-items:center;}
+.profile-topbtn.logged-in{border-color:var(--accent);color:var(--accent);}
+.profile-topbtn .pf-av{width:20px;height:20px;border-radius:50%;object-fit:cover;}
+.prf-btn-lbl{font-size:12px;font-weight:500;}
 .hp-nav-btn{background:transparent;border:none;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;padding:6px 12px;border-radius:6px;transition:all .15s;font-family:'Inter', sans-serif;}
 .hp-nav-btn:hover{background:var(--s2);color:var(--text);}
 .hp-nav-btn.active{color:var(--text);}

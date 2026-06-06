@@ -65,8 +65,8 @@ if('serviceWorker' in navigator){
     <a href="/" class="hp-nav-btn" onclick="event.preventDefault(); goScreener()">Tarayıcı</a>
     <a href="/analiz/" class="hp-nav-btn active" onclick="event.preventDefault(); goAnaliz()">Analiz</a>
     <div class="tright">
-      <a href="/profil" class="topbarbtn infobtn profile-topbtn" title="Profilim">
-        <span id="profile-btn-inner">👤</span>
+      <a href="/profil" id="profile-btn" class="topbarbtn infobtn profile-topbtn" title="Profilim">
+        <span id="profile-btn-inner">👤</span><span class="prf-btn-lbl">Profil</span>
       </a>
       <button class="topbarbtn infobtn" onclick="openInfo()">Bilgi Bankası</button>
       <button class="topbarbtn supportbtn" onclick="openSupport()">
