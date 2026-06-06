@@ -1,4 +1,4 @@
-// DeepFin — Profil Sayfası v9
+// DeepFin — Profil Sayfası v10
 (function() {
 'use strict';
 
@@ -156,7 +156,7 @@ function renderQuizQ() {
   document.getElementById('quiz-step').textContent    = (_quizQ + 1) + ' / ' + QUIZ.length;
   document.getElementById('quiz-prog').style.width    = (pct + 20) + '%';
   document.getElementById('quiz-q-text').textContent  = q.q;
-  document.getElementById('quiz-back').disabled       = _quizQ === 0;
+  document.getElementById('quiz-back').disabled       = false;
   document.getElementById('quiz-next').disabled       = _quizAns[_quizQ] == null;
   document.getElementById('quiz-next').textContent    = _quizQ === QUIZ.length - 1 ? 'Bitir ✓' : 'Sonraki →';
   document.getElementById('quiz-header').style.display = '';
@@ -188,7 +188,19 @@ window.quizNext = function() {
 };
 
 window.quizBack = function() {
-  if (_quizQ > 0) { _quizQ--; renderQuizQ(); }
+  if (_quizQ > 0) {
+    _quizQ--;
+    renderQuizQ();
+  } else {
+    // İlk soruda geri → profil sayfasına dön
+    var qs = document.getElementById('pf-quiz-section');
+    if (qs) qs.style.display = 'none';
+    if (_tempReg) {
+      document.getElementById('pf-login').style.display = 'block';
+    } else {
+      document.getElementById('pf-user').style.display = 'block';
+    }
+  }
 };
 
 function showQuizResult() {
