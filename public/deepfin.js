@@ -1712,150 +1712,149 @@ function tblScroll(px){
   if(w) w.scrollBy({left:px, behavior:'smooth'});
 }
 
-// ── UNİFİED CHİP SİSTEMİ — tüm gruplardan toplam max 3 seçim ──
+// ── UNİFİED CHİP SİSTEMİ — her panel bağımsız çalışır ──
 
-// Tüm seçili chip'lerin filtrelerini merge edip uygula
-function applyAllChips() {
-  // Goat/preset chip'leri hisse için — aktif değilse hisseyi seç
+var BASIC_CHIP_CFG = {
+  goatId: 'goat-chips', presetsId: 'presets', techId: 'tech-presets',
+  goatInfoId: 'goat-info', presetInfoId: 'preset-info', techInfoId: 'tech-preset-info'
+};
+var ADV_CHIP_CFG = {
+  goatId: 'adv-goat-chips', presetsId: 'adv-presets', techId: 'adv-tech-presets',
+  goatInfoId: 'goat-info-adv', presetInfoId: 'preset-info-adv', techInfoId: 'tech-preset-info-adv'
+};
+
+function _applyChips(cfg) {
   if (_activeAsset !== 'hisse') selectAsset('hisse');
+  var merged = {}, specials = [];
 
-  var merged = {};
-  var specials = [];
+  function mergeOne(filters) {
+    Object.keys(filters).forEach(function(k) {
+      var v = filters[k];
+      if (!(k in merged)) { merged[k] = v; return; }
+      if (k.endsWith('_min')) merged[k] = Math.max(merged[k], v);
+      if (k.endsWith('_max')) merged[k] = Math.min(merged[k], v);
+    });
+  }
 
-  // GOAT chip'leri
-  document.querySelectorAll('.goat-chip.on').forEach(function(c) {
-    var g = GURUS[c.dataset.goat];
-    if (!g) return;
+  document.querySelectorAll('#' + cfg.goatId + ' .goat-chip.on').forEach(function(c) {
+    var g = GURUS[c.dataset.goat]; if (!g) return;
     if (g.special) specials.push(g.special);
-    Object.keys(g.filters).forEach(function(k) {
-      var v = g.filters[k];
-      if (!(k in merged)) { merged[k] = v; return; }
-      if (k.endsWith('_min')) merged[k] = Math.max(merged[k], v);
-      if (k.endsWith('_max')) merged[k] = Math.min(merged[k], v);
-    });
+    mergeOne(g.filters);
+  });
+  document.querySelectorAll('#' + cfg.presetsId + ' .chip.on').forEach(function(c) {
+    var p = PRESETS[c.dataset.preset]; if (p) mergeOne(p.filters);
+  });
+  document.querySelectorAll('#' + cfg.techId + ' .chip.on').forEach(function(c) {
+    var p = TECH_PRESETS[c.dataset.tech]; if (p) mergeOne(p.filters);
   });
 
-  // Temel analiz preset'leri
-  document.querySelectorAll('#presets .chip.on').forEach(function(c) {
-    var p = PRESETS[c.dataset.preset];
-    if (!p) return;
-    Object.keys(p.filters).forEach(function(k) {
-      var v = p.filters[k];
-      if (!(k in merged)) { merged[k] = v; return; }
-      if (k.endsWith('_min')) merged[k] = Math.max(merged[k], v);
-      if (k.endsWith('_max')) merged[k] = Math.min(merged[k], v);
-    });
-  });
-
-  // Teknik analiz preset'leri
-  document.querySelectorAll('#tech-presets .chip.on').forEach(function(c) {
-    var p = TECH_PRESETS[c.dataset.tech];
-    if (!p) return;
-    Object.keys(p.filters).forEach(function(k) {
-      var v = p.filters[k];
-      if (!(k in merged)) { merged[k] = v; return; }
-      if (k.endsWith('_min')) merged[k] = Math.max(merged[k], v);
-      if (k.endsWith('_max')) merged[k] = Math.min(merged[k], v);
-    });
-  });
-
-  // Inputları temizle ve merged değerleri uygula
-  document.querySelectorAll('.finps input').forEach(function(i){ i.value = ''; });
+  document.querySelectorAll('.finps input').forEach(function(i) { i.value = ''; });
   Object.keys(merged).forEach(function(k) {
     var el = document.getElementById(k); if (el) el.value = merged[k];
   });
 
-  // Açıklama metinleri — tüm aktif chip'lerden
   var allInfos = [];
-  document.querySelectorAll('.goat-chip.on').forEach(function(c) {
+  document.querySelectorAll('#' + cfg.goatId + ' .goat-chip.on').forEach(function(c) {
     var g = GURUS[c.dataset.goat];
-    if (g) allInfos.push({ label: g.label, desc: g.desc, infoId: 'goat-info' });
+    if (g) allInfos.push({ label: g.label, desc: g.desc, infoId: cfg.goatInfoId });
   });
-  var seenPreset = new Set();
-  document.querySelectorAll('[data-preset].chip.on').forEach(function(c) {
-    if (seenPreset.has(c.dataset.preset)) return; seenPreset.add(c.dataset.preset);
+  document.querySelectorAll('#' + cfg.presetsId + ' .chip.on').forEach(function(c) {
     var p = PRESETS[c.dataset.preset];
-    if (p) allInfos.push({ label: c.textContent.trim(), desc: p.desc, infoId: 'preset-info' });
+    if (p) allInfos.push({ label: c.textContent.trim(), desc: p.desc, infoId: cfg.presetInfoId });
   });
-  var seenTech = new Set();
-  document.querySelectorAll('[data-tech].chip.on').forEach(function(c) {
-    if (seenTech.has(c.dataset.tech)) return; seenTech.add(c.dataset.tech);
+  document.querySelectorAll('#' + cfg.techId + ' .chip.on').forEach(function(c) {
     var p = TECH_PRESETS[c.dataset.tech];
-    if (p) allInfos.push({ label: p.label, desc: p.desc, infoId: 'tech-preset-info' });
+    if (p) allInfos.push({ label: p.label, desc: p.desc, infoId: cfg.techInfoId });
   });
 
-  // Tüm info div'leri gizle (basic + adv)
-  ['goat-info','preset-info','tech-preset-info','goat-info-adv','preset-info-adv','tech-preset-info-adv'].forEach(function(id){
+  [cfg.goatInfoId, cfg.presetInfoId, cfg.techInfoId].forEach(function(id) {
     var el = document.getElementById(id); if (el) { el.style.display = 'none'; el.innerHTML = ''; }
   });
-
-  // Bilgileri gruplarına göre dağıt (hem basic hem adv panellerde göster)
   var byGroup = {};
   allInfos.forEach(function(info) {
     if (!byGroup[info.infoId]) byGroup[info.infoId] = [];
     byGroup[info.infoId].push('<strong>' + info.label + ':</strong> ' + info.desc);
   });
   Object.keys(byGroup).forEach(function(id) {
-    [id, id + '-adv'].forEach(function(eid) {
-      var el = document.getElementById(eid);
-      if (el) { el.innerHTML = byGroup[id].join('<br><br>'); el.style.display = 'block'; }
-    });
+    var el = document.getElementById(id);
+    if (el) { el.innerHTML = byGroup[id].join('<br><br>'); el.style.display = 'block'; }
   });
 
   updateClrBtn();
   var special = specials.length > 0 ? specials[0] : null;
-  if (allData.length > 0) {
-    applyAndRender(special);
-  } else {
-    // Veri yoksa tara ve bitince filtrele
-    runScan();
-  }
+  if (allData.length > 0) { applyAndRender(special); } else { runScan(); }
 }
 
-// Toplam seçili chip sayısı (deduplicated by key)
-function countSelectedChips() {
-  var keys = new Set();
-  document.querySelectorAll('.goat-chip.on').forEach(function(c) { keys.add('g:' + c.dataset.goat); });
-  document.querySelectorAll('[data-preset].chip.on').forEach(function(c) { keys.add('p:' + c.dataset.preset); });
-  document.querySelectorAll('[data-tech].chip.on').forEach(function(c) { keys.add('t:' + c.dataset.tech); });
-  return keys.size;
-}
+function applyAllChips()    { _applyChips(BASIC_CHIP_CFG); }
+function applyAllChipsAdv() { _applyChips(ADV_CHIP_CFG); }
 
-function _chipClick(chip, applyFn) {
+function _countChips(cfg) {
+  return document.querySelectorAll(
+    '#' + cfg.goatId + ' .goat-chip.on, #' + cfg.presetsId + ' .chip.on, #' + cfg.techId + ' .chip.on'
+  ).length;
+}
+function countSelectedChips() { return _countChips(BASIC_CHIP_CFG) + _countChips(ADV_CHIP_CFG); }
+
+// ── Basic panel chip event listeners ──
+document.getElementById('goat-chips').addEventListener('click', function(e) {
+  var chip = e.target.closest('.goat-chip'); if (!chip) return;
   var wasOn = chip.classList.contains('on');
-  if (!wasOn && countSelectedChips() >= 5) return;
+  if (!wasOn && _countChips(BASIC_CHIP_CFG) >= 5) return;
   chip.classList.toggle('on');
-  applyFn();
+  applyAllChips();
   if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
-}
+});
+document.getElementById('presets').addEventListener('click', function(e) {
+  var chip = e.target.closest('.chip'); if (!chip || !PRESETS[chip.dataset.preset]) return;
+  var wasOn = chip.classList.contains('on');
+  if (!wasOn && _countChips(BASIC_CHIP_CFG) >= 5) return;
+  chip.classList.toggle('on');
+  applyAllChips();
+  if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
+});
+document.getElementById('tech-presets').addEventListener('click', function(e) {
+  var chip = e.target.closest('.tech-chip'); if (!chip || !TECH_PRESETS[chip.dataset.tech]) return;
+  var wasOn = chip.classList.contains('on');
+  if (!wasOn && _countChips(BASIC_CHIP_CFG) >= 5) return;
+  chip.classList.toggle('on');
+  applyAllChips();
+  if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
+});
 
-// GOAT chip'leri — basic + adv
-['goat-chips', 'adv-goat-chips'].forEach(function(id) {
-  var el = document.getElementById(id); if (!el) return;
+// ── Advanced panel chip event listeners ──
+(function() {
+  var el = document.getElementById('adv-goat-chips'); if (!el) return;
   el.addEventListener('click', function(e) {
     var chip = e.target.closest('.goat-chip'); if (!chip) return;
-    _chipClick(chip, applyAllChips);
+    var wasOn = chip.classList.contains('on');
+    if (!wasOn && _countChips(ADV_CHIP_CFG) >= 5) return;
+    chip.classList.toggle('on');
+    applyAllChipsAdv();
+    if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
   });
-});
-
-// Temel analiz preset'leri — basic + adv
-['presets', 'adv-presets'].forEach(function(id) {
-  var el = document.getElementById(id); if (!el) return;
+})();
+(function() {
+  var el = document.getElementById('adv-presets'); if (!el) return;
   el.addEventListener('click', function(e) {
     var chip = e.target.closest('.chip'); if (!chip || !PRESETS[chip.dataset.preset]) return;
-    _chipClick(chip, applyAllChips);
+    var wasOn = chip.classList.contains('on');
+    if (!wasOn && _countChips(ADV_CHIP_CFG) >= 5) return;
+    chip.classList.toggle('on');
+    applyAllChipsAdv();
+    if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
   });
-});
-
-// Teknik analiz preset'leri — basic + adv
-['tech-presets', 'adv-tech-presets'].forEach(function(id) {
-  var el = document.getElementById(id); if (!el) return;
+})();
+(function() {
+  var el = document.getElementById('adv-tech-presets'); if (!el) return;
   el.addEventListener('click', function(e) {
     var chip = e.target.closest('.tech-chip'); if (!chip || !TECH_PRESETS[chip.dataset.tech]) return;
-    _chipClick(chip, applyAllChips);
+    var wasOn = chip.classList.contains('on');
+    if (!wasOn && _countChips(ADV_CHIP_CFG) >= 5) return;
+    chip.classList.toggle('on');
+    applyAllChipsAdv();
+    if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
   });
-});
-
+})();
 function updateClrBtn() {
   const btn = document.getElementById('clrbtn');
   const btnAdv = document.getElementById('clrbtn-adv');
