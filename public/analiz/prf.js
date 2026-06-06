@@ -2106,6 +2106,7 @@ var _origPrfTab = prfTab;
 prfTab = function(id, el) {
   _origPrfTab(id, el);
   if (id === 'financials') {
+    _buildTrend(_prfData);
     loadFinancialsPanel();
     renderFundPanel('balance', 'annual');
     renderFundPanel('cashflow', 'annual');

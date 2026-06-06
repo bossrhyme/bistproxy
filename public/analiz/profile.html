@@ -109,7 +109,6 @@ if('serviceWorker' in navigator){
 
         <div class="prf-tabs">
           <div class="prf-tab on" onclick="prfTab('overview',this)">Genel Bakış</div>
-          <div class="prf-tab" onclick="prfTab('trend',this)">📈 Trend</div>
           <div class="prf-tab" onclick="prfTab('financials',this)">Finansallar</div>
           <div class="prf-tab" onclick="prfTab('news',this)">Haberler</div>
           <div class="prf-tab" onclick="prfTab('guru',this)">GOAT Analizi</div>
@@ -149,22 +148,23 @@ if('serviceWorker' in navigator){
           </div>
         </div>
 
-        <!-- ═══ TREND ═══ -->
-        <div id="prf-panel-trend" class="prf-panel">
+        <!-- ═══ FİNANSALLAR ═══ -->
+        <div id="prf-panel-financials" class="prf-panel">
+          <!-- Gelir & Kâr Trendi -->
           <div class="prf-section">
             <div class="prf-sec-title">Gelir & Kâr Trendi</div>
             <div style="display:flex;gap:10px;margin-bottom:12px;" id="prf-trend-cards">
               <div style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;">
                 <div style="font-size:9px;color:var(--text2);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">Gelir Büyümesi</div>
                 <div id="prf-rev-spark" style="height:44px;margin-bottom:6px;"></div>
-                <div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--text);" id="prf-rev-val">—</div>
-                <div style="font-size:10px;font-family:'JetBrains Mono',monospace;" id="prf-rev-chg">YoY TTM</div>
+                <div style="font-family:'Geist Mono',monospace;font-size:16px;font-weight:700;color:var(--text);" id="prf-rev-val">—</div>
+                <div style="font-size:10px;font-family:'Geist Mono',monospace;" id="prf-rev-chg">YoY TTM</div>
               </div>
               <div style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;">
                 <div style="font-size:9px;color:var(--text2);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">Kazanç Büyümesi</div>
                 <div id="prf-earn-spark" style="height:44px;margin-bottom:6px;"></div>
-                <div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--text);" id="prf-earn-val">—</div>
-                <div style="font-size:10px;font-family:'JetBrains Mono',monospace;" id="prf-earn-chg">YoY TTM</div>
+                <div style="font-family:'Geist Mono',monospace;font-size:16px;font-weight:700;color:var(--text);" id="prf-earn-val">—</div>
+                <div style="font-size:10px;font-family:'Geist Mono',monospace;" id="prf-earn-chg">YoY TTM</div>
               </div>
               <div style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;">
                 <div style="font-size:9px;color:var(--text2);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">Performans</div>
@@ -172,14 +172,11 @@ if('serviceWorker' in navigator){
               </div>
             </div>
           </div>
-          <div class="prf-section" style="border-bottom:none;">
+          <!-- Şirket Hakkında -->
+          <div class="prf-section">
             <div class="prf-sec-title">Şirket Hakkında</div>
             <p id="prf-desc" style="font-size:12px;color:var(--text2);line-height:1.7;">Yükleniyor...</p>
           </div>
-        </div>
-
-        <!-- ═══ FİNANSALLAR ═══ -->
-        <div id="prf-panel-financials" class="prf-panel">
           <div class="prf-section">
             <div class="prf-sec-title">Temel Finansal Göstergeler</div>
             <div id="prf-fin-summary" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:20px;"></div>
@@ -370,6 +367,6 @@ if('serviceWorker' in navigator){
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
-<script src="/analiz/prf.js?v=9546693"></script>
+<script src="/analiz/prf.js?v=9546694"></script>
 </body>
 </html>
