@@ -1,4 +1,4 @@
-// DeepFin — Profil Sayfası v10
+// DeepFin — Profil Sayfası v11
 (function() {
 'use strict';
 
@@ -217,7 +217,7 @@ function showQuizResult() {
       '<span style="width:10px;height:10px;border-radius:50%;background:' + inv.color + ';display:inline-block;"></span>' + inv.name +
     '</div>' +
     '<div class="quiz-result-desc">' + inv.desc + '</div>' +
-    '<button class="quiz-finish-btn" id="quiz-finish-btn" onclick="finishQuiz(\'' + type + '\')">Hesabımı Oluştur →</button>' +
+    '<button class="quiz-finish-btn" id="quiz-finish-btn" onclick="finishQuiz(\'' + type + '\')">' + (_tempReg ? 'Hesabımı Oluştur →' : 'Kaydet ve Profile Dön →') + '</button>' +
     '</div>';
 }
 
@@ -244,7 +244,8 @@ window.finishQuiz = async function(type) {
         hideQuizSection();
         document.getElementById('pf-user').style.display = 'block';
         renderIdentity();
-        toast('Yatırımcı tipin güncellendi: ' + INV_TYPES[type].name);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        toast('⚔ ' + INV_TYPES[type].name + ' — yatırımcı tipin güncellendi!');
       } else {
         hideQuizSection();
         document.getElementById('pf-user').style.display = 'block';
@@ -267,8 +268,9 @@ window.finishQuiz = async function(type) {
       _user = d2.user;
       hideQuizSection();
       showUser();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       await Promise.all([loadWatchlists(), loadPortfolio()]);
-      toast('Hoş geldin ' + (d2.user.username || d2.user.name) + '!');
+      toast('⚔ Hoş geldin ' + (d2.user.username || d2.user.name) + '! Yatırımcı kimliğin hazır.');
     } else {
       hideQuizSection();
       document.getElementById('pf-login').style.display = 'block';
