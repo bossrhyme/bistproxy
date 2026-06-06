@@ -85,7 +85,7 @@
       ]
     },
     {
-      "source": "/(|index\\.html|screener|analiz/|analiz/index\\.html|analiz/profil\\.html|analiz/profile\\.html)",
+      "source": "/(|index\\.html|screener|analiz/|analiz/index\\.html|analiz/profil\\.html|analiz/profile\\.html|profil|profil/|profil/index\\.html)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -162,12 +162,14 @@
     },
     { "source": "/api/symbol-list",   "destination": "/api/symbols.js" },
     { "source": "/api/symbol-search", "destination": "/api/symbols.js" },
-    { "source": "/api/auth/register",         "destination": "/api/user.js" },
-    { "source": "/api/auth/login",            "destination": "/api/user.js" },
-    { "source": "/api/auth/me",               "destination": "/api/user.js" },
-    { "source": "/api/auth/logout",           "destination": "/api/user.js" },
-    { "source": "/api/auth/change-password",  "destination": "/api/user.js" },
-    { "source": "/api/auth/update-profile",   "destination": "/api/user.js" },
+    { "source": "/api/auth/register",           "destination": "/api/user.js" },
+    { "source": "/api/auth/login",              "destination": "/api/user.js" },
+    { "source": "/api/auth/me",                 "destination": "/api/user.js" },
+    { "source": "/api/auth/logout",             "destination": "/api/user.js" },
+    { "source": "/api/auth/change-password",    "destination": "/api/user.js" },
+    { "source": "/api/auth/update-profile",     "destination": "/api/user.js" },
+    { "source": "/api/auth/daily-checkin",      "destination": "/api/user.js" },
+    { "source": "/api/auth/set-investor-type",  "destination": "/api/user.js" },
     { "source": "/api/portfolio/item",        "destination": "/api/user.js" },
     { "source": "/api/portfolio",             "destination": "/api/user.js" },
     { "source": "/api/watchlists/:path*",  "destination": "/api/user.js" },
