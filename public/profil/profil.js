@@ -509,15 +509,17 @@ function renderListPanel() {
 
   var rows = items.map(function(item) {
     var sym = esc(item.symbol);
-    return '<tr>' +
+    var ex  = esc(item.exchange || 'bist');
+    var analiz = '/analiz/profile.html?sym=' + encodeURIComponent(item.symbol.replace('.IS','')) + '&ex=' + encodeURIComponent(item.exchange || 'bist');
+    return '<tr style="cursor:pointer" onclick="window.location.href=\'' + analiz + '\'">' +
       '<td><span class="pf-sym">' + sym + '</span></td>' +
-      '<td><span class="pf-ex-badge">' + esc(item.exchange) + '</span></td>' +
+      '<td><span class="pf-ex-badge">' + ex + '</span></td>' +
       '<td class="pf-price-cell" id="wlp-' + sym + '">—</td>' +
       '<td class="pf-chg-cell"   id="wlc-' + sym + '">—</td>' +
       '<td style="color:var(--muted2);font-size:11px;">' + formatDate(item.addedAt) + '</td>' +
-      '<td><input class="pf-note-input" value="' + esc(item.note || '') +
+      '<td onclick="event.stopPropagation()"><input class="pf-note-input" value="' + esc(item.note || '') +
         '" placeholder="Not..." onblur="saveNote(\'' + list.id + '\',\'' + sym + '\',this.value)"></td>' +
-      '<td><button class="pf-remove-btn" onclick="removeItem(\'' + list.id + '\',\'' + sym + '\')" title="Çıkar">×</button></td>' +
+      '<td onclick="event.stopPropagation()"><button class="pf-remove-btn" onclick="removeItem(\'' + list.id + '\',\'' + sym + '\')" title="Çıkar">×</button></td>' +
     '</tr>';
   }).join('');
 
@@ -643,7 +645,7 @@ window.addItem = async function() {
     var r = await fetch('/api/watchlists/item', { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ listId: _activeListId, symbol: sym, exchange: ex }) });
     var d = await r.json();
-    if (d.watchlists) { _lists = d.watchlists; document.getElementById('pf-add-sym').value = ''; renderTabs(); renderListPanel(); toast('✓ ' + sym + ' eklendi'); window.location.href = '/analiz/profile.html?sym=' + encodeURIComponent(sym.replace('.IS','')) + '&ex=' + encodeURIComponent(ex); }
+    if (d.watchlists) { _lists = d.watchlists; document.getElementById('pf-add-sym').value = ''; renderTabs(); renderListPanel(); toast('✓ ' + sym + ' eklendi'); }
   } catch(e) { toast('Hata oluştu'); }
   btn.disabled = false;
 };
@@ -834,7 +836,8 @@ function renderPfPanel() {
   var positions = pf.positions || [];
 
   var rows = positions.map(function(pos) {
-    return '<tr>' +
+    var analiz = '/analiz/profile.html?sym=' + encodeURIComponent(pos.symbol.replace('.IS','')) + '&ex=' + encodeURIComponent(pos.exchange || 'bist');
+    return '<tr style="cursor:pointer" onclick="window.location.href=\'' + analiz + '\'">' +
       '<td><span class="pf-sym">' + esc(pos.symbol) + '</span></td>' +
       '<td><span class="pf-ex-badge">' + esc(pos.exchange) + '</span></td>' +
       '<td>' + pos.quantity.toLocaleString('tr-TR') + '</td>' +
@@ -842,7 +845,7 @@ function renderPfPanel() {
       '<td id="pfp-' + pos.id + '">—</td>' +
       '<td id="pfv-' + pos.id + '">—</td>' +
       '<td id="pfpnl-' + pos.id + '">—</td>' +
-      '<td><button class="pf-remove-btn" onclick="removePosition(\'' + pf.id + '\',\'' + pos.id + '\')" title="Çıkar">×</button></td>' +
+      '<td onclick="event.stopPropagation()"><button class="pf-remove-btn" onclick="removePosition(\'' + pf.id + '\',\'' + pos.id + '\')" title="Çıkar">×</button></td>' +
     '</tr>';
   }).join('');
 
@@ -912,7 +915,7 @@ window.addPosition = async function() {
       _portfolios = d.portfolios;
       var pickBtn = document.getElementById('pf-pos-sym-btn');
       if (pickBtn) { pickBtn.textContent = '🔍 Hisse Seç'; pickBtn.classList.remove('selected'); }
-      renderPfTabs(); renderPfPanel(); toast('✓ ' + sym + ' eklendi'); window.location.href = '/analiz/profile.html?sym=' + encodeURIComponent(sym.replace('.IS','')) + '&ex=' + encodeURIComponent(ex);
+      renderPfTabs(); renderPfPanel(); toast('✓ ' + sym + ' eklendi');
     }
   } catch(e) { toast('Hata oluştu'); addBtn.disabled = false; }
 };
