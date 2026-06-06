@@ -3214,6 +3214,9 @@ function selectExchange(el) {
   document.querySelectorAll('.exbtn').forEach(b => b.classList.remove('on'));
   el.classList.add('on');
   currentExchange = el.dataset.exchange;
+  document.querySelectorAll('#adv-ex-grid .exbtn').forEach(p => {
+    p.classList.toggle('on', p.dataset.exchange === currentExchange);
+  });
   // Veri sıfırla
   allData = []; filtered = []; selSym = null;
   closeDetail();
@@ -3467,7 +3470,32 @@ function closeFooterModal() {
 }
 // Footer scroll reveal — kaldırıldı
 
-// Patch basic sector select to also sync
+// ── ADV EXCHANGE SYNC ──
+function advSelectExchange(el) {
+  document.querySelectorAll('#adv-ex-grid .exbtn').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  const exKey = el.dataset.exchange;
+  const mainBtn = document.querySelector('#sb-panel-basic .exbtn[data-exchange="' + exKey + '"]');
+  if (mainBtn) selectExchange(mainBtn);
+}
+
+// ── SIDEBAR TABS ──
+function switchSbTab(tab) {
+  if (tab === 'advanced') {
+    const cur = document.querySelector('.exbtn.on');
+    if (cur) {
+      const exKey = cur.dataset.exchange;
+      document.querySelectorAll('#adv-ex-grid .exbtn').forEach(p => {
+        p.classList.toggle('on', p.dataset.exchange === exKey);
+      });
+    }
+  }
+  document.getElementById('sb-panel-basic').style.display    = tab === 'basic'    ? '' : 'none';
+  document.getElementById('sb-panel-advanced').style.display = tab === 'advanced' ? '' : 'none';
+  document.getElementById('sb-tab-basic').classList.toggle('active',    tab === 'basic');
+  document.getElementById('sb-tab-advanced').classList.toggle('active', tab === 'advanced');
+}
+
 // ── HOMEPAGE / SCREENER NAV ──
 
 
