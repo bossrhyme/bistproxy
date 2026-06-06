@@ -12,12 +12,7 @@
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;}
 body{overflow-y:auto;}
 
-/* Topbar */
-.pf-topbar{display:flex;align-items:center;gap:12px;padding:0 20px;height:48px;border-bottom:1px solid var(--border);background:var(--s1);position:sticky;top:0;z-index:10;}
-.pf-back{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted2);text-decoration:none;background:var(--s2);border:1px solid var(--border);padding:4px 10px;border-radius:6px;transition:all .15s;}
-.pf-back:hover{color:var(--accent);border-color:var(--accent);}
-.pf-logo{font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;}
-.pf-logo-mark{width:22px;height:22px;background:var(--accent);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;}
+/* Topbar — reuses deepfin.css classes */
 
 /* Main layout */
 .pf-main{max-width:1120px;margin:0 auto;padding:32px 20px 60px;}
@@ -248,9 +243,20 @@ body{overflow-y:auto;}
 </style>
 </head>
 <body>
-<div class="pf-topbar">
-  <a href="/" class="pf-back">← Tarayıcı</a>
-  <div class="pf-logo"><div class="pf-logo-mark">D</div>DeepFin</div>
+<div class="topbar" style="position:sticky;top:0;z-index:10;">
+  <div class="tlogo"><div class="tlogo-mark">D</div>DeepFin</div>
+  <span class="tlive">Canlı</span>
+  <a href="/" class="hp-nav-btn">Anasayfa</a>
+  <a href="/" class="hp-nav-btn">Tarayıcı</a>
+  <a href="/analiz/" class="hp-nav-btn">Analiz</a>
+  <div class="tright">
+    <span class="hp-nav-btn active" style="cursor:default;">👤 Profil</span>
+    <a href="/" class="topbarbtn infobtn">Bilgi Bankası</a>
+    <button class="topbarbtn supportbtn" onclick="window.location.href='/'">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+      Destek Ol
+    </button>
+  </div>
 </div>
 
 <div class="pf-main">
