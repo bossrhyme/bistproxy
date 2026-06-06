@@ -857,6 +857,19 @@ function _showListFilterPicker(evt) {
 
   var btn  = (evt && evt.currentTarget) || document.getElementById('fav-filter-btn');
   var rect = btn ? btn.getBoundingClientRect() : { left: 8, bottom: 48 };
+
+  // Veri yoksa önce yükle
+  if (!_dfWatchlists.length && !_dfPortfolios.length) {
+    Promise.all([
+      fetch('/api/watchlists', { credentials:'same-origin' }).then(function(r){ return r.json(); }).then(function(d){ _dfWatchlists = d.watchlists || []; }).catch(function(){}),
+      fetch('/api/portfolio',  { credentials:'same-origin' }).then(function(r){ return r.json(); }).then(function(d){ _dfPortfolios = d.portfolios || []; }).catch(function(){})
+    ]).then(function() { _doShowListFilterPicker(rect); });
+    return;
+  }
+  _doShowListFilterPicker(rect);
+}
+
+function _doShowListFilterPicker(rect) {
   var div  = document.createElement('div');
   div.id   = 'df-list-filter-picker';
   div.style.cssText = 'position:fixed;z-index:9999;background:var(--s1);border:1px solid var(--border);border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.18);min-width:200px;max-width:240px;padding:6px 0;left:' + Math.max(4, rect.left) + 'px;top:' + (rect.bottom + 4) + 'px;font-family:Inter,sans-serif';
@@ -888,9 +901,11 @@ function _showListFilterPicker(evt) {
   }
 
   if (_dfPortfolios.length) {
-    var sep = document.createElement('div');
-    sep.style.cssText = 'height:1px;background:var(--border);margin:4px 0';
-    div.appendChild(sep);
+    if (_dfWatchlists.length) {
+      var sep = document.createElement('div');
+      sep.style.cssText = 'height:1px;background:var(--border);margin:4px 0';
+      div.appendChild(sep);
+    }
     secLabel('Portföyler');
     _dfPortfolios.forEach(function(pf) {
       var syms = (pf.positions || []).map(function(p) { return (p.symbol || '').replace('.IS','').toUpperCase(); });
