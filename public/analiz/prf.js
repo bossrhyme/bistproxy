@@ -534,11 +534,191 @@ function _buildTrend(d) {
 function _renderInvestorFit(d) {
   var el = document.getElementById('prf-investor-fit');
   if (!el) return;
-  el.innerHTML =
-    '<div style="padding:28px 0;text-align:center;color:var(--muted);font-size:12px;display:flex;flex-direction:column;align-items:center;gap:6px;">' +
-    '<span style="font-size:22px;">🧬</span>' +
-    '<span>Yatırımcı eşleşme analizi hazırlanıyor...</span>' +
+  if (!d) { el.innerHTML = '<div style="padding:24px 0;text-align:center;color:var(--muted);font-size:12px;">Veri yok.</div>'; return; }
+
+  var n = function(v) { return (v != null && !isNaN(+v)) ? +v : null; };
+  var pe   = n(d.pe_ratio);
+  var pb   = n(d.price_book_ratio);
+  var roe  = d.roe  != null ? n(d.roe)  * 100 : null;
+  var nm   = d.net_margin   != null ? n(d.net_margin)   * 100 : null;
+  var gm   = d.gross_margin != null ? n(d.gross_margin) * 100 : null;
+  var de   = n(d.debt_to_equity);
+  var cr   = n(d.current_ratio);
+  var dy   = d.dividend_yield_recent != null ? n(d.dividend_yield_recent) * 100 : null;
+  var peg  = n(d.peg_ratio);
+  var fs   = n(d.piotroski_f_score);
+  var rg   = n(d.revenue_growth_ttm_yoy != null ? d.revenue_growth_ttm_yoy : d.total_revenue_change_ttm_yoy);
+  var eg   = n(d.earnings_per_share_change_ttm_yoy != null ? d.earnings_per_share_change_ttm_yoy : d.eps_growth_ttm_yoy);
+  var pm   = n(d.Perf_1M != null ? d.Perf_1M : d.perf1M);
+  var py   = n(d.Perf_Y  != null ? d.Perf_Y  : d.perfY);
+  var mc   = n(d.market_cap_basic);
+  var beta = n(d.beta);
+  var price  = n(d.close || d.price);
+  var high52 = n(d['52_week_high']);
+  var nearHigh52 = (price && high52 && high52 > 0) ? ((price / high52 - 1) * 100) : null;
+
+  var fv = function(v, fmt) { return v != null ? fmt(v) : '—'; };
+  var pctFmt = function(v) { return (v >= 0 ? '+' : '') + v.toFixed(1) + '%'; };
+
+  var types = [
+    {
+      id:'value', emoji:'📊', name:'Değer Yatırımcısı', color:'#3b82f6',
+      desc:'Ucuz fiyatlı, sağlam bilançolu şirketleri arar',
+      crits:[
+        {t:'F/K < 15',       v:fv(pe, function(v){return v.toFixed(1)+'x';}),  p:pe!=null&&pe>0&&pe<15},
+        {t:'PD/DD < 1.5',    v:fv(pb, function(v){return v.toFixed(2)+'x';}),  p:pb!=null&&pb<1.5},
+        {t:'ROE > 15%',      v:fv(roe,function(v){return v.toFixed(1)+'%';}),  p:roe!=null&&roe>15},
+        {t:'Net Marj > 10%', v:fv(nm, function(v){return v.toFixed(1)+'%';}),  p:nm!=null&&nm>10},
+        {t:'Borç/Öz < 0.5', v:fv(de, function(v){return v.toFixed(2);}),      p:de!=null&&de<0.5},
+        {t:'F-Skor ≥ 7',     v:fv(fs, function(v){return v+'/9';}),             p:fs!=null&&fs>=7},
+      ]
+    },
+    {
+      id:'growth', emoji:'🚀', name:'Büyüme Yatırımcısı', color:'#10b981',
+      desc:'Hızlı büyüyen, yüksek potansiyelli şirketleri arar',
+      crits:[
+        {t:'Gelir Büyümesi > 15%', v:fv(rg, pctFmt), p:rg!=null&&rg>15},
+        {t:'EPS Büyümesi > 20%',   v:fv(eg, pctFmt), p:eg!=null&&eg>20},
+        {t:'PEG < 1',              v:fv(peg,function(v){return v.toFixed(2);}), p:peg!=null&&peg>0&&peg<1},
+        {t:'Brüt Marj > 30%',      v:fv(gm, function(v){return v.toFixed(1)+'%';}), p:gm!=null&&gm>30},
+        {t:'ROE > 12%',            v:fv(roe,function(v){return v.toFixed(1)+'%';}), p:roe!=null&&roe>12},
+        {t:'Borç/Öz < 1',         v:fv(de, function(v){return v.toFixed(2);}), p:de!=null&&de<1},
+      ]
+    },
+    {
+      id:'div', emoji:'💰', name:'Temettü Yatırımcısı', color:'#f59e0b',
+      desc:'Düzenli ve yüksek temettü ödeyen şirketleri arar',
+      crits:[
+        {t:'Temettü Verimi > 3%', v:fv(dy, function(v){return v.toFixed(1)+'%';}), p:dy!=null&&dy>3},
+        {t:'Net Marj > 8%',       v:fv(nm, function(v){return v.toFixed(1)+'%';}), p:nm!=null&&nm>8},
+        {t:'F-Skor ≥ 6',          v:fv(fs, function(v){return v+'/9';}),            p:fs!=null&&fs>=6},
+        {t:'Borç/Öz < 1',        v:fv(de, function(v){return v.toFixed(2);}),      p:de!=null&&de<1},
+        {t:'Cari Oran > 1.2',     v:fv(cr, function(v){return v.toFixed(2)+'x';}), p:cr!=null&&cr>1.2},
+        {t:'ROE > 10%',           v:fv(roe,function(v){return v.toFixed(1)+'%';}), p:roe!=null&&roe>10},
+      ]
+    },
+    {
+      id:'mom', emoji:'⚡', name:'Momentum Yatırımcısı', color:'#8b5cf6',
+      desc:'Fiyat ve kazanç ivmesi güçlü hisseleri arar',
+      crits:[
+        {t:'52H Yüksek yakını',    v:fv(nearHigh52,function(v){return v.toFixed(1)+'%';}), p:nearHigh52!=null&&nearHigh52>-10},
+        {t:'Aylık Perf. > 5%',    v:fv(pm, pctFmt), p:pm!=null&&pm>5},
+        {t:'Yıllık Perf. > 20%',  v:fv(py, pctFmt), p:py!=null&&py>20},
+        {t:'Gelir Büyümesi > 10%',v:fv(rg, pctFmt), p:rg!=null&&rg>10},
+        {t:'EPS Büyümesi pozitif', v:fv(eg, pctFmt), p:eg!=null&&eg>0},
+      ]
+    },
+    {
+      id:'def', emoji:'🛡️', name:'Defansif Yatırımcı', color:'#64748b',
+      desc:'Düşük riskli, istikrarlı şirketleri tercih eder',
+      crits:[
+        {t:'Borç/Öz < 0.5',  v:fv(de, function(v){return v.toFixed(2);}),      p:de!=null&&de<0.5},
+        {t:'Cari Oran > 1.5', v:fv(cr, function(v){return v.toFixed(2)+'x';}), p:cr!=null&&cr>1.5},
+        {t:'Net Marj > 5%',   v:fv(nm, function(v){return v.toFixed(1)+'%';}), p:nm!=null&&nm>5},
+        {t:'Temettü > 2%',    v:fv(dy, function(v){return v.toFixed(1)+'%';}), p:dy!=null&&dy>2},
+        {t:'F-Skor ≥ 6',      v:fv(fs, function(v){return v+'/9';}),            p:fs!=null&&fs>=6},
+        {t:'F/K < 20',        v:fv(pe, function(v){return v.toFixed(1)+'x';}), p:pe!=null&&pe>0&&pe<20},
+      ]
+    },
+    {
+      id:'small', emoji:'🌱', name:'Küçük Sermaye', color:'#06b6d4',
+      desc:'Büyüme potansiyeli yüksek küçük şirketleri arar',
+      crits:[
+        {t:'Piy. Değ. < 2Mrd', v:fv(mc, function(v){return v.toFixed(0)+'M';}), p:mc!=null&&mc<2000},
+        {t:'Gelir Büyümesi > 10%', v:fv(rg, pctFmt), p:rg!=null&&rg>10},
+        {t:'F/K < 20',         v:fv(pe, function(v){return v.toFixed(1)+'x';}), p:pe!=null&&pe>0&&pe<20},
+        {t:'ROE > 10%',        v:fv(roe,function(v){return v.toFixed(1)+'%';}), p:roe!=null&&roe>10},
+        {t:'F-Skor ≥ 5',       v:fv(fs, function(v){return v+'/9';}),            p:fs!=null&&fs>=5},
+      ]
+    },
+    {
+      id:'spec', emoji:'🎰', name:'Spekülatif Yatırımcı', color:'#f43f5e',
+      desc:'Yüksek risk-getiri profilindeki hisseleri arar',
+      crits:[
+        {t:'Beta > 1.3',          v:fv(beta,function(v){return v.toFixed(2);}), p:beta!=null&&beta>1.3},
+        {t:'Aylık Perf. > 10%',   v:fv(pm, pctFmt), p:pm!=null&&pm>10},
+        {t:'EPS Büyümesi > 30%',  v:fv(eg, pctFmt), p:eg!=null&&eg>30},
+        {t:'Gelir Büyümesi > 20%',v:fv(rg, pctFmt), p:rg!=null&&rg>20},
+      ]
+    },
+    {
+      id:'tech', emoji:'💻', name:'Teknoloji Odaklı', color:'#0ea5e9',
+      desc:'Teknoloji ve yüksek büyümeli sektörleri arar',
+      crits:[
+        {t:'Gelir Büyümesi > 20%', v:fv(rg, pctFmt), p:rg!=null&&rg>20},
+        {t:'Brüt Marj > 40%',      v:fv(gm, function(v){return v.toFixed(1)+'%';}), p:gm!=null&&gm>40},
+        {t:'ROE > 15%',            v:fv(roe,function(v){return v.toFixed(1)+'%';}), p:roe!=null&&roe>15},
+        {t:'F/K < 30',             v:fv(pe, function(v){return v.toFixed(1)+'x';}), p:pe!=null&&pe>0&&pe<30},
+        {t:'Borç/Öz < 0.8',       v:fv(de, function(v){return v.toFixed(2);}),      p:de!=null&&de<0.8},
+      ]
+    },
+    {
+      id:'bal', emoji:'⚖️', name:'Dengeli Yatırımcı', color:'#a78bfa',
+      desc:'Risk ve getiriyi dengeleyen karma strateji uygular',
+      crits:[
+        {t:'F/K < 20',     v:fv(pe, function(v){return v.toFixed(1)+'x';}), p:pe!=null&&pe>0&&pe<20},
+        {t:'ROE > 10%',    v:fv(roe,function(v){return v.toFixed(1)+'%';}), p:roe!=null&&roe>10},
+        {t:'Net Marj > 5%',v:fv(nm, function(v){return v.toFixed(1)+'%';}), p:nm!=null&&nm>5},
+        {t:'Temettü > 1%', v:fv(dy, function(v){return v.toFixed(1)+'%';}), p:dy!=null&&dy>1},
+        {t:'Borç/Öz < 1', v:fv(de, function(v){return v.toFixed(2);}),      p:de!=null&&de<1},
+        {t:'F-Skor ≥ 5',   v:fv(fs, function(v){return v+'/9';}),            p:fs!=null&&fs>=5},
+      ]
+    },
+  ];
+
+  var _userType = null;
+  try { var _u = JSON.parse(localStorage.getItem('deepfin_user')||'null'); if(_u&&_u.investorType) _userType=_u.investorType; } catch(e){}
+
+  var html = types.map(function(t) {
+    var passed = t.crits.filter(function(c){return c.p;}).length;
+    var total  = t.crits.length;
+    var ratio  = passed / total;
+    var verdict, vColor, vBg;
+    if (ratio >= 0.65)      { verdict='ALIR ✅';    vColor='#10b981'; vBg='rgba(16,185,129,.1)'; }
+    else if (ratio >= 0.40) { verdict='ŞARTLI ⚠️';  vColor='#f0b429'; vBg='rgba(240,180,41,.08)'; }
+    else                    { verdict='ALMAZ ❌';    vColor='#f43f5e'; vBg='rgba(244,63,94,.08)'; }
+    var isUser = _userType === t.id;
+    var isOpen = isUser;
+    var leftColor = ratio>=0.65?'#10b981':ratio>=0.40?'#f0b429':'#f43f5e';
+    var critHtml = t.crits.map(function(c){
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);">'+
+        '<div style="display:flex;align-items:center;gap:7px;">'+
+        '<div style="width:7px;height:7px;border-radius:50%;flex-shrink:0;background:'+(c.p?'#10b981':'#f43f5e')+'"></div>'+
+        '<span style="font-size:11px;color:var(--text2);">'+c.t+'</span>'+
+        '</div>'+
+        (c.v&&c.v!=='—'?'<span style="color:var(--muted2);font-size:10px;font-family:\'Geist Mono\',monospace;">'+c.v+'</span>':'')+
+        '</div>';
+    }).join('');
+    return '<div style="border:1px solid '+(isUser?t.color+'60':'var(--border)')+';border-left:3px solid '+leftColor+';border-radius:8px;margin-bottom:8px;overflow:hidden;background:var(--s1);">'+
+      '<div onclick="toggleInvFit(\''+t.id+'\')" style="display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;user-select:none;">'+
+        '<span style="font-size:18px;line-height:1;">'+t.emoji+'</span>'+
+        '<div style="flex:1;min-width:0;">'+
+          '<div style="font-size:12px;font-weight:700;color:var(--text);">'+t.name+
+          (isUser?' <span style="font-size:9px;padding:1px 5px;background:'+t.color+'22;color:'+t.color+';border:1px solid '+t.color+'44;border-radius:3px;font-weight:600;">SİZİN TİPİNİZ</span>':'')+
+          '</div>'+
+          '<div style="font-size:10px;color:var(--muted2);margin-top:1px;">'+t.desc+'</div>'+
+        '</div>'+
+        '<div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">'+
+          '<span style="font-size:10px;font-weight:700;color:var(--muted2);">'+passed+'/'+total+'</span>'+
+          '<span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;background:'+vBg+';color:'+vColor+';">'+verdict+'</span>'+
+          '<span style="color:var(--muted2);font-size:11px;" id="inv-fit-chevron-'+t.id+'">'+(isOpen?'▲':'▼')+'</span>'+
+        '</div>'+
+      '</div>'+
+      '<div id="inv-fit-body-'+t.id+'" style="'+(isOpen?'':'display:none;')+'padding:0 14px 12px;border-top:1px solid var(--border);">'+
+        '<div style="padding-top:10px;">'+critHtml+'</div>'+
+      '</div>'+
     '</div>';
+  }).join('');
+  el.innerHTML = html;
+}
+
+function toggleInvFit(id) {
+  var body = document.getElementById('inv-fit-body-'+id);
+  var chev = document.getElementById('inv-fit-chevron-'+id);
+  if (!body) return;
+  var hidden = body.style.display === 'none';
+  body.style.display = hidden ? 'block' : 'none';
+  if (chev) chev.textContent = hidden ? '▲' : '▼';
 }
 
 // ── Sektör Ortalaması Yükle ───────────────────────────────────────────────
@@ -1162,6 +1342,7 @@ function _buildPrfMetrics() {
 }
 
 function _buildPrfPiotroski() {
+  if (!document.getElementById('prf-fscore-num')) return;
   var d = _prfData;
   var score = d ? d.piotroski_f_score : null;
   if(score===null||score===undefined) { document.getElementById('prf-fscore-num').textContent='—'; return; }
@@ -1578,6 +1759,7 @@ async function loadYahooData(sym, ex) {
       _buildPrfPiotroski();
       _buildDeepFinScore();
       _buildTrend(_prfData);
+      _renderInvestorFit(_prfData);
       setTimeout(function(){
         _buildPrfGuru();
         _buildPrfSide();

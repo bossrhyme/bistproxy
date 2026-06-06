@@ -112,7 +112,6 @@ if('serviceWorker' in navigator){
           <div class="prf-tab" onclick="prfTab('trend',this)">📈 Trend</div>
           <div class="prf-tab" onclick="prfTab('financials',this)">Finansallar</div>
           <div class="prf-tab" onclick="prfTab('news',this)">Haberler</div>
-          <div class="prf-tab" onclick="prfTab('piotroski',this)">F-Score</div>
           <div class="prf-tab" onclick="prfTab('guru',this)">GOAT Analizi</div>
           <div class="prf-tab" onclick="prfTab('fairvalue',this)">💰 Adil Fiyat</div>
           <div class="prf-tab" style="display:flex;align-items:center;gap:6px;" onclick="prfTab('ai',this)">🤖 YZ Analizi <span style="font-size:9px;padding:1px 6px;background:rgba(240,180,41,.15);color:#f0b429;border:1px solid rgba(240,180,41,.3);border-radius:3px;font-weight:600;letter-spacing:.3px;">YAKINDA</span></div>
@@ -236,20 +235,6 @@ if('serviceWorker' in navigator){
           <div class="prf-section" style="border-bottom:none;">
             <div class="prf-sec-title">Son Haberler</div>
             <div id="prf-news-list"><div style="padding:20px;color:var(--muted2);font-size:12px;">Haberler yükleniyor...</div></div>
-          </div>
-        </div>
-
-        <div id="prf-panel-piotroski" class="prf-panel">
-          <div class="prf-section">
-            <div class="prf-sec-title">Piotroski F-Score</div>
-            <div class="prf-fscore-badge">
-              <div class="prf-fscore-num" id="prf-fscore-num">—</div>
-              <div>
-                <div id="prf-fscore-label" style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">—</div>
-                <div style="font-size:11px;color:var(--text2);">9 kriter üzerinden değerlendirme</div>
-              </div>
-            </div>
-            <div class="prf-fgrid" id="prf-fgrid"></div>
           </div>
         </div>
 
@@ -385,6 +370,6 @@ if('serviceWorker' in navigator){
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
-<script src="/analiz/prf.js?v=9546691"></script>
+<script src="/analiz/prf.js?v=9546692"></script>
 </body>
 </html>
