@@ -413,6 +413,22 @@ async function handleUpdateProfile(req, res) {
   jsonRes(res, 200, { ok: true, name: newName });
 }
 
+async function handleSetInvestorType(req, res) {
+  if (req.method !== 'POST') { jsonRes(res, 405, { error: 'Method not allowed' }); return; }
+  const user = await getUser(req);
+  if (!user) { jsonRes(res, 401, { error: 'Unauthorized' }); return; }
+  const { investorType } = await readBody(req);
+  const VALID = ['growth','div','value','mom','def','small','spec','tech','bal'];
+  if (!investorType || !VALID.includes(investorType)) {
+    jsonRes(res, 400, { error: 'Geçersiz yatırımcı tipi' }); return;
+  }
+  const full = await kvGet('usr:' + user.id);
+  if (!full) { jsonRes(res, 404, { error: 'Kullanıcı bulunamadı' }); return; }
+  full.investorType = investorType;
+  await kvSet('usr:' + user.id, full);
+  jsonRes(res, 200, { ok: true, user: safeUser(full) });
+}
+
 // ── main router ───────────────────────────────
 module.exports = async function handler(req, res) {
   const path = (req.url || '').split('?')[0];
@@ -424,7 +440,8 @@ module.exports = async function handler(req, res) {
     if (path === '/api/auth/logout')          return await handleLogout(req, res);
     if (path === '/api/auth/change-password') return await handleChangePassword(req, res);
     if (path === '/api/auth/update-profile')  return await handleUpdateProfile(req, res);
-    if (path === '/api/auth/daily-checkin')   return await handleDailyCheckin(req, res);
+    if (path === '/api/auth/daily-checkin')     return await handleDailyCheckin(req, res);
+    if (path === '/api/auth/set-investor-type') return await handleSetInvestorType(req, res);
     if (path.startsWith('/api/portfolio'))    return await handlePortfolio(req, res);
     if (path.startsWith('/api/watchlists'))   return await handleWatchlists(req, res);
 

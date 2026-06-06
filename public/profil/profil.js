@@ -134,6 +134,11 @@ function showQuiz() {
   document.getElementById('quiz-overlay').classList.add('open');
 }
 
+window.startQuizForExistingUser = function() {
+  _tempReg = null; // signal: existing user update, not new registration
+  showQuiz();
+};
+
 function renderQuizQ() {
   var q    = QUIZ[_quizQ];
   var pct  = Math.round((_quizQ / QUIZ.length) * 100);
@@ -194,23 +199,49 @@ function showQuizResult() {
 }
 
 window.finishQuiz = async function(type) {
-  var btn = document.getElementById('quiz-finish-btn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Kaydediliyor...'; }
+  var btn   = document.getElementById('quiz-finish-btn');
   var errEl = document.getElementById('pf-auth-err');
+  if (btn) { btn.disabled = true; btn.textContent = 'Kaydediliyor...'; }
+
+  // Existing user updating investor type
+  if (!_tempReg && _user) {
+    try {
+      var r = await fetch('/api/auth/set-investor-type', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ investorType: type })
+      });
+      var d = await r.json();
+      if (d.ok) {
+        _user.investorType = type;
+        document.getElementById('quiz-overlay').classList.remove('open');
+        renderIdentity();
+        toast('Yatırımcı tipin güncellendi: ' + INV_TYPES[type].name);
+      } else {
+        document.getElementById('quiz-overlay').classList.remove('open');
+        toast(d.error || 'Güncelleme başarısız.');
+      }
+    } catch(e) {
+      document.getElementById('quiz-overlay').classList.remove('open');
+      toast('Bağlantı hatası.');
+    }
+    return;
+  }
+
+  // New registration flow
   try {
     var body = { email: _tempReg.email, password: _tempReg.password, username: _tempReg.username, investorType: type };
-    var r = await fetch('/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
-    var d = await r.json();
-    if (d.user) {
-      _user = d.user;
+    var r2 = await fetch('/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    var d2 = await r2.json();
+    if (d2.user) {
+      _user = d2.user;
       document.getElementById('quiz-overlay').classList.remove('open');
       document.getElementById('pf-login').style.display = 'none';
       showUser();
       await Promise.all([loadWatchlists(), loadPortfolio()]);
-      toast('Hoş geldin ' + (d.user.username || d.user.name) + '!');
+      toast('Hoş geldin ' + (d2.user.username || d2.user.name) + '!');
     } else {
       document.getElementById('quiz-overlay').classList.remove('open');
-      if (errEl) errEl.textContent = d.error || 'Kayıt başarısız.';
+      if (errEl) errEl.textContent = d2.error || 'Kayıt başarısız.';
       if (btn) { btn.disabled = false; btn.textContent = 'Hesabımı Oluştur →'; }
     }
   } catch(e) {
@@ -302,9 +333,11 @@ function renderIdentity() {
   var sv = document.getElementById('pf-streak-val');
   if (sv) sv.textContent = _user.loginStreak || 0;
 
-  // Tara button
+  // Tara / Quiz buttons
   var taraBtn = document.getElementById('pf-tara-btn');
+  var quizBtn = document.getElementById('pf-quiz-btn');
   if (taraBtn) taraBtn.disabled = !_user.investorType;
+  if (quizBtn) quizBtn.style.display = _user.investorType ? 'none' : 'inline-flex';
 
   // Settings name input
   var nameInp = document.getElementById('pf-name-input');
