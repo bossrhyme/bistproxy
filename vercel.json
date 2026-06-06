@@ -44,7 +44,7 @@
       ]
     },
     {
-      "source": "/(deepfin|analiz/prf|analiz/analiz)\\.(css|js)",
+      "source": "/(deepfin|analiz/prf|profil/profil)\\.(css|js)",
       "headers": [
         {
           "key": "Cache-Control",
