@@ -20,7 +20,29 @@ body{overflow-y:auto;}
 .pf-logo-mark{width:22px;height:22px;background:var(--accent);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;}
 
 /* Main layout */
-.pf-main{max-width:760px;margin:0 auto;padding:32px 20px 60px;}
+.pf-main{max-width:1120px;margin:0 auto;padding:32px 20px 60px;}
+
+/* Two-column layout */
+.pf-columns{display:flex;gap:24px;align-items:flex-start;}
+.pf-col-main{flex:1;min-width:0;}
+.pf-col-side{width:300px;flex-shrink:0;position:sticky;top:60px;}
+@media(max-width:960px){.pf-columns{flex-direction:column;}.pf-col-side{width:100%;position:static;}}
+
+/* Investor sidebar */
+.pf-inv-sb{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:16px;max-height:calc(100vh - 80px);overflow-y:auto;}
+.pf-inv-sb-title{font-size:11px;font-weight:700;color:var(--muted2);letter-spacing:.6px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+.pf-inv-sb-item{padding:10px 12px;border-radius:8px;border:1.5px solid var(--border);margin-bottom:7px;cursor:default;transition:border-color .15s,background .15s;}
+.pf-inv-sb-item.pf-inv-sb-me{background:rgba(0,0,0,.03);}
+.pf-inv-sb-head{display:flex;gap:9px;align-items:flex-start;margin-bottom:5px;}
+.pf-inv-sb-emoji{font-size:20px;line-height:1;flex-shrink:0;margin-top:1px;}
+.pf-inv-sb-name{font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:5px;}
+.pf-inv-sb-me-badge{font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;color:#fff;letter-spacing:.3px;}
+.pf-inv-sb-desc{font-size:11px;color:var(--muted2);line-height:1.45;margin-top:2px;}
+.pf-inv-sb-meta{display:flex;gap:10px;margin-top:6px;flex-wrap:wrap;}
+.pf-inv-sb-chip{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--s2);color:var(--muted2);}
+.pf-inv-sb-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;}
+.pf-inv-sb-tag{font-size:10px;padding:2px 7px;border-radius:8px;background:var(--s3);color:var(--muted2);}
+.pf-inv-sb-scrollhint{text-align:center;font-size:10px;color:var(--muted2);margin-top:8px;}
 
 /* Loading */
 #pf-loading{display:flex;align-items:center;justify-content:center;padding:80px 20px;gap:10px;color:var(--muted2);font-size:13px;}
@@ -249,6 +271,8 @@ body{overflow-y:auto;}
   </div>
 
   <div id="pf-user">
+  <div class="pf-columns">
+  <div class="pf-col-main">
     <!-- Identity card -->
     <div class="pf-identity" id="pf-identity">
       <div class="pf-avatar-col">
@@ -324,7 +348,15 @@ body{overflow-y:auto;}
         </div>
       </div>
     </div>
+  </div><!-- /pf-col-main -->
+
+  <!-- Right sidebar: investor types -->
+  <div class="pf-col-side">
+    <div class="pf-inv-sb" id="pf-inv-sidebar"></div>
   </div>
+
+  </div><!-- /pf-columns -->
+  </div><!-- /pf-user -->
 </div>
 
 <!-- New list modal -->
@@ -390,6 +422,6 @@ body{overflow-y:auto;}
 
 <div class="pf-toast" id="pf-toast"></div>
 
-<script src="/profil/profil.js?v=11"></script>
+<script src="/profil/profil.js?v=12"></script>
 </body>
 </html>

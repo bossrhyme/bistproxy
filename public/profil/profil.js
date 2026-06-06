@@ -1,4 +1,4 @@
-// DeepFin — Profil Sayfası v11
+// DeepFin — Profil Sayfası v12
 (function() {
 'use strict';
 
@@ -73,6 +73,60 @@ function getWarriorSVG(tier, color) {
     (hasStar ? '<circle cx="22" cy="62" r="2.5" fill="' + c + '" opacity="0.7"/><circle cx="58" cy="62" r="2.5" fill="' + c + '" opacity="0.7"/>' : '') +
     (hasDStar ? '<circle cx="15" cy="58" r="2" fill="' + c + '" opacity="0.5"/><circle cx="65" cy="58" r="2" fill="' + c + '" opacity="0.5"/>' : '') +
     '</svg>';
+}
+
+// ── Investor type metadata ────────────────────
+var INV_META = {
+  growth: { emoji:'🚀', risk:'Yüksek',      vade:'1–5 yıl',   tags:['Gelir büyümesi','EPS artışı','PEG oranı','Pazar payı'] },
+  div:    { emoji:'💰', risk:'Düşük-Orta',   vade:'5+ yıl',    tags:['Temettü verimi','Ödeme oranı','Temettü büyümesi','Nakit akışı'] },
+  value:  { emoji:'🔍', risk:'Orta',         vade:'3–7 yıl',   tags:['F/K oranı','PD/DD','EV/EBITDA','İç değer'] },
+  mom:    { emoji:'🏄', risk:'Yüksek',       vade:'1–12 ay',   tags:['RSI','52H yakınlık','Göreceli güç','Hacim artışı'] },
+  def:    { emoji:'🛡️', risk:'Düşük',        vade:'5+ yıl',    tags:['Düşük beta','Borç/özsermaye','Temettü istikrarı','Savunma sektörü'] },
+  small:  { emoji:'🔭', risk:'Yüksek',       vade:'2–5 yıl',   tags:['Küçük ölçek','Keşfedilmemiş','Büyüme potansiyeli','Düşük analist takibi'] },
+  spec:   { emoji:'⚡', risk:'Çok Yüksek',   vade:'Günler–Aylar', tags:['Hacim patlaması','Kırılım','Yüksek volatilite','Katalizör'] },
+  tech:   { emoji:'🤖', risk:'Yüksek',       vade:'2–5 yıl',   tags:['Ar-Ge harcaması','Gelir büyümesi','TAM büyüklüğü','Yazılım marjı'] },
+  bal:    { emoji:'⚖️', risk:'Orta',         vade:'5+ yıl',    tags:['Çeşitlendirme','Sharpe oranı','Korelasyon','Risk/getiri dengesi'] },
+};
+
+function renderInvestorSidebar() {
+  var sb = document.getElementById('pf-inv-sidebar');
+  if (!sb) return;
+  var current = _user && _user.investorType;
+
+  var html = '<div class="pf-inv-sb-title">⚔ Yatırımcı Tipleri</div>';
+
+  Object.keys(INV_TYPES).forEach(function(key) {
+    var inv  = INV_TYPES[key];
+    var meta = INV_META[key];
+    var isMe = current === key;
+    var borderStyle = isMe ? 'border-color:' + inv.color + ';' : '';
+    var bgStyle     = isMe ? 'background:' + inv.color + '12;' : '';
+    html +=
+      '<div class="pf-inv-sb-item' + (isMe ? ' pf-inv-sb-me' : '') + '" style="' + borderStyle + bgStyle + '">' +
+        '<div class="pf-inv-sb-head">' +
+          '<span class="pf-inv-sb-emoji">' + meta.emoji + '</span>' +
+          '<div style="flex:1;min-width:0;">' +
+            '<div class="pf-inv-sb-name">' +
+              '<span style="color:' + inv.color + '">' + inv.name + '</span>' +
+              (isMe ? '<span class="pf-inv-sb-me-badge" style="background:' + inv.color + '">SEN</span>' : '') +
+            '</div>' +
+            '<div class="pf-inv-sb-desc">' + inv.desc + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="pf-inv-sb-meta">' +
+          '<span class="pf-inv-sb-chip">⏱ ' + meta.vade + '</span>' +
+          '<span class="pf-inv-sb-chip">⚠ ' + meta.risk + '</span>' +
+        '</div>' +
+        '<div class="pf-inv-sb-tags">' +
+          meta.tags.map(function(t){ return '<span class="pf-inv-sb-tag">' + t + '</span>'; }).join('') +
+        '</div>' +
+      '</div>';
+  });
+
+  if (!current) {
+    html += '<div class="pf-inv-sb-scrollhint">Quiz yaparak tipini belirle 👆</div>';
+  }
+  sb.innerHTML = html;
 }
 
 // ── Quiz ──────────────────────────────────────
@@ -379,6 +433,8 @@ function renderIdentity() {
   // Settings name input
   var nameInp = document.getElementById('pf-name-input');
   if (nameInp) nameInp.value = _user.name || '';
+
+  renderInvestorSidebar();
 }
 
 function showUser() {
