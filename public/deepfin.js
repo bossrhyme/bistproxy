@@ -825,25 +825,22 @@ function _syncFavToWatchlist(sym, add) {
 }
 
 function _updateFavBtn() {
-  var label, active;
+  var active;
   if (_dfUser) {
     active = !!_dfListFilter;
-    label  = active ? '★ ' + _dfListFilter.name + ' (' + _dfListFilter.symbols.length + ')' : '☆ Listelerim';
   } else {
     active = favFilterActive;
-    label  = active ? '★ Favoriler (' + favSet.size + ')' : '☆ Favoriler';
   }
   ['fav-filter-btn', 'tb-fav-btn'].forEach(function(id) {
     var btn = document.getElementById(id);
     if (!btn) return;
     btn.classList.toggle('on', active);
-    btn.textContent = label;
+    btn.textContent = active ? '★ Listelerim' : '☆ Listelerim';
   });
 }
 
 function toggleFavFilter(evt) {
   if (_dfUser) {
-    if (_dfListFilter) { _dfListFilter = null; _updateFavBtn(); renderTable(); return; }
     _showListFilterPicker(evt || window.event);
   } else {
     favFilterActive = !favFilterActive;
@@ -874,6 +871,20 @@ function _doShowListFilterPicker(rect) {
   div.id   = 'df-list-filter-picker';
   div.style.cssText = 'position:fixed;z-index:9999;background:var(--s1);border:1px solid var(--border);border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.18);min-width:200px;max-width:240px;padding:6px 0;left:' + Math.max(4, rect.left) + 'px;top:' + (rect.bottom + 4) + 'px;font-family:Inter,sans-serif';
 
+  // Aktif filtre varsa "Tüm hisseler" (temizle) seçeneği göster
+  if (_dfListFilter) {
+    var clearRow = document.createElement('div');
+    clearRow.style.cssText = 'padding:7px 12px;cursor:pointer;font-size:12px;color:var(--red);display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);margin-bottom:4px;';
+    clearRow.innerHTML = '<span>✕</span><span>Filtreyi kaldır — ' + _dfListFilter.name + '</span>';
+    clearRow.onmouseenter = function() { clearRow.style.background = 'var(--red-bg)'; };
+    clearRow.onmouseleave = function() { clearRow.style.background = ''; };
+    clearRow.onclick = function(e) {
+      e.stopPropagation(); div.remove(); document.removeEventListener('click', outside);
+      _dfListFilter = null; _updateFavBtn(); renderTable();
+    };
+    div.appendChild(clearRow);
+  }
+
   function secLabel(txt) {
     var l = document.createElement('div');
     l.style.cssText = 'padding:4px 12px 2px;font-size:10px;font-weight:700;color:var(--text2);letter-spacing:.5px;text-transform:uppercase';
@@ -892,11 +903,14 @@ function _doShowListFilterPicker(rect) {
     secLabel('Takip Listeleri');
     _dfWatchlists.forEach(function(list) {
       var syms = (list.items || []).map(function(i) { return (i.symbol || '').replace('.IS','').toUpperCase(); });
-      div.appendChild(makeRow(list.icon || '⭐', list.name + ' (' + syms.length + ')', function(e) {
+      var isActive = _dfListFilter && _dfListFilter.id === list.id;
+      var row = makeRow(list.icon || '⭐', list.name + ' (' + syms.length + ')', function(e) {
         e.stopPropagation(); div.remove(); document.removeEventListener('click', outside);
         _dfListFilter = { id: list.id, name: list.name, symbols: syms };
         _updateFavBtn(); renderTable();
-      }));
+      });
+      if (isActive) row.style.background = 'rgba(14,165,233,.07)';
+      div.appendChild(row);
     });
   }
 
@@ -909,11 +923,14 @@ function _doShowListFilterPicker(rect) {
     secLabel('Portföyler');
     _dfPortfolios.forEach(function(pf) {
       var syms = (pf.positions || []).map(function(p) { return (p.symbol || '').replace('.IS','').toUpperCase(); });
-      div.appendChild(makeRow(pf.icon || '📊', pf.name + ' (' + syms.length + ')', function(e) {
+      var isActive = _dfListFilter && _dfListFilter.id === pf.id;
+      var row = makeRow(pf.icon || '📊', pf.name + ' (' + syms.length + ')', function(e) {
         e.stopPropagation(); div.remove(); document.removeEventListener('click', outside);
         _dfListFilter = { id: pf.id, name: pf.name, symbols: syms };
         _updateFavBtn(); renderTable();
-      }));
+      });
+      if (isActive) row.style.background = 'rgba(14,165,233,.07)';
+      div.appendChild(row);
     });
   }
 
