@@ -706,7 +706,7 @@ td:first-child,td:nth-child(2){text-align:left;}
 .hamburger-btn.open .ham-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
 .hamburger-btn.open .ham-line:nth-child(2) { opacity: 0; }
 .hamburger-btn.open .ham-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-max-width: 480px) {
+@media(max-width: 480px) {
   /* Çok küçük ekranlar (SE, Mini) */
   .exchange-grid { grid-template-columns: repeat(2, 1fr); gap: 4px; }
   .exbtn { font-size: 10px; padding: 7px 4px; }
