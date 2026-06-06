@@ -2161,7 +2161,8 @@ function _vsGetVisible() {
 
 function _vsRender() {
   var tbody = document.getElementById('tbody');
-  if (!tbody || !_vsData.length) return;
+  if (!tbody) return;
+  if (!_vsData.length) { tbody.innerHTML = ''; return; }
 
   var v      = _vsGetVisible();
   var end    = Math.min(_vsData.length, v.start + v.count);
@@ -2297,8 +2298,12 @@ function _vsRowHtml(s, idx) {
     base = filtered.filter(function(s) { return favSet.has(s.symbol); });
   }
   _vsData = sorted(base);
+  _vsStart = 0;
+  var _rtWrap = document.getElementById('twrap');
+  if (_rtWrap) _rtWrap.scrollTop = 0;
   _vsInit();
   _vsRender();
+  updateStatsBar();
   setTimeout(applyColVisibility, 0);
 }
 
@@ -3015,7 +3020,7 @@ init();
       _dfUser = d.user;
       fetch('/api/watchlists', { credentials: 'same-origin' })
         .then(function(r) { return r.json(); })
-        .then(function(wd) { _dfWatchlists = wd.watchlists || []; _updateFavBtn(); })
+        .then(function(wd) { _dfWatchlists = wd.watchlists || []; _updateFavBtn(); if (allData.length) renderTable(); })
         .catch(function() {});
       fetch('/api/portfolio', { credentials: 'same-origin' })
         .then(function(r) { return r.json(); })
