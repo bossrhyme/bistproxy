@@ -1479,7 +1479,8 @@ async function runScan(){
     const _exm = EXCHANGE_META[currentExchange]||EXCHANGE_META.bist;
 
     updateExchangeBadge();
-    applyAndRender();
+    applyAndRender(window._chipSpecial || null);
+    window._chipSpecial = null;
 
   } catch(err) {
     showState('errstate');
@@ -1782,7 +1783,8 @@ function _applyChips(cfg) {
 
   updateClrBtn();
   var special = specials.length > 0 ? specials[0] : null;
-  if (allData.length > 0) { applyAndRender(special); } else { runScan(); }
+  window._chipSpecial = special;
+  runScan();
 }
 
 function applyAllChips()    { _applyChips(BASIC_CHIP_CFG); }
@@ -1799,7 +1801,7 @@ function countSelectedChips() { return _countChips(BASIC_CHIP_CFG) + _countChips
 document.getElementById('goat-chips').addEventListener('click', function(e) {
   var chip = e.target.closest('.goat-chip'); if (!chip) return;
   var wasOn = chip.classList.contains('on');
-  if (!wasOn && _countChips(BASIC_CHIP_CFG) >= 5) return;
+  if (!wasOn && _countChips(BASIC_CHIP_CFG) >= 4) return;
   chip.classList.toggle('on');
   applyAllChips();
   if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
@@ -1807,7 +1809,7 @@ document.getElementById('goat-chips').addEventListener('click', function(e) {
 document.getElementById('presets').addEventListener('click', function(e) {
   var chip = e.target.closest('.chip'); if (!chip || !PRESETS[chip.dataset.preset]) return;
   var wasOn = chip.classList.contains('on');
-  if (!wasOn && _countChips(BASIC_CHIP_CFG) >= 5) return;
+  if (!wasOn && _countChips(BASIC_CHIP_CFG) >= 4) return;
   chip.classList.toggle('on');
   applyAllChips();
   if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
@@ -1815,7 +1817,7 @@ document.getElementById('presets').addEventListener('click', function(e) {
 document.getElementById('tech-presets').addEventListener('click', function(e) {
   var chip = e.target.closest('.tech-chip'); if (!chip || !TECH_PRESETS[chip.dataset.tech]) return;
   var wasOn = chip.classList.contains('on');
-  if (!wasOn && _countChips(BASIC_CHIP_CFG) >= 5) return;
+  if (!wasOn && _countChips(BASIC_CHIP_CFG) >= 4) return;
   chip.classList.toggle('on');
   applyAllChips();
   if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
@@ -1827,7 +1829,7 @@ document.getElementById('tech-presets').addEventListener('click', function(e) {
   el.addEventListener('click', function(e) {
     var chip = e.target.closest('.goat-chip'); if (!chip) return;
     var wasOn = chip.classList.contains('on');
-    if (!wasOn && _countChips(ADV_CHIP_CFG) >= 5) return;
+    if (!wasOn && _countChips(ADV_CHIP_CFG) >= 4) return;
     chip.classList.toggle('on');
     applyAllChipsAdv();
     if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
@@ -1838,7 +1840,7 @@ document.getElementById('tech-presets').addEventListener('click', function(e) {
   el.addEventListener('click', function(e) {
     var chip = e.target.closest('.chip'); if (!chip || !PRESETS[chip.dataset.preset]) return;
     var wasOn = chip.classList.contains('on');
-    if (!wasOn && _countChips(ADV_CHIP_CFG) >= 5) return;
+    if (!wasOn && _countChips(ADV_CHIP_CFG) >= 4) return;
     chip.classList.toggle('on');
     applyAllChipsAdv();
     if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
@@ -1849,7 +1851,7 @@ document.getElementById('tech-presets').addEventListener('click', function(e) {
   el.addEventListener('click', function(e) {
     var chip = e.target.closest('.tech-chip'); if (!chip || !TECH_PRESETS[chip.dataset.tech]) return;
     var wasOn = chip.classList.contains('on');
-    if (!wasOn && _countChips(ADV_CHIP_CFG) >= 5) return;
+    if (!wasOn && _countChips(ADV_CHIP_CFG) >= 4) return;
     chip.classList.toggle('on');
     applyAllChipsAdv();
     if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
