@@ -7,445 +7,71 @@ function openTradingView() {
   window.open('https://www.tradingview.com/chart/?symbol='+pfx+'%3A'+sym, '_blank');
 }
 
-// ── Chart state ──────────────────────────────────────────────────────────
-var _chartInst  = null;
-var _chartSer   = null;
-var _chartType  = 'candle';
-var _chartIval  = 'D';
-var _chartRange = '1y';
-var _chartPct   = false;
-var _chartData  = [];
-var _chartSym2  = '';
-var _chartEx2   = '';
-var _chartInds  = { sma20: false, sma50: false, sma200: false, bb: false, vol: false };
-var _chartIndS  = {};
-var _chartDataIdx = {};
-var _chartIndCache = {};
-var _drawMode   = null;
-var _drawPts    = [];
-var _drawings   = [];
-var _drawPreviewSer = null;
-var _selectedDrawing = null;
-
-function _tbHtml() {
-  var b = function(id, label, on, fn) {
-    var bd = on ? '1px solid #0ea5e9' : '1px solid #e2e8f0';
-    var bg = on ? 'rgba(14,165,233,.1)' : 'transparent';
-    var cl = on ? '#0ea5e9' : '#94a3b8';
-    return '<button id="'+id+'" onclick="'+fn+'" style="padding:3px 8px;font-size:10px;font-weight:600;border-radius:4px;cursor:pointer;border:'+bd+';background:'+bg+';color:'+cl+';transition:all .15s;white-space:nowrap;font-family:Inter,sans-serif;line-height:1.5;">'+label+'</button>';
-  };
-  var sp = '<div style="width:1px;height:13px;background:#e2e8f0;margin:0 2px;flex-shrink:0;"></div>';
-  var T = _chartType, I = _chartIval, R = _chartRange, P = _chartPct;
-  var Ids = _chartInds, Dm = _drawMode;
-  var row1 =
-    b('ct-c','Mum',T==='candle',"setChartType('candle')")+b('ct-l','Çizgi',T==='line',"setChartType('line')")+sp+
-    b('ci-D','G',I==='D',"setChartInterval('D')")+b('ci-W','H',I==='W',"setChartInterval('W')")+b('ci-M','A',I==='M',"setChartInterval('M')")+sp+
-    b('cr-1m','1A',R==='1m',"setChartRange('1m')")+b('cr-3m','3A',R==='3m',"setChartRange('3m')")+b('cr-6m','6A',R==='6m',"setChartRange('6m')")+b('cr-1y','1Y',R==='1y',"setChartRange('1y')")+b('cr-all','Tümü',R==='all',"setChartRange('all')")+sp+
-    b('cp-pct','%',P,'setChartPct()');
-  var row2 =
-    b('ind-sma20','SMA 20',Ids.sma20,"toggleInd('sma20')")+b('ind-sma50','SMA 50',Ids.sma50,"toggleInd('sma50')")+b('ind-sma200','SMA 200',Ids.sma200,"toggleInd('sma200')")+b('ind-bb','BB',Ids.bb,"toggleInd('bb')")+b('ind-vol','Hacim',Ids.vol,"toggleInd('vol')")+sp+
-    b('draw-trend','↗ Trend',Dm==='trend',"setDrawMode('trend')")+b('draw-ray','→ ışın',Dm==='ray',"setDrawMode('ray')")+b('draw-horizontal','— Yatay',Dm==='horizontal',"setDrawMode('horizontal')")+sp+
-    '<button onclick="clearDrawings()" style="padding:3px 8px;font-size:10px;font-weight:600;border-radius:4px;cursor:pointer;border:1px solid #fecdd3;background:transparent;color:#f43f5e;transition:all .15s;white-space:nowrap;font-family:Inter,sans-serif;line-height:1.5;">✕ Temizle</button>';
-  return '<div style="padding:7px 12px;border-bottom:1px solid #e2e8f0;background:#fff;">'+
-    '<div style="display:flex;align-items:center;gap:3px;flex-wrap:wrap;row-gap:4px;">'+row1+'</div>'+
-    '<div style="display:flex;align-items:center;gap:3px;flex-wrap:wrap;row-gap:4px;margin-top:6px;padding-top:6px;border-top:1px solid #f1f5f9;">'+row2+'</div>'+
-    '</div>';
-}
-
-function _tbSet(id, on) {
-  var btn = document.getElementById(id);
-  if (!btn) return;
-  btn.style.border     = on ? '1px solid #0ea5e9' : '1px solid #e2e8f0';
-  btn.style.background = on ? 'rgba(14,165,233,.1)' : 'transparent';
-  btn.style.color      = on ? '#0ea5e9' : '#94a3b8';
-}
-function _tbGroup(prefix, vals, active) {
-  vals.forEach(function(v) { _tbSet(prefix+v, v===active); });
-}
-
-function _chartFiltered() {
-  if (_chartRange === 'all') return _chartData;
-  var days = {'1m':30,'3m':91,'6m':182,'1y':365}[_chartRange] || 365;
-  var since = Math.floor(Date.now()/1000) - days*86400;
-  return _chartData.filter(function(c) { return c.time >= since; });
-}
-
-// ── Indicators ──────────────────────────────────────────────────────────
-function _calcSMA(data, period) {
-  var result=[], sum=0;
-  for(var i=0;i<data.length;i++){
-    sum+=data[i].close;
-    if(i>=period) sum-=data[i-period].close;
-    if(i>=period-1) result.push({time:data[i].time,value:sum/period});
-  }
-  return result;
-}
-
-function _calcBB(data, period, mult) {
-  var result=[], sumX=0, sumX2=0;
-  for(var i=0;i<data.length;i++){
-    var c=data[i].close;
-    sumX+=c; sumX2+=c*c;
-    if(i>=period){var old=data[i-period].close;sumX-=old;sumX2-=old*old;}
-    if(i>=period-1){
-      var mean=sumX/period;
-      var std=Math.sqrt(Math.max(0,sumX2/period-mean*mean));
-      result.push({time:data[i].time,upper:mean+mult*std,middle:mean,lower:mean-mult*std});
-    }
-  }
-  return result;
-}
-
-function _addIndSeries(key, data) {
-  if(!_chartInst) return;
-  data = data || _chartFiltered();
-  if(!data.length) return;
-  var mkL=function(color,w,dash){
-    return _chartInst.addLineSeries({color:color,lineWidth:w||1,lineStyle:dash||0,priceLineVisible:false,lastValueVisible:false,crosshairMarkerVisible:false});
-  };
-  var full=_chartData.length?_chartData:data;
-  var rng=data.length?{min:data[0].time,max:data[data.length-1].time}:null;
-  var fil=rng?function(d){return d.time>=rng.min&&d.time<=rng.max;}:function(){return true;};
-  function trySet(ser, d){try{ser.setData(d);}catch(e){return false;} return true;}
-  if(key==='sma20'){
-    if(!_chartIndCache.sma20) _chartIndCache.sma20=_calcSMA(full,20);
-    if(!_chartIndS.sma20) _chartIndS.sma20=mkL('#3b82f6',1);
-    if(!trySet(_chartIndS.sma20,_chartIndCache.sma20.filter(fil))){_chartIndS.sma20=mkL('#3b82f6',1);_chartIndS.sma20.setData(_chartIndCache.sma20.filter(fil));}
-  }
-  if(key==='sma50'){
-    if(!_chartIndCache.sma50) _chartIndCache.sma50=_calcSMA(full,50);
-    if(!_chartIndS.sma50) _chartIndS.sma50=mkL('#f59e0b',1);
-    if(!trySet(_chartIndS.sma50,_chartIndCache.sma50.filter(fil))){_chartIndS.sma50=mkL('#f59e0b',1);_chartIndS.sma50.setData(_chartIndCache.sma50.filter(fil));}
-  }
-  if(key==='sma200'){
-    if(!_chartIndCache.sma200) _chartIndCache.sma200=_calcSMA(full,200);
-    if(!_chartIndS.sma200) _chartIndS.sma200=mkL('#ef4444',1.5);
-    if(!trySet(_chartIndS.sma200,_chartIndCache.sma200.filter(fil))){_chartIndS.sma200=mkL('#ef4444',1.5);_chartIndS.sma200.setData(_chartIndCache.sma200.filter(fil));}
-  }
-  if(key==='bb'){
-    if(!_chartIndCache.bb) _chartIndCache.bb=_calcBB(full,20,2);
-    if(!_chartIndS.bb_u) _chartIndS.bb_u=mkL('#8b5cf6',1,1);
-    if(!_chartIndS.bb_m) _chartIndS.bb_m=mkL('#8b5cf6',1,2);
-    if(!_chartIndS.bb_l) _chartIndS.bb_l=mkL('#8b5cf6',1,1);
-    var bbf=_chartIndCache.bb.filter(fil);
-    try{_chartIndS.bb_u.setData(bbf.map(function(d){return{time:d.time,value:d.upper};}));}catch(e){}
-    try{_chartIndS.bb_m.setData(bbf.map(function(d){return{time:d.time,value:d.middle};}));}catch(e){}
-    try{_chartIndS.bb_l.setData(bbf.map(function(d){return{time:d.time,value:d.lower};}));}catch(e){}
-  }
-  if(key==='vol'){
-    if(!_chartIndS.vol){
-      _chartIndS.vol=_chartInst.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:'vol'});
-      _chartInst.priceScale('vol').applyOptions({scaleMargins:{top:0.8,bottom:0}});
-    }
-    var vd=data.map(function(d){return{time:d.time,value:d.volume||0,color:d.close>=d.open?'rgba(16,185,129,.35)':'rgba(244,63,94,.3)'};});
-    try{_chartIndS.vol.setData(vd);}catch(e){
-      _chartIndS.vol=_chartInst.addHistogramSeries({priceFormat:{type:'volume'},priceScaleId:'vol'});
-      _chartInst.priceScale('vol').applyOptions({scaleMargins:{top:0.8,bottom:0}});
-      _chartIndS.vol.setData(vd);
-    }
-  }
-}
-
-function _removeIndSeries(key) {
-  var rm=function(k){if(_chartIndS[k]&&_chartInst){try{_chartInst.removeSeries(_chartIndS[k]);}catch(e){}_chartIndS[k]=null;}};
-  if(key==='bb'){rm('bb_u');rm('bb_m');rm('bb_l');}else rm(key);
-}
-
-function _redrawInds(data) {
-  Object.keys(_chartInds).forEach(function(k){if(_chartInds[k]) _addIndSeries(k,data);});
-}
-
-function toggleInd(key) {
-  _chartInds[key] = !_chartInds[key];
-  _tbSet('ind-'+key, _chartInds[key]);
-  if(_chartInds[key]) _addIndSeries(key); else _removeIndSeries(key);
-}
-// ── Drawing tools ─────────────────────────────────────────
-function _segDist(px,py,x1,y1,x2,y2){
-  var dx=x2-x1,dy=y2-y1,l2=dx*dx+dy*dy;
-  if(!l2) return Math.sqrt((px-x1)*(px-x1)+(py-y1)*(py-y1));
-  var t=Math.max(0,Math.min(1,((px-x1)*dx+(py-y1)*dy)/l2));
-  return Math.sqrt(Math.pow(px-x1-t*dx,2)+Math.pow(py-y1-t*dy,2));
-}
-
-function _findNearDrawing(px,py){
-  if(!_chartInst||!_chartSer) return -1;
-  var best=-1,bestD=14;
-  _drawings.forEach(function(d,i){
-    try{
-      if(d._pl){
-        var ly=_chartSer.priceToCoordinate(d._price);
-        if(ly!==null&&Math.abs(py-ly)<bestD){bestD=Math.abs(py-ly);best=i;}
-      } else if(d._ser&&d._pts){
-        var x1=_chartInst.timeScale().timeToCoordinate(d._pts[0].time);
-        var y1=_chartSer.priceToCoordinate(d._pts[0].value);
-        var x2=_chartInst.timeScale().timeToCoordinate(d._pts[1].time);
-        var y2=_chartSer.priceToCoordinate(d._pts[1].value);
-        if(x1!==null&&y1!==null&&x2!==null&&y2!==null){
-          var dist=_segDist(px,py,x1,y1,x2,y2);
-          if(dist<bestD){bestD=dist;best=i;}
-        }
-      }
-    }catch(e){}
-  });
-  return best;
-}
-
-function _hideDeleteBtn(){
-  var btn=document.getElementById('draw-del-btn');
-  if(btn) btn.style.display='none';
-}
-
-function _showDeleteBtn(d){
-  var el=document.getElementById('prf-chart-inner');
-  if(!el||!_chartInst||!_chartSer) return;
-  var btn=document.getElementById('draw-del-btn');
-  if(!btn){
-    btn=document.createElement('div');
-    btn.id='draw-del-btn';
-    btn.innerHTML='<svg width="10" height="10" viewBox="0 0 10 10"><line x1="1" y1="1" x2="9" y2="9" stroke="#fff" stroke-width="2"/><line x1="9" y1="1" x2="1" y2="9" stroke="#fff" stroke-width="2"/></svg>';
-    btn.title='Sil (Delete)';
-    btn.style.cssText='position:absolute;background:#f43f5e;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:50;box-shadow:0 2px 8px rgba(244,63,94,.4);user-select:none;right:40px;top:8px;';
-    btn.onclick=function(e){e.stopPropagation();deleteSelectedDrawing();};
-    el.appendChild(btn);
-  }
-  btn.style.display='flex';
-}
-
-function _deselectDrawing(){
-  if(_selectedDrawing===null) return;
-  var d=_drawings[_selectedDrawing];
-  if(d){
-    if(d._ser){try{d._ser.applyOptions({color:'#8b5cf6',lineWidth:1.5});}catch(e){} try{d._ser.setMarkers([]);}catch(e){}}
-    if(d._pl){try{d._pl.applyOptions({color:'#8b5cf6',lineWidth:1});}catch(e){}}
-  }
-  _selectedDrawing=null;
-  _hideDeleteBtn();
-}
-
-function _selectDrawing(idx){
-  if(_selectedDrawing===idx){_deselectDrawing();return;}
-  _deselectDrawing();
-  _selectedDrawing=idx;
-  var d=_drawings[idx];
-  if(!d) return;
-  if(d._ser){
-    try{d._ser.applyOptions({color:'#a78bfa',lineWidth:2.5});}catch(e){}
-    try{d._ser.setMarkers([
-      {time:d._pts[0].time,position:'inBar',color:'#7c3aed',shape:'circle',size:1},
-      {time:d._pts[1].time,position:'inBar',color:'#7c3aed',shape:'circle',size:1}
-    ]);}catch(e){}
-  }
-  if(d._pl){try{d._pl.applyOptions({color:'#a78bfa',lineWidth:2});}catch(e){}}
-  _showDeleteBtn(d);
-}
-
-function deleteSelectedDrawing(){
-  if(_selectedDrawing===null) return;
-  var d=_drawings[_selectedDrawing];
-  if(d){
-    if(d._pl){try{_chartSer.removePriceLine(d._pl);}catch(e){}}
-    else if(d._ser){try{_chartInst.removeSeries(d._ser);}catch(e){}}
-  }
-  _drawings.splice(_selectedDrawing,1);
-  _selectedDrawing=null;
-  _hideDeleteBtn();
-}
-
-function _clearDrawPreview(){
-  if(_drawPreviewSer&&_chartInst){try{_chartInst.removeSeries(_drawPreviewSer);}catch(e){}}
-  _drawPreviewSer=null;
-  if(_chartSer){try{_chartSer.setMarkers([]);}catch(e){}}
-}
-
-function setDrawMode(mode){
-  _drawMode=(_drawMode===mode)?null:mode;
-  ['trend','ray','horizontal'].forEach(function(m){_tbSet('draw-'+m,_drawMode===m);});
-  _drawPts=[];
-  _clearDrawPreview();
-  _deselectDrawing();
-  var el=document.getElementById('prf-chart-inner');
-  if(el) el.style.cursor=_drawMode?'crosshair':'default';
-}
-
-function clearDrawings(){
-  _deselectDrawing();
-  _clearDrawPreview();
-  _drawings.forEach(function(d){
-    if(d._pl){try{_chartSer.removePriceLine(d._pl);}catch(e){}}
-    else if(d._ser){try{_chartInst.removeSeries(d._ser);}catch(e){}}
-  });
-  _drawings=[]; _drawPts=[];
-  var btn=document.getElementById('draw-del-btn');
-  if(btn) btn.remove();
-}
-
-function _onChartClick(param){
-  if(!param.time||!_chartInst||!_chartSer) return;
-  if(!_drawMode){
-    var pt=param.point;
-    if(pt){var nIdx=_findNearDrawing(pt.x,pt.y); if(nIdx>=0)_selectDrawing(nIdx); else _deselectDrawing();}
-    return;
-  }
-  var price=null;
-  if(param.seriesData){var sd=param.seriesData.get(_chartSer);if(sd)price=sd.close!==undefined?sd.close:sd.value;}
-  if(price==null){price=_chartDataIdx[param.time]||null;}
-  if(price==null) return;
-  if(_drawMode==='horizontal'){
-    var pl=_chartSer.createPriceLine({price:price,color:'#8b5cf6',lineWidth:1,lineStyle:2,axisLabelVisible:true,title:price.toFixed(2)});
-    _drawings.push({_pl:pl,_price:price}); return;
-  }
-  _drawPts.push({time:param.time,value:price});
-  if(_drawPts.length===1){
-    _chartSer.setMarkers([{time:param.time,position:'inBar',color:'#8b5cf6',shape:'circle',size:1}]);
-    _drawPreviewSer=_chartInst.addLineSeries({color:'#8b5cf6',lineWidth:1,lineStyle:1,priceLineVisible:false,lastValueVisible:false,crosshairMarkerVisible:false});
-    _drawPreviewSer.setData([{time:param.time,value:price}]);
-  }
-  if(_drawPts.length===2){
-    var p1=_drawPts[0],p2=_drawPts[1];
-    if(p1.time===p2.time){_drawPts=[];return;}
-    _clearDrawPreview();
-    var pts=[p1,p2].sort(function(a,b){return a.time-b.time;});
-    if(_drawMode==='ray'){
-      var last=_chartData[_chartData.length-1];
-      if(last&&last.time>pts[1].time){
-        var slope=(pts[1].value-pts[0].value)/(pts[1].time-pts[0].time);
-        pts[1]={time:last.time,value:pts[0].value+slope*(last.time-pts[0].time)};
-      }
-    }
-    var ls=_chartInst.addLineSeries({color:'#8b5cf6',lineWidth:1.5,priceLineVisible:false,lastValueVisible:false,crosshairMarkerVisible:false});
-    ls.setData([{time:pts[0].time,value:pts[0].value},{time:pts[1].time,value:pts[1].value}]);
-    _drawings.push({_ser:ls,_pts:[{time:pts[0].time,value:pts[0].value},{time:pts[1].time,value:pts[1].value}],_type:_drawMode});
-    _drawPts=[];
-  }
-}
-// ── Chart core ────────────────────────────────────────────────────────────
-function _chartApply() {
-  if (!_chartInst||!_chartSer||!_chartData.length) return;
-  var data = _chartFiltered();
-  if (!data.length) return;
-  _chartSer.setData(_chartType==='line'
-    ? data.map(function(c){return{time:c.time,value:c.close};})
-    : data
-  );
-  _redrawInds(data);
-  _chartInst.timeScale().fitContent();
-}
-
-function setChartType(type) {
-  if (type===_chartType) return;
-  _chartType = type;
-  _tbGroup('ct-',['c','l'], type==='candle'?'c':'l');
-  if (!_chartInst) return;
-  try{_chartInst.removeSeries(_chartSer);}catch(e){}
-  _chartSer = type==='line'
-    ? _chartInst.addLineSeries({color:'#0ea5e9',lineWidth:2,crosshairMarkerRadius:4,priceLineVisible:false})
-    : _chartInst.addCandlestickSeries({upColor:'#10b981',downColor:'#f43f5e',borderUpColor:'#10b981',borderDownColor:'#f43f5e',wickUpColor:'#10b981',wickDownColor:'#f43f5e'});
-  _chartApply();
-}
-
-function setChartInterval(ival) {
-  if (ival===_chartIval) return;
-  _chartIval = ival;
-  _tbGroup('ci-',['D','W','M'], ival);
-  _fetchChart(_chartSym2, _chartEx2);
-}
-
-function setChartRange(range) {
-  _chartRange = range;
-  _tbGroup('cr-',['1m','3m','6m','1y','all'], range);
-  _chartApply();
-}
-
-function setChartPct() {
-  _chartPct = !_chartPct;
-  _tbSet('cp-pct', _chartPct);
-  if (_chartInst) _chartInst.priceScale('right').applyOptions({mode: _chartPct?2:0});
-}
-
-function _fetchChart(sym, ex) {
-  var exMeta = EXCHANGE_META[ex]||EXCHANGE_META.bist;
-  var suffix = encodeURIComponent(exMeta.yahooSuffix||'');
-  var url = '/api/scan?action=chart&symbol='+sym+'&interval='+_chartIval+'&currency=TL&suffix='+suffix;
-  fetch(url)
-    .then(function(r){return r.json();})
-    .then(function(data){
-      if (!data||data.s!=='ok'||!data.candles||!data.candles.length) return;
-      var seen = {};
-      _chartData = data.candles
-        .map(function(c){return{time:c.t,open:c.o,high:c.h,low:c.l,close:c.c,volume:c.v||0};})
-        .filter(function(c){return c.open!=null&&c.close!=null;})
-        .sort(function(a,b){return a.time-b.time;})
-        .filter(function(c){if(seen[c.time])return false;seen[c.time]=1;return true;});
-      _chartDataIdx={};
-      _chartData.forEach(function(c){_chartDataIdx[c.time]=c.close;});
-      _chartIndCache={};
-      Object.keys(_chartInds).forEach(function(k){if(_chartInds[k])_removeIndSeries(k);});
-      _chartApply();
-
-    })
-    .catch(function(e){console.error('Chart error:',e);});
-}
+// ── TradingView Widget ────────────────────────────────────────────────────
+var _tvWidget = null;
 
 function loadTVWidget(sym, ex) {
-  _chartSym2=sym; _chartEx2=ex;
-  _chartData=[]; _chartInst=null; _chartSer=null; _chartPct=false;
-  _drawMode=null; _drawPts=[]; _drawings=[]; _drawPreviewSer=null; _selectedDrawing=null; _chartIndS={}; _chartDataIdx={}; _chartIndCache={};
-
   var container = document.getElementById('prf-tv-widget');
   if (!container) return;
-  var ph = document.getElementById('prf-tv-placeholder');
-  if (ph) ph.style.display='none';
 
-  container.innerHTML = _tbHtml()+'<div id="prf-chart-inner" style="width:100%;height:256px;background:#f8fafc;position:relative;"></div>';
+  var prefixes = {
+    bist:'BIST',    nasdaq:'NASDAQ', nyse:'NYSE',    sp500:'NYSE',
+    dax:'XETR',     lse:'LSE',       nikkei:'TSE',
+    france:'EURONEXT', amsterdam:'EURONEXT', brussels:'EURONEXT',
+    lisbon:'EURONEXT', oslo:'OSLO',  milan:'MIL',
+    krx:'KRX',      moex:'MOEX',    tsx:'TSX',
+    india:'NSE',    australia:'ASX', hkex:'HKEX',
+    saudi:'TADAWUL', uae:'DFM',     sweden:'NASDAQ', southafrica:'JSE',
+  };
+  var pfx  = prefixes[ex] || 'BIST';
+  var tvSym = pfx + ':' + sym.toUpperCase();
+
+  container.innerHTML = '<div id="prf-tv-inner" style="width:100%;height:100%;"></div>';
 
   function _init() {
-    var chartEl = document.getElementById('prf-chart-inner');
-    if (!chartEl||!window.LightweightCharts) {
-      if(chartEl) chartEl.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:12px;">Grafik kütüphanesi yüklenemedi</div>';
+    if (!window.TradingView || !window.TradingView.widget) {
+      container.innerHTML =
+        '<div style="height:460px;display:flex;align-items:center;justify-content:center;' +
+        'color:var(--muted);font-size:12px;flex-direction:column;gap:10px;">' +
+        '<span>Grafik yüklenemedi</span>' +
+        '<a href="https://www.tradingview.com/chart/?symbol=' + tvSym +
+        '" target="_blank" rel="noopener" style="color:var(--accent);font-size:11px;">TradingView\'de aç ↗</a></div>';
       return;
     }
-    _chartInst = LightweightCharts.createChart(chartEl, {
-      autoSize: true,
-      layout:{background:{color:'#f8fafc'},textColor:'#94a3b8',fontSize:11,fontFamily:'Inter, sans-serif'},
-      grid:{vertLines:{color:'#edf2f7',style:1},horzLines:{color:'#edf2f7',style:1}},
-      crosshair:{mode:LightweightCharts.CrosshairMode.Normal,vertLine:{color:'#cbd5e1',labelBackgroundColor:'#64748b'},horzLine:{color:'#cbd5e1',labelBackgroundColor:'#64748b'}},
-      rightPriceScale:{borderColor:'#e2e8f0',textColor:'#94a3b8'},
-      timeScale:{borderColor:'#e2e8f0',textColor:'#94a3b8',timeVisible:true,secondsVisible:false},
-      handleScroll:true, handleScale:true,
+    _tvWidget = new TradingView.widget({
+      autosize:            true,
+      symbol:              tvSym,
+      interval:            'D',
+      timezone:            'Europe/Istanbul',
+      theme:               'light',
+      style:               '1',
+      locale:              'tr',
+      enable_publishing:   false,
+      allow_symbol_change: false,
+      container_id:        'prf-tv-inner',
+      hide_side_toolbar:   false,
+      withdateranges:      true,
+      save_image:          false,
+      hide_legend:         false,
+      support_host:        'https://www.tradingview.com',
     });
-    _chartSer = _chartInst.addCandlestickSeries({upColor:'#10b981',downColor:'#f43f5e',borderUpColor:'#10b981',borderDownColor:'#f43f5e',wickUpColor:'#10b981',wickDownColor:'#f43f5e'});
-    _chartInst.subscribeClick(_onChartClick);
-    _chartInst.subscribeCrosshairMove(function(param) {
-      if (!_drawPreviewSer||!_drawPts.length||!param.time) return;
-      var px = null;
-      if (param.seriesData) { var sd2=param.seriesData.get(_chartSer); if(sd2) px=sd2.close!==undefined?sd2.close:sd2.value; }
-      if(px==null){ px=_chartDataIdx[param.time]||null; }
-      if (px==null) return;
-      var p1=_drawPts[0];
-      if (!p1||p1.time===param.time) return;
-      var pts2=[p1,{time:param.time,value:px}].sort(function(a,b){return a.time-b.time;});
-      try{_drawPreviewSer.setData([{time:pts2[0].time,value:pts2[0].value},{time:pts2[1].time,value:pts2[1].value}]);}catch(e){}
-    });
-    if(window._drawKeyH) document.removeEventListener('keydown',window._drawKeyH);
-    window._drawKeyH=function(e){
-      if((e.key==='Delete'||e.key==='Backspace')&&_selectedDrawing!==null){
-        var ae=document.activeElement;
-        if(!ae||ae.tagName!=='INPUT'){deleteSelectedDrawing();e.preventDefault();}
-      }
-      if(e.key==='Escape'){if(_selectedDrawing!==null)_deselectDrawing();else if(_drawMode)setDrawMode(_drawMode);}
-    };
-    document.addEventListener('keydown',window._drawKeyH);
-    _fetchChart(sym, ex);
     var ld = document.getElementById('prf-live-dot');
-    if (ld) ld.style.display='flex';
+    if (ld) ld.style.display = 'flex';
   }
 
-  function _wait(n) {
-    if (window.LightweightCharts) { _init(); }
-    else if (n>0) { setTimeout(function(){_wait(n-1);},100); }
+  if (window.TradingView) {
+    _init();
+  } else {
+    var s = document.createElement('script');
+    s.src = 'https://s3.tradingview.com/tv.js';
+    s.onload = _init;
+    s.onerror = function() {
+      container.innerHTML =
+        '<div style="height:460px;display:flex;align-items:center;justify-content:center;' +
+        'color:var(--muted);font-size:12px;">Grafik yüklenemedi</div>';
+    };
+    document.head.appendChild(s);
   }
-  _wait(20);
 }
 
 
