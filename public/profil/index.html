@@ -43,6 +43,8 @@ body{overflow-y:auto;}
 .pf-inv-sb-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;}
 .pf-inv-sb-tag{font-size:10px;padding:2px 7px;border-radius:8px;background:var(--s3);color:var(--muted2);}
 .pf-inv-sb-scrollhint{text-align:center;font-size:10px;color:var(--muted2);margin-top:8px;}
+.pf-inv-sb-change-btn{width:100%;background:var(--s2);border:1px dashed var(--border2);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;margin-bottom:14px;transition:all .15s;text-align:center;display:block;}
+.pf-inv-sb-change-btn:hover{border-color:var(--accent);color:var(--accent);border-style:solid;}
 
 /* Loading */
 #pf-loading{display:flex;align-items:center;justify-content:center;padding:80px 20px;gap:10px;color:var(--muted2);font-size:13px;}
@@ -66,7 +68,8 @@ body{overflow-y:auto;}
 
 /* ── IDENTITY CARD ── */
 #pf-user{display:none;}
-.pf-identity{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px;display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;}
+.pf-identity{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px;display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;position:relative;overflow:hidden;transition:border-color .35s,background .35s;}
+.pf-identity-dec{position:absolute;right:-8px;bottom:-20px;font-size:100px;opacity:.08;pointer-events:none;line-height:1;user-select:none;transition:opacity .35s;}
 .pf-avatar-col{display:flex;flex-direction:column;align-items:center;gap:8px;flex-shrink:0;}
 .pf-warrior-wrap{position:relative;width:76px;height:76px;}
 .pf-warrior-wrap svg{width:76px;height:76px;display:block;}
@@ -275,6 +278,7 @@ body{overflow-y:auto;}
   <div class="pf-col-main">
     <!-- Identity card -->
     <div class="pf-identity" id="pf-identity">
+      <div class="pf-identity-dec" id="pf-identity-dec"></div>
       <div class="pf-avatar-col">
         <div class="pf-warrior-wrap" id="pf-warrior-svg"></div>
         <div class="pf-rank-label" id="pf-rank-label">—</div>
@@ -422,6 +426,6 @@ body{overflow-y:auto;}
 
 <div class="pf-toast" id="pf-toast"></div>
 
-<script src="/profil/profil.js?v=12"></script>
+<script src="/profil/profil.js?v=13"></script>
 </body>
 </html>

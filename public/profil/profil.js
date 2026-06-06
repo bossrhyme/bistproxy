@@ -1,4 +1,4 @@
-// DeepFin — Profil Sayfası v12
+// DeepFin — Profil Sayfası v13
 (function() {
 'use strict';
 
@@ -94,6 +94,11 @@ function renderInvestorSidebar() {
   var current = _user && _user.investorType;
 
   var html = '<div class="pf-inv-sb-title">⚔ Yatırımcı Tipleri</div>';
+
+  if (_user) {
+    html += '<button class="pf-inv-sb-change-btn" onclick="startQuizForExistingUser()">' +
+      (current ? '🔄 Tipini Değiştir' : '🧬 Tipini Belirle') + '</button>';
+  }
 
   Object.keys(INV_TYPES).forEach(function(key) {
     var inv  = INV_TYPES[key];
@@ -433,6 +438,26 @@ function renderIdentity() {
   // Settings name input
   var nameInp = document.getElementById('pf-name-input');
   if (nameInp) nameInp.value = _user.name || '';
+
+  // Identity card personalization by investor type
+  var identityCard = document.getElementById('pf-identity');
+  var identityDec  = document.getElementById('pf-identity-dec');
+  if (identityCard) {
+    if (_user.investorType && INV_TYPES[_user.investorType]) {
+      var iType = _user.investorType;
+      var iInv  = INV_TYPES[iType];
+      var iMeta = INV_META[iType];
+      identityCard.style.border     = '1px solid ' + iInv.color + '40';
+      identityCard.style.borderLeft = '3px solid ' + iInv.color;
+      identityCard.style.background = 'linear-gradient(130deg,' + iInv.color + '12 0%,var(--s1) 55%)';
+      if (identityDec) { identityDec.textContent = iMeta.emoji; }
+    } else {
+      identityCard.style.border     = '';
+      identityCard.style.borderLeft = '';
+      identityCard.style.background = '';
+      if (identityDec) identityDec.textContent = '';
+    }
+  }
 
   renderInvestorSidebar();
 }
