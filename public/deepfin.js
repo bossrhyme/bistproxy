@@ -1021,10 +1021,14 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 // ═══════════════════════════════════════════
 // TRADINGVIEW SCANNER — tek istekte tüm BIST
 // ═══════════════════════════════════════════
+var _scanRunning = false;
 async function runScan(){
+  if (_scanRunning) return;
+  _scanRunning = true;
   closeMobileDrawer();
   // Disclaimer kontrolü
   if (!disclaimerAccepted && !localStorage.getItem('df_disclaimer_v2')) {
+    _scanRunning = false;
     showDisclaimerModal();
     return;
   }
@@ -1449,6 +1453,7 @@ async function runScan(){
     showState('errstate');
     document.getElementById('errmsg').textContent = err.message || 'Bilinmeyen hata';
   } finally {
+    _scanRunning = false;
     btn.disabled = false;
     stopScanEta();
     document.getElementById('stopbtn').style.display = 'none';
@@ -2756,6 +2761,7 @@ function showState(id){
 
 function abortScan(){
   scanAborted = true;
+  _scanRunning = false;
   document.getElementById('stopbtn').style.display = 'none';
   document.getElementById('scanbtn').disabled = false;
 }
@@ -3836,7 +3842,7 @@ document.addEventListener('DOMContentLoaded', function(){
   var _investor = _sp.get('investor');
   if (_p === 'profile' || _p === 'screener' || _p === 'analiz' || _path === '/screener' || _hasWl) {
     showScreener();
-    if (allData.length === 0 && !_hasWl) runScan();
+    if (!_investor && allData.length === 0 && !_hasWl) runScan();
   } else {
     showHomepage();
   }
@@ -3854,12 +3860,16 @@ document.addEventListener('DOMContentLoaded', function(){
     };
     if (_IMAP[_investor]) {
       setTimeout(function() {
-        // Ensure BIST is selected
+        // Ensure BIST is selected — use direct property set to avoid triggering runScan via selectExchange
         var bistBtn = document.querySelector('.exbtn[data-exchange="bist"]');
-        if (bistBtn && !bistBtn.classList.contains('on')) selectExchange(bistBtn);
+        if (bistBtn && !bistBtn.classList.contains('on')) {
+          document.querySelectorAll('.exbtn').forEach(function(b){ b.classList.remove('on'); });
+          bistBtn.classList.add('on');
+          currentExchange = 'bist';
+        }
         _IMAP[_investor]();
-        if (!allData.length) runScan();
-      }, 600);
+        runScan();
+      }, 300);
     }
   }
   var total = document.querySelectorAll('[data-goat],[data-preset],[data-tech]').length;
