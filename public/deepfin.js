@@ -2442,8 +2442,6 @@ function showDetail(sym){
     document.getElementById('dchg').innerHTML = `<span class="${cls}">${chg?sign+chg.toFixed(2)+' ₺ · ':''} ${sign}${s.changePercent.toFixed(2)}%</span>`;
   } else document.getElementById('dchg').innerHTML = '';
   
-  document.getElementById('dfresh').textContent = `↻ Finnhub · ${new Date().toLocaleTimeString('tr-TR')}`;
-  document.getElementById('dsec').textContent = s.symbol + '.IS';
 
   // Şirket Profili
   buildProfile(s);
@@ -2776,29 +2774,6 @@ function fetchYahooVerify(sym, ex) {
         }
       });
 
-      // Eğer önemli farklar varsa detail header'ına badge ekle
-      var badge = document.getElementById('dverify-badge');
-      if(!badge) {
-        badge = document.createElement('div');
-        badge.id = 'dverify-badge';
-        badge.style.cssText = 'font-size:9px;padding:2px 7px;border-radius:4px;font-weight:600;letter-spacing:.3px;cursor:help;';
-        var dfresh = document.getElementById('dfresh');
-        if(dfresh && dfresh.parentNode) dfresh.parentNode.insertBefore(badge, dfresh.nextSibling);
-      }
-
-      if(mismatch.length === 0) {
-        badge.textContent = '✓ Doğrulandı';
-        badge.style.background = 'rgba(0,192,118,.1)';
-        badge.style.color = '#00c076';
-        badge.title = 'Tüm oranlar anlık veriyle uyuşuyor';
-      } else {
-        badge.textContent = '⚠ ' + mismatch.length + ' oran farklı';
-        badge.style.background = 'rgba(240,180,41,.1)';
-        badge.style.color = '#f0b429';
-        badge.title = mismatch.map(function(m){
-          return m.label + ': Tarama='+parseFloat(m.tv).toFixed(2)+' Anlık='+parseFloat(m.yh).toFixed(2)+' (%'+m.pct+' fark)';
-        }).join(' | ');
-      }
 
       console.log('[DeepFin] Yahoo verify:', sym, mismatch.length === 0 ? '✅ uyumlu' : '⚠ '+mismatch.length+' fark', mismatch);
     })
