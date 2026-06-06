@@ -240,6 +240,79 @@ body{overflow-y:auto;}
 .quiz-finish-btn{background:var(--accent);border:none;border-radius:8px;padding:12px 28px;font-size:14px;font-weight:700;color:#fff;cursor:pointer;width:100%;transition:opacity .15s;}
 .quiz-finish-btn:hover{opacity:.88;}
 .quiz-finish-btn:disabled{opacity:.5;cursor:not-allowed;}
+
+@media(max-width:768px){
+  /* Layout */
+  .pf-main{padding:16px 12px 80px;}
+
+  /* Identity card */
+  .pf-identity{padding:14px;gap:12px;}
+  .pf-warrior-wrap{width:56px;height:56px;}
+  .pf-warrior-wrap svg{width:56px;height:56px;}
+  .pf-identity-name{font-size:14px;}
+  .pf-action-row{gap:6px;}
+  .pf-tara-btn{font-size:11px;padding:6px 10px;}
+  .pf-logout-btn{font-size:11px;padding:5px 10px;}
+  .pf-meta-row{gap:8px;}
+
+  /* List tabs — yatay kaydırılabilir */
+  .pf-list-tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:4px;}
+  .pf-list-tabs::-webkit-scrollbar{display:none;}
+  .pf-list-tab{flex-shrink:0;min-height:36px;}
+
+  /* Tablo — yatay scroll container */
+  .pf-list-panel{overflow:hidden;}
+  .pf-stock-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .pf-stock-table{min-width:500px;}
+  .pf-stock-table td,.pf-stock-table th{padding:10px 10px;}
+  .pf-stock-table tr{min-height:44px;}
+
+  /* Add form */
+  .pf-add-form{flex-wrap:wrap;gap:6px;padding:10px 12px;}
+  .pf-add-form input,.pf-add-form select{font-size:16px;}
+  .pf-sym-pick-btn{width:100%;}
+
+  /* Portfolio */
+  .pf-pf-total{font-size:11px;padding:8px 12px;}
+
+  /* iOS auto-zoom */
+  input,select,textarea{font-size:16px !important;}
+
+  /* Touch targets */
+  .pf-remove-btn{min-width:36px;min-height:36px;display:inline-flex;align-items:center;justify-content:center;}
+  .pf-list-del-btn,.pf-scan-btn{min-height:36px;}
+
+  /* Hisse picker */
+  .pf-sym-picker-bg{padding-top:0;align-items:flex-end;}
+  .pf-sym-picker{width:100%;max-width:100%;border-radius:16px 16px 0 0;max-height:80vh;}
+
+  /* Quiz */
+  .quiz-box{width:100%;border-radius:14px 14px 0 0;max-height:95vh;}
+  .quiz-overlay{padding:0;align-items:flex-end;}
+  .quiz-body{padding:16px 18px;}
+  .quiz-header{padding:16px 18px 0;}
+  .quiz-opt{font-size:12px;padding:10px 14px;}
+
+  /* Toast */
+  .pf-toast{bottom:calc(16px + env(safe-area-inset-bottom, 0px));width:90%;text-align:center;}
+
+  /* Investor sidebar */
+  .pf-inv-sb{max-height:none;}
+
+  /* Section başlıkları */
+  .pf-section-title{font-size:10px;}
+}
+
+@media(max-width:480px){
+  .pf-main{padding:12px 10px 80px;}
+  .pf-identity{flex-direction:column;align-items:flex-start;}
+  .pf-avatar-col{flex-direction:row;align-items:center;gap:12px;width:100%;}
+  .pf-warrior-wrap{width:48px;height:48px;}
+  .pf-warrior-wrap svg{width:48px;height:48px;}
+  .pf-identity-body{min-width:0;width:100%;}
+  .pf-list-tab{font-size:11px;padding:5px 10px;}
+  .pf-stock-table{min-width:420px;}
+}
 </style>
 </head>
 <body>
@@ -432,6 +505,6 @@ body{overflow-y:auto;}
 
 <div class="pf-toast" id="pf-toast"></div>
 
-<script src="/profil/profil.js?v=14"></script>
+<script src="/profil/profil.js?v=15"></script>
 </body>
 </html>

@@ -530,11 +530,11 @@ function renderListPanel() {
       '<a href="' + scanUrl + '" class="pf-scan-btn">↗ Tara</a>' +
       (canDel ? '<button class="pf-list-del-btn" onclick="deleteList(\'' + list.id + '\')">Sil</button>' : '') +
     '</div>' +
-    '<table class="pf-stock-table"><thead><tr>' +
+    '<div class="pf-stock-table-wrap"><table class="pf-stock-table"><thead><tr>' +
       '<th>Sembol</th><th>Borsa</th><th>Fiyat</th><th>Değ%</th><th>Ekleme</th><th>Not</th><th></th>' +
     '</tr></thead><tbody>' +
       (rows || '<tr><td colspan="7"><div class="pf-empty">Liste boş — aşağıdan hisse ekle.</div></td></tr>') +
-    '</tbody></table>' +
+    '</tbody></table></div>' +
     '<div class="pf-add-form">' +
       '<button class="pf-add-btn" onclick="openSymPicker()">🔍 Hisse Ekle</button>' +
     '</div>';
@@ -856,11 +856,11 @@ function renderPfPanel() {
       '<div class="pf-pf-total" id="pf-pf-total"></div>' +
       (canDel ? '<button class="pf-list-del-btn" onclick="deletePf(\'' + pf.id + '\')">Sil</button>' : '') +
     '</div>' +
-    '<table class="pf-stock-table"><thead><tr>' +
+    '<div class="pf-stock-table-wrap"><table class="pf-stock-table"><thead><tr>' +
       '<th>Sembol</th><th>Borsa</th><th>Adet</th><th>Maliyet</th><th>Fiyat</th><th>Değer</th><th>K/Z</th><th></th>' +
     '</tr></thead><tbody>' +
       (rows || '<tr><td colspan="8"><div class="pf-empty">Henüz pozisyon yok — aşağıdan ekle.</div></td></tr>') +
-    '</tbody></table>' +
+    '</tbody></table></div>' +
     '<div class="pf-add-form" style="flex-wrap:wrap">' +
       '<button class="pf-sym-pick-btn" id="pf-pos-sym-btn" onclick="openSymPicker(\'portfolio\')">🔍 Hisse Seç</button>' +
       '<input type="number" id="pf-pos-qty"  placeholder="Adet"    min="0.001" step="any" style="width:80px">' +
