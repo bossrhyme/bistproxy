@@ -530,7 +530,57 @@ function _buildTrend(d) {
 }
 
 
-// ── Hangi Yatırımcı Alır? ────────────────────────────────────────────────
+// ── Hangi Yatırımcı Neden Alabilir? ─────────────────────────────────────
+var _INV_FIT_PHRASES = {
+  'F/K < 15':               { p:'F/K 15x altında, değer eşiğini karşılıyor', f:'F/K 15x üzerinde, hisse primli fiyatlanıyor' },
+  'F/K < 20':               { p:'F/K 20x altında, makul fiyatlama', f:'F/K 20x üzerinde, değerleme yüksek' },
+  'F/K < 25':               { p:'F/K kabul edilebilir aralıkta', f:'F/K 25x üzerinde, fiyat kazanca göre yüksek' },
+  'F/K < 30':               { p:'F/K büyüme beklentisiyle örtüşüyor', f:'F/K 30x üzerinde, büyüme zaten fiyatlanmış görünüyor' },
+  'PD/DD < 1.5':            { p:'PD/DD 1.5x altında, defter değerine yakın fiyatlama', f:'PD/DD 1.5x üzerinde, varlıklara göre primli' },
+  'ROE > 15%':              { p:'ROE %15 üzerinde, güçlü özsermaye getirisi', f:'ROE %15 altında, özsermaye verimliliği sınırlı' },
+  'ROE > 12%':              { p:'ROE %12 üzerinde, tatmin edici özsermaye getirisi', f:'ROE %12 altında, özsermaye verimliliği büyüme yatırımcısı beklentisinin altında' },
+  'ROE > 10%':              { p:'ROE %10 üzerinde, pozitif özsermaye getirisi', f:'ROE %10 altında, sermaye verimliliği düşük' },
+  'Net Marj > 10%':         { p:'net marj %10 üzerinde, sağlıklı karlılık', f:'net marj %10 altında, kar marjı dar' },
+  'Net Marj > 8%':          { p:'net marj %8 üzerinde, temettü sürdürülebilirliğini destekler', f:'net marj %8 altında, dar kar marjı temettü sürekliliğini zorlayabilir' },
+  'Net Marj > 5%':          { p:'net marj %5 üzerinde, pozitif karlılık', f:'net marj %5 altında, karlılık zayıf' },
+  'Brüt Marj > 30%':        { p:'brüt marj %30 üzerinde, rekabetçi ürün/hizmet gücünü yansıtıyor', f:'brüt marj %30 altında, ham karlılık baskı altında' },
+  'Brüt Marj > 40%':        { p:'brüt marj %40 üzerinde, teknoloji şirketi profiline uygun güçlü marj', f:'brüt marj %40 altında, teknoloji yatırımcısının beklediği seviyenin altında' },
+  'Borç/Öz < 0.5':          { p:'düşük borç/özsermaye oranı finansal esneklik sağlıyor', f:'borç/özsermaye yüksek, finansal kaldıraç riski var' },
+  'Borç/Öz < 1':            { p:'borç/özsermaye yönetilebilir seviyede', f:'borç/özsermaye 1x üzerinde, borç yükü dikkat gerektiriyor' },
+  'Borç/Öz < 0.8':          { p:'borç seviyesi makul', f:'borç/özsermaye 0.8x üzerinde' },
+  'F-Skor ≥ 7':             { p:'Piotroski F-Skoru 7+, güçlü bilanço sağlığı', f:'F-Skor 7 altında, bilanço iyileştirme sinyalleri sınırlı' },
+  'F-Skor ≥ 6':             { p:'F-Skor 6+, finansal tablolar tutarlı görünüyor', f:'F-Skor 6 altında, finansal tablolarda zayıf sinyaller var' },
+  'F-Skor ≥ 5':             { p:'F-Skor 5+, finansal görünüm nötr/pozitif', f:'F-Skor 5 altında, dikkat gerektiren finansal sinyaller mevcut' },
+  'Gelir Büyümesi > 15%':   { p:'gelir büyümesi %15 üzerinde, güçlü büyüme ivmesi var', f:'gelir büyümesi %15 altında, beklenen büyüme ivmesi henüz görünmüyor' },
+  'Gelir Büyümesi > 10%':   { p:'gelir büyümesi %10 üzerinde', f:'gelir büyümesi %10 altında' },
+  'Gelir Büyümesi > 20%':   { p:'gelir büyümesi %20 üzerinde, yüksek ivmeli büyüme', f:'gelir büyümesi %20 altında' },
+  'EPS Büyümesi > 20%':     { p:'hisse başı kazanç büyümesi güçlü', f:'hisse başı kazanç büyümesi beklentinin altında' },
+  'EPS Büyümesi > 30%':     { p:'hisse başı kazanç büyümesi %30 üzerinde, güçlü kazanç ivmesi', f:'hisse başı kazanç büyümesi beklentinin altında' },
+  'EPS Büyümesi pozitif':   { p:'kazanç büyümesi pozitif yönde', f:'kazanç büyümesi negatif' },
+  'PEG < 1':                { p:'PEG 1 altında, büyümeye göre fiyatlama cazip görünüyor', f:'PEG 1 üzerinde, büyüme tam fiyatlanmış görünüyor' },
+  'Cari Oran > 1.2':        { p:'cari oran yeterli kısa vadeli likidite sağlıyor', f:'cari oran 1.2x altında, kısa vadeli yükümlülüklerde risk var' },
+  'Cari Oran > 1.5':        { p:'cari oran 1.5x üzerinde, güçlü kısa vadeli likidite', f:'cari oran 1.5x altında, defansif profil için likidite riski mevcut' },
+  'Temettü Verimi > 3%':    { p:'temettü verimi %3 üzerinde, cazip nakit getirisi', f:'temettü verimi %3 altında, temettü yatırımcısı için yeterli değil' },
+  'Temettü > 2%':           { p:'temettü verimi %2 üzerinde, savunma portföyüne nakit katkısı var', f:'temettü verimi %2 altında' },
+  'Temettü > 1%':           { p:'temettü verimi mevcut', f:'temettü verimi %1 altında veya dağıtılmıyor' },
+  '52H Yüksek yakını':      { p:'fiyat 52 haftalık zirveye yakın, momentum güçlü', f:'fiyat 52 haftalık zirveden uzakta, momentum zayıf' },
+  'Aylık Perf. > 5%':       { p:'aylık performans %5 üzerinde, kısa vadeli ivme pozitif', f:'aylık performans %5 altında, kısa vadeli ivme zayıf' },
+  'Yıllık Perf. > 20%':     { p:'yıllık performans %20 üzerinde, güçlü uzun vadeli trend', f:'yıllık performans %20 altında, uzun vadeli ivme sınırlı' },
+  'Aylık Perf. > 10%':      { p:'aylık fiyat hareketi güçlü', f:'aylık fiyat hareketi beklentinin altında' },
+  'Beta > 1.3':             { p:'yüksek beta, piyasanın üzerinde fiyat hareketi bekleniyor', f:'beta düşük, spekülatif profil için fiyat oynaklığı sınırlı' },
+  'Piy. Değ. < 2Mrd':      { p:'küçük piyasa değeri büyüme potansiyeli açısından ilgi çekici', f:'piyasa değeri 2 milyar üzerinde, küçük sermaye profili değil' },
+};
+
+function _buildInvExplanation(crits) {
+  var passList = crits.filter(function(c){ return c.p && _INV_FIT_PHRASES[c.t]; }).slice(0, 3);
+  var failList = crits.filter(function(c){ return !c.p && _INV_FIT_PHRASES[c.t]; }).slice(0, 2);
+  if (!passList.length && !failList.length) return '';
+  var parts = [];
+  if (passList.length) parts.push(passList.map(function(c){ return _INV_FIT_PHRASES[c.t].p; }).join(', ')+'.');
+  if (failList.length) parts.push('Öte yandan '+failList.map(function(c){ return _INV_FIT_PHRASES[c.t].f; }).join('; ')+'.');
+  return parts.join(' ');
+}
+
 function _renderInvestorFit(d) {
   var el = document.getElementById('prf-investor-fit');
   if (!el) return;
@@ -673,23 +723,27 @@ function _renderInvestorFit(d) {
     var passed = t.crits.filter(function(c){return c.p;}).length;
     var total  = t.crits.length;
     var ratio  = passed / total;
-    var verdict, vColor, vBg;
-    if (ratio >= 0.65)      { verdict='ALIR ✅';    vColor='#10b981'; vBg='rgba(16,185,129,.1)'; }
-    else if (ratio >= 0.40) { verdict='ŞARTLI ⚠️';  vColor='#f0b429'; vBg='rgba(240,180,41,.08)'; }
-    else                    { verdict='ALMAZ ❌';    vColor='#f43f5e'; vBg='rgba(244,63,94,.08)'; }
+    var scoreColor = ratio >= 0.65 ? '#10b981' : ratio >= 0.40 ? '#f0b429' : 'var(--muted2)';
+    var leftColor  = ratio >= 0.65 ? '#10b981' : ratio >= 0.40 ? '#f0b429' : 'var(--border2)';
     var isUser = _userType === t.id;
     var isOpen = isUser;
-    var leftColor = ratio>=0.65?'#10b981':ratio>=0.40?'#f0b429':'#f43f5e';
+
     var critHtml = t.crits.map(function(c){
       return '<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);">'+
         '<div style="display:flex;align-items:center;gap:7px;">'+
-        '<div style="width:7px;height:7px;border-radius:50%;flex-shrink:0;background:'+(c.p?'#10b981':'#f43f5e')+'"></div>'+
-        '<span style="font-size:11px;color:var(--text2);">'+c.t+'</span>'+
+        '<div style="width:7px;height:7px;border-radius:50%;flex-shrink:0;background:'+(c.p?'#10b981':'var(--border2)')+'"></div>'+
+        '<span style="font-size:11px;color:'+(c.p?'var(--text2)':'var(--muted2)')+';">'+c.t+'</span>'+
         '</div>'+
         (c.v&&c.v!=='—'?'<span style="color:var(--muted2);font-size:10px;font-family:\'Geist Mono\',monospace;">'+c.v+'</span>':'')+
         '</div>';
     }).join('');
-    return '<div style="border:1px solid '+(isUser?t.color+'60':'var(--border)')+';border-left:3px solid '+leftColor+';border-radius:8px;margin-bottom:8px;overflow:hidden;background:var(--s1);">'+
+
+    var explanation = _buildInvExplanation(t.crits);
+    var explanationHtml = explanation
+      ? '<div style="margin-top:12px;padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--text2);line-height:1.7;">'+explanation+'</div>'
+      : '';
+
+    return '<div style="border:1px solid '+(isUser?t.color+'50':'var(--border)')+';border-left:3px solid '+leftColor+';border-radius:8px;margin-bottom:8px;overflow:hidden;background:var(--s1);">'+
       '<div onclick="toggleInvFit(\''+t.id+'\')" style="display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;user-select:none;">'+
         '<span style="font-size:18px;line-height:1;">'+t.emoji+'</span>'+
         '<div style="flex:1;min-width:0;">'+
@@ -699,13 +753,13 @@ function _renderInvestorFit(d) {
           '<div style="font-size:10px;color:var(--muted2);margin-top:1px;">'+t.desc+'</div>'+
         '</div>'+
         '<div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">'+
-          '<span style="font-size:10px;font-weight:700;color:var(--muted2);">'+passed+'/'+total+'</span>'+
-          '<span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;background:'+vBg+';color:'+vColor+';">'+verdict+'</span>'+
+          '<span style="font-size:11px;font-weight:700;color:'+scoreColor+';">'+passed+'/'+total+'</span>'+
           '<span style="color:var(--muted2);font-size:11px;" id="inv-fit-chevron-'+t.id+'">'+(isOpen?'▲':'▼')+'</span>'+
         '</div>'+
       '</div>'+
-      '<div id="inv-fit-body-'+t.id+'" style="'+(isOpen?'':'display:none;')+'padding:0 14px 12px;border-top:1px solid var(--border);">'+
+      '<div id="inv-fit-body-'+t.id+'" style="'+(isOpen?'':'display:none;')+'padding:0 14px 14px;border-top:1px solid var(--border);">'+
         '<div style="padding-top:10px;">'+critHtml+'</div>'+
+        explanationHtml+
       '</div>'+
     '</div>';
   }).join('');
