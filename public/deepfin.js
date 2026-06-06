@@ -1811,6 +1811,33 @@ function countSelectedChips() {
   return document.querySelectorAll('.goat-chip.on, #presets .chip.on, #tech-presets .chip.on').length;
 }
 
+// Adv panel chip state → basic panel sync
+function syncAdvPanelChips() {
+  // GOAT
+  document.querySelectorAll('#goat-chips .goat-chip').forEach(function(bc) {
+    var ac = document.querySelector('#adv-goat-chips .goat-chip[data-goat="' + bc.dataset.goat + '"]');
+    if (ac) ac.classList.toggle('on', bc.classList.contains('on'));
+  });
+  // Preset
+  document.querySelectorAll('#presets .chip').forEach(function(bc) {
+    var ac = document.querySelector('#adv-presets .chip[data-preset="' + bc.dataset.preset + '"]');
+    if (ac) ac.classList.toggle('on', bc.classList.contains('on'));
+  });
+  // Tech
+  document.querySelectorAll('#tech-presets .chip').forEach(function(bc) {
+    var ac = document.querySelector('#adv-tech-presets .chip[data-tech="' + bc.dataset.tech + '"]');
+    if (ac) ac.classList.toggle('on', bc.classList.contains('on'));
+  });
+  // Info divs
+  ['goat-info','preset-info','tech-preset-info'].forEach(function(id) {
+    var src = document.getElementById(id), dst = document.getElementById(id + '-adv');
+    if (src && dst) { dst.innerHTML = src.innerHTML; dst.style.display = src.style.display || ''; }
+  });
+  // Sector
+  var sf = document.getElementById('sector_filter'), sfAdv = document.getElementById('sector_filter_adv');
+  if (sf && sfAdv && sfAdv.value !== sf.value) sfAdv.value = sf.value;
+}
+
 // GOAT chip'leri
 document.getElementById('goat-chips').addEventListener('click', function(e) {
   var chip = e.target.closest('.goat-chip'); if (!chip) return;
@@ -1818,6 +1845,7 @@ document.getElementById('goat-chips').addEventListener('click', function(e) {
   if (!wasOn && countSelectedChips() >= 5) return;
   chip.classList.toggle('on');
   applyAllChips();
+  syncAdvPanelChips();
   if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
 });
 
@@ -1829,6 +1857,7 @@ document.getElementById('presets').addEventListener('click', function(e) {
   if (!wasOn && countSelectedChips() >= 5) return;
   chip.classList.toggle('on');
   applyAllChips();
+  syncAdvPanelChips();
   if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
 });
 
@@ -1840,7 +1869,35 @@ document.getElementById('tech-presets').addEventListener('click', function(e) {
   if (!wasOn && countSelectedChips() >= 5) return;
   chip.classList.toggle('on');
   applyAllChips();
+  syncAdvPanelChips();
   if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
+});
+
+// Adv panel chip clicks → proxy to basic panel
+document.addEventListener('click', function(e) {
+  var advPanel = document.getElementById('sb-panel-advanced');
+  if (!advPanel || !advPanel.contains(e.target)) return;
+  // GOAT
+  var gc = e.target.closest('#adv-goat-chips .goat-chip');
+  if (gc) {
+    var bc = document.querySelector('#goat-chips .goat-chip[data-goat="' + gc.dataset.goat + '"]');
+    if (bc) bc.click();
+    return;
+  }
+  // Preset
+  var pc = e.target.closest('#adv-presets .chip');
+  if (pc && PRESETS && PRESETS[pc.dataset.preset]) {
+    var bp = document.querySelector('#presets .chip[data-preset="' + pc.dataset.preset + '"]');
+    if (bp) bp.click();
+    return;
+  }
+  // Tech
+  var tc = e.target.closest('#adv-tech-presets .chip');
+  if (tc && TECH_PRESETS && TECH_PRESETS[tc.dataset.tech]) {
+    var bt = document.querySelector('#tech-presets .chip[data-tech="' + tc.dataset.tech + '"]');
+    if (bt) bt.click();
+    return;
+  }
 });
 
 function updateClrBtn() {
@@ -1858,7 +1915,8 @@ function updateClrBtn() {
 function clearFilters(resetChips=true){
   document.querySelectorAll('.finps input').forEach(i=>i.value='');
   const sf = document.getElementById('sector_filter'); if(sf) sf.value = '';
-  if(resetChips) { document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on')); ['goat-info','preset-info','tech-preset-info'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.display='none';el.innerHTML='';}});}  
+  const sfAdv = document.getElementById('sector_filter_adv'); if(sfAdv) sfAdv.value = '';
+  if(resetChips) { document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on')); ['goat-info','preset-info','tech-preset-info','goat-info-adv','preset-info-adv','tech-preset-info-adv'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.display='none';el.innerHTML='';}});}
   updateClrBtn();
   if(allData.length) applyAndRender();
 }
@@ -3479,6 +3537,16 @@ function advSelectExchange(el) {
   if (mainBtn) selectExchange(mainBtn);
 }
 
+// ── SECTOR SYNC ──
+function syncSectorAndFilter(source) {
+  var basic = document.getElementById('sector_filter');
+  var adv   = document.getElementById('sector_filter_adv');
+  if (!basic || !adv) return;
+  if (source === 'adv') { basic.value = adv.value; }
+  else                  { adv.value = basic.value; }
+  liveFilter();
+}
+
 // ── SIDEBAR TABS ──
 function switchSbTab(tab) {
   if (tab === 'advanced') {
@@ -3489,6 +3557,7 @@ function switchSbTab(tab) {
         p.classList.toggle('on', p.dataset.exchange === exKey);
       });
     }
+    syncAdvPanelChips();
   }
   document.getElementById('sb-panel-basic').style.display    = tab === 'basic'    ? '' : 'none';
   document.getElementById('sb-panel-advanced').style.display = tab === 'advanced' ? '' : 'none';

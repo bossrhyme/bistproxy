@@ -108,7 +108,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=arctic18">
+<link rel="stylesheet" href="/deepfin.css?v=arctic19">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -749,6 +749,167 @@ if('serviceWorker' in navigator){
         <button class="clrbtn" onclick="clearFilters()" id="clrbtn" style="display:none;">✕ Filtreleri Temizle</button>
 
 
+        <div class="filter-group">
+          <div class="filter-group-title">🏭 Sektör</div>
+          <select id="sector_filter" onchange="syncSectorAndFilter('basic')" style="width:100%;background:var(--s2);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:5px 8px;font-size:11px;cursor:pointer;">
+            <option value="">— Tümü —</option>
+            <option value="Teknoloji">Teknoloji</option>
+            <option value="Elektronik Teknoloji">Elektronik Teknoloji</option>
+            <option value="Yazılım">Yazılım</option>
+            <option value="Donanım">Donanım</option>
+            <option value="Yarı İletkenler">Yarı İletkenler</option>
+            <option value="Biyoteknoloji">Biyoteknoloji</option>
+            <option value="Finans">Finans</option>
+            <option value="Finansal Hizmetler">Finansal Hizmetler</option>
+            <option value="Bankacılık">Bankacılık</option>
+            <option value="Sigorta">Sigorta</option>
+            <option value="Yatırım Fonu">Yatırım Fonu</option>
+            <option value="Sağlık">Sağlık</option>
+            <option value="Sağlık Teknolojisi">Sağlık Teknolojisi</option>
+            <option value="Sağlık Hizmetleri">Sağlık Hizmetleri</option>
+            <option value="İlaç">İlaç</option>
+            <option value="Enerji">Enerji</option>
+            <option value="Enerji &amp; Maden">Enerji &amp; Maden</option>
+            <option value="Enerji Dışı Madenler">Enerji Dışı Madenler</option>
+            <option value="Madencilik">Madencilik</option>
+            <option value="Uzay">Uzay</option>
+            <option value="Havacılık &amp; Savunma">Havacılık &amp; Savunma</option>
+            <option value="Sanayi">Sanayi</option>
+            <option value="Üretim Sanayi">Üretim Sanayi</option>
+            <option value="Endüstriyel Hizmetler">Endüstriyel Hizmetler</option>
+            <option value="Proses Endüstrisi">Proses Endüstrisi</option>
+            <option value="Otomotiv">Otomotiv</option>
+            <option value="Döngüsel Tüketim">Döngüsel Tüketim</option>
+            <option value="Savunmacı Tüketim">Savunmacı Tüketim</option>
+            <option value="Dayanıklı Tüketim">Dayanıklı Tüketim</option>
+            <option value="Dayanıksız Tüketim">Dayanıksız Tüketim</option>
+            <option value="Tüketici Hizmetleri">Tüketici Hizmetleri</option>
+            <option value="Perakende">Perakende</option>
+            <option value="Gıda &amp; İçecek">Gıda &amp; İçecek</option>
+            <option value="Gıda İşleme">Gıda İşleme</option>
+            <option value="Ticari Hizmetler">Ticari Hizmetler</option>
+            <option value="Dağıtım Hizmetleri">Dağıtım Hizmetleri</option>
+            <option value="İletişim Hizmetleri">İletişim Hizmetleri</option>
+            <option value="İletişim">İletişim</option>
+            <option value="Kamu Hizmetleri">Kamu Hizmetleri</option>
+            <option value="Ulaşım">Ulaşım</option>
+            <option value="Temel Malzemeler">Temel Malzemeler</option>
+            <option value="Malzemeler">Malzemeler</option>
+            <option value="Kimya">Kimya</option>
+            <option value="Gayrimenkul">Gayrimenkul</option>
+            <option value="İnşaat">İnşaat</option>
+            <option value="Tekstil">Tekstil</option>
+            <option value="Holding">Holding</option>
+            <option value="Kamu">Kamu</option>
+            <option value="Diğer">Diğer</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-title">🏭 Sektör</div>
+          <select id="sector_filter_adv" onchange="syncSectorAndFilter('adv')" style="width:100%;background:var(--s2);border:1px solid var(--border);color:var(--text);border-radius:4px;padding:5px 8px;font-size:11px;cursor:pointer;">
+            <option value="">— Tümü —</option>
+            <option value="Teknoloji">Teknoloji</option>
+            <option value="Elektronik Teknoloji">Elektronik Teknoloji</option>
+            <option value="Yazılım">Yazılım</option>
+            <option value="Donanım">Donanım</option>
+            <option value="Yarı İletkenler">Yarı İletkenler</option>
+            <option value="Biyoteknoloji">Biyoteknoloji</option>
+            <option value="Finans">Finans</option>
+            <option value="Finansal Hizmetler">Finansal Hizmetler</option>
+            <option value="Bankacılık">Bankacılık</option>
+            <option value="Sigorta">Sigorta</option>
+            <option value="Yatırım Fonu">Yatırım Fonu</option>
+            <option value="Sağlık">Sağlık</option>
+            <option value="Sağlık Teknolojisi">Sağlık Teknolojisi</option>
+            <option value="Sağlık Hizmetleri">Sağlık Hizmetleri</option>
+            <option value="İlaç">İlaç</option>
+            <option value="Enerji">Enerji</option>
+            <option value="Enerji &amp; Maden">Enerji &amp; Maden</option>
+            <option value="Enerji Dışı Madenler">Enerji Dışı Madenler</option>
+            <option value="Madencilik">Madencilik</option>
+            <option value="Uzay">Uzay</option>
+            <option value="Havacılık &amp; Savunma">Havacılık &amp; Savunma</option>
+            <option value="Sanayi">Sanayi</option>
+            <option value="Üretim Sanayi">Üretim Sanayi</option>
+            <option value="Endüstriyel Hizmetler">Endüstriyel Hizmetler</option>
+            <option value="Proses Endüstrisi">Proses Endüstrisi</option>
+            <option value="Otomotiv">Otomotiv</option>
+            <option value="Döngüsel Tüketim">Döngüsel Tüketim</option>
+            <option value="Savunmacı Tüketim">Savunmacı Tüketim</option>
+            <option value="Dayanıklı Tüketim">Dayanıklı Tüketim</option>
+            <option value="Dayanıksız Tüketim">Dayanıksız Tüketim</option>
+            <option value="Tüketici Hizmetleri">Tüketici Hizmetleri</option>
+            <option value="Perakende">Perakende</option>
+            <option value="Gıda &amp; İçecek">Gıda &amp; İçecek</option>
+            <option value="Gıda İşleme">Gıda İşleme</option>
+            <option value="Ticari Hizmetler">Ticari Hizmetler</option>
+            <option value="Dağıtım Hizmetleri">Dağıtım Hizmetleri</option>
+            <option value="İletişim Hizmetleri">İletişim Hizmetleri</option>
+            <option value="İletişim">İletişim</option>
+            <option value="Kamu Hizmetleri">Kamu Hizmetleri</option>
+            <option value="Ulaşım">Ulaşım</option>
+            <option value="Temel Malzemeler">Temel Malzemeler</option>
+            <option value="Malzemeler">Malzemeler</option>
+            <option value="Kimya">Kimya</option>
+            <option value="Gayrimenkul">Gayrimenkul</option>
+            <option value="İnşaat">İnşaat</option>
+            <option value="Tekstil">Tekstil</option>
+            <option value="Holding">Holding</option>
+            <option value="Kamu">Kamu</option>
+            <option value="Diğer">Diğer</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-title">🐐 GOAT Yatırımcı ve Traderlar</div>
+          <div class="chips" id="adv-goat-chips">
+            <div class="chip goat-chip" data-goat="ackman">Ackman</div>
+            <div class="chip goat-chip" data-goat="ark">ARK/Wood</div>
+            <div class="chip goat-chip" data-goat="buffett">Buffett</div>
+            <div class="chip goat-chip" data-goat="dalio">Dalio</div>
+            <div class="chip goat-chip" data-goat="einhorn">Einhorn</div>
+            <div class="chip goat-chip" data-goat="fisher">Fisher</div>
+            <div class="chip goat-chip" data-goat="graham">Graham</div>
+            <div class="chip goat-chip" data-goat="greenblatt">Greenblatt</div>
+            <div class="chip goat-chip" data-goat="icahn">Icahn</div>
+            <div class="chip goat-chip" data-goat="klarman">Klarman</div>
+            <div class="chip goat-chip" data-goat="lynch">Lynch</div>
+            <div class="chip goat-chip" data-goat="marks">Marks</div>
+            <div class="chip goat-chip" data-goat="minervini">Minervini</div>
+            <div class="chip goat-chip" data-goat="munger">Munger</div>
+            <div class="chip goat-chip" data-goat="oneil">O'Neil</div>
+            <div class="chip goat-chip" data-goat="oshaughnessy">O'Shaughnessy</div>
+            <div class="chip goat-chip" data-goat="piotroski">Piotroski</div>
+            <div class="chip goat-chip" data-goat="schloss">Schloss</div>
+            <div class="chip goat-chip" data-goat="soros">Soros</div>
+          </div>
+          <div class="goat-info" id="goat-info-adv"></div>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-title">📊 Hazır Temel Analiz</div>
+          <div class="presets chips" id="adv-presets">
+            <div class="chip" data-preset="lowdebt">Az Borç</div>
+            <div class="chip" data-preset="growth">Büyüme</div>
+            <div class="chip" data-preset="value">Değer</div>
+            <div class="chip" data-preset="quality">Kaliteli</div>
+            <div class="chip" data-preset="momentum">Momentum</div>
+            <div class="chip" data-preset="dividend">Temettü</div>
+          </div>
+          <div class="goat-info" id="preset-info-adv"></div>
+          <div class="filter-group-title" style="margin-top:10px;">📈 Hazır Teknik Analiz</div>
+          <div class="presets chips" id="adv-tech-presets">
+            <div class="chip tech-chip" data-tech="breakout">Kırılım</div>
+            <div class="chip tech-chip" data-tech="oversold">Dip Fırsatı</div>
+            <div class="chip tech-chip" data-tech="nearHigh">Zirveye Yakın</div>
+            <div class="chip tech-chip" data-tech="pullback">Sağlıklı Çekilme</div>
+            <div class="chip tech-chip" data-tech="strongDay">Güçlü Gün</div>
+            <div class="chip tech-chip" data-tech="highVolume">Kurumsal Hacim</div>
+            <div class="chip tech-chip" data-tech="techBuy">26 İndikatör AL</div>
+            <div class="chip tech-chip" data-tech="momentum3m">3 Aylık Lider</div>
+            <div class="chip tech-chip" data-tech="trendFollow">Güçlü Trendde</div>
+            <div class="chip tech-chip" data-tech="rsiBounce">RSI Toparlanması</div>
+          </div>
+          <div class="goat-info" id="tech-preset-info-adv"></div>
+        </div>
         <div class="filter-group">
           <div class="filter-group-title">📊 Hazır Temel Analiz</div>
           <div class="presets chips" id="presets">
@@ -1775,6 +1936,6 @@ if('serviceWorker' in navigator){
     </div>
   </div>
 </div>
-<script src="/deepfin.js?v=46"></script>
+<script src="/deepfin.js?v=47"></script>
 </body>
 </html>
