@@ -2134,7 +2134,7 @@ function _initWorker() {
 // ── VIRTUAL SCROLL ────────────────────────────────
 var _vsData    = [];      // sıralanmış tam liste
 var _vsStart   = 0;       // ilk görünen satır index'i
-var _vsRowH    = 36;      // satır yüksekliği (px) - CSS ile uyumlu
+var _vsRowH    = window.matchMedia('(max-width:768px)').matches ? 44 : 36; // mobilde 44px (Apple HIG)
 var _vsBuffer  = 15;      // ekstra render (üst+alt buffer)
 var _vsRAF     = null;
 
@@ -2224,6 +2224,7 @@ function _vsInit() {
   // Window resize — ekran boyutu değişince daha fazla satır göster
   if (!window._vsWinListener) {
     window.addEventListener('resize', function() {
+      _vsRowH = window.matchMedia('(max-width:768px)').matches ? 44 : 36;
       if (_vsData && _vsData.length) { if (_vsRAF) cancelAnimationFrame(_vsRAF); _vsRAF = requestAnimationFrame(_vsRender); }
     }, {passive: true});
     window._vsWinListener = true;
@@ -2919,15 +2920,14 @@ init();
     .then(function(d) {
       if (!d.user) return;
       _dfUser = d.user;
-      fetch('/api/watchlists', { credentials: 'same-origin' })
-        .then(function(r) { return r.json(); })
-        .then(function(wd) { _dfWatchlists = wd.watchlists || []; _updateFavBtn(); if (allData.length) renderTable(); })
-        .catch(function() {});
-      fetch('/api/portfolio', { credentials: 'same-origin' })
-        .then(function(r) { return r.json(); })
-        .then(function(pd) { _dfPortfolios = pd.portfolios || []; })
-        .catch(function() {});
       _updateFavBtn();
+      Promise.all([
+        fetch('/api/watchlists', { credentials: 'same-origin' }).then(function(r){ return r.json(); }).then(function(wd){ _dfWatchlists = wd.watchlists || []; }).catch(function(){}),
+        fetch('/api/portfolio',  { credentials: 'same-origin' }).then(function(r){ return r.json(); }).then(function(pd){ _dfPortfolios = pd.portfolios || []; }).catch(function(){})
+      ]).then(function() {
+        _updateFavBtn();
+        if (allData.length) renderTable();
+      });
       var btn = document.getElementById('profile-btn');
       if (!btn) return;
       btn.classList.add('logged-in');
