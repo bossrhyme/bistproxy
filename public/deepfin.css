@@ -48,7 +48,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter', sans-serif;}
 #app{display:flex;flex-direction:column;height:100dvh;position:relative;z-index:1;}
 
 /* ── TOPBAR ── */
-.topbar{display:flex;align-items:center;padding:0 16px;height:48px;border-bottom:1px solid var(--border);background:var(--s1);flex-shrink:0;gap:10px;z-index:10;box-shadow:var(--shadow);}
+.topbar{display:flex;align-items:center;padding:0 16px;padding-left:calc(16px + env(safe-area-inset-left, 0px));padding-right:calc(16px + env(safe-area-inset-right, 0px));height:48px;border-bottom:1px solid var(--border);background:var(--s1);flex-shrink:0;gap:10px;z-index:10;box-shadow:var(--shadow);}
 .tlogo{font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;letter-spacing:-.3px;display:flex;align-items:center;gap:6px;}
 .tlogo-mark{width:22px;height:22px;background:var(--accent);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;}
 .tlogo span{color:var(--text2);font-weight:400;font-size:13px;}
@@ -502,6 +502,7 @@ td:first-child,td:nth-child(2){text-align:left;}
      TABLO — yatay kaydırılabilir (asıl düzeltme)
   ───────────────────────────────────────── */
   /* twrap dup removed */
+  .twrap { padding-bottom: env(safe-area-inset-bottom, 0px); }
   table {
     min-width: 860px;              /* tüm kolonlar sığsın */
     width: max-content;            /* içeriğe göre genişle */
@@ -560,6 +561,7 @@ td:first-child,td:nth-child(2){text-align:left;}
     display: flex !important;
     flex-direction: column !important;
     overflow-y: auto !important;
+    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
   }
   .dhead {
     padding: 14px 16px;
@@ -593,7 +595,10 @@ td:first-child,td:nth-child(2){text-align:left;}
   /* ─────────────────────────────────────────
      GENEL TOUCH TARGETS (Apple HIG & Material)
   ───────────────────────────────────────── */
-  button, .chip, .goat-chip, .exbtn, .sb-tab, .dtab { min-height: 36px; }
+  button, .chip, .goat-chip, .exbtn, .sb-tab, .dtab,
+  .ctab, .ctab-cur, .itab, .tbtn, .info-tab, .info-asset-tab { min-height: 44px; }
+  .sb-tab { min-height: 44px; line-height: 1; }
+  .chip, .goat-chip { padding: 8px 12px; }
 
   /* ─────────────────────────────────────────
      HOMEPAGE
@@ -695,7 +700,7 @@ td:first-child,td:nth-child(2){text-align:left;}
   display: block;
 }
 #drawer-content {
-  padding: 8px 0 80px;
+  padding: 8px 0 calc(80px + env(safe-area-inset-bottom, 0px));
 }
 
 /* Drawer içindeki chip seçim feedback */
@@ -733,6 +738,15 @@ td:first-child,td:nth-child(2){text-align:left;}
    iOS Safari sayfayı zoom'luyor — mobilde minimum 16px zorunlu */
 @media (max-width: 768px) {
   input, textarea, select { font-size: 16px !important; }
+}
+
+/* backdrop-filter performans: düşük güçlü cihazlarda (coarse pointer = dokunmatik)
+   blur yerine yüksek opaklık kullanılır — GPU blokajı önlenir */
+@media (pointer: coarse) and (max-width: 768px) {
+  .modal-overlay { backdrop-filter: none; background: rgba(0,0,0,.85); }
+  .smodal-overlay { backdrop-filter: none; background: rgba(0,0,0,.88); }
+  .drawer-overlay { backdrop-filter: none; background: rgba(0,0,0,.7); }
+  #drawer-overlay { backdrop-filter: none; background: rgba(0,0,0,.7); }
 }
 
 /* ── TICKER TAPE ── */

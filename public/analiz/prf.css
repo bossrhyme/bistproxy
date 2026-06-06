@@ -717,7 +717,7 @@ td:first-child,td:nth-child(2){text-align:left;}
 
 /* ══ PROFİL CSS ══ */
 #profile-page{display:flex;flex:1;flex-direction:column;overflow:hidden;min-height:0;}
-.prf-topbar{height:40px;border-bottom:1px solid var(--border);background:var(--s1);display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0;}
+.prf-topbar{height:40px;border-bottom:1px solid var(--border);background:var(--s1);display:flex;align-items:center;padding:0 16px;padding-left:calc(16px + env(safe-area-inset-left, 0px));padding-right:calc(16px + env(safe-area-inset-right, 0px));gap:10px;flex-shrink:0;}
 .prf-back{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);cursor:pointer;background:none;border:1px solid var(--border);border-radius:5px;padding:4px 10px;transition:all .15s;font-family:Inter, sans-serif;}
 .prf-back:hover{color:var(--text);border-color:var(--border2);}
 .prf-crumb{font-size:11px;color:var(--muted2);display:flex;align-items:center;gap:5px;font-family:"Geist Mono", monospace;}
@@ -839,8 +839,12 @@ td:first-child,td:nth-child(2){text-align:left;}
   .prf-hero{padding:14px 16px 0;}
   .prf-name{font-size:18px;}
   .prf-topbar .prf-back,.prf-topbar .prf-tv-btn{min-height:44px;min-width:44px;}
+  .prf-tab{min-height:44px;}
   .prf-mgrid{gap:8px;}
   .prf-mcard{padding:10px 12px;}
+  .prf-main{padding-bottom:calc(16px + env(safe-area-inset-bottom, 0px));}
+  .prf-side{padding-bottom:calc(16px + env(safe-area-inset-bottom, 0px));}
+  button,.topbarbtn{min-height:44px;}
 }
 @media(max-width:480px){
   .prf-mgrid{grid-template-columns:1fr 1fr;}

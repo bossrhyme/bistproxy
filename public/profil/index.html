@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Profilim — DeepFin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -243,7 +243,7 @@ body{overflow-y:auto;}
 
 @media(max-width:768px){
   /* Layout */
-  .pf-main{padding:16px 12px 80px;}
+  .pf-main{padding:16px 12px calc(80px + env(safe-area-inset-bottom, 0px));}
 
   /* Identity card */
   .pf-identity{padding:14px;gap:12px;}
@@ -258,7 +258,7 @@ body{overflow-y:auto;}
   /* List tabs — yatay kaydırılabilir */
   .pf-list-tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:4px;}
   .pf-list-tabs::-webkit-scrollbar{display:none;}
-  .pf-list-tab{flex-shrink:0;min-height:36px;}
+  .pf-list-tab{flex-shrink:0;min-height:44px;}
 
   /* Tablo — yatay scroll container */
   .pf-list-panel{overflow:hidden;}
@@ -304,7 +304,7 @@ body{overflow-y:auto;}
 }
 
 @media(max-width:480px){
-  .pf-main{padding:12px 10px 80px;}
+  .pf-main{padding:12px 10px calc(80px + env(safe-area-inset-bottom, 0px));}
   .pf-identity{flex-direction:column;align-items:flex-start;}
   .pf-avatar-col{flex-direction:row;align-items:center;gap:12px;width:100%;}
   .pf-warrior-wrap{width:48px;height:48px;}
