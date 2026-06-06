@@ -643,7 +643,7 @@ window.addItem = async function() {
     var r = await fetch('/api/watchlists/item', { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ listId: _activeListId, symbol: sym, exchange: ex }) });
     var d = await r.json();
-    if (d.watchlists) { _lists = d.watchlists; document.getElementById('pf-add-sym').value = ''; renderTabs(); renderListPanel(); toast('✓ ' + sym + ' eklendi'); }
+    if (d.watchlists) { _lists = d.watchlists; document.getElementById('pf-add-sym').value = ''; renderTabs(); renderListPanel(); toast('✓ ' + sym + ' eklendi'); window.location.href = '/analiz/profile.html?sym=' + encodeURIComponent(sym.replace('.IS','')) + '&ex=' + encodeURIComponent(ex); }
   } catch(e) { toast('Hata oluştu'); }
   btn.disabled = false;
 };
@@ -912,7 +912,7 @@ window.addPosition = async function() {
       _portfolios = d.portfolios;
       var pickBtn = document.getElementById('pf-pos-sym-btn');
       if (pickBtn) { pickBtn.textContent = '🔍 Hisse Seç'; pickBtn.classList.remove('selected'); }
-      renderPfTabs(); renderPfPanel(); toast('✓ ' + sym + ' eklendi');
+      renderPfTabs(); renderPfPanel(); toast('✓ ' + sym + ' eklendi'); window.location.href = '/analiz/profile.html?sym=' + encodeURIComponent(sym.replace('.IS','')) + '&ex=' + encodeURIComponent(ex);
     }
   } catch(e) { toast('Hata oluştu'); addBtn.disabled = false; }
 };
