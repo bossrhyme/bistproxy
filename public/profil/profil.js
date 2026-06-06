@@ -93,11 +93,10 @@ function renderInvestorSidebar() {
   if (!sb) return;
   var current = _user && _user.investorType;
 
-  var html = '<div class="pf-inv-sb-title">⚔ Yatırımcı Tipleri</div>';
+  var html = '<div class="pf-inv-sb-title">Yatırımcı Profilleri</div>';
 
   if (_user) {
-    html += '<button class="pf-inv-sb-change-btn" onclick="startQuizForExistingUser()">' +
-      (current ? '🔄 Tipini Değiştir' : '🧬 Tipini Belirle') + '</button>';
+    html += '<button class="pf-inv-sb-change-btn" onclick="startQuizForExistingUser()">Kimliğini Güncelle</button>';
   }
 
   Object.keys(INV_TYPES).forEach(function(key) {
