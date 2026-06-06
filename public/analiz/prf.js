@@ -2197,3 +2197,63 @@ function _buildMetricsCard(m, type) {
   html += '</div>';
   return html;
 }
+
+// ── DeepFin Skoru Tooltip ────────────────────────────────────────────────
+(function() {
+  var _tip = null;
+
+  function _tipContent() {
+    var w = _dfW();
+    function row(emoji, label, weight, desc) {
+      return '<div style="background:var(--s2);border-radius:6px;padding:7px 9px;margin-bottom:5px;">'+
+        '<div style="display:flex;align-items:center;gap:5px;margin-bottom:2px;">'+
+        '<span style="font-size:13px;">'+emoji+'</span>'+
+        '<span style="font-size:11px;font-weight:700;color:var(--text);">'+label+'</span>'+
+        '<span style="font-size:10px;font-weight:700;color:var(--accent);margin-left:auto;">%'+weight+'</span>'+
+        '</div>'+
+        '<div style="font-size:9px;color:var(--muted2);line-height:1.5;">'+desc+'</div>'+
+        '</div>';
+    }
+    return '<div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px;letter-spacing:.2px;">DeepFin Skoru Nasıl Hesaplanır?</div>'+
+      '<div style="font-size:10px;color:var(--muted2);margin-bottom:10px;line-height:1.55;">4 boyutun ağırlıklı ortalaması (0–100). Her boyut kendi metrikleri 0–100\'e normalize edilerek hesaplanır.</div>'+
+      row('📊','Temel', w.temel, 'ROE · Net Marj · Brüt Marj · Gelir Büyümesi · Kazanç Büyümesi · Piotroski F-Skor')+
+      row('📉','Teknik', w.teknik, 'Haftalık · Aylık · Yıllık Fiyat Performansı')+
+      row('💰','Değerleme', w.deger, 'F/K · PD/DD · Fiyat / Satış oranları')+
+      row('⚡','Momentum', w.mom, 'Kısa ve uzun vadeli fiyat ivmesi')+
+      '<div style="border-top:1px solid var(--border);padding-top:7px;margin-top:2px;font-size:10px;">'+
+      '<span style="color:var(--muted2);">Puan: </span>'+
+      '<span style="color:#10b981;font-weight:700;">75+ Güçlü</span> · '+
+      '<span style="color:#3b82f6;font-weight:700;">60–75 İyi</span> · '+
+      '<span style="color:#f0b429;font-weight:700;">45–60 Orta</span> · '+
+      '<span style="color:#f43f5e;font-weight:700;">&lt;45 Zayıf</span>'+
+      '</div>'+
+      '<div style="margin-top:6px;font-size:9px;color:var(--muted);">⚙ Ağırlıklar &ldquo;Ağırlık&rdquo; butonundan kişiselleştirilebilir.</div>';
+  }
+
+  function _show(rect) {
+    if (!_tip) {
+      _tip = document.createElement('div');
+      _tip.style.cssText = 'position:fixed;z-index:2000;width:272px;background:var(--s1);border:1px solid var(--border2);border-radius:10px;padding:14px 15px;box-shadow:0 8px 28px rgba(15,23,42,.13);pointer-events:none;opacity:0;transition:opacity .15s;';
+      document.body.appendChild(_tip);
+    }
+    _tip.innerHTML = _tipContent();
+    var tipH = 300;
+    var left  = rect.left - 272 - 12;
+    var top   = rect.top + rect.height / 2 - tipH / 2;
+    if (left < 8) left = rect.right + 12;
+    top = Math.max(8, Math.min(top, window.innerHeight - tipH - 8));
+    _tip.style.left = left + 'px';
+    _tip.style.top  = top  + 'px';
+    _tip.style.opacity = '1';
+  }
+
+  function _hide() { if (_tip) _tip.style.opacity = '0'; }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var wrap = document.querySelector('.df-sc-ring-wrap');
+    if (!wrap) return;
+    wrap.style.cursor = 'help';
+    wrap.addEventListener('mouseenter', function() { _show(wrap.getBoundingClientRect()); });
+    wrap.addEventListener('mouseleave', _hide);
+  });
+})();
