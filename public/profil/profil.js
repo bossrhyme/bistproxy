@@ -1,4 +1,4 @@
-// DeepFin — Profil Sayfası v6
+// DeepFin — Profil Sayfası v8
 (function() {
 'use strict';
 
@@ -137,8 +137,12 @@ function showQuiz() {
   var hdr = document.getElementById('quiz-header'); if (hdr) hdr.style.display = '';
   var ftr = document.getElementById('quiz-footer'); if (ftr) ftr.style.display = '';
   renderQuizQ();
-  var overlay = document.getElementById('quiz-overlay');
-  if (overlay) { overlay.style.display = 'flex'; overlay.classList.add('open'); }
+  // Section swap: hide other sections, show quiz section
+  ['pf-loading','pf-login','pf-user'].forEach(function(id){
+    var el = document.getElementById(id); if (el) el.style.display = 'none';
+  });
+  var qs = document.getElementById('pf-quiz-section');
+  if (qs) qs.style.display = 'block';
 }
 
 window.startQuizForExistingUser = function() {
@@ -210,6 +214,11 @@ window.finishQuiz = async function(type) {
   var errEl = document.getElementById('pf-auth-err');
   if (btn) { btn.disabled = true; btn.textContent = 'Kaydediliyor...'; }
 
+  function hideQuizSection() {
+    var qs = document.getElementById('pf-quiz-section');
+    if (qs) qs.style.display = 'none';
+  }
+
   // Existing user updating investor type
   if (!_tempReg && _user) {
     try {
@@ -220,15 +229,18 @@ window.finishQuiz = async function(type) {
       var d = await r.json();
       if (d.ok) {
         _user.investorType = type;
-        var _qov=document.getElementById('quiz-overlay');if(_qov){_qov.style.display='none';_qov.classList.remove('open');}
+        hideQuizSection();
+        document.getElementById('pf-user').style.display = 'block';
         renderIdentity();
         toast('Yatırımcı tipin güncellendi: ' + INV_TYPES[type].name);
       } else {
-        var _qov=document.getElementById('quiz-overlay');if(_qov){_qov.style.display='none';_qov.classList.remove('open');}
+        hideQuizSection();
+        document.getElementById('pf-user').style.display = 'block';
         toast(d.error || 'Güncelleme başarısız.');
       }
     } catch(e) {
-      var _qov=document.getElementById('quiz-overlay');if(_qov){_qov.style.display='none';_qov.classList.remove('open');}
+      hideQuizSection();
+      document.getElementById('pf-user').style.display = 'block';
       toast('Bağlantı hatası.');
     }
     return;
@@ -241,18 +253,19 @@ window.finishQuiz = async function(type) {
     var d2 = await r2.json();
     if (d2.user) {
       _user = d2.user;
-      var _qov=document.getElementById('quiz-overlay');if(_qov){_qov.style.display='none';_qov.classList.remove('open');}
-      document.getElementById('pf-login').style.display = 'none';
+      hideQuizSection();
       showUser();
       await Promise.all([loadWatchlists(), loadPortfolio()]);
       toast('Hoş geldin ' + (d2.user.username || d2.user.name) + '!');
     } else {
-      var _qov=document.getElementById('quiz-overlay');if(_qov){_qov.style.display='none';_qov.classList.remove('open');}
+      hideQuizSection();
+      document.getElementById('pf-login').style.display = 'block';
       if (errEl) errEl.textContent = d2.error || 'Kayıt başarısız.';
       if (btn) { btn.disabled = false; btn.textContent = 'Hesabımı Oluştur →'; }
     }
   } catch(e) {
-    var _qov=document.getElementById('quiz-overlay');if(_qov){_qov.style.display='none';_qov.classList.remove('open');}
+    hideQuizSection();
+    document.getElementById('pf-login').style.display = 'block';
     if (errEl) errEl.textContent = 'Bağlantı hatası.';
     if (btn) { btn.disabled = false; btn.textContent = 'Hesabımı Oluştur →'; }
   }
@@ -326,7 +339,7 @@ function renderIdentity() {
         '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">' +
         '<span style="font-size:11px;color:var(--muted2);">Yatırımcı tipi belirlenmedi</span>' +
         '<button onclick="startQuizForExistingUser()" style="background:#6366f1;color:#fff;border:none;border-radius:6px;' +
-          'padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">🧬 Quiz Yap</button>' +
+          'padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">🧬 Quiz\'e Başla</button>' +
         '</div>';
     }
   }

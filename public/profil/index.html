@@ -363,29 +363,33 @@ body{overflow-y:auto;}
   </div>
 </div>
 
-<!-- Quiz overlay -->
-<div class="quiz-overlay" id="quiz-overlay">
-  <div class="quiz-box" id="quiz-box">
-    <div class="quiz-header" id="quiz-header">
-      <div class="quiz-header-top">
-        <div class="quiz-title">🧬 Yatırımcı Kişiliği Testi</div>
-        <div class="quiz-step" id="quiz-step">1 / 5</div>
+<!-- Quiz section (replaces profile content when active) -->
+<div id="pf-quiz-section" style="display:none;max-width:520px;margin:0 auto;padding:0 0 60px;">
+  <div style="background:var(--s1);border:1px solid var(--border2);border-radius:14px;overflow:hidden;">
+    <div id="quiz-header" style="padding:20px 24px 0;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:15px;font-weight:800;">🧬 Yatırımcı Kişiliği Testi</div>
+        <div id="quiz-step" style="font-size:11px;color:var(--muted2);font-weight:600;">1 / 5</div>
       </div>
-      <div class="quiz-prog-track"><div class="quiz-prog-fill" id="quiz-prog" style="width:20%"></div></div>
+      <div style="height:4px;background:var(--s3);border-radius:2px;overflow:hidden;margin-bottom:16px;">
+        <div id="quiz-prog" style="height:100%;background:var(--accent);border-radius:2px;transition:width .3s ease;width:20%;"></div>
+      </div>
     </div>
-    <div class="quiz-body" id="quiz-body">
-      <div class="quiz-q" id="quiz-q-text"></div>
-      <div class="quiz-opts" id="quiz-opts"></div>
+    <div id="quiz-body" style="padding:22px 24px;">
+      <div id="quiz-q-text" style="font-size:14px;font-weight:700;margin-bottom:18px;line-height:1.5;"></div>
+      <div id="quiz-opts" style="display:flex;flex-direction:column;gap:8px;"></div>
     </div>
-    <div class="quiz-footer" id="quiz-footer">
-      <button class="quiz-back-btn" id="quiz-back" onclick="quizBack()" disabled>← Geri</button>
-      <button class="quiz-next-btn" id="quiz-next" onclick="quizNext()" disabled>Sonraki →</button>
+    <div id="quiz-footer" style="padding:16px 24px 20px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);">
+      <button id="quiz-back" onclick="quizBack()" disabled
+        style="background:transparent;border:1px solid var(--border);border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;color:var(--muted2);cursor:pointer;">← Geri</button>
+      <button id="quiz-next" onclick="quizNext()" disabled
+        style="background:var(--accent);border:none;border-radius:7px;padding:8px 20px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;opacity:.5;">Sonraki →</button>
     </div>
   </div>
 </div>
 
 <div class="pf-toast" id="pf-toast"></div>
 
-<script src="/profil/profil.js?v=7"></script>
+<script src="/profil/profil.js?v=8"></script>
 </body>
 </html>
