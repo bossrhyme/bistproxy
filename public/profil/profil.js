@@ -130,12 +130,19 @@ function calcInvestorType(answers) {
 function showQuiz() {
   _quizAns = [];
   _quizQ   = 0;
+  // Restore quiz body HTML in case showQuizResult() had replaced it
+  var body = document.getElementById('quiz-body');
+  if (body) body.innerHTML = '<div class="quiz-q" id="quiz-q-text"></div><div class="quiz-opts" id="quiz-opts"></div>';
+  // Show header/footer
+  var hdr = document.getElementById('quiz-header'); if (hdr) hdr.style.display = '';
+  var ftr = document.getElementById('quiz-footer'); if (ftr) ftr.style.display = '';
   renderQuizQ();
-  document.getElementById('quiz-overlay').classList.add('open');
+  var overlay = document.getElementById('quiz-overlay');
+  if (overlay) { overlay.style.display = 'flex'; overlay.classList.add('open'); }
 }
 
 window.startQuizForExistingUser = function() {
-  _tempReg = null; // signal: existing user update, not new registration
+  _tempReg = null;
   showQuiz();
 };
 
@@ -213,15 +220,15 @@ window.finishQuiz = async function(type) {
       var d = await r.json();
       if (d.ok) {
         _user.investorType = type;
-        document.getElementById('quiz-overlay').classList.remove('open');
+        var _qov=document.getElementById('quiz-overlay');if(_qov){_qov.style.display='none';_qov.classList.remove('open');}
         renderIdentity();
         toast('Yatırımcı tipin güncellendi: ' + INV_TYPES[type].name);
       } else {
-        document.getElementById('quiz-overlay').classList.remove('open');
+        var _qov=document.getElementById('quiz-overlay');if(_qov){_qov.style.display='none';_qov.classList.remove('open');}
         toast(d.error || 'Güncelleme başarısız.');
       }
     } catch(e) {
-      document.getElementById('quiz-overlay').classList.remove('open');
+      var _qov=document.getElementById('quiz-overlay');if(_qov){_qov.style.display='none';_qov.classList.remove('open');}
       toast('Bağlantı hatası.');
     }
     return;
@@ -234,18 +241,18 @@ window.finishQuiz = async function(type) {
     var d2 = await r2.json();
     if (d2.user) {
       _user = d2.user;
-      document.getElementById('quiz-overlay').classList.remove('open');
+      var _qov=document.getElementById('quiz-overlay');if(_qov){_qov.style.display='none';_qov.classList.remove('open');}
       document.getElementById('pf-login').style.display = 'none';
       showUser();
       await Promise.all([loadWatchlists(), loadPortfolio()]);
       toast('Hoş geldin ' + (d2.user.username || d2.user.name) + '!');
     } else {
-      document.getElementById('quiz-overlay').classList.remove('open');
+      var _qov=document.getElementById('quiz-overlay');if(_qov){_qov.style.display='none';_qov.classList.remove('open');}
       if (errEl) errEl.textContent = d2.error || 'Kayıt başarısız.';
       if (btn) { btn.disabled = false; btn.textContent = 'Hesabımı Oluştur →'; }
     }
   } catch(e) {
-    document.getElementById('quiz-overlay').classList.remove('open');
+    var _qov=document.getElementById('quiz-overlay');if(_qov){_qov.style.display='none';_qov.classList.remove('open');}
     if (errEl) errEl.textContent = 'Bağlantı hatası.';
     if (btn) { btn.disabled = false; btn.textContent = 'Hesabımı Oluştur →'; }
   }
