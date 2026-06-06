@@ -23,7 +23,7 @@
 <meta name="twitter:image" content="https://deepfin.vercel.app/og-image.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="/analiz/prf.css?v=arctic6">
+<link rel="stylesheet" href="/analiz/prf.css?v=arctic7">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
 
 
@@ -116,7 +116,6 @@ if('serviceWorker' in navigator){
           <div class="prf-tab" onclick="prfTab('news',this)">Haberler</div>
           <div class="prf-tab" onclick="prfTab('guru',this)">GOAT Analizi</div>
           <div class="prf-tab" onclick="prfTab('fairvalue',this)">💰 Adil Fiyat</div>
-          <div class="prf-tab" style="display:flex;align-items:center;gap:6px;" onclick="prfTab('ai',this)">🤖 YZ Analizi <span style="font-size:9px;padding:1px 6px;background:rgba(240,180,41,.15);color:#f0b429;border:1px solid rgba(240,180,41,.3);border-radius:3px;font-weight:600;letter-spacing:.3px;">YAKINDA</span></div>
         </div>
 
         <div id="prf-panel-overview" class="prf-panel on">
@@ -253,38 +252,6 @@ if('serviceWorker' in navigator){
           </div>
         </div>
 
-        <div id="prf-panel-ai" class="prf-panel">
-          <div class="prf-section">
-            <div class="prf-sec-title">Yapay Zeka Destekli Analiz</div>
-            <div class="prf-ai-box" id="prf-ai-box">
-              <div class="prf-ai-loading" id="prf-ai-loading">
-                <div class="prf-spinner"></div>YZ analizi hazırlanıyor...
-              </div>
-              <div id="prf-ai-content" style="display:none;">
-                <div class="prf-ai-hdr">
-                  <div class="prf-ai-icon">🤖</div>
-                  <div>
-                    <div style="font-size:13px;font-weight:700;color:var(--text);" id="prf-ai-title">DeepFin AI</div>
-                    <div style="font-size:10px;color:var(--text2);">Screener verisi üzerinde üretildi</div>
-                  </div>
-                  <div class="prf-ai-badge">CLAUDE</div>
-                </div>
-                <div class="prf-ai-content" id="prf-ai-text"></div>
-                <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(14,165,233,.15);font-size:10px;color:var(--muted2);">⚠ Bilgi amaçlıdır, yatırım tavsiyesi değildir.</div>
-              </div>
-            </div>
-            <div style="margin-top:14px;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:16px;">
-              <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:10px;">Soru sor</div>
-              <div style="display:flex;gap:8px;">
-                <input type="text" id="prf-ai-q" placeholder="Örn: Bu hisse Buffett kriterlerine uygun mu?"
-                  style="flex:1;background:var(--s3);border:1px solid var(--border2);border-radius:6px;padding:8px 12px;color:var(--text);font-size:11px;outline:none;font-family:Inter,sans-serif;"
-                  onkeydown="if(event.key==='Enter') askPrfAI()">
-                <button onclick="askPrfAI()" style="padding:8px 14px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">Sor →</button>
-              </div>
-              <div id="prf-ai-answer" style="display:none;margin-top:12px;font-size:12px;color:var(--text2);line-height:1.7;padding:12px;background:var(--s3);border-radius:6px;"></div>
-            </div>
-          </div>
-        </div>
       </div>
 
       <div class="prf-side">
@@ -370,6 +337,6 @@ if('serviceWorker' in navigator){
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
-<script src="/analiz/prf.js?v=9546695"></script>
+<script src="/analiz/prf.js?v=9546696"></script>
 </body>
 </html>

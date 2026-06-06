@@ -784,12 +784,6 @@ td:first-child,td:nth-child(2){text-align:left;}
 .prf-gscore.fail{color:var(--red);}
 .prf-gcrit{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text2);padding:2px 0;}
 .prf-cdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
-.prf-ai-box{background:linear-gradient(135deg,rgba(14,165,233,.06),rgba(14,165,233,.02));border:1px solid rgba(14,165,233,.2);border-radius:10px;padding:18px;}
-.prf-ai-hdr{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
-.prf-ai-icon{width:30px;height:30px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
-.prf-ai-badge{margin-left:auto;font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;background:rgba(14,165,233,.12);color:var(--accent);border:1px solid rgba(14,165,233,.3);}
-.prf-ai-content{font-size:12px;color:var(--text2);line-height:1.7;}
-.prf-ai-loading{display:flex;align-items:center;gap:10px;padding:20px;color:var(--text2);font-size:12px;}
 .prf-spinner{width:18px;height:18px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:prf-spin .7s linear infinite;flex-shrink:0;}
 @keyframes prf-spin{to{transform:rotate(360deg);}}
 .prf-sside{padding:16px;border-bottom:1px solid var(--border);}

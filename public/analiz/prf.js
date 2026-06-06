@@ -1052,7 +1052,6 @@ var currentExchange = 'bist';
 var _prfSym = '';
 var _prfEx  = '';
 var _prfData = null;
-var _prfAiDone = false;
 var _sectorAvg = null;
 var _urlParams = new URLSearchParams(window.location.search);
 var _fxRates = { TRY: 44.6, EUR: 0.920, GBP: 0.790, JPY: 150.0, KRW: 1350.0, RUB: 89.0, NOK: 10.7, CAD: 1.37, TWD: 32.0, BRL: 5.70, HKD: 7.78, CNY: 7.25, SAR: 3.75, CHF: 0.895, AUD: 1.58, ZAR: 18.5 }; // fallback, sayfa yüklenince /api/rates ile güncellenir
@@ -1326,7 +1325,6 @@ function showProfil(sym, ex) {
       _buildFinancials(_prfData);
     }, 0);
   });
-  _prfAiDone = false;
   // RAF: browser layout tamamlandıktan sonra chart çiz
   requestAnimationFrame(function() {
     setTimeout(function() { loadTVWidget(sym, ex); }, 50);
@@ -1524,7 +1522,6 @@ function prfTab(id, el) {
   if(el) el.classList.add('on');
   var panel = document.getElementById('prf-panel-'+id);
   if(panel) panel.classList.add('on');
-  if(id==='ai' && !_prfAiDone) _startPrfAI();
   if(id==='fairvalue') _startFairValue();
 }
 
@@ -1719,46 +1716,6 @@ function _renderFV(el, price, cur, d, v) {
   el.innerHTML = html.join('');
 }
 
-function _startPrfAI() {
-  _prfAiDone = true;
-  var d = _prfData, sym = _prfSym;
-  var loading = document.getElementById('prf-ai-loading');
-  var content = document.getElementById('prf-ai-content');
-  var textEl  = document.getElementById('prf-ai-text');
-  if(!d) {
-    if(loading) loading.style.display='none';
-    if(content) content.style.display='block';
-    if(textEl) textEl.innerHTML='Screener verisi bulunamadı. Önce tarama yapın.';
-    return;
-  }
-  setTimeout(function(){
-    if(loading) loading.style.display='none';
-    if(content) content.style.display='block';
-    document.getElementById('prf-ai-title').textContent = sym+' — DeepFin AI';
-    var pe=d.pe_ratio, roe=(d.roe||0)*100, nm=(d.net_margin||0)*100, fs=d.piotroski_f_score, peg=d.peg_ratio, de=d.debt_to_equity;
-    var pos=[], neg=[];
-    if(pe&&pe<15&&pe>0) pos.push('F/K ('+pe.toFixed(1)+'x) değerli görünüyor');
-    if(roe>15) pos.push('ROE %'+roe.toFixed(1)+' güçlü özsermaye getirisi');
-    if(nm>10) pos.push('Net marj %'+nm.toFixed(1)+' sağlıklı');
-    if(fs>=7) pos.push('F-Score '+fs+'/9 — finansal sağlık güçlü');
-    if(peg&&peg<1&&peg>0) pos.push('PEG '+peg.toFixed(2)+' — büyümeye göre ucuz');
-    if(pe&&pe>30) neg.push('F/K ('+pe.toFixed(1)+'x) yüksek, primli');
-    if(roe<8) neg.push('ROE %'+roe.toFixed(1)+' — özsermaye verimliliği düşük');
-    if(fs&&fs<4) neg.push('F-Score '+fs+'/9 — finansal tablo zayıf');
-    if(de&&de>2) neg.push('Borç/Öz '+de.toFixed(2)+' — yüksek borç');
-    textEl.innerHTML =
-      (pos.length?'<div style="margin-bottom:10px"><span style="color:var(--green);font-weight:700">💚 Güçlü Yönler:</span><br>'+pos.map(function(p){return '• '+p;}).join('<br>')+'</div>':'')+
-      (neg.length?'<div><span style="color:var(--red);font-weight:700">🔴 Dikkat:</span><br>'+neg.map(function(n){return '• '+n;}).join('<br>')+'</div>':'')+
-      (!pos.length&&!neg.length?'Veri yetersiz — tarama yapıp tekrar deneyin.':'')+
-      '<br><div style="margin-top:8px;color:var(--muted2);font-size:10px">🔄 Claude API entegrasyonu yakında</div>';
-  }, 800);
-}
-
-function askPrfAI() {
-  var ans = document.getElementById('prf-ai-answer');
-  ans.style.display='block';
-  ans.innerHTML='<span style="color:var(--muted)">⏳ Claude API entegrasyonu yakında aktif olacak.</span>';
-}
 
 // ── Twelve Data: fiyat + şirket bilgisi ──
 async function loadYahooData(sym, ex) {
