@@ -1,4 +1,4 @@
-// DeepFin — Profil Sayfası
+// DeepFin — Profil Sayfası v6
 (function() {
 'use strict';
 
@@ -8,7 +8,217 @@ var _activeListId = null;
 var _authMode     = 'login';
 var _acEl         = null;
 var _acTimer      = null;
-var _acActive     = null; // { input, onSelect }
+var _acActive     = null;
+
+// ── Investor types ────────────────────────────
+var INV_TYPES = {
+  growth: {name:'Büyüme Avcısı',      color:'#f59e0b', desc:'Yüksek büyüme potansiyeli olan şirketleri hedefler.',      preset:'growth'},
+  div:    {name:'Temettü Koleksiyoneri',color:'#10b981',desc:'Düzenli ve güvenilir temettü veren şirketleri tercih eder.',preset:'dividend'},
+  value:  {name:'Değer Dedektifi',     color:'#6366f1', desc:'Piyasanın altında değerlenen şirketleri arar.',             preset:'value'},
+  mom:    {name:'Momentum Sörfçüsü',   color:'#f97316', desc:'Yükselen trendleri yakalar ve momentum hisselerine odaklanır.',preset:'mom'},
+  def:    {name:'Savunma Kalesi',      color:'#14b8a6', desc:'Düşük riskli, istikrarlı ve güçlü şirketleri tercih eder.',  preset:'def'},
+  small:  {name:'Küçük Değer Keşifçisi',color:'#8b5cf6',desc:'Henüz keşfedilmemiş küçük şirketleri hedefler.',           preset:'small'},
+  spec:   {name:'Spekülatif Akıncı',   color:'#ef4444', desc:'Yüksek riskli, yüksek ödüllü fırsatları agresif takip eder.',preset:'spec'},
+  tech:   {name:'Teknoloji Vizyoneri', color:'#0ea5e9', desc:'İnovasyon ve teknoloji odaklı şirketlere odaklanır.',        preset:'tech'},
+  bal:    {name:'Çevik Dengeleyici',   color:'#64748b', desc:'Dengeli ve çeşitlendirilmiş portföy stratejisi izler.',      preset:'bal'},
+};
+
+// ── Rank tiers ────────────────────────────────
+var RANKS = [
+  {tier:1, name:'Çaylak Asker',      color:'#6b7280'},
+  {tier:2, name:'Nefer',             color:'#78716c'},
+  {tier:3, name:'Onbaşı',            color:'#0ea5e9'},
+  {tier:4, name:'Çavuş',             color:'#22c55e'},
+  {tier:5, name:'Teğmen',            color:'#f59e0b'},
+  {tier:6, name:'Yüzbaşı',           color:'#a855f7'},
+  {tier:7, name:'Binbaşı',           color:'#f97316'},
+  {tier:8, name:'Albay',             color:'#ef4444'},
+  {tier:9, name:'General',           color:'#eab308'},
+  {tier:10,name:'Spartan Efsanesi',  color:'#fbbf24'},
+];
+
+function getLevel(points) { return Math.min(50, Math.floor((points||0) / 1000) + 1); }
+function getTier(level)   { return Math.min(10, Math.ceil(level / 5)); }
+function getRank(level)   { return RANKS[getTier(level) - 1]; }
+
+function getWarriorSVG(tier, color) {
+  var roman = ['I','II','III','IV','V','VI','VII','VIII','IX','X'][tier-1] || 'I';
+  var hasPl  = tier >= 3;  // plume
+  var hasStar = tier >= 6; // side stars
+  var hasDStar= tier >= 8; // outer stars
+  var hasCrown= tier === 10;
+  var c = color;
+  return '<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">' +
+    '<circle cx="40" cy="40" r="39" fill="#0f172a"/>' +
+    '<circle cx="40" cy="40" r="37" fill="none" stroke="' + c + '" stroke-width="2" opacity="0.5"/>' +
+    // plume
+    (hasPl ? '<rect x="38" y="7" width="4" height="12" fill="' + c + '" rx="2" opacity="0.9"/>' : '') +
+    // crown
+    (hasCrown ? '<path d="M29 18 L34 13 L40 16 L46 13 L51 18" fill="none" stroke="' + c + '" stroke-width="2.5" stroke-linejoin="round"/>' : '') +
+    // helmet dome
+    '<path d="M40 18 C27 18 18 27 18 38 C18 44 21 49 24 53 L24 57 L56 57 L56 53 C59 49 62 44 62 38 C62 27 53 18 40 18 Z" fill="' + c + '" opacity="0.9"/>' +
+    // cheek guards
+    '<rect x="18" y="42" width="7" height="12" rx="2" fill="' + c + '" opacity="0.7"/>' +
+    '<rect x="55" y="42" width="7" height="12" rx="2" fill="' + c + '" opacity="0.7"/>' +
+    // face opening
+    '<rect x="26" y="32" width="28" height="22" rx="3" fill="#0f172a"/>' +
+    // eye slits
+    '<rect x="27" y="36" width="10" height="3.5" rx="1.75" fill="' + c + '" opacity="0.85"/>' +
+    '<rect x="43" y="36" width="10" height="3.5" rx="1.75" fill="' + c + '" opacity="0.85"/>' +
+    // nose guard
+    '<rect x="38.5" y="39" width="3" height="10" rx="1.5" fill="' + c + '" opacity="0.4"/>' +
+    // tier label
+    '<text x="40" y="74" font-family="monospace" font-size="8" fill="' + c + '" text-anchor="middle" font-weight="bold" opacity="0.9">' + roman + '</text>' +
+    // side decorations
+    (hasStar ? '<circle cx="22" cy="62" r="2.5" fill="' + c + '" opacity="0.7"/><circle cx="58" cy="62" r="2.5" fill="' + c + '" opacity="0.7"/>' : '') +
+    (hasDStar ? '<circle cx="15" cy="58" r="2" fill="' + c + '" opacity="0.5"/><circle cx="65" cy="58" r="2" fill="' + c + '" opacity="0.5"/>' : '') +
+    '</svg>';
+}
+
+// ── Quiz ──────────────────────────────────────
+var QUIZ = [
+  { q: 'Yatırım hedefin nedir?', opts: [
+    {t:'Sermayemi hızla büyütmek istiyorum', score:{growth:3, tech:2, spec:1}},
+    {t:'Düzenli temettü geliri almak istiyorum', score:{div:3, def:1}},
+    {t:'Düşük değerlenmiş şirketler bulmak istiyorum', score:{value:3, small:2}},
+    {t:'Piyasa trendlerini takip etmek istiyorum', score:{mom:3, spec:2}},
+    {t:'İstikrarlı ve dengeli büyüme istiyorum', score:{bal:3, def:2}},
+  ]},
+  { q: 'Risk toleransın ne kadar?', opts: [
+    {t:'Çok yüksek — büyük dalgalanmalar sorun değil', score:{spec:3, mom:2}},
+    {t:'Yüksek — kısa vadeli kayıpları kaldırabilirim', score:{growth:3, tech:2, small:1}},
+    {t:'Orta — makul dalgalanmalara katlanırım', score:{bal:3, value:1, small:2}},
+    {t:'Düşük — istikrar tercih ederim', score:{div:3, def:3, value:1}},
+  ]},
+  { q: 'Tercih ettiğin yatırım ufku nedir?', opts: [
+    {t:'Kısa vadeli (1 yıldan az)', score:{spec:3, mom:3}},
+    {t:'Orta vadeli (1–3 yıl)', score:{growth:2, tech:2, small:2, mom:1}},
+    {t:'Uzun vadeli (3–7 yıl)', score:{value:3, bal:2, growth:1}},
+    {t:'Çok uzun vadeli (7+ yıl)', score:{div:3, def:3, value:2}},
+  ]},
+  { q: 'Hangi tür şirketlere yatırım yapmayı seversin?', opts: [
+    {t:'Yüksek büyüme potansiyeli olan teknoloji şirketleri', score:{tech:3, growth:2}},
+    {t:'Köklü, kârlı ve temettü veren şirketler', score:{div:3, def:2, value:1}},
+    {t:'Küçük, henüz keşfedilmemiş şirketler', score:{small:3, spec:2, value:1}},
+    {t:'Güçlü momentum gösteren trend hisseler', score:{mom:3, growth:1}},
+    {t:'Farklı sektörlerden dengeli sepet', score:{bal:3, def:1}},
+  ]},
+  { q: 'Piyasayı nasıl analiz edersin?', opts: [
+    {t:'Teknik analiz — grafik, destek-direnç, hacim', score:{mom:3, spec:3}},
+    {t:'Temel analiz — F/K, PD/DD, karlılık oranları', score:{value:3, div:2, def:1}},
+    {t:'Makroekonomik veriler — faiz, döviz, enflasyon', score:{bal:3, def:2}},
+    {t:'Büyüme metrikleri — gelir artışı, pazar payı', score:{growth:3, tech:3, small:1}},
+  ]},
+];
+
+var _tempReg  = null; // {email, username, password}
+var _quizAns  = [];   // answer index per question
+var _quizQ    = 0;    // current question index (0-4)
+
+function calcInvestorType(answers) {
+  var scores = {};
+  Object.keys(INV_TYPES).forEach(function(k){ scores[k] = 0; });
+  answers.forEach(function(aIdx, qIdx) {
+    var sc = QUIZ[qIdx].opts[aIdx].score;
+    Object.keys(sc).forEach(function(k){ scores[k] = (scores[k]||0) + sc[k]; });
+  });
+  var best = 'bal', bestVal = -1;
+  Object.keys(scores).forEach(function(k){ if (scores[k] > bestVal){ bestVal = scores[k]; best = k; }});
+  return best;
+}
+
+function showQuiz() {
+  _quizAns = [];
+  _quizQ   = 0;
+  renderQuizQ();
+  document.getElementById('quiz-overlay').classList.add('open');
+}
+
+function renderQuizQ() {
+  var q    = QUIZ[_quizQ];
+  var pct  = Math.round((_quizQ / QUIZ.length) * 100);
+  document.getElementById('quiz-step').textContent    = (_quizQ + 1) + ' / ' + QUIZ.length;
+  document.getElementById('quiz-prog').style.width    = (pct + 20) + '%';
+  document.getElementById('quiz-q-text').textContent  = q.q;
+  document.getElementById('quiz-back').disabled       = _quizQ === 0;
+  document.getElementById('quiz-next').disabled       = _quizAns[_quizQ] == null;
+  document.getElementById('quiz-next').textContent    = _quizQ === QUIZ.length - 1 ? 'Bitir ✓' : 'Sonraki →';
+  document.getElementById('quiz-header').style.display = '';
+  document.getElementById('quiz-footer').style.display = '';
+
+  var optsEl = document.getElementById('quiz-opts');
+  optsEl.innerHTML = '';
+  q.opts.forEach(function(opt, i) {
+    var btn = document.createElement('button');
+    btn.className = 'quiz-opt' + (_quizAns[_quizQ] === i ? ' selected' : '');
+    btn.textContent = opt.t;
+    btn.onclick = function() {
+      _quizAns[_quizQ] = i;
+      optsEl.querySelectorAll('.quiz-opt').forEach(function(b,j){ b.classList.toggle('selected', j===i); });
+      document.getElementById('quiz-next').disabled = false;
+    };
+    optsEl.appendChild(btn);
+  });
+}
+
+window.quizNext = function() {
+  if (_quizAns[_quizQ] == null) return;
+  if (_quizQ < QUIZ.length - 1) {
+    _quizQ++;
+    renderQuizQ();
+  } else {
+    showQuizResult();
+  }
+};
+
+window.quizBack = function() {
+  if (_quizQ > 0) { _quizQ--; renderQuizQ(); }
+};
+
+function showQuizResult() {
+  var type  = calcInvestorType(_quizAns);
+  var inv   = INV_TYPES[type];
+  document.getElementById('quiz-header').style.display = 'none';
+  document.getElementById('quiz-footer').style.display = 'none';
+  var body  = document.getElementById('quiz-body');
+  body.innerHTML =
+    '<div class="quiz-result">' +
+    '<div class="quiz-result-icon">⚔️</div>' +
+    '<div class="quiz-result-title">Yatırımcı Tipin:</div>' +
+    '<div class="quiz-result-badge" style="border-color:' + inv.color + ';color:' + inv.color + '">' +
+      '<span style="width:10px;height:10px;border-radius:50%;background:' + inv.color + ';display:inline-block;"></span>' + inv.name +
+    '</div>' +
+    '<div class="quiz-result-desc">' + inv.desc + '</div>' +
+    '<button class="quiz-finish-btn" id="quiz-finish-btn" onclick="finishQuiz(\'' + type + '\')">Hesabımı Oluştur →</button>' +
+    '</div>';
+}
+
+window.finishQuiz = async function(type) {
+  var btn = document.getElementById('quiz-finish-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Kaydediliyor...'; }
+  var errEl = document.getElementById('pf-auth-err');
+  try {
+    var body = { email: _tempReg.email, password: _tempReg.password, username: _tempReg.username, investorType: type };
+    var r = await fetch('/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    var d = await r.json();
+    if (d.user) {
+      _user = d.user;
+      document.getElementById('quiz-overlay').classList.remove('open');
+      document.getElementById('pf-login').style.display = 'none';
+      showUser();
+      await Promise.all([loadWatchlists(), loadPortfolio()]);
+      toast('Hoş geldin ' + (d.user.username || d.user.name) + '!');
+    } else {
+      document.getElementById('quiz-overlay').classList.remove('open');
+      if (errEl) errEl.textContent = d.error || 'Kayıt başarısız.';
+      if (btn) { btn.disabled = false; btn.textContent = 'Hesabımı Oluştur →'; }
+    }
+  } catch(e) {
+    document.getElementById('quiz-overlay').classList.remove('open');
+    if (errEl) errEl.textContent = 'Bağlantı hatası.';
+    if (btn) { btn.disabled = false; btn.textContent = 'Hesabımı Oluştur →'; }
+  }
+};
 
 // ── Başlat ───────────────────────────────────
 async function init() {
@@ -19,6 +229,17 @@ async function init() {
       _user = d.user;
       showUser();
       await Promise.all([loadWatchlists(), loadPortfolio()]);
+      // Daily checkin — fire and forget
+      fetch('/api/auth/daily-checkin', {method:'POST'})
+        .then(function(rr){ return rr.json(); })
+        .then(function(dd) {
+          if (dd.ok && !dd.alreadyChecked && dd.pointsAdded > 0) {
+            _user.points = dd.points;
+            _user.loginStreak = dd.streak;
+            renderIdentity();
+            toast('+100 XP — ' + dd.streak + ' günlük giriş serisi!');
+          }
+        }).catch(function(){});
     } else {
       showLogin();
     }
@@ -30,21 +251,77 @@ function showLogin() {
   document.getElementById('pf-login').style.display   = 'block';
 }
 
+function renderIdentity() {
+  if (!_user) return;
+  var pts    = _user.points || 0;
+  var level  = getLevel(pts);
+  var tier   = getTier(level);
+  var rank   = getRank(level);
+  var xpInLevel = pts - (level - 1) * 1000;
+  var xpPct  = Math.min(100, Math.round(xpInLevel / 10));
+
+  // Avatar SVG
+  var wrap = document.getElementById('pf-warrior-svg');
+  if (wrap) wrap.innerHTML = getWarriorSVG(tier, rank.color);
+
+  // Rank label
+  var rl = document.getElementById('pf-rank-label');
+  if (rl) { rl.textContent = rank.name; rl.style.color = rank.color; }
+
+  // Name / username
+  var dn = document.getElementById('pf-display-name');
+  if (dn) dn.textContent = _user.name || _user.username || _user.email;
+  var un = document.getElementById('pf-username-text');
+  if (un) un.textContent = _user.username || _user.email.split('@')[0];
+  var em = document.getElementById('pf-email-text');
+  if (em) em.textContent = _user.email;
+
+  // Investor badge
+  var bw = document.getElementById('pf-inv-badge-wrap');
+  if (bw) {
+    if (_user.investorType && INV_TYPES[_user.investorType]) {
+      var inv = INV_TYPES[_user.investorType];
+      bw.innerHTML = '<div class="pf-inv-badge" style="border-color:' + inv.color + ';color:' + inv.color + '">' +
+        '<span class="pf-inv-badge-icon" style="background:' + inv.color + '"></span>' + inv.name + '</div>';
+    } else {
+      bw.innerHTML = '<div class="pf-no-badge">Yatırımcı tipi belirlenmedi</div>';
+    }
+  }
+
+  // XP bar
+  var lvEl = document.getElementById('pf-level-num');
+  if (lvEl) { lvEl.textContent = 'Sv.' + level; lvEl.style.color = rank.color; }
+  var xpFill = document.getElementById('pf-xp-fill');
+  if (xpFill) { xpFill.style.width = xpPct + '%'; xpFill.style.background = rank.color; }
+  var xpLabel = document.getElementById('pf-xp-label');
+  if (xpLabel) xpLabel.textContent = xpInLevel + ' / 1000 XP';
+
+  // Meta
+  var pv = document.getElementById('pf-points-val');
+  if (pv) pv.textContent = pts.toLocaleString('tr-TR');
+  var sv = document.getElementById('pf-streak-val');
+  if (sv) sv.textContent = _user.loginStreak || 0;
+
+  // Tara button
+  var taraBtn = document.getElementById('pf-tara-btn');
+  if (taraBtn) taraBtn.disabled = !_user.investorType;
+
+  // Settings name input
+  var nameInp = document.getElementById('pf-name-input');
+  if (nameInp) nameInp.value = _user.name || '';
+}
+
 function showUser() {
   document.getElementById('pf-loading').style.display = 'none';
   document.getElementById('pf-user').style.display    = 'block';
-  document.getElementById('pf-name').textContent      = _user.name || _user.email;
-  document.getElementById('pf-email').textContent     = _user.email;
-  var nameInp = document.getElementById('pf-name-input');
-  if (nameInp) nameInp.value = _user.name || '';
-  var wrap = document.getElementById('pf-avatar-wrap');
-  if (_user.picture) {
-    wrap.innerHTML = '<img src="' + _user.picture + '" alt="avatar" onerror="this.style.display=\'none\'">';
-  } else {
-    var ini = document.getElementById('pf-initials');
-    if (ini) ini.textContent = (_user.name || _user.email || '?')[0].toUpperCase();
-  }
+  renderIdentity();
 }
+
+window.taraWithPreset = function() {
+  if (!_user || !_user.investorType) return;
+  var url = '/?from=screener&investor=' + encodeURIComponent(_user.investorType);
+  window.location.href = url;
+};
 
 // ── Watchlistler ──────────────────────────────
 async function loadWatchlists() {
@@ -70,11 +347,6 @@ function renderTabs() {
 window.switchList = function(id) {
   _activeListId = id; renderTabs(); renderListPanel();
 };
-
-function exOpts() {
-  return ['bist:BIST','nasdaq:NASDAQ','sp500:S&P 500','nyse:NYSE','dax:DAX','lse:LSE','nikkei:Nikkei']
-    .map(function(s) { var p = s.split(':'); return '<option value="' + p[0] + '">' + p[1] + '</option>'; }).join('');
-}
 
 function renderListPanel() {
   var list  = _lists.find(function(l) { return l.id === _activeListId; });
@@ -159,7 +431,7 @@ async function fetchWatchlistPrices(items) {
   });
 }
 
-// ── Autocomplete (portföy için) ───────────────
+// ── Autocomplete ──────────────────────────────
 function getACEl() {
   if (!_acEl) {
     _acEl = document.createElement('div');
@@ -205,9 +477,7 @@ window.pickAC = function(sym, ex) {
   }
   clearAC();
 };
-window.clearAC = function() {
-  var el = getACEl(); el.style.display = 'none'; _acActive = null;
-};
+window.clearAC = function() { var el = getACEl(); el.style.display = 'none'; _acActive = null; };
 window.delayHideAC = function() { setTimeout(clearAC, 180); };
 document.addEventListener('click', function(e) {
   if (_acEl && !_acEl.contains(e.target)) clearAC();
@@ -270,7 +540,7 @@ window.deleteList = async function(listId) {
   } catch(e) {}
 };
 
-// ── Modal (watchlist ve portföy için ortak) ────
+// ── Modal ────────────────────────────────────
 var _modalMode = 'watchlist';
 window.openModal = function(mode) {
   _modalMode = mode || 'watchlist';
@@ -288,9 +558,9 @@ window.createFromModal = async function() {
   await createList(name);
 };
 
-// ── Hisse Picker Modal ────────────────────────
+// ── Hisse Picker ──────────────────────────────
 var _spTimer = null;
-var _spMode  = 'watchlist'; // 'watchlist' | 'portfolio'
+var _spMode  = 'watchlist';
 
 window.openSymPicker = function(mode) {
   _spMode = mode || 'watchlist';
@@ -343,7 +613,6 @@ function renderSymResults(symbols, ex) {
 window.addFromPicker = async function(sym, ex) {
   closeSymPicker();
   if (_spMode === 'portfolio') {
-    // Portföy modunda: sadece alanları doldur, kullanıcı qty+cost girer
     document.getElementById('pf-pos-sym').value  = sym;
     document.getElementById('pf-pos-ex').value   = ex;
     var btn = document.getElementById('pf-pos-sym-btn');
@@ -353,11 +622,9 @@ window.addFromPicker = async function(sym, ex) {
     setTimeout(function() { var q = document.getElementById('pf-pos-qty'); if (q) q.focus(); }, 50);
     return;
   }
-  // Watchlist modu
   try {
     var r = await fetch('/api/watchlists/item', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ listId: _activeListId, symbol: sym, exchange: ex })
     });
     var d = await r.json();
@@ -380,8 +647,8 @@ async function createList(name) {
 }
 
 // ── Portföy ───────────────────────────────────
-var _portfolios   = [];
-var _activePfId   = null;
+var _portfolios = [];
+var _activePfId = null;
 
 async function loadPortfolio() {
   try {
@@ -566,8 +833,12 @@ window.saveName = async function() {
     var r = await fetch('/api/auth/update-profile', { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ name: name }) });
     var d = await r.json();
-    if (d.ok) { _user.name = d.name; document.getElementById('pf-name').textContent = d.name; toast('✓ İsim güncellendi'); }
-    else toast(d.error || 'Hata oluştu');
+    if (d.ok) {
+      _user.name = d.name;
+      var dn = document.getElementById('pf-display-name');
+      if (dn) dn.textContent = d.name;
+      toast('✓ İsim güncellendi');
+    } else toast(d.error || 'Hata oluştu');
   } catch(e) { toast('Hata oluştu'); }
   btn.disabled = false;
 };
@@ -600,11 +871,11 @@ window.changePassword = async function() {
 window.toggleAuthMode = function() {
   _authMode = _authMode === 'login' ? 'register' : 'login';
   var isReg = _authMode === 'register';
-  document.getElementById('pf-auth-title').textContent    = isReg ? 'Hesap Oluştur' : 'Profiline giriş yap';
-  document.getElementById('pf-auth-btn').textContent      = isReg ? 'Kayıt Ol' : 'Giriş Yap';
-  document.getElementById('pf-auth-name').style.display   = isReg ? 'block' : 'none';
-  document.getElementById('pf-switch-text').textContent   = isReg ? 'Zaten hesabın var mı?' : 'Hesabın yok mu?';
-  document.getElementById('pf-switch-btn').textContent    = isReg ? 'Giriş Yap' : 'Kayıt Ol';
+  document.getElementById('pf-auth-title').textContent      = isReg ? 'Hesap Oluştur' : 'Profiline giriş yap';
+  document.getElementById('pf-auth-btn').textContent        = isReg ? 'Devam Et →' : 'Giriş Yap';
+  document.getElementById('pf-auth-username').style.display = isReg ? 'block' : 'none';
+  document.getElementById('pf-switch-text').textContent     = isReg ? 'Zaten hesabın var mı?' : 'Hesabın yok mu?';
+  document.getElementById('pf-switch-btn').textContent      = isReg ? 'Giriş Yap' : 'Kayıt Ol';
   document.getElementById('pf-auth-password').setAttribute('autocomplete', isReg ? 'new-password' : 'current-password');
   document.getElementById('pf-auth-err').textContent = '';
 };
@@ -613,31 +884,55 @@ window.submitAuth = async function(e) {
   if (e) e.preventDefault();
   var email    = (document.getElementById('pf-auth-email').value    || '').trim();
   var password = (document.getElementById('pf-auth-password').value || '');
-  var name     = (document.getElementById('pf-auth-name').value     || '').trim();
+  var username = (document.getElementById('pf-auth-username').value || '').trim();
   var errEl    = document.getElementById('pf-auth-err');
   errEl.textContent = '';
+
   if (!email || !password) { errEl.textContent = 'E-posta ve şifre gerekli.'; return; }
-  if (_authMode === 'register' && password.length < 8) { errEl.textContent = 'Şifre en az 8 karakter olmalı.'; return; }
+
+  if (_authMode === 'register') {
+    if (password.length < 8) { errEl.textContent = 'Şifre en az 8 karakter olmalı.'; return; }
+    if (!username || username.length < 3 || username.length > 20) {
+      errEl.textContent = 'Kullanıcı adı 3-20 karakter olmalı.'; return;
+    }
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+      errEl.textContent = 'Kullanıcı adı sadece harf, rakam ve alt çizgi içerebilir.'; return;
+    }
+    _tempReg = { email: email, password: password, username: username };
+    showQuiz();
+    return;
+  }
+
   var btn = document.getElementById('pf-auth-btn');
-  btn.disabled = true; btn.textContent = _authMode === 'login' ? 'Giriş yapılıyor...' : 'Kaydediliyor...';
-  var body = { email: email, password: password };
-  if (_authMode === 'register' && name) body.name = name;
+  btn.disabled = true; btn.textContent = 'Giriş yapılıyor...';
   try {
-    var r = await fetch(_authMode === 'login' ? '/api/auth/login' : '/api/auth/register', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    var r = await fetch('/api/auth/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, password: password }) });
     var d = await r.json();
     if (d.user) {
       _user = d.user;
       document.getElementById('pf-login').style.display = 'none';
       showUser();
       await Promise.all([loadWatchlists(), loadPortfolio()]);
+      // Daily checkin after login
+      fetch('/api/auth/daily-checkin', {method:'POST'})
+        .then(function(rr){ return rr.json(); })
+        .then(function(dd) {
+          if (dd.ok && !dd.alreadyChecked && dd.pointsAdded > 0) {
+            _user.points = dd.points;
+            _user.loginStreak = dd.streak;
+            renderIdentity();
+            toast('+100 XP — ' + dd.streak + ' günlük giriş serisi!');
+          }
+        }).catch(function(){});
     } else {
       errEl.textContent = d.error || 'Hata oluştu.';
-      btn.disabled = false; btn.textContent = _authMode === 'login' ? 'Giriş Yap' : 'Kayıt Ol';
+      btn.disabled = false; btn.textContent = 'Giriş Yap';
     }
   } catch(err) {
     errEl.textContent = 'Bağlantı hatası.';
-    btn.disabled = false; btn.textContent = _authMode === 'login' ? 'Giriş Yap' : 'Kayıt Ol';
+    btn.disabled = false; btn.textContent = 'Giriş Yap';
   }
 };
 

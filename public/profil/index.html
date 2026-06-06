@@ -32,8 +32,6 @@ body{overflow-y:auto;}
 .pf-login-icon{font-size:48px;margin-bottom:16px;}
 .pf-login-title{font-size:20px;font-weight:700;margin-bottom:8px;}
 .pf-login-sub{font-size:13px;color:var(--muted2);margin-bottom:28px;line-height:1.6;}
-.pf-google-btn{display:inline-flex;align-items:center;gap:10px;background:var(--s1);border:1px solid var(--border2);color:var(--text);padding:11px 22px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;transition:all .15s;box-shadow:0 1px 3px rgba(0,0,0,.06);}
-.pf-google-btn:hover{border-color:var(--accent);box-shadow:0 2px 8px rgba(14,165,233,.15);}
 .pf-auth-form{display:flex;flex-direction:column;gap:10px;max-width:320px;margin:0 auto;text-align:left;}
 .pf-auth-form input{background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:11px 14px;font-size:13px;color:var(--text);outline:none;font-family:inherit;width:100%;}
 .pf-auth-form input:focus{border-color:var(--accent);}
@@ -44,14 +42,41 @@ body{overflow-y:auto;}
 .pf-auth-switch{margin-top:14px;font-size:12px;color:var(--muted2);}
 .pf-auth-switch button{background:none;border:none;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;padding:0;margin-left:4px;}
 
-/* User section */
+/* ── IDENTITY CARD ── */
 #pf-user{display:none;}
-.pf-user-card{display:flex;align-items:center;gap:16px;background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:28px;}
-.pf-avatar{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid var(--border2);background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:var(--accent);flex-shrink:0;overflow:hidden;}
-.pf-avatar img{width:100%;height:100%;object-fit:cover;}
-.pf-user-name{font-size:15px;font-weight:700;margin-bottom:2px;}
-.pf-user-email{font-size:12px;color:var(--muted2);}
-.pf-logout-btn{margin-left:auto;font-size:11px;font-weight:500;color:var(--muted2);background:transparent;border:1px solid var(--border);padding:5px 12px;border-radius:6px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.pf-identity{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px;display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;}
+.pf-avatar-col{display:flex;flex-direction:column;align-items:center;gap:8px;flex-shrink:0;}
+.pf-warrior-wrap{position:relative;width:76px;height:76px;}
+.pf-warrior-wrap svg{width:76px;height:76px;display:block;}
+.pf-rank-label{font-size:10px;font-weight:700;text-align:center;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;}
+.pf-identity-body{flex:1;min-width:180px;}
+.pf-identity-name{font-size:16px;font-weight:800;margin-bottom:2px;display:flex;align-items:center;gap:8px;}
+.pf-identity-username{font-size:12px;color:var(--muted2);margin-bottom:10px;}
+.pf-identity-username span{color:var(--accent);font-weight:600;}
+
+/* Investor badge */
+.pf-inv-badge{display:inline-flex;align-items:center;gap:7px;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid;margin-bottom:12px;cursor:default;}
+.pf-inv-badge-icon{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.pf-no-badge{font-size:11px;color:var(--muted2);margin-bottom:12px;}
+
+/* XP bar */
+.pf-xp-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.pf-level-num{font-size:12px;font-weight:800;min-width:28px;}
+.pf-xp-track{flex:1;height:6px;background:var(--s3);border-radius:3px;overflow:hidden;}
+.pf-xp-fill{height:100%;border-radius:3px;transition:width .4s ease;}
+.pf-xp-label{font-size:10px;color:var(--muted2);min-width:60px;text-align:right;}
+
+/* Streak + meta */
+.pf-meta-row{display:flex;gap:14px;flex-wrap:wrap;}
+.pf-meta-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted2);}
+.pf-meta-item b{color:var(--text);font-weight:700;}
+
+/* Action buttons */
+.pf-action-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+.pf-tara-btn{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;transition:opacity .15s;}
+.pf-tara-btn:hover{opacity:.88;}
+.pf-tara-btn:disabled{opacity:.4;cursor:not-allowed;}
+.pf-logout-btn{font-size:11px;font-weight:500;color:var(--muted2);background:transparent;border:1px solid var(--border);padding:5px 12px;border-radius:6px;cursor:pointer;transition:all .15s;white-space:nowrap;}
 .pf-logout-btn:hover{border-color:var(--red);color:var(--red);}
 
 /* Section */
@@ -103,22 +128,6 @@ body{overflow-y:auto;}
 .pf-sym-pick-btn:hover{border-color:var(--accent);color:var(--accent);}
 .pf-sym-pick-btn.selected{border-color:var(--accent);color:var(--accent);background:rgba(14,165,233,.08);}
 
-/* Portfolio placeholder */
-.pf-coming-soon{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:28px;text-align:center;}
-.pf-coming-badge{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:600;color:var(--accent);background:rgba(14,165,233,.08);border:1px solid rgba(14,165,233,.2);padding:3px 10px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:12px;}
-.pf-coming-title{font-size:15px;font-weight:700;margin-bottom:6px;}
-.pf-coming-desc{font-size:12px;color:var(--muted2);line-height:1.6;}
-
-/* New list modal */
-.pf-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;display:flex;align-items:center;justify-content:center;display:none;}
-.pf-modal{background:var(--s1);border:1px solid var(--border2);border-radius:10px;padding:24px;width:320px;max-width:90vw;}
-.pf-modal-title{font-size:14px;font-weight:700;margin-bottom:16px;}
-.pf-modal input{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:13px;color:var(--text);outline:none;font-family:inherit;margin-bottom:12px;}
-.pf-modal input:focus{border-color:var(--accent);}
-.pf-modal-btns{display:flex;gap:8px;justify-content:flex-end;}
-.pf-modal-cancel{background:transparent;border:1px solid var(--border);border-radius:6px;padding:7px 14px;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;}
-.pf-modal-ok{background:var(--accent);border:none;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;}
-
 /* Price cells */
 .pf-price-cell{font-size:12px;font-weight:600;color:var(--text);}
 .pf-chg-cell{font-size:11px;font-weight:600;min-width:52px;}
@@ -149,6 +158,16 @@ body{overflow-y:auto;}
 .pf-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(40px);background:var(--text);color:var(--bg);padding:8px 18px;border-radius:6px;font-size:12px;font-weight:500;z-index:200;opacity:0;transition:all .25s;pointer-events:none;}
 .pf-toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
 
+/* New list modal */
+.pf-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;display:flex;align-items:center;justify-content:center;display:none;}
+.pf-modal{background:var(--s1);border:1px solid var(--border2);border-radius:10px;padding:24px;width:320px;max-width:90vw;}
+.pf-modal-title{font-size:14px;font-weight:700;margin-bottom:16px;}
+.pf-modal input{width:100%;background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:13px;color:var(--text);outline:none;font-family:inherit;margin-bottom:12px;}
+.pf-modal input:focus{border-color:var(--accent);}
+.pf-modal-btns{display:flex;gap:8px;justify-content:flex-end;}
+.pf-modal-cancel{background:transparent;border:1px solid var(--border);border-radius:6px;padding:7px 14px;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;}
+.pf-modal-ok{background:var(--accent);border:none;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;}
+
 /* Hisse Picker Modal */
 .pf-sym-picker-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-start;justify-content:center;padding-top:60px;}
 .pf-sym-picker{background:var(--s1);border:1px solid var(--border2);border-radius:12px;width:480px;max-width:95vw;max-height:75vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.4);}
@@ -169,6 +188,38 @@ body{overflow-y:auto;}
 .pf-sp-add{font-size:11px;font-weight:600;color:var(--accent);opacity:0;transition:opacity .15s;white-space:nowrap;}
 .pf-sp-loading{animation:pulse 1s ease-in-out infinite;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── QUIZ OVERLAY ── */
+.quiz-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;}
+.quiz-overlay.open{display:flex;}
+.quiz-box{background:var(--s1);border:1px solid var(--border2);border-radius:14px;width:520px;max-width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 16px 60px rgba(0,0,0,.5);}
+.quiz-header{padding:22px 24px 0;border-bottom:1px solid var(--border);}
+.quiz-header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.quiz-title{font-size:15px;font-weight:800;}
+.quiz-step{font-size:11px;color:var(--muted2);font-weight:600;}
+.quiz-prog-track{height:4px;background:var(--s3);border-radius:2px;overflow:hidden;margin-bottom:16px;}
+.quiz-prog-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s ease;}
+.quiz-body{padding:22px 24px;}
+.quiz-q{font-size:14px;font-weight:700;margin-bottom:18px;line-height:1.5;}
+.quiz-opts{display:flex;flex-direction:column;gap:8px;}
+.quiz-opt{background:var(--s2);border:1.5px solid var(--border);border-radius:9px;padding:12px 16px;font-size:13px;cursor:pointer;transition:all .15s;text-align:left;color:var(--text);line-height:1.4;}
+.quiz-opt:hover{border-color:var(--accent);background:rgba(14,165,233,.06);}
+.quiz-opt.selected{border-color:var(--accent);background:rgba(14,165,233,.1);font-weight:600;}
+.quiz-footer{padding:16px 24px 20px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);}
+.quiz-back-btn{background:transparent;border:1px solid var(--border);border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;color:var(--muted2);cursor:pointer;transition:all .15s;}
+.quiz-back-btn:hover{border-color:var(--text);color:var(--text);}
+.quiz-back-btn:disabled{opacity:.3;cursor:not-allowed;}
+.quiz-next-btn{background:var(--accent);border:none;border-radius:7px;padding:8px 20px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;transition:opacity .15s;}
+.quiz-next-btn:hover{opacity:.88;}
+.quiz-next-btn:disabled{opacity:.4;cursor:not-allowed;}
+.quiz-result{padding:24px;text-align:center;}
+.quiz-result-icon{font-size:52px;margin-bottom:12px;}
+.quiz-result-title{font-size:18px;font-weight:800;margin-bottom:6px;}
+.quiz-result-desc{font-size:12px;color:var(--muted2);line-height:1.6;margin-bottom:20px;}
+.quiz-result-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 18px;border-radius:24px;font-size:13px;font-weight:700;border:2px solid;margin-bottom:20px;}
+.quiz-finish-btn{background:var(--accent);border:none;border-radius:8px;padding:12px 28px;font-size:14px;font-weight:700;color:#fff;cursor:pointer;width:100%;transition:opacity .15s;}
+.quiz-finish-btn:hover{opacity:.88;}
+.quiz-finish-btn:disabled{opacity:.5;cursor:not-allowed;}
 </style>
 </head>
 <body>
@@ -186,8 +237,8 @@ body{overflow-y:auto;}
     <div class="pf-login-sub">Takip listelerini kaydet, cihazlar arası senkronize et.</div>
     <form class="pf-auth-form" onsubmit="submitAuth(event)">
       <input type="email"    id="pf-auth-email"    placeholder="E-posta adresi" autocomplete="email"            required maxlength="120">
+      <input type="text"     id="pf-auth-username" placeholder="Kullanıcı adı (3-20 karakter)" autocomplete="username" maxlength="20" style="display:none">
       <input type="password" id="pf-auth-password" placeholder="Şifre (en az 8 karakter)" autocomplete="current-password" required maxlength="100">
-      <input type="text"     id="pf-auth-name"     placeholder="Adınız (isteğe bağlı)"    autocomplete="name"   maxlength="60" style="display:none">
       <button type="submit" class="pf-auth-submit" id="pf-auth-btn">Giriş Yap</button>
       <div class="pf-auth-err" id="pf-auth-err"></div>
     </form>
@@ -198,15 +249,32 @@ body{overflow-y:auto;}
   </div>
 
   <div id="pf-user">
-    <div class="pf-user-card">
-      <div class="pf-avatar" id="pf-avatar-wrap">
-        <span id="pf-initials">?</span>
+    <!-- Identity card -->
+    <div class="pf-identity" id="pf-identity">
+      <div class="pf-avatar-col">
+        <div class="pf-warrior-wrap" id="pf-warrior-svg"></div>
+        <div class="pf-rank-label" id="pf-rank-label">—</div>
       </div>
-      <div>
-        <div class="pf-user-name" id="pf-name">—</div>
-        <div class="pf-user-email" id="pf-email">—</div>
+      <div class="pf-identity-body">
+        <div class="pf-identity-name">
+          <span id="pf-display-name">—</span>
+        </div>
+        <div class="pf-identity-username">@<span id="pf-username-text">—</span> · <span id="pf-email-text">—</span></div>
+        <div id="pf-inv-badge-wrap"></div>
+        <div class="pf-xp-row">
+          <span class="pf-level-num" id="pf-level-num">Sv.1</span>
+          <div class="pf-xp-track"><div class="pf-xp-fill" id="pf-xp-fill" style="width:0%"></div></div>
+          <span class="pf-xp-label" id="pf-xp-label">0 / 1000 XP</span>
+        </div>
+        <div class="pf-meta-row" id="pf-meta-row">
+          <div class="pf-meta-item"><b id="pf-points-val">0</b>&nbsp;XP</div>
+          <div class="pf-meta-item">Seri:&nbsp;<b id="pf-streak-val">0</b>&nbsp;gün</div>
+        </div>
+        <div class="pf-action-row">
+          <button class="pf-tara-btn" id="pf-tara-btn" onclick="taraWithPreset()" disabled>⚔ Yatırımcı Stratejimle Tara</button>
+          <a href="/api/auth/logout" class="pf-logout-btn" onclick="return confirm('Çıkış yapılsın mı?')">Çıkış Yap</a>
+        </div>
       </div>
-      <a href="/api/auth/logout" class="pf-logout-btn" onclick="return confirm('Çıkış yapılsın mı?')">Çıkış Yap</a>
     </div>
 
     <!-- Watchlists -->
@@ -295,8 +363,29 @@ body{overflow-y:auto;}
   </div>
 </div>
 
+<!-- Quiz overlay -->
+<div class="quiz-overlay" id="quiz-overlay">
+  <div class="quiz-box" id="quiz-box">
+    <div class="quiz-header" id="quiz-header">
+      <div class="quiz-header-top">
+        <div class="quiz-title">🧬 Yatırımcı Kişiliği Testi</div>
+        <div class="quiz-step" id="quiz-step">1 / 5</div>
+      </div>
+      <div class="quiz-prog-track"><div class="quiz-prog-fill" id="quiz-prog" style="width:20%"></div></div>
+    </div>
+    <div class="quiz-body" id="quiz-body">
+      <div class="quiz-q" id="quiz-q-text"></div>
+      <div class="quiz-opts" id="quiz-opts"></div>
+    </div>
+    <div class="quiz-footer" id="quiz-footer">
+      <button class="quiz-back-btn" id="quiz-back" onclick="quizBack()" disabled>← Geri</button>
+      <button class="quiz-next-btn" id="quiz-next" onclick="quizNext()" disabled>Sonraki →</button>
+    </div>
+  </div>
+</div>
+
 <div class="pf-toast" id="pf-toast"></div>
 
-<script src="/profil/profil.js?v=1"></script>
+<script src="/profil/profil.js?v=6"></script>
 </body>
 </html>

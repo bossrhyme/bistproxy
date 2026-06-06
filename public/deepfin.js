@@ -3833,11 +3833,34 @@ document.addEventListener('DOMContentLoaded', function(){
   var _p    = _sp.get('from');
   var _path = window.location.pathname;
   var _hasWl = !!_sp.get('wl');
+  var _investor = _sp.get('investor');
   if (_p === 'profile' || _p === 'screener' || _p === 'analiz' || _path === '/screener' || _hasWl) {
     showScreener();
     if (allData.length === 0 && !_hasWl) runScan();
   } else {
     showHomepage();
+  }
+  if (_investor) {
+    var _IMAP = {
+      growth: function(){ var c=document.querySelector('[data-preset="growth"]');     if(c&&!c.classList.contains('on'))c.click(); },
+      div:    function(){ var c=document.querySelector('[data-preset="dividend"]');   if(c&&!c.classList.contains('on'))c.click(); },
+      value:  function(){ var c=document.querySelector('[data-preset="value"]');      if(c&&!c.classList.contains('on'))c.click(); },
+      mom:    function(){ var c=document.querySelector('[data-tech="momentum3m"]');   if(c&&!c.classList.contains('on'))c.click(); },
+      def:    function(){ var c=document.querySelector('[data-preset="quality"]');    if(c&&!c.classList.contains('on'))c.click(); },
+      small:  function(){ var c=document.querySelector('[data-preset="lowdebt"]');    if(c&&!c.classList.contains('on'))c.click(); },
+      spec:   function(){ var c=document.querySelector('[data-tech="breakout"]');     if(c&&!c.classList.contains('on'))c.click(); },
+      tech:   function(){ var c=document.querySelector('[data-goat="ark"]');          if(c&&!c.classList.contains('on'))c.click(); },
+      bal:    function(){ var c=document.querySelector('[data-preset="quality"]');    if(c&&!c.classList.contains('on'))c.click(); },
+    };
+    if (_IMAP[_investor]) {
+      setTimeout(function() {
+        // Ensure BIST is selected
+        var bistBtn = document.querySelector('.exbtn[data-exchange="bist"]');
+        if (bistBtn && !bistBtn.classList.contains('on')) selectExchange(bistBtn);
+        _IMAP[_investor]();
+        if (!allData.length) runScan();
+      }, 600);
+    }
   }
   var total = document.querySelectorAll('[data-goat],[data-preset],[data-tech]').length;
   var el = document.querySelector('[data-strat-count]');

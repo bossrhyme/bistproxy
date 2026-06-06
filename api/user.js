@@ -71,12 +71,20 @@ async function saveWatchlists(userId, lists) {
 
 // ── route handlers ────────────────────────────
 
+function safeUser(u) {
+  return { id: u.id, email: u.email, name: u.name, username: u.username || '', picture: u.picture || '',
+           investorType: u.investorType || null, points: u.points || 0,
+           lastLoginDate: u.lastLoginDate || null, loginStreak: u.loginStreak || 0 };
+}
+
 async function handleRegister(req, res) {
   if (req.method !== 'POST') { jsonRes(res, 405, { error: 'Method not allowed' }); return; }
-  const body     = await readBody(req);
-  const email    = (body.email    || '').trim().toLowerCase();
-  const password = (body.password || '');
-  const name     = (body.name     || '').trim();
+  const body         = await readBody(req);
+  const email        = (body.email        || '').trim().toLowerCase();
+  const password     = (body.password     || '');
+  const username     = (body.username     || '').trim();
+  const investorType = (body.investorType || '').trim() || null;
+  const name         = (body.name         || username || '').trim();
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     jsonRes(res, 400, { error: 'Geçerli bir e-posta adresi girin' }); return;
@@ -84,26 +92,28 @@ async function handleRegister(req, res) {
   if (!password || password.length < 8) {
     jsonRes(res, 400, { error: 'Şifre en az 8 karakter olmalı' }); return;
   }
-  if (password.length > 100) {
-    jsonRes(res, 400, { error: 'Şifre çok uzun' }); return;
+  if (password.length > 100) { jsonRes(res, 400, { error: 'Şifre çok uzun' }); return; }
+  if (!username || username.length < 3 || username.length > 20 || !/^[a-zA-Z0-9_]+$/.test(username)) {
+    jsonRes(res, 400, { error: 'Kullanıcı adı 3-20 karakter, sadece harf/rakam/alt çizgi olabilir' }); return;
   }
 
-  const userId  = 'em_' + email;
-  const existing = await kvGet('usr:' + userId);
+  const userId   = 'em_' + email;
+  const unKey    = 'usr_un:' + username.toLowerCase();
+  const [existing, takenUn] = await Promise.all([kvGet('usr:' + userId), kvGet(unKey)]);
   if (existing) { jsonRes(res, 409, { error: 'Bu e-posta zaten kayıtlı' }); return; }
+  if (takenUn)  { jsonRes(res, 409, { error: 'Bu kullanıcı adı zaten alınmış' }); return; }
 
   const passwordHash = hashPassword(password);
   const user = {
-    id: userId, email,
-    name: name || email.split('@')[0],
-    picture: '',
-    createdAt: Date.now(),
-    passwordHash
+    id: userId, email, username,
+    name: name || username,
+    picture: '', createdAt: Date.now(), passwordHash,
+    investorType, points: 0, lastLoginDate: null, loginStreak: 0
   };
-  await kvSet('usr:' + userId, user);
+  await Promise.all([kvSet('usr:' + userId, user), kvSet(unKey, userId)]);
   const { token, ttl } = await createSession(userId);
   res.setHeader('Set-Cookie', 'df_sess=' + token + '; Path=/; Max-Age=' + ttl + '; HttpOnly; Secure; SameSite=Lax');
-  jsonRes(res, 200, { user: { id: user.id, email: user.email, name: user.name, picture: user.picture } });
+  jsonRes(res, 200, { user: safeUser(user) });
 }
 
 async function handleLogin(req, res) {
@@ -125,7 +135,7 @@ async function handleLogin(req, res) {
 
   const { token, ttl } = await createSession(userId);
   res.setHeader('Set-Cookie', 'df_sess=' + token + '; Path=/; Max-Age=' + ttl + '; HttpOnly; Secure; SameSite=Lax');
-  jsonRes(res, 200, { user: { id: user.id, email: user.email, name: user.name, picture: user.picture } });
+  jsonRes(res, 200, { user: safeUser(user) });
 }
 
 async function handleMe(req, res) {
@@ -134,13 +144,36 @@ async function handleMe(req, res) {
   try {
     const user = await getUser(req);
     if (user) {
-      res.status(200).json({ user: { id: user.id, email: user.email, name: user.name, picture: user.picture } });
+      const full = await kvGet('usr:' + user.id);
+      res.status(200).json({ user: safeUser(full || user) });
     } else {
       res.status(200).json({ user: null });
     }
   } catch (e) {
     res.status(200).json({ user: null });
   }
+}
+
+async function handleDailyCheckin(req, res) {
+  if (req.method !== 'POST') { jsonRes(res, 405, { error: 'Method not allowed' }); return; }
+  const user = await getUser(req);
+  if (!user) { jsonRes(res, 401, { error: 'Unauthorized' }); return; }
+  const full = await kvGet('usr:' + user.id);
+  if (!full) { jsonRes(res, 404, { error: 'User not found' }); return; }
+
+  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+  if (full.lastLoginDate === today) {
+    jsonRes(res, 200, { ok: true, pointsAdded: 0, points: full.points || 0, streak: full.loginStreak || 0, alreadyChecked: true });
+    return;
+  }
+
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const streak = full.lastLoginDate === yesterday ? (full.loginStreak || 0) + 1 : 1;
+  full.points       = (full.points || 0) + 100;
+  full.lastLoginDate = today;
+  full.loginStreak   = streak;
+  await kvSet('usr:' + user.id, full);
+  jsonRes(res, 200, { ok: true, pointsAdded: 100, points: full.points, streak, alreadyChecked: false });
 }
 
 async function handleLogout(req, res) {
@@ -391,6 +424,7 @@ module.exports = async function handler(req, res) {
     if (path === '/api/auth/logout')          return await handleLogout(req, res);
     if (path === '/api/auth/change-password') return await handleChangePassword(req, res);
     if (path === '/api/auth/update-profile')  return await handleUpdateProfile(req, res);
+    if (path === '/api/auth/daily-checkin')   return await handleDailyCheckin(req, res);
     if (path.startsWith('/api/portfolio'))    return await handlePortfolio(req, res);
     if (path.startsWith('/api/watchlists'))   return await handleWatchlists(req, res);
 
