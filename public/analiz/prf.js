@@ -530,6 +530,17 @@ function _buildTrend(d) {
 }
 
 
+// ── Hangi Yatırımcı Alır? ────────────────────────────────────────────────
+function _renderInvestorFit(d) {
+  var el = document.getElementById('prf-investor-fit');
+  if (!el) return;
+  el.innerHTML =
+    '<div style="padding:28px 0;text-align:center;color:var(--muted);font-size:12px;display:flex;flex-direction:column;align-items:center;gap:6px;">' +
+    '<span style="font-size:22px;">🧬</span>' +
+    '<span>Yatırımcı eşleşme analizi hazırlanıyor...</span>' +
+    '</div>';
+}
+
 // ── Sektör Ortalaması Yükle ───────────────────────────────────────────────
 function loadSectorAvg(sector, ex) {
   if (!sector || _sectorAvg !== null) { _renderSectorComparison(); return; }
@@ -1074,6 +1085,7 @@ function showProfil(sym, ex) {
     _buildPrfPiotroski();
     _buildDeepFinScore();
     _buildTrend(_prfData);
+    _renderInvestorFit(_prfData);
     setTimeout(function(){
       _buildPrfGuru();
       _buildPrfSide();
