@@ -1,4 +1,4 @@
-// DeepFin — Profil Sayfası v8
+// DeepFin — Profil Sayfası v9
 (function() {
 'use strict';
 
@@ -323,7 +323,7 @@ function renderIdentity() {
   var dn = document.getElementById('pf-display-name');
   if (dn) dn.textContent = _user.name || _user.username || _user.email;
   var un = document.getElementById('pf-username-text');
-  if (un) un.textContent = _user.username || _user.email.split('@')[0];
+  if (un) un.textContent = _user.username || _user.name || _user.email.split('@')[0];
   var em = document.getElementById('pf-email-text');
   if (em) em.textContent = _user.email;
 
