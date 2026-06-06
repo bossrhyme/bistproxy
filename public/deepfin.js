@@ -2489,17 +2489,17 @@ function initChart(container) {
   lwChart = LightweightCharts.createChart(container, {
     width: (container.offsetWidth > 50 ? container.offsetWidth : (document.querySelector('.detail.open')?.offsetWidth - 20 || 340)),
     height: 260,
-    layout: { background: { color: '#0d1117' }, textColor: '#6a8fa8' },
-    grid: { vertLines: { color: '#1c2d40' }, horzLines: { color: '#1c2d40' } },
-    crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
-    rightPriceScale: { borderColor: '#1c2d40' },
-    timeScale: { borderColor: '#1c2d40', timeVisible: true, secondsVisible: false },
+    layout: { background: { color: '#f8fafc' }, textColor: '#94a3b8', fontSize: 11, fontFamily: 'Inter, sans-serif' },
+    grid: { vertLines: { color: '#edf2f7', style: 1 }, horzLines: { color: '#edf2f7', style: 1 } },
+    crosshair: { mode: LightweightCharts.CrosshairMode.Normal, vertLine: { color: '#cbd5e1', labelBackgroundColor: '#64748b' }, horzLine: { color: '#cbd5e1', labelBackgroundColor: '#64748b' } },
+    rightPriceScale: { borderColor: '#e2e8f0', textColor: '#94a3b8' },
+    timeScale: { borderColor: '#e2e8f0', textColor: '#94a3b8', timeVisible: true, secondsVisible: false },
     handleScroll: true, handleScale: true,
   });
   lwSeries = lwChart.addCandlestickSeries({
-    upColor: '#0ff0b3', downColor: '#ff4d6d',
-    borderUpColor: '#0ff0b3', borderDownColor: '#ff4d6d',
-    wickUpColor: '#09c48a', wickDownColor: '#cc2244',
+    upColor: '#10b981', downColor: '#f43f5e',
+    borderUpColor: '#10b981', borderDownColor: '#f43f5e',
+    wickUpColor: '#10b981', wickDownColor: '#f43f5e',
   });
   if (window._attachChartResizeObserver) window._attachChartResizeObserver(container);
 }
@@ -2515,31 +2515,31 @@ function applyIndicators() {
   const active = [...document.querySelectorAll('.itab.on')].map(t => t.dataset.ind);
 
   if (active.includes('MA20')) {
-    const s = lwChart.addLineSeries({ color: '#f0c040', lineWidth: 1, priceLineVisible: false });
+    const s = lwChart.addLineSeries({ color: '#3b82f6', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
     s.setData(calcSMA(lwCandles, 20));
     lwIndSeries['MA20'] = s;
   }
   if (active.includes('MA50')) {
-    const s = lwChart.addLineSeries({ color: '#38bdf8', lineWidth: 1, priceLineVisible: false });
+    const s = lwChart.addLineSeries({ color: '#f59e0b', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
     s.setData(calcSMA(lwCandles, 50));
     lwIndSeries['MA50'] = s;
   }
   if (active.includes('EMA20')) {
-    const s = lwChart.addLineSeries({ color: '#a78bfa', lineWidth: 1, priceLineVisible: false });
+    const s = lwChart.addLineSeries({ color: '#8b5cf6', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
     s.setData(calcEMA(lwCandles, 20));
     lwIndSeries['EMA20'] = s;
   }
   if (active.includes('BB')) {
     const bb = calcBB(lwCandles);
-    const su = lwChart.addLineSeries({ color: 'rgba(56,189,248,.5)', lineWidth: 1, priceLineVisible: false });
-    const sm = lwChart.addLineSeries({ color: 'rgba(56,189,248,.3)', lineWidth: 1, lineStyle: 1, priceLineVisible: false });
-    const sl = lwChart.addLineSeries({ color: 'rgba(56,189,248,.5)', lineWidth: 1, priceLineVisible: false });
+    const su = lwChart.addLineSeries({ color: 'rgba(14,165,233,.5)', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
+    const sm = lwChart.addLineSeries({ color: 'rgba(14,165,233,.35)', lineWidth: 1, lineStyle: 1, priceLineVisible: false, lastValueVisible: false });
+    const sl = lwChart.addLineSeries({ color: 'rgba(14,165,233,.5)', lineWidth: 1, priceLineVisible: false, lastValueVisible: false });
     su.setData(bb.upper); sm.setData(bb.mid); sl.setData(bb.lower);
     lwIndSeries['BB_u'] = su; lwIndSeries['BB_m'] = sm; lwIndSeries['BB_l'] = sl;
   }
   if (active.includes('VOL')) {
     lwVolSeries = lwChart.addHistogramSeries({
-      color: 'rgba(15,240,179,.3)',
+      color: 'rgba(16,185,129,.35)',
       priceFormat: { type: 'volume' },
       priceScaleId: 'vol',
       scaleMargins: { top: 0.8, bottom: 0 },
@@ -2547,7 +2547,7 @@ function applyIndicators() {
     const volData = lwCandles.map(c => ({
       time: c.time,
       value: c.volume || 0,
-      color: c.close >= c.open ? 'rgba(15,240,179,.3)' : 'rgba(255,77,109,.3)'
+      color: c.close >= c.open ? 'rgba(16,185,129,.35)' : 'rgba(244,63,94,.3)'
     }));
     lwVolSeries.setData(volData);
   }
