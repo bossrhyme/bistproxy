@@ -315,7 +315,12 @@ function renderIdentity() {
       bw.innerHTML = '<div class="pf-inv-badge" style="border-color:' + inv.color + ';color:' + inv.color + '">' +
         '<span class="pf-inv-badge-icon" style="background:' + inv.color + '"></span>' + inv.name + '</div>';
     } else {
-      bw.innerHTML = '<div class="pf-no-badge">Yatırımcı tipi belirlenmedi</div>';
+      bw.innerHTML =
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">' +
+        '<span style="font-size:11px;color:var(--muted2);">Yatırımcı tipi belirlenmedi</span>' +
+        '<button onclick="startQuizForExistingUser()" style="background:#6366f1;color:#fff;border:none;border-radius:6px;' +
+          'padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;">🧬 Quiz Yap</button>' +
+        '</div>';
     }
   }
 
@@ -333,11 +338,9 @@ function renderIdentity() {
   var sv = document.getElementById('pf-streak-val');
   if (sv) sv.textContent = _user.loginStreak || 0;
 
-  // Tara / Quiz buttons
+  // Tara button
   var taraBtn = document.getElementById('pf-tara-btn');
-  var quizBtn = document.getElementById('pf-quiz-btn');
   if (taraBtn) taraBtn.disabled = !_user.investorType;
-  if (quizBtn) quizBtn.style.display = _user.investorType ? 'none' : 'inline-flex';
 
   // Settings name input
   var nameInp = document.getElementById('pf-name-input');
