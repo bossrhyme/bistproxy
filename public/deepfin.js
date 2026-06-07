@@ -1726,54 +1726,78 @@ var ADV_CHIP_CFG = {
   profileGridId: 'adv-profile-grid'
 };
 
-// ── Yatırımcı Profilleri ────────────────────────────────────
+// ── Yatırımcı Profilleri (quiz tipleriyle eşleşir) ──────────
 var INVESTOR_PROFILES = [
   {
-    key: 'value-hunter',
-    label: 'Değer Avcısı',
-    icon: '🎯',
-    goat:   ['buffett'],
-    preset: ['value', 'lowdebt'],
-    tech:   []
-  },
-  {
-    key: 'growth-chaser',
-    label: 'Büyüme Takipçisi',
+    key: 'growth',
+    label: 'Büyüme Avcısı',
     icon: '🚀',
     goat:   [],
     preset: ['growth', 'momentum'],
     tech:   ['breakout']
   },
   {
-    key: 'dividend',
-    label: 'Temettü Odaklı',
+    key: 'div',
+    label: 'Temettü Koleksiyoneri',
     icon: '💰',
     goat:   [],
-    preset: ['dividend', 'quality', 'lowdebt'],
+    preset: ['dividend', 'lowdebt'],
     tech:   []
   },
   {
-    key: 'quality',
-    label: 'Kalite Odaklı',
-    icon: '⭐',
-    goat:   ['graham'],
-    preset: ['quality'],
-    tech:   ['trendFollow']
+    key: 'value',
+    label: 'Değer Dedektifi',
+    icon: '🎯',
+    goat:   ['buffett'],
+    preset: ['value', 'lowdebt'],
+    tech:   []
   },
   {
-    key: 'momentum-trader',
-    label: 'Momentum Trader',
+    key: 'mom',
+    label: 'Momentum Sörfçüsü',
     icon: '⚡',
     goat:   [],
-    preset: [],
-    tech:   ['breakout', 'techBuy', 'momentum3m', 'trendFollow']
+    preset: ['momentum'],
+    tech:   ['momentum3m', 'breakout']
   },
   {
-    key: 'piotroski',
-    label: 'Piotroski Avı',
-    icon: '🏆',
-    goat:   ['piotroski'],
-    preset: ['value', 'lowdebt'],
+    key: 'def',
+    label: 'Savunma Kalesi',
+    icon: '🛡️',
+    goat:   [],
+    preset: ['quality', 'lowdebt'],
+    tech:   []
+  },
+  {
+    key: 'small',
+    label: 'Küçük Değer Keşifçisi',
+    icon: '🔭',
+    goat:   [],
+    preset: ['value', 'growth'],
+    tech:   []
+  },
+  {
+    key: 'spec',
+    label: 'Spekülatif Akıncı',
+    icon: '🔥',
+    goat:   [],
+    preset: [],
+    tech:   ['breakout', 'techBuy', 'highVolume']
+  },
+  {
+    key: 'tech',
+    label: 'Teknoloji Vizyoneri',
+    icon: '💻',
+    goat:   [],
+    preset: [],
+    tech:   ['breakout', 'techBuy', 'trendFollow']
+  },
+  {
+    key: 'bal',
+    label: 'Çevik Dengeleyici',
+    icon: '⚖️',
+    goat:   [],
+    preset: ['quality', 'dividend'],
     tech:   []
   }
 ];
