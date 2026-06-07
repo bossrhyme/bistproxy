@@ -87,7 +87,7 @@ if('serviceWorker' in navigator){
       </div>
       <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
         <span id="prf-live-dot" style="display:none;font-size:10px;color:var(--green);"><span style="display:inline-block;width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s ease infinite;margin-right:4px;"></span>Canlı</span>
-        <button id="prf-tv-btn" onclick="openTradingView()" class="prf-back">↗ TradingView</button>
+
       </div>
     </div>
 
@@ -120,15 +120,7 @@ if('serviceWorker' in navigator){
         </div>
 
         <div id="prf-panel-overview" class="prf-panel on">
-          <!-- Grafik -->
-          <div class="prf-section" style="padding:0;overflow:hidden;border-radius:0;border-bottom:1px solid var(--border);">
-            <div id="prf-tv-widget" style="background:var(--bg);position:relative;">
-              <div id="prf-tv-placeholder" style="height:260px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:var(--muted);font-size:11px;">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity=".4"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                <span style="letter-spacing:.3px;">Grafik yükleniyor...</span>
-              </div>
-            </div>
-          </div>
+
 
           <!-- Temel Metrikler -->
           <div class="prf-section">
