@@ -110,10 +110,9 @@ module.exports = async function(req, res) {
   const req2 = https.request(options, (res2) => {
     let data = '';
     res2.on('data', c => data += c);
-    res2.on('end', () => {
+    res2.on('end', async () => {
       try {
         const parsed = JSON.parse(data);
-        // TV news response: { items: [{title, published, source, url, ...}] }
         const items = (parsed.items || []).slice(0, 10).map(item => ({
           headline: item.title || item.headline || '',
           source:   item.source?.name || item.provider || '',
@@ -122,14 +121,22 @@ module.exports = async function(req, res) {
         }));
         const newsResult = { news: items };
         kvSet(cacheKey, newsResult, 300).catch(() => {});
+        kvSet('stale:' + cacheKey, newsResult, 86400).catch(() => {});
         res.setHeader('Content-Type', 'application/json');
         res.setHeader('Cache-Control', 'public, max-age=300');
         return res.status(200).json(newsResult);
       } catch(e) {
+        // JSON parse başarısız = TradingView banlı/rate-limited → stale dene
+        const stale = await kvGet('stale:' + cacheKey);
+        if (stale) { res.setHeader('X-Cache', 'STALE'); return res.status(200).json(stale); }
         return res.status(200).json({ news: [] });
       }
     });
   });
-  req2.on('error', () => res.status(200).json({ news: [] }));
+  req2.on('error', async () => {
+    const stale = await kvGet('stale:' + cacheKey);
+    if (stale) { res.setHeader('X-Cache', 'STALE'); return res.status(200).json(stale); }
+    res.status(200).json({ news: [] });
+  });
   req2.end();
 };

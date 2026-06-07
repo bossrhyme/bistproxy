@@ -436,8 +436,16 @@ module.exports = async function(req, res) {
       };
       makeRequest('scanner.tradingview.com', cfg.tvPath, 'POST', headers, payload, async (err, data, statusCode) => {
         if (err) {
-          const msg = err.message === 'timeout' ? 'İstek zaman aşımına uğradı' : 'Veri alınamadı';
-          res.status(504).json({ error: msg });
+          // Ağ/timeout hatası → stale cache dene
+          const stale = kvEnabled() ? await kvGet('stale:' + cacheKey) : null;
+          if (stale) {
+            res.setHeader('X-Cache', 'STALE');
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200).end(JSON.stringify(stale));
+          } else {
+            const msg = err.message === 'timeout' ? 'İstek zaman aşımına uğradı' : 'Veri alınamadı';
+            res.status(504).json({ error: msg });
+          }
           return resolve();
         }
 
@@ -448,17 +456,25 @@ module.exports = async function(req, res) {
           parsed._currency  = cfg.currency;
           parsed.columns    = merged.columns;
 
-          // 3. Cache'e yaz — KV + in-memory
+          // 3. Cache'e yaz — KV (kısa TTL) + stale KV (24h) + in-memory
           if (parsed.data && parsed.data.length > 0) {
             memSet(cacheKey, parsed, Math.min(ttl, 300));
             if (kvEnabled()) {
               kvSet(cacheKey, parsed, ttl).catch(() => {});
+              kvSet('stale:' + cacheKey, parsed, 86400).catch(() => {});
             }
           }
 
           res.status(statusCode).end(JSON.stringify(parsed));
         } catch(e) {
-          res.status(statusCode).end(data);
+          // JSON parse başarısız = TradingView HTML/Cloudflare döndü (ban/rate-limit)
+          const stale = kvEnabled() ? await kvGet('stale:' + cacheKey) : null;
+          if (stale) {
+            res.setHeader('X-Cache', 'STALE');
+            res.status(200).end(JSON.stringify(stale));
+          } else {
+            res.status(statusCode).end(data);
+          }
         }
         resolve();
       });

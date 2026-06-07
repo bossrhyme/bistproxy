@@ -174,9 +174,12 @@ module.exports = async (req, res) => {
 
     const result = { source: 'tradingview', yahoo, symbol: sym };
     kvSet(cacheKey, result, 300).catch(() => {});
+    kvSet('stale:' + cacheKey, result, 86400).catch(() => {});
     res.status(200).json(result);
 
   } catch (e) {
+    const stale = await kvGet('stale:' + cacheKey);
+    if (stale) { res.setHeader('X-Cache', 'STALE'); return res.status(200).json(stale); }
     res.status(500).json({ error: 'Doğrulama hatası' });
   }
 };

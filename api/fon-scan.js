@@ -156,19 +156,6 @@ function sharpe(prices) {
   return parseFloat(((avg*252 - 0.45) / (std*Math.sqrt(252))).toFixed(2));
 }
 
-// ── Yahoo Finance doğrulama ───────────────────────────────────────────
-async function yahoo(code) {
-  try {
-    const r = await makeReq('query1.finance.yahoo.com',
-      '/v8/finance/chart/' + encodeURIComponent(code+'.IS') + '?interval=1d&range=5d',
-      'GET', { Accept: 'application/json' });
-    if (r.status !== 200) return null;
-    const j = JSON.parse(r.body);
-    const closes = j?.chart?.result?.[0]?.indicators?.quote?.[0]?.close?.filter(Boolean);
-    return closes?.length ? closes[closes.length-1] : null;
-  } catch(e) { return null; }
-}
-
 // ── CORS origins ──────────────────────────────────────────────────────
 const ORIGINS = ['https://deepfin.vercel.app','https://bistproxy.vercel.app','https://www.deepfin.com'];
 
@@ -332,18 +319,7 @@ module.exports = async function handler(req, res) {
     funds.sort((a,b) => (b[sf] ?? -Infinity) - (a[sf] ?? -Infinity));
     funds = funds.slice(0, limit);
 
-    // ── Yahoo Finance doğrulama (top 3) ──────────────────────────
-    await Promise.all(funds.slice(0,3).map(async f => {
-      const yp = await yahoo(f.code);
-      if (yp) {
-        const diff = Math.abs((yp - f.price) / f.price * 100);
-        f.yahooPrice = yp;
-        f.verified   = diff < 5;
-        f.verifyNote = `Yahoo farkı: ${diff.toFixed(2)}%`;
-      }
-    }));
-
-    const result = { funds, total: funds.length, source:'tefas', secondary:'yahoo_finance', updatedAt: new Date().toISOString() };
+    const result = { funds, total: funds.length, source:'tefas', updatedAt: new Date().toISOString() };
     if (kvEnabled()) {
       await kvSet(cacheKey, result, 3600);
       kvDel(lockKey).catch(() => {});

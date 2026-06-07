@@ -149,14 +149,22 @@ module.exports = async function(req, res) {
     'Accept':         'application/json',
   };
 
-  makeRequest('scanner.tradingview.com', cfg.tvPath, 'POST', headers, payload, (err, data) => {
-    if (err) return res.status(500).json({ error: 'Bağlantı hatası' });
+  makeRequest('scanner.tradingview.com', cfg.tvPath, 'POST', headers, payload, async (err, data) => {
+    if (err) {
+      const stale = await kvGet('stale:' + cacheKey);
+      if (stale) { res.setHeader('X-Cache', 'STALE'); return res.status(200).json(stale); }
+      return res.status(500).json({ error: 'Bağlantı hatası' });
+    }
 
     try {
       const parsed = JSON.parse(data);
       const row    = parsed.data?.[0]?.d || [];
 
-      if (!row.length) return res.status(404).json({ error: 'Hisse bulunamadı: ' + symbol });
+      if (!row.length) {
+        const stale = await kvGet('stale:' + cacheKey);
+        if (stale) { res.setHeader('X-Cache', 'STALE'); return res.status(200).json(stale); }
+        return res.status(404).json({ error: 'Hisse bulunamadı: ' + symbol });
+      }
 
       const raw = {};
       fields.forEach((f, i) => { raw[f] = row[i] ?? null; });
@@ -215,9 +223,13 @@ module.exports = async function(req, res) {
       res.setHeader('Content-Type', 'application/json');
       res.setHeader('Cache-Control', 'public, max-age=60');
       kvSet(cacheKey, result, 60).catch(() => {});
+      kvSet('stale:' + cacheKey, result, 86400).catch(() => {});
       return res.status(200).json(result);
 
     } catch(e) {
+      // JSON parse başarısız = TradingView banlı/rate-limited
+      const stale = await kvGet('stale:' + cacheKey);
+      if (stale) { res.setHeader('X-Cache', 'STALE'); return res.status(200).json(stale); }
       return res.status(500).json({ error: 'Veri işlenemedi' });
     }
   });
