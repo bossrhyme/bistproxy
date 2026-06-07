@@ -2644,6 +2644,8 @@ function _loadLightweightCharts(cb) {
   _lcLoading = true;
   var script = document.createElement('script');
   script.src = 'https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js';
+  script.integrity = 'sha384-rRoXxn2yHlrZYB587Ki9RO1tONhLdM6XfORg7Rw4uwH4/Fh/5nP7IUX91bkaKUgs';
+  script.crossOrigin = 'anonymous';
   script.onload = function() {
     _lcLoaded = true; _lcLoading = false;
     _lcQueue.forEach(function(fn){ fn(); }); _lcQueue = [];

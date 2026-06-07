@@ -266,7 +266,6 @@ async function doLogin() {
       btn.disabled = false; btn.textContent = 'Giriş Yap'; return;
     }
     _key = key;
-    sessionStorage.setItem('df_admin_key', key);
     _reportData = d;
     document.getElementById('ad-login').style.display = 'none';
     document.getElementById('ad-shell').style.display = 'block';
@@ -278,7 +277,6 @@ async function doLogin() {
 }
 
 function doLogout() {
-  sessionStorage.removeItem('df_admin_key');
   _key = ''; _reportData = null; _usersData = null;
   document.getElementById('ad-shell').style.display = 'none';
   document.getElementById('ad-login').style.display = 'flex';
@@ -287,11 +285,6 @@ function doLogout() {
   document.getElementById('ad-login-btn').textContent = 'Giriş Yap';
 }
 
-// ── Auto-login from sessionStorage ──
-(function(){
-  var saved = sessionStorage.getItem('df_admin_key');
-  if (saved) { document.getElementById('ad-key-input').value = saved; doLogin(); }
-})();
 
 // ── Tab switching ──
 function switchTab(name, btn) {

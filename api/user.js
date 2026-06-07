@@ -38,6 +38,21 @@ function getIP(req) {
     || req.socket.remoteAddress || 'unknown').slice(0, 45);
 }
 
+const ALLOWED_ORIGINS = new Set([
+  'https://www.deepfin.com',
+  'https://deepfin.vercel.app',
+  'https://bistproxy.vercel.app',
+]);
+function checkOrigin(req) {
+  const method = req.method;
+  if (method === 'GET' || method === 'HEAD' || method === 'OPTIONS') return true;
+  const origin  = req.headers['origin']  || '';
+  const referer = req.headers['referer'] || '';
+  if (!origin && !referer) return true; // same-origin requests from server/curl; browser always sends Origin
+  if (origin) return ALLOWED_ORIGINS.has(origin);
+  try { return ALLOWED_ORIGINS.has(new URL(referer).origin); } catch(e) { return false; }
+}
+
 // KV-backed rate limiter. Returns true if request is allowed.
 async function rlCheck(key, max, windowSec) {
   const safeKey = 'rl:' + key.replace(/[^a-z0-9.:@_-]/gi, '').slice(0, 60);
@@ -96,6 +111,7 @@ function safeUser(u) {
 
 async function handleRegister(req, res) {
   if (req.method !== 'POST') { jsonRes(res, 405, { error: 'Method not allowed' }); return; }
+  if (!checkOrigin(req)) { jsonRes(res, 403, { error: 'Geçersiz istek kaynağı' }); return; }
   if (!await rlCheck('reg:' + getIP(req), 5, 3600)) {
     jsonRes(res, 429, { error: 'Çok fazla deneme. 1 saat sonra tekrar deneyin.' }); return;
   }
@@ -105,7 +121,23 @@ async function handleRegister(req, res) {
   const username     = (body.username     || '').trim();
   const investorType = (body.investorType || '').trim() || null;
   const name         = (body.name         || username || '').trim();
-  const dob          = (body.dob          || '').trim() || null;
+  const rawDob       = (body.dob          || '').trim();
+  let   dob          = null;
+  if (rawDob) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(rawDob)) {
+      jsonRes(res, 400, { error: 'Doğum tarihi YYYY-AA-GG formatında olmalı' }); return;
+    }
+    const dobDate = new Date(rawDob);
+    if (isNaN(dobDate.getTime())) {
+      jsonRes(res, 400, { error: 'Geçerli bir doğum tarihi girin' }); return;
+    }
+    const nowY = new Date().getFullYear();
+    const dobY = dobDate.getFullYear();
+    if (dobY < 1900 || dobY > nowY - 5) {
+      jsonRes(res, 400, { error: 'Geçerli bir doğum tarihi girin' }); return;
+    }
+    dob = rawDob;
+  }
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     jsonRes(res, 400, { error: 'Geçerli bir e-posta adresi girin' }); return;
@@ -143,6 +175,7 @@ async function handleRegister(req, res) {
 
 async function handleLogin(req, res) {
   if (req.method !== 'POST') { jsonRes(res, 405, { error: 'Method not allowed' }); return; }
+  if (!checkOrigin(req)) { jsonRes(res, 403, { error: 'Geçersiz istek kaynağı' }); return; }
   if (!await rlCheck('login:' + getIP(req), 10, 900)) {
     jsonRes(res, 429, { error: 'Çok fazla deneme. 15 dakika sonra tekrar deneyin.' }); return;
   }
@@ -211,6 +244,7 @@ async function handleLogout(req, res) {
 }
 
 async function handleWatchlists(req, res) {
+  if (!checkOrigin(req)) { jsonRes(res, 403, { error: 'Geçersiz istek kaynağı' }); return; }
   const user = await getUser(req);
   if (!user) { jsonRes(res, 401, { error: 'Unauthorized' }); return; }
 
@@ -228,6 +262,8 @@ async function handleWatchlists(req, res) {
   if (method === 'POST' && isItem) {
     const { listId, symbol, exchange, note } = await readBody(req);
     if (!listId || !symbol || !exchange) { jsonRes(res, 400, { error: 'listId, symbol, exchange required' }); return; }
+    if (typeof symbol !== 'string' || symbol.length > 20) { jsonRes(res, 400, { error: 'Geçersiz sembol' }); return; }
+    if (typeof note === 'string' && note.length > 200) { jsonRes(res, 400, { error: 'Not en fazla 200 karakter olabilir' }); return; }
     const lists = await getWatchlists(user.id);
     const list  = lists.find(l => l.id === listId);
     if (!list) { jsonRes(res, 404, { error: 'List not found' }); return; }
@@ -252,8 +288,11 @@ async function handleWatchlists(req, res) {
   if (method === 'POST') {
     const { name, icon } = await readBody(req);
     if (!name || !name.trim()) { jsonRes(res, 400, { error: 'name required' }); return; }
+    if (name.trim().length > 40) { jsonRes(res, 400, { error: 'Liste adı en fazla 40 karakter olabilir' }); return; }
     const lists = await getWatchlists(user.id);
-    lists.push({ id: 'wl_' + Date.now(), name: name.trim(), icon: icon || '⭐', createdAt: Date.now(), items: [] });
+    if (lists.length >= 20) { jsonRes(res, 400, { error: 'En fazla 20 liste oluşturabilirsiniz' }); return; }
+    const safeIcon = typeof icon === 'string' ? icon.slice(0, 8) : '⭐';
+    lists.push({ id: 'wl_' + Date.now(), name: name.trim(), icon: safeIcon, createdAt: Date.now(), items: [] });
     await saveWatchlists(user.id, lists);
     jsonRes(res, 200, { watchlists: lists }); return;
   }
@@ -264,8 +303,11 @@ async function handleWatchlists(req, res) {
     const lists = await getWatchlists(user.id);
     const idx   = lists.findIndex(l => l.id === id);
     if (idx === -1) { jsonRes(res, 404, { error: 'List not found' }); return; }
-    if (name  !== undefined) lists[idx].name  = name.trim();
-    if (icon  !== undefined) lists[idx].icon  = icon;
+    if (name !== undefined) {
+      if (!name.trim() || name.trim().length > 40) { jsonRes(res, 400, { error: 'Liste adı 1-40 karakter olmalı' }); return; }
+      lists[idx].name = name.trim();
+    }
+    if (icon !== undefined) lists[idx].icon = typeof icon === 'string' ? icon.slice(0, 8) : '⭐';
     if (items !== undefined) lists[idx].items = items;
     await saveWatchlists(user.id, lists);
     jsonRes(res, 200, { watchlists: lists }); return;
@@ -305,6 +347,7 @@ async function savePortfolios(userId, portfolios) {
 }
 
 async function handlePortfolio(req, res) {
+  if (!checkOrigin(req)) { jsonRes(res, 403, { error: 'Geçersiz istek kaynağı' }); return; }
   const user = await getUser(req);
   if (!user) { jsonRes(res, 401, { error: 'Unauthorized' }); return; }
   const method  = req.method;
@@ -321,8 +364,11 @@ async function handlePortfolio(req, res) {
   if (method === 'POST' && !isItem) {
     const { name, icon } = await readBody(req);
     if (!name || !name.trim()) { jsonRes(res, 400, { error: 'name required' }); return; }
+    if (name.trim().length > 40) { jsonRes(res, 400, { error: 'Portföy adı en fazla 40 karakter olabilir' }); return; }
     const portfolios = await getPortfolios(user.id);
-    portfolios.push({ id: 'pf_' + Date.now(), name: name.trim(), icon: icon || '📊', createdAt: Date.now(), positions: [] });
+    if (portfolios.length >= 10) { jsonRes(res, 400, { error: 'En fazla 10 portföy oluşturabilirsiniz' }); return; }
+    const safeIcon = typeof icon === 'string' ? icon.slice(0, 8) : '📊';
+    portfolios.push({ id: 'pf_' + Date.now(), name: name.trim(), icon: safeIcon, createdAt: Date.now(), positions: [] });
     await savePortfolios(user.id, portfolios);
     jsonRes(res, 200, { portfolios }); return;
   }
@@ -334,8 +380,11 @@ async function handlePortfolio(req, res) {
     const portfolios = await getPortfolios(user.id);
     const pf = portfolios.find(p => p.id === id);
     if (!pf) { jsonRes(res, 404, { error: 'Portfolio not found' }); return; }
-    if (name !== undefined) pf.name = name.trim();
-    if (icon !== undefined) pf.icon = icon;
+    if (name !== undefined) {
+      if (!name.trim() || name.trim().length > 40) { jsonRes(res, 400, { error: 'Portföy adı 1-40 karakter olmalı' }); return; }
+      pf.name = name.trim();
+    }
+    if (icon !== undefined) pf.icon = typeof icon === 'string' ? icon.slice(0, 8) : '📊';
     await savePortfolios(user.id, portfolios);
     jsonRes(res, 200, { portfolios }); return;
   }
@@ -411,6 +460,7 @@ async function handlePortfolio(req, res) {
 
 async function handleChangePassword(req, res) {
   if (req.method !== 'POST') { jsonRes(res, 405, { error: 'Method not allowed' }); return; }
+  if (!checkOrigin(req)) { jsonRes(res, 403, { error: 'Geçersiz istek kaynağı' }); return; }
   const user = await getUser(req);
   if (!user) { jsonRes(res, 401, { error: 'Unauthorized' }); return; }
   if (!await rlCheck('cpw:' + user.id, 5, 3600)) {
@@ -600,12 +650,9 @@ module.exports = async function handler(req, res) {
     console.error('[user.js] handler error:', path, e.message);
     const isKvErr = e.message && (e.message.includes('KV_REST_API') || e.message.includes('KV GET') || e.message.includes('KV SET'));
     if (isKvErr) {
-      jsonRes(res, 503, {
-        error: 'Veritabanı bağlantı hatası. Vercel → Storage → deepfin-cache KV\'yi bistproxy projesine bağlayın.',
-        detail: e.message
-      });
+      jsonRes(res, 503, { error: 'Veritabanı bağlantı hatası. Lütfen daha sonra tekrar deneyin.' });
     } else {
-      jsonRes(res, 500, { error: 'Sunucu hatası: ' + e.message });
+      jsonRes(res, 500, { error: 'Beklenmeyen bir hata oluştu. Lütfen daha sonra tekrar deneyin.' });
     }
   }
 };
