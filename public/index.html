@@ -108,7 +108,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=arctic29">
+<link rel="stylesheet" href="/deepfin.css?v=arctic30">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -524,16 +524,16 @@ if('serviceWorker' in navigator){
           <div class="hp-strat-group">
             <div class="hp-strat-group-label">Teknik Analiz</div>
             <div class="hp-strat-chips-row">
-              <button class="hp-chip" onclick="applyTechAndGo('breakout')" data-tip="Zirveye yakın, günlük %1.5+ yükseliş, yüksek hacim — trendin başlangıcında">💥 Kırılım</button>
-              <button class="hp-chip" onclick="applyTechAndGo('oversold')" data-tip="Zirveden %20+ düşmüş, RSI &lt; 35 — aşırı satılmış, toparlanma fırsatı">📉 Dip Fırsatı</button>
-              <button class="hp-chip" onclick="applyTechAndGo('nearHigh')" data-tip="52H zirvesinden %3 içinde, 3A getiri &gt; %5 — güçlü trendin devamı">🏔️ Zirveye Yakın</button>
-              <button class="hp-chip" onclick="applyTechAndGo('pullback')" data-tip="Zirveden %10 geri, dibinden %10 yukarı — sağlıklı düzeltme, trende giriş">🔄 Çekilme</button>
-              <button class="hp-chip" onclick="applyTechAndGo('strongDay')" data-tip="Günlük %2+ yükseliş, normalin üzerinde hacim — bugün dikkat çeken">☀️ Güçlü Gün</button>
-              <button class="hp-chip" onclick="applyTechAndGo('highVolume')" data-tip="Hacim &gt; 5M lot — büyük kurumsal alıcıların pozisyon açtığı sinyal">🏦 Kurumsal Hacim</button>
-              <button class="hp-chip" onclick="applyTechAndGo('techBuy')" data-tip="TradingView skoru &gt; 0.5 — 26 indikatörün büyük çoğunluğu AL sinyali veriyor">📊 26 İndikatör AL</button>
-              <button class="hp-chip" onclick="applyTechAndGo('momentum3m')" data-tip="3A getiri &gt; %15, 6A getiri &gt; %20 — sürdürülebilir orta vadeli momentum">🏃 3A Lider</button>
-              <button class="hp-chip" onclick="applyTechAndGo('trendFollow')" data-tip="Yıllık dibinden %25+ yukarı, 6A getiri &gt; %10 — trend hâlâ güçlü">🌊 Güçlü Trend</button>
-              <button class="hp-chip" onclick="applyTechAndGo('rsiBounce')" data-tip="RSI 30–50 arası, dibi geride bırakmış — toparlanmanın erken aşaması">🔋 RSI Sıçraması</button>
+              <button class="hp-chip" onclick="applyTechAndGo('breakout')" data-tip="Zirveye yakın, günlük %1.5+ yükseliş, yüksek hacim — trendin başlangıcında">💥 Breakout</button>
+              <button class="hp-chip" onclick="applyTechAndGo('oversold')" data-tip="Zirveden %20+ düşmüş, RSI &lt; 35 — aşırı satılmış, toparlanma fırsatı">📉 Aşırı Satış</button>
+              <button class="hp-chip" onclick="applyTechAndGo('nearHigh')" data-tip="52H zirvesinden %3 içinde, 3A getiri &gt; %5 — güçlü trendin devamı">🏔️ ATH Yakın</button>
+              <button class="hp-chip" onclick="applyTechAndGo('pullback')" data-tip="Zirveden %10 geri, dibinden %10 yukarı — sağlıklı düzeltme, trende giriş">🔄 Düzeltme</button>
+              <button class="hp-chip" onclick="applyTechAndGo('strongDay')" data-tip="Günlük %2+ yükseliş, normalin üzerinde hacim — bugün dikkat çeken">☀️ Günlük Hareket</button>
+              <button class="hp-chip" onclick="applyTechAndGo('highVolume')" data-tip="Hacim &gt; 5M lot — büyük kurumsal alıcıların pozisyon açtığı sinyal">🏦 Akıllı Para</button>
+              <button class="hp-chip" onclick="applyTechAndGo('techBuy')" data-tip="TradingView skoru &gt; 0.5 — 26 indikatörün büyük çoğunluğu AL sinyali veriyor">📊 Güçlü Sinyal</button>
+              <button class="hp-chip" onclick="applyTechAndGo('momentum3m')" data-tip="3A getiri &gt; %15, 6A getiri &gt; %20 — sürdürülebilir orta vadeli momentum">🏃 3A Momentum</button>
+              <button class="hp-chip" onclick="applyTechAndGo('trendFollow')" data-tip="Yıllık dibinden %25+ yukarı, 6A getiri &gt; %10 — trend hâlâ güçlü">🌊 Trend Takibi</button>
+              <button class="hp-chip" onclick="applyTechAndGo('rsiBounce')" data-tip="RSI 30–50 arası, dibi geride bırakmış — toparlanmanın erken aşaması">🔋 Toparlanıyor</button>
             </div>
           </div>
         </div>
@@ -1974,7 +1974,7 @@ if('serviceWorker' in navigator){
     </div>
   </div>
 </div>
-<script src="/deepfin.js?v=60"></script>
+<script src="/deepfin.js?v=61"></script>
 <div id="hisse-hidden-filters" style="display:none;">
   <input type="number" id="piotroski_min">
   <input type="number" id="piotroski_max">
