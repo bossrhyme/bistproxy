@@ -110,6 +110,30 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 @keyframes spin{to{transform:rotate(360deg);}}
 .ad-loading{padding:40px;text-align:center;color:var(--muted);}
 .ad-empty{color:var(--muted2);font-style:italic;padding:12px 0;}
+.ad-detail-btn{background:var(--s2);border:1px solid var(--border);border-radius:5px;padding:3px 8px;font-size:11px;color:var(--muted);cursor:pointer;transition:all .15s;}
+.ad-detail-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+/* ── USER DETAIL MODAL ── */
+#ud-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;overflow-y:auto;padding:20px;}
+#ud-box{background:var(--s1);border:1px solid var(--border);border-radius:12px;max-width:680px;margin:40px auto;overflow:hidden;}
+#ud-header{background:var(--s2);padding:16px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);}
+#ud-header-title{flex:1;font-size:15px;font-weight:700;}
+#ud-close{background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;color:var(--muted);cursor:pointer;}
+#ud-close:hover{border-color:var(--red);color:var(--red);}
+#ud-body{padding:20px;}
+.ud-section{margin-bottom:18px;}
+.ud-section-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;}
+.ud-list-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:5px;display:flex;align-items:center;gap:6px;}
+.ud-list-name .ud-cnt{font-size:11px;color:var(--muted2);font-weight:400;}
+.ud-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+.ud-chip{background:var(--s3);border:1px solid var(--border);border-radius:6px;padding:3px 9px;font-size:11px;color:var(--text);}
+.ud-chip .ud-exch{color:var(--muted2);font-size:10px;margin-left:3px;}
+.ud-pos-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);}
+.ud-pos-row:last-child{border-bottom:none;}
+.ud-pos-sym{font-size:12px;font-weight:600;}
+.ud-pos-meta{font-size:11px;color:var(--muted);}
+.ud-pos-cost{font-size:11px;color:var(--muted2);text-align:right;}
+#ud-spin{text-align:center;padding:30px;color:var(--muted);}
 </style>
 </head>
 <body>
@@ -195,6 +219,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
                   <th>Yaş Grubu</th>
                   <th>Yatırımcı Tipi</th>
                   <th>Kayıt Tarihi</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody id="usr-tbody"></tbody>
@@ -207,15 +232,28 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
   </div>
 </div>
 
+<!-- USER DETAIL MODAL -->
+<div id="ud-overlay" onclick="if(event.target===this)closeUserDetail()">
+  <div id="ud-box">
+    <div id="ud-header">
+      <div id="ud-header-title">Kullanıcı Detayı</div>
+      <button id="ud-close" onclick="closeUserDetail()">✕ Kapat</button>
+    </div>
+    <div id="ud-body">
+      <div id="ud-spin"><span class="ad-spin"></span> Yükleniyor...</div>
+    </div>
+  </div>
+</div>
+
 <script>
 var _key = '';
 var _reportData = null;
 var _usersData  = null;
 
 var STRAT_LABELS = {
-  tech:   { breakout:'💥 Breakout', oversold:'📉 Aşırı Satış', nearHigh:'🏔️ ATH Yakın', pullback:'🔄 Düzeltme',
-            strongDay:'☀️ Günlük Hareket', highVolume:'🏦 Akıllı Para', techBuy:'📊 Güçlü Sinyal',
-            momentum3m:'🏃 3A Momentum', trendFollow:'🌊 Trend Takibi', rsiBounce:'🔋 Toparlanıyor' },
+  tech:   { breakout:'💥 Breakout', oversold:'📉 Aşırı Satış', nearhigh:'🏔️ ATH Yakın', pullback:'🔄 Düzeltme',
+            strongday:'☀️ Günlük Hareket', highvolume:'🏦 Akıllı Para', techbuy:'📊 Güçlü Sinyal',
+            momentum3m:'🏃 3A Momentum', trendfollow:'🌊 Trend Takibi', rsibounce:'🔋 Toparlanıyor' },
   goat:   { buffett:'🎯 Buffett', graham:'📚 Graham', fisher:'🔭 Fisher',
             munger:'🧠 Munger', lynch:'📈 Lynch', piotroski:'🏆 Piotroski' },
   preset: { value:'💎 Değer', growth:'🚀 Büyüme', dividend:'💰 Temettü',
@@ -453,7 +491,7 @@ var INV_BADGE_MAP = {growth:'growth',div:'div',value:'value',mom:'mom',def:'def'
 
 function renderUserTable(users) {
   if (!users.length) {
-    document.getElementById('usr-tbody').innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted2);padding:20px;">Kullanıcı bulunamadı.</td></tr>';
+    document.getElementById('usr-tbody').innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted2);padding:20px;">Kullanıcı bulunamadı.</td></tr>';
     return;
   }
   var html = '';
@@ -468,6 +506,7 @@ function renderUserTable(users) {
     html += '<td>' + esc(u.ageGroup) + '</td>';
     html += '<td><span class="ad-badge ' + badge + '">' + esc(invLbl) + '</span></td>';
     html += '<td>' + fmtDate(u.createdAt) + '</td>';
+    html += '<td><button class="ad-detail-btn" onclick="openUserDetail(\'' + esc(u.email) + '\',\'' + esc(u.name || u.username) + '\')">📁 Detay</button></td>';
     html += '</tr>';
   });
   document.getElementById('usr-tbody').innerHTML = html;
@@ -482,6 +521,81 @@ function filterUsers() {
         || (u.email||'').toLowerCase().includes(q);
   });
   renderUserTable(filtered);
+}
+
+// ── User Detail Modal ──
+async function openUserDetail(email, name) {
+  var overlay = document.getElementById('ud-overlay');
+  var body = document.getElementById('ud-body');
+  document.getElementById('ud-header-title').textContent = name + ' — ' + email;
+  body.innerHTML = '<div id="ud-spin"><span class="ad-spin"></span> Yükleniyor...</div>';
+  overlay.style.display = 'block';
+  try {
+    var r = await fetch('/api/admin/user-detail?email=' + encodeURIComponent(email), { headers: { 'x-admin-key': _key } });
+    var d = await r.json();
+    if (d.error) { body.innerHTML = '<div class="ad-empty" style="padding:20px;">' + esc(d.error) + '</div>'; return; }
+    body.innerHTML = renderUserDetailBody(d);
+  } catch(e) {
+    body.innerHTML = '<div class="ad-empty" style="padding:20px;">Yüklenemedi.</div>';
+  }
+}
+
+function closeUserDetail() {
+  document.getElementById('ud-overlay').style.display = 'none';
+}
+
+function renderUserDetailBody(d) {
+  var html = '';
+
+  // Watchlists
+  html += '<div class="ud-section">';
+  html += '<div class="ud-section-title">📌 Takip Listeleri</div>';
+  var wls = d.watchlists || [];
+  if (!wls.length) {
+    html += '<div class="ad-empty">Takip listesi yok.</div>';
+  } else {
+    wls.forEach(function(list) {
+      var items = list.items || [];
+      html += '<div class="ud-list-name">' + esc(list.icon || '⭐') + ' ' + esc(list.name) + ' <span class="ud-cnt">(' + items.length + ' hisse)</span></div>';
+      if (items.length) {
+        html += '<div class="ud-chips">';
+        items.forEach(function(it) {
+          html += '<div class="ud-chip">' + esc(it.symbol) + '<span class="ud-exch">' + esc(it.exchange) + '</span></div>';
+        });
+        html += '</div>';
+      } else {
+        html += '<div class="ad-empty" style="font-size:11px;margin-bottom:8px;">Boş liste</div>';
+      }
+    });
+  }
+  html += '</div>';
+
+  // Portfolios
+  html += '<div class="ud-section">';
+  html += '<div class="ud-section-title">📊 Portföyler</div>';
+  var pfs = d.portfolios || [];
+  if (!pfs.length) {
+    html += '<div class="ad-empty">Portföy yok.</div>';
+  } else {
+    pfs.forEach(function(pf) {
+      var positions = pf.positions || [];
+      html += '<div class="ud-list-name">' + esc(pf.icon || '📊') + ' ' + esc(pf.name) + ' <span class="ud-cnt">(' + positions.length + ' pozisyon)</span></div>';
+      if (positions.length) {
+        positions.forEach(function(pos) {
+          html += '<div class="ud-pos-row">';
+          html += '<div class="ud-pos-sym">' + esc(pos.symbol) + ' <span class="ud-pos-meta">(' + esc(pos.exchange) + ')</span></div>';
+          html += '<div class="ud-pos-meta">× ' + pos.quantity + '</div>';
+          html += '<div class="ud-pos-cost">@ ' + (pos.avgCost || 0).toFixed(2) + '</div>';
+          html += '</div>';
+        });
+      } else {
+        html += '<div class="ad-empty" style="font-size:11px;margin-bottom:8px;">Boş portföy</div>';
+      }
+    });
+  }
+  html += '</div>';
+
+  return html;
 }
 </script>
 </body>

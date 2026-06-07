@@ -644,6 +644,21 @@ async function handleAdminUsers(req, res) {
   }
 }
 
+// ── Admin User Detail ──────────────────────────
+async function handleAdminUserDetail(req, res) {
+  if (!checkAdminKey(req)) { jsonRes(res, 403, { error: 'Yetkisiz' }); return; }
+  const match = (req.url || '').match(/[?&]email=([^&]*)/);
+  if (!match) { jsonRes(res, 400, { error: 'email gerekli' }); return; }
+  const email = decodeURIComponent(match[1]).trim().toLowerCase();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { jsonRes(res, 400, { error: 'Geçersiz email' }); return; }
+  const userId = 'em_' + email;
+  const [watchlists, portfolios] = await Promise.all([
+    getWatchlists(userId).catch(() => []),
+    getPortfolios(userId).catch(() => [])
+  ]);
+  jsonRes(res, 200, { watchlists, portfolios });
+}
+
 // ── Admin Bans ─────────────────────────────────
 async function handleAdminBans(req, res) {
   if (!checkAdminKey(req)) { jsonRes(res, 403, { error: 'Yetkisiz' }); return; }
@@ -702,6 +717,7 @@ module.exports = async function handler(req, res) {
     if (path === '/api/report')              return await handleReport(req, res);
     if (path === '/api/admin/users')         return await handleAdminUsers(req, res);
     if (path === '/api/admin/bans')          return await handleAdminBans(req, res);
+    if (path === '/api/admin/user-detail')   return await handleAdminUserDetail(req, res);
     if (path === '/api/auth/register')        return await handleRegister(req, res);
     if (path === '/api/auth/login')           return await handleLogin(req, res);
     if (path === '/api/auth/me')              return await handleMe(req, res);
