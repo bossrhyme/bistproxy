@@ -1717,12 +1717,108 @@ function tblScroll(px){
 
 var BASIC_CHIP_CFG = {
   goatId: 'goat-chips', presetsId: 'presets', techId: 'tech-presets',
-  goatInfoId: 'goat-info', presetInfoId: 'preset-info', techInfoId: 'tech-preset-info'
+  goatInfoId: 'goat-info', presetInfoId: 'preset-info', techInfoId: 'tech-preset-info',
+  profileGridId: 'profile-grid'
 };
 var ADV_CHIP_CFG = {
   goatId: 'adv-goat-chips', presetsId: 'adv-presets', techId: 'adv-tech-presets',
-  goatInfoId: 'goat-info-adv', presetInfoId: 'preset-info-adv', techInfoId: 'tech-preset-info-adv'
+  goatInfoId: 'goat-info-adv', presetInfoId: 'preset-info-adv', techInfoId: 'tech-preset-info-adv',
+  profileGridId: 'adv-profile-grid'
 };
+
+// ── Yatırımcı Profilleri ────────────────────────────────────
+var INVESTOR_PROFILES = [
+  {
+    key: 'value-hunter',
+    label: 'Değer Avcısı',
+    icon: '🎯',
+    goat:   ['buffett'],
+    preset: ['value', 'lowdebt'],
+    tech:   []
+  },
+  {
+    key: 'growth-chaser',
+    label: 'Büyüme Takipçisi',
+    icon: '🚀',
+    goat:   [],
+    preset: ['growth', 'momentum'],
+    tech:   ['breakout']
+  },
+  {
+    key: 'dividend',
+    label: 'Temettü Odaklı',
+    icon: '💰',
+    goat:   [],
+    preset: ['dividend', 'quality', 'lowdebt'],
+    tech:   []
+  },
+  {
+    key: 'quality',
+    label: 'Kalite Odaklı',
+    icon: '⭐',
+    goat:   ['graham'],
+    preset: ['quality'],
+    tech:   ['trendFollow']
+  },
+  {
+    key: 'momentum-trader',
+    label: 'Momentum Trader',
+    icon: '⚡',
+    goat:   [],
+    preset: [],
+    tech:   ['breakout', 'techBuy', 'momentum3m', 'trendFollow']
+  },
+  {
+    key: 'piotroski',
+    label: 'Piotroski Avı',
+    icon: '🏆',
+    goat:   ['piotroski'],
+    preset: ['value', 'lowdebt'],
+    tech:   []
+  }
+];
+
+function _clearPanelChips(cfg) {
+  ['#' + cfg.goatId + ' .goat-chip', '#' + cfg.presetsId + ' .chip', '#' + cfg.techId + ' .chip'].forEach(function(sel) {
+    document.querySelectorAll(sel).forEach(function(c) { c.classList.remove('on'); });
+  });
+  // Clear profile active state
+  var pg = document.getElementById(cfg.profileGridId);
+  if (pg) pg.querySelectorAll('.profile-chip').forEach(function(c) { c.classList.remove('on'); });
+}
+
+function applyProfile(profileKey, cfg) {
+  var pg = document.getElementById(cfg.profileGridId);
+  var btn = pg ? pg.querySelector('.profile-chip[data-profile="' + profileKey + '"]') : null;
+  var isActive = btn && btn.classList.contains('on');
+
+  _clearPanelChips(cfg);
+
+  if (isActive) {
+    // Toggle off — just clear, trigger scan with no filters
+    _applyChips(cfg);
+    return;
+  }
+
+  var profile = INVESTOR_PROFILES.find(function(p) { return p.key === profileKey; });
+  if (!profile) return;
+
+  profile.goat.forEach(function(g) {
+    var c = document.querySelector('#' + cfg.goatId + ' .goat-chip[data-goat="' + g + '"]');
+    if (c) c.classList.add('on');
+  });
+  profile.preset.forEach(function(p) {
+    var c = document.querySelector('#' + cfg.presetsId + ' .chip[data-preset="' + p + '"]');
+    if (c) c.classList.add('on');
+  });
+  profile.tech.forEach(function(t) {
+    var c = document.querySelector('#' + cfg.techId + ' .chip[data-tech="' + t + '"]');
+    if (c) c.classList.add('on');
+  });
+
+  if (btn) btn.classList.add('on');
+  _applyChips(cfg);
+}
 
 function _applyChips(cfg) {
   if (_activeAsset !== 'hisse') selectAsset('hisse');

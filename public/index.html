@@ -805,6 +805,19 @@ if('serviceWorker' in navigator){
           </select>
         </div>
         
+
+        <div class="filter-group">
+          <div class="filter-group-title">👤 Profil Bazlı Tarama</div>
+          <div class="profile-chips" id="profile-grid">
+            <div class="chip profile-chip" data-profile="value-hunter" onclick="applyProfile('value-hunter', BASIC_CHIP_CFG)">🎯 Değer Avcısı</div>
+            <div class="chip profile-chip" data-profile="growth-chaser" onclick="applyProfile('growth-chaser', BASIC_CHIP_CFG)">🚀 Büyüme Takipçisi</div>
+            <div class="chip profile-chip" data-profile="dividend" onclick="applyProfile('dividend', BASIC_CHIP_CFG)">💰 Temettü Odaklı</div>
+            <div class="chip profile-chip" data-profile="quality" onclick="applyProfile('quality', BASIC_CHIP_CFG)">⭐ Kalite Odaklı</div>
+            <div class="chip profile-chip" data-profile="momentum-trader" onclick="applyProfile('momentum-trader', BASIC_CHIP_CFG)">⚡ Momentum Trader</div>
+            <div class="chip profile-chip" data-profile="piotroski" onclick="applyProfile('piotroski', BASIC_CHIP_CFG)">🏆 Piotroski Avı</div>
+          </div>
+        </div>
+        
         <div class="filter-group">
           <div class="filter-group-title">🐐 GOAT Yatırımcı ve Traderlar</div>
           <div class="chips" id="goat-chips">
@@ -1010,6 +1023,17 @@ if('serviceWorker' in navigator){
             <option value="Kamu">Kamu</option>
             <option value="Diğer">Diğer</option>
           </select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-group-title">👤 Profil Bazlı Tarama</div>
+          <div class="profile-chips" id="adv-profile-grid">
+            <div class="chip profile-chip" data-profile="value-hunter" onclick="applyProfile('value-hunter', ADV_CHIP_CFG)">🎯 Değer Avcısı</div>
+            <div class="chip profile-chip" data-profile="growth-chaser" onclick="applyProfile('growth-chaser', ADV_CHIP_CFG)">🚀 Büyüme Takipçisi</div>
+            <div class="chip profile-chip" data-profile="dividend" onclick="applyProfile('dividend', ADV_CHIP_CFG)">💰 Temettü Odaklı</div>
+            <div class="chip profile-chip" data-profile="quality" onclick="applyProfile('quality', ADV_CHIP_CFG)">⭐ Kalite Odaklı</div>
+            <div class="chip profile-chip" data-profile="momentum-trader" onclick="applyProfile('momentum-trader', ADV_CHIP_CFG)">⚡ Momentum Trader</div>
+            <div class="chip profile-chip" data-profile="piotroski" onclick="applyProfile('piotroski', ADV_CHIP_CFG)">🏆 Piotroski Avı</div>
+          </div>
         </div>
         <div class="filter-group">
           <div class="filter-group-title">🐐 GOAT Yatırımcı ve Traderlar</div>
@@ -1939,7 +1963,7 @@ if('serviceWorker' in navigator){
     </div>
   </div>
 </div>
-<script src="/deepfin.js?v=52"></script>
+<script src="/deepfin.js?v=53"></script>
 <div id="hisse-hidden-filters" style="display:none;">
   <input type="number" id="piotroski_min">
   <input type="number" id="piotroski_max">
