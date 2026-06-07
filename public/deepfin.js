@@ -1067,6 +1067,7 @@ async function runScan(){
     showDisclaimerModal();
     return;
   }
+  _track('scan', 'run');
   // Döviz kurları güncelleme (USD bazlı)
   try {
     const rateRes = await fetch('/api/rates');
@@ -1926,6 +1927,7 @@ document.getElementById('goat-chips').addEventListener('click', function(e) {
   var wasOn = chip.classList.contains('on');
   if (!wasOn && _countChips(BASIC_CHIP_CFG) >= 4) return;
   chip.classList.toggle('on');
+  if (!wasOn) _track('goat', chip.dataset.goat);
   applyAllChips();
   if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
 });
@@ -1934,6 +1936,7 @@ document.getElementById('presets').addEventListener('click', function(e) {
   var wasOn = chip.classList.contains('on');
   if (!wasOn && _countChips(BASIC_CHIP_CFG) >= 4) return;
   chip.classList.toggle('on');
+  if (!wasOn) _track('preset', chip.dataset.preset);
   applyAllChips();
   if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
 });
@@ -1942,6 +1945,7 @@ document.getElementById('tech-presets').addEventListener('click', function(e) {
   var wasOn = chip.classList.contains('on');
   if (!wasOn && _countChips(BASIC_CHIP_CFG) >= 4) return;
   chip.classList.toggle('on');
+  if (!wasOn) _track('tech', chip.dataset.tech);
   applyAllChips();
   if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
 });
@@ -1954,6 +1958,7 @@ document.getElementById('tech-presets').addEventListener('click', function(e) {
     var wasOn = chip.classList.contains('on');
     if (!wasOn && _countChips(ADV_CHIP_CFG) >= 4) return;
     chip.classList.toggle('on');
+    if (!wasOn) _track('goat', chip.dataset.goat);
     applyAllChipsAdv();
     if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
   });
@@ -1965,6 +1970,7 @@ document.getElementById('tech-presets').addEventListener('click', function(e) {
     var wasOn = chip.classList.contains('on');
     if (!wasOn && _countChips(ADV_CHIP_CFG) >= 4) return;
     chip.classList.toggle('on');
+    if (!wasOn) _track('preset', chip.dataset.preset);
     applyAllChipsAdv();
     if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
   });
@@ -1976,6 +1982,7 @@ document.getElementById('tech-presets').addEventListener('click', function(e) {
     var wasOn = chip.classList.contains('on');
     if (!wasOn && _countChips(ADV_CHIP_CFG) >= 4) return;
     chip.classList.toggle('on');
+    if (!wasOn) _track('tech', chip.dataset.tech);
     applyAllChipsAdv();
     if (window.innerWidth <= 768) setTimeout(closeMobileDrawer, 200);
   });

@@ -538,6 +538,11 @@ async function handleTrack(req, res) {
   try {
     const body = await readBody(req);
     const type = (body.type || '').toLowerCase().replace(/[^a-z]/g, '');
+    if (type === 'scan') {
+      await kvIncr('df_total_scans');
+      jsonRes(res, 200, { ok: true });
+      return;
+    }
     if (!['tech','goat','preset','wl'].includes(type)) { jsonRes(res, 400, {}); return; }
     const rawKey = (body.key || '').trim();
     const safeKey = type === 'wl'
