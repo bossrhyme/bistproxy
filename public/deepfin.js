@@ -2650,20 +2650,21 @@ function _loadLightweightCharts(cb) {
   if (_lcLoading) return;
   _lcLoading = true;
   var script = document.createElement('script');
-  script.src = 'https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js';
-  script.integrity = 'sha384-rRoXxn2yHlrZYB587Ki9RO1tONhLdM6XfORg7Rw4uwH4/Fh/5nP7IUX91bkaKUgs';
-  script.crossOrigin = 'anonymous';
+  script.src = 'https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js';
   script.onload = function() {
     _lcLoaded = true; _lcLoading = false;
     _lcQueue.forEach(function(fn){ fn(); }); _lcQueue = [];
   };
-  script.onerror = function() { _lcLoading = false; };
+  script.onerror = function() {
+    _lcLoading = false;
+    _lcQueue.forEach(function(fn){ fn(); }); _lcQueue = [];
+  };
   document.head.appendChild(script);
 }
 // ────────────────────────────────────────────────────
 
 function initChart(container) {
-  if (lwChart) { lwChart.remove(); lwChart = null; lwSeries = null; lwVolSeries = null; lwIndSeries = {}; }
+  if (lwChart) { try { lwChart.remove(); } catch(e){} lwChart = null; lwSeries = null; lwVolSeries = null; lwIndSeries = {}; }
   lwChart = LightweightCharts.createChart(container, {
     width: (container.offsetWidth > 50 ? container.offsetWidth : (document.querySelector('.detail.open')?.offsetWidth - 20 || 340)),
     height: 260,
