@@ -1037,6 +1037,7 @@ window.toggleAuthMode = function() {
   document.getElementById('pf-switch-text').textContent       = isReg ? 'Zaten hesabın var mı?' : 'Hesabın yok mu?';
   document.getElementById('pf-switch-btn').textContent        = isReg ? 'Giriş Yap' : 'Kayıt Ol';
   document.getElementById('pf-auth-password').setAttribute('autocomplete', isReg ? 'new-password' : 'current-password');
+  document.getElementById('pf-remember-row').style.display = isReg ? 'none' : 'flex';
   document.getElementById('pf-auth-err').textContent = '';
   if (!isReg) document.getElementById('pf-consent-check').checked = false;
 };
@@ -1082,12 +1083,13 @@ window.submitAuth = async function(e) {
     return;
   }
 
+  var rememberMe = document.getElementById('pf-remember-check').checked;
   var btn = document.getElementById('pf-auth-btn');
   btn.disabled = true; btn.textContent = 'Giriş yapılıyor...';
   try {
     var r = await fetch('/api/auth/login', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email, password: password }) });
+      body: JSON.stringify({ email: email, password: password, rememberMe: rememberMe }) });
     var d = await r.json();
     if (d.user) {
       _user = d.user;

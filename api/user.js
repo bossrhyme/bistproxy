@@ -79,11 +79,11 @@ function verifyPassword(password, stored) {
   return crypto.timingSafeEqual(hashBuf, derived);
 }
 
-async function createSession(userId) {
+async function createSession(userId, remember) {
   const token = crypto.randomBytes(32).toString('hex');
-  const ttl   = 30 * 24 * 60 * 60;
+  const ttl   = remember ? 30 * 24 * 60 * 60 : 24 * 60 * 60;
   await kvSet('sess:' + token, { userId, createdAt: Date.now(), expiresAt: Date.now() + ttl * 1000 }, ttl);
-  return { token, ttl };
+  return { token, ttl, remember: !!remember };
 }
 
 // ── watchlist helpers ─────────────────────────
@@ -168,7 +168,7 @@ async function handleRegister(req, res) {
   fetch(process.env.KV_REST_API_URL + '/incr/df_total_users', {
     method: 'POST', headers: { Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN }
   }).catch(() => {});
-  const { token, ttl } = await createSession(userId);
+  const { token, ttl } = await createSession(userId, true);
   res.setHeader('Set-Cookie', 'df_sess=' + token + '; Path=/; Max-Age=' + ttl + '; HttpOnly; Secure; SameSite=Lax');
   jsonRes(res, 200, { user: safeUser(user) });
 }
@@ -179,9 +179,10 @@ async function handleLogin(req, res) {
   if (!await rlCheck('login:' + getIP(req), 10, 900)) {
     jsonRes(res, 429, { error: 'Çok fazla deneme. 15 dakika sonra tekrar deneyin.' }); return;
   }
-  const body     = await readBody(req);
-  const email    = (body.email    || '').trim().toLowerCase();
-  const password = (body.password || '');
+  const body       = await readBody(req);
+  const email      = (body.email      || '').trim().toLowerCase();
+  const password   = (body.password   || '');
+  const rememberMe = !!body.rememberMe;
 
   if (!email || !password) { jsonRes(res, 400, { error: 'E-posta ve şifre gerekli' }); return; }
 
@@ -193,8 +194,9 @@ async function handleLogin(req, res) {
   try { ok = verifyPassword(password, user.passwordHash); } catch(e) { console.error('[login] verifyPassword error:', e.message); }
   if (!ok) { jsonRes(res, 401, { error: 'E-posta veya şifre hatalı' }); return; }
 
-  const { token, ttl } = await createSession(userId);
-  res.setHeader('Set-Cookie', 'df_sess=' + token + '; Path=/; Max-Age=' + ttl + '; HttpOnly; Secure; SameSite=Lax');
+  const { token, ttl } = await createSession(userId, rememberMe);
+  const cookieMaxAge = rememberMe ? '; Max-Age=' + ttl : '';
+  res.setHeader('Set-Cookie', 'df_sess=' + token + '; Path=/' + cookieMaxAge + '; HttpOnly; Secure; SameSite=Lax');
   jsonRes(res, 200, { user: safeUser(user) });
 }
 

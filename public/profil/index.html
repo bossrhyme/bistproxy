@@ -69,6 +69,9 @@ body{overflow-y:auto;}
 .pf-consent-check-row{display:flex;align-items:flex-start;gap:8px;margin-top:10px;cursor:pointer;}
 .pf-consent-check-row input[type=checkbox]{margin-top:2px;width:16px;height:16px;accent-color:var(--accent);flex-shrink:0;cursor:pointer;}
 .pf-consent-check-row span{font-size:12px;color:var(--text);font-weight:500;line-height:1.45;}
+.pf-remember-row{display:flex;align-items:center;gap:8px;margin:2px 0 0;cursor:pointer;}
+.pf-remember-row input[type=checkbox]{width:15px;height:15px;accent-color:var(--accent);cursor:pointer;flex-shrink:0;}
+.pf-remember-row span{font-size:12px;color:var(--muted2);font-weight:500;}
 
 /* ── IDENTITY CARD ── */
 #pf-user{display:none;}
@@ -380,6 +383,10 @@ body{overflow-y:auto;}
           <span>Kişisel verilerimin yukarıda belirtilen amaçlarla işlenmesini okudum, anladım ve onaylıyorum.</span>
         </label>
       </div>
+      <label class="pf-remember-row" id="pf-remember-row">
+        <input type="checkbox" id="pf-remember-check" checked>
+        <span>Beni hatırla</span>
+      </label>
       <button type="submit" class="pf-auth-submit" id="pf-auth-btn">Giriş Yap</button>
       <div class="pf-auth-err" id="pf-auth-err"></div>
     </form>
