@@ -3904,13 +3904,22 @@ function selectExchangeAndGo(exKey) {
 }
 
 function applyStrategyAndGo(goatKey) {
-  // Önce temizle, sonra strateji seç
   clearFilters();
   showScreener();
   setTimeout(function(){
     var chip = document.querySelector('.goat-chip[data-goat="' + goatKey + '"]');
     if(chip) { chip.click(); }
-    runScan();
+    else runScan();
+  }, 100);
+}
+
+function applyPresetAndGo(presetKey) {
+  clearFilters();
+  showScreener();
+  setTimeout(function(){
+    var chip = document.querySelector('.chip[data-preset="' + presetKey + '"]');
+    if(chip) { chip.click(); }
+    else runScan();
   }, 100);
 }
 

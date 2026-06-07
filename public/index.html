@@ -108,7 +108,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=arctic27">
+<link rel="stylesheet" href="/deepfin.css?v=arctic28">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -498,47 +498,29 @@ if('serviceWorker' in navigator){
       <!-- Stratejiler -->
       <div class="hp-section">
         <div class="hp-section-title">Popüler Stratejiler</div>
-        <div class="hp-strategy-list">
-          <a href="/?strategy=buffett" class="hp-strategy" onclick="event.preventDefault(); applyStrategyAndGo('buffett')">
-            <div class="hp-strategy-emoji">🎯</div>
-            <div class="hp-strategy-info">
-              <div class="hp-strategy-name">Warren Buffett</div>
-              <div class="hp-strategy-desc">Değer yatırımı · Güçlü marka · Düşük borç · Yüksek ROE</div>
+        <div class="hp-strat-chips">
+          <div class="hp-strat-group">
+            <div class="hp-strat-group-label">GOAT Yatırımcıları</div>
+            <div class="hp-strat-chips-row">
+              <button class="hp-chip" onclick="applyStrategyAndGo('buffett')">🎯 Buffett</button>
+              <button class="hp-chip" onclick="applyStrategyAndGo('graham')">📚 Graham</button>
+              <button class="hp-chip" onclick="applyStrategyAndGo('fisher')">🔭 Fisher</button>
+              <button class="hp-chip" onclick="applyStrategyAndGo('munger')">🧠 Munger</button>
+              <button class="hp-chip" onclick="applyStrategyAndGo('lynch')">📈 Lynch</button>
+              <button class="hp-chip" onclick="applyStrategyAndGo('piotroski')">🏆 Piotroski</button>
             </div>
-            <div class="hp-strategy-arrow">›</div>
-          </a>
-          <a href="/?strategy=lynch" class="hp-strategy" onclick="event.preventDefault(); applyStrategyAndGo('lynch')">
-            <div class="hp-strategy-emoji">📈</div>
-            <div class="hp-strategy-info">
-              <div class="hp-strategy-name">Peter Lynch — PEG</div>
-              <div class="hp-strategy-desc">Büyüme + değer · PEG &lt; 1 · Anlaşılır şirketler</div>
+          </div>
+          <div class="hp-strat-group">
+            <div class="hp-strat-group-label">Temel Analiz</div>
+            <div class="hp-strat-chips-row">
+              <button class="hp-chip" onclick="applyPresetAndGo('value')">🎯 Değer</button>
+              <button class="hp-chip" onclick="applyPresetAndGo('growth')">🚀 Büyüme</button>
+              <button class="hp-chip" onclick="applyPresetAndGo('dividend')">💰 Temettü</button>
+              <button class="hp-chip" onclick="applyPresetAndGo('quality')">⭐ Kalite</button>
+              <button class="hp-chip" onclick="applyPresetAndGo('lowdebt')">🛡️ Az Borç</button>
+              <button class="hp-chip" onclick="applyPresetAndGo('momentum')">⚡ Momentum</button>
             </div>
-            <div class="hp-strategy-arrow">›</div>
-          </a>
-          <a href="/?strategy=graham" class="hp-strategy" onclick="event.preventDefault(); applyStrategyAndGo('graham')">
-            <div class="hp-strategy-emoji">📚</div>
-            <div class="hp-strategy-info">
-              <div class="hp-strategy-name">Benjamin Graham</div>
-              <div class="hp-strategy-desc">Derin değer · Güvenlik marjı · F/K &lt; 10</div>
-            </div>
-            <div class="hp-strategy-arrow">›</div>
-          </a>
-          <a href="/?strategy=minervini" class="hp-strategy" onclick="event.preventDefault(); applyStrategyAndGo('minervini')">
-            <div class="hp-strategy-emoji">⚡</div>
-            <div class="hp-strategy-info">
-              <div class="hp-strategy-name">Mark Minervini — SEPA</div>
-              <div class="hp-strategy-desc">Momentum · EPS büyümesi · 52H zirvesine yakın</div>
-            </div>
-            <div class="hp-strategy-arrow">›</div>
-          </a>
-          <a href="/?strategy=piotroski" class="hp-strategy" onclick="event.preventDefault(); applyStrategyAndGo('piotroski')">
-            <div class="hp-strategy-emoji">🏆</div>
-            <div class="hp-strategy-info">
-              <div class="hp-strategy-name">Piotroski F-Score</div>
-              <div class="hp-strategy-desc">Bilanço sağlığı · 9 kriter · F-Score 7–9</div>
-            </div>
-            <div class="hp-strategy-arrow">›</div>
-          </a>
+          </div>
         </div>
       </div>
     </div>
@@ -1977,7 +1959,7 @@ if('serviceWorker' in navigator){
     </div>
   </div>
 </div>
-<script src="/deepfin.js?v=58"></script>
+<script src="/deepfin.js?v=59"></script>
 <div id="hisse-hidden-filters" style="display:none;">
   <input type="number" id="piotroski_min">
   <input type="number" id="piotroski_max">
