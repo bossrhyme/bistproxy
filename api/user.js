@@ -573,8 +573,9 @@ function checkAdminKey(req) {
 async function handleReport(req, res) {
   if (!checkAdminKey(req)) { jsonRes(res, 403, { error: 'Yetkisiz' }); return; }
   try {
-    const cached = await kvGet('rpt:cache').catch(() => null);
-    if (cached && cached._ts && Date.now() - cached._ts < 600000) {
+    const forceRefresh = (req.url || '').includes('force=1');
+    const cached = forceRefresh ? null : await kvGet('rpt:cache:v2').catch(() => null);
+    if (cached && cached._ts && Date.now() - cached._ts < 60000) {
       jsonRes(res, 200, cached); return;
     }
     const [scansRaw, usersRaw, userKeys, techKeys, goatKeys, presetKeys, wlKeys] = await Promise.all([
@@ -603,7 +604,7 @@ async function handleReport(req, res) {
       stats: { total_scans: parseInt(scansRaw, 10) || 0, total_users: Math.max(parseInt(usersRaw, 10) || 0, actualUsers) },
       strategies, watchlist, _ts: Date.now()
     };
-    await kvSet('rpt:cache', report, 600).catch(() => {});
+    await kvSet('rpt:cache:v2', report, 60).catch(() => {});
     jsonRes(res, 200, report);
   } catch(e) {
     jsonRes(res, 500, { error: e.message });

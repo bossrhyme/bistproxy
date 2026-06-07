@@ -181,6 +181,7 @@
     { "source": "/api/track",              "destination": "/api/user.js" },
     { "source": "/api/report",             "destination": "/api/user.js" },
     { "source": "/api/admin/users",        "destination": "/api/user.js" },
+    { "source": "/api/admin/bans",         "destination": "/api/user.js" },
     { "source": "/profil",            "destination": "/profil/index.html" },
     { "source": "/profil/",           "destination": "/profil/index.html" },
     { "source": "/admin",             "destination": "/admin/index.html" },
