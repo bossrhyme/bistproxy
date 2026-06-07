@@ -469,6 +469,6 @@ module.exports = async function handler(req, res) {
 
   } catch(err) {
     console.error('kripto-scan error:', err.message);
-    return res.status(500).json({ error: err.message, coins: [] });
+    return res.status(500).json({ error: 'Veri alınamadı', coins: [] });
   }
 };

@@ -249,6 +249,7 @@ async function handleWatchlists(req, res) {
   if (!checkOrigin(req)) { jsonRes(res, 403, { error: 'Geçersiz istek kaynağı' }); return; }
   const user = await getUser(req);
   if (!user) { jsonRes(res, 401, { error: 'Unauthorized' }); return; }
+  res.setHeader('Cache-Control', 'no-store, must-revalidate');
 
   const method  = req.method;
   const urlPath = (req.url || '').split('?')[0];
@@ -261,16 +262,23 @@ async function handleWatchlists(req, res) {
     jsonRes(res, 200, { watchlists: lists }); return;
   }
 
+  const VALID_EX = new Set(['bist','nasdaq','sp500','nyse','dax','lse','nikkei','krx','crypto',
+    'dublin','lisbon','brussels','amsterdam','france','moex','oslo','milan','tsx','twse',
+    'b3','hkex','china','saudi','sweden','india','uae','switzerland','australia','southafrica']);
+
   if (method === 'POST' && isItem) {
     const { listId, symbol, exchange, note } = await readBody(req);
     if (!listId || !symbol || !exchange) { jsonRes(res, 400, { error: 'listId, symbol, exchange required' }); return; }
-    if (typeof symbol !== 'string' || symbol.length > 20) { jsonRes(res, 400, { error: 'Geçersiz sembol' }); return; }
+    if (typeof symbol !== 'string' || !/^[A-Z0-9._-]{1,20}$/i.test(symbol)) { jsonRes(res, 400, { error: 'Geçersiz sembol' }); return; }
+    if (typeof exchange !== 'string' || !VALID_EX.has(exchange.toLowerCase())) { jsonRes(res, 400, { error: 'Geçersiz borsa' }); return; }
     if (typeof note === 'string' && note.length > 200) { jsonRes(res, 400, { error: 'Not en fazla 200 karakter olabilir' }); return; }
     const lists = await getWatchlists(user.id);
     const list  = lists.find(l => l.id === listId);
     if (!list) { jsonRes(res, 404, { error: 'List not found' }); return; }
-    if (!list.items.find(i => i.symbol === symbol && i.exchange === exchange)) {
-      list.items.push({ symbol, exchange, addedAt: Date.now(), note: note || '' });
+    const safeSymbol = symbol.toUpperCase().replace(/[^A-Z0-9._-]/g, '').slice(0, 20);
+    const safeExchange = exchange.toLowerCase();
+    if (!list.items.find(i => i.symbol === safeSymbol && i.exchange === safeExchange)) {
+      list.items.push({ symbol: safeSymbol, exchange: safeExchange, addedAt: Date.now(), note: note || '' });
     }
     await saveWatchlists(user.id, lists);
     jsonRes(res, 200, { watchlists: lists }); return;
@@ -310,7 +318,15 @@ async function handleWatchlists(req, res) {
       lists[idx].name = name.trim();
     }
     if (icon !== undefined) lists[idx].icon = typeof icon === 'string' ? icon.slice(0, 8) : '⭐';
-    if (items !== undefined) lists[idx].items = items;
+    if (items !== undefined) {
+      if (!Array.isArray(items)) { jsonRes(res, 400, { error: 'Geçersiz items' }); return; }
+      lists[idx].items = items.map(item => ({
+        symbol:   (typeof item.symbol === 'string' ? item.symbol.toUpperCase().replace(/[^A-Z0-9._-]/g, '').slice(0, 20) : ''),
+        exchange: (typeof item.exchange === 'string' && VALID_EX.has(item.exchange.toLowerCase())) ? item.exchange.toLowerCase() : 'bist',
+        addedAt:  typeof item.addedAt === 'number' ? item.addedAt : Date.now(),
+        note:     typeof item.note === 'string' ? item.note.slice(0, 200) : '',
+      })).filter(item => item.symbol);
+    }
     await saveWatchlists(user.id, lists);
     jsonRes(res, 200, { watchlists: lists }); return;
   }
@@ -352,6 +368,7 @@ async function handlePortfolio(req, res) {
   if (!checkOrigin(req)) { jsonRes(res, 403, { error: 'Geçersiz istek kaynağı' }); return; }
   const user = await getUser(req);
   if (!user) { jsonRes(res, 401, { error: 'Unauthorized' }); return; }
+  res.setHeader('Cache-Control', 'no-store, must-revalidate');
   const method  = req.method;
   const urlPath = (req.url || '').split('?')[0];
   const isItem  = urlPath.endsWith('/item');
@@ -485,6 +502,7 @@ async function handleChangePassword(req, res) {
 
 async function handleUpdateProfile(req, res) {
   if (req.method !== 'POST') { jsonRes(res, 405, { error: 'Method not allowed' }); return; }
+  if (!checkOrigin(req)) { jsonRes(res, 403, { error: 'Geçersiz istek kaynağı' }); return; }
   const user = await getUser(req);
   if (!user) { jsonRes(res, 401, { error: 'Unauthorized' }); return; }
   const { name } = await readBody(req);
@@ -499,6 +517,7 @@ async function handleUpdateProfile(req, res) {
 
 async function handleSetInvestorType(req, res) {
   if (req.method !== 'POST') { jsonRes(res, 405, { error: 'Method not allowed' }); return; }
+  if (!checkOrigin(req)) { jsonRes(res, 403, { error: 'Geçersiz istek kaynağı' }); return; }
   const user = await getUser(req);
   if (!user) { jsonRes(res, 401, { error: 'Unauthorized' }); return; }
   const { investorType } = await readBody(req);
@@ -536,9 +555,12 @@ function checkAdminKey(req) {
   const adminKey = process.env.ADMIN_KEY;
   if (!adminKey) return false;
   const hKey = req.headers['x-admin-key'] || '';
-  if (!hKey || hKey.length !== adminKey.length) return false;
+  if (!hKey) return false;
+  // HMAC karşılaştırması: anahtar uzunluğunu ele vermez, timing-safe
   try {
-    return crypto.timingSafeEqual(Buffer.from(hKey), Buffer.from(adminKey));
+    const h1 = crypto.createHmac('sha256', 'df').update(hKey).digest();
+    const h2 = crypto.createHmac('sha256', 'df').update(adminKey).digest();
+    return crypto.timingSafeEqual(h1, h2);
   } catch(e) { return false; }
 }
 
