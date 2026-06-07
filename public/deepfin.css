@@ -629,13 +629,40 @@ td:first-child,td:nth-child(2){text-align:left;}
   .hp-strategy-card { padding: 12px; }
   .hp-steps { flex-direction: column !important; gap: 16px; }
   .hp-step-connector { display: none !important; }
-  .hp-stat-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  /* Stats bar: 2×2 grid (dead .hp-stat-grid rule replaced with actual class) */
+  .hp-stats { display: grid; grid-template-columns: 1fr 1fr; }
+  .hp-stat { border-right: none; border-bottom: 1px solid var(--border); padding: 18px 16px; }
+  .hp-stat:nth-child(odd) { border-right: 1px solid var(--border); }
+  .hp-stat:last-child, .hp-stat:nth-last-child(2):nth-child(odd) { border-bottom: none; }
+  .hp-stat-val { font-size: 32px; }
+  .hp-stat-label { font-size: 12px; }
+
+  /* Body: tek sütun */
+  .hp-body { grid-template-columns: 1fr; }
+  .hp-section { border-right: none; border-bottom: 1px solid var(--border); padding: 24px 20px; }
+  .hp-section:last-child { border-bottom: none; }
+
+  /* Exchange grid: 2 sütun */
+  .hp-exchange-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .hp-excard { padding: 12px 14px; }
+  .hp-excard-flag img { width: 32px !important; height: 23px !important; }
+  .hp-excard-name { font-size: 14px; }
+  .hp-excard-count { font-size: 11px; margin-top: 2px; }
+
+  /* Strategy list */
+  .hp-strategy { padding: 14px; }
+  .hp-strategy-name { font-size: 13px; }
 
   /* ─────────────────────────────────────────
      FOOTER
   ───────────────────────────────────────── */
+  .hp-footer { padding: 28px 20px 0; }
+  .hp-footer-top { flex-direction: column; gap: 24px; }
+  .footer-brand { flex: none; }
+  .footer-links-group { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 24px; }
+  .hp-footer-bottom { flex-direction: column; text-align: center; gap: 6px; }
+  /* eski dead kurallar — kalsın zarar vermez */
   .footer-top { flex-direction: column; gap: 20px; }
-  .footer-links-group { flex-wrap: wrap; }
   .footer-bottom { flex-direction: column; text-align: center; gap: 8px; }
 
   /* ─────────────────────────────────────────
@@ -729,7 +756,8 @@ td:first-child,td:nth-child(2){text-align:left;}
 
   .hp-title { font-size: 24px !important; }
   .hp-strategies-grid { grid-template-columns: 1fr !important; }
-  .hp-stat-grid { grid-template-columns: 1fr !important; }
+  .hp-stats { grid-template-columns: 1fr 1fr; }
+  .hp-exchange-grid { grid-template-columns: 1fr 1fr; }
   .hp-howto-step { max-width: 100%; }
   .hp-cta-primary, .hp-cta-secondary { font-size: 13px; padding: 12px 16px; }
 }
