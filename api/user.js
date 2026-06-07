@@ -67,7 +67,7 @@ function verifyPassword(password, stored) {
 async function createSession(userId) {
   const token = crypto.randomBytes(32).toString('hex');
   const ttl   = 30 * 24 * 60 * 60;
-  await kvSet('sess:' + token, { userId, expiresAt: Date.now() + ttl * 1000 }, ttl);
+  await kvSet('sess:' + token, { userId, createdAt: Date.now(), expiresAt: Date.now() + ttl * 1000 }, ttl);
   return { token, ttl };
 }
 
@@ -425,7 +425,8 @@ async function handleChangePassword(req, res) {
   let ok = false;
   try { ok = verifyPassword(currentPassword, full.passwordHash); } catch(e) {}
   if (!ok) { jsonRes(res, 401, { error: 'Mevcut şifre hatalı' }); return; }
-  full.passwordHash = hashPassword(newPassword);
+  full.passwordHash      = hashPassword(newPassword);
+  full.passwordChangedAt = Date.now();
   await kvSet('usr:' + user.id, full);
   jsonRes(res, 200, { ok: true });
 }

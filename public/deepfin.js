@@ -10,6 +10,9 @@ function chipRadio(el) {
 }
 function chipToggle(el) { el.classList.toggle('on'); }
 
+function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function safeUrl(u) { var s = String(u||''); return /^https?:\/\//i.test(s) ? s : '#'; }
+
 // ── Durum ─────────────────────────────────────────────────────
 var _activeAsset = null;
 var _fonTicker   = [];
@@ -875,7 +878,7 @@ function _doShowListFilterPicker(rect) {
   if (_dfListFilter) {
     var clearRow = document.createElement('div');
     clearRow.style.cssText = 'padding:7px 12px;cursor:pointer;font-size:12px;color:var(--red);display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);margin-bottom:4px;';
-    clearRow.innerHTML = '<span>✕</span><span>Filtreyi kaldır — ' + _dfListFilter.name + '</span>';
+    clearRow.innerHTML = '<span>✕</span><span>Filtreyi kaldır — ' + esc(_dfListFilter.name) + '</span>';
     clearRow.onmouseenter = function() { clearRow.style.background = 'var(--red-bg)'; };
     clearRow.onmouseleave = function() { clearRow.style.background = ''; };
     clearRow.onclick = function(e) {
@@ -893,7 +896,7 @@ function _doShowListFilterPicker(rect) {
   function makeRow(icon, name, onclick) {
     var row = document.createElement('div');
     row.style.cssText = 'padding:7px 12px;cursor:pointer;font-size:12px;color:var(--text);display:flex;align-items:center;gap:8px;white-space:nowrap;overflow:hidden';
-    row.innerHTML = '<span>' + icon + '</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis">' + name + '</span>';
+    row.innerHTML = '<span>' + esc(icon) + '</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis">' + esc(name) + '</span>';
     row.onmouseenter = function() { row.style.background = 'var(--s2)'; };
     row.onmouseleave = function() { row.style.background = ''; };
     row.onclick = onclick; return row;
@@ -1028,9 +1031,9 @@ async function fetchNews(sym) {
     if (!items.length) { list.innerHTML = '<div style="color:var(--muted2);font-size:11px;text-align:center;padding:20px;">Haber bulunamadı.</div>'; return; }
     list.innerHTML = items.slice(0, 10).map(function(n) {
       var dt = n.published ? new Date(n.published*1000).toLocaleDateString('tr-TR',{day:'2-digit',month:'2-digit',year:'numeric'}) : '';
-      return '<a href="'+(n.url||'#')+'" target="_blank" rel="noopener" class="dnews-item">'
-        + '<div class="dnews-meta"><span class="dnews-src">'+(n.source||'')+'</span><span class="dnews-date">'+dt+'</span></div>'
-        + '<div class="dnews-title">'+(n.headline||n.title||'')+'</div></a>';
+      return '<a href="'+safeUrl(n.url)+'" target="_blank" rel="noopener noreferrer" class="dnews-item">'
+        + '<div class="dnews-meta"><span class="dnews-src">'+esc(n.source||'')+'</span><span class="dnews-date">'+esc(dt)+'</span></div>'
+        + '<div class="dnews-title">'+esc(n.headline||n.title||'')+'</div></a>';
     }).join('');
   } catch(e) {
     list.innerHTML = '<div style="color:var(--muted2);font-size:11px;text-align:center;padding:20px;">Haber yüklenemedi.</div>';
@@ -2948,7 +2951,7 @@ function _renderWlPicker(evt, sym, ex) {
   function makeRow(icon, name, onclick) {
     var row = document.createElement('div');
     row.style.cssText = 'padding:7px 12px;cursor:pointer;font-size:12px;color:var(--text);display:flex;align-items:center;gap:8px;white-space:nowrap;overflow:hidden';
-    row.innerHTML = '<span style="font-size:13px">' + icon + '</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis">' + name + '</span>';
+    row.innerHTML = '<span style="font-size:13px">' + esc(icon) + '</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis">' + esc(name) + '</span>';
     row.onmouseenter = function() { row.style.background = 'var(--s2)'; };
     row.onmouseleave = function() { row.style.background = ''; };
     row.onclick = onclick;

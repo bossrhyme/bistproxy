@@ -23,7 +23,9 @@ async function getUser(req) {
     if (session.expiresAt && Date.now() > session.expiresAt) return null;
 
     const user = await kvGet('usr:' + session.userId);
-    return user || null;
+    if (!user) return null;
+    if (user.passwordChangedAt && session.createdAt && session.createdAt < user.passwordChangedAt) return null;
+    return user;
   } catch (e) { return null; }
 }
 
