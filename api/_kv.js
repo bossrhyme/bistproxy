@@ -93,4 +93,4 @@ async function kvMGet(keys) {
   });
 }
 
-module.exports = { kvGet, kvSet, kvDel, kvIncr, kvKeys, kvMGet };
+module.exports = { kvGet, kvSet, kvDel, kvIncr, kvPipeline, kvKeys, kvMGet };

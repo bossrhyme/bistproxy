@@ -9,7 +9,7 @@
 //   *    /api/watchlists/item  → add/remove item
 // ─────────────────────────────────────────────
 const crypto = require('crypto');
-const { kvGet, kvSet, kvDel, kvIncr, kvKeys, kvMGet } = require('./_kv');
+const { kvGet, kvSet, kvDel, kvIncr, kvPipeline, kvKeys, kvMGet } = require('./_kv');
 const { getUser, parseCookie } = require('./_auth');
 
 // ── helpers ──────────────────────────────────
@@ -31,6 +31,23 @@ async function readBody(req) {
     req.on('end', () => { try { resolve(JSON.parse(data || '{}')); } catch(e) { resolve({}); } });
     req.on('error', () => resolve({}));
   });
+}
+
+function getIP(req) {
+  return ((req.headers['x-forwarded-for'] || '').split(',')[0].trim()
+    || req.socket.remoteAddress || 'unknown').slice(0, 45);
+}
+
+// KV-backed rate limiter. Returns true if request is allowed.
+async function rlCheck(key, max, windowSec) {
+  const safeKey = 'rl:' + key.replace(/[^a-z0-9.:@_-]/gi, '').slice(0, 60);
+  try {
+    const res = await kvPipeline([['INCR', safeKey], ['TTL', safeKey]]);
+    const count = (res[0] && res[0].result) || 0;
+    const ttl   = (res[1] && res[1].result) || -1;
+    if (ttl < 0) await kvPipeline([['EXPIRE', safeKey, windowSec]]);
+    return count <= max;
+  } catch(e) { return true; } // fail open if KV is down
 }
 
 // ── password helpers ─────────────────────────
@@ -79,6 +96,9 @@ function safeUser(u) {
 
 async function handleRegister(req, res) {
   if (req.method !== 'POST') { jsonRes(res, 405, { error: 'Method not allowed' }); return; }
+  if (!await rlCheck('reg:' + getIP(req), 5, 3600)) {
+    jsonRes(res, 429, { error: 'Çok fazla deneme. 1 saat sonra tekrar deneyin.' }); return;
+  }
   const body         = await readBody(req);
   const email        = (body.email        || '').trim().toLowerCase();
   const password     = (body.password     || '');
@@ -123,6 +143,9 @@ async function handleRegister(req, res) {
 
 async function handleLogin(req, res) {
   if (req.method !== 'POST') { jsonRes(res, 405, { error: 'Method not allowed' }); return; }
+  if (!await rlCheck('login:' + getIP(req), 10, 900)) {
+    jsonRes(res, 429, { error: 'Çok fazla deneme. 15 dakika sonra tekrar deneyin.' }); return;
+  }
   const body     = await readBody(req);
   const email    = (body.email    || '').trim().toLowerCase();
   const password = (body.password || '');
@@ -131,12 +154,11 @@ async function handleLogin(req, res) {
 
   const userId = 'em_' + email;
   const user   = await kvGet('usr:' + userId);
-  if (!user)              { jsonRes(res, 401, { error: 'Bu e-posta ile kayıtlı hesap bulunamadı' }); return; }
-  if (!user.passwordHash) { jsonRes(res, 401, { error: 'Hesap verisi eksik, lütfen tekrar kayıt olun' }); return; }
+  if (!user || !user.passwordHash) { jsonRes(res, 401, { error: 'E-posta veya şifre hatalı' }); return; }
 
   let ok = false;
   try { ok = verifyPassword(password, user.passwordHash); } catch(e) { console.error('[login] verifyPassword error:', e.message); }
-  if (!ok) { jsonRes(res, 401, { error: 'Şifre hatalı' }); return; }
+  if (!ok) { jsonRes(res, 401, { error: 'E-posta veya şifre hatalı' }); return; }
 
   const { token, ttl } = await createSession(userId);
   res.setHeader('Set-Cookie', 'df_sess=' + token + '; Path=/; Max-Age=' + ttl + '; HttpOnly; Secure; SameSite=Lax');
@@ -391,9 +413,13 @@ async function handleChangePassword(req, res) {
   if (req.method !== 'POST') { jsonRes(res, 405, { error: 'Method not allowed' }); return; }
   const user = await getUser(req);
   if (!user) { jsonRes(res, 401, { error: 'Unauthorized' }); return; }
+  if (!await rlCheck('cpw:' + user.id, 5, 3600)) {
+    jsonRes(res, 429, { error: 'Çok fazla deneme. 1 saat sonra tekrar deneyin.' }); return;
+  }
   const { currentPassword, newPassword } = await readBody(req);
   if (!currentPassword || !newPassword)  { jsonRes(res, 400, { error: 'Mevcut ve yeni şifre gerekli' }); return; }
   if (newPassword.length < 8)            { jsonRes(res, 400, { error: 'Yeni şifre en az 8 karakter olmalı' }); return; }
+  if (newPassword.length > 100)          { jsonRes(res, 400, { error: 'Yeni şifre çok uzun' }); return; }
   const full = await kvGet('usr:' + user.id);
   if (!full || !full.passwordHash) { jsonRes(res, 400, { error: 'Şifre değiştirilemedi' }); return; }
   let ok = false;
@@ -456,10 +482,11 @@ async function handleTrack(req, res) {
 function checkAdminKey(req) {
   const adminKey = process.env.ADMIN_KEY;
   if (!adminKey) return false;
-  const rawQ = ((req.url || '').match(/[?&]key=([^&]+)/) || [])[1] || '';
-  const qKey = rawQ ? decodeURIComponent(rawQ) : '';
   const hKey = req.headers['x-admin-key'] || '';
-  return qKey === adminKey || hKey === adminKey;
+  if (!hKey || hKey.length !== adminKey.length) return false;
+  try {
+    return crypto.timingSafeEqual(Buffer.from(hKey), Buffer.from(adminKey));
+  } catch(e) { return false; }
 }
 
 // ── Report ─────────────────────────────────────

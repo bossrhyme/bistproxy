@@ -255,7 +255,7 @@ async function doLogin() {
   btn.disabled = true; btn.textContent = 'Kontrol ediliyor...';
   document.getElementById('ad-err').textContent = '';
   try {
-    var r = await fetch('/api/report?key=' + encodeURIComponent(key));
+    var r = await fetch('/api/report', { headers: { 'x-admin-key': key } });
     if (r.status === 403) {
       document.getElementById('ad-err').textContent = 'Yanlış şifre.';
       btn.disabled = false; btn.textContent = 'Giriş Yap'; return;
@@ -317,7 +317,7 @@ async function loadReport() {
   document.getElementById('wl-loading').style.display = 'block';
   document.getElementById('wl-content').style.display = 'none';
   try {
-    var r = await fetch('/api/report?key=' + encodeURIComponent(_key));
+    var r = await fetch('/api/report', { headers: { 'x-admin-key': _key } });
     _reportData = await r.json();
     renderAll();
   } catch(e) {}
@@ -328,7 +328,7 @@ async function loadUsers() {
   document.getElementById('usr-loading').style.display = 'block';
   document.getElementById('usr-content').style.display = 'none';
   try {
-    var r = await fetch('/api/admin/users?key=' + encodeURIComponent(_key));
+    var r = await fetch('/api/admin/users', { headers: { 'x-admin-key': _key } });
     _usersData = await r.json();
     renderUsers();
   } catch(e) {
