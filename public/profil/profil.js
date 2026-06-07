@@ -976,6 +976,10 @@ async function createPortfolio(name) {
 window.toggleProfileMenu = function(e) {
   if (e) e.stopPropagation();
   var menu = document.getElementById('pf-profile-menu');
+  var btn  = e && e.currentTarget || document.querySelector('.pf-topbar-profile-btn');
+  var rect = btn ? btn.getBoundingClientRect() : { bottom: 54, right: window.innerWidth - 16 };
+  menu.style.top   = (rect.bottom + 6) + 'px';
+  menu.style.right = (window.innerWidth - rect.right) + 'px';
   menu.classList.toggle('open');
 };
 document.addEventListener('click', function() {

@@ -185,9 +185,8 @@ body{overflow-y:auto;}
 .pf-settings-label{font-size:10px;font-weight:700;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;}
 
 /* Profile topbar menu */
-.pf-topbar-btn-wrap{position:relative;}
 .pf-topbar-profile-btn{cursor:pointer!important;border-color:var(--accent)!important;color:var(--accent)!important;}
-#pf-profile-menu{position:absolute;right:0;top:calc(100% + 6px);background:var(--s1);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.22);min-width:170px;padding:5px 0;z-index:500;display:none;}
+#pf-profile-menu{position:fixed;background:var(--s1);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.28);min-width:170px;padding:5px 0;z-index:9999;display:none;}
 #pf-profile-menu.open{display:block;}
 .pf-menu-item{display:flex;align-items:center;gap:9px;padding:10px 15px;font-size:12px;font-weight:500;color:var(--text);cursor:pointer;transition:background .12s;white-space:nowrap;text-decoration:none;border:none;background:none;width:100%;font-family:inherit;}
 .pf-menu-item:hover{background:var(--s2);}
