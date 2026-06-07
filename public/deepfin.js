@@ -201,7 +201,7 @@ function _clearContent() {
 function _resetPanel(panelId) {
   var panel = document.getElementById(panelId);
   if (!panel) return;
-  panel.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); });
+  panel.querySelectorAll('.chip:not(.goat-chip)').forEach(function(c){ c.classList.remove('on'); });
   panel.querySelectorAll('input[type="number"]').forEach(function(inp){ inp.value = ''; });
   var tvsel = document.getElementById('k_tvrating');
   if (tvsel) tvsel.value = '';
@@ -2736,6 +2736,8 @@ function applyIndicators() {
 function updateChart(sym) {
   if (!sym) return;
   if (!_lcLoaded) {
+    var _lc_cont = document.getElementById('tv-chart-container');
+    if (_lc_cont) _lc_cont.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:11px;">Grafik yükleniyor...</div>';
     _loadLightweightCharts(function() { updateChart(sym); });
     return;
   }
@@ -2749,10 +2751,18 @@ function updateChart(sym) {
   var suffix = encodeURIComponent((EXCHANGE_META[currentExchange]||EXCHANGE_META.bist).yahooSuffix);
   var url = PROXY_URL + '?action=chart&symbol=' + sym + '&interval=' + interval + '&currency=' + currency + '&suffix=' + suffix;
 
+  function _chartError(msg) {
+    var cont = document.getElementById('tv-chart-container');
+    if (cont) cont.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:11px;flex-direction:column;gap:6px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>' + msg + '</div>';
+  }
+  _chartError('Grafik yükleniyor...');
   fetch(url)
     .then(function(r){ return r.json(); })
     .then(function(data) {
-      if (!data || data.s !== 'ok' || !data.candles || !data.candles.length) return;
+      if (!data || data.s !== 'ok' || !data.candles || !data.candles.length) {
+        _chartError('Grafik verisi alınamadı');
+        return;
+      }
       lwCandles = data.candles.map(function(c){ return { time:c.t, open:c.o, high:c.h, low:c.l, close:c.c, volume:c.v||0 }; });
       lwSeries.setData(lwCandles);
       lwChart.timeScale().fitContent();
@@ -2776,7 +2786,7 @@ function updateChart(sym) {
       _resizeChart(5);
       applyIndicators();
     })
-    .catch(function(e){ console.error('Chart error:', e); });
+    .catch(function(e){ console.error('Chart error:', e); _chartError('Grafik yüklenemedi'); });
 }
 
 // ── Yahoo Finance Doğrulama ──────────────────────────────────────────────
