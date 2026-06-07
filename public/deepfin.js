@@ -1869,7 +1869,7 @@ function _applyChips(cfg) {
     var p = TECH_PRESETS[c.dataset.tech]; if (p) mergeOne(p.filters);
   });
 
-  document.querySelectorAll('.finps input').forEach(function(i) { i.value = ''; });
+  document.querySelectorAll('.finps input, #hisse-hidden-filters input').forEach(function(i) { i.value = ''; });
   Object.keys(merged).forEach(function(k) {
     var el = document.getElementById(k); if (el) el.value = merged[k];
   });
@@ -1984,14 +1984,14 @@ function updateClrBtn() {
   const hasChip = document.querySelector('.chip.on');
   const sectorSel = (document.getElementById('sector_filter') || {}).value
                  || (document.getElementById('sector_filter_adv') || {}).value || '';
-  const hasInput = sectorSel !== '' || Array.from(document.querySelectorAll('.finps input')).some(i => i.value !== '');
+  const hasInput = sectorSel !== '' || Array.from(document.querySelectorAll('.finps input, #hisse-hidden-filters input')).some(i => i.value !== '');
   const show = (hasChip || hasInput) ? 'block' : 'none';
   btn.style.display = show;
   if (btnAdv) btnAdv.style.display = show;
 }
 
 function clearFilters(resetChips=true){
-  document.querySelectorAll('.finps input').forEach(i=>i.value='');
+  document.querySelectorAll('.finps input, #hisse-hidden-filters input').forEach(i=>i.value='');
   const sf = document.getElementById('sector_filter'); if(sf) sf.value = '';
   const sfAdv = document.getElementById('sector_filter_adv'); if(sfAdv) sfAdv.value = '';
   if(resetChips) { document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on')); ['goat-info','preset-info','tech-preset-info','goat-info-adv','preset-info-adv','tech-preset-info-adv'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.display='none';el.innerHTML='';}});}
