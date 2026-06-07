@@ -612,14 +612,14 @@ td:first-child,td:nth-child(2){text-align:left;}
   .hp-howto { padding: 28px 20px; }
   .hp-howto-steps { flex-direction: column; align-items: center; gap: 0; }
   .hp-howto-step {
-    width: 100%; max-width: 360px; min-height: auto;
-    flex-direction: row; align-items: center; gap: 14px;
-    padding: 14px 16px; text-align: left;
+    width: 100%; max-width: 320px; min-height: auto;
+    flex-direction: column; align-items: center; gap: 6px;
+    padding: 20px 16px 16px; text-align: center;
   }
-  .hp-howto-icon { font-size: 26px !important; margin-top: 0 !important; flex-shrink: 0; }
+  .hp-howto-icon { font-size: 26px !important; margin-top: 4px !important; }
   .hp-howto-label { font-size: 13px; }
-  .hp-howto-desc { min-height: auto !important; text-align: left !important; justify-content: flex-start !important; font-size: 11px; }
-  .hp-howto-num { position: static !important; transform: none !important; flex-shrink: 0; }
+  .hp-howto-desc { min-height: auto !important; text-align: center !important; justify-content: center !important; font-size: 11px; }
+  .hp-howto-num { position: absolute !important; top: -12px !important; left: 50% !important; transform: translateX(-50%) !important; }
   .hp-howto-arrow { transform: rotate(90deg); margin: 6px auto; padding-bottom: 0 !important; align-self: center; }
   .hp-disclaimer { margin: 16px 0 0; padding: 12px 14px; font-size: 11px; }
   .hp-section { padding: 28px 20px; }
