@@ -925,7 +925,7 @@ td:first-child,td:nth-child(2){text-align:left;}
 a.hp-nav-btn{text-decoration:none;color:var(--text2);display:inline-block;}
 a.hp-excard{text-decoration:none;color:inherit;display:flex;}
 a.hp-strategy{text-decoration:none;color:inherit;display:flex;}
-.hp-ex-extra{display:none;}
+a.hp-excard.hp-ex-extra{display:none;}
 .hp-ex-more-row{grid-column:1/-1;display:flex;justify-content:center;padding:4px 0;}
 .hp-ex-more-btn{background:var(--s1);border:1px solid var(--border);border-radius:20px;padding:6px 18px;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .15s;}
 .hp-ex-more-btn:hover{border-color:var(--accent);color:var(--accent);}
