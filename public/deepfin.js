@@ -3187,6 +3187,7 @@ function switchXTab(el) {
   const tab = el.dataset.xtab;
   const panel = document.getElementById('dxpanel-' + tab);
   if (panel) panel.classList.add('on');
+  if (tab === 'news' && selSym) fetchNews(selSym);
 }
 
 // SEC EDGAR — Form 4 Insider Trading
