@@ -85,6 +85,7 @@ async function handleRegister(req, res) {
   const username     = (body.username     || '').trim();
   const investorType = (body.investorType || '').trim() || null;
   const name         = (body.name         || username || '').trim();
+  const dob          = (body.dob          || '').trim() || null;
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     jsonRes(res, 400, { error: 'Geçerli bir e-posta adresi girin' }); return;
@@ -107,6 +108,7 @@ async function handleRegister(req, res) {
   const user = {
     id: userId, email, username,
     name: name || username,
+    dob,
     picture: '', createdAt: Date.now(), passwordHash,
     investorType, points: 0, lastLoginDate: null, loginStreak: 0
   };

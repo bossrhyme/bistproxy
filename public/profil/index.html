@@ -62,6 +62,13 @@ body{overflow-y:auto;}
 .pf-auth-err{font-size:12px;color:var(--red);min-height:16px;}
 .pf-auth-switch{margin-top:14px;font-size:12px;color:var(--muted2);}
 .pf-auth-switch button{background:none;border:none;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;padding:0;margin-left:4px;}
+.pf-consent-block{margin-top:2px;}
+.pf-consent-text{background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:12px 14px;font-size:11px;color:var(--muted2);line-height:1.65;max-height:180px;overflow-y:auto;text-align:left;}
+.pf-consent-text strong{color:var(--text);display:block;margin-top:10px;}
+.pf-consent-text strong:first-child{margin-top:0;}
+.pf-consent-check-row{display:flex;align-items:flex-start;gap:8px;margin-top:10px;cursor:pointer;}
+.pf-consent-check-row input[type=checkbox]{margin-top:2px;width:16px;height:16px;accent-color:var(--accent);flex-shrink:0;cursor:pointer;}
+.pf-consent-check-row span{font-size:12px;color:var(--text);font-weight:500;line-height:1.45;}
 
 /* ── IDENTITY CARD ── */
 #pf-user{display:none;}
@@ -343,8 +350,36 @@ body{overflow-y:auto;}
     <div class="pf-login-sub">Takip listelerini kaydet, cihazlar arası senkronize et.</div>
     <form class="pf-auth-form" onsubmit="submitAuth(event)">
       <input type="email"    id="pf-auth-email"    placeholder="E-posta adresi" autocomplete="email"            required maxlength="120">
+      <input type="text"     id="pf-auth-fullname" placeholder="Ad Soyad" autocomplete="name" maxlength="60" style="display:none">
+      <input type="text"     id="pf-auth-dob"      placeholder="Doğum Tarihi (GG/AA/YYYY)" autocomplete="bday" maxlength="10" inputmode="numeric" style="display:none">
       <input type="text"     id="pf-auth-username" placeholder="Kullanıcı adı (3-20 karakter)" autocomplete="username" maxlength="20" style="display:none">
       <input type="password" id="pf-auth-password" placeholder="Şifre (en az 8 karakter)" autocomplete="current-password" required maxlength="100">
+      <div id="pf-consent-block" style="display:none;" class="pf-consent-block">
+        <div class="pf-consent-text">
+          <strong>Kişisel Verilerin İşlenmesi Hakkında Aydınlatma Metni</strong>
+          <strong>Veri Sorumlusu</strong>
+          DeepFin (deepfin.vercel.app)
+          <strong>Toplanan Kişisel Veriler</strong>
+          E-posta adresi, ad soyad, doğum tarihi, kullanıcı adı ve platform kullanım istatistikleri.
+          <strong>İşleme Amaçları</strong>
+          · Hesabınızın oluşturulması ve yönetilmesi<br>
+          · Yatırımcı profilinizin kişiselleştirilmesi<br>
+          · Platform hizmetlerinin sunulması ve iyileştirilmesi<br>
+          · Güvenlik ve kimlik doğrulama işlemleri
+          <strong>Hukuki Dayanak</strong>
+          6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) uyarınca açık rızanıza ve sözleşmenin ifasına dayanmaktadır.
+          <strong>Saklama Süresi</strong>
+          Verileriniz hesabınız aktif olduğu süre boyunca ve yasal yükümlülükler kapsamında saklanmaktadır. Hesabınızı sildiğinizde kişisel verileriniz en geç 30 gün içinde sistemden kaldırılır.
+          <strong>Haklarınız (KVKK Madde 11)</strong>
+          Kişisel verilerinize erişme, düzeltme, silme, işlenmesini kısıtlama ve itiraz etme haklarına sahipsiniz. Bu haklarınızı profil sayfanız üzerinden kullanabilirsiniz.
+          <strong>Üçüncü Taraf Paylaşımı</strong>
+          Verileriniz yalnızca altyapı sağlayıcısı Upstash (şifreli veritabanı) ile paylaşılmakta olup reklam, pazarlama veya ticari amaçlarla üçüncü taraflarla paylaşılmamaktadır.
+        </div>
+        <label class="pf-consent-check-row">
+          <input type="checkbox" id="pf-consent-check">
+          <span>Kişisel verilerimin yukarıda belirtilen amaçlarla işlenmesini okudum, anladım ve onaylıyorum.</span>
+        </label>
+      </div>
       <button type="submit" class="pf-auth-submit" id="pf-auth-btn">Giriş Yap</button>
       <div class="pf-auth-err" id="pf-auth-err"></div>
     </form>

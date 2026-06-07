@@ -319,7 +319,7 @@ window.finishQuiz = async function(type) {
 
   // New registration flow
   try {
-    var body = { email: _tempReg.email, password: _tempReg.password, username: _tempReg.username, investorType: type };
+    var body = { email: _tempReg.email, password: _tempReg.password, username: _tempReg.username, name: _tempReg.name || '', dob: _tempReg.dob || '', investorType: type };
     var r2 = await fetch('/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
     var d2 = await r2.json();
     if (d2.user) {
@@ -1024,13 +1024,17 @@ window.changePassword = async function() {
 window.toggleAuthMode = function() {
   _authMode = _authMode === 'login' ? 'register' : 'login';
   var isReg = _authMode === 'register';
-  document.getElementById('pf-auth-title').textContent      = isReg ? 'Hesap Oluştur' : 'Profiline giriş yap';
-  document.getElementById('pf-auth-btn').textContent        = isReg ? 'Devam Et →' : 'Giriş Yap';
-  document.getElementById('pf-auth-username').style.display = isReg ? 'block' : 'none';
-  document.getElementById('pf-switch-text').textContent     = isReg ? 'Zaten hesabın var mı?' : 'Hesabın yok mu?';
-  document.getElementById('pf-switch-btn').textContent      = isReg ? 'Giriş Yap' : 'Kayıt Ol';
+  document.getElementById('pf-auth-title').textContent        = isReg ? 'Hesap Oluştur' : 'Profiline giriş yap';
+  document.getElementById('pf-auth-btn').textContent          = isReg ? 'Devam Et →' : 'Giriş Yap';
+  document.getElementById('pf-auth-fullname').style.display   = isReg ? 'block' : 'none';
+  document.getElementById('pf-auth-dob').style.display        = isReg ? 'block' : 'none';
+  document.getElementById('pf-auth-username').style.display   = isReg ? 'block' : 'none';
+  document.getElementById('pf-consent-block').style.display   = isReg ? 'block' : 'none';
+  document.getElementById('pf-switch-text').textContent       = isReg ? 'Zaten hesabın var mı?' : 'Hesabın yok mu?';
+  document.getElementById('pf-switch-btn').textContent        = isReg ? 'Giriş Yap' : 'Kayıt Ol';
   document.getElementById('pf-auth-password').setAttribute('autocomplete', isReg ? 'new-password' : 'current-password');
   document.getElementById('pf-auth-err').textContent = '';
+  if (!isReg) document.getElementById('pf-consent-check').checked = false;
 };
 
 window.submitAuth = async function(e) {
@@ -1044,6 +1048,20 @@ window.submitAuth = async function(e) {
   if (!email || !password) { errEl.textContent = 'E-posta ve şifre gerekli.'; return; }
 
   if (_authMode === 'register') {
+    var fullname = (document.getElementById('pf-auth-fullname').value || '').trim();
+    var dobRaw   = (document.getElementById('pf-auth-dob').value || '').trim();
+    var consent  = document.getElementById('pf-consent-check').checked;
+
+    if (!fullname || fullname.length < 2) {
+      errEl.textContent = 'Ad Soyad en az 2 karakter olmalı.'; return;
+    }
+    if (!dobRaw) {
+      errEl.textContent = 'Doğum tarihi gerekli.'; return;
+    }
+    var dobParsed = _parseDob(dobRaw);
+    if (!dobParsed) {
+      errEl.textContent = 'Geçerli bir doğum tarihi girin (GG/AA/YYYY).'; return;
+    }
     if (password.length < 8) { errEl.textContent = 'Şifre en az 8 karakter olmalı.'; return; }
     if (!username || username.length < 3 || username.length > 20) {
       errEl.textContent = 'Kullanıcı adı 3-20 karakter olmalı.'; return;
@@ -1051,7 +1069,10 @@ window.submitAuth = async function(e) {
     if (!/^[a-zA-Z0-9_]+$/.test(username)) {
       errEl.textContent = 'Kullanıcı adı sadece harf, rakam ve alt çizgi içerebilir.'; return;
     }
-    _tempReg = { email: email, password: password, username: username };
+    if (!consent) {
+      errEl.textContent = 'Devam edebilmek için gizlilik metnini okuyup onaylamanız gerekiyor.'; return;
+    }
+    _tempReg = { email: email, password: password, username: username, name: fullname, dob: dobParsed };
     showQuiz();
     return;
   }
@@ -1090,6 +1111,17 @@ window.submitAuth = async function(e) {
 };
 
 // ── Helpers ───────────────────────────────────
+function _parseDob(raw) {
+  // Accepts GG/AA/YYYY or GG.AA.YYYY or GG-AA-YYYY
+  var m = raw.match(/^(\d{1,2})[\/\.\-](\d{1,2})[\/\.\-](\d{4})$/);
+  if (!m) return null;
+  var d = parseInt(m[1], 10), mo = parseInt(m[2], 10), y = parseInt(m[3], 10);
+  if (mo < 1 || mo > 12 || d < 1 || d > 31 || y < 1900 || y > new Date().getFullYear()) return null;
+  var dt = new Date(y, mo - 1, d);
+  if (dt.getFullYear() !== y || dt.getMonth() !== mo - 1 || dt.getDate() !== d) return null;
+  return y + '-' + String(mo).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+}
+
 function esc(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
