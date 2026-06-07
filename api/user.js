@@ -142,10 +142,10 @@ async function handleRegister(req, res) {
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     jsonRes(res, 400, { error: 'Geçerli bir e-posta adresi girin' }); return;
   }
-  if (!password || password.length < 8) {
-    jsonRes(res, 400, { error: 'Şifre en az 8 karakter olmalı' }); return;
+  if (!password || password.length < 6) {
+    jsonRes(res, 400, { error: 'Şifre en az 6 karakter olmalı' }); return;
   }
-  if (password.length > 100) { jsonRes(res, 400, { error: 'Şifre çok uzun' }); return; }
+  if (password.length > 20) { jsonRes(res, 400, { error: 'Şifre en fazla 20 karakter olabilir' }); return; }
   if (!username || username.length < 3 || username.length > 20 || !/^[a-zA-Z0-9_]+$/.test(username)) {
     jsonRes(res, 400, { error: 'Kullanıcı adı 3-20 karakter, sadece harf/rakam/alt çizgi olabilir' }); return;
   }
@@ -468,8 +468,8 @@ async function handleChangePassword(req, res) {
   }
   const { currentPassword, newPassword } = await readBody(req);
   if (!currentPassword || !newPassword)  { jsonRes(res, 400, { error: 'Mevcut ve yeni şifre gerekli' }); return; }
-  if (newPassword.length < 8)            { jsonRes(res, 400, { error: 'Yeni şifre en az 8 karakter olmalı' }); return; }
-  if (newPassword.length > 100)          { jsonRes(res, 400, { error: 'Yeni şifre çok uzun' }); return; }
+  if (newPassword.length < 6)            { jsonRes(res, 400, { error: 'Yeni şifre en az 6 karakter olmalı' }); return; }
+  if (newPassword.length > 20)           { jsonRes(res, 400, { error: 'Yeni şifre en fazla 20 karakter olabilir' }); return; }
   const full = await kvGet('usr:' + user.id);
   if (!full || !full.passwordHash) { jsonRes(res, 400, { error: 'Şifre değiştirilemedi' }); return; }
   let ok = false;

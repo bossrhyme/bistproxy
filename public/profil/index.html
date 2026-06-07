@@ -353,7 +353,7 @@ body{overflow-y:auto;}
       <input type="text"     id="pf-auth-fullname" placeholder="Ad Soyad" autocomplete="name" maxlength="60" style="display:none">
       <input type="text"     id="pf-auth-dob"      placeholder="Doğum Tarihi (GG/AA/YYYY)" autocomplete="bday" maxlength="10" inputmode="numeric" style="display:none">
       <input type="text"     id="pf-auth-username" placeholder="Kullanıcı adı (3-20 karakter)" autocomplete="username" maxlength="20" style="display:none">
-      <input type="password" id="pf-auth-password" placeholder="Şifre (en az 8 karakter)" autocomplete="current-password" required maxlength="100">
+      <input type="password" id="pf-auth-password" placeholder="Şifre (6-20 karakter)" autocomplete="current-password" required minlength="6" maxlength="20">
       <div id="pf-consent-block" style="display:none;" class="pf-consent-block">
         <div class="pf-consent-text">
           <strong>Kişisel Verilerin İşlenmesi Hakkında Aydınlatma Metni</strong>
@@ -458,9 +458,9 @@ body{overflow-y:auto;}
           <div class="pf-settings-group">
             <div class="pf-settings-label">Şifre Değiştir</div>
             <div style="display:flex;flex-direction:column;gap:8px;max-width:300px;">
-              <input type="password" id="pf-pw-cur"  class="pf-settings-input" placeholder="Mevcut şifre"   autocomplete="current-password">
-              <input type="password" id="pf-pw-new"  class="pf-settings-input" placeholder="Yeni şifre"     autocomplete="new-password">
-              <input type="password" id="pf-pw-conf" class="pf-settings-input" placeholder="Şifreyi onayla" autocomplete="new-password">
+              <input type="password" id="pf-pw-cur"  class="pf-settings-input" placeholder="Mevcut şifre"        autocomplete="current-password" maxlength="20">
+              <input type="password" id="pf-pw-new"  class="pf-settings-input" placeholder="Yeni şifre (6-20 karakter)" autocomplete="new-password" minlength="6" maxlength="20">
+              <input type="password" id="pf-pw-conf" class="pf-settings-input" placeholder="Şifreyi onayla"      autocomplete="new-password" minlength="6" maxlength="20">
               <div class="pf-auth-err" id="pf-pw-err"></div>
               <button class="pf-add-btn" id="pf-pw-btn" onclick="changePassword()" style="align-self:flex-start">Güncelle</button>
             </div>

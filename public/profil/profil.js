@@ -1006,7 +1006,8 @@ window.changePassword = async function() {
   var errEl = document.getElementById('pf-pw-err');
   errEl.textContent = '';
   if (!cur || !nw || !conf)  { errEl.textContent = 'Tüm alanları doldurun.'; return; }
-  if (nw.length < 8)         { errEl.textContent = 'Yeni şifre en az 8 karakter.'; return; }
+  if (nw.length < 6)         { errEl.textContent = 'Yeni şifre en az 6 karakter.'; return; }
+  if (nw.length > 20)        { errEl.textContent = 'Yeni şifre en fazla 20 karakter olabilir.'; return; }
   if (nw !== conf)           { errEl.textContent = 'Yeni şifreler eşleşmiyor.'; return; }
   var btn = document.getElementById('pf-pw-btn'); btn.disabled = true;
   try {
@@ -1065,7 +1066,8 @@ window.submitAuth = async function(e) {
     if (!dobParsed) {
       errEl.textContent = 'Geçerli bir doğum tarihi girin (GG/AA/YYYY).'; return;
     }
-    if (password.length < 8) { errEl.textContent = 'Şifre en az 8 karakter olmalı.'; return; }
+    if (password.length < 6) { errEl.textContent = 'Şifre en az 6 karakter olmalı.'; return; }
+    if (password.length > 20) { errEl.textContent = 'Şifre en fazla 20 karakter olabilir.'; return; }
     if (!username || username.length < 3 || username.length > 20) {
       errEl.textContent = 'Kullanıcı adı 3-20 karakter olmalı.'; return;
     }
