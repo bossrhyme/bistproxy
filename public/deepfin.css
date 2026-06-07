@@ -136,7 +136,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter', sans-serif;}
 #sb-panel-basic .exbtn[data-exchange="india"],
 #sb-panel-basic .exbtn[data-exchange="uae"] { display: none !important; }
 
-/* Saklanan GOAT'lar (basic'te sadece: Buffett Fisher Graham Munger kalır) */
+/* Saklanan GOAT'lar (basic'te: Buffett Fisher Graham Lynch Munger kalır) */
 #goat-chips .goat-chip[data-goat="ackman"],
 #goat-chips .goat-chip[data-goat="ark"],
 #goat-chips .goat-chip[data-goat="dalio"],
@@ -144,7 +144,6 @@ body{background:var(--bg);color:var(--text);font-family:'Inter', sans-serif;}
 #goat-chips .goat-chip[data-goat="greenblatt"],
 #goat-chips .goat-chip[data-goat="icahn"],
 #goat-chips .goat-chip[data-goat="klarman"],
-#goat-chips .goat-chip[data-goat="lynch"],
 #goat-chips .goat-chip[data-goat="marks"],
 #goat-chips .goat-chip[data-goat="minervini"],
 #goat-chips .goat-chip[data-goat="oneil"],
