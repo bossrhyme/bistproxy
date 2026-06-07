@@ -716,34 +716,34 @@ const PROXY_URL = '/api/scan';
 // ── EXCHANGE CONFIG ──
 let currentExchange = 'bist';
 const EXCHANGE_META = {
-  bist:   { name: 'BIST',    currency: '₺', currencyCode: 'TRY', flag: '🇹🇷', yahooSuffix: '.IS', filters: [] },
-  nasdaq: { name: 'NASDAQ',  currency: '$',  currencyCode: 'USD', flag: '🇺🇸', yahooSuffix: '',    filters: [{ left: 'exchange', operation: 'equal', right: 'NASDAQ' }] },
-  sp500:  { name: 'S&P 500', currency: '$',  currencyCode: 'USD', flag: '🇺🇸', yahooSuffix: '',    filters: [] },
-  dax:    { name: 'DAX',     currency: '€',  currencyCode: 'EUR', flag: '🇩🇪', yahooSuffix: '.DE', filters: [] },
-  lse:    { name: 'LSE',     currency: '£',  currencyCode: 'GBP', flag: '🇬🇧', yahooSuffix: '.L',  filters: [] },
-  nikkei: { name: 'Nikkei',  currency: '¥',  currencyCode: 'JPY', flag: '🇯🇵', yahooSuffix: '.T',  filters: [] },
-  nyse:   { name: 'NYSE',   currency: '$',  currencyCode: 'USD', flag: '🇺🇸', yahooSuffix: '',    filters: [{ left: 'exchange', operation: 'equal', right: 'NYSE' }] },
-  krx:    { name: 'KRX',    currency: '₩',  currencyCode: 'KRW', flag: '🇰🇷', yahooSuffix: '.KS', filters: [] },
-  moex:   { name: 'MOEX',   currency: '₽',  currencyCode: 'RUB', flag: '🇷🇺', yahooSuffix: '.ME', filters: [] },
-  france:    { name: 'Euronext Paris',     currency: '€', currencyCode: 'EUR', flag: '🇫🇷', yahooSuffix: '.PA', filters: [] },
-  amsterdam: { name: 'Euronext Amsterdam', currency: '€', currencyCode: 'EUR', flag: '🇳🇱', yahooSuffix: '.AS', filters: [] },
-  brussels:  { name: 'Euronext Brussels',  currency: '€', currencyCode: 'EUR', flag: '🇧🇪', yahooSuffix: '.BR', filters: [] },
-  lisbon:    { name: 'Euronext Lisbon',    currency: '€', currencyCode: 'EUR', flag: '🇵🇹', yahooSuffix: '.LS', filters: [] },
-  dublin:    { name: 'Euronext Dublin',    currency: '€', currencyCode: 'EUR', flag: '🇮🇪', yahooSuffix: '.IR', filters: [] },
-  oslo:      { name: 'Oslo Bors',          currency: 'kr', currencyCode: 'NOK', flag: '🇳🇴', yahooSuffix: '.OL', filters: [] },
-  milan:     { name: 'Borsa Italiana',     currency: '€', currencyCode: 'EUR', flag: '🇮🇹', yahooSuffix: '.MI', filters: [] },
-  tsx:       { name: 'TSX',               currency: 'C$', currencyCode: 'CAD', flag: '🇨🇦', yahooSuffix: '.TO', filters: [] },
-  twse:      { name: 'TWSE',              currency: 'NT$', currencyCode: 'TWD', flag: '🇹🇼', yahooSuffix: '.TW', filters: [] },
-  b3:        { name: 'B3',               currency: 'R$',  currencyCode: 'BRL', flag: '🇧🇷', yahooSuffix: '.SA', filters: [] },
-  hkex:      { name: 'HKEX',            currency: 'HK$', currencyCode: 'HKD', flag: '🇭🇰', yahooSuffix: '.HK', filters: [] },
-  china:     { name: 'SSE/SZSE',        currency: '¥',   currencyCode: 'CNY', flag: '🇨🇳', yahooSuffix: '.SS', filters: [] },
-  saudi:       { name: 'Tadawul',         currency: '﷼',   currencyCode: 'SAR', flag: '🇸🇦', yahooSuffix: '.SR', filters: [] },
-  switzerland: { name: 'SIX',             currency: 'Fr',  currencyCode: 'CHF', flag: '🇨🇭', yahooSuffix: '.SW', filters: [] },
-  australia:   { name: 'ASX',             currency: 'A$',  currencyCode: 'AUD', flag: '🇦🇺', yahooSuffix: '.AX', filters: [] },
-  southafrica: { name: 'JSE',             currency: 'R',   currencyCode: 'ZAR', flag: '🇿🇦', yahooSuffix: '.JO', filters: [] },
-  sweden:      { name: 'Nasdaq S.', currency: 'kr', currencyCode: 'SEK', flag: '🇸🇪', yahooSuffix: '.ST', filters: [] },
-  india:       { name: 'NSE',             currency: '₹',   currencyCode: 'INR', flag: '🇮🇳', yahooSuffix: '.NS', filters: [] },
-  uae:         { name: 'DFM',             currency: 'د.إ', currencyCode: 'AED', flag: '🇦🇪', yahooSuffix: '.DU', filters: [] },
+  bist:        { name: 'BIST',             currency: '₺',   currencyCode: 'TRY', flag: '🇹🇷', yahooSuffix: '.IS', tvPrefix: 'BIST',       filters: [] },
+  nasdaq:      { name: 'NASDAQ',           currency: '$',   currencyCode: 'USD', flag: '🇺🇸', yahooSuffix: '',    tvPrefix: 'NASDAQ',     filters: [{ left: 'exchange', operation: 'equal', right: 'NASDAQ' }] },
+  sp500:       { name: 'S&P 500',          currency: '$',   currencyCode: 'USD', flag: '🇺🇸', yahooSuffix: '',    tvPrefix: '',           filters: [] },
+  dax:         { name: 'DAX',              currency: '€',   currencyCode: 'EUR', flag: '🇩🇪', yahooSuffix: '.DE', tvPrefix: 'XETR',       filters: [] },
+  lse:         { name: 'LSE',              currency: '£',   currencyCode: 'GBP', flag: '🇬🇧', yahooSuffix: '.L',  tvPrefix: 'LSE',        filters: [] },
+  nikkei:      { name: 'Nikkei',           currency: '¥',   currencyCode: 'JPY', flag: '🇯🇵', yahooSuffix: '.T',  tvPrefix: 'TSE',        filters: [] },
+  nyse:        { name: 'NYSE',             currency: '$',   currencyCode: 'USD', flag: '🇺🇸', yahooSuffix: '',    tvPrefix: 'NYSE',       filters: [{ left: 'exchange', operation: 'equal', right: 'NYSE' }] },
+  krx:         { name: 'KRX',             currency: '₩',   currencyCode: 'KRW', flag: '🇰🇷', yahooSuffix: '.KS', tvPrefix: 'KRX',        filters: [] },
+  moex:        { name: 'MOEX',            currency: '₽',   currencyCode: 'RUB', flag: '🇷🇺', yahooSuffix: '.ME', tvPrefix: 'MOEX',       filters: [] },
+  france:      { name: 'Euronext Paris',   currency: '€',   currencyCode: 'EUR', flag: '🇫🇷', yahooSuffix: '.PA', tvPrefix: 'EURONEXT',   filters: [] },
+  amsterdam:   { name: 'Euronext Amsterdam', currency: '€', currencyCode: 'EUR', flag: '🇳🇱', yahooSuffix: '.AS', tvPrefix: 'EURONEXT',   filters: [] },
+  brussels:    { name: 'Euronext Brussels', currency: '€',  currencyCode: 'EUR', flag: '🇧🇪', yahooSuffix: '.BR', tvPrefix: 'EURONEXT',   filters: [] },
+  lisbon:      { name: 'Euronext Lisbon',  currency: '€',   currencyCode: 'EUR', flag: '🇵🇹', yahooSuffix: '.LS', tvPrefix: 'EURONEXT',   filters: [] },
+  dublin:      { name: 'Euronext Dublin',  currency: '€',   currencyCode: 'EUR', flag: '🇮🇪', yahooSuffix: '.IR', tvPrefix: 'EURONEXT',   filters: [] },
+  oslo:        { name: 'Oslo Bors',        currency: 'kr',  currencyCode: 'NOK', flag: '🇳🇴', yahooSuffix: '.OL', tvPrefix: 'OSL',        filters: [] },
+  milan:       { name: 'Borsa Italiana',   currency: '€',   currencyCode: 'EUR', flag: '🇮🇹', yahooSuffix: '.MI', tvPrefix: 'MIL',        filters: [] },
+  tsx:         { name: 'TSX',              currency: 'C$',  currencyCode: 'CAD', flag: '🇨🇦', yahooSuffix: '.TO', tvPrefix: 'TSX',        filters: [] },
+  twse:        { name: 'TWSE',             currency: 'NT$', currencyCode: 'TWD', flag: '🇹🇼', yahooSuffix: '.TW', tvPrefix: 'TWSE',       filters: [] },
+  b3:          { name: 'B3',              currency: 'R$',   currencyCode: 'BRL', flag: '🇧🇷', yahooSuffix: '.SA', tvPrefix: 'BMFBOVESPA', filters: [] },
+  hkex:        { name: 'HKEX',           currency: 'HK$',  currencyCode: 'HKD', flag: '🇭🇰', yahooSuffix: '.HK', tvPrefix: 'HKEX',       filters: [] },
+  china:       { name: 'SSE/SZSE',       currency: '¥',    currencyCode: 'CNY', flag: '🇨🇳', yahooSuffix: '.SS', tvPrefix: 'SSE',        filters: [] },
+  saudi:       { name: 'Tadawul',         currency: '﷼',    currencyCode: 'SAR', flag: '🇸🇦', yahooSuffix: '.SR', tvPrefix: 'TADAWUL',    filters: [] },
+  switzerland: { name: 'SIX',             currency: 'Fr',   currencyCode: 'CHF', flag: '🇨🇭', yahooSuffix: '.SW', tvPrefix: 'SIX',        filters: [] },
+  australia:   { name: 'ASX',             currency: 'A$',   currencyCode: 'AUD', flag: '🇦🇺', yahooSuffix: '.AX', tvPrefix: 'ASX',        filters: [] },
+  southafrica: { name: 'JSE',             currency: 'R',    currencyCode: 'ZAR', flag: '🇿🇦', yahooSuffix: '.JO', tvPrefix: 'JSE',        filters: [] },
+  sweden:      { name: 'Nasdaq S.',        currency: 'kr',   currencyCode: 'SEK', flag: '🇸🇪', yahooSuffix: '.ST', tvPrefix: 'STO',        filters: [] },
+  india:       { name: 'NSE',             currency: '₹',    currencyCode: 'INR', flag: '🇮🇳', yahooSuffix: '.NS', tvPrefix: 'NSE',        filters: [] },
+  uae:         { name: 'DFM',             currency: 'د.إ',  currencyCode: 'AED', flag: '🇦🇪', yahooSuffix: '.DU', tvPrefix: 'DFM',        filters: [] },
 };
 
 let allData = [];
@@ -2735,58 +2735,37 @@ function applyIndicators() {
 
 function updateChart(sym) {
   if (!sym) return;
-  if (!_lcLoaded) {
-    var _lc_cont = document.getElementById('tv-chart-container');
-    if (_lc_cont) _lc_cont.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:11px;">Grafik yükleniyor...</div>';
-    _loadLightweightCharts(function() { updateChart(sym); });
-    return;
-  }
-  var interval = (document.querySelector('.ctab.on') || {}).dataset && document.querySelector('.ctab.on').dataset.interval || '240';
-  var currency = (document.querySelector('.ctab-cur.on') || {}).dataset && document.querySelector('.ctab-cur.on').dataset.currency || 'TL';
   var container = document.getElementById('tv-chart-container');
   if (!container) return;
 
-  initChart(container);
+  var indTabs = document.getElementById('ind-tabs');
+  if (indTabs) indTabs.style.display = 'none';
 
-  var suffix = encodeURIComponent((EXCHANGE_META[currentExchange]||EXCHANGE_META.bist).yahooSuffix);
-  var url = PROXY_URL + '?action=chart&symbol=' + sym + '&interval=' + interval + '&currency=' + currency + '&suffix=' + suffix;
+  var exMeta = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
+  var tvPrefix = exMeta.tvPrefix;
+  var tvSym = tvPrefix ? tvPrefix + ':' + sym : sym;
 
-  function _chartError(msg) {
-    var cont = document.getElementById('tv-chart-container');
-    if (cont) cont.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:11px;flex-direction:column;gap:6px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>' + msg + '</div>';
-  }
-  _chartError('Grafik yükleniyor...');
-  fetch(url)
-    .then(function(r){ return r.json(); })
-    .then(function(data) {
-      if (!data || data.s !== 'ok' || !data.candles || !data.candles.length) {
-        _chartError('Grafik verisi alınamadı');
-        return;
-      }
-      lwCandles = data.candles.map(function(c){ return { time:c.t, open:c.o, high:c.h, low:c.l, close:c.c, volume:c.v||0 }; });
-      lwSeries.setData(lwCandles);
-      lwChart.timeScale().fitContent();
+  var ctabEl = document.querySelector('.ctab.on');
+  var interval = ctabEl ? (ctabEl.dataset.interval || 'D') : 'D';
 
-      // Resize: birden fazla deneme - panel transition sonrası kesin boyut
-      function _resizeChart(tries) {
-        var cont = document.getElementById('tv-chart-container');
-        if (!cont || !lwChart) return;
-        var w = cont.offsetWidth;
-        if (!w || w < 50) {
-          var det = document.querySelector('.detail.open');
-          w = det ? det.offsetWidth - 24 : 336;
-        }
-        if (w > 50) {
-          lwChart.resize(w, 260);
-          lwChart.timeScale().fitContent();
-        } else if (tries > 0) {
-          setTimeout(function(){ _resizeChart(tries - 1); }, 100);
-        }
-      }
-      _resizeChart(5);
-      applyIndicators();
-    })
-    .catch(function(e){ console.error('Chart error:', e); _chartError('Grafik yüklenemedi'); });
+  var cfg = {
+    autosize: true,
+    symbol: tvSym,
+    interval: interval,
+    timezone: 'Europe/Istanbul',
+    theme: 'dark',
+    style: '1',
+    locale: 'tr',
+    enable_publishing: false,
+    hide_top_toolbar: false,
+    hide_legend: false,
+    withdateranges: false,
+    range: '3M',
+    calendar: false,
+    support_host: 'https://www.tradingview.com'
+  };
+
+  container.innerHTML = '<iframe scrolling="no" allowtransparency="true" frameborder="0" src="https://s.tradingview.com/embed-widget/advanced-chart/?locale=tr#' + JSON.stringify(cfg) + '" style="width:100%;height:100%;border:none;display:block;" loading="lazy"></iframe>';
 }
 
 // ── Yahoo Finance Doğrulama ──────────────────────────────────────────────
@@ -3920,6 +3899,7 @@ function _doShowScreener() {
   if (!_activeAsset) _updateOnboarding('hisse');
   var _hb2 = document.getElementById('hamburger-btn'); if(_hb2 && window.innerWidth <= 768) _hb2.style.display = 'flex';
   if(window.location.pathname !== '/screener') history.pushState({page:'screener'}, '', '/screener');
+  document.querySelectorAll('#goat-chips .goat-chip[data-goat="lynch"]').forEach(function(c){ if(!c.classList.contains('on')) c.classList.add('on'); });
 }
 
 function selectExchangeAndGo(exKey) {
