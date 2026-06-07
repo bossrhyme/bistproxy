@@ -456,7 +456,8 @@ async function handleTrack(req, res) {
 function checkAdminKey(req) {
   const adminKey = process.env.ADMIN_KEY;
   if (!adminKey) return false;
-  const qKey = ((req.url || '').match(/[?&]key=([^&]+)/) || [])[1] || '';
+  const rawQ = ((req.url || '').match(/[?&]key=([^&]+)/) || [])[1] || '';
+  const qKey = rawQ ? decodeURIComponent(rawQ) : '';
   const hKey = req.headers['x-admin-key'] || '';
   return qKey === adminKey || hKey === adminKey;
 }
