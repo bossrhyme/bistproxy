@@ -108,7 +108,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=arctic21">
+<link rel="stylesheet" href="/deepfin.css?v=arctic22">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -143,7 +143,7 @@ if('serviceWorker' in navigator){
 <!-- ─── MAIN APP ─── -->
 <div id="app" class="on">
   <div class="topbar">
-    <div class="tlogo"><div class="tlogo-mark">D</div>DeepFin</div>
+    <div class="tlogo" onclick="showHomepage()" style="cursor:pointer"><div class="tlogo-mark">D</div>DeepFin</div>
     <span class="tlive">Canlı</span>
     <a href="/" class="hp-nav-btn active" id="nav-home" onclick="event.preventDefault(); showHomepage()">Anasayfa</a>
     <a href="/" class="hp-nav-btn" id="nav-tarama" onclick="event.preventDefault(); showScreener()">Tarayıcı</a>
@@ -1969,7 +1969,7 @@ if('serviceWorker' in navigator){
     </div>
   </div>
 </div>
-<script src="/deepfin.js?v=55"></script>
+<script src="/deepfin.js?v=56"></script>
 <div id="hisse-hidden-filters" style="display:none;">
   <input type="number" id="piotroski_min">
   <input type="number" id="piotroski_max">

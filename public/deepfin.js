@@ -3753,6 +3753,7 @@ function _doShowHomepage() {
   var dnh = document.getElementById('dnav-home'); if(dnh) dnh.classList.add('active');
   var dnt = document.getElementById('dnav-tarama'); if(dnt) dnt.classList.remove('active');
   clearFilters();
+  var _hb = document.getElementById('hamburger-btn'); if(_hb) _hb.style.display = 'none';
   if(window.location.pathname !== '/') history.pushState({page:'home'}, '', '/');
 }
 
@@ -3892,6 +3893,7 @@ function _doShowScreener() {
   var dnh3=document.getElementById('dnav-home');if(dnh3)dnh3.classList.remove('active');
   var dnt3=document.getElementById('dnav-tarama');if(dnt3)dnt3.classList.add('active');
   if (!_activeAsset) _updateOnboarding('hisse');
+  var _hb2 = document.getElementById('hamburger-btn'); if(_hb2 && window.innerWidth <= 768) _hb2.style.display = 'flex';
   if(window.location.pathname !== '/screener') history.pushState({page:'screener'}, '', '/screener');
 }
 

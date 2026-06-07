@@ -392,13 +392,12 @@ td:first-child,td:nth-child(2){text-align:left;}
     height: calc(52px + env(safe-area-inset-top, 0px)); /* Dynamic Island / notch */
   }
   .tlive { display: none; }
-  .tlogo span:not(.tlogo-mark) { display: none; }
   .tlogo-mark { width: 28px; height: 28px; font-size: 14px; }
-  .tlogo { gap: 0; }
+  .tlogo { font-size: 14px; }
   .supportbtn { display: none; }
-  /* Nav linkleri ve Bilgi Bankası topbar'dan gizle — drawer'da erişilebilir */
-  .hp-nav-btn { display: none !important; }
   .infobtn:not(.profile-topbtn) { display: none !important; }
+  /* Nav linkleri mobilde kompakt göster */
+  .hp-nav-btn { display: inline-flex !important; padding: 4px 8px; font-size: 12px; }
 
   /* Arama kutusu — esnek genişle */
   .tsearch {
@@ -408,12 +407,12 @@ td:first-child,td:nth-child(2){text-align:left;}
   .tsearch input { font-size: 13px; padding: 7px 10px 7px 30px; }
 
   /* Sağ grup */
-  .tright { gap: 4px; margin-left: 0; }
+  .tright { gap: 4px; margin-left: auto; }
   .infobtn { font-size: 11px; padding: 5px 8px; min-height: 34px; }
   .topbarbtn { padding: 5px 10px; font-size: 11px; min-height: 34px; }
 
-  /* Hamburger */
-  .hamburger-btn { display: flex !important; min-height: 44px; min-width: 44px; }
+  /* Hamburger — JS tarafından display kontrol edilir (showHomepage/showScreener) */
+  .hamburger-btn { min-height: 36px; min-width: 36px; }
 
   /* ─────────────────────────────────────────
      LAYOUT — sidebar gizli, drawer ile açılır
