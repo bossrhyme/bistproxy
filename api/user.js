@@ -470,16 +470,16 @@ async function handleReport(req, res) {
     if (cached && cached._ts && Date.now() - cached._ts < 600000) {
       jsonRes(res, 200, cached); return;
     }
-    const [scansRaw, usersRaw] = await Promise.all([
+    const [scansRaw, usersRaw, userKeys, techKeys, goatKeys, presetKeys, wlKeys] = await Promise.all([
       kvGet('df_total_scans').catch(() => 0),
-      kvGet('df_total_users').catch(() => 0)
-    ]);
-    const [techKeys, goatKeys, presetKeys, wlKeys] = await Promise.all([
+      kvGet('df_total_users').catch(() => 0),
+      kvKeys('usr:em_*'),
       kvKeys('rpt:tech:*'),
       kvKeys('rpt:goat:*'),
       kvKeys('rpt:preset:*'),
       kvKeys('rpt:wl:*')
     ]);
+    const actualUsers = userKeys.length;
     const allStratKeys = [...techKeys, ...goatKeys, ...presetKeys];
     const [stratVals, wlVals] = await Promise.all([
       kvMGet(allStratKeys),
@@ -493,7 +493,7 @@ async function handleReport(req, res) {
       return { symbol: k.split(':')[2], count: parseInt(wlVals[i], 10) || 0 };
     }).sort(function(a, b) { return b.count - a.count; }).slice(0, 30);
     const report = {
-      stats: { total_scans: parseInt(scansRaw, 10) || 0, total_users: parseInt(usersRaw, 10) || 0 },
+      stats: { total_scans: parseInt(scansRaw, 10) || 0, total_users: Math.max(parseInt(usersRaw, 10) || 0, actualUsers) },
       strategies, watchlist, _ts: Date.now()
     };
     await kvSet('rpt:cache', report, 600).catch(() => {});

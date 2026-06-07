@@ -420,6 +420,8 @@ function renderUsers() {
   document.getElementById('usr-loading').style.display = 'none';
   document.getElementById('usr-content').style.display = 'block';
   _allUsers = d.users || [];
+  // Stat kartını gerçek sayıyla güncelle
+  document.getElementById('st-users').textContent = fmtNum(_allUsers.length);
   renderAgeBar(d.ageDist, 'age-bars');
   renderDistBar(d.invDist, 'inv-bars', INV_LABELS);
   renderUserTable(_allUsers);
