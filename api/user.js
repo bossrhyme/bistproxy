@@ -432,11 +432,23 @@ async function handleSetInvestorType(req, res) {
   jsonRes(res, 200, { ok: true, user: safeUser(full) });
 }
 
+async function handleStats(req, res) {
+  res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
+  res.setHeader('Content-Type', 'application/json');
+  try {
+    const [scansRaw, usersRaw] = await Promise.all([kvGet('df_total_scans'), kvGet('df_total_users')]);
+    res.status(200).json({ scans: parseInt(scansRaw, 10) || 0, users: parseInt(usersRaw, 10) || 0 });
+  } catch (e) {
+    res.status(200).json({ scans: 0, users: 0 });
+  }
+}
+
 // ── main router ───────────────────────────────
 module.exports = async function handler(req, res) {
   const path = (req.url || '').split('?')[0];
 
   try {
+    if (path === '/api/stats')               return await handleStats(req, res);
     if (path === '/api/auth/register')        return await handleRegister(req, res);
     if (path === '/api/auth/login')           return await handleLogin(req, res);
     if (path === '/api/auth/me')              return await handleMe(req, res);

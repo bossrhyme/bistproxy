@@ -110,7 +110,7 @@
     },
     {
       "source": "/api/stats",
-      "destination": "/api/stats.js"
+      "destination": "/api/user.js"
     },
     {
       "source": "/api/scan",
