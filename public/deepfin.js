@@ -4014,8 +4014,8 @@ document.addEventListener('DOMContentLoaded', function(){
     fetch('/api/stats').then(function(r){ return r.json(); }).then(function(d){
       var eScans = document.getElementById('stat-scan-count');
       var eUsers = document.getElementById('stat-user-count');
-      if (eScans && d.scans) _countUp(eScans, d.scans);
-      if (eUsers && d.users) _countUp(eUsers, d.users);
+      if (eScans && d.scans != null) _countUp(eScans, d.scans);
+      if (eUsers && d.users != null) _countUp(eUsers, d.users);
     }).catch(function(){});
   }
   fetchLiveStats();

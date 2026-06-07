@@ -670,11 +670,17 @@ async function handleAdminBans(req, res) {
 }
 
 async function handleStats(req, res) {
-  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Cache-Control', 'public, max-age=60');
   res.setHeader('Content-Type', 'application/json');
   try {
-    const [scansRaw, usersRaw] = await Promise.all([kvGet('df_total_scans'), kvGet('df_total_users')]);
-    res.status(200).json({ scans: parseInt(scansRaw, 10) || 0, users: parseInt(usersRaw, 10) || 0 });
+    const [scansRaw, usersRaw, userKeys] = await Promise.all([
+      kvGet('df_total_scans').catch(() => 0),
+      kvGet('df_total_users').catch(() => 0),
+      kvKeys('usr:em_*').catch(() => []),
+    ]);
+    const scans = parseInt(scansRaw, 10) || 0;
+    const users = Math.max(parseInt(usersRaw, 10) || 0, userKeys.length);
+    res.status(200).json({ scans, users });
   } catch (e) {
     res.status(200).json({ scans: 0, users: 0 });
   }
