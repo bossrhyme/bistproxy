@@ -29,7 +29,58 @@ const ALLOWED_ORIGINS = [
   'https://www.deepfin.com',
 ];
 
-module.exports = function(req, res) {
+async function kvGet(key) {
+  try {
+    const url = process.env.KV_REST_API_URL;
+    const token = process.env.KV_REST_API_TOKEN;
+    if (!url || !token) return null;
+    const r = await fetch(url + '/get/' + encodeURIComponent(key), { headers: { Authorization: 'Bearer ' + token } });
+    const j = await r.json();
+    return j.result ? JSON.parse(j.result) : null;
+  } catch { return null; }
+}
+
+async function kvSet(key, value, ttlSec) {
+  try {
+    const url = process.env.KV_REST_API_URL;
+    const token = process.env.KV_REST_API_TOKEN;
+    if (!url || !token) return;
+    await fetch(url + '/set/' + encodeURIComponent(key) + '?ex=' + ttlSec, {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify(value)
+    });
+  } catch {}
+}
+
+async function kvIncr(key, ttlSec) {
+  try {
+    const url = process.env.KV_REST_API_URL;
+    const token = process.env.KV_REST_API_TOKEN;
+    if (!url || !token) return 0;
+    const r = await fetch(url + '/pipeline', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify([['INCR', key], ['TTL', key]])
+    });
+    const arr = await r.json();
+    const count = arr[0]?.result || 0;
+    if ((arr[1]?.result || -1) < 0) {
+      fetch(url + '/pipeline', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify([['EXPIRE', key, ttlSec]])
+      }).catch(() => {});
+    }
+    return count;
+  } catch { return 0; }
+}
+
+function getClientIP(req) {
+  return ((req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown').slice(0, 45);
+}
+
+module.exports = async function(req, res) {
   const origin = req.headers.origin || '';
   const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
   res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
@@ -45,10 +96,25 @@ module.exports = function(req, res) {
 
   if (!symbol) return res.status(400).json({ error: 'symbol gerekli' });
 
+  // Rate limit
+  const ip = getClientIP(req);
+  const rlCount = await kvIncr('rl:quote:' + ip, 60);
+  if (rlCount > 60) return res.status(429).json({ error: 'Çok fazla istek, lütfen bekleyin.' });
+
   // Haber isteği — şimdilik boş
   if (type === 'news') return res.status(200).json({ news: [] });
 
   const cfg = EXCHANGE_CONFIG[exchange] || EXCHANGE_CONFIG.bist;
+
+  // KV cache
+  const cacheKey = 'df_quote_v1_' + exchange + '_' + symbol;
+  const cached = await kvGet(cacheKey);
+  if (cached) {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Cache-Control', 'public, max-age=60');
+    res.setHeader('X-Cache', 'HIT');
+    return res.status(200).json(cached);
+  }
 
   const fields = [
     'name', 'description', 'close', 'change', 'change_abs', 'volume',
@@ -148,6 +214,7 @@ module.exports = function(req, res) {
 
       res.setHeader('Content-Type', 'application/json');
       res.setHeader('Cache-Control', 'public, max-age=60');
+      kvSet(cacheKey, result, 60).catch(() => {});
       return res.status(200).json(result);
 
     } catch(e) {

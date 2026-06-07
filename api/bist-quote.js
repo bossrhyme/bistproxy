@@ -33,6 +33,33 @@ async function kvSet(key, value, ttlSec = 120) {
   } catch { /* silent */ }
 }
 
+async function kvIncr(key, ttlSec) {
+  try {
+    const url   = process.env.KV_REST_API_URL;
+    const token = process.env.KV_REST_API_TOKEN;
+    if (!url || !token) return 0;
+    const r = await fetch(url + '/pipeline', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify([['INCR', key], ['TTL', key]])
+    });
+    const arr = await r.json();
+    const count = arr[0]?.result || 0;
+    if ((arr[1]?.result || -1) < 0) {
+      fetch(url + '/pipeline', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify([['EXPIRE', key, ttlSec]])
+      }).catch(() => {});
+    }
+    return count;
+  } catch { return 0; }
+}
+
+function getClientIP(req) {
+  return ((req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown').slice(0, 45);
+}
+
 // İş Yatırım fast_info endpoint (hisse özet verisi)
 async function fetchFastInfo(ticker) {
   const url = `${IS_BASE}/HisseGetir?hisse=${encodeURIComponent(ticker)}`;
@@ -94,6 +121,10 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Vary', 'Origin');
   if (req.method === 'OPTIONS') return res.status(200).end();
+
+  const ip = getClientIP(req);
+  const rlCount = await kvIncr('rl:bist-quote:' + ip, 60);
+  if (rlCount > 60) return res.status(429).json({ error: 'Çok fazla istek, lütfen bekleyin.' });
 
   const { symbol } = req.query;
 

@@ -39,6 +39,49 @@ async function kvSet(key, value, ttl) {
   } catch(e) {}
 }
 
+async function kvDel(key) {
+  try {
+    if (!kvEnabled()) return;
+    const u = new URL(process.env.KV_REST_API_URL);
+    makeReq(u.hostname, '/del/' + encodeURIComponent(key), 'POST',
+      { Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN, 'Content-Length': '0' }, '').catch(() => {});
+  } catch(e) {}
+}
+
+async function kvSetNX(key, ttlSec) {
+  try {
+    if (!kvEnabled()) return true;
+    const u = new URL(process.env.KV_REST_API_URL);
+    const r = await makeReq(u.hostname,
+      '/set/' + encodeURIComponent(key) + '?ex=' + ttlSec + '&nx', 'POST',
+      { Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN, 'Content-Type': 'application/json' },
+      JSON.stringify(1));
+    return JSON.parse(r.body).result === 'OK';
+  } catch(e) { return true; }
+}
+
+async function kvIncr(key, ttlSec) {
+  try {
+    if (!kvEnabled()) return 0;
+    const u = new URL(process.env.KV_REST_API_URL);
+    const r = await makeReq(u.hostname, '/pipeline', 'POST',
+      { Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN, 'Content-Type': 'application/json' },
+      JSON.stringify([['INCR', key], ['TTL', key]]));
+    const arr = JSON.parse(r.body);
+    const count = arr[0]?.result || 0;
+    if ((arr[1]?.result || -1) < 0) {
+      makeReq(u.hostname, '/pipeline', 'POST',
+        { Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN, 'Content-Type': 'application/json' },
+        JSON.stringify([['EXPIRE', key, ttlSec]])).catch(() => {});
+    }
+    return count;
+  } catch(e) { return 0; }
+}
+
+function getClientIP(req) {
+  return ((req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown').slice(0, 45);
+}
+
 // ── Tarih formatlama ──────────────────────────────────────────────────
 function fmtDate(d) {
   return String(d.getDate()).padStart(2,'0') + '.' +
@@ -166,6 +209,13 @@ module.exports = async function handler(req, res) {
     maxPaycount:                   q.get('max_paycount')  ? parseFloat(q.get('max_paycount'))  : null,
   };
 
+  // Rate limit
+  const ip = getClientIP(req);
+  const rlCount = await kvIncr('rl:fon-scan:' + ip, 60);
+  if (rlCount > 10) {
+    return res.status(200).end(JSON.stringify({ funds: [], total: 0, source: 'tefas', error: 'Çok fazla istek, lütfen bekleyin.' }));
+  }
+
   // Her tarama isteğinde sayacı artır
   if (kvEnabled()) {
     makeReq(new URL(process.env.KV_REST_API_URL).hostname, '/incr/df_total_scans', 'POST',
@@ -177,6 +227,16 @@ module.exports = async function handler(req, res) {
   if (kvEnabled()) {
     const hit = await kvGet(cacheKey);
     if (hit) { res.setHeader('X-Cache','HIT'); return res.status(200).end(JSON.stringify(hit)); }
+  }
+
+  // Stampede lock — tek istek TEFAS'a gider
+  const lockKey = 'lock:fon-scan:' + fonTur + ':' + preset;
+  const gotLock = await kvSetNX(lockKey, 30);
+  if (!gotLock) {
+    await sleep(3000);
+    const retry = await kvGet(cacheKey);
+    if (retry) { res.setHeader('X-Cache', 'HIT'); return res.status(200).end(JSON.stringify(retry)); }
+    return res.status(200).end(JSON.stringify({ funds: [], total: 0, source: 'tefas', error: 'Veri yükleniyor, lütfen tekrar deneyin.' }));
   }
 
   try {
@@ -286,6 +346,7 @@ module.exports = async function handler(req, res) {
     const result = { funds, total: funds.length, source:'tefas', secondary:'yahoo_finance', updatedAt: new Date().toISOString() };
     if (kvEnabled()) {
       await kvSet(cacheKey, result, 3600);
+      kvDel(lockKey).catch(() => {});
     }
     return res.status(200).end(JSON.stringify(result));
 

@@ -44,6 +44,28 @@ async function kvSet(key, value, ttl) {
   } catch(e) {}
 }
 
+async function kvIncr(key, ttlSec) {
+  try {
+    if (!kvEnabled()) return 0;
+    const u = new URL(process.env.KV_REST_API_URL);
+    const r = await makeReq(u.hostname, '/pipeline', 'POST',
+      { Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN, 'Content-Type': 'application/json' },
+      JSON.stringify([['INCR', key], ['TTL', key]]));
+    const arr = JSON.parse(r.body);
+    const count = arr[0]?.result || 0;
+    if ((arr[1]?.result || -1) < 0) {
+      makeReq(u.hostname, '/pipeline', 'POST',
+        { Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN, 'Content-Type': 'application/json' },
+        JSON.stringify([['EXPIRE', key, ttlSec]])).catch(() => {});
+    }
+    return count;
+  } catch(e) { return 0; }
+}
+
+function getClientIP(req) {
+  return ((req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown').slice(0, 45);
+}
+
 // ── 1. Birincil Kaynak: CoinGecko /coins/markets ─────────────────────
 async function fetchCoinGecko(params) {
   const {
@@ -359,6 +381,11 @@ module.exports = async function handler(req, res) {
     maxMcTvl:       url.searchParams.get('max_mc_tvl')   ? parseFloat(url.searchParams.get('max_mc_tvl'))   : null,
     ...( PRESETS[preset] || {} )
   };
+
+  // Rate limit
+  const ip = getClientIP(req);
+  const rlCount = await kvIncr('rl:kripto-scan:' + ip, 60);
+  if (rlCount > 20) return res.status(429).json({ error: 'Çok fazla istek, lütfen bekleyin.' });
 
   // Her tarama isteğinde sayacı artır
   if (kvEnabled()) {

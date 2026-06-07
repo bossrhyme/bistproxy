@@ -62,6 +62,27 @@ async function kvSet(key, value, ttl) {
   } catch(e) {}
 }
 
+async function kvIncr(key, ttlSec) {
+  try {
+    if (!kvEnabled()) return 0;
+    const raw = await fetchHttp(kvUrl() + '/pipeline', 'POST',
+      { Authorization: 'Bearer ' + kvToken(), 'Content-Type': 'application/json' },
+      JSON.stringify([['INCR', key], ['TTL', key]]));
+    const arr = JSON.parse(raw);
+    const count = arr[0]?.result || 0;
+    if ((arr[1]?.result || -1) < 0) {
+      fetchHttp(kvUrl() + '/pipeline', 'POST',
+        { Authorization: 'Bearer ' + kvToken(), 'Content-Type': 'application/json' },
+        JSON.stringify([['EXPIRE', key, ttlSec]])).catch(() => {});
+    }
+    return count;
+  } catch(e) { return 0; }
+}
+
+function getClientIP(req) {
+  return ((req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown').slice(0, 45);
+}
+
 // ── symbol-list ───────────────────────────────
 const LIST_CONFIG = {
   bist:   { tvPath: '/turkey/scan',  filters: [{ left: 'typespecs', operation: 'has', right: ['common'] }] },
@@ -180,6 +201,10 @@ module.exports = async function(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Vary', 'Origin');
   if (req.method === 'OPTIONS') return res.status(200).end();
+
+  const ip = getClientIP(req);
+  const rlCount = await kvIncr('rl:symbols:' + ip, 60);
+  if (rlCount > 30) return res.status(429).json({ error: 'Çok fazla istek, lütfen bekleyin.' });
 
   const path = (req.url || '').split('?')[0];
   if (path === '/api/symbol-search') return handleSearch(req, res);
