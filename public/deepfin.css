@@ -607,14 +607,17 @@ td:first-child,td:nth-child(2){text-align:left;}
   /* ─────────────────────────────────────────
      HOMEPAGE
   ───────────────────────────────────────── */
-  #homepage { overflow-x: hidden; }
-  .hp-hero { padding: 40px 20px 30px; }
+  #homepage { overflow-x: hidden; width: 100%; }
+  .hp-hero { padding: 40px 20px 30px; text-align: center; }
+  .hp-sub { margin-left: auto; margin-right: auto; }
+  .hp-badge { margin-left: auto; margin-right: auto; }
   .hp-title { font-size: 30px !important; letter-spacing: -1px; }
-  .hp-sub { font-size: 13px !important; line-height: 1.5; }
   .hp-cta { flex-direction: column; align-items: stretch; gap: 10px; }
   .hp-cta-primary, .hp-cta-secondary { text-align: center; width: 100%; padding: 13px 20px; font-size: 14px; }
-  .hp-howto { padding: 28px 20px; }
-  .hp-howto-steps { flex-direction: column; align-items: center; gap: 0; }
+  /* Howto: flex column ile tüm içerik ortalansın */
+  .hp-howto { padding: 28px 20px; display: flex; flex-direction: column; align-items: center; }
+  .hp-howto-title { width: 100%; text-align: center; }
+  .hp-howto-steps { width: 100%; flex-direction: column; align-items: center; gap: 0; }
   .hp-howto-step {
     width: 100%; max-width: 320px; min-height: auto;
     flex-direction: column; align-items: center; gap: 6px;
@@ -627,7 +630,7 @@ td:first-child,td:nth-child(2){text-align:left;}
   .hp-howto-arrow { transform: rotate(90deg); margin: 6px auto; padding-bottom: 0 !important; align-self: center; }
   .hp-disclaimer { margin: 16px 0 0; padding: 12px 14px; font-size: 11px; }
   .hp-section { padding: 28px 20px; }
-  .hp-section-title { font-size: 18px; }
+  .hp-section-title { font-size: 11px; }
   .hp-features-grid { grid-template-columns: 1fr !important; gap: 10px; }
   .hp-strategies-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px; }
   .hp-strategy-card { padding: 12px; }
