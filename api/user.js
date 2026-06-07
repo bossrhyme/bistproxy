@@ -638,6 +638,37 @@ async function handleAdminUsers(req, res) {
   }
 }
 
+// ── Admin Bans ─────────────────────────────────
+async function handleAdminBans(req, res) {
+  if (!checkAdminKey(req)) { jsonRes(res, 403, { error: 'Yetkisiz' }); return; }
+  if (req.method === 'GET') {
+    try {
+      const keys = await kvKeys('ban:ip:*');
+      const ips = keys.map(k => k.replace('ban:ip:', ''));
+      jsonRes(res, 200, { banned: ips, count: ips.length });
+    } catch(e) { jsonRes(res, 500, { error: e.message }); }
+  } else if (req.method === 'POST') {
+    const body = await readBody(req);
+    const ip = (body.ip || '').trim().slice(0, 45);
+    const action = body.action || 'ban';
+    if (!ip) { jsonRes(res, 400, { error: 'ip gerekli' }); return; }
+    if (!/^[a-fA-F0-9.:]{1,45}$/.test(ip)) { jsonRes(res, 400, { error: 'Geçersiz IP' }); return; }
+    try {
+      if (action === 'unban') {
+        await kvDel('ban:ip:' + ip);
+        await kvDel('viol:ip:' + ip);
+        jsonRes(res, 200, { ok: true, action: 'unban', ip });
+      } else {
+        const ttl = Math.min(parseInt(body.ttl, 10) || 86400, 604800);
+        await kvSet('ban:ip:' + ip, '1', ttl);
+        jsonRes(res, 200, { ok: true, action: 'ban', ip, ttl });
+      }
+    } catch(e) { jsonRes(res, 500, { error: e.message }); }
+  } else {
+    jsonRes(res, 405, { error: 'Method Not Allowed' });
+  }
+}
+
 async function handleStats(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('Content-Type', 'application/json');
@@ -658,6 +689,7 @@ module.exports = async function handler(req, res) {
     if (path === '/api/track')               return await handleTrack(req, res);
     if (path === '/api/report')              return await handleReport(req, res);
     if (path === '/api/admin/users')         return await handleAdminUsers(req, res);
+    if (path === '/api/admin/bans')          return await handleAdminBans(req, res);
     if (path === '/api/auth/register')        return await handleRegister(req, res);
     if (path === '/api/auth/login')           return await handleLogin(req, res);
     if (path === '/api/auth/me')              return await handleMe(req, res);

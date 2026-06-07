@@ -1,4 +1,5 @@
 const https = require('https');
+const { protect, trackViolation } = require('./_protect');
 
 async function kvGet(key) {
   try {
@@ -67,6 +68,7 @@ module.exports = async function(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Vary', 'Origin');
   if (req.method === 'OPTIONS') return res.status(200).end();
+  if (await protect(req, res)) return;
 
   const url = new URL(req.url, 'http://localhost');
   const sym = (url.searchParams.get('sym') || '').toUpperCase();
@@ -77,7 +79,7 @@ module.exports = async function(req, res) {
   // Rate limit
   const ip = getClientIP(req);
   const rlCount = await kvIncr('rl:news:' + ip, 60);
-  if (rlCount > 30) return res.status(429).json({ news: [] });
+  if (rlCount > 30) { trackViolation(ip).catch(() => {}); return res.status(429).json({ news: [] }); }
 
   // KV cache
   const cacheKey = 'df_news_v1_' + (ex || 'bist') + '_' + sym;

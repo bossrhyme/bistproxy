@@ -1,4 +1,5 @@
 const https = require('https');
+const { protect, trackViolation } = require('./_protect');
 
 function makeRequest(hostname, path, method, headers, body, callback) {
   const options = { hostname, path, method, headers };
@@ -88,6 +89,7 @@ module.exports = async function(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Vary', 'Origin');
   if (req.method === 'OPTIONS') return res.status(200).end();
+  if (await protect(req, res)) return;
 
   const url      = new URL(req.url, 'http://localhost');
   const symbol   = (url.searchParams.get('sym') || url.searchParams.get('symbol') || '').toUpperCase();
@@ -99,7 +101,7 @@ module.exports = async function(req, res) {
   // Rate limit
   const ip = getClientIP(req);
   const rlCount = await kvIncr('rl:quote:' + ip, 60);
-  if (rlCount > 60) return res.status(429).json({ error: 'Çok fazla istek, lütfen bekleyin.' });
+  if (rlCount > 60) { trackViolation(ip).catch(() => {}); return res.status(429).json({ error: 'Çok fazla istek, lütfen bekleyin.' }); }
 
   // Haber isteği — şimdilik boş
   if (type === 'news') return res.status(200).json({ news: [] });

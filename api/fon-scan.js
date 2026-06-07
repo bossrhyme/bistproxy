@@ -1,4 +1,5 @@
 const https = require('https');
+const { protect, trackViolation } = require('./_protect');
 
 // ── HTTPS isteği ──────────────────────────────────────────────────────
 function makeReq(hostname, path, method, headers, body) {
@@ -167,6 +168,7 @@ module.exports = async function handler(req, res) {
   res.setHeader('Vary', 'Origin');
   res.setHeader('Content-Type', 'application/json');
   if (req.method === 'OPTIONS') return res.status(200).end();
+  if (await protect(req, res)) return;
 
   const PRESETS = {
     hizli_yukselis: { sort: 'ret7d' },
@@ -200,6 +202,7 @@ module.exports = async function handler(req, res) {
   const ip = getClientIP(req);
   const rlCount = await kvIncr('rl:fon-scan:' + ip, 60);
   if (rlCount > 10) {
+    trackViolation(ip).catch(() => {});
     return res.status(200).end(JSON.stringify({ funds: [], total: 0, source: 'tefas', error: 'Çok fazla istek, lütfen bekleyin.' }));
   }
 

@@ -1,4 +1,5 @@
 // api/bist-quote.js
+const { protect, trackViolation } = require('./_protect');
 // DeepFin — İş Yatırım Tekil Hisse Proxy
 // Tek bir BIST hissesi için: fiyat, F/K, PD/DD, ROE, halka açıklık, yabancı oranı
 // Vercel serverless — Upstash KV cache (2dk TTL)
@@ -121,10 +122,11 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Vary', 'Origin');
   if (req.method === 'OPTIONS') return res.status(200).end();
+  if (await protect(req, res)) return;
 
   const ip = getClientIP(req);
   const rlCount = await kvIncr('rl:bist-quote:' + ip, 60);
-  if (rlCount > 60) return res.status(429).json({ error: 'Çok fazla istek, lütfen bekleyin.' });
+  if (rlCount > 60) { trackViolation(ip).catch(() => {}); return res.status(429).json({ error: 'Çok fazla istek, lütfen bekleyin.' }); }
 
   const { symbol } = req.query;
 

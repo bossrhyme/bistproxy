@@ -2,6 +2,7 @@
 // Primary: open.er-api.com (ToS uyumlu, 1500 req/ay)
 // Fallback: KV backup → sabit değerler
 const https = require('https');
+const { protect } = require('./_protect');
 
 async function kvGet(key) {
   try {
@@ -94,6 +95,7 @@ module.exports = async function(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Vary', 'Origin');
   if (req.method === 'OPTIONS') return res.status(200).end();
+  if (await protect(req, res)) return;
 
   // In-memory cache geçerli mi?
   if (_cache && (Date.now() - _cacheAt) < CACHE_MS) {

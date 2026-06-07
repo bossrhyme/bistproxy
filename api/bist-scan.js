@@ -1,4 +1,5 @@
 // api/bist-scan.js
+const { protect, trackViolation } = require('./_protect');
 // DeepFin — İş Yatırım Screener Proxy
 // Gerçek endpoint: getScreenerDataNEW
 // Doğrulanmış field ID'leri:
@@ -128,10 +129,11 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Vary', 'Origin');
   if (req.method === 'OPTIONS') return res.status(200).end();
+  if (await protect(req, res)) return;
 
   const ip = getClientIP(req);
   const rlCount = await kvIncr('rl:bist-scan:' + ip, 60);
-  if (rlCount > 30) return res.status(429).json({ error: 'Çok fazla istek, lütfen bekleyin.' });
+  if (rlCount > 30) { trackViolation(ip).catch(() => {}); return res.status(429).json({ error: 'Çok fazla istek, lütfen bekleyin.' }); }
 
   const cacheKey = 'bist_enrichment_v3';
 

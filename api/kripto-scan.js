@@ -1,4 +1,5 @@
 const https = require('https');
+const { protect, trackViolation } = require('./_protect');
 
 // ── Yardımcı: HTTPS isteği ────────────────────────────────────────────
 function makeReq(hostname, path, method, headers, body) {
@@ -354,6 +355,7 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Vary', 'Origin');
   if (req.method === 'OPTIONS') return res.status(200).end();
+  if (await protect(req, res)) return;
 
   const url = new URL(req.url, 'https://x');
 
@@ -385,7 +387,7 @@ module.exports = async function handler(req, res) {
   // Rate limit
   const ip = getClientIP(req);
   const rlCount = await kvIncr('rl:kripto-scan:' + ip, 60);
-  if (rlCount > 20) return res.status(429).json({ error: 'Çok fazla istek, lütfen bekleyin.' });
+  if (rlCount > 20) { trackViolation(ip).catch(() => {}); return res.status(429).json({ error: 'Çok fazla istek, lütfen bekleyin.' }); }
 
   // Her tarama isteğinde sayacı artır
   if (kvEnabled()) {

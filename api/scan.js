@@ -1,4 +1,5 @@
 const https = require('https');
+const { protect, trackViolation } = require('./_protect');
 
 // ─────────────────────────────────────────────
 // In-memory fallback cache (aynı serverless instance içinde KV down olunca devreye girer)
@@ -288,6 +289,7 @@ module.exports = async function(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Vary', 'Origin');
   if (req.method === 'OPTIONS') return res.status(200).end();
+  if (await protect(req, res)) return;
 
   const url      = new URL(req.url, 'http://localhost');
   const action   = url.searchParams.get('action') || 'scan';
@@ -318,6 +320,7 @@ module.exports = async function(req, res) {
       const rlCount = rlJson.result || 0;
       if (rlCount > 60) {
         res.setHeader('Retry-After', '60');
+        trackViolation(clientIp).catch(() => {});
         return res.status(429).json({ error: 'Çok fazla istek. Lütfen bir dakika bekleyin.' });
       }
     } catch(e) { /* rate limit hatası kritik değil, devam et */ }

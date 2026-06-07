@@ -4,6 +4,7 @@
 // (consolidated from two files to stay within Hobby plan 12-function limit)
 // ─────────────────────────────────────────────
 const https = require('https');
+const { protect, trackViolation } = require('./_protect');
 
 const ALLOWED_ORIGINS = [
   'https://deepfin.vercel.app',
@@ -201,10 +202,11 @@ module.exports = async function(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   res.setHeader('Vary', 'Origin');
   if (req.method === 'OPTIONS') return res.status(200).end();
+  if (await protect(req, res)) return;
 
   const ip = getClientIP(req);
   const rlCount = await kvIncr('rl:symbols:' + ip, 60);
-  if (rlCount > 30) return res.status(429).json({ error: 'Çok fazla istek, lütfen bekleyin.' });
+  if (rlCount > 30) { trackViolation(ip).catch(() => {}); return res.status(429).json({ error: 'Çok fazla istek, lütfen bekleyin.' }); }
 
   const path = (req.url || '').split('?')[0];
   if (path === '/api/symbol-search') return handleSearch(req, res);

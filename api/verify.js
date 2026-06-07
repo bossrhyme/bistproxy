@@ -1,6 +1,7 @@
 // api/verify.js — TradingView Scanner ile TV verisi doğrulama
 // Aynı scan.js proxy'sini kullanır - ek kaynak gerektirmez
 const https = require('https');
+const { protect, trackViolation } = require('./_protect');
 
 const TV_PATHS = {
   bist:'   /turkey/scan', nasdaq:'/america/scan', sp500:'/america/scan',
@@ -121,6 +122,7 @@ module.exports = async (req, res) => {
   res.setHeader('Vary', 'Origin');
   res.setHeader('Cache-Control', 'no-store');
   if (req.method === 'OPTIONS') return res.status(200).end();
+  if (await protect(req, res)) return;
 
   const url      = new URL(req.url, 'https://x');
   const sym      = (url.searchParams.get('symbol') || '').toUpperCase()
@@ -132,7 +134,7 @@ module.exports = async (req, res) => {
   // Rate limit
   const ip = getClientIP(req);
   const rlCount = await kvIncr('rl:verify:' + ip, 60);
-  if (rlCount > 20) return res.status(429).json({ error: 'Çok fazla istek, lütfen bekleyin.' });
+  if (rlCount > 20) { trackViolation(ip).catch(() => {}); return res.status(429).json({ error: 'Çok fazla istek, lütfen bekleyin.' }); }
 
   // KV cache
   const cacheKey = 'df_verify_v1_' + exchange + '_' + sym;
