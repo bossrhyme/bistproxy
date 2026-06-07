@@ -123,6 +123,9 @@ module.exports = async function handler(req, res) {
     };
 
     await kvSet(cacheKey, response, 300); // 5dk cache
+    fetch(process.env.KV_REST_API_URL + '/incr/df_total_scans', {
+      method: 'POST', headers: { Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN }
+    }).catch(() => {});
     res.setHeader('X-Cache', 'MISS');
     return res.status(200).json(response);
 
