@@ -888,7 +888,7 @@ td:first-child,td:nth-child(2){text-align:left;}
 .hp-stat:last-child{border-right:none;}
 .hp-stat-val{font-size:30px;font-weight:800;color:var(--accent);font-family:'Geist Mono', monospace;letter-spacing:-1px;}
 .hp-stat-val span{color:var(--accent);font-size:inherit;letter-spacing:inherit;}
-.hp-stat-label{font-size:10px;color:var(--muted2);margin-top:5px;line-height:1.4;}
+.hp-stat-label{font-size:10px;font-weight:700;color:var(--muted2);margin-top:5px;line-height:1.4;}
 .live-dot{display:inline-block;width:6px;height:6px;background:var(--green);border-radius:50%;margin-right:4px;animation:pulse 2s ease-in-out infinite;vertical-align:middle;}
 
 .hp-body{display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid var(--border);}
