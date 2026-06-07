@@ -108,7 +108,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=arctic28">
+<link rel="stylesheet" href="/deepfin.css?v=arctic29">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -502,23 +502,38 @@ if('serviceWorker' in navigator){
           <div class="hp-strat-group">
             <div class="hp-strat-group-label">GOAT Yatırımcıları</div>
             <div class="hp-strat-chips-row">
-              <button class="hp-chip" onclick="applyStrategyAndGo('buffett')">🎯 Buffett</button>
-              <button class="hp-chip" onclick="applyStrategyAndGo('graham')">📚 Graham</button>
-              <button class="hp-chip" onclick="applyStrategyAndGo('fisher')">🔭 Fisher</button>
-              <button class="hp-chip" onclick="applyStrategyAndGo('munger')">🧠 Munger</button>
-              <button class="hp-chip" onclick="applyStrategyAndGo('lynch')">📈 Lynch</button>
-              <button class="hp-chip" onclick="applyStrategyAndGo('piotroski')">🏆 Piotroski</button>
+              <button class="hp-chip" onclick="applyStrategyAndGo('buffett')" data-tip="Yüksek marj &amp; ROE, düşük borç — uzun vadeli kalite şirket">🎯 Buffett</button>
+              <button class="hp-chip" onclick="applyStrategyAndGo('graham')" data-tip="F/K &lt; 10, PD/DD &lt; 1.5, CR &gt; 2 — güvenlik marjıyla derin değer">📚 Graham</button>
+              <button class="hp-chip" onclick="applyStrategyAndGo('fisher')" data-tip="Satış + kar büyümesi güçlü, istikrarlı marj — büyüme ve kalite bir arada">🔭 Fisher</button>
+              <button class="hp-chip" onclick="applyStrategyAndGo('munger')" data-tip="Brüt marj %50+, ROE %20+, neredeyse borçsuz — mükemmel şirket adil fiyata">🧠 Munger</button>
+              <button class="hp-chip" onclick="applyStrategyAndGo('lynch')" data-tip="PEG &lt; 1.5 — büyümesine göre hâlâ ucuz hisse (GARP)">📈 Lynch</button>
+              <button class="hp-chip" onclick="applyStrategyAndGo('piotroski')" data-tip="F-Score ≥ 7 — 9 finansal kriterde yüksek bilanço sağlığı">🏆 Piotroski</button>
             </div>
           </div>
           <div class="hp-strat-group">
             <div class="hp-strat-group-label">Temel Analiz</div>
             <div class="hp-strat-chips-row">
-              <button class="hp-chip" onclick="applyPresetAndGo('value')">🎯 Değer</button>
-              <button class="hp-chip" onclick="applyPresetAndGo('growth')">🚀 Büyüme</button>
-              <button class="hp-chip" onclick="applyPresetAndGo('dividend')">💰 Temettü</button>
-              <button class="hp-chip" onclick="applyPresetAndGo('quality')">⭐ Kalite</button>
-              <button class="hp-chip" onclick="applyPresetAndGo('lowdebt')">🛡️ Az Borç</button>
-              <button class="hp-chip" onclick="applyPresetAndGo('momentum')">⚡ Momentum</button>
+              <button class="hp-chip" onclick="applyPresetAndGo('value')" data-tip="F/K &lt; 15, PD/DD &lt; 2, temettü &gt; %2 — kazancına göre ucuz ama kârlı">💎 Değer</button>
+              <button class="hp-chip" onclick="applyPresetAndGo('growth')" data-tip="EPS büyümesi &gt; %20, gelir büyümesi &gt; %15, ROE &gt; %15 — ivme kazanan">🚀 Büyüme</button>
+              <button class="hp-chip" onclick="applyPresetAndGo('dividend')" data-tip="Temettü verimi &gt; %4, borç/özkaynak &lt; 80 — düzenli nakit akışı">💰 Temettü</button>
+              <button class="hp-chip" onclick="applyPresetAndGo('quality')" data-tip="ROE &gt; %20, net marj &gt; %15, düşük borç — her koşulda ayakta kalan">⭐ Kalite</button>
+              <button class="hp-chip" onclick="applyPresetAndGo('lowdebt')" data-tip="D/E &lt; 30, CR &gt; 2 — kriz dayanımı yüksek finansal güvenlik">🛡️ Az Borç</button>
+              <button class="hp-chip" onclick="applyPresetAndGo('momentum')" data-tip="Gelir ve EPS büyümesi &gt; %20 — hem satışlar hem karlar aynı anda hızlanıyor">⚡ Momentum</button>
+            </div>
+          </div>
+          <div class="hp-strat-group">
+            <div class="hp-strat-group-label">Teknik Analiz</div>
+            <div class="hp-strat-chips-row">
+              <button class="hp-chip" onclick="applyTechAndGo('breakout')" data-tip="Zirveye yakın, günlük %1.5+ yükseliş, yüksek hacim — trendin başlangıcında">💥 Kırılım</button>
+              <button class="hp-chip" onclick="applyTechAndGo('oversold')" data-tip="Zirveden %20+ düşmüş, RSI &lt; 35 — aşırı satılmış, toparlanma fırsatı">📉 Dip Fırsatı</button>
+              <button class="hp-chip" onclick="applyTechAndGo('nearHigh')" data-tip="52H zirvesinden %3 içinde, 3A getiri &gt; %5 — güçlü trendin devamı">🏔️ Zirveye Yakın</button>
+              <button class="hp-chip" onclick="applyTechAndGo('pullback')" data-tip="Zirveden %10 geri, dibinden %10 yukarı — sağlıklı düzeltme, trende giriş">🔄 Çekilme</button>
+              <button class="hp-chip" onclick="applyTechAndGo('strongDay')" data-tip="Günlük %2+ yükseliş, normalin üzerinde hacim — bugün dikkat çeken">☀️ Güçlü Gün</button>
+              <button class="hp-chip" onclick="applyTechAndGo('highVolume')" data-tip="Hacim &gt; 5M lot — büyük kurumsal alıcıların pozisyon açtığı sinyal">🏦 Kurumsal Hacim</button>
+              <button class="hp-chip" onclick="applyTechAndGo('techBuy')" data-tip="TradingView skoru &gt; 0.5 — 26 indikatörün büyük çoğunluğu AL sinyali veriyor">📊 26 İndikatör AL</button>
+              <button class="hp-chip" onclick="applyTechAndGo('momentum3m')" data-tip="3A getiri &gt; %15, 6A getiri &gt; %20 — sürdürülebilir orta vadeli momentum">🏃 3A Lider</button>
+              <button class="hp-chip" onclick="applyTechAndGo('trendFollow')" data-tip="Yıllık dibinden %25+ yukarı, 6A getiri &gt; %10 — trend hâlâ güçlü">🌊 Güçlü Trend</button>
+              <button class="hp-chip" onclick="applyTechAndGo('rsiBounce')" data-tip="RSI 30–50 arası, dibi geride bırakmış — toparlanmanın erken aşaması">🔋 RSI Sıçraması</button>
             </div>
           </div>
         </div>
@@ -1959,7 +1974,7 @@ if('serviceWorker' in navigator){
     </div>
   </div>
 </div>
-<script src="/deepfin.js?v=59"></script>
+<script src="/deepfin.js?v=60"></script>
 <div id="hisse-hidden-filters" style="display:none;">
   <input type="number" id="piotroski_min">
   <input type="number" id="piotroski_max">

@@ -3923,6 +3923,16 @@ function applyPresetAndGo(presetKey) {
   }, 100);
 }
 
+function applyTechAndGo(techKey) {
+  clearFilters();
+  showScreener();
+  setTimeout(function(){
+    var chip = document.querySelector('.tech-chip[data-tech="' + techKey + '"]');
+    if(chip) { chip.click(); }
+    else runScan();
+  }, 100);
+}
+
 
 
 // ── TOOLTIP: sadece th[data-tip] ──
