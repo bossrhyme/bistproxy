@@ -993,8 +993,26 @@ window.showSettingsView = function() {
   document.getElementById('pf-user').style.display = 'none';
   var sv = document.getElementById('pf-settings-view');
   sv.style.display = 'block';
+  if (!_user) return;
+
   var ni = document.getElementById('pf-name-input');
-  if (ni && _user) ni.value = _user.name || '';
+  if (ni) ni.value = _user.name || '';
+
+  var unEl = document.getElementById('pf-settings-username');
+  if (unEl) unEl.value = _user.username ? '@' + _user.username : '';
+
+  var emEl = document.getElementById('pf-settings-email');
+  if (emEl) emEl.value = _user.email || '';
+
+  var dobEl = document.getElementById('pf-settings-dob');
+  if (dobEl) {
+    if (_user.dob) {
+      var parts = _user.dob.split('-');
+      dobEl.value = parts.length === 3 ? parts[2] + '/' + parts[1] + '/' + parts[0] : _user.dob;
+    } else {
+      dobEl.value = '—';
+    }
+  }
 };
 
 window.hideSettingsView = function() {

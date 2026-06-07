@@ -180,9 +180,11 @@ body{overflow-y:auto;}
 /* Settings */
 .pf-settings-input{background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:12px;color:var(--text);outline:none;font-family:inherit;flex:1;min-width:0;}
 .pf-settings-input:focus{border-color:var(--accent);}
+.pf-settings-input[readonly]{color:var(--muted2);background:var(--s1);cursor:default;}
 .pf-settings-group{padding:16px;border-bottom:1px solid var(--border);}
 .pf-settings-group:last-child{border-bottom:none;}
 .pf-settings-label{font-size:10px;font-weight:700;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;}
+.pf-settings-section-title{font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.8px;text-transform:uppercase;padding:14px 16px 2px;}
 
 /* Profile topbar menu */
 .pf-topbar-profile-btn{cursor:pointer!important;border-color:var(--accent)!important;color:var(--accent)!important;}
@@ -480,13 +482,27 @@ body{overflow-y:auto;}
       <div class="pf-sv-title">⚙️ Hesap Ayarları</div>
     </div>
     <div class="pf-section">
+      <div class="pf-settings-section-title">KİŞİSEL BİLGİLER</div>
       <div class="pf-settings-group">
-        <div class="pf-settings-label">İsim</div>
+        <div class="pf-settings-label">Ad Soyad</div>
         <div style="display:flex;gap:8px;">
           <input type="text" id="pf-name-input" class="pf-settings-input" placeholder="Adınız" maxlength="60">
           <button class="pf-add-btn" id="pf-save-name-btn" onclick="saveName()">Kaydet</button>
         </div>
       </div>
+      <div class="pf-settings-group">
+        <div class="pf-settings-label">Kullanıcı Adı</div>
+        <input type="text" id="pf-settings-username" class="pf-settings-input" readonly>
+      </div>
+      <div class="pf-settings-group">
+        <div class="pf-settings-label">E-posta</div>
+        <input type="text" id="pf-settings-email" class="pf-settings-input" readonly>
+      </div>
+      <div class="pf-settings-group">
+        <div class="pf-settings-label">Doğum Tarihi</div>
+        <input type="text" id="pf-settings-dob" class="pf-settings-input" readonly>
+      </div>
+      <div class="pf-settings-section-title" style="margin-top:8px;">GÜVENLİK</div>
       <div class="pf-settings-group">
         <div class="pf-settings-label">Şifre Değiştir</div>
         <div style="display:flex;flex-direction:column;gap:8px;max-width:320px;">

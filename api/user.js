@@ -105,7 +105,7 @@ async function saveWatchlists(userId, lists) {
 
 function safeUser(u) {
   return { id: u.id, email: u.email, name: u.name, username: u.username || '', picture: u.picture || '',
-           investorType: u.investorType || null, points: u.points || 0,
+           dob: u.dob || null, investorType: u.investorType || null, points: u.points || 0,
            lastLoginDate: u.lastLoginDate || null, loginStreak: u.loginStreak || 0 };
 }
 
