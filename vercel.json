@@ -85,7 +85,7 @@
       ]
     },
     {
-      "source": "/(|index\\.html|screener|analiz/|analiz/index\\.html|analiz/profil\\.html|analiz/profile\\.html|profil|profil/|profil/index\\.html)",
+      "source": "/(|index\\.html|screener|analiz/|analiz/index\\.html|analiz/profil\\.html|analiz/profile\\.html|profil|profil/|profil/index\\.html|admin|admin/|admin/index\\.html)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -178,8 +178,13 @@
     { "source": "/api/portfolio",             "destination": "/api/user.js" },
     { "source": "/api/watchlists/:path*",  "destination": "/api/user.js" },
     { "source": "/api/watchlists",         "destination": "/api/user.js" },
+    { "source": "/api/track",              "destination": "/api/user.js" },
+    { "source": "/api/report",             "destination": "/api/user.js" },
+    { "source": "/api/admin/users",        "destination": "/api/user.js" },
     { "source": "/profil",            "destination": "/profil/index.html" },
-    { "source": "/profil/",           "destination": "/profil/index.html" }
+    { "source": "/profil/",           "destination": "/profil/index.html" },
+    { "source": "/admin",             "destination": "/admin/index.html" },
+    { "source": "/admin/",            "destination": "/admin/index.html" }
   ],
   "functions": {
     "api/verify.js": {

@@ -58,4 +58,39 @@ async function kvDel(key) {
   if (json.error) throw new Error('KV: ' + json.error);
 }
 
-module.exports = { kvGet, kvSet, kvDel };
+async function kvIncr(key) {
+  const res  = await fetch(kvUrl() + '/incr/' + encodeURIComponent(key), {
+    method: 'POST',
+    headers: kvHeaders()
+  });
+  const json = await res.json();
+  return json.result || 0;
+}
+
+// Run multiple Redis commands in one round-trip via Upstash pipeline
+async function kvPipeline(commands) {
+  const res  = await fetch(kvUrl() + '/pipeline', {
+    method: 'POST',
+    headers: { ...kvHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(commands)
+  });
+  const arr = await res.json();
+  if (!Array.isArray(arr)) throw new Error('KV PIPELINE bad response');
+  return arr;
+}
+
+async function kvKeys(pattern) {
+  const arr = await kvPipeline([['KEYS', pattern]]);
+  return (arr[0] && arr[0].result) || [];
+}
+
+async function kvMGet(keys) {
+  if (!keys.length) return [];
+  const arr = await kvPipeline(keys.map(k => ['GET', k]));
+  return arr.map(function(item) {
+    if (!item || item.result === null || item.result === undefined) return null;
+    try { return JSON.parse(item.result); } catch(e) { return item.result; }
+  });
+}
+
+module.exports = { kvGet, kvSet, kvDel, kvIncr, kvKeys, kvMGet };

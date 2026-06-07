@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DeepFin Admin</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0d1117;--s1:#161b22;--s2:#1c2128;--s3:#21262d;
+  --border:#30363d;--border2:#484f58;
+  --text:#e6edf3;--muted:#8b949e;--muted2:#6e7681;
+  --accent:#0ea5e9;--accent2:#38bdf8;
+  --green:#3fb950;--red:#f85149;--yellow:#d29922;--purple:#a371f7;
+  --orange:#e3b341;
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;min-height:100vh;}
+
+/* ── LOGIN ── */
+#ad-login{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;}
+.ad-login-box{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:40px 32px;width:100%;max-width:360px;text-align:center;}
+.ad-login-icon{font-size:40px;margin-bottom:16px;}
+.ad-login-title{font-size:20px;font-weight:700;margin-bottom:6px;}
+.ad-login-sub{font-size:12px;color:var(--muted);margin-bottom:28px;}
+.ad-login-box input{width:100%;background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:11px 14px;font-size:13px;color:var(--text);outline:none;font-family:inherit;margin-bottom:10px;}
+.ad-login-box input:focus{border-color:var(--accent);}
+.ad-login-btn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;transition:opacity .15s;}
+.ad-login-btn:hover{opacity:.88;}
+.ad-login-btn:disabled{opacity:.5;cursor:not-allowed;}
+.ad-err{font-size:12px;color:var(--red);min-height:18px;margin-top:8px;}
+
+/* ── SHELL ── */
+#ad-shell{display:none;}
+.ad-topbar{background:var(--s1);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
+.ad-logo{font-size:15px;font-weight:800;color:var(--accent);flex:1;}
+.ad-logo span{color:var(--muted);font-weight:400;font-size:11px;margin-left:6px;}
+.ad-topbar-btn{background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:12px;color:var(--muted);cursor:pointer;transition:all .15s;}
+.ad-topbar-btn:hover{border-color:var(--accent);color:var(--accent);}
+.ad-topbar-btn.danger:hover{border-color:var(--red);color:var(--red);}
+.ad-cache-label{font-size:11px;color:var(--muted2);}
+
+.ad-main{padding:20px;max-width:1200px;margin:0 auto;}
+
+/* ── STATS CARDS ── */
+.ad-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px;}
+.ad-stat{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:16px 18px;}
+.ad-stat-val{font-size:26px;font-weight:800;margin-bottom:4px;}
+.ad-stat-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+.ad-stat-val.blue{color:var(--accent);}
+.ad-stat-val.green{color:var(--green);}
+.ad-stat-val.purple{color:var(--purple);}
+.ad-stat-val.orange{color:var(--orange);}
+
+/* ── TABS ── */
+.ad-tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:20px;}
+.ad-tab{background:none;border:none;border-bottom:2px solid transparent;padding:8px 16px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;margin-bottom:-1px;font-family:inherit;}
+.ad-tab:hover{color:var(--text);}
+.ad-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+.ad-panel{display:none;}
+.ad-panel.active{display:block;}
+
+/* ── SECTION ── */
+.ad-section{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:16px;}
+.ad-section-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px;}
+
+/* ── BAR CHART ── */
+.ad-bar-list{display:flex;flex-direction:column;gap:8px;}
+.ad-bar-row{display:grid;grid-template-columns:130px 1fr 50px;align-items:center;gap:10px;}
+.ad-bar-label{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ad-bar-track{background:var(--s3);border-radius:4px;height:8px;overflow:hidden;}
+.ad-bar-fill{height:100%;border-radius:4px;transition:width .4s ease;}
+.ad-bar-fill.blue{background:var(--accent);}
+.ad-bar-fill.green{background:var(--green);}
+.ad-bar-fill.purple{background:var(--purple);}
+.ad-bar-count{font-size:12px;font-weight:700;color:var(--muted);text-align:right;}
+
+/* ── STRATEGY GROUPS ── */
+.ad-strat-groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;}
+
+/* ── TABLE ── */
+.ad-table-wrap{overflow-x:auto;}
+.ad-table{width:100%;border-collapse:collapse;font-size:12px;}
+.ad-table th{background:var(--s2);color:var(--muted);font-weight:600;text-align:left;padding:8px 12px;border-bottom:1px solid var(--border);white-space:nowrap;position:sticky;top:0;}
+.ad-table td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.ad-table tr:last-child td{border-bottom:none;}
+.ad-table tr:hover td{background:var(--s2);}
+.ad-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;}
+.ad-badge.growth{background:rgba(63,185,80,.15);color:var(--green);}
+.ad-badge.value{background:rgba(14,165,233,.15);color:var(--accent);}
+.ad-badge.tech{background:rgba(163,113,247,.15);color:var(--purple);}
+.ad-badge.dividend{background:rgba(227,179,65,.15);color:var(--orange);}
+.ad-badge.bal{background:rgba(139,148,158,.15);color:var(--muted);}
+.ad-badge.def{background:rgba(63,185,80,.1);color:#6ee7b7;}
+.ad-badge.small{background:rgba(248,81,73,.15);color:var(--red);}
+.ad-badge.other{background:var(--s3);color:var(--muted);}
+.ad-search{width:100%;background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--text);outline:none;font-family:inherit;margin-bottom:14px;}
+.ad-search:focus{border-color:var(--accent);}
+.ad-rank{font-size:11px;color:var(--muted2);font-weight:700;width:24px;text-align:right;}
+
+/* ── DIST GRID ── */
+.ad-dist-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+@media(max-width:600px){.ad-dist-grid{grid-template-columns:1fr;}}
+
+/* ── LOADING ── */
+.ad-spin{width:20px;height:20px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;margin-right:8px;vertical-align:middle;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.ad-loading{padding:40px;text-align:center;color:var(--muted);}
+.ad-empty{color:var(--muted2);font-style:italic;padding:12px 0;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="ad-login">
+  <div class="ad-login-box">
+    <div class="ad-login-icon">🛡</div>
+    <div class="ad-login-title">DeepFin Admin</div>
+    <div class="ad-login-sub">Yönetim paneline erişmek için admin şifresini girin.</div>
+    <input type="password" id="ad-key-input" placeholder="Admin şifresi" autocomplete="current-password">
+    <button class="ad-login-btn" id="ad-login-btn" onclick="doLogin()">Giriş Yap</button>
+    <div class="ad-err" id="ad-err"></div>
+  </div>
+</div>
+
+<!-- SHELL -->
+<div id="ad-shell">
+  <div class="ad-topbar">
+    <div class="ad-logo">DeepFin Admin <span id="ad-cache-ts"></span></div>
+    <button class="ad-topbar-btn" onclick="refreshAll()">↻ Yenile</button>
+    <button class="ad-topbar-btn danger" onclick="doLogout()">Çıkış</button>
+  </div>
+  <div class="ad-main">
+
+    <!-- Stats -->
+    <div class="ad-stats" id="ad-stats-row">
+      <div class="ad-stat"><div class="ad-stat-val blue" id="st-scans">—</div><div class="ad-stat-lbl">Toplam Tarama</div></div>
+      <div class="ad-stat"><div class="ad-stat-val green" id="st-users">—</div><div class="ad-stat-lbl">Kayıtlı Kullanıcı</div></div>
+      <div class="ad-stat"><div class="ad-stat-val purple" id="st-top-strat">—</div><div class="ad-stat-lbl">En Popüler Strateji</div></div>
+      <div class="ad-stat"><div class="ad-stat-val orange" id="st-top-stock">—</div><div class="ad-stat-lbl">En Çok Eklenen Hisse</div></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="ad-tabs">
+      <button class="ad-tab active" onclick="switchTab('stratejiler',this)">📊 Stratejiler</button>
+      <button class="ad-tab" onclick="switchTab('hisseler',this)">📈 Hisseler</button>
+      <button class="ad-tab" onclick="switchTab('kullanicilar',this)">👥 Kullanıcılar</button>
+    </div>
+
+    <!-- Tab: Stratejiler -->
+    <div class="ad-panel active" id="tab-stratejiler">
+      <div class="ad-loading" id="strat-loading"><span class="ad-spin"></span>Yükleniyor...</div>
+      <div class="ad-strat-groups" id="strat-content" style="display:none;"></div>
+    </div>
+
+    <!-- Tab: Hisseler -->
+    <div class="ad-panel" id="tab-hisseler">
+      <div class="ad-loading" id="wl-loading"><span class="ad-spin"></span>Yükleniyor...</div>
+      <div id="wl-content" style="display:none;">
+        <div class="ad-section">
+          <div class="ad-section-title">En Çok Takip Listesine Eklenen Hisseler</div>
+          <div class="ad-bar-list" id="wl-bars"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Kullanıcılar -->
+    <div class="ad-panel" id="tab-kullanicilar">
+      <div class="ad-loading" id="usr-loading"><span class="ad-spin"></span>Yükleniyor...</div>
+      <div id="usr-content" style="display:none;">
+        <div class="ad-dist-grid">
+          <div class="ad-section">
+            <div class="ad-section-title">Yaş Dağılımı</div>
+            <div class="ad-bar-list" id="age-bars"></div>
+          </div>
+          <div class="ad-section">
+            <div class="ad-section-title">Yatırımcı Tipi Dağılımı</div>
+            <div class="ad-bar-list" id="inv-bars"></div>
+          </div>
+        </div>
+        <div class="ad-section">
+          <div class="ad-section-title">Kullanıcı Listesi</div>
+          <input type="search" class="ad-search" id="usr-search" placeholder="Kullanıcı ara..." oninput="filterUsers()">
+          <div class="ad-table-wrap">
+            <table class="ad-table" id="usr-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Kullanıcı Adı</th>
+                  <th>Ad Soyad</th>
+                  <th>E-posta</th>
+                  <th>Yaş Grubu</th>
+                  <th>Yatırımcı Tipi</th>
+                  <th>Kayıt Tarihi</th>
+                </tr>
+              </thead>
+              <tbody id="usr-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+var _key = '';
+var _reportData = null;
+var _usersData  = null;
+
+var STRAT_LABELS = {
+  tech:   { breakout:'💥 Breakout', oversold:'📉 Aşırı Satış', nearHigh:'🏔️ ATH Yakın', pullback:'🔄 Düzeltme',
+            strongDay:'☀️ Günlük Hareket', highVolume:'🏦 Akıllı Para', techBuy:'📊 Güçlü Sinyal',
+            momentum3m:'🏃 3A Momentum', trendFollow:'🌊 Trend Takibi', rsiBounce:'🔋 Toparlanıyor' },
+  goat:   { buffett:'🎯 Buffett', graham:'📚 Graham', fisher:'🔭 Fisher',
+            munger:'🧠 Munger', lynch:'📈 Lynch', piotroski:'🏆 Piotroski' },
+  preset: { value:'💎 Değer', growth:'🚀 Büyüme', dividend:'💰 Temettü',
+            quality:'⭐ Kalite', lowdebt:'🛡️ Az Borç', momentum:'⚡ Momentum' }
+};
+var STRAT_GROUP_LABELS = { tech:'Teknik Analiz', goat:'GOAT Stratejileri', preset:'Temel Analiz' };
+var STRAT_COLORS       = { tech:'blue', goat:'green', preset:'purple' };
+
+var INV_LABELS = { growth:'🚀 Büyüme', value:'💎 Değer', tech:'💻 Teknoloji',
+                  dividend:'💰 Temettü', bal:'⚖️ Dengeli', def:'🛡️ Defansif', small:'🔍 Küçük Şirket' };
+
+function fmtNum(n) {
+  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+  if (n >= 1000)    return (n/1000).toFixed(1) + 'K';
+  return String(n);
+}
+
+function fmtDate(ts) {
+  if (!ts) return '—';
+  return new Date(ts).toLocaleDateString('tr-TR',{day:'2-digit',month:'short',year:'numeric'});
+}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// ── Login / Logout ──
+document.getElementById('ad-key-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') doLogin();
+});
+
+async function doLogin() {
+  var key = document.getElementById('ad-key-input').value.trim();
+  if (!key) return;
+  var btn = document.getElementById('ad-login-btn');
+  btn.disabled = true; btn.textContent = 'Kontrol ediliyor...';
+  document.getElementById('ad-err').textContent = '';
+  try {
+    var r = await fetch('/api/report?key=' + encodeURIComponent(key));
+    if (r.status === 403) {
+      document.getElementById('ad-err').textContent = 'Yanlış şifre.';
+      btn.disabled = false; btn.textContent = 'Giriş Yap'; return;
+    }
+    var d = await r.json();
+    if (d.error) {
+      document.getElementById('ad-err').textContent = d.error;
+      btn.disabled = false; btn.textContent = 'Giriş Yap'; return;
+    }
+    _key = key;
+    sessionStorage.setItem('df_admin_key', key);
+    _reportData = d;
+    document.getElementById('ad-login').style.display = 'none';
+    document.getElementById('ad-shell').style.display = 'block';
+    renderAll();
+  } catch(e) {
+    document.getElementById('ad-err').textContent = 'Bağlantı hatası.';
+    btn.disabled = false; btn.textContent = 'Giriş Yap';
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem('df_admin_key');
+  _key = ''; _reportData = null; _usersData = null;
+  document.getElementById('ad-shell').style.display = 'none';
+  document.getElementById('ad-login').style.display = 'flex';
+  document.getElementById('ad-key-input').value = '';
+  document.getElementById('ad-login-btn').disabled = false;
+  document.getElementById('ad-login-btn').textContent = 'Giriş Yap';
+}
+
+// ── Auto-login from sessionStorage ──
+(function(){
+  var saved = sessionStorage.getItem('df_admin_key');
+  if (saved) { document.getElementById('ad-key-input').value = saved; doLogin(); }
+})();
+
+// ── Tab switching ──
+function switchTab(name, btn) {
+  document.querySelectorAll('.ad-tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.ad-panel').forEach(function(p){p.classList.remove('active');});
+  btn.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'kullanicilar' && !_usersData) loadUsers();
+}
+
+// ── Refresh ──
+async function refreshAll() {
+  _reportData = null; _usersData = null;
+  await loadReport();
+  var activeTab = document.querySelector('.ad-tab.active');
+  if (activeTab && activeTab.textContent.includes('Kullanıcı')) loadUsers();
+}
+
+// ── Load Report ──
+async function loadReport() {
+  document.getElementById('strat-loading').style.display = 'block';
+  document.getElementById('strat-content').style.display = 'none';
+  document.getElementById('wl-loading').style.display = 'block';
+  document.getElementById('wl-content').style.display = 'none';
+  try {
+    var r = await fetch('/api/report?key=' + encodeURIComponent(_key));
+    _reportData = await r.json();
+    renderAll();
+  } catch(e) {}
+}
+
+// ── Load Users ──
+async function loadUsers() {
+  document.getElementById('usr-loading').style.display = 'block';
+  document.getElementById('usr-content').style.display = 'none';
+  try {
+    var r = await fetch('/api/admin/users?key=' + encodeURIComponent(_key));
+    _usersData = await r.json();
+    renderUsers();
+  } catch(e) {
+    document.getElementById('usr-loading').style.display = 'none';
+  }
+}
+
+// ── Render All ──
+function renderAll() {
+  if (!_reportData) return;
+  renderStats();
+  renderStrategies();
+  renderWatchlist();
+  var ts = _reportData._ts ? new Date(_reportData._ts).toLocaleTimeString('tr-TR') : '';
+  document.getElementById('ad-cache-ts').textContent = ts ? '· ' + ts + ' itibarıyla' : '';
+}
+
+// ── Render Stats Cards ──
+function renderStats() {
+  var d = _reportData;
+  document.getElementById('st-scans').textContent = fmtNum(d.stats.total_scans);
+  document.getElementById('st-users').textContent = fmtNum(d.stats.total_users);
+  var topS = d.strategies && d.strategies[0];
+  document.getElementById('st-top-strat').textContent = topS
+    ? ((STRAT_LABELS[topS.type] && STRAT_LABELS[topS.type][topS.key]) || topS.key)
+    : '—';
+  var topW = d.watchlist && d.watchlist[0];
+  document.getElementById('st-top-stock').textContent = topW ? topW.symbol : '—';
+}
+
+// ── Render Strategies ──
+function renderStrategies() {
+  var d = _reportData;
+  document.getElementById('strat-loading').style.display = 'none';
+  document.getElementById('strat-content').style.display = 'grid';
+  var groups = { tech:[], goat:[], preset:[] };
+  (d.strategies || []).forEach(function(s){
+    if (groups[s.type]) groups[s.type].push(s);
+  });
+  var html = '';
+  ['goat','preset','tech'].forEach(function(type) {
+    var items = groups[type]; if (!items || !items.length) return;
+    var max = items[0] ? items[0].count : 1;
+    var color = STRAT_COLORS[type];
+    html += '<div class="ad-section">';
+    html += '<div class="ad-section-title">' + esc(STRAT_GROUP_LABELS[type]) + '</div>';
+    html += '<div class="ad-bar-list">';
+    items.forEach(function(s, i) {
+      var label = (STRAT_LABELS[type] && STRAT_LABELS[type][s.key]) || s.key;
+      var pct   = max > 0 ? Math.round((s.count / max) * 100) : 0;
+      html += '<div class="ad-bar-row">';
+      html += '<div class="ad-bar-label">' + esc(label) + '</div>';
+      html += '<div class="ad-bar-track"><div class="ad-bar-fill ' + color + '" style="width:' + pct + '%"></div></div>';
+      html += '<div class="ad-bar-count">' + s.count + '</div>';
+      html += '</div>';
+    });
+    html += '</div></div>';
+  });
+  document.getElementById('strat-content').innerHTML = html || '<div class="ad-empty">Henüz veri yok. Stratejilere tıklandıkça burada görünecek.</div>';
+}
+
+// ── Render Watchlist ──
+function renderWatchlist() {
+  var d = _reportData;
+  document.getElementById('wl-loading').style.display = 'none';
+  document.getElementById('wl-content').style.display = 'block';
+  var items = (d.watchlist || []).slice(0, 30);
+  if (!items.length) {
+    document.getElementById('wl-bars').innerHTML = '<div class="ad-empty">Henüz veri yok.</div>';
+    return;
+  }
+  var max = items[0].count;
+  var html = '';
+  items.forEach(function(s, i) {
+    var pct = max > 0 ? Math.round((s.count / max) * 100) : 0;
+    html += '<div class="ad-bar-row">';
+    html += '<div class="ad-bar-label"><span class="ad-rank">' + (i+1) + '.</span> ' + esc(s.symbol) + '</div>';
+    html += '<div class="ad-bar-track"><div class="ad-bar-fill blue" style="width:' + pct + '%"></div></div>';
+    html += '<div class="ad-bar-count">' + s.count + '</div>';
+    html += '</div>';
+  });
+  document.getElementById('wl-bars').innerHTML = html;
+}
+
+// ── Render Users ──
+var _allUsers = [];
+function renderUsers() {
+  var d = _usersData;
+  document.getElementById('usr-loading').style.display = 'none';
+  document.getElementById('usr-content').style.display = 'block';
+  _allUsers = d.users || [];
+  renderAgeBar(d.ageDist, 'age-bars');
+  renderDistBar(d.invDist, 'inv-bars', INV_LABELS);
+  renderUserTable(_allUsers);
+}
+
+function renderAgeBar(dist, elId) {
+  var keys  = ['<18','18-24','25-34','35-49','50+','—'];
+  var max   = Math.max.apply(null, keys.map(function(k){ return dist[k] || 0; }));
+  var html  = '';
+  keys.forEach(function(k) {
+    var v = dist[k] || 0; if (!v) return;
+    var pct = max > 0 ? Math.round((v / max) * 100) : 0;
+    html += '<div class="ad-bar-row"><div class="ad-bar-label">' + esc(k) + '</div>';
+    html += '<div class="ad-bar-track"><div class="ad-bar-fill green" style="width:' + pct + '%"></div></div>';
+    html += '<div class="ad-bar-count">' + v + '</div></div>';
+  });
+  document.getElementById(elId).innerHTML = html || '<div class="ad-empty">Veri yok.</div>';
+}
+
+function renderDistBar(dist, elId, labels) {
+  var items = Object.keys(dist).map(function(k){ return {k:k, v:dist[k]}; })
+    .sort(function(a,b){ return b.v - a.v; });
+  var max = items.length ? items[0].v : 1;
+  var html = '';
+  items.forEach(function(item) {
+    var lbl = (labels && labels[item.k]) || item.k;
+    var pct = max > 0 ? Math.round((item.v / max) * 100) : 0;
+    html += '<div class="ad-bar-row"><div class="ad-bar-label">' + esc(lbl) + '</div>';
+    html += '<div class="ad-bar-track"><div class="ad-bar-fill purple" style="width:' + pct + '%"></div></div>';
+    html += '<div class="ad-bar-count">' + item.v + '</div></div>';
+  });
+  document.getElementById(elId).innerHTML = html || '<div class="ad-empty">Veri yok.</div>';
+}
+
+var INV_BADGE_MAP = {growth:'growth',value:'value',tech:'tech',dividend:'dividend',bal:'bal',def:'def',small:'small'};
+
+function renderUserTable(users) {
+  if (!users.length) {
+    document.getElementById('usr-tbody').innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted2);padding:20px;">Kullanıcı bulunamadı.</td></tr>';
+    return;
+  }
+  var html = '';
+  users.forEach(function(u, i) {
+    var badge = INV_BADGE_MAP[u.investorType] || 'other';
+    var invLbl = (INV_LABELS[u.investorType]) || u.investorType;
+    html += '<tr>';
+    html += '<td class="ad-rank">' + (i+1) + '</td>';
+    html += '<td><strong>@' + esc(u.username) + '</strong></td>';
+    html += '<td>' + esc(u.name || '—') + '</td>';
+    html += '<td>' + esc(u.email) + '</td>';
+    html += '<td>' + esc(u.ageGroup) + '</td>';
+    html += '<td><span class="ad-badge ' + badge + '">' + esc(invLbl) + '</span></td>';
+    html += '<td>' + fmtDate(u.createdAt) + '</td>';
+    html += '</tr>';
+  });
+  document.getElementById('usr-tbody').innerHTML = html;
+}
+
+function filterUsers() {
+  var q = (document.getElementById('usr-search').value || '').toLowerCase();
+  if (!q) { renderUserTable(_allUsers); return; }
+  var filtered = _allUsers.filter(function(u) {
+    return (u.username||'').toLowerCase().includes(q)
+        || (u.name||'').toLowerCase().includes(q)
+        || (u.email||'').toLowerCase().includes(q);
+  });
+  renderUserTable(filtered);
+}
+</script>
+</body>
+</html>

@@ -3903,7 +3903,13 @@ function selectExchangeAndGo(exKey) {
   if(btn) selectExchange(btn);
 }
 
+function _track(type, key) {
+  fetch('/api/track', { method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({type: type, key: key}) }).catch(function(){});
+}
+
 function applyStrategyAndGo(goatKey) {
+  _track('goat', goatKey);
   clearFilters();
   showScreener();
   setTimeout(function(){
@@ -3914,6 +3920,7 @@ function applyStrategyAndGo(goatKey) {
 }
 
 function applyPresetAndGo(presetKey) {
+  _track('preset', presetKey);
   clearFilters();
   showScreener();
   setTimeout(function(){
@@ -3924,6 +3931,7 @@ function applyPresetAndGo(presetKey) {
 }
 
 function applyTechAndGo(techKey) {
+  _track('tech', techKey);
   clearFilters();
   showScreener();
   setTimeout(function(){

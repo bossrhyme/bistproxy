@@ -9,7 +9,7 @@
 //   *    /api/watchlists/item  → add/remove item
 // ─────────────────────────────────────────────
 const crypto = require('crypto');
-const { kvGet, kvSet, kvDel } = require('./_kv');
+const { kvGet, kvSet, kvDel, kvIncr, kvKeys, kvMGet } = require('./_kv');
 const { getUser, parseCookie } = require('./_auth');
 
 // ── helpers ──────────────────────────────────
@@ -434,6 +434,107 @@ async function handleSetInvestorType(req, res) {
   jsonRes(res, 200, { ok: true, user: safeUser(full) });
 }
 
+// ── Track ──────────────────────────────────────
+async function handleTrack(req, res) {
+  if (req.method !== 'POST') { jsonRes(res, 405, {}); return; }
+  try {
+    const body = await readBody(req);
+    const type = (body.type || '').toLowerCase().replace(/[^a-z]/g, '');
+    if (!['tech','goat','preset','wl'].includes(type)) { jsonRes(res, 400, {}); return; }
+    const rawKey = (body.key || '').trim();
+    const safeKey = type === 'wl'
+      ? rawKey.toUpperCase().replace(/[^A-Z0-9.]/g, '').slice(0, 12)
+      : rawKey.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 30);
+    if (!safeKey) { jsonRes(res, 400, {}); return; }
+    await kvIncr('rpt:' + type + ':' + safeKey);
+    jsonRes(res, 200, { ok: true });
+  } catch(e) {
+    jsonRes(res, 200, { ok: false });
+  }
+}
+
+function checkAdminKey(req) {
+  const adminKey = process.env.ADMIN_KEY;
+  if (!adminKey) return false;
+  const qKey = ((req.url || '').match(/[?&]key=([^&]+)/) || [])[1] || '';
+  const hKey = req.headers['x-admin-key'] || '';
+  return qKey === adminKey || hKey === adminKey;
+}
+
+// ── Report ─────────────────────────────────────
+async function handleReport(req, res) {
+  if (!checkAdminKey(req)) { jsonRes(res, 403, { error: 'Yetkisiz' }); return; }
+  try {
+    const cached = await kvGet('rpt:cache').catch(() => null);
+    if (cached && cached._ts && Date.now() - cached._ts < 600000) {
+      jsonRes(res, 200, cached); return;
+    }
+    const [scansRaw, usersRaw] = await Promise.all([
+      kvGet('df_total_scans').catch(() => 0),
+      kvGet('df_total_users').catch(() => 0)
+    ]);
+    const [techKeys, goatKeys, presetKeys, wlKeys] = await Promise.all([
+      kvKeys('rpt:tech:*'),
+      kvKeys('rpt:goat:*'),
+      kvKeys('rpt:preset:*'),
+      kvKeys('rpt:wl:*')
+    ]);
+    const allStratKeys = [...techKeys, ...goatKeys, ...presetKeys];
+    const [stratVals, wlVals] = await Promise.all([
+      kvMGet(allStratKeys),
+      kvMGet(wlKeys)
+    ]);
+    const strategies = allStratKeys.map(function(k, i) {
+      const parts = k.split(':');
+      return { type: parts[1], key: parts[2], count: parseInt(stratVals[i], 10) || 0 };
+    }).sort(function(a, b) { return b.count - a.count; });
+    const watchlist = wlKeys.map(function(k, i) {
+      return { symbol: k.split(':')[2], count: parseInt(wlVals[i], 10) || 0 };
+    }).sort(function(a, b) { return b.count - a.count; }).slice(0, 30);
+    const report = {
+      stats: { total_scans: parseInt(scansRaw, 10) || 0, total_users: parseInt(usersRaw, 10) || 0 },
+      strategies, watchlist, _ts: Date.now()
+    };
+    await kvSet('rpt:cache', report, 600).catch(() => {});
+    jsonRes(res, 200, report);
+  } catch(e) {
+    jsonRes(res, 500, { error: e.message });
+  }
+}
+
+// ── Admin Users ────────────────────────────────
+async function handleAdminUsers(req, res) {
+  if (!checkAdminKey(req)) { jsonRes(res, 403, { error: 'Yetkisiz' }); return; }
+  try {
+    const cached = await kvGet('rpt:users_cache').catch(() => null);
+    if (cached && cached._ts && Date.now() - cached._ts < 300000) {
+      jsonRes(res, 200, cached); return;
+    }
+    const userKeys = await kvKeys('usr:em_*');
+    const userVals = await kvMGet(userKeys);
+    const users = userVals.filter(Boolean).map(function(u) {
+      let ageGroup = '—';
+      if (u.dob) {
+        const age = Math.floor((Date.now() - new Date(u.dob).getTime()) / (365.25 * 24 * 3600 * 1000));
+        ageGroup = age < 18 ? '<18' : age < 25 ? '18-24' : age < 35 ? '25-34' : age < 50 ? '35-49' : '50+';
+      }
+      return { username: u.username, name: u.name || '', email: u.email,
+               investorType: u.investorType || '—', ageGroup, createdAt: u.createdAt || 0 };
+    }).sort(function(a, b) { return b.createdAt - a.createdAt; });
+    const ageDist = {}, invDist = {};
+    users.forEach(function(u) {
+      ageDist[u.ageGroup] = (ageDist[u.ageGroup] || 0) + 1;
+      if (u.investorType && u.investorType !== '—')
+        invDist[u.investorType] = (invDist[u.investorType] || 0) + 1;
+    });
+    const result = { users, ageDist, invDist, _ts: Date.now() };
+    await kvSet('rpt:users_cache', result, 300).catch(() => {});
+    jsonRes(res, 200, result);
+  } catch(e) {
+    jsonRes(res, 500, { error: e.message });
+  }
+}
+
 async function handleStats(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('Content-Type', 'application/json');
@@ -451,6 +552,9 @@ module.exports = async function handler(req, res) {
 
   try {
     if (path === '/api/stats')               return await handleStats(req, res);
+    if (path === '/api/track')               return await handleTrack(req, res);
+    if (path === '/api/report')              return await handleReport(req, res);
+    if (path === '/api/admin/users')         return await handleAdminUsers(req, res);
     if (path === '/api/auth/register')        return await handleRegister(req, res);
     if (path === '/api/auth/login')           return await handleLogin(req, res);
     if (path === '/api/auth/me')              return await handleMe(req, res);
