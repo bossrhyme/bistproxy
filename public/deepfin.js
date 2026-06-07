@@ -1519,37 +1519,37 @@ const TECH_PRESETS = {
   // ── GELİŞTİRİLMİŞ (mevcut 6) ──────────────────────────────────────────
 
   breakout: {
-    label: 'Kırılım',
+    label: 'Breakout',
     desc: 'Kırılım takipçisi için uzun süre dar bir aralıkta sıkışan ve ardından güçlü bir hareketle o aralığı kıran hisse ilgi çeker. Hacimin de artması bu kırılımın sahte olmadığının işareti. Trendin tam başlangıç noktasını yakalamak için.',
     filters: { from_high_max: -5, chg_min: 1.5, vol_min: 0.5, tech_rating_min: 0.1 }
   },
 
   oversold: {
-    label: 'Dip Fırsatı',
+    label: 'Aşırı Satış',
     desc: 'Dip avcısı için herkes satarken almak cesaret ister ama fırsat da getirir. Sert bir düşüşün ardından teknik göstergeler aşırı satılmış bölgesine giren hisseler aranır. Temel değerleri hâlâ sağlamsa toparlanma potansiyeli taşır.',
     filters: { from_high_max: -20, chg_min: 0, rsi_max: 35 }
   },
 
   nearHigh: {
-    label: 'Zirveye Yakın',
+    label: 'ATH Yakın',
     desc: 'Trend takipçisi için zirvesine yakın olmak genellikle trendin devam ettiğinin işareti. Son bir ayın en yüksek fiyatına çok yakın, orta vadede de kazanmış hisseler aranır. Güçlü trendde olan hisseyi yakalamak isteyenler için.',
     filters: { from_high_max: -3, perf3m_min: 5 }
   },
 
   pullback: {
-    label: 'Sağlıklı Çekilme',
+    label: 'Düzeltme',
     desc: 'Düzeltme avcısı için güçlü bir trendin içindeki kısa süreli geri çekilme, hem trend güçlü hem fiyat daha makul anlamına gelir. Zirveden sınırlı geri çekilmiş, yıllık dibinden ise uzaklaşmış hisseler aranır. Trende daha iyi fiyattan girmek için.',
     filters: { from_high_max: -10, from_low_min: 10, perf6m_min: 10 }
   },
 
   strongDay: {
-    label: 'Güçlü Gün',
+    label: 'Günlük Hareket',
     desc: 'Kısa vadeli takipçi için bugün ciddi miktarda yükselen ve normalden fazla el değiştiren hisse dikkat çeker. Arkasında bir haber, açıklama ya da büyük bir alım olabilir. Ani kısa vadeli bir hareketin başlangıcını yakalamak için.',
     filters: { chg_min: 2, vol_min: 0.5 }
   },
 
   highVolume: {
-    label: 'Kurumsal Hacim',
+    label: 'Akıllı Para',
     desc: 'Kurumsal akışı izleyen yatırımcı için normalden çok daha fazla işlem hacmi önemli bir sinyal taşır. Bu ölçekte hacim genellikle büyük kurumsal alıcıların pozisyon açtığını gösterir. Akıllı paranın nereye gittiğini izlemek isteyenler için.',
     filters: { vol_min: 5, chg_min: 0 }
   },
@@ -1557,25 +1557,25 @@ const TECH_PRESETS = {
   // ── YENİ ──────────────────────────────────────────────────────────────
 
   techBuy: {
-    label: '26 İndikatör AL',
+    label: 'Güçlü Sinyal',
     desc: 'Teknik analist için tek bir indikatör yeterli değil, hepsinin aynı yönü göstermesi lazım. RSI, MACD, Stochastic ve hareketli ortalamalar dahil 26 göstergenin büyük çoğunluğu alım sinyali veriyor. En kapsamlı teknik onay.',
     filters: { tech_rating_min: 0.5 }
   },
 
   momentum3m: {
-    label: '3 Aylık Lider',
+    label: '3A Momentum',
     desc: 'Orta vadeli momentum takipçisi için kısa vadede değil, birkaç aydır güçlü olan hisse daha güvenilir bir sinyal verir. Son üç ve altı ayda piyasanın önünde giden hisseler aranır. Her iki dönemde de güçlü olan momentum devam eder.',
     filters: { perf3m_min: 15, perf6m_min: 20 }
   },
 
   trendFollow: {
-    label: 'Güçlü Trendde',
+    label: 'Trend Takibi',
     desc: 'Trend takipçisi için dip geride kalmış ve trendi yukarı olan hisse en güçlü adaydır. Yıllık en düşük seviyesinden önemli ölçüde yükseliş yapmış ve bu kazancını koruyan hisseler aranır. Düşükten uzak, güçlü kalmaya devam eden profil.',
     filters: { from_low_min: 25, perf6m_min: 10 }
   },
 
   rsiBounce: {
-    label: 'RSI Toparlanması',
+    label: 'Toparlanıyor',
     desc: 'Toparlanma avcısı için aşırı satılmış bölgeden çıkmış ama henüz pahalı bölgeye girmemiş hisse iyi bir konumda. Dibi geride bırakmış, fiyatı hâlâ makul seviyede. Toparlanmanın erken aşamasını yakalamak için.',
     filters: { rsi_min: 30, rsi_max: 50, from_low_min: 3 }
   },
