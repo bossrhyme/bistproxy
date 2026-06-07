@@ -90,10 +90,12 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .ad-badge.growth{background:rgba(63,185,80,.15);color:var(--green);}
 .ad-badge.value{background:rgba(14,165,233,.15);color:var(--accent);}
 .ad-badge.tech{background:rgba(163,113,247,.15);color:var(--purple);}
-.ad-badge.dividend{background:rgba(227,179,65,.15);color:var(--orange);}
+.ad-badge.div{background:rgba(227,179,65,.15);color:var(--orange);}
+.ad-badge.mom{background:rgba(249,115,22,.15);color:#fb923c;}
+.ad-badge.spec{background:rgba(248,81,73,.2);color:var(--red);}
 .ad-badge.bal{background:rgba(139,148,158,.15);color:var(--muted);}
 .ad-badge.def{background:rgba(63,185,80,.1);color:#6ee7b7;}
-.ad-badge.small{background:rgba(248,81,73,.15);color:var(--red);}
+.ad-badge.small{background:rgba(139,92,246,.15);color:#c4b5fd;}
 .ad-badge.other{background:var(--s3);color:var(--muted);}
 .ad-search{width:100%;background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--text);outline:none;font-family:inherit;margin-bottom:14px;}
 .ad-search:focus{border-color:var(--accent);}
@@ -222,8 +224,11 @@ var STRAT_LABELS = {
 var STRAT_GROUP_LABELS = { tech:'Teknik Analiz', goat:'GOAT Stratejileri', preset:'Temel Analiz' };
 var STRAT_COLORS       = { tech:'blue', goat:'green', preset:'purple' };
 
-var INV_LABELS = { growth:'🚀 Büyüme', value:'💎 Değer', tech:'💻 Teknoloji',
-                  dividend:'💰 Temettü', bal:'⚖️ Dengeli', def:'🛡️ Defansif', small:'🔍 Küçük Şirket' };
+var INV_LABELS = {
+  growth:'🚀 Büyüme Avcısı', div:'💰 Temettü Koleksiyoneri', value:'🔍 Değer Dedektifi',
+  mom:'🏄 Momentum Sörfçüsü', def:'🛡️ Savunma Kalesi', small:'🔭 Küçük Değer Keşifçisi',
+  spec:'⚡ Spekülatif Akıncı', tech:'💻 Teknoloji Vizyoneri', bal:'⚖️ Çevik Dengeleyici'
+};
 
 function fmtNum(n) {
   if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
@@ -449,7 +454,7 @@ function renderDistBar(dist, elId, labels) {
   document.getElementById(elId).innerHTML = html || '<div class="ad-empty">Veri yok.</div>';
 }
 
-var INV_BADGE_MAP = {growth:'growth',value:'value',tech:'tech',dividend:'dividend',bal:'bal',def:'def',small:'small'};
+var INV_BADGE_MAP = {growth:'growth',div:'div',value:'value',mom:'mom',def:'def',small:'small',spec:'spec',tech:'tech',bal:'bal'};
 
 function renderUserTable(users) {
   if (!users.length) {
