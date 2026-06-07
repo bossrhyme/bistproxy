@@ -973,12 +973,29 @@ async function createPortfolio(name) {
 }
 
 // ── Ayarlar ───────────────────────────────────
-window.toggleSettings = function() {
-  var body = document.getElementById('pf-settings-body');
-  var chev = document.getElementById('pf-settings-chev');
-  var open = body.style.display !== 'none';
-  body.style.display  = open ? 'none' : 'block';
-  if (chev) chev.textContent = open ? '▼' : '▲';
+window.toggleProfileMenu = function(e) {
+  if (e) e.stopPropagation();
+  var menu = document.getElementById('pf-profile-menu');
+  menu.classList.toggle('open');
+};
+document.addEventListener('click', function() {
+  var menu = document.getElementById('pf-profile-menu');
+  if (menu) menu.classList.remove('open');
+});
+
+window.showSettingsView = function() {
+  var menu = document.getElementById('pf-profile-menu');
+  if (menu) menu.classList.remove('open');
+  document.getElementById('pf-user').style.display = 'none';
+  var sv = document.getElementById('pf-settings-view');
+  sv.style.display = 'block';
+  var ni = document.getElementById('pf-name-input');
+  if (ni && _user) ni.value = _user.name || '';
+};
+
+window.hideSettingsView = function() {
+  document.getElementById('pf-settings-view').style.display = 'none';
+  document.getElementById('pf-user').style.display = 'block';
 };
 
 window.saveName = async function() {

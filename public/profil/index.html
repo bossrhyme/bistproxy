@@ -178,13 +178,28 @@ body{overflow-y:auto;}
 .pf-pf-total.has-data{display:block;}
 
 /* Settings */
-.pf-settings-toggle{cursor:pointer;user-select:none;}
-.pf-settings-toggle:hover{color:var(--text);}
 .pf-settings-input{background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:12px;color:var(--text);outline:none;font-family:inherit;flex:1;min-width:0;}
 .pf-settings-input:focus{border-color:var(--accent);}
 .pf-settings-group{padding:16px;border-bottom:1px solid var(--border);}
 .pf-settings-group:last-child{border-bottom:none;}
 .pf-settings-label{font-size:10px;font-weight:700;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;}
+
+/* Profile topbar menu */
+.pf-topbar-btn-wrap{position:relative;}
+.pf-topbar-profile-btn{cursor:pointer!important;border-color:var(--accent)!important;color:var(--accent)!important;}
+#pf-profile-menu{position:absolute;right:0;top:calc(100% + 6px);background:var(--s1);border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.22);min-width:170px;padding:5px 0;z-index:500;display:none;}
+#pf-profile-menu.open{display:block;}
+.pf-menu-item{display:flex;align-items:center;gap:9px;padding:10px 15px;font-size:12px;font-weight:500;color:var(--text);cursor:pointer;transition:background .12s;white-space:nowrap;text-decoration:none;border:none;background:none;width:100%;font-family:inherit;}
+.pf-menu-item:hover{background:var(--s2);}
+.pf-menu-item.danger{color:var(--red);}
+.pf-menu-sep{height:1px;background:var(--border);margin:4px 0;}
+
+/* Settings view (full-page replace) */
+#pf-settings-view{display:none;padding:20px 16px 40px;max-width:520px;margin:0 auto;}
+.pf-sv-header{display:flex;align-items:center;gap:10px;margin-bottom:24px;}
+.pf-sv-back{background:none;border:none;cursor:pointer;color:var(--muted2);font-size:13px;padding:4px 0;display:flex;align-items:center;gap:6px;font-family:inherit;font-weight:500;}
+.pf-sv-back:hover{color:var(--text);}
+.pf-sv-title{font-size:16px;font-weight:800;}
 
 /* Toast */
 .pf-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(40px);background:var(--text);color:var(--bg);padding:8px 18px;border-radius:6px;font-size:12px;font-weight:500;z-index:200;opacity:0;transition:all .25s;pointer-events:none;}
@@ -335,7 +350,14 @@ body{overflow-y:auto;}
   <a href="/" class="hp-nav-btn">Tarayıcı</a>
   <a href="/analiz/" class="hp-nav-btn">Analiz</a>
   <div class="tright">
-    <span class="topbarbtn infobtn profile-topbtn" style="cursor:default;border-color:var(--accent);color:var(--accent);">👤<span class="prf-btn-lbl">Profil</span></span>
+    <div class="pf-topbar-btn-wrap">
+      <span class="topbarbtn infobtn pf-topbar-profile-btn" onclick="toggleProfileMenu(event)">👤<span class="prf-btn-lbl">Profil</span> ▾</span>
+      <div id="pf-profile-menu">
+        <button class="pf-menu-item" onclick="showSettingsView()">⚙️ Hesap Ayarları</button>
+        <div class="pf-menu-sep"></div>
+        <a href="/api/auth/logout" class="pf-menu-item danger" onclick="return confirm('Çıkış yapılsın mı?')">↪ Çıkış Yap</a>
+      </div>
+    </div>
     <a href="/" class="topbarbtn infobtn">Bilgi Bankası</a>
     <button class="topbarbtn supportbtn" onclick="window.location.href='/'">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
@@ -421,9 +443,6 @@ body{overflow-y:auto;}
           <div class="pf-meta-item"><b id="pf-points-val">0</b>&nbsp;XP</div>
           <div class="pf-meta-item">Seri:&nbsp;<b id="pf-streak-val">0</b>&nbsp;gün</div>
         </div>
-        <div class="pf-action-row">
-          <a href="/api/auth/logout" class="pf-logout-btn" onclick="return confirm('Çıkış yapılsın mı?')">Çıkış Yap</a>
-        </div>
       </div>
     </div>
 
@@ -445,35 +464,6 @@ body{overflow-y:auto;}
       </div>
     </div>
 
-    <!-- Settings -->
-    <div class="pf-section">
-      <div class="pf-section-title pf-settings-toggle" onclick="toggleSettings()">
-        ⚙ Hesap Ayarları <span id="pf-settings-chev" style="font-size:10px;margin-left:4px;">▼</span>
-      </div>
-      <div id="pf-settings-body" style="display:none;">
-        <div class="pf-list-panel" style="margin-bottom:10px;">
-          <div class="pf-settings-group">
-            <div class="pf-settings-label">İsim</div>
-            <div style="display:flex;gap:8px;">
-              <input type="text" id="pf-name-input" class="pf-settings-input" placeholder="Adınız" maxlength="60">
-              <button class="pf-add-btn" id="pf-save-name-btn" onclick="saveName()">Kaydet</button>
-            </div>
-          </div>
-        </div>
-        <div class="pf-list-panel">
-          <div class="pf-settings-group">
-            <div class="pf-settings-label">Şifre Değiştir</div>
-            <div style="display:flex;flex-direction:column;gap:8px;max-width:300px;">
-              <input type="password" id="pf-pw-cur"  class="pf-settings-input" placeholder="Mevcut şifre"        autocomplete="current-password" maxlength="20">
-              <input type="password" id="pf-pw-new"  class="pf-settings-input" placeholder="Yeni şifre (6-20 karakter)" autocomplete="new-password" minlength="6" maxlength="20">
-              <input type="password" id="pf-pw-conf" class="pf-settings-input" placeholder="Şifreyi onayla"      autocomplete="new-password" minlength="6" maxlength="20">
-              <div class="pf-auth-err" id="pf-pw-err"></div>
-              <button class="pf-add-btn" id="pf-pw-btn" onclick="changePassword()" style="align-self:flex-start">Güncelle</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
   </div><!-- /pf-col-main -->
 
   <!-- Right sidebar: investor types -->
@@ -483,6 +473,34 @@ body{overflow-y:auto;}
 
   </div><!-- /pf-columns -->
   </div><!-- /pf-user -->
+
+  <!-- Hesap Ayarları sayfası -->
+  <div id="pf-settings-view">
+    <div class="pf-sv-header">
+      <button class="pf-sv-back" onclick="hideSettingsView()">← Geri</button>
+      <div class="pf-sv-title">⚙️ Hesap Ayarları</div>
+    </div>
+    <div class="pf-section">
+      <div class="pf-settings-group">
+        <div class="pf-settings-label">İsim</div>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="pf-name-input" class="pf-settings-input" placeholder="Adınız" maxlength="60">
+          <button class="pf-add-btn" id="pf-save-name-btn" onclick="saveName()">Kaydet</button>
+        </div>
+      </div>
+      <div class="pf-settings-group">
+        <div class="pf-settings-label">Şifre Değiştir</div>
+        <div style="display:flex;flex-direction:column;gap:8px;max-width:320px;">
+          <input type="password" id="pf-pw-cur"  class="pf-settings-input" placeholder="Mevcut şifre"              autocomplete="current-password" maxlength="20">
+          <input type="password" id="pf-pw-new"  class="pf-settings-input" placeholder="Yeni şifre (6-20 karakter)" autocomplete="new-password" minlength="6" maxlength="20">
+          <input type="password" id="pf-pw-conf" class="pf-settings-input" placeholder="Şifreyi onayla"             autocomplete="new-password" minlength="6" maxlength="20">
+          <div class="pf-auth-err" id="pf-pw-err"></div>
+          <button class="pf-add-btn" id="pf-pw-btn" onclick="changePassword()" style="align-self:flex-start">Güncelle</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- New list modal -->
