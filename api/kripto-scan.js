@@ -360,6 +360,12 @@ module.exports = async function handler(req, res) {
     ...( PRESETS[preset] || {} )
   };
 
+  // Her tarama isteğinde sayacı artır
+  if (kvEnabled()) {
+    makeReq(new URL(process.env.KV_REST_API_URL).hostname, '/incr/df_total_scans', 'POST',
+      { Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN, 'Content-Length': '0' }, '').catch(() => {});
+  }
+
   // Cache key
   const cacheKey = `df_kripto_v2_${category}_${preset}_${sortBy}_${limit}_${page}_${JSON.stringify(filters)}`;
   if (kvEnabled()) {
@@ -429,8 +435,6 @@ module.exports = async function handler(req, res) {
     // 6. Cache (2 dakika)
     if (kvEnabled()) {
       await kvSet(cacheKey, result, 120);
-      makeReq(new URL(process.env.KV_REST_API_URL).hostname, '/incr/df_total_scans', 'POST',
-        { Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN, 'Content-Length': '0' }, '').catch(()=>{});
     }
 
     res.setHeader('Content-Type', 'application/json');

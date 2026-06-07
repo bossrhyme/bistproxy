@@ -166,6 +166,12 @@ module.exports = async function handler(req, res) {
     maxPaycount:                   q.get('max_paycount')  ? parseFloat(q.get('max_paycount'))  : null,
   };
 
+  // Her tarama isteğinde sayacı artır
+  if (kvEnabled()) {
+    makeReq(new URL(process.env.KV_REST_API_URL).hostname, '/incr/df_total_scans', 'POST',
+      { Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN, 'Content-Length': '0' }, '').catch(() => {});
+  }
+
   // KV Cache
   const cacheKey = `df_fon_v9_${fonTur}_${preset}_${sortBy}_${limit}_${JSON.stringify(filters)}`;
   if (kvEnabled()) {
@@ -280,8 +286,6 @@ module.exports = async function handler(req, res) {
     const result = { funds, total: funds.length, source:'tefas', secondary:'yahoo_finance', updatedAt: new Date().toISOString() };
     if (kvEnabled()) {
       await kvSet(cacheKey, result, 3600);
-      makeReq(new URL(process.env.KV_REST_API_URL).hostname, '/incr/df_total_scans', 'POST',
-        { Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN, 'Content-Length': '0' }, '').catch(()=>{});
     }
     return res.status(200).end(JSON.stringify(result));
 

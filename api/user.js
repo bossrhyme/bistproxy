@@ -433,7 +433,7 @@ async function handleSetInvestorType(req, res) {
 }
 
 async function handleStats(req, res) {
-  res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
+  res.setHeader('Cache-Control', 'no-store');
   res.setHeader('Content-Type', 'application/json');
   try {
     const [scansRaw, usersRaw] = await Promise.all([kvGet('df_total_scans'), kvGet('df_total_users')]);

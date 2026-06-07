@@ -396,6 +396,12 @@ module.exports = async function(req, res) {
     const cacheKey = 'df_v4_' + exchange + '_' + colHash; // v4: country-specific paths for india/sweden/uae
     const ttl      = getCacheTTL(exchange);
 
+    // Her tarama isteğinde sayacı artır (cache hit/miss fark etmez)
+    if (kvEnabled()) {
+      fetchHttp(process.env.KV_REST_API_URL + '/incr/df_total_scans', 'POST',
+        { Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN }).catch(() => {});
+    }
+
     // 1. Cache HIT? — önce KV, yoksa in-memory fallback
     const memHit = memGet(cacheKey);
     if (memHit) {
@@ -447,8 +453,6 @@ module.exports = async function(req, res) {
             memSet(cacheKey, parsed, Math.min(ttl, 300));
             if (kvEnabled()) {
               kvSet(cacheKey, parsed, ttl).catch(() => {});
-              fetchHttp(process.env.KV_REST_API_URL + '/incr/df_total_scans', 'POST',
-                { Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN }).catch(()=>{});
             }
           }
 
