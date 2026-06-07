@@ -1285,6 +1285,23 @@ tbody tr td { height: 36px; }
 .ibt.bad{background:var(--red-bg);color:var(--red);}
 @media(max-width:640px){.ib-items-grid{grid-template-columns:1fr;}}
 
+/* ── Seviye Tablosu ── */
+.lvl-intro-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;}
+@media(max-width:640px){.lvl-intro-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:400px){.lvl-intro-grid{grid-template-columns:1fr;}}
+.lvl-tier{margin-bottom:8px;border-radius:8px;overflow:hidden;border:1px solid var(--border);}
+.lvl-tier-hdr{display:flex;align-items:center;gap:8px;padding:8px 12px;}
+.lvl-roman{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;font-family:monospace;flex-shrink:0;border:1.5px solid currentColor;background:rgba(255,255,255,.06);}
+.lvl-tier-name{font-size:12px;font-weight:700;flex:1;}
+.lvl-tier-range{font-size:10px;font-weight:600;opacity:.75;white-space:nowrap;}
+.lvl-tier-avdesc{font-size:9px;opacity:.5;font-style:italic;white-space:nowrap;margin-left:6px;}
+@media(max-width:500px){.lvl-tier-avdesc{display:none;}}
+.lvl-rows{background:var(--s2);}
+.lvl-row{display:grid;grid-template-columns:52px 1fr auto;align-items:center;gap:8px;padding:5px 12px;border-top:1px solid var(--border);}
+.lvl-lv{font-size:12px;font-weight:800;font-family:'Geist Mono',monospace;}
+.lvl-desc{font-size:11px;color:var(--muted2);}
+.lvl-pill{font-size:10px;font-family:'Geist Mono',monospace;border-radius:4px;padding:2px 7px;white-space:nowrap;background:rgba(255,255,255,.04);color:var(--muted);}
+
 /* ── Sidebar Collapse ─── */
 .sidebar.collapsed{width:0;min-width:0;padding:0;overflow:hidden;opacity:0;border-right:none;}
 .sb-toggle{position:relative;z-index:2;width:16px;min-width:16px;height:100%;background:var(--accent);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;padding:0;flex-shrink:0;}

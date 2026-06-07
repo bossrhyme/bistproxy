@@ -108,7 +108,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=arctic31">
+<link rel="stylesheet" href="/deepfin.css?v=arctic32">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -1406,6 +1406,7 @@ if('serviceWorker' in navigator){
         <button class="ib-btn active" onclick="switchAssetTab('hisse',this)">📈 Hisse</button>
         <button class="ib-btn" onclick="switchAssetTab('kripto',this)">₿ Kripto</button>
         <button class="ib-btn" onclick="switchAssetTab('fon',this)">🏦 Fon <small style="font-size:9px;opacity:.6;font-weight:500;">yakında</small></button>
+        <button class="ib-btn" onclick="switchAssetTab('seviyeler',this)">⚔️ Seviyeler</button>
         <span class="ib-soon">Yakında: ETF · Eurobond · Bono · Viop · Varant · Opsiyon</span>
       </div>
 
@@ -1840,6 +1841,203 @@ if('serviceWorker' in navigator){
         </div><!-- /Kripto Filtre -->
 
       </div><!-- /asset-panel-kripto -->
+
+      <!-- ── SEVİYELER ── -->
+      <div class="ib-panel" id="asset-panel-seviyeler">
+
+        <div class="ib-section" style="margin-top:0;">
+          <div class="ib-sec-hdr">⚔️ Seviye &amp; Rütbe Sistemi</div>
+
+          <div class="lvl-intro-grid">
+            <div class="ib-item">
+              <div class="ib-name">XP Kazanım</div>
+              <div class="ib-desc">Her günlük girişte +100 XP kazanırsın. Her seviye için ~10 aktif gün gerekir.</div>
+              <div class="ib-crit">+100 XP — Günlük giriş bonusu</div>
+            </div>
+            <div class="ib-item">
+              <div class="ib-name">Rütbe Yükselmesi</div>
+              <div class="ib-desc">Her 5 seviyede bir rütbe değişir. Toplamda 10 rütbe, Çaylak Asker'den Spartan Efsanesi'ne.</div>
+              <div class="ib-crit">10 rütbe · 5 seviyede bir yükselme</div>
+            </div>
+            <div class="ib-item">
+              <div class="ib-name">Spartan Kask</div>
+              <div class="ib-desc">Profil fotoğrafın rütbenle değişir: yeni renk, sorguç, yıldız ve taç açılır.</div>
+              <div class="ib-crit">Max: Seviye 50 · 49.000 XP</div>
+            </div>
+          </div>
+
+          <!-- ── Tier 1 ── -->
+          <div class="lvl-tier">
+            <div class="lvl-tier-hdr" style="background:rgba(107,114,128,.12);color:#6b7280;">
+              <div class="lvl-roman">I</div>
+              <div class="lvl-tier-name">Çaylak Asker</div>
+              <div class="lvl-tier-range">Seviye 1–5</div>
+              <div class="lvl-tier-avdesc">Gri kask · süsleme yok</div>
+            </div>
+            <div class="lvl-rows">
+              <div class="lvl-row"><div class="lvl-lv" style="color:#6b7280">Lv.1</div><div class="lvl-desc">Başlangıç seviyesi</div><div class="lvl-pill">0 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#6b7280">Lv.2</div><div class="lvl-desc">~10 günlük giriş</div><div class="lvl-pill">1.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#6b7280">Lv.3</div><div class="lvl-desc">~20 günlük giriş</div><div class="lvl-pill">2.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#6b7280">Lv.4</div><div class="lvl-desc">~30 günlük giriş</div><div class="lvl-pill">3.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#6b7280">Lv.5</div><div class="lvl-desc">~40 günlük giriş</div><div class="lvl-pill">4.000 XP</div></div>
+            </div>
+          </div>
+
+          <!-- ── Tier 2 ── -->
+          <div class="lvl-tier">
+            <div class="lvl-tier-hdr" style="background:rgba(120,113,108,.12);color:#a8a29e;">
+              <div class="lvl-roman">II</div>
+              <div class="lvl-tier-name">Nefer</div>
+              <div class="lvl-tier-range">Seviye 6–10</div>
+              <div class="lvl-tier-avdesc">Kahverengi kask · savaş izleri</div>
+            </div>
+            <div class="lvl-rows">
+              <div class="lvl-row"><div class="lvl-lv" style="color:#a8a29e">Lv.6</div><div class="lvl-desc">~50 günlük giriş</div><div class="lvl-pill">5.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#a8a29e">Lv.7</div><div class="lvl-desc">~60 günlük giriş</div><div class="lvl-pill">6.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#a8a29e">Lv.8</div><div class="lvl-desc">~70 günlük giriş</div><div class="lvl-pill">7.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#a8a29e">Lv.9</div><div class="lvl-desc">~80 günlük giriş</div><div class="lvl-pill">8.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#a8a29e">Lv.10</div><div class="lvl-desc">~90 günlük giriş</div><div class="lvl-pill">9.000 XP</div></div>
+            </div>
+          </div>
+
+          <!-- ── Tier 3 ── -->
+          <div class="lvl-tier">
+            <div class="lvl-tier-hdr" style="background:rgba(14,165,233,.1);color:#0ea5e9;">
+              <div class="lvl-roman">III</div>
+              <div class="lvl-tier-name">Onbaşı</div>
+              <div class="lvl-tier-range">Seviye 11–15</div>
+              <div class="lvl-tier-avdesc">Mavi kask · sorguç kazanıldı</div>
+            </div>
+            <div class="lvl-rows">
+              <div class="lvl-row"><div class="lvl-lv" style="color:#0ea5e9">Lv.11</div><div class="lvl-desc">~100 günlük giriş</div><div class="lvl-pill">10.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#0ea5e9">Lv.12</div><div class="lvl-desc">~110 günlük giriş</div><div class="lvl-pill">11.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#0ea5e9">Lv.13</div><div class="lvl-desc">~120 günlük giriş</div><div class="lvl-pill">12.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#0ea5e9">Lv.14</div><div class="lvl-desc">~130 günlük giriş</div><div class="lvl-pill">13.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#0ea5e9">Lv.15</div><div class="lvl-desc">~140 günlük giriş</div><div class="lvl-pill">14.000 XP</div></div>
+            </div>
+          </div>
+
+          <!-- ── Tier 4 ── -->
+          <div class="lvl-tier">
+            <div class="lvl-tier-hdr" style="background:rgba(34,197,94,.1);color:#22c55e;">
+              <div class="lvl-roman">IV</div>
+              <div class="lvl-tier-name">Çavuş</div>
+              <div class="lvl-tier-range">Seviye 16–20</div>
+              <div class="lvl-tier-avdesc">Yeşil kask · sorguç</div>
+            </div>
+            <div class="lvl-rows">
+              <div class="lvl-row"><div class="lvl-lv" style="color:#22c55e">Lv.16</div><div class="lvl-desc">~150 günlük giriş</div><div class="lvl-pill">15.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#22c55e">Lv.17</div><div class="lvl-desc">~160 günlük giriş</div><div class="lvl-pill">16.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#22c55e">Lv.18</div><div class="lvl-desc">~170 günlük giriş</div><div class="lvl-pill">17.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#22c55e">Lv.19</div><div class="lvl-desc">~180 günlük giriş</div><div class="lvl-pill">18.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#22c55e">Lv.20</div><div class="lvl-desc">~190 günlük giriş</div><div class="lvl-pill">19.000 XP</div></div>
+            </div>
+          </div>
+
+          <!-- ── Tier 5 ── -->
+          <div class="lvl-tier">
+            <div class="lvl-tier-hdr" style="background:rgba(245,158,11,.1);color:#f59e0b;">
+              <div class="lvl-roman">V</div>
+              <div class="lvl-tier-name">Teğmen</div>
+              <div class="lvl-tier-range">Seviye 21–25</div>
+              <div class="lvl-tier-avdesc">Amber kask · sorguç</div>
+            </div>
+            <div class="lvl-rows">
+              <div class="lvl-row"><div class="lvl-lv" style="color:#f59e0b">Lv.21</div><div class="lvl-desc">~200 günlük giriş</div><div class="lvl-pill">20.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#f59e0b">Lv.22</div><div class="lvl-desc">~210 günlük giriş</div><div class="lvl-pill">21.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#f59e0b">Lv.23</div><div class="lvl-desc">~220 günlük giriş</div><div class="lvl-pill">22.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#f59e0b">Lv.24</div><div class="lvl-desc">~230 günlük giriş</div><div class="lvl-pill">23.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#f59e0b">Lv.25</div><div class="lvl-desc">~240 günlük giriş</div><div class="lvl-pill">24.000 XP</div></div>
+            </div>
+          </div>
+
+          <!-- ── Tier 6 ── -->
+          <div class="lvl-tier">
+            <div class="lvl-tier-hdr" style="background:rgba(168,85,247,.1);color:#a855f7;">
+              <div class="lvl-roman">VI</div>
+              <div class="lvl-tier-name">Yüzbaşı</div>
+              <div class="lvl-tier-range">Seviye 26–30</div>
+              <div class="lvl-tier-avdesc">Mor kask · sorguç + yan yıldızlar açıldı</div>
+            </div>
+            <div class="lvl-rows">
+              <div class="lvl-row"><div class="lvl-lv" style="color:#a855f7">Lv.26</div><div class="lvl-desc">~250 günlük giriş</div><div class="lvl-pill">25.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#a855f7">Lv.27</div><div class="lvl-desc">~260 günlük giriş</div><div class="lvl-pill">26.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#a855f7">Lv.28</div><div class="lvl-desc">~270 günlük giriş</div><div class="lvl-pill">27.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#a855f7">Lv.29</div><div class="lvl-desc">~280 günlük giriş</div><div class="lvl-pill">28.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#a855f7">Lv.30</div><div class="lvl-desc">~290 günlük giriş</div><div class="lvl-pill">29.000 XP</div></div>
+            </div>
+          </div>
+
+          <!-- ── Tier 7 ── -->
+          <div class="lvl-tier">
+            <div class="lvl-tier-hdr" style="background:rgba(249,115,22,.1);color:#f97316;">
+              <div class="lvl-roman">VII</div>
+              <div class="lvl-tier-name">Binbaşı</div>
+              <div class="lvl-tier-range">Seviye 31–35</div>
+              <div class="lvl-tier-avdesc">Turuncu kask · sorguç + yan yıldızlar</div>
+            </div>
+            <div class="lvl-rows">
+              <div class="lvl-row"><div class="lvl-lv" style="color:#f97316">Lv.31</div><div class="lvl-desc">~300 günlük giriş</div><div class="lvl-pill">30.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#f97316">Lv.32</div><div class="lvl-desc">~310 günlük giriş</div><div class="lvl-pill">31.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#f97316">Lv.33</div><div class="lvl-desc">~320 günlük giriş</div><div class="lvl-pill">32.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#f97316">Lv.34</div><div class="lvl-desc">~330 günlük giriş</div><div class="lvl-pill">33.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#f97316">Lv.35</div><div class="lvl-desc">~340 günlük giriş</div><div class="lvl-pill">34.000 XP</div></div>
+            </div>
+          </div>
+
+          <!-- ── Tier 8 ── -->
+          <div class="lvl-tier">
+            <div class="lvl-tier-hdr" style="background:rgba(239,68,68,.1);color:#ef4444;">
+              <div class="lvl-roman">VIII</div>
+              <div class="lvl-tier-name">Albay</div>
+              <div class="lvl-tier-range">Seviye 36–40</div>
+              <div class="lvl-tier-avdesc">Kırmızı kask · sorguç + iç yıldız + dış yıldız açıldı</div>
+            </div>
+            <div class="lvl-rows">
+              <div class="lvl-row"><div class="lvl-lv" style="color:#ef4444">Lv.36</div><div class="lvl-desc">~350 günlük giriş</div><div class="lvl-pill">35.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#ef4444">Lv.37</div><div class="lvl-desc">~360 günlük giriş</div><div class="lvl-pill">36.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#ef4444">Lv.38</div><div class="lvl-desc">~370 günlük giriş</div><div class="lvl-pill">37.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#ef4444">Lv.39</div><div class="lvl-desc">~380 günlük giriş</div><div class="lvl-pill">38.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#ef4444">Lv.40</div><div class="lvl-desc">~390 günlük giriş</div><div class="lvl-pill">39.000 XP</div></div>
+            </div>
+          </div>
+
+          <!-- ── Tier 9 ── -->
+          <div class="lvl-tier">
+            <div class="lvl-tier-hdr" style="background:rgba(234,179,8,.1);color:#eab308;">
+              <div class="lvl-roman">IX</div>
+              <div class="lvl-tier-name">General</div>
+              <div class="lvl-tier-range">Seviye 41–45</div>
+              <div class="lvl-tier-avdesc">Sarı kask · sorguç + tüm yıldızlar</div>
+            </div>
+            <div class="lvl-rows">
+              <div class="lvl-row"><div class="lvl-lv" style="color:#eab308">Lv.41</div><div class="lvl-desc">~400 günlük giriş</div><div class="lvl-pill">40.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#eab308">Lv.42</div><div class="lvl-desc">~410 günlük giriş</div><div class="lvl-pill">41.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#eab308">Lv.43</div><div class="lvl-desc">~420 günlük giriş</div><div class="lvl-pill">42.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#eab308">Lv.44</div><div class="lvl-desc">~430 günlük giriş</div><div class="lvl-pill">43.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#eab308">Lv.45</div><div class="lvl-desc">~440 günlük giriş</div><div class="lvl-pill">44.000 XP</div></div>
+            </div>
+          </div>
+
+          <!-- ── Tier 10 ── -->
+          <div class="lvl-tier">
+            <div class="lvl-tier-hdr" style="background:rgba(251,191,36,.12);color:#fbbf24;">
+              <div class="lvl-roman">X</div>
+              <div class="lvl-tier-name">Spartan Efsanesi</div>
+              <div class="lvl-tier-range">Seviye 46–50</div>
+              <div class="lvl-tier-avdesc">Altın kask · sorguç + yıldızlar + taç</div>
+            </div>
+            <div class="lvl-rows">
+              <div class="lvl-row"><div class="lvl-lv" style="color:#fbbf24">Lv.46</div><div class="lvl-desc">~450 günlük giriş</div><div class="lvl-pill">45.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#fbbf24">Lv.47</div><div class="lvl-desc">~460 günlük giriş</div><div class="lvl-pill">46.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#fbbf24">Lv.48</div><div class="lvl-desc">~470 günlük giriş</div><div class="lvl-pill">47.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#fbbf24">Lv.49</div><div class="lvl-desc">~480 günlük giriş</div><div class="lvl-pill">48.000 XP</div></div>
+              <div class="lvl-row"><div class="lvl-lv" style="color:#fbbf24">Lv.50</div><div class="lvl-desc">Max seviye · ~490 günlük giriş</div><div class="lvl-pill">49.000 XP</div></div>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- /asset-panel-seviyeler -->
 
     </div><!-- /modal-body -->
   </div><!-- /modal -->
