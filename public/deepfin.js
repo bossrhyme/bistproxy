@@ -3913,10 +3913,10 @@ function applyStrategyAndGo(goatKey) {
   clearFilters();
   showScreener();
   setTimeout(function(){
-    var chip = document.querySelector('.goat-chip[data-goat="' + goatKey + '"]');
-    if(chip) { chip.click(); }
+    var chip = document.querySelector('#goat-chips .goat-chip[data-goat="' + goatKey + '"]');
+    if (chip) { chip.classList.add('on'); applyAllChips(); }
     else runScan();
-  }, 100);
+  }, 150);
 }
 
 function applyPresetAndGo(presetKey) {
@@ -3924,10 +3924,10 @@ function applyPresetAndGo(presetKey) {
   clearFilters();
   showScreener();
   setTimeout(function(){
-    var chip = document.querySelector('.chip[data-preset="' + presetKey + '"]');
-    if(chip) { chip.click(); }
+    var chip = document.querySelector('#presets .chip[data-preset="' + presetKey + '"]');
+    if (chip) { chip.classList.add('on'); applyAllChips(); }
     else runScan();
-  }, 100);
+  }, 150);
 }
 
 function applyTechAndGo(techKey) {
@@ -3935,10 +3935,10 @@ function applyTechAndGo(techKey) {
   clearFilters();
   showScreener();
   setTimeout(function(){
-    var chip = document.querySelector('.tech-chip[data-tech="' + techKey + '"]');
-    if(chip) { chip.click(); }
+    var chip = document.querySelector('#tech-presets .tech-chip[data-tech="' + techKey + '"]');
+    if (chip) { chip.classList.add('on'); applyAllChips(); }
     else runScan();
-  }, 100);
+  }, 150);
 }
 
 
