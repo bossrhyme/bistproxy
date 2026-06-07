@@ -3767,6 +3767,7 @@ function _doShowHomepage() {
   var dnh = document.getElementById('dnav-home'); if(dnh) dnh.classList.add('active');
   var dnt = document.getElementById('dnav-tarama'); if(dnt) dnt.classList.remove('active');
   clearFilters();
+  document.querySelectorAll('.goat-chip[data-goat="lynch"]').forEach(function(c){ c.classList.add('on'); });
   var _hb = document.getElementById('hamburger-btn'); if(_hb) _hb.style.display = 'none';
   if(window.location.pathname !== '/') history.pushState({page:'home'}, '', '/');
 }
