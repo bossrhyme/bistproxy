@@ -680,13 +680,14 @@ td:first-child,td:nth-child(2){text-align:left;}
   .hp-strategy-card { padding: 12px; }
   .hp-steps { flex-direction: column !important; gap: 16px; }
   .hp-step-connector { display: none !important; }
-  /* Stats bar: 2×2 grid (dead .hp-stat-grid rule replaced with actual class) */
+  /* Stats bar: 2×3 grid (6 items) */
   .hp-stats { display: grid; grid-template-columns: 1fr 1fr; }
-  .hp-stat { border-right: none; border-bottom: 1px solid var(--border); padding: 18px 16px; }
+  .hp-stat { border-right: none; border-bottom: 1px solid var(--border); padding: 16px 12px; }
   .hp-stat:nth-child(odd) { border-right: 1px solid var(--border); }
-  .hp-stat:last-child, .hp-stat:nth-last-child(2):nth-child(odd) { border-bottom: none; }
-  .hp-stat-val { font-size: 32px; }
-  .hp-stat-label { font-size: 12px; }
+  .hp-stat:last-child { border-bottom: none; }
+  .hp-stat:nth-last-child(2):nth-child(odd) { border-bottom: none; }
+  .hp-stat-val { font-size: 26px; }
+  .hp-stat-label { font-size: 11px; }
 
   /* Body: tek sütun */
   .hp-body { grid-template-columns: 1fr; }
@@ -888,6 +889,7 @@ td:first-child,td:nth-child(2){text-align:left;}
 .hp-stat-val{font-size:28px;font-weight:800;color:var(--text);font-family:'Geist Mono', monospace;letter-spacing:-1px;}
 .hp-stat-val span{color:var(--accent);font-size:16px;}
 .hp-stat-label{font-size:11px;color:var(--muted2);margin-top:4px;}
+.live-dot{display:inline-block;width:6px;height:6px;background:var(--green);border-radius:50%;margin-right:4px;animation:pulse 2s ease-in-out infinite;vertical-align:middle;}
 
 .hp-body{display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid var(--border);}
 .hp-section{padding:32px 40px;border-right:1px solid var(--border);}

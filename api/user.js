@@ -111,6 +111,9 @@ async function handleRegister(req, res) {
     investorType, points: 0, lastLoginDate: null, loginStreak: 0
   };
   await Promise.all([kvSet('usr:' + userId, user), kvSet(unKey, userId)]);
+  fetch(process.env.KV_REST_API_URL + '/incr/df_total_users', {
+    method: 'POST', headers: { Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN }
+  }).catch(() => {});
   const { token, ttl } = await createSession(userId);
   res.setHeader('Set-Cookie', 'df_sess=' + token + '; Path=/; Max-Age=' + ttl + '; HttpOnly; Secure; SameSite=Lax');
   jsonRes(res, 200, { user: safeUser(user) });

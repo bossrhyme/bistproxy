@@ -109,6 +109,10 @@
       "destination": "/"
     },
     {
+      "source": "/api/stats",
+      "destination": "/api/stats.js"
+    },
+    {
       "source": "/api/scan",
       "destination": "/api/scan.js"
     },

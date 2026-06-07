@@ -3958,14 +3958,35 @@ window.addEventListener('popstate', function(e) {
 document.addEventListener('DOMContentLoaded', function(){
   _initWorker();
   _updateOnboarding(null); // Varsayılan: genel onboarding
-  // Tarama sayacını çek
-  fetch('/api/stats').then(function(r){ return r.json(); }).then(function(d){
-    var el = document.getElementById('stat-scan-count');
-    if (!el || !d.scans) return;
-    var n = d.scans;
-    var fmt = n >= 1000 ? (Math.floor(n/1000) + '.000+') : (n + '+');
-    el.textContent = fmt;
-  }).catch(function(){});
+  // Canlı istatistikleri çek ve her 60s güncelle
+  function _fmtStatNum(n) {
+    if (!n || n === 0) return '—';
+    if (n >= 1000000) return (n / 1000000).toFixed(1).replace('.', ',') + 'M+';
+    if (n >= 1000) return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '';
+    return n.toString();
+  }
+  function _countUp(el, target) {
+    if (!el || !target) return;
+    var start = 0; var duration = 800; var startTime = null;
+    function step(ts) {
+      if (!startTime) startTime = ts;
+      var prog = Math.min((ts - startTime) / duration, 1);
+      var eased = 1 - Math.pow(1 - prog, 3);
+      el.textContent = _fmtStatNum(Math.round(eased * target));
+      if (prog < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  function fetchLiveStats() {
+    fetch('/api/stats').then(function(r){ return r.json(); }).then(function(d){
+      var eScans = document.getElementById('stat-scan-count');
+      var eUsers = document.getElementById('stat-user-count');
+      if (eScans && d.scans) _countUp(eScans, d.scans);
+      if (eUsers && d.users) _countUp(eUsers, d.users);
+    }).catch(function(){});
+  }
+  fetchLiveStats();
+  setInterval(fetchLiveStats, 60000);
   var _sp   = new URLSearchParams(window.location.search);
   var _p    = _sp.get('from');
   var _path = window.location.pathname;
