@@ -1,17 +1,17 @@
-// DeepFin Service Worker v11 - Network First for CSS/JS
-const CACHE = 'deepfin-v11';
+// DeepFin Service Worker v80 - Network First for CSS/JS
+const CACHE = 'deepfin-v80';
 
 // Install: hızlı geç
 self.addEventListener('install', function(e) {
   self.skipWaiting();
 });
 
-// Activate: tüm eski cache'leri temizle
+// Activate: sadece eski cache'leri temizle (mevcut cache'i koru)
 self.addEventListener('activate', function(e) {
   e.waitUntil(
     caches.keys().then(function(keys) {
       return Promise.all(
-        keys.map(function(k){ return caches.delete(k); })
+        keys.filter(function(k){ return k !== CACHE; }).map(function(k){ return caches.delete(k); })
       );
     })
   );

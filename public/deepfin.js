@@ -34,6 +34,8 @@ var _fonData     = [];
 var _kriptoData  = [];
 var _fonMeta     = {};
 var _kriptoMeta  = {};
+var _fonShowAll  = false;
+var _kriptoShowAll = false;
 
 // ── Landing'e dön ─────────────────────────────────────────────
 function goBackToLanding() {
@@ -344,12 +346,14 @@ function runFonScan() {
     .finally(function(){ if(btn){btn.textContent='▶ Fon Tara';btn.disabled=false;} });
 }
 
-function _renderFon(funds, meta) {
+function _renderFon(funds, meta, forceAll) {
+  _fonShowAll = !!forceAll;
   if (!funds.length) {
     var ra=document.getElementById('result-area');
     if(ra) ra.innerHTML='<div style="padding:30px;text-align:center;color:var(--muted2);font-size:12px">Eşleşen fon bulunamadı.</div>';
     return;
   }
+  var FON_INIT = 200;
   var fR=function(v){
     if(v==null) return '<span style="color:var(--muted2)">—</span>';
     return '<span style="color:'+(v>=0?'var(--green)':'var(--red)')+'">'+(v>=0?'+':'')+v.toFixed(1)+'%</span>';
@@ -363,7 +367,8 @@ function _renderFon(funds, meta) {
     return '<span style="font-size:9px;padding:1px 4px;border-radius:3px;background:var(--s3);color:var(--muted2);margin-left:4px">'+label+'</span>';
   };
   var truncName = function(n){ return n && n.length > 42 ? n.slice(0,42)+'...' : (n||''); };
-  var rows=funds.map(function(f,i){
+  var visibleFunds = (_fonShowAll || funds.length <= FON_INIT) ? funds : funds.slice(0, FON_INIT);
+  var rows=visibleFunds.map(function(f,i){
     var ver=f.verified?'<sup style="color:var(--green);font-size:8px">✓</sup>':'';
     var isFav=fonFavSet.has(f.code);
     return '<tr>'
@@ -396,7 +401,13 @@ function _renderFon(funds, meta) {
     return '<th class="right'+(active?' sorted':'')+'" style="cursor:pointer" onclick="_fonSort(\''+c.k+'\')">'
       +c.l+arrow+'</th>';
   }).join('');
-  var tbl='<table><thead><tr><th style="width:28px"></th><th>Fon</th>'+thSort+'</tr></thead><tbody>'+rows+'</tbody></table>';
+  var moreBar = (!_fonShowAll && funds.length > FON_INIT)
+    ? '<div style="text-align:center;padding:10px 0 4px">'
+      +'<button onclick="_renderFon(_fonData,_fonMeta,true)" style="background:var(--s2);border:1px solid var(--border2);color:var(--text2);border-radius:6px;padding:7px 16px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">'
+      +'Tümünü göster — '+(funds.length - FON_INIT)+' fon daha'
+      +'</button></div>'
+    : '';
+  var tbl='<table><thead><tr><th style="width:28px"></th><th>Fon</th>'+thSort+'</tr></thead><tbody>'+rows+'</tbody></table>'+moreBar;
   _showResultArea(hdr, tbl, funds.length);
 }
 
@@ -408,7 +419,7 @@ function _fonSort(field) {
   var sd = document.getElementById('sortd');
   if (sf) sf.value = field;
   if (sd) sd.value = sortSt.dir;
-  _renderFon(_sortAsset(_fonData, sortSt.field, sortSt.dir), _fonMeta);
+  _renderFon(_sortAsset(_fonData, sortSt.field, sortSt.dir), _fonMeta, _fonShowAll);
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -456,12 +467,14 @@ function runKriptoScan() {
     .finally(function(){if(btn){btn.textContent='▶ Kripto Tara';btn.disabled=false;}});
 }
 
-function _renderKripto(coins, meta) {
+function _renderKripto(coins, meta, forceAll) {
+  _kriptoShowAll = !!forceAll;
   if(!coins.length){
     var ra=document.getElementById('result-area');
     if(ra) ra.innerHTML='<div style="padding:30px;text-align:center;color:var(--muted2);font-size:12px">Eşleşen coin bulunamadı.</div>';
     return;
   }
+  var KRIPTO_INIT = 100;
   var fP=function(v){if(!v)return'—';if(v>=1000)return'$'+v.toLocaleString('en',{maximumFractionDigits:0});if(v>=1)return'$'+v.toFixed(2);if(v>=0.01)return'$'+v.toFixed(4);return'$'+v.toFixed(6);};
   var fM=function(v){if(!v)return'—';if(v>=1e9)return'$'+(v/1e9).toFixed(1)+'B';if(v>=1e6)return'$'+(v/1e6).toFixed(0)+'M';return'$'+v.toFixed(0);};
   var fC=function(v){if(v==null)return'<span style="color:var(--muted2)">—</span>';return'<span style="color:'+(v>=0?'var(--green)':'var(--red)')+'">'+(v>=0?'+':'')+v.toFixed(1)+'%</span>';};
@@ -475,7 +488,8 @@ function _renderKripto(coins, meta) {
   var note=(meta.sources&&meta.sources.note)||'';
   var truncName = function(n){ return n && n.length > 30 ? n.slice(0,30)+'...' : (n||''); };
   var hasTvl = coins.some(function(c){ return c.tvl != null; });
-  var rows=coins.map(function(c,i){
+  var visibleCoins = (_kriptoShowAll || coins.length <= KRIPTO_INIT) ? coins : coins.slice(0, KRIPTO_INIT);
+  var rows=visibleCoins.map(function(c,i){
     var ver=c.verified?'<sup style="color:var(--green);font-size:8px">✓</sup>':'';
     var img=c.image?'<img src="'+c.image+'" width="14" height="14" style="border-radius:50%;vertical-align:middle;margin-right:3px" onerror="this.remove()">':'';
     var isFav=kriptoFavSet.has(c.symbol);
@@ -511,7 +525,13 @@ function _renderKripto(coins, meta) {
     return '<th class="right'+(active?' sorted':'')+'" style="cursor:pointer" onclick="_kriptoSort(\''+c.k+'\')">'
       +c.l+arrow+'</th>';
   }).join('');
-  var tbl='<table><thead><tr><th style="width:28px"></th><th>Coin</th>'+kThSort+'<th class="right">TV</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  var kMoreBar = (!_kriptoShowAll && coins.length > KRIPTO_INIT)
+    ? '<div style="text-align:center;padding:10px 0 4px">'
+      +'<button onclick="_renderKripto(_kriptoData,_kriptoMeta,true)" style="background:var(--s2);border:1px solid var(--border2);color:var(--text2);border-radius:6px;padding:7px 16px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">'
+      +'Tümünü göster — '+(coins.length - KRIPTO_INIT)+' coin daha'
+      +'</button></div>'
+    : '';
+  var tbl='<table><thead><tr><th style="width:28px"></th><th>Coin</th>'+kThSort+'<th class="right">TV</th></tr></thead><tbody>'+rows+'</tbody></table>'+kMoreBar;
   _showResultArea(hdr, tbl, coins.length);
 }
 
@@ -524,7 +544,7 @@ function _kriptoSort(field) {
   var sd = document.getElementById('sortd');
   if (sf) sf.value = field;
   if (sd) sd.value = sortSt.dir;
-  _renderKripto(_sortAsset(_kriptoData, sortSt.field, sortSt.dir), _kriptoMeta);
+  _renderKripto(_sortAsset(_kriptoData, sortSt.field, sortSt.dir), _kriptoMeta, _kriptoShowAll);
 }
 
 var _tvCurrentSym = null;
