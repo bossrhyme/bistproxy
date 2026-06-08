@@ -108,7 +108,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=arctic42">
+<link rel="stylesheet" href="/deepfin.css?v=arctic43">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -1259,6 +1259,7 @@ if('serviceWorker' in navigator){
 
       <!-- STATS BAR -->
       <div class="stats-bar" id="stats-bar">
+        <button id="mobile-filter-btn" class="mobile-filter-btn" onclick="toggleMobileDrawer()" title="Filtreleri aç">☰ Filtreler</button>
         <button id="fav-filter-btn" class="sb-fav-btn" onclick="toggleFavFilter()" title="Listelerim">☆ Listelerim</button>
         <button class="col-btn" onclick="openColPicker()" title="Kolonları özelleştir">⚙ Kolonlar</button>
         <div class="sb-search">
