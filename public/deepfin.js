@@ -1530,6 +1530,7 @@ async function runScan(){
           }
           return mapped;
         })(),
+        sectorRaw: sector || null,
         '52WeekHigh': high1m || null,
         '52WeekLow': low1m || null,
         piotroski: g('piotroski_f_score') !== null ? Math.round(g('piotroski_f_score')) : null,
@@ -2613,6 +2614,26 @@ function showDetail(sym){
   // Şirket Profili
   buildProfile(s);
 
+  // ── Graham Sayısı ─────────────────────────────────────────────
+  // Graham = price × √(22.5 / (PE × PB))  [√(22.5 × EPS × BV_per_share)]
+  const _pe = s.peNormalizedAnnual, _pb = s.pbAnnual, _price = s.currentPrice;
+  const grahamNum = (_pe > 0 && _pb > 0 && _price > 0)
+    ? _price * Math.sqrt(22.5 / (_pe * _pb)) : null;
+
+  // ── Bileşik Skor (0-10) ───────────────────────────────────────
+  var _cscore = 0, _cscount = 0;
+  function _cs(val, good, ok) { _cscount++; if(val!=null){ if(val>=good)_cscore+=2; else if(val>=ok)_cscore+=1; } }
+  function _csLow(val, good, ok) { _cscount++; if(val!=null){ if(val<=good)_cscore+=2; else if(val<=ok)_cscore+=1; } }
+  _cs(s.roeTTM, 15, 5);
+  _cs(s.netProfitMarginTTM, 10, 0);
+  _cs(s.revenueGrowthTTMYoy, 10, 0);
+  _cs(s.epsGrowthTTMYoy, 10, 0);
+  _csLow(s['totalDebt/totalEquityAnnual'], 0.5, 1);
+  _cs(s.currentRatioAnnual, 2, 1);
+  if(s.piotroski!=null){ _cscount++; if(s.piotroski>=7)_cscore+=2; else if(s.piotroski>=5)_cscore+=1; }
+  if(s.peg!=null){ _cscount++; if(s.peg<1)_cscore+=2; else if(s.peg<2)_cscore+=1; }
+  const compositeScore = _cscount>0 ? Math.min(10, Math.round(_cscore*10/_cscount)) : null;
+
   const G = [
     {t:'Değerleme', rows:[
       ['F/K <tag>TTM</tag>', s.peNormalizedAnnual, v=>v.toFixed(1), 'dval-pe'],
@@ -2633,6 +2654,22 @@ function showDetail(sym){
         var color = v<1?'#00c076':v<2?'#f0b429':'#f6465d';
         var label = v<1?'Ucuz':v<2?'Makul':'Pahalı';
         return '<span style="color:'+color+';font-weight:700">'+v.toFixed(2)+'</span> <span style="color:'+color+';font-size:9px">'+label+'</span>';
+      }],
+      ['Graham Sayısı', grahamNum, function(v) {
+        var pct = ((_price - v) / v * 100);
+        var isUnder = _price < v;
+        var color = isUnder ? '#00c076' : (Math.abs(pct)<20 ? '#f0b429' : '#f6465d');
+        var sign = isUnder ? '−' : '+';
+        var pctAbs = Math.abs(pct);
+        return '<span style="font-weight:700">'+v.toFixed(2)+'</span>'
+          + ' <span style="font-size:9px;color:'+color+'">fiyat '+sign+pctAbs.toFixed(0)+'%</span>';
+      }],
+      ['Bileşik Skor', compositeScore, function(v) {
+        var color = v>=7?'#00c076':v>=4?'#f0b429':'#f6465d';
+        var label = v>=7?'Güçlü':v>=4?'Orta':'Zayıf';
+        var bars = '';
+        for(var i=0;i<10;i++) bars += '<span style="display:inline-block;width:6px;height:8px;border-radius:1px;margin-right:1px;background:'+(i<v?color:'var(--border2)')+'"></span>';
+        return bars + ' <span style="color:'+color+';font-size:9px;font-weight:700;margin-left:3px">'+v+'/10 '+label+'</span>';
       }],
     ]},
     {t:'Karlılık', rows:[
@@ -2675,6 +2712,10 @@ function showDetail(sym){
   if(shrTab) shrTab.style.display = isUS?'':'none';
   switchXTab(document.querySelector('.dxtab[data-xtab="fundamentals"]'));
   if (isUS) { fetchInsider(sym); fetchShortInterest(sym); }
+
+  // Sektör karşılaştırması & DCF
+  renderDCF(s);
+  if (s.sectorRaw) fetchSectorComps(s);
 
   // Yahoo Finance doğrulama — TV verisiyle karşılaştır
   fetchYahooVerify(sym, currentExchange);
@@ -3442,6 +3483,143 @@ function renderShortInterest(el, d, symbol) {
     '<div style="margin-top:8px;text-align:center;">' +
       '<a href="' + nasdaqUrl + '" target="_blank" style="color:var(--accent);font-size:9px;text-decoration:none;">Tum gecmis &rarr; Nasdaq &#8599;</a>' +
     '</div>';
+}
+
+// ── Sektör Karşılaştırması ────────────────────────────────────
+async function fetchSectorComps(s) {
+  var el = document.getElementById('sector-body');
+  if (!el) return;
+  el.innerHTML = '<div class="dxloading">Sektör verisi yükleniyor...</div>';
+  try {
+    var r = await fetch('/api/fundamentals?type=sector_avg&sector=' + encodeURIComponent(s.sectorRaw) + '&exchange=' + (s.exchangeId || 'bist'));
+    var d = await r.json();
+    if (d.error) throw new Error(d.error);
+    var avg = d.avg || {};
+    var rows = [
+      ['F/K',          s.peNormalizedAnnual,              avg.pe,            v=>v.toFixed(1)],
+      ['PD/DD',        s.pbAnnual,                        avg.pb,            v=>v.toFixed(2)],
+      ['F/S',          s.psTTM,                           avg.ps,            v=>v.toFixed(2)],
+      ['PEG',          s.peg,                             avg.peg,           v=>v.toFixed(2)],
+      ['ROE %',        s.roeTTM,                          avg.roe,           v=>v.toFixed(1)+'%'],
+      ['ROA %',        s.roaTTM,                          avg.roa,           v=>v.toFixed(1)+'%'],
+      ['Net Marj %',   s.netProfitMarginTTM,              avg.netMargin,     v=>v.toFixed(1)+'%'],
+      ['Brüt Marj %',  s.grossMarginTTM,                  avg.grossMargin,   v=>v.toFixed(1)+'%'],
+      ['Gelir Büy. %', s.revenueGrowthTTMYoy,             avg.revenueGrowth, v=>(v>=0?'+':'')+v.toFixed(1)+'%'],
+      ['Temettü %',    s.dividendYieldIndicatedAnnual,    avg.dividendYield, v=>v.toFixed(2)+'%'],
+      ['Borç/Özk.',    s['totalDebt/totalEquityAnnual'],  avg.debtToEquity,  v=>v.toFixed(2)],
+      ['Cari Oran',    s.currentRatioAnnual,              avg.currentRatio,  v=>v.toFixed(2)],
+    ];
+    var higherIsBetter = { 'ROE %':1,'ROA %':1,'Net Marj %':1,'Brüt Marj %':1,'Gelir Büy. %':1,'Temettü %':1,'Cari Oran':1 };
+    var lowerIsBetter  = { 'F/K':1,'PD/DD':1,'F/S':1,'PEG':1,'Borç/Özk.':1 };
+    var tbody = rows.map(function(row) {
+      var label = row[0], sv = row[1], av = row[2], fmt = row[3];
+      var svStr = sv != null ? fmt(sv) : '—';
+      var avStr = av != null ? fmt(av) : '—';
+      var color = '';
+      if (sv != null && av != null) {
+        var better = higherIsBetter[label] ? sv > av : lowerIsBetter[label] ? sv < av : null;
+        color = better === true ? 'var(--green)' : better === false ? 'var(--red)' : '';
+      }
+      return '<tr>'
+        + '<td style="color:var(--muted2)">' + label + '</td>'
+        + '<td style="font-weight:700;color:' + (color||'var(--text)') + '">' + svStr + '</td>'
+        + '<td style="color:var(--text2)">' + avStr + '</td>'
+        + '</tr>';
+    }).join('');
+    el.innerHTML =
+      '<div style="font-size:9px;color:var(--muted2);margin-bottom:8px;padding:0 4px">'
+      + 'Sektör: <strong style="color:var(--text)">' + esc(s.sector||s.sectorRaw) + '</strong>'
+      + ' &nbsp;·&nbsp; ' + (d.count||0) + ' şirket ortalaması'
+      + '</div>'
+      + '<table style="width:100%;border-collapse:collapse;font-size:11px;">'
+      + '<thead><tr style="border-bottom:1px solid var(--border)">'
+      + '<th style="text-align:left;padding:4px;color:var(--muted2);font-weight:600">Metrik</th>'
+      + '<th style="text-align:right;padding:4px;color:var(--muted2);font-weight:600">Bu Hisse</th>'
+      + '<th style="text-align:right;padding:4px;color:var(--muted2);font-weight:600">Sektör Ort.</th>'
+      + '</tr></thead>'
+      + '<tbody>' + tbody + '</tbody>'
+      + '</table>';
+  } catch(e) {
+    console.error('[sector-comps]', e.message);
+    var el2 = document.getElementById('sector-body');
+    if(el2) el2.innerHTML = '<div class="dxerror">&#9888; Sektör verisi alınamadı.</div>';
+  }
+}
+
+// ── DCF Hesaplayıcı ───────────────────────────────────────────
+function renderDCF(s) {
+  var el = document.getElementById('dcf-body');
+  if (!el) return;
+  var price = s.currentPrice || 0;
+  var pe    = s.peNormalizedAnnual;
+  var eps   = (pe && pe > 0 && price > 0) ? (price / pe) : null;
+  var gDef  = s.epsGrowthTTMYoy != null ? Math.max(-50, Math.min(50, s.epsGrowthTTMYoy)) : 10;
+  var epsStr = eps != null ? eps.toFixed(2) : '';
+  el.innerHTML =
+    '<div style="padding:4px 0 8px;font-size:9px;color:var(--muted2)">İndirgenmiş Nakit Akımı modeli — varsayılanlar mevcut veriden dolduruldu.</div>'
+    + '<div class="dcf-grid">'
+    + _dcfField('dcf-eps',   'Mevcut EPS',            epsStr,     '',   'Hisse başı kazanç (₺)')
+    + _dcfField('dcf-g',     'Büyüme Oranı %',        gDef.toFixed(1), '', 'Yıllık EPS büyüme beklentisi')
+    + _dcfField('dcf-wacc',  'İskonto Oranı % (WACC)','12',       '',   'Fırsat maliyeti / gerekli getiri')
+    + _dcfField('dcf-tg',    'Terminal Büyüme %',      '4',        '',   'Sonsuza dek sürdürülebilir büyüme')
+    + _dcfField('dcf-yrs',   'Projeksiyon (yıl)',      '10',       '',   'Detaylı nakit akımı dönemi')
+    + '</div>'
+    + '<button onclick="_calcDCF(' + price.toFixed(2) + ')" style="margin-top:10px;width:100%;background:var(--accent);color:#fff;border:none;padding:8px;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer">Hesapla</button>'
+    + '<div id="dcf-result" style="margin-top:10px"></div>';
+}
+function _dcfField(id, label, val, unit, hint) {
+  return '<div style="margin-bottom:8px">'
+    + '<div style="font-size:9px;color:var(--muted2);margin-bottom:3px" title="' + esc(hint) + '">' + label + '</div>'
+    + '<input id="' + id + '" type="number" value="' + esc(val) + '" step="any"'
+    + ' style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:6px 8px;font-size:12px;border-radius:4px;outline:none">'
+    + '</div>';
+}
+function _calcDCF(currentPrice) {
+  var eps  = parseFloat(document.getElementById('dcf-eps').value);
+  var g    = parseFloat(document.getElementById('dcf-g').value) / 100;
+  var wacc = parseFloat(document.getElementById('dcf-wacc').value) / 100;
+  var tg   = parseFloat(document.getElementById('dcf-tg').value) / 100;
+  var yrs  = parseInt(document.getElementById('dcf-yrs').value, 10);
+  var el   = document.getElementById('dcf-result');
+  if (!el) return;
+  if (isNaN(eps)||eps<=0||isNaN(g)||isNaN(wacc)||wacc<=0||isNaN(tg)||isNaN(yrs)||yrs<1||wacc<=tg) {
+    el.innerHTML = '<div style="color:var(--red);font-size:10px">&#9888; Geçersiz giriş — WACC > terminal büyüme ve EPS > 0 olmalı.</div>';
+    return;
+  }
+  var pv = 0, cf = eps;
+  for (var t = 1; t <= yrs; t++) {
+    cf = cf * (1 + g);
+    pv += cf / Math.pow(1 + wacc, t);
+  }
+  // Terminal value
+  var tv = cf * (1 + tg) / (wacc - tg);
+  pv += tv / Math.pow(1 + wacc, yrs);
+
+  var mos = currentPrice > 0 ? ((pv - currentPrice) / pv * 100) : null;
+  var mosColor = mos == null ? 'var(--muted2)' : mos > 30 ? 'var(--green)' : mos > 0 ? '#f0b429' : 'var(--red)';
+  var signal = mos == null ? '—' : mos > 30 ? 'AL' : mos > 0 ? 'İZLE' : 'PAHAL';
+  var sigColor = mos == null ? 'var(--muted2)' : mos > 30 ? 'var(--green)' : mos > 0 ? '#f0b429' : 'var(--red)';
+
+  el.innerHTML =
+    '<div style="background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:12px">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+    + '<span style="font-size:11px;color:var(--muted2)">İçsel Değer</span>'
+    + '<span style="font-size:18px;font-weight:800;color:var(--text)">' + pv.toFixed(2) + '</span>'
+    + '</div>'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+    + '<span style="font-size:11px;color:var(--muted2)">Mevcut Fiyat</span>'
+    + '<span style="font-size:14px;font-weight:600;color:var(--text)">' + currentPrice.toFixed(2) + '</span>'
+    + '</div>'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+    + '<span style="font-size:11px;color:var(--muted2)">Güvenlik Payı</span>'
+    + '<span style="font-size:14px;font-weight:700;color:' + mosColor + '">'
+    + (mos != null ? (mos > 0 ? '+' : '') + mos.toFixed(1) + '%' : '—') + '</span>'
+    + '</div>'
+    + '<div style="border-top:1px solid var(--border);padding-top:8px;text-align:center">'
+    + '<span style="font-size:13px;font-weight:800;color:' + sigColor + ';letter-spacing:.5px">' + signal + '</span>'
+    + '</div>'
+    + '</div>'
+    + '<div style="font-size:8px;color:var(--muted);margin-top:6px;text-align:center">Bu hesaplama yatırım tavsiyesi değildir.</div>';
 }
 
 function selectExchange(el) {

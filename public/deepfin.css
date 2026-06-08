@@ -1327,6 +1327,13 @@ tbody tr td { height: 36px; }
 .theme-toggle-btn{background:transparent;border:1px solid var(--border2);color:var(--text2);font-size:14px;padding:4px 8px;line-height:1;}
 .theme-toggle-btn:hover{border-color:var(--accent);color:var(--accent);}
 
+/* ── Sektör & DCF Tabs ──────────────────────────────────────── */
+#sector-body table tr:hover td{background:var(--s2);}
+#sector-body table td{padding:5px 4px;border-bottom:1px solid var(--border);}
+.dcf-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.dcf-grid input:focus{border-color:var(--accent)!important;box-shadow:0 0 0 2px rgba(14,165,233,.15);}
+@media(max-width:400px){.dcf-grid{grid-template-columns:1fr;}}
+
 /* ── Skeleton Loader ─────────────────────────────────────────── */
 @keyframes sk-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 .sk-wrap{padding:4px 0;}
