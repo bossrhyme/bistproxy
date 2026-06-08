@@ -4065,25 +4065,25 @@ document.addEventListener('DOMContentLoaded', function(){
 // ── Sidebar Collapse ──
 
 function toggleSidebar() {
-  var sb     = document.getElementById('sidebar');
-  var toggle = document.getElementById('sb-toggle');
-  var reopen = document.getElementById('sb-reopen');
-  if (!sb || !toggle) return;
+  var sb         = document.getElementById('sidebar');
+  var reopen     = document.getElementById('sb-reopen');
+  var tickerWrap = document.getElementById('ticker-wrap');
+  if (!sb) return;
   var collapsed = sb.classList.toggle('collapsed');
-  toggle.style.display = collapsed ? 'none' : 'flex';
-  if (reopen) reopen.style.display = collapsed ? 'flex' : 'none';
+  if (reopen)     reopen.style.display = collapsed ? 'flex' : 'none';
+  if (tickerWrap) tickerWrap.classList.toggle('sb-open', collapsed);
   try { localStorage.setItem('df_sb_collapsed', collapsed ? '1' : '0'); } catch(e) {}
 }
 
 function initSidebarState() {
   try {
     if (localStorage.getItem('df_sb_collapsed') === '1') {
-      var sb     = document.getElementById('sidebar');
-      var toggle = document.getElementById('sb-toggle');
-      var reopen = document.getElementById('sb-reopen');
-      if (sb)     sb.classList.add('collapsed');
-      if (toggle) toggle.style.display = 'none';
-      if (reopen) reopen.style.display = 'flex';
+      var sb         = document.getElementById('sidebar');
+      var reopen     = document.getElementById('sb-reopen');
+      var tickerWrap = document.getElementById('ticker-wrap');
+      if (sb)         sb.classList.add('collapsed');
+      if (reopen)     reopen.style.display = 'flex';
+      if (tickerWrap) tickerWrap.classList.add('sb-open');
     }
   } catch(e) {}
 }
