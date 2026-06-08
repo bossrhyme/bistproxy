@@ -4062,37 +4062,28 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 
 
-// ── Filter Panel Collapse ──
-
-function toggleSbpFilters() {
-  var scroll = document.getElementById('sbp-hisse-scroll');
-  var btn = document.getElementById('sbp-filter-toggle');
-  if (!scroll || !btn) return;
-  var hidden = scroll.style.display === 'none';
-  scroll.style.display = hidden ? '' : 'none';
-  btn.textContent = hidden ? '▼' : '▲';
-}
-
 // ── Sidebar Collapse ──
 
 function toggleSidebar() {
-  var sb  = document.getElementById('sidebar');
-  var btn = document.getElementById('sb-toggle');
-  if (!sb || !btn) return;
+  var sb     = document.getElementById('sidebar');
+  var toggle = document.getElementById('sb-toggle');
+  var reopen = document.getElementById('sb-reopen');
+  if (!sb || !toggle) return;
   var collapsed = sb.classList.toggle('collapsed');
-  btn.classList.toggle('collapsed', collapsed);
-  btn.textContent = collapsed ? '›' : '‹';
-  btn.title = collapsed ? 'Strateji panelini aç' : 'Strateji panelini gizle';
+  toggle.style.display = collapsed ? 'none' : 'flex';
+  if (reopen) reopen.style.display = collapsed ? 'flex' : 'none';
   try { localStorage.setItem('df_sb_collapsed', collapsed ? '1' : '0'); } catch(e) {}
 }
 
 function initSidebarState() {
   try {
     if (localStorage.getItem('df_sb_collapsed') === '1') {
-      var sb  = document.getElementById('sidebar');
-      var btn = document.getElementById('sb-toggle');
-      if (sb)  sb.classList.add('collapsed');
-      if (btn) { btn.classList.add('collapsed'); btn.textContent = '›'; btn.title = 'Strateji panelini aç'; }
+      var sb     = document.getElementById('sidebar');
+      var toggle = document.getElementById('sb-toggle');
+      var reopen = document.getElementById('sb-reopen');
+      if (sb)     sb.classList.add('collapsed');
+      if (toggle) toggle.style.display = 'none';
+      if (reopen) reopen.style.display = 'flex';
     }
   } catch(e) {}
 }
