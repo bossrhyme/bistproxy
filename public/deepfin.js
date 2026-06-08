@@ -56,6 +56,7 @@ var _fonMeta     = {};
 var _kriptoMeta  = {};
 var _fonShowAll  = false;
 var _kriptoShowAll = false;
+var _detailStock = null; // aktif detay paneli hissesi
 
 // ── Landing'e dön ─────────────────────────────────────────────
 function goBackToLanding() {
@@ -2710,12 +2711,9 @@ function showDetail(sym){
   var shrTab = document.querySelector('.dxtab[data-xtab="short"]');
   if(insTab) insTab.style.display = isUS?'':'none';
   if(shrTab) shrTab.style.display = isUS?'':'none';
+  _detailStock = s;
   switchXTab(document.querySelector('.dxtab[data-xtab="fundamentals"]'));
   if (isUS) { fetchInsider(sym); fetchShortInterest(sym); }
-
-  // Sektör karşılaştırması & DCF
-  renderDCF(s);
-  if (s.sectorRaw) fetchSectorComps(s);
 
   // Yahoo Finance doğrulama — TV verisiyle karşılaştır
   fetchYahooVerify(sym, currentExchange);
@@ -3318,7 +3316,16 @@ function switchXTab(el) {
   const tab = el.dataset.xtab;
   const panel = document.getElementById('dxpanel-' + tab);
   if (panel) panel.classList.add('on');
-  if (tab === 'news' && selSym) fetchNews(selSym);
+  if (tab === 'news'   && selSym)       fetchNews(selSym);
+  if (tab === 'dcf'    && _detailStock) renderDCF(_detailStock);
+  if (tab === 'sector' && _detailStock) {
+    if (_detailStock.sectorRaw) {
+      fetchSectorComps(_detailStock);
+    } else {
+      var sb = document.getElementById('sector-body');
+      if (sb) sb.innerHTML = '<div class="dxloading" style="color:var(--muted2)">Bu hisse için sektör verisi mevcut değil.</div>';
+    }
+  }
 }
 
 // SEC EDGAR — Form 4 Insider Trading
