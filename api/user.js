@@ -24,10 +24,14 @@ function redirect(res, location) {
   res.end();
 }
 
+const MAX_BODY = 64 * 1024; // 64 KB
 async function readBody(req) {
   return new Promise((resolve) => {
     let data = '';
-    req.on('data', c => { data += c; });
+    req.on('data', c => {
+      data += c;
+      if (data.length > MAX_BODY) { data = ''; req.destroy(); resolve({}); }
+    });
     req.on('end', () => { try { resolve(JSON.parse(data || '{}')); } catch(e) { resolve({}); } });
     req.on('error', () => resolve({}));
   });
@@ -45,10 +49,18 @@ const ALLOWED_ORIGINS = new Set([
 ]);
 function checkOrigin(req) {
   const method = req.method;
-  if (method === 'GET' || method === 'HEAD' || method === 'OPTIONS') return true;
+  if (method === 'OPTIONS') return true;
   const origin  = req.headers['origin']  || '';
   const referer = req.headers['referer'] || '';
-  if (!origin && !referer) return true; // same-origin requests from server/curl; browser always sends Origin
+  // GET/HEAD: require X-Requested-With or known origin to block simple CSRF
+  if (method === 'GET' || method === 'HEAD') {
+    if (req.headers['x-requested-with'] === 'XMLHttpRequest') return true;
+    if (!origin && !referer) return true; // server-to-server
+    if (origin) return ALLOWED_ORIGINS.has(origin);
+    try { return ALLOWED_ORIGINS.has(new URL(referer).origin); } catch(e) { return false; }
+  }
+  // POST/PUT/DELETE: strict origin check
+  if (!origin && !referer) return true; // server-to-server (no browser Origin)
   if (origin) return ALLOWED_ORIGINS.has(origin);
   try { return ALLOWED_ORIGINS.has(new URL(referer).origin); } catch(e) { return false; }
 }
@@ -62,7 +74,7 @@ async function rlCheck(key, max, windowSec) {
     const ttl   = (res[1] && res[1].result) || -1;
     if (ttl < 0) await kvPipeline([['EXPIRE', safeKey, windowSec]]);
     return count <= max;
-  } catch(e) { return true; } // fail open if KV is down
+  } catch(e) { console.error('[rlCheck] KV error:', e.message); return false; } // fail closed
 }
 
 // ── password helpers ─────────────────────────

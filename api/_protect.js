@@ -14,7 +14,7 @@ async function kv(cmds) {
       body: JSON.stringify(cmds)
     });
     return await r.json();
-  } catch { return []; }
+  } catch(e) { console.error('[kv] error:', e.message); return []; }
 }
 
 // Common automated HTTP clients — not real browser users

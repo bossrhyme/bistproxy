@@ -11,7 +11,20 @@ function chipRadio(el) {
 function chipToggle(el) { el.classList.toggle('on'); }
 
 function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function escJS(s) { return String(s == null ? '' : s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/</g,'\\x3C').replace(/>/g,'\\x3E'); }
 function safeUrl(u) { var s = String(u||''); return /^https?:\/\//i.test(s) ? s : '#'; }
+
+// Auto-attach X-Requested-With to all /api/ fetches (CSRF protection)
+(function() {
+  var _f = window.fetch;
+  window.fetch = function(url, opts) {
+    if (typeof url === 'string' && url.startsWith('/api/')) {
+      opts = Object.assign({}, opts);
+      opts.headers = Object.assign({'X-Requested-With': 'XMLHttpRequest'}, opts.headers || {});
+    }
+    return _f.apply(this, arguments.length === 1 ? [url] : [url, opts]);
+  };
+})();
 
 // ── Durum ─────────────────────────────────────────────────────
 var _activeAsset = null;
@@ -354,7 +367,7 @@ function _renderFon(funds, meta) {
     var ver=f.verified?'<sup style="color:var(--green);font-size:8px">✓</sup>':'';
     var isFav=fonFavSet.has(f.code);
     return '<tr>'
-      +'<td class="nfav" onclick="event.stopPropagation();toggleFonFav(\''+f.code+'\')" title="'+(isFav?'Favorilerden çıkar':'Favorilere ekle')+'"><span class="fav-icon'+(isFav?' fav-on':'')+'">★</span></td>'
+      +'<td class="nfav" onclick="event.stopPropagation();toggleFonFav(\''+escJS(f.code)+'\')" title="'+(isFav?'Favorilerden çıkar':'Favorilere ekle')+'"><span class="fav-icon'+(isFav?' fav-on':'')+'">★</span></td>'
       +'<td style="padding:7px 6px;white-space:nowrap">'
         +'<span class="row-num">'+(i+1)+'</span>'
         +'<span class="sym-wrap"><span class="row-arrow">›</span><span class="sym">'+f.code+'</span>'+ver+catBadge(f.category)+'</span>'
@@ -467,7 +480,7 @@ function _renderKripto(coins, meta) {
     var img=c.image?'<img src="'+c.image+'" width="14" height="14" style="border-radius:50%;vertical-align:middle;margin-right:3px" onerror="this.remove()">':'';
     var isFav=kriptoFavSet.has(c.symbol);
     return '<tr>'
-      +'<td class="nfav" onclick="event.stopPropagation();toggleKriptoFav(\''+c.symbol+'\')" title="'+(isFav?'Favorilerden çıkar':'Favorilere ekle')+'"><span class="fav-icon'+(isFav?' fav-on':'')+'">★</span></td>'
+      +'<td class="nfav" onclick="event.stopPropagation();toggleKriptoFav(\''+escJS(c.symbol)+'\')" title="'+(isFav?'Favorilerden çıkar':'Favorilere ekle')+'"><span class="fav-icon'+(isFav?' fav-on':'')+'">★</span></td>'
       +'<td style="padding:7px 6px;white-space:nowrap">'
         +'<span class="row-num">'+(c.rank||i+1)+'</span>'
         +'<span class="sym-wrap"><span class="row-arrow">›</span>'+img+'<span class="sym">'+(c.symbol||'').toUpperCase()+'</span>'+ver+'</span>'
@@ -2393,15 +2406,15 @@ function _vsRowHtml(s, idx) {
   var isFav, favClick, favTitle;
   if (_dfUser) {
     isFav     = isInAnyList(s.symbol);
-    favClick  = "showWlPicker(event,'" + s.symbol + "','" + currentExchange + "')";
+    favClick  = "showWlPicker(event,'" + escJS(s.symbol) + "','" + escJS(currentExchange) + "')";
     favTitle  = isFav ? 'Listede var — başka listeye ekle' : 'Listeye ekle';
   } else {
     isFav     = favSet.has(s.symbol);
-    favClick  = "event.stopPropagation();toggleFav('" + s.symbol + "')";
+    favClick  = "event.stopPropagation();toggleFav('" + escJS(s.symbol) + "')";
     favTitle  = isFav ? 'Favorilerden çıkar' : 'Favorilere ekle';
   }
-  return `<tr onclick="showDetail('${s.symbol}')" class="${selSym===s.symbol?'selrow':''}">
-      <td class="nfav"><span class="fav-icon${isFav?' fav-on':''}" onclick="${favClick}" title="${favTitle}">★</span></td>
+  return `<tr onclick="showDetail('${escJS(s.symbol)}')" class="${selSym===s.symbol?'selrow':''}">
+      <td class="nfav"><span class="fav-icon${isFav?' fav-on':''}" onclick="${favClick}" title="${esc(favTitle)}">★</span></td>
       <td data-col="symbol" style="display:table-cell;"><span class="row-num">${idx+1}</span><span class="sym-wrap"><span class="row-arrow">›</span><span class="sym">${s.symbol}</span></span></td>
       <td data-col="name" style="${cv('name')}font-size:11px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.name}">${s.name}</td>
       <td data-col="price" style="${cv('price')}">${s.currentPrice!=null?(s.currentPrice.toFixed(2)+' '+(EXCHANGE_META[currentExchange]||EXCHANGE_META.bist).currency):nil}</td>
@@ -2483,10 +2496,10 @@ function buildProfile(s) {
   // Hemen Al + Detaylı Analiz butonları
   linksEl.innerHTML = [
     '<div class="dpl-action-row">',
-      '<button class="dpl-buy" onclick="onHemenAl(\'' + sym + '\',\'' + ex + '\')" title="Broker\'da işlem aç">',
+      '<button class="dpl-buy" onclick="onHemenAl(\'' + escJS(sym) + '\',\'' + escJS(ex) + '\')" title="Broker\'da işlem aç">',
         '🛒 Hemen Al',
       '</button>',
-      '<button class="dpl-analyze" onclick="openDetayliAnaliz(\'' + symClean + '\',\'' + ex + '\')">',
+      '<button class="dpl-analyze" onclick="openDetayliAnaliz(\'' + escJS(symClean) + '\',\'' + escJS(ex) + '\')">',
         '📊 Detaylı Analiz',
       '</button>',
     '</div>'
