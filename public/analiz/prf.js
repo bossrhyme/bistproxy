@@ -27,14 +27,29 @@ var _drawings   = [];
 var _drawPreviewSer = null;
 var _selectedDrawing = null;
 
+function _themeColors() {
+  var s = getComputedStyle(document.documentElement);
+  var g = function(v) { return s.getPropertyValue(v).trim(); };
+  return {
+    bg:      g('--bg')      || '#09101e',
+    s1:      g('--s1')      || '#0e1828',
+    border:  g('--border')  || '#1e2d45',
+    border2: g('--border2') || '#2d4060',
+    text2:   g('--text2')   || '#7a8fb0',
+    muted2:  g('--muted2')  || '#5c7898',
+    accent:  g('--accent')  || '#0ea5e9',
+  };
+}
+
 function _tbHtml() {
+  var col = _themeColors();
   var b = function(id, label, on, fn) {
-    var bd = on ? '1px solid #0ea5e9' : '1px solid #e2e8f0';
+    var bd = on ? '1px solid '+col.accent : '1px solid '+col.border;
     var bg = on ? 'rgba(14,165,233,.1)' : 'transparent';
-    var cl = on ? '#0ea5e9' : '#94a3b8';
+    var cl = on ? col.accent : col.text2;
     return '<button id="'+id+'" onclick="'+fn+'" style="padding:3px 8px;font-size:10px;font-weight:600;border-radius:4px;cursor:pointer;border:'+bd+';background:'+bg+';color:'+cl+';transition:all .15s;white-space:nowrap;font-family:Inter,sans-serif;line-height:1.5;">'+label+'</button>';
   };
-  var sp = '<div style="width:1px;height:13px;background:#e2e8f0;margin:0 2px;flex-shrink:0;"></div>';
+  var sp = '<div style="width:1px;height:13px;background:'+col.border+';margin:0 2px;flex-shrink:0;"></div>';
   var T = _chartType, I = _chartIval, R = _chartRange, P = _chartPct;
   var Ids = _chartInds, Dm = _drawMode;
   var row1 =
@@ -46,18 +61,19 @@ function _tbHtml() {
     b('ind-sma20','SMA 20',Ids.sma20,"toggleInd('sma20')")+b('ind-sma50','SMA 50',Ids.sma50,"toggleInd('sma50')")+b('ind-sma200','SMA 200',Ids.sma200,"toggleInd('sma200')")+b('ind-bb','BB',Ids.bb,"toggleInd('bb')")+b('ind-vol','Hacim',Ids.vol,"toggleInd('vol')")+sp+
     b('draw-trend','↗ Trend',Dm==='trend',"setDrawMode('trend')")+b('draw-ray','→ ışın',Dm==='ray',"setDrawMode('ray')")+b('draw-horizontal','— Yatay',Dm==='horizontal',"setDrawMode('horizontal')")+sp+
     '<button onclick="clearDrawings()" style="padding:3px 8px;font-size:10px;font-weight:600;border-radius:4px;cursor:pointer;border:1px solid #fecdd3;background:transparent;color:#f43f5e;transition:all .15s;white-space:nowrap;font-family:Inter,sans-serif;line-height:1.5;">✕ Temizle</button>';
-  return '<div style="padding:7px 12px;border-bottom:1px solid #e2e8f0;background:#fff;">'+
+  return '<div style="padding:7px 12px;border-bottom:1px solid '+col.border+';background:'+col.s1+';">'+
     '<div style="display:flex;align-items:center;gap:3px;flex-wrap:wrap;row-gap:4px;">'+row1+'</div>'+
-    '<div style="display:flex;align-items:center;gap:3px;flex-wrap:wrap;row-gap:4px;margin-top:6px;padding-top:6px;border-top:1px solid #f1f5f9;">'+row2+'</div>'+
+    '<div style="display:flex;align-items:center;gap:3px;flex-wrap:wrap;row-gap:4px;margin-top:6px;padding-top:6px;border-top:1px solid '+col.border+';">'+row2+'</div>'+
     '</div>';
 }
 
 function _tbSet(id, on) {
   var btn = document.getElementById(id);
   if (!btn) return;
-  btn.style.border     = on ? '1px solid #0ea5e9' : '1px solid #e2e8f0';
+  var col = _themeColors();
+  btn.style.border     = on ? '1px solid '+col.accent : '1px solid '+col.border;
   btn.style.background = on ? 'rgba(14,165,233,.1)' : 'transparent';
-  btn.style.color      = on ? '#0ea5e9' : '#94a3b8';
+  btn.style.color      = on ? col.accent : col.text2;
 }
 function _tbGroup(prefix, vals, active) {
   vals.forEach(function(v) { _tbSet(prefix+v, v===active); });
@@ -397,21 +413,22 @@ function loadTVWidget(sym, ex) {
   var ph = document.getElementById('prf-tv-placeholder');
   if (ph) ph.style.display='none';
 
-  container.innerHTML = _tbHtml()+'<div id="prf-chart-inner" style="width:100%;height:256px;background:#f8fafc;position:relative;"></div>';
+  var col = _themeColors();
+  container.innerHTML = _tbHtml()+'<div id="prf-chart-inner" style="width:100%;height:256px;background:'+col.bg+';position:relative;"></div>';
 
   function _init() {
     var chartEl = document.getElementById('prf-chart-inner');
     if (!chartEl||!window.LightweightCharts) {
-      if(chartEl) chartEl.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:12px;">Grafik kütüphanesi yüklenemedi</div>';
+      if(chartEl) chartEl.innerHTML='<div style="display:flex;align-items:center;justify-content:center;height:100%;color:'+col.text2+';font-size:12px;">Grafik kütüphanesi yüklenemedi</div>';
       return;
     }
     _chartInst = LightweightCharts.createChart(chartEl, {
       autoSize: true,
-      layout:{background:{color:'#f8fafc'},textColor:'#94a3b8',fontSize:11,fontFamily:'Inter, sans-serif'},
-      grid:{vertLines:{color:'#edf2f7',style:1},horzLines:{color:'#edf2f7',style:1}},
-      crosshair:{mode:LightweightCharts.CrosshairMode.Normal,vertLine:{color:'#cbd5e1',labelBackgroundColor:'#64748b'},horzLine:{color:'#cbd5e1',labelBackgroundColor:'#64748b'}},
-      rightPriceScale:{borderColor:'#e2e8f0',textColor:'#94a3b8'},
-      timeScale:{borderColor:'#e2e8f0',textColor:'#94a3b8',timeVisible:true,secondsVisible:false},
+      layout:{background:{color:col.bg},textColor:col.text2,fontSize:11,fontFamily:'Inter, sans-serif'},
+      grid:{vertLines:{color:col.border,style:1},horzLines:{color:col.border,style:1}},
+      crosshair:{mode:LightweightCharts.CrosshairMode.Normal,vertLine:{color:col.border2,labelBackgroundColor:col.muted2},horzLine:{color:col.border2,labelBackgroundColor:col.muted2}},
+      rightPriceScale:{borderColor:col.border,textColor:col.text2},
+      timeScale:{borderColor:col.border,textColor:col.text2,timeVisible:true,secondsVisible:false},
       handleScroll:true, handleScale:true,
     });
     _chartSer = _chartInst.addCandlestickSeries({upColor:'#10b981',downColor:'#f43f5e',borderUpColor:'#10b981',borderDownColor:'#f43f5e',wickUpColor:'#10b981',wickDownColor:'#f43f5e'});
