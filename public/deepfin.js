@@ -1700,7 +1700,7 @@ const GURUS = {
   ark: {
     label: 'Cathie Wood / ARK',
     desc: 'Cathie Wood için bugünkü kâr değil yarınki pazar büyüklüğü önemlidir. Yapay zeka, biyoteknoloji, fintech gibi geleceğin teknolojilerini geliştiren şirketler aranır. Bugün zarar ediyor olabilir ama 5-10 yıl içinde piyasayı dönüştürme potansiyeli taşımalı.',
-    filters: {revg_min:30, earng_min:20, cr_min:1}
+    filters: {revg_min:30, cr_min:1}
   },
   buffett: {
     label: 'Warren Buffett',
@@ -1761,7 +1761,7 @@ const GURUS = {
   oneil: {
     label: "William O'Neil — CAN SLIM",
     desc: "O'Neil için hem temeller hem fiyat aynı yönde hareket etmeli. C: çeyreklik EPS büyümesi, A: yıllık kazanç, N: yeni katalizör, S: arz/talep. Not: CAN SLIM'in L (liderlik/RS), I (kurumsal sponsorluk) ve M (piyasa yönü) bileşenleri teknik analiz gerektirir; bu filtreler temel ön elemedir.",
-    filters: {earng_min:25, revg_min:15, roe_min:17, de_max:100, cr_min:1}
+    filters: {earng_min:25, revg_min:25, roe_min:17, de_max:100, cr_min:1}
   },
   oshaughnessy: {
     label: "O'Shaughnessy — What Works on Wall St.",
@@ -1771,7 +1771,7 @@ const GURUS = {
   piotroski: {
     label: 'Piotroski F-Score',
     desc: 'Piotroski F-Score, düşük F/DD hisseler arasında kaliteyi ölçer (P/B < 1 giriş koşulu). 9 binary sinyalin toplamı: kârlılık (ROA, OCF, değişim), kaldıraç (borç azalıyor, cari oran artıyor, seyreltme yok), verimlilik (brüt marj ve varlık devir hızı artıyor). 7–9 arası güçlü, 0–2 arası zayıf.',
-    filters: {pb_max:1, roe_min:3, cr_min:1, de_max:120},
+    filters: {pb_max:1, roe_min:3, cr_min:1},
     special: 'piotroski'
   },
   schloss: {
