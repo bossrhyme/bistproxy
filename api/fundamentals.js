@@ -212,7 +212,7 @@ module.exports = async (req, res) => {
             exchange: ex,
           });
         } catch(e) {
-          res.status(500).json({ error: e.message });
+          console.error("[fundamentals]", e.message); res.status(500).json({ error: "Sunucu hatası" });
         }
         resolve();
       });
@@ -273,6 +273,6 @@ module.exports = async (req, res) => {
 
   } catch (e) {
     console.error('fundamentals error:', e.message);
-    return res.status(500).json({ error: e.message, annual:[], quarterly:[] });
+    return res.status(500).json({ error: 'Sunucu hatası', annual:[], quarterly:[] });
   }
 };

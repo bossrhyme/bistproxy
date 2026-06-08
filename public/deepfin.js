@@ -377,10 +377,52 @@ function runFonScan() {
       updateTicker();
     })
     .catch(function(e){
+      console.error('[fon-scan]', e.message);
       var ra=document.getElementById('result-area');
-      if(ra) ra.innerHTML='<div style="padding:20px;text-align:center;color:var(--red);font-size:12px">Hata: '+e.message+'</div>';
+      if(ra) ra.innerHTML='<div style="padding:20px;text-align:center;color:var(--red);font-size:12px">TEFAS verisi şu an alınamıyor — lütfen bir dakika sonra tekrar deneyin.</div>';
     })
-    .finally(function(){ if(btn){btn.textContent='▶ Fon Tara';btn.disabled=false;} });
+}
+
+// ── Fon satır şablonu ────────────────────────────────────────
+var _FON_CAT = { YAT:'Hisse', BOR:'Borçl.', PMI:'Para Piy.', KAR:'Karma', ALT:'Altın', DÖV:'Döviz', SRB:'Serbest', GGF:'G.Giriş' };
+function _fonPct(v) {
+  if (v == null) return '<span style="color:var(--muted2)">—</span>';
+  return `<span style="color:${v>=0?'var(--green)':'var(--red)'}">${v>=0?'+':''}${v.toFixed(1)}%</span>`;
+}
+function _fonPay(v) {
+  if (!v || v <= 0) return '—';
+  if (v >= 1e9) return (v/1e9).toFixed(1)+'B';
+  if (v >= 1e6) return (v/1e6).toFixed(0)+'M';
+  if (v >= 1e3) return (v/1e3).toFixed(0)+'K';
+  return v;
+}
+function _fonCatBadge(cat) {
+  if (!cat) return '';
+  var code = (cat.match(/\(([^)]+)\)/) || [])[1] || cat;
+  return `<span style="font-size:9px;padding:1px 4px;border-radius:3px;background:var(--s3);color:var(--muted2);margin-left:4px">${_FON_CAT[code]||code.slice(0,6)}</span>`;
+}
+function _fonRowHtml(f, i) {
+  var isFav = fonFavSet.has(f.code);
+  var ver   = f.verified ? '<sup style="color:var(--green);font-size:8px">✓</sup>' : '';
+  var name  = f.name && f.name.length > 42 ? f.name.slice(0, 42) + '…' : (f.name || '');
+  return `<tr>
+    <td class="nfav" onclick="event.stopPropagation();toggleFonFav('${escJS(f.code)}')" title="${isFav?'Favorilerden çıkar':'Favorilere ekle'}"><span class="fav-icon${isFav?' fav-on':''}">★</span></td>
+    <td style="padding:7px 6px;white-space:nowrap">
+      <span class="row-num">${i+1}</span>
+      <span class="sym-wrap"><span class="row-arrow">›</span><span class="sym">${f.code}</span>${ver}${_fonCatBadge(f.category)}</span>
+      <div class="tsub" title="${esc(f.name||'')}">${esc(name)}</div>
+    </td>
+    <td class="tn">₺${(f.price||0).toFixed(4)}</td>
+    <td class="tn">${_fonPct(f.ret7d)}</td>
+    <td class="tn">${_fonPct(f.retYtd)}</td>
+    <td class="tn">${_fonPct(f.ret1m)}</td>
+    <td class="tn">${_fonPct(f.ret3m)}</td>
+    <td class="tn">${_fonPct(f.ret1y)}</td>
+    <td class="tn">${f.sharpe!=null?f.sharpe.toFixed(2):'—'}</td>
+    <td class="tn muted">₺${(f.totalValueM||0).toFixed(0)}M</td>
+    <td class="tn muted">${f.investors?f.investors.toLocaleString('tr-TR'):'—'}</td>
+    <td class="tn muted">${_fonPay(f.paycount)}</td>
+  </tr>`;
 }
 
 function _renderFon(funds, meta, forceAll) {
@@ -391,42 +433,8 @@ function _renderFon(funds, meta, forceAll) {
     return;
   }
   var FON_INIT = 200;
-  var fR=function(v){
-    if(v==null) return '<span style="color:var(--muted2)">—</span>';
-    return '<span style="color:'+(v>=0?'var(--green)':'var(--red)')+'">'+(v>=0?'+':'')+v.toFixed(1)+'%</span>';
-  };
-  var fPay=function(v){ if(!v||v<=0) return '—'; if(v>=1e9) return (v/1e9).toFixed(1)+'B'; if(v>=1e6) return (v/1e6).toFixed(0)+'M'; if(v>=1e3) return (v/1e3).toFixed(0)+'K'; return v; };
-  var CAT_LABEL = { YAT:'Hisse', BOR:'Borçl.', PMI:'Para Piy.', KAR:'Karma', ALT:'Altın', DÖV:'Döviz', SRB:'Serbest', GGF:'G.Giriş' };
-  var catBadge = function(cat) {
-    if(!cat) return '';
-    var code = (cat.match(/\(([^)]+)\)/) || [])[1] || cat;
-    var label = CAT_LABEL[code] || code.slice(0,6);
-    return '<span style="font-size:9px;padding:1px 4px;border-radius:3px;background:var(--s3);color:var(--muted2);margin-left:4px">'+label+'</span>';
-  };
-  var truncName = function(n){ return n && n.length > 42 ? n.slice(0,42)+'...' : (n||''); };
   var visibleFunds = (_fonShowAll || funds.length <= FON_INIT) ? funds : funds.slice(0, FON_INIT);
-  var rows=visibleFunds.map(function(f,i){
-    var ver=f.verified?'<sup style="color:var(--green);font-size:8px">✓</sup>':'';
-    var isFav=fonFavSet.has(f.code);
-    return '<tr>'
-      +'<td class="nfav" onclick="event.stopPropagation();toggleFonFav(\''+escJS(f.code)+'\')" title="'+(isFav?'Favorilerden çıkar':'Favorilere ekle')+'"><span class="fav-icon'+(isFav?' fav-on':'')+'">★</span></td>'
-      +'<td style="padding:7px 6px;white-space:nowrap">'
-        +'<span class="row-num">'+(i+1)+'</span>'
-        +'<span class="sym-wrap"><span class="row-arrow">›</span><span class="sym">'+f.code+'</span>'+ver+catBadge(f.category)+'</span>'
-        +'<div class="tsub" title="'+f.name+'">'+truncName(f.name)+'</div>'
-      +'</td>'
-      +'<td class="tn">₺'+(f.price||0).toFixed(4)+'</td>'
-      +'<td class="tn">'+fR(f.ret7d)+'</td>'
-      +'<td class="tn">'+fR(f.retYtd)+'</td>'
-      +'<td class="tn">'+fR(f.ret1m)+'</td>'
-      +'<td class="tn">'+fR(f.ret3m)+'</td>'
-      +'<td class="tn">'+fR(f.ret1y)+'</td>'
-      +'<td class="tn">'+(f.sharpe!=null?f.sharpe.toFixed(2):'—')+'</td>'
-      +'<td class="tn muted">₺'+(f.totalValueM||0).toFixed(0)+'M</td>'
-      +'<td class="tn muted">'+(f.investors?f.investors.toLocaleString('tr-TR'):'—')+'</td>'
-      +'<td class="tn muted">'+fPay(f.paycount)+'</td>'
-      +'</tr>';
-  }).join('');
+  var rows = visibleFunds.map(_fonRowHtml).join('');
   var hdr='<div class="res-hdr"><b>TEFAS Fon</b><span class="res-cnt">'+funds.length+' fon</span></div>';
   var sortCols = [
     {k:'price',l:'Fiyat'},{k:'ret7d',l:'7G%'},{k:'retYtd',l:'YTD%'},{k:'ret1m',l:'1A%'},{k:'ret3m',l:'3A%'},
@@ -498,10 +506,65 @@ function runKriptoScan() {
       updateTicker();
     })
     .catch(function(e){
+      console.error('[kripto-scan]', e.message);
       var ra=document.getElementById('result-area');
-      if(ra) ra.innerHTML='<div style="padding:20px;text-align:center;color:var(--red);font-size:12px">Hata: '+e.message+'</div>';
+      if(ra) ra.innerHTML='<div style="padding:20px;text-align:center;color:var(--red);font-size:12px">Kripto verisi yüklenemedi — lütfen bir dakika sonra tekrar deneyin.</div>';
     })
     .finally(function(){if(btn){btn.textContent='▶ Kripto Tara';btn.disabled=false;}});
+}
+
+// ── Kripto satır şablonu ──────────────────────────────────────
+var _TV_BADGE = {STRONG_BUY:['var(--green)','G.AL'],BUY:['var(--green)','AL'],NEUTRAL:['var(--muted2)','NÖT'],SELL:['var(--red)','SAT'],STRONG_SELL:['var(--red)','G.SAT']};
+function _kriptoPct(v) {
+  if (v == null) return '<span style="color:var(--muted2)">—</span>';
+  return `<span style="color:${v>=0?'var(--green)':'var(--red)'}">${v>=0?'+':''}${v.toFixed(1)}%</span>`;
+}
+function _kriptoPrice(v) {
+  if (!v) return '—';
+  if (v >= 1000) return '$' + v.toLocaleString('en', {maximumFractionDigits:0});
+  if (v >= 1)    return '$' + v.toFixed(2);
+  if (v >= 0.01) return '$' + v.toFixed(4);
+  return '$' + v.toFixed(6);
+}
+function _kriptoMcap(v) {
+  if (!v) return '—';
+  if (v >= 1e9) return '$' + (v/1e9).toFixed(1) + 'B';
+  if (v >= 1e6) return '$' + (v/1e6).toFixed(0) + 'M';
+  return '$' + v.toFixed(0);
+}
+function _kriptoTvl(tvl, mcTvl) {
+  if (!tvl) return '<span style="color:var(--muted2)">—</span>';
+  var t = tvl>=1e9 ? '$'+(tvl/1e9).toFixed(1)+'B' : tvl>=1e6 ? '$'+(tvl/1e6).toFixed(0)+'M' : '$'+tvl.toFixed(0);
+  return t + (mcTvl != null ? `<div style="font-size:9px;color:var(--muted2)">${mcTvl.toFixed(1)}x</div>` : '');
+}
+function _kriptoTvBadge(r) {
+  var m = _TV_BADGE[r];
+  if (!m) return '<span style="color:var(--muted2)">—</span>';
+  return `<span style="color:${m[0]};font-size:9px;font-weight:700">${m[1]}</span>`;
+}
+function _kriptoRowHtml(c, i, hasTvl) {
+  var isFav = kriptoFavSet.has(c.symbol);
+  var ver   = c.verified ? '<sup style="color:var(--green);font-size:8px">✓</sup>' : '';
+  var img   = c.image ? `<img src="${c.image}" width="14" height="14" style="border-radius:50%;vertical-align:middle;margin-right:3px" onerror="this.remove()">` : '';
+  var name  = c.name && c.name.length > 30 ? c.name.slice(0, 30) + '…' : (c.name || '');
+  return `<tr>
+    <td class="nfav" onclick="event.stopPropagation();toggleKriptoFav('${escJS(c.symbol)}')" title="${isFav?'Favorilerden çıkar':'Favorilere ekle'}"><span class="fav-icon${isFav?' fav-on':''}">★</span></td>
+    <td style="padding:7px 6px;white-space:nowrap">
+      <span class="row-num">${c.rank||i+1}</span>
+      <span class="sym-wrap"><span class="row-arrow">›</span>${img}<span class="sym">${(c.symbol||'').toUpperCase()}</span>${ver}</span>
+      <div class="tsub">${esc(name)}</div>
+    </td>
+    <td class="tn">${_kriptoPrice(c.price)}</td>
+    <td class="tn">${_kriptoPct(c.change24h)}</td>
+    <td class="tn">${_kriptoPct(c.change7d)}</td>
+    <td class="tn">${_kriptoPct(c.change30d)}</td>
+    <td class="tn muted">${_kriptoMcap(c.mcap)}</td>
+    <td class="tn muted">${_kriptoMcap(c.volume24h)}</td>
+    <td class="tn muted">${c.rsi14!=null?c.rsi14.toFixed(0):'—'}</td>
+    <td class="tn">${_kriptoPct(c.athChange)}</td>
+    ${hasTvl ? `<td class="tn muted">${_kriptoTvl(c.tvl,c.mcTvl)}</td>` : ''}
+    <td class="tn">${_kriptoTvBadge(c.tvRating)}</td>
+  </tr>`;
 }
 
 function _renderKripto(coins, meta, forceAll) {
@@ -512,43 +575,10 @@ function _renderKripto(coins, meta, forceAll) {
     return;
   }
   var KRIPTO_INIT = 100;
-  var fP=function(v){if(!v)return'—';if(v>=1000)return'$'+v.toLocaleString('en',{maximumFractionDigits:0});if(v>=1)return'$'+v.toFixed(2);if(v>=0.01)return'$'+v.toFixed(4);return'$'+v.toFixed(6);};
-  var fM=function(v){if(!v)return'—';if(v>=1e9)return'$'+(v/1e9).toFixed(1)+'B';if(v>=1e6)return'$'+(v/1e6).toFixed(0)+'M';return'$'+v.toFixed(0);};
-  var fC=function(v){if(v==null)return'<span style="color:var(--muted2)">—</span>';return'<span style="color:'+(v>=0?'var(--green)':'var(--red)')+'">'+(v>=0?'+':'')+v.toFixed(1)+'%</span>';};
-  var tvBadge=function(r){var map={STRONG_BUY:['var(--green)','G.AL'],BUY:['var(--green)','AL'],NEUTRAL:['var(--muted2)','NÖT'],SELL:['var(--red)','SAT'],STRONG_SELL:['var(--red)','G.SAT']};if(!r||!map[r])return'<span style="color:var(--muted2)">—</span>';return'<span style="color:'+map[r][0]+';font-size:9px;font-weight:700">'+map[r][1]+'</span>';};
-  var fTvl=function(tvl,mcTvl){
-    if(!tvl) return '<span style="color:var(--muted2)">—</span>';
-    var tvlTxt=tvl>=1e9?'$'+(tvl/1e9).toFixed(1)+'B':tvl>=1e6?'$'+(tvl/1e6).toFixed(0)+'M':'$'+tvl.toFixed(0);
-    var ratioTxt=mcTvl!=null?'<div style="font-size:9px;color:var(--muted2)">'+mcTvl.toFixed(1)+'x</div>':'';
-    return tvlTxt+ratioTxt;
-  };
   var note=(meta.sources&&meta.sources.note)||'';
-  var truncName = function(n){ return n && n.length > 30 ? n.slice(0,30)+'...' : (n||''); };
   var hasTvl = coins.some(function(c){ return c.tvl != null; });
   var visibleCoins = (_kriptoShowAll || coins.length <= KRIPTO_INIT) ? coins : coins.slice(0, KRIPTO_INIT);
-  var rows=visibleCoins.map(function(c,i){
-    var ver=c.verified?'<sup style="color:var(--green);font-size:8px">✓</sup>':'';
-    var img=c.image?'<img src="'+c.image+'" width="14" height="14" style="border-radius:50%;vertical-align:middle;margin-right:3px" onerror="this.remove()">':'';
-    var isFav=kriptoFavSet.has(c.symbol);
-    return '<tr>'
-      +'<td class="nfav" onclick="event.stopPropagation();toggleKriptoFav(\''+escJS(c.symbol)+'\')" title="'+(isFav?'Favorilerden çıkar':'Favorilere ekle')+'"><span class="fav-icon'+(isFav?' fav-on':'')+'">★</span></td>'
-      +'<td style="padding:7px 6px;white-space:nowrap">'
-        +'<span class="row-num">'+(c.rank||i+1)+'</span>'
-        +'<span class="sym-wrap"><span class="row-arrow">›</span>'+img+'<span class="sym">'+(c.symbol||'').toUpperCase()+'</span>'+ver+'</span>'
-        +'<div class="tsub">'+truncName(c.name)+'</div>'
-      +'</td>'
-      +'<td class="tn">'+fP(c.price)+'</td>'
-      +'<td class="tn">'+fC(c.change24h)+'</td>'
-      +'<td class="tn">'+fC(c.change7d)+'</td>'
-      +'<td class="tn">'+fC(c.change30d)+'</td>'
-      +'<td class="tn muted">'+fM(c.mcap)+'</td>'
-      +'<td class="tn muted">'+fM(c.volume24h)+'</td>'
-      +'<td class="tn muted">'+(c.rsi14!=null?c.rsi14.toFixed(0):'—')+'</td>'
-      +'<td class="tn">'+fC(c.athChange)+'</td>'
-      +(hasTvl?'<td class="tn muted">'+fTvl(c.tvl,c.mcTvl)+'</td>':'')
-      +'<td class="tn">'+tvBadge(c.tvRating)+'</td>'
-      +'</tr>';
-  }).join('');
+  var rows = visibleCoins.map(function(c, i){ return _kriptoRowHtml(c, i, hasTvl); }).join('');
   var srcLabel = hasTvl ? 'CoinGecko · TradingView · DeFiLlama' : 'CoinGecko · TradingView';
   var hdr='<div class="res-hdr"><b>₿ Kripto</b><span class="res-cnt">'+coins.length+' coin</span>'+(note?'<span class="res-ok">'+note+'</span>':'')+'<span class="res-src">'+srcLabel+'</span></div>';
   var kCols=[
@@ -1558,7 +1588,8 @@ async function runScan(){
 
   } catch(err) {
     showState('errstate');
-    document.getElementById('errmsg').textContent = err.message || 'Bilinmeyen hata';
+    console.error('[scan]', err.message);
+    document.getElementById('errmsg').textContent = 'Veri alınamadı — bağlantıyı kontrol edip tekrar deneyin.';
   } finally {
     _scanRunning = false;
     btn.disabled = false;
@@ -3306,7 +3337,8 @@ async function fetchInsider(symbol) {
       '<th>Tarih</th><th>Kisi / Unvan</th><th>Islem</th><th>Adet</th><th>Tutar</th>' +
       '</tr></thead><tbody>' + tbody + '</tbody></table>';
   } catch(e) {
-    el.innerHTML = '<div class="dxerror">&#9888; ' + e.message + '</div>';
+    console.error('[insider]', e.message);
+    el.innerHTML = '<div class="dxerror">&#9888; İçeriden işlem verisi yüklenemedi.</div>';
   }
 }
 

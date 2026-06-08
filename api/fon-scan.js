@@ -331,6 +331,6 @@ module.exports = async function handler(req, res) {
 
   } catch(err) {
     console.error('fon-scan fatal:', err.message);
-    return res.status(200).end(JSON.stringify({ funds:[], total:0, source:'tefas', error: err.message }));
+    return res.status(200).end(JSON.stringify({ funds:[], total:0, source:'tefas', error: 'TEFAS verisi şu an alınamıyor' }));
   }
 };

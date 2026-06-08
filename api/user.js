@@ -619,7 +619,7 @@ async function handleReport(req, res) {
     await kvSet('rpt:cache:v2', report, 60).catch(() => {});
     jsonRes(res, 200, report);
   } catch(e) {
-    jsonRes(res, 500, { error: e.message });
+    console.error("[user.js]", e.message); jsonRes(res, 500, { error: "Sunucu hatası" });
   }
 }
 
@@ -652,7 +652,7 @@ async function handleAdminUsers(req, res) {
     await kvSet('rpt:users_cache', result, 300).catch(() => {});
     jsonRes(res, 200, result);
   } catch(e) {
-    jsonRes(res, 500, { error: e.message });
+    console.error("[user.js]", e.message); jsonRes(res, 500, { error: "Sunucu hatası" });
   }
 }
 
@@ -679,7 +679,7 @@ async function handleAdminBans(req, res) {
       const keys = await kvKeys('ban:ip:*');
       const ips = keys.map(k => k.replace('ban:ip:', ''));
       jsonRes(res, 200, { banned: ips, count: ips.length });
-    } catch(e) { jsonRes(res, 500, { error: e.message }); }
+    } catch(e) { console.error("[user.js]", e.message); jsonRes(res, 500, { error: "Sunucu hatası" }); }
   } else if (req.method === 'POST') {
     const body = await readBody(req);
     const ip = (body.ip || '').trim().slice(0, 45);
@@ -696,7 +696,7 @@ async function handleAdminBans(req, res) {
         await kvSet('ban:ip:' + ip, '1', ttl);
         jsonRes(res, 200, { ok: true, action: 'ban', ip, ttl });
       }
-    } catch(e) { jsonRes(res, 500, { error: e.message }); }
+    } catch(e) { console.error("[user.js]", e.message); jsonRes(res, 500, { error: "Sunucu hatası" }); }
   } else {
     jsonRes(res, 405, { error: 'Method Not Allowed' });
   }

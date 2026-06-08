@@ -541,7 +541,7 @@ module.exports = async function(req, res) {
             return { t, o: o/fx, h: h/fx, l: l/fx, c: c/fx, v: q.volume[i]||0 };
           }).filter(Boolean);
           res.status(200).json({ s: 'ok', candles });
-        } catch(e) { res.status(500).json({ error: e.message }); }
+        } catch(e) { console.error('[scan]', e.message); res.status(500).json({ error: 'Veri alınamadı' }); }
         resolve();
       });
     }
@@ -560,7 +560,7 @@ module.exports = async function(req, res) {
         } else {
           res.status(200).json({ s: 'no_data', candles: [] });
         }
-      } catch(e) { res.status(500).json({ error: e.message }); }
+      } catch(e) { console.error('[scan]', e.message); res.status(500).json({ error: 'Veri alınamadı' }); }
       resolve();
     });
   }
@@ -640,7 +640,7 @@ module.exports = async function(req, res) {
         }
         res.setHeader('Content-Type', 'application/json');
         res.status(200).json({ cik, results: results.slice(0, 20) });
-      } catch(e) { res.status(500).json({ error: e.message }); }
+      } catch(e) { console.error('[scan]', e.message); res.status(500).json({ error: 'Veri alınamadı' }); }
       resolve();
     });
   }
@@ -675,7 +675,7 @@ module.exports = async function(req, res) {
         } catch(e) {}
 
         res.status(200).json({ source: 'nasdaq', symbol, rows: rows.slice(0, 10), floatShares });
-      } catch(e) { res.status(500).json({ error: e.message }); }
+      } catch(e) { console.error('[scan]', e.message); res.status(500).json({ error: 'Veri alınamadı' }); }
       resolve();
     });
   }
