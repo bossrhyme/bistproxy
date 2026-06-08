@@ -1694,7 +1694,7 @@ const GURUS = {
 
   ackman: {
     label: 'Bill Ackman — Activist',
-    desc: 'Ackman için kalite şart ama piyasanın henüz fark etmemesi de şart. Özkaynak getirisi ve net kar marjı yüksek, borcu makul, kazancına göre ucuz kalmış şirketlere yatırım yapar.',
+    desc: 'Ackman için kalite şart ama piyasanın henüz fark etmemesi de şart. Özkaynak getirisi ve net kar marjı yüksek, serbest nakit akışı güçlü, borcu makul, kazancına göre ucuz kalmış şirketlere yatırım yapar. Tahmin edilebilir iş modeli ve dominant pazar pozisyonu öncelikli kriterlerdir.',
     filters: {roe_min:15, margin_min:10, de_max:80, cr_min:1.2, pe_max:20}
   },
   ark: {
@@ -1704,89 +1704,89 @@ const GURUS = {
   },
   buffett: {
     label: 'Warren Buffett',
-    desc: 'Buffett için rakiplerin kolayca kopyalayamadığı iş modeli her şeyden önce gelir. Hem brüt hem net kar marjı yüksek, özkaynak getirisi güçlü, borcu az — ve fiyatı ne aşırı ucuz ne aşırı pahalı. Hızlı alım-satım değil, sağlam bir şirkete uzun vadeli ortak ol.',
+    desc: 'Buffett için rakiplerin kolayca kopyalayamadığı iş modeli her şeyden önce gelir. Hem brüt hem net kar marjı yüksek, özkaynak getirisi güçlü, borcu az. Not: Gerçek metodoloji 10 yıllık tutarlı EPS büyümesi ve DCF tabanlı içsel değer hesabı gerektirir; bu filtreler nicel bir ön eleme sunmaktadır.',
     filters: {pe_min:5, pe_max:25, roe_min:20, margin_min:20, gross_min:40, de_max:50, cr_min:1.5}
   },
   einhorn: {
     label: 'David Einhorn — Deep Value',
-    desc: 'Einhorn için piyasanın görmezden geldiği şirket en büyük fırsattır. Kazancına göre gerçekten ucuz, nakit fazlası var, borcu az ve kârlı şirketlere yatırım yapar.',
+    desc: 'Einhorn için piyasanın görmezden geldiği şirket en büyük fırsattır. Kazancına göre gerçekten ucuz, serbest nakit akışı güçlü, borcu az ve kârlı şirketlere yatırım yapar. Katalizör beklentisi (yeniden yapılanma, açıklama olayı) asıl tetikleyicidir.',
     filters: {pe_max:15, de_max:50, cr_min:1.5, margin_min:8, roe_min:10}
   },
   marks: {
     label: 'Howard Marks — Risk Yönetimi',
-    desc: 'Marks için ucuz olmak yetmez — piyasanın neden ucuz bıraktığını anlamak şart. Döngünün geç aşamasında herkesin kötümser olduğu, gerçek değerinin altında fiyatlanmış, nakit akışı güçlü şirketleri arar. İkinci seviye düşünce: konsensüs neyi göremiyor? Oaktree Capital kurucusu, 2008–2024 ~%19/yıl.',
+    desc: 'Howard Marks\'ın felsefesinden ilham alınan defansif değer ekranı. Marks hisse screener\'ı yayınlamamıştır; odağı ikinci seviye düşünce, risk kontrolü ve piyasa döngüleridir. Bu filtreler onun risk yönetimi ilkelerini (düşük değerleme, güçlü bilanço) yansıtmaktadır.',
     filters: {pe_max:18, pb_max:2, de_max:80, cr_min:1.2, margin_min:8}
   },
   fisher: {
     label: 'Philip Fisher — Scuttlebutt',
-    desc: 'Fisher için gerçekten iyi şirketi bulmak zordur ama bulunca satmak gerekmez. Satışları ve karları istikrarlı büyüyen, hem brüt hem net kar marjı güçlü, borcu kontrollü şirketlere yatırım yapar.',
+    desc: 'Fisher\'ın yaklaşımı temelde niteseldir (15 maddelik scuttlebutt analizi). Bu filtreler, onun büyüyen ve kârlı şirket anlayışının nicel proxyleridir: satışları ve karları istikrarlı büyüyen, hem brüt hem net kar marjı güçlü şirketler. Gerçek metodoloji yönetim kalitesi ve Ar-Ge yetkinliğini ölçmeyi gerektirir.',
     filters: {revg_min:15, earng_min:15, gross_min:35, margin_min:12, de_max:60}
   },
   graham: {
     label: 'Benjamin Graham',
-    desc: 'Graham için ucuz olmak yetmez — güvende olmak da şart. Kazancına ve defter değerine göre gerçekten ucuz, borcu az, kısa vadeli borçlarını rahatça karşılayacak kadar varlığa sahip ve temettü ödeyen şirketleri arar. Hepsi aynı anda tutmalı, biri eksik olsa geçmez.',
-    filters: {pe_max:10, pb_max:1.5, de_max:50, cr_min:2, div_min:1}
+    desc: 'Graham için ucuz olmak yetmez — güvende olmak da şart. "The Intelligent Investor"ın Savunmacı Yatırımcı kriterleri: F/K < 15, F/DD < 1.5, cari oran > 2, kesintisiz temettü. Kazancına ve defter değerine göre gerçekten ucuz, borcu az, likit bilançolu şirketleri arar.',
+    filters: {pe_max:15, pb_max:1.5, de_max:50, cr_min:2, div_min:1}
   },
   greenblatt: {
     label: 'Joel Greenblatt — Magic Formula',
-    desc: 'Greenblatt için iki soru yeterlidir: şirket iyi mi, fiyatı makul mu? Her ikisi de tutuyorsa al. Bu basit formülle yıllarca piyasa ortalamasını geçti. Özkaynak getirisi yüksek ama henüz pahalılaşmamış şirketler hedef.',
+    desc: 'Orijinal Magic Formula, ROC ve Kazanç Verimi\'ne göre sıralama yapar — sabit eşik kullanmaz. Bu filtreler sıralama sisteminin nicel proxyleridir: yüksek ROE (ROC\'un yaklaşımı) + düşük F/K (kazanç veriminin yaklaşımı). Gerçek uygulama için tüm hisseleri sıralamak ve en iyi 20–30\'unu seçmek gerekir.',
     filters: {roe_min:25, pe_max:15, de_max:80, cr_min:1}
   },
   icahn: {
     label: 'Carl Icahn — Activist Value',
-    desc: 'Icahn için nakit bol ama fiyat düşükse harekete geçme zamanıdır. Borsa değeri defter değerine yakın, kazancına göre ucuz, borcu düşük, nakit güçlü ve temettü ödeyen şirketlere yatırım yapar.',
+    desc: 'Icahn için nakit bol ama fiyat düşükse harekete geçme zamanıdır. Borsa değeri defter değerine yakın, kazancına göre ucuz şirketlere yatırım yapar. Asıl hedef: zayıf yönetim, gizli varlıklar veya fazla nakit barındıran, aktivisizm potansiyeli taşıyan şirketler.',
     filters: {pb_max:1.5, pe_max:12, de_max:60, cr_min:1.5, div_min:1}
   },
   klarman: {
     label: 'Seth Klarman — Margin of Safety',
-    desc: 'Klarman için hata payı büyük olmak şarttır — Graham\'dan bile daha temkinli. Kazancına ve defter değerine göre çok ucuz, borcu minimal, nakit güçlü şirketlere yatırım yapar.',
+    desc: 'Klarman için hata payı büyük olmak şarttır — Graham\'dan bile daha temkinli. Kazancına ve defter değerine göre çok ucuz, borcu minimal, nakit güçlü şirketlere yatırım yapar. Not: Klarman sabit eşik vermez; içsel değere göre iskonto (NAV, DCF, likidite değeri) asıl kriterdir.',
     filters: {pe_max:10, pb_max:1.2, de_max:40, cr_min:2, margin_min:5}
   },
   lynch: {
     label: 'Peter Lynch — GARP',
-    desc: 'Lynch için büyüyen ama buna rağmen hâlâ ucuz olan şirket nadir ve değerlidir. Büyüme hızı fiyat/kazanç oranını geçiyorsa iyi fırsat — büyümesine göre ucuz şirketlere yatırım yapar.',
-    filters: {pe_min:5, pe_max:35, earng_min:15, de_max:80, cr_min:1},
+    desc: 'Lynch için büyüyen ama buna rağmen hâlâ ucuz olan şirket nadir ve değerlidir. PEG < 1 asıl kriter: büyüme hızı F/K oranını geçiyorsa ucuz sayılır. Fast-grower tanımı %20+ yıllık EPS büyümesidir.',
+    filters: {pe_min:5, pe_max:35, earng_min:20, de_max:80, cr_min:1},
     special: 'peg'
   },
   minervini: {
     label: 'Mark Minervini — SEPA',
-    desc: 'Minervini için hem temel hem teknik aynı anda güçlü olmalı. Karı hızla artıyor, özkaynak getirisi ve net kar marjı güçlü, borcu kontrollü şirketlere yatırım yapar.',
+    desc: 'Minervini için hem temel hem teknik aynı anda güçlü olmalı. Karı hızla artıyor, özkaynak getirisi ve net kar marjı güçlü, borcu kontrollü şirketlere yatırım yapar. Not: SEPA\'nın kalbi Trend Template filtresidir (200MA üstü, yükselen MA, güçlü RS) — teknik tarama ile tamamlanmalıdır.',
     filters: {earng_min:25, roe_min:17, margin_min:10, de_max:100, cr_min:1}
   },
   munger: {
     label: 'Charlie Munger — Quality Compounder',
-    desc: 'Munger için adil fiyata mükemmel şirket, ucuz fiyata vasat şirketten çok daha iyidir. Brüt ve net kar marjı çok yüksek, özkaynak getirisi güçlü, neredeyse borçsuz şirketler arar. Büyüme değil, sürdürülebilir kalite önde.',
+    desc: 'Munger için adil fiyata mükemmel şirket, ucuz fiyata vasat şirketten çok daha iyidir. Brüt ve net kar marjı çok yüksek, özkaynak getirisi güçlü, neredeyse borçsuz şirketler arar. Geniş ve dayanıklı ekonomik hendek (moat) ile güçlü fiyatlama gücü temel kriterleridir.',
     filters: {gross_min:50, roe_min:20, de_max:30, margin_min:20, cr_min:1.5}
   },
   oneil: {
     label: "William O'Neil — CAN SLIM",
-    desc: "O'Neil için hem temeller hem de fiyat aynı yönde hareket etmeli. Karları ve satışları hızla büyüyen, özkaynak getirisi güçlü şirketlere yatırım yapar.",
+    desc: "O'Neil için hem temeller hem fiyat aynı yönde hareket etmeli. C: çeyreklik EPS büyümesi, A: yıllık kazanç, N: yeni katalizör, S: arz/talep. Not: CAN SLIM'in L (liderlik/RS), I (kurumsal sponsorluk) ve M (piyasa yönü) bileşenleri teknik analiz gerektirir; bu filtreler temel ön elemedir.",
     filters: {earng_min:25, revg_min:15, roe_min:17, de_max:100, cr_min:1}
   },
   oshaughnessy: {
     label: "O'Shaughnessy — What Works on Wall St.",
-    desc: "O'Shaughnessy için his değil, 50 yıllık veri konuşur. Satışlarına göre ucuz, temettü ödeyen, satışları büyüyen ve özkaynak getirisi pozitif şirketler uzun vadede piyasayı sürekli geçmiş. Tarihin verdiği yanıt, herhangi bir guru görüşünden daha güvenilir.",
-    filters: {ps_max:1.5, div_min:1, revg_min:10, roe_min:10}
+    desc: "O'Shaughnessy için his değil, 50 yıllık veri konuşur. Cornerstone Growth: F/S < 1.5, 5 yıllık tutarlı büyüme, güçlü 12 aylık momentum. Cornerstone Value: en yüksek temettü verimi sıralaması. Bu filtreler kitabın temel nicel kriterlerini yansıtmaktadır.",
+    filters: {ps_max:1.5, div_min:2, revg_min:10, roe_min:10}
   },
   piotroski: {
     label: 'Piotroski F-Score',
-    desc: 'Piotroski için hisseyi anlamak 9 soruya bakmak demektir. Kâr etti mi? Nakit artıyor mu? Borç azaldı mı? Verimlilik yükseldi mi? Bu sorulardan yüksek puan alan şirket gerçekten sağlam demektir. Hissiyat yok, tamamen sayılar konuşur.',
-    filters: {roe_min:3, cr_min:1, de_max:120},
+    desc: 'Piotroski F-Score, düşük F/DD hisseler arasında kaliteyi ölçer (P/B < 1 giriş koşulu). 9 binary sinyalin toplamı: kârlılık (ROA, OCF, değişim), kaldıraç (borç azalıyor, cari oran artıyor, seyreltme yok), verimlilik (brüt marj ve varlık devir hızı artıyor). 7–9 arası güçlü, 0–2 arası zayıf.',
+    filters: {pb_max:1, roe_min:3, cr_min:1, de_max:120},
     special: 'piotroski'
   },
   schloss: {
     label: 'Walter Schloss — Deep Value',
-    desc: 'Schloss için strateji son derece basit: defter değerinin altında, borcu az, temettü ödeyen hisseyi al ve bekle. 45 yılda bunu yaparak yıllık %15\'in üzerinde getiri elde etti. Karmaşıklık değil, sabır ve disiplin.',
-    filters: {pb_max:1, pe_max:12, de_max:30, div_min:1, cr_min:1.5}
+    desc: 'Schloss için strateji son derece basit: defter değerinin altında, borcu kontrollü, temettü ödeyen hisseyi al ve bekle. 45 yılda bunu yaparak yıllık %15\'in üzerinde getiri elde etti. Borçsuzluğu tercih etti; içeriden sahiplik (insider ownership) ve uzun şirket geçmişi kritik ek kriterlerdir.',
+    filters: {pb_max:1, pe_max:12, de_max:100, div_min:2, cr_min:1.5}
   },
   soros: {
     label: 'George Soros — Reflexivity',
-    desc: 'Soros için piyasa her zaman yanlış fiyatlar — mesele kendini besleyen döngüyü erken görmek. Reflexivity: güçlü fiyat hareketi beklentileri değiştirir, beklentiler piyasayı, piyasa da temel verileri etkiler. Döngü başladığında trende bin, kırılım sinyali gelince çık. Hisse uyarlaması: güçlü 3–6 aylık fiyat trendi + gelir büyümesi (makro rüzgar) + teknik onay. Kalite/borç kriteri yok — tema oturmuşsa bilanço ikinci plandadır. Quantum Fund, 1969–2011 ~%20/yıl.',
+    desc: 'Soros bir makro traderdir; reflexivity teorisinden ilham alınan momentum ekranı. Reflexivity: güçlü fiyat hareketi beklentileri değiştirir, beklentiler piyasayı etkiler. Hisse uyarlaması: güçlü 3–6 aylık fiyat trendi + büyüyen gelir (makro rüzgar) + teknik onay. Not: Soros\'un gerçek stratejisi para birimi/faiz bahislerinden oluşur; bu filtreler teorisinin hisse ekranı yorumudur.',
     filters: {perf3m_min:10, perf6m_min:15, revg_min:15, earng_min:10, tech_rating_min:0.2}
   },
   dalio: {
     label: 'Ray Dalio — All Weather',
-    desc: 'Dalio için piyasayı tahmin etmeye çalışmak değil, her senaryoya hazır olmak önemlidir. Büyüme, daralma, enflasyon, deflasyon — hepsine dayanıklı hisse profili: düzenli temettü (nakit akışı güvencesi), düşük borç (kriz dayanımı), güçlü kâr marjı (her koşulda ayakta kalma), likit bilanço. Orijinal strateji düşük beta arar; tarayıcıda beta filtresi olmadığından defansif sektör kontrolü önerilir. Bridgewater kurucusu, 1991–2023 ~%11.4/yıl.',
+    desc: 'Dalio\'nun All Weather stratejisi varlık sınıfı tahsisidir (%30 hisse, %40 uzun tahvil, %15 orta tahvil, %7.5 altın, %7.5 emtia). Bu filtreler, onun "her koşulda ayakta kal" felsefesinden ilham alınan defansif hisse ekranıdır: düzenli temettü, düşük borç, güçlü kâr marjı, likit bilanço.',
     filters: {div_min:2, de_max:60, cr_min:1.3, margin_min:8, roe_min:10, pe_max:25}
   },
   citadel: {
