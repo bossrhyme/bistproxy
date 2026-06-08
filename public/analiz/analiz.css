@@ -129,3 +129,14 @@ footer a:hover{color:var(--text2);}
 .copy-btn:hover,.copy-btn.copied{background:var(--green);color:#000;}
 .smodal-thanks{text-align:center;font-size:11px;color:var(--muted2);margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
 .smodal-thanks strong{color:var(--text);}
+/* ── Dark Mode ── */
+[data-theme="dark"]{
+  --bg:#0d1117;--s1:#161b22;--s2:#1c2128;--s3:#21262d;
+  --border:#30363d;--border2:#484f58;
+  --green:#3fb950;--green2:#2ea043;--green-bg:rgba(63,185,80,.12);
+  --red:#f85149;--red-bg:rgba(248,81,73,.12);
+  --gold:#f0b429;--teal:#2dd4bf;
+  --text:#e6edf3;--text2:#8b949e;--muted:#6e7681;--muted2:#8b949e;
+}
+.theme-toggle-btn{background:transparent;border:1px solid var(--border2);color:var(--text2);font-size:14px;padding:4px 8px;line-height:1;cursor:pointer;border-radius:4px;}
+.theme-toggle-btn:hover{border-color:var(--accent);color:var(--accent);}

@@ -23,7 +23,8 @@
 <meta name="twitter:image" content="https://deepfin.vercel.app/og-image.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="/analiz/prf.css?v=arctic12">
+<script>(function(){try{var t=localStorage.getItem('df_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
+<link rel="stylesheet" href="/analiz/prf.css?v=arctic13">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap"></noscript>
 
@@ -55,6 +56,22 @@ if('serviceWorker' in navigator){
   });
 }
 </script>
+<script>
+function toggleTheme(){
+  var dark = document.documentElement.getAttribute('data-theme') !== 'dark';
+  try{localStorage.setItem('df_theme', dark?'dark':'light');}catch(e){}
+  document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+  var btn = document.getElementById('theme-toggle');
+  if(btn) btn.textContent = dark?'☀':'☾';
+  var m = document.getElementById('meta-theme-color');
+  if(m) m.content = dark?'#0d1117':'#f8fafc';
+}
+window.addEventListener('DOMContentLoaded', function(){
+  var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  var btn = document.getElementById('theme-toggle');
+  if(btn) btn.textContent = dark?'☀':'☾';
+});
+</script>
 </head>
 <body>
 <div id="app">
@@ -66,6 +83,7 @@ if('serviceWorker' in navigator){
     <a href="/" class="hp-nav-btn" onclick="event.preventDefault(); goScreener()">Tarayıcı</a>
     <a href="/analiz/" class="hp-nav-btn active" onclick="event.preventDefault(); goAnaliz()">Analiz</a>
     <div class="tright">
+      <button class="topbarbtn theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir" aria-label="Karanlık/Açık mod geçiş">☾</button>
       <a href="/profil" id="profile-btn" class="topbarbtn infobtn profile-topbtn" title="Profilim">
         <span id="profile-btn-inner">👤</span><span class="prf-btn-lbl">Profil</span>
       </a>

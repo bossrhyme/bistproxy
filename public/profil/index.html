@@ -8,7 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"></noscript>
-<link rel="stylesheet" href="/deepfin.css?v=arctic16">
+<script>(function(){try{var t=localStorage.getItem('df_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
+<link rel="stylesheet" href="/deepfin.css?v=arctic46">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;}
@@ -351,6 +352,7 @@ body{overflow-y:auto;}
   <a href="/" class="hp-nav-btn">Tarayıcı</a>
   <a href="/analiz/" class="hp-nav-btn">Analiz</a>
   <div class="tright">
+    <button class="topbarbtn theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir" aria-label="Karanlık/Açık mod geçiş">☾</button>
     <div class="pf-topbar-btn-wrap">
       <span class="topbarbtn infobtn pf-topbar-profile-btn" onclick="toggleProfileMenu(event)">👤<span class="prf-btn-lbl">Profil</span> ▾</span>
       <div id="pf-profile-menu">
@@ -582,5 +584,21 @@ body{overflow-y:auto;}
 <div class="pf-toast" id="pf-toast"></div>
 
 <script src="/profil/profil.js?v=15"></script>
+<script>
+function toggleTheme(){
+  var dark = document.documentElement.getAttribute('data-theme') !== 'dark';
+  try{localStorage.setItem('df_theme', dark?'dark':'light');}catch(e){}
+  document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+  var btn = document.getElementById('theme-toggle');
+  if(btn) btn.textContent = dark?'☀':'☾';
+  var m = document.getElementById('meta-theme-color');
+  if(m) m.content = dark?'#0d1117':'#f8fafc';
+}
+(function(){
+  var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  var btn = document.getElementById('theme-toggle');
+  if(btn) btn.textContent = dark?'☀':'☾';
+})();
+</script>
 </body>
 </html>
