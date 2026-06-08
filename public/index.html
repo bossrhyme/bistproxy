@@ -6,7 +6,7 @@
 <title>DeepFin — Hisse Tarama | Buffett, Lynch, Graham Stratejileri</title>
 <meta name="description" content="Hisse, fon ve kripto — 28+ borsa, 30.000+ enstrüman — hisse ve kripto tek ekranda. 50+ strateji ve 34 filtre kriteriyle saniyeler içinde tara, dünyaca ünlü stratejilerle analiz et.">
 <meta name="robots" content="index, follow">
-<meta name="theme-color" content="#f8fafc">
+<meta name="theme-color" content="#f8fafc" id="meta-theme-color">
 <link rel="canonical" href="https://deepfin.vercel.app/">
 <!-- Open Graph -->
 <meta property="og:type" content="website">
@@ -25,6 +25,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap"></noscript>
+<script>(function(){try{var t=localStorage.getItem('df_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
 <style id="critical-css">
 
 :root{
@@ -35,6 +36,22 @@
   --blue:#0ea5e9;--blue2:#0284c7;
   --gold:#d97706;--text:#0f172a;--text2:#475569;--muted:#94a3b8;--muted2:#64748b;
   --accent:#0ea5e9;
+}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1117;--s1:#161b22;--s2:#1c2128;--s3:#21262d;
+    --border:#30363d;--border2:#484f58;
+    --green:#3fb950;--green-bg:rgba(63,185,80,.12);
+    --red:#f85149;--red-bg:rgba(248,81,73,.12);
+    --text:#e6edf3;--text2:#8b949e;--muted:#6e7681;--muted2:#8b949e;
+  }
+}
+[data-theme="dark"]{
+  --bg:#0d1117;--s1:#161b22;--s2:#1c2128;--s3:#21262d;
+  --border:#30363d;--border2:#484f58;
+  --green:#3fb950;--green-bg:rgba(63,185,80,.12);
+  --red:#f85149;--red-bg:rgba(248,81,73,.12);
+  --text:#e6edf3;--text2:#8b949e;--muted:#6e7681;--muted2:#8b949e;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 *{-webkit-tap-highlight-color:transparent;}
@@ -108,8 +125,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=arctic43">
-<script src="/deepfin.js?v=81" defer></script>
+<link rel="stylesheet" href="/deepfin.css?v=arctic44">
+<script src="/deepfin.js?v=82" defer></script>
 <link rel="dns-prefetch" href="https://api.coingecko.com">
 <link rel="dns-prefetch" href="https://finnhub.io">
 <link rel="dns-prefetch" href="https://www.tefas.gov.tr">
@@ -157,9 +174,9 @@ if('serviceWorker' in navigator){
     </button>
 
     <div class="tright">
-
+      <button class="topbarbtn theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir" aria-label="Karanlık/Açık mod geçiş">☾</button>
       <a href="/profil" id="profile-btn" class="topbarbtn infobtn profile-topbtn" title="Profilim">
-        <span id="profile-btn-inner">👤</span><span class="prf-btn-lbl">Profil</span>
+        <span id="profile-btn-inner">👤</span><span class="prf-btn-lbl">Profil</span><span id="fav-total-badge" style="display:none;background:var(--accent);color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 5px;margin-left:2px;line-height:1.4;align-items:center;"></span>
       </a>
       <button class="topbarbtn infobtn" onclick="openInfo()">Bilgi Bankası</button>
       <button class="topbarbtn supportbtn" onclick="openSupport()">

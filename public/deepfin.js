@@ -14,6 +14,34 @@ function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replac
 function escJS(s) { return String(s == null ? '' : s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/</g,'\\x3C').replace(/>/g,'\\x3E'); }
 function safeUrl(u) { var s = String(u||''); return /^https?:\/\//i.test(s) ? s : '#'; }
 
+// ── Tema ──────────────────────────────────────────────────────
+function _isDark() {
+  var t = document.documentElement.getAttribute('data-theme');
+  if (t === 'dark') return true;
+  if (t === 'light') return false;
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme:dark)').matches;
+}
+function _applyTheme(dark) {
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  var meta = document.getElementById('meta-theme-color');
+  if (meta) meta.content = dark ? '#0d1117' : '#f8fafc';
+  var btn = document.getElementById('theme-toggle');
+  if (btn) btn.textContent = dark ? '☀' : '☾';
+}
+function toggleTheme() {
+  var next = !_isDark();
+  try { localStorage.setItem('df_theme', next ? 'dark' : 'light'); } catch(e) {}
+  _applyTheme(next);
+}
+function _initTheme() {
+  _applyTheme(_isDark());
+  if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change', function(e) {
+      if (!localStorage.getItem('df_theme')) _applyTheme(e.matches);
+    });
+  }
+}
+
 // Auto-attach X-Requested-With to all /api/ fetches (CSRF protection)
 (function() {
   var _f = window.fetch;
@@ -267,7 +295,16 @@ function _showLoading(msg) {
   if (!twrap || !ra) return;
   twrap.style.display = 'block';
   ra.style.display = 'block';
-  ra.innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted2);font-size:12px">' + msg + '</div>';
+  var skRows = '';
+  var widths = [28, 120, 55, 45, 45, 45, 45, 45, 45, 70, 60];
+  for (var i = 0; i < 10; i++) {
+    skRows += '<div class="sk-row">' + widths.map(function(w){
+      return '<div class="sk-cell" style="width:'+w+'px'+(i===0?';opacity:.5':'')+'"></div>';
+    }).join('') + '</div>';
+  }
+  ra.innerHTML = '<div class="sk-hdr"><div class="sk-hdr-cell" style="width:80px"></div><div class="sk-hdr-cell" style="width:120px"></div></div>'
+    + '<div class="sk-wrap">' + skRows + '</div>'
+    + '<div style="padding:12px;text-align:center;color:var(--muted2);font-size:11px">' + msg + '</div>';
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -811,21 +848,21 @@ function saveKriptoFavs() { localStorage.setItem('df_kripto_favs', JSON.stringif
 function toggleFonFav(code) {
   if (fonFavSet.has(code)) { fonFavSet.delete(code); showToast('✕ ' + code + ' favorilerden çıkarıldı'); }
   else { fonFavSet.add(code); showToast('★ ' + code + ' favorilere eklendi'); }
-  saveFonFavs();
-  _renderFon(_sortAsset(_fonData, sortSt.field, sortSt.dir), _fonMeta);
+  saveFonFavs(); _updateFavBadge();
+  _renderFon(_sortAsset(_fonData, sortSt.field, sortSt.dir), _fonMeta, _fonShowAll);
 }
 function toggleKriptoFav(sym) {
   if (kriptoFavSet.has(sym)) { kriptoFavSet.delete(sym); showToast('✕ ' + sym + ' favorilerden çıkarıldı'); }
   else { kriptoFavSet.add(sym); showToast('★ ' + sym + ' favorilere eklendi'); }
-  saveKriptoFavs();
-  _renderKripto(_sortAsset(_kriptoData, sortSt.field, sortSt.dir), _kriptoMeta);
+  saveKriptoFavs(); _updateFavBadge();
+  _renderKripto(_sortAsset(_kriptoData, sortSt.field, sortSt.dir), _kriptoMeta, _kriptoShowAll);
 }
 
 function toggleFav(sym) {
   var adding = !favSet.has(sym);
   if (adding) { favSet.add(sym); showToast('★ ' + sym + ' favorilere eklendi'); }
   else { favSet.delete(sym); showToast('✕ ' + sym + ' favorilerden çıkarıldı'); }
-  saveFavs(); renderTable(); _updateFavBtn();
+  saveFavs(); renderTable(); _updateFavBtn(); _updateFavBadge();
   // Giriş yapıldıysa "Favorilerim" watchlist'ini de senkronize et
   if (_dfUser) _syncFavToWatchlist(sym, adding);
 }
@@ -2433,7 +2470,7 @@ function _vsRowHtml(s, idx) {
     favClick  = "event.stopPropagation();toggleFav('" + escJS(s.symbol) + "')";
     favTitle  = isFav ? 'Favorilerden çıkar' : 'Favorilere ekle';
   }
-  return `<tr onclick="showDetail('${escJS(s.symbol)}')" class="${selSym===s.symbol?'selrow':''}">
+  return `<tr onclick="showDetail('${escJS(s.symbol)}')" tabindex="0" class="${selSym===s.symbol?'selrow':''}">
       <td class="nfav"><span class="fav-icon${isFav?' fav-on':''}" onclick="${favClick}" title="${esc(favTitle)}">★</span></td>
       <td data-col="symbol" style="display:table-cell;"><span class="row-num">${idx+1}</span><span class="sym-wrap"><span class="row-arrow">›</span><span class="sym">${s.symbol}</span></span></td>
       <td data-col="name" style="${cv('name')}font-size:11px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.name}">${s.name}</td>
@@ -4011,6 +4048,55 @@ function applyTechAndGo(techKey) {
 // Start on homepage
 // analiz dropdown click-outside: analiz.js'de handle ediliyor
 
+// ── Klavye Navigasyonu ────────────────────────────────────────
+function _initKeyboardNav() {
+  // Tüm chip'lere tabindex + role ekle (keyboard focus desteği)
+  document.querySelectorAll('.chip,.goat-chip,.exbtn').forEach(function(el) {
+    if (!el.hasAttribute('tabindex')) {
+      el.setAttribute('tabindex', '0');
+      if (!el.getAttribute('role')) el.setAttribute('role', 'button');
+    }
+  });
+
+  // Enter/Space ile chip/button aktivasyonu
+  document.addEventListener('keydown', function(e) {
+    var el = e.target;
+    if (e.key === 'Enter' || e.key === ' ') {
+      if (el.classList.contains('chip') || el.classList.contains('goat-chip') || el.classList.contains('exbtn')) {
+        e.preventDefault();
+        el.click();
+        return;
+      }
+    }
+    // Tablo satırları: ok tuşlarıyla navigasyon
+    if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && el.tagName === 'TR') {
+      e.preventDefault();
+      var tbody = el.closest('tbody');
+      if (!tbody) return;
+      var rows = Array.from(tbody.querySelectorAll('tr:not(.vs-pad)'));
+      var idx = rows.indexOf(el);
+      var next = e.key === 'ArrowDown' ? rows[idx + 1] : rows[idx - 1];
+      if (next) { next.setAttribute('tabindex', '-1'); next.focus(); }
+    }
+    // Enter ile satır açma
+    if (e.key === 'Enter' && el.tagName === 'TR') {
+      el.click();
+    }
+  });
+}
+
+// ── Favori Toplam Sayısı (Item 12 — birleştirme yardımcısı) ──
+function _getFavTotalCount() {
+  return (favSet ? favSet.size : 0) + (fonFavSet ? fonFavSet.size : 0) + (kriptoFavSet ? kriptoFavSet.size : 0);
+}
+function _updateFavBadge() {
+  var badge = document.getElementById('fav-total-badge');
+  if (!badge) return;
+  var n = _getFavTotalCount();
+  badge.textContent = n > 0 ? n : '';
+  badge.style.display = n > 0 ? 'inline-flex' : 'none';
+}
+
 // ── URL ROUTING (History API) ─────────────────────────
 window.addEventListener('popstate', function(e) {
   var path = window.location.pathname;
@@ -4019,7 +4105,10 @@ window.addEventListener('popstate', function(e) {
 });
 // ─────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function(){
+  _initTheme();
   _initWorker();
+  _initKeyboardNav();
+  _updateFavBadge();
   _updateOnboarding(null); // Varsayılan: genel onboarding
   // Canlı istatistikleri çek ve her 60s güncelle
   function _fmtStatNum(n) {

@@ -1497,3 +1497,44 @@ tbody tr td { height: 36px; }
   /* Screener boş durum — ortalama */
   .cstate{width:100% !important;align-items:center !important;justify-content:center !important;}
 }
+
+/* ── Dark Mode ──────────────────────────────────────────────── */
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1117;--s1:#161b22;--s2:#1c2128;--s3:#21262d;
+    --border:#30363d;--border2:#484f58;
+    --green:#3fb950;--green2:#2ea043;--green-bg:rgba(63,185,80,.12);
+    --red:#f85149;--red-bg:rgba(248,81,73,.12);
+    --gold:#f0b429;--teal:#2dd4bf;
+    --text:#e6edf3;--text2:#8b949e;--muted:#6e7681;--muted2:#8b949e;
+    --shadow:0 1px 3px rgba(0,0,0,.4),0 1px 2px rgba(0,0,0,.3);
+    --shadow-md:0 4px 12px rgba(0,0,0,.5),0 2px 4px rgba(0,0,0,.4);
+  }
+}
+[data-theme="dark"]{
+  --bg:#0d1117;--s1:#161b22;--s2:#1c2128;--s3:#21262d;
+  --border:#30363d;--border2:#484f58;
+  --green:#3fb950;--green2:#2ea043;--green-bg:rgba(63,185,80,.12);
+  --red:#f85149;--red-bg:rgba(248,81,73,.12);
+  --gold:#f0b429;--teal:#2dd4bf;
+  --text:#e6edf3;--text2:#8b949e;--muted:#6e7681;--muted2:#8b949e;
+  --shadow:0 1px 3px rgba(0,0,0,.4),0 1px 2px rgba(0,0,0,.3);
+  --shadow-md:0 4px 12px rgba(0,0,0,.5),0 2px 4px rgba(0,0,0,.4);
+}
+
+/* Theme toggle button */
+.theme-toggle-btn{background:transparent;border:1px solid var(--border2);color:var(--text2);font-size:14px;padding:4px 8px;line-height:1;}
+.theme-toggle-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+/* ── Skeleton Loader ─────────────────────────────────────────── */
+@keyframes sk-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.sk-wrap{padding:4px 0;}
+.sk-row{display:flex;align-items:center;gap:6px;padding:9px 12px;border-bottom:1px solid var(--border);}
+.sk-cell{height:9px;flex-shrink:0;border-radius:3px;background:linear-gradient(90deg,var(--s2) 25%,var(--s3) 50%,var(--s2) 75%);background-size:200% 100%;animation:sk-shimmer 1.4s infinite;}
+.sk-hdr{padding:10px 12px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;}
+.sk-hdr-cell{height:11px;border-radius:3px;background:var(--s3);}
+
+/* ── Keyboard Focus ─────────────────────────────────────────── */
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px;}
+.chip:focus-visible,.exbtn:focus-visible,.dtab:focus-visible,.sb-tab:focus-visible,.sbp-scan-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+button:focus:not(:focus-visible),a:focus:not(:focus-visible),[tabindex]:focus:not(:focus-visible){outline:none;}
