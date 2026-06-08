@@ -4076,14 +4076,10 @@ function toggleSidebar() {
 }
 
 function initSidebarState() {
-  try {
-    if (localStorage.getItem('df_sb_collapsed') === '1') {
-      var sb         = document.getElementById('sidebar');
-      var reopen     = document.getElementById('sb-reopen');
-      var tickerWrap = document.getElementById('ticker-wrap');
-      if (sb)         sb.classList.add('collapsed');
-      if (reopen)     reopen.style.display = 'flex';
-      if (tickerWrap) tickerWrap.classList.add('sb-open');
-    }
-  } catch(e) {}
+  var sb         = document.getElementById('sidebar');
+  var reopen     = document.getElementById('sb-reopen');
+  var tickerWrap = document.getElementById('ticker-wrap');
+  if (sb)         sb.classList.remove('collapsed');
+  if (reopen)     reopen.style.display = 'none';
+  if (tickerWrap) tickerWrap.classList.remove('sb-open');
 }
