@@ -16,12 +16,12 @@ function safeUrl(u) { var s = String(u||''); return /^https?:\/\//i.test(s) ? s 
 
 // ── Tema ──────────────────────────────────────────────────────
 function _isDark() {
-  try { return localStorage.getItem('df_theme') !== 'light'; } catch(e) { return true; }
+  try { return localStorage.getItem('df_theme') === 'dark'; } catch(e) { return false; }
 }
 function _applyTheme(dark) {
   document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
   var meta = document.getElementById('meta-theme-color');
-  if (meta) meta.content = dark ? '#09101e' : '#ffffff';
+  if (meta) meta.content = dark ? '#09101e' : '#f8fafc';
   var btn = document.getElementById('theme-toggle');
   if (btn) btn.textContent = dark ? '☀' : '☾';
 }

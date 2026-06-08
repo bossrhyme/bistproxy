@@ -352,7 +352,7 @@ body{overflow-y:auto;}
   <a href="/" class="hp-nav-btn">Tarayıcı</a>
   <a href="/analiz/" class="hp-nav-btn">Analiz</a>
   <div class="tright">
-    <button class="topbarbtn theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir" aria-label="Karanlık/Açık mod geçiş">☀</button>
+    <button class="topbarbtn theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir" aria-label="Karanlık/Açık mod geçiş">☾</button>
     <div class="pf-topbar-btn-wrap">
       <span class="topbarbtn infobtn pf-topbar-profile-btn" onclick="toggleProfileMenu(event)">👤<span class="prf-btn-lbl">Profil</span> ▾</span>
       <div id="pf-profile-menu">
@@ -586,16 +586,16 @@ body{overflow-y:auto;}
 <script src="/profil/profil.js?v=15"></script>
 <script>
 function toggleTheme(){
-  var dark = document.documentElement.getAttribute('data-theme') === 'light';
+  var dark = document.documentElement.getAttribute('data-theme') !== 'dark';
   try{localStorage.setItem('df_theme', dark?'dark':'light');}catch(e){}
   document.documentElement.setAttribute('data-theme', dark?'dark':'light');
   var btn = document.getElementById('theme-toggle');
   if(btn) btn.textContent = dark?'☀':'☾';
   var m = document.getElementById('meta-theme-color');
-  if(m) m.content = dark?'#09101e':'#ffffff';
+  if(m) m.content = dark?'#09101e':'#f8fafc';
 }
 (function(){
-  var dark = document.documentElement.getAttribute('data-theme') !== 'light';
+  var dark = document.documentElement.getAttribute('data-theme') === 'dark';
   var btn = document.getElementById('theme-toggle');
   if(btn) btn.textContent = dark?'☀':'☾';
 })();
