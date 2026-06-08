@@ -467,9 +467,27 @@ td:first-child,td:nth-child(2){text-align:left;}
     overflow: hidden;
   }
   /* Sidebar mobilde = drawer (fixed, slide) */
-  
+  .sidebar {
+    position: fixed;
+    top: calc(52px + env(safe-area-inset-top, 0px));
+    left: 0;
+    bottom: 0;
+    width: 85vw;
+    max-width: 320px;
+    z-index: 200;
+    transform: translateX(-100%) translateZ(0);
+    transition: transform .25s cubic-bezier(.4,0,.2,1) !important;
+    will-change: transform;
+    min-width: unset;
+  }
   .sidebar.open {
-    transform: translateX(0) !important;
+    transform: translateX(0) translateZ(0) !important;
+  }
+  .sidebar.collapsed {
+    transform: translateX(-100%) translateZ(0) !important;
+    width: 85vw !important;
+    min-width: unset !important;
+    opacity: 1 !important;
   }
 
   /* ─────────────────────────────────────────

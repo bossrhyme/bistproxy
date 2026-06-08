@@ -4065,6 +4065,7 @@ document.addEventListener('DOMContentLoaded', function(){
 // ── Sidebar Collapse ──
 
 function toggleSidebar() {
+  if (window.innerWidth <= 768) { closeMobileDrawer(); return; }
   var sb         = document.getElementById('sidebar');
   var reopen     = document.getElementById('sb-reopen');
   var tickerWrap = document.getElementById('ticker-wrap');
@@ -4076,6 +4077,7 @@ function toggleSidebar() {
 }
 
 function initSidebarState() {
+  if (window.innerWidth <= 768) { closeMobileDrawer(); return; }
   var sb         = document.getElementById('sidebar');
   var reopen     = document.getElementById('sb-reopen');
   var tickerWrap = document.getElementById('ticker-wrap');
