@@ -649,8 +649,11 @@ if('serviceWorker' in navigator){
 
       <!-- PANEL: Hisse -->
       <div class="sbp" id="sbp-hisse">
-        <button class="sbp-back" onclick="goBackToLanding()">← Varlık Listesi</button>
-        <div class="sbp-scroll">
+        <div class="sbp-header-row">
+          <button class="sbp-back" onclick="goBackToLanding()">← Varlık Listesi</button>
+          <button class="sbp-filter-toggle" id="sbp-filter-toggle" onclick="toggleSbpFilters()" title="Filtreleri gizle/göster">▼</button>
+        </div>
+        <div class="sbp-scroll" id="sbp-hisse-scroll">
 
 
       <!-- SIDEBAR TABS -->
@@ -2173,7 +2176,7 @@ if('serviceWorker' in navigator){
     </div>
   </div>
 </div>
-<script src="/deepfin.js?v=73"></script>
+<script src="/deepfin.js?v=74"></script>
 <div id="hisse-hidden-filters" style="display:none;">
   <input type="number" id="piotroski_min">
   <input type="number" id="piotroski_max">

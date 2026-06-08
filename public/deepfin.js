@@ -4062,6 +4062,17 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 
 
+// ── Filter Panel Collapse ──
+
+function toggleSbpFilters() {
+  var scroll = document.getElementById('sbp-hisse-scroll');
+  var btn = document.getElementById('sbp-filter-toggle');
+  if (!scroll || !btn) return;
+  var hidden = scroll.style.display === 'none';
+  scroll.style.display = hidden ? '' : 'none';
+  btn.textContent = hidden ? '▼' : '▲';
+}
+
 // ── Sidebar Collapse ──
 
 function toggleSidebar() {
