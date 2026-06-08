@@ -124,6 +124,55 @@ function makeRequest(hostname, path, method, headers, body, callback, timeoutMs 
   req.end();
 }
 
+// ─────────────────────────────────────────────
+// Yahoo Finance crumb/cookie auth (Redis + in-memory cache)
+// Since mid-2024 Yahoo requires a valid crumb+cookie pair for all chart API calls.
+// We get the cookie from fc.yahoo.com then exchange it for a crumb from query2.
+// ─────────────────────────────────────────────
+async function getYahooCrumb() {
+  const memC = memGet('yf_crumb_v2');
+  if (memC && memC.crumb) return memC;
+  const kvC = kvEnabled() ? await kvGet('yf_crumb_v2') : null;
+  if (kvC && kvC.crumb) { memSet('yf_crumb_v2', kvC, 1800); return kvC; }
+
+  const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
+
+  const cookie = await new Promise((resolve) => {
+    const req = https.request({
+      hostname: 'fc.yahoo.com', path: '/', method: 'GET',
+      headers: { 'User-Agent': UA, 'Accept': '*/*' }
+    }, (response) => {
+      const setCookies = response.headers['set-cookie'] || [];
+      const cookieStr = setCookies.map(c => c.split(';')[0]).join('; ');
+      response.resume();
+      resolve(cookieStr || '');
+    });
+    req.setTimeout(6000, () => { req.destroy(); resolve(''); });
+    req.on('error', () => resolve(''));
+    req.end();
+  });
+
+  const crumb = await new Promise((resolve) => {
+    const hdrs = { 'User-Agent': UA, 'Accept': '*/*' };
+    if (cookie) hdrs['Cookie'] = cookie;
+    const req = https.request({
+      hostname: 'query2.finance.yahoo.com', path: '/v1/test/getcrumb', method: 'GET', headers: hdrs
+    }, (response) => {
+      let d = ''; response.on('data', c => d += c); response.on('end', () => resolve(d.trim()));
+    });
+    req.setTimeout(6000, () => { req.destroy(); resolve(''); });
+    req.on('error', () => resolve(''));
+    req.end();
+  });
+
+  if (!crumb || crumb.length < 3 || crumb.startsWith('<') || crumb.startsWith('{')) return null;
+
+  const result = { crumb, cookie };
+  memSet('yf_crumb_v2', result, 1800);
+  if (kvEnabled()) kvSet('yf_crumb_v2', result, 1800).catch(() => {});
+  return result;
+}
+
 const EXCHANGE_CONFIG = {
   bist:   { tvPath: '/turkey/scan',  yahooSuffix: '.IS', currency: 'TRY',
             extraFilters: [
@@ -503,12 +552,37 @@ module.exports = async function(req, res) {
     const altSuffix = activeSuffix === '.SS' ? '.SZ' : activeSuffix === '.SZ' ? '.SS' : null;
     const yhSym = symbol + activeSuffix;
 
-    const fetchChart = (sym) => new Promise((resolve, reject) => {
-      const path = '/v8/finance/chart/' + encodeURIComponent(sym) + '?interval=' + yhInterval + '&range=' + yhRange + '&includePrePost=false';
-      makeRequest('query1.finance.yahoo.com', path, 'GET', { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' }, null, (err, data) => {
-        if (err) reject(err); else resolve(data);
+    const UA_YF = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
+    const fetchChart = async (sym) => {
+      const basePath = '/v8/finance/chart/' + encodeURIComponent(sym) + '?interval=' + yhInterval + '&range=' + yhRange + '&includePrePost=false';
+      const auth = await getYahooCrumb();
+      const chartPath = auth ? basePath + '&crumb=' + encodeURIComponent(auth.crumb) : basePath;
+      const hdrs = { 'User-Agent': UA_YF, 'Accept': 'application/json' };
+      if (auth && auth.cookie) hdrs['Cookie'] = auth.cookie;
+
+      return new Promise((resolve, reject) => {
+        makeRequest('query2.finance.yahoo.com', chartPath, 'GET', hdrs, null, async (err, data, statusCode) => {
+          if (err) return reject(err);
+          // Crumb expired → invalidate and retry once
+          if (statusCode === 401 || statusCode === 403) {
+            memSet('yf_crumb_v2', null, 1);
+            if (kvEnabled()) kvSet('yf_crumb_v2', null, 1).catch(() => {});
+            try {
+              const auth2 = await getYahooCrumb();
+              if (!auth2) return resolve(data);
+              const retryPath = basePath + '&crumb=' + encodeURIComponent(auth2.crumb);
+              const hdrs2 = { 'User-Agent': UA_YF, 'Accept': 'application/json' };
+              if (auth2.cookie) hdrs2['Cookie'] = auth2.cookie;
+              makeRequest('query2.finance.yahoo.com', retryPath, 'GET', hdrs2, null, (e2, d2) => {
+                if (e2) reject(e2); else resolve(d2);
+              });
+            } catch(e2) { resolve(data); }
+            return;
+          }
+          resolve(data);
+        });
       });
-    });
+    };
 
     // Veriyi parse eder, başarısızsa null döner
     function parseCandles(raw) {
