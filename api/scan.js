@@ -540,8 +540,8 @@ module.exports = async function(req, res) {
     const currency = url.searchParams.get('currency') || 'TL';
     const suffix   = url.searchParams.get('suffix') !== null ? url.searchParams.get('suffix') : '.IS';
 
-    const intervalMap = { '240': '1h', 'D': '1d', 'W': '1wk' };
-    const rangeMap    = { '240': '30d', 'D': '6mo', 'W': '2y' };
+    const intervalMap = { '240': '1h', 'D': '1d', 'W': '1wk', 'M': '1mo' };
+    const rangeMap    = { '240': '30d', 'D': '2y', 'W': '5y', 'M': '10y' };
     const yhInterval  = intervalMap[interval] || '1h';
     const yhRange     = rangeMap[interval]    || '30d';
 
