@@ -55,7 +55,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter', sans-serif;}
 /* ── TOPBAR ── */
 .topbar{display:flex;align-items:center;padding:0 16px;padding-left:calc(16px + env(safe-area-inset-left, 0px));padding-right:calc(16px + env(safe-area-inset-right, 0px));height:52px;border-bottom:1px solid var(--border);background:var(--s1);flex-shrink:0;gap:10px;z-index:10;box-shadow:var(--shadow);}
 .tlogo{font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;letter-spacing:-.3px;display:flex;align-items:center;gap:7px;}
-.tlogo-mark{width:24px;height:24px;background:var(--accent);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;}
+.tlogo-mark{width:22px;height:22px;background:var(--accent);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;}
 .tlogo span{color:var(--text2);font-weight:400;font-size:13px;}
 .tlive{font-size:10px;color:var(--green);background:var(--green-bg);border:1px solid rgba(5,150,105,.2);padding:3px 9px;border-radius:var(--r-pill);font-weight:500;display:flex;align-items:center;gap:4px;}
 .tlive::before{content:'';width:5px;height:5px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
@@ -103,7 +103,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter', sans-serif;}
 .filter-group-title{font-size:10px;font-weight:600;color:var(--muted2);letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:4px;}
 .filter-group-title::after{display:none;}
 .chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px;}
-.chip{font-size:10px;font-weight:500;padding:4px 10px;border:1px solid var(--border);cursor:pointer;border-radius:var(--r-pill);background:var(--s1);color:var(--text2);white-space:nowrap;transition:all .12s;display:inline-flex;align-items:center;}
+.chip{font-size:11px;font-weight:500;padding:4px 10px;border:1px solid var(--border);cursor:pointer;border-radius:var(--r-pill);background:var(--s1);color:var(--text2);white-space:nowrap;transition:all .12s;display:inline-flex;align-items:center;}
 .chip:hover{border-color:var(--accent);color:var(--accent);background:var(--hover);}
 .chip.on{border-color:var(--accent);color:#fff;background:var(--accent);font-weight:600;}
 
@@ -249,7 +249,7 @@ td:first-child,td:nth-child(2){text-align:left;}
 .drow{display:flex;justify-content:space-between;margin-bottom:5px;align-items:center;padding:2px 0;}
 .drow:hover{background:rgba(0,0,0,.03);border-radius:4px;}
 .dkey{font-size:11px;color:var(--muted2);font-weight:400;}
-.dkey tag{font-size:10px;color:var(--muted);background:var(--s2);padding:1px 4px;border-radius:var(--r-sm);margin-left:4px;font-weight:500;}
+.dkey tag{font-size:9px;color:var(--muted);background:var(--s2);padding:1px 4px;border-radius:var(--r-sm);margin-left:4px;font-weight:500;}
 .dval{font-size:12px;font-weight:600;}
 
 .chart-section{padding:10px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
@@ -310,7 +310,7 @@ td:first-child,td:nth-child(2){text-align:left;}
 .goat-card-criteria{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;}
 .goat-criterion{font-size:10px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r-sm);padding:2px 7px;color:var(--muted2);}
 .goat-divider{border:none;border-top:1px solid var(--border);margin:20px 0;}
-.goat-fund-tag{display:inline-block;font-size:10px;font-weight:700;padding:1px 5px;border-radius:var(--r-sm);background:rgba(240,180,41,.12);color:#d97706;margin-left:6px;vertical-align:middle;}
+.goat-fund-tag{display:inline-block;font-size:8px;font-weight:700;padding:1px 5px;border-radius:var(--r-sm);background:rgba(240,180,41,.12);color:#d97706;margin-left:6px;vertical-align:middle;}
 .picard{background:var(--s2);border:1px solid var(--border);padding:16px 18px;border-radius:8px;transition:border-color .15s;}
 .picard:hover{border-color:var(--accent);}
 .picard-name{font-size:14px;font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-.2px;}
