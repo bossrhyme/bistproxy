@@ -2579,10 +2579,10 @@ function buildProfile(s) {
   linksEl.innerHTML = [
     '<div class="dpl-action-row">',
       '<button class="dpl-buy" onclick="onHemenAl(\'' + escJS(sym) + '\',\'' + escJS(ex) + '\')" title="Broker\'da işlem aç">',
-        '🛒 Hemen Al',
+        'Hemen Al',
       '</button>',
       '<button class="dpl-analyze" onclick="openDetayliAnaliz(\'' + escJS(symClean) + '\',\'' + escJS(ex) + '\')">',
-        '📊 Detaylı Analiz',
+        'Detaylı Analiz',
       '</button>',
     '</div>'
   ].join('');
