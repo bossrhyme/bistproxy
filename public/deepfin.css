@@ -480,23 +480,50 @@ td:first-child,td:nth-child(2){text-align:left;}
   .exbtn-sub { display: none; }
 
   /* ─────────────────────────────────────────
-     CHIP'LER — yatay kaydırılabilir
+     CHIP'LER — 2 sütun grid
   ───────────────────────────────────────── */
   .chips {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding-bottom: 6px;
-    
-    scrollbar-width: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    overflow: visible;
+    padding-bottom: 0;
   }
-  .chips::-webkit-scrollbar { display: none; }
   .chip, .goat-chip {
-    flex-shrink: 0;
     font-size: 11px;
     padding: 5px 10px;
-    min-height: 32px;
+    min-height: 36px;
+    justify-content: center;
+    text-align: center;
   }
+
+  /* ─────────────────────────────────────────
+     VARLİK LİSTESİ — aç/kapat satırı
+  ───────────────────────────────────────── */
+  .sbp-header-row {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .sbp-header-row .sbp-back {
+    border-bottom: none;
+    flex: 1;
+  }
+  .sbp-filter-toggle {
+    padding: 0 14px;
+    background: none;
+    border: none;
+    border-left: 1px solid var(--border);
+    color: var(--text2);
+    font-size: 13px;
+    cursor: pointer;
+    min-height: 44px;
+    min-width: 44px;
+    transition: color .12s;
+    font-family: inherit;
+  }
+  .sbp-filter-toggle:hover { color: var(--accent); }
 
   /* ─────────────────────────────────────────
      MAIN & CONTENT
