@@ -3756,7 +3756,6 @@ function _doShowHomepage() {
   var dnh = document.getElementById('dnav-home'); if(dnh) dnh.classList.add('active');
   var dnt = document.getElementById('dnav-tarama'); if(dnt) dnt.classList.remove('active');
   clearFilters();
-  document.querySelectorAll('.goat-chip[data-goat="lynch"]').forEach(function(c){ c.classList.add('on'); });
   var _hb = document.getElementById('hamburger-btn'); if(_hb) _hb.style.display = 'none';
   if(window.location.pathname !== '/') history.pushState({page:'home'}, '', '/');
 }
@@ -3899,7 +3898,6 @@ function _doShowScreener() {
   if (!_activeAsset) _updateOnboarding('hisse');
   var _hb2 = document.getElementById('hamburger-btn'); if(_hb2 && window.innerWidth <= 768) _hb2.style.display = 'flex';
   if(window.location.pathname !== '/screener') history.pushState({page:'screener'}, '', '/screener');
-  document.querySelectorAll('#goat-chips .goat-chip[data-goat="lynch"]').forEach(function(c){ if(!c.classList.contains('on')) c.classList.add('on'); });
 }
 
 function selectExchangeAndGo(exKey) {
