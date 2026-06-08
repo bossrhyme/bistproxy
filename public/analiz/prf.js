@@ -1631,7 +1631,7 @@ function _renderFV(el, price, cur, d, v) {
     var vc = c.c ? cmap[c.c]||'var(--text)' : 'var(--text)';
     html.push('<div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;">');
     html.push('<div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;">'+c.l+'</div>');
-    html.push('<div style="font-size:12px;font-weight:700;font-family:\'JetBrains Mono\',monospace;color:'+vc+';">'+c.v+'</div>');
+    html.push('<div style="font-size:12px;font-weight:700;font-family:\'Geist Mono\',monospace;color:'+vc+';">'+c.v+'</div>');
     html.push('</div>');
   });
   html.push('</div>');
@@ -1673,7 +1673,7 @@ function _renderFV(el, price, cur, d, v) {
     html.push('<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--s2);border:1px solid var(--border);border-radius:8px;">');
     html.push('<div><div style="font-size:11px;font-weight:600;color:var(--text);">'+t.icon+' '+t.label+'</div>');
     html.push('<div style="font-size:10px;color:var(--muted2);margin-top:2px;">'+t.desc+'</div></div>');
-    html.push('<div style="text-align:right;"><div style="font-size:13px;font-weight:700;font-family:\'JetBrains Mono\',monospace;color:var(--text);">'+f2(t.price)+'</div>');
+    html.push('<div style="text-align:right;"><div style="font-size:13px;font-weight:700;font-family:\'Geist Mono\',monospace;color:var(--text);">'+f2(t.price)+'</div>');
     html.push('<div style="font-size:10px;font-weight:600;color:'+cc+';">'+p2(chg)+'</div></div></div>');
   });
   html.push('</div></div>');
@@ -1698,7 +1698,7 @@ function _renderFV(el, price, cur, d, v) {
     html.push('<div style="display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);">');
     html.push('<div style="min-width:20px;height:20px;border-radius:50%;background:'+(s.ok?'var(--accent)':'rgba(100,116,139,.3)')+';color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;">'+s.n+'</div>');
     html.push('<div><div style="font-size:11px;font-weight:600;color:var(--text);">'+s.t+'</div>');
-    html.push('<div style="font-size:10px;color:var(--muted2);margin-top:2px;font-family:\'JetBrains Mono\',monospace;">'+s.f+'</div></div></div>');
+    html.push('<div style="font-size:10px;color:var(--muted2);margin-top:2px;font-family:\'Geist Mono\',monospace;">'+s.f+'</div></div></div>');
   });
   html.push('</div></div>');
 

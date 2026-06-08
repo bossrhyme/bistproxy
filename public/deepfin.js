@@ -3363,8 +3363,8 @@ async function fetchInsider(symbol) {
         '<td><div style="font-weight:600;color:var(--text)">' + r.owner + '</div>' +
         '<div style="font-size:8px;color:var(--muted2)">' + r.title + '</div></td>' +
         '<td class="' + tl.cls + '">' + tl.label + '</td>' +
-        '<td style="font-family:\'JetBrains Mono\',monospace">' + sh + '</td>' +
-        '<td style="font-family:\'JetBrains Mono\',monospace;font-weight:600">' + val + '</td>' +
+        '<td style="font-family:\'Geist Mono\',monospace">' + sh + '</td>' +
+        '<td style="font-family:\'Geist Mono\',monospace;font-weight:600">' + val + '</td>' +
         '</tr>';
     });
     const edgarLink = 'https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=' + data.cik + '&type=4&owner=include&count=40';
