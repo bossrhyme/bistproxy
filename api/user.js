@@ -47,6 +47,13 @@ const ALLOWED_ORIGINS = new Set([
   'https://deepfin.vercel.app',
   'https://bistproxy.vercel.app',
 ]);
+// Vercel preview deployments: bistproxy-git-<branch>-<team>.vercel.app
+const VERCEL_PREVIEW_RE = /^https:\/\/bistproxy(-[a-z0-9-]+)?\.vercel\.app$/i;
+function isAllowedOrigin(origin) {
+  if (!origin) return false;
+  if (ALLOWED_ORIGINS.has(origin)) return true;
+  try { return VERCEL_PREVIEW_RE.test(origin); } catch(e) { return false; }
+}
 function checkOrigin(req) {
   const method = req.method;
   if (method === 'OPTIONS') return true;
@@ -56,13 +63,13 @@ function checkOrigin(req) {
   if (method === 'GET' || method === 'HEAD') {
     if (req.headers['x-requested-with'] === 'XMLHttpRequest') return true;
     if (!origin && !referer) return true; // server-to-server
-    if (origin) return ALLOWED_ORIGINS.has(origin);
-    try { return ALLOWED_ORIGINS.has(new URL(referer).origin); } catch(e) { return false; }
+    if (origin) return isAllowedOrigin(origin);
+    try { return isAllowedOrigin(new URL(referer).origin); } catch(e) { return false; }
   }
   // POST/PUT/DELETE: strict origin check
   if (!origin && !referer) return true; // server-to-server (no browser Origin)
-  if (origin) return ALLOWED_ORIGINS.has(origin);
-  try { return ALLOWED_ORIGINS.has(new URL(referer).origin); } catch(e) { return false; }
+  if (origin) return isAllowedOrigin(origin);
+  try { return isAllowedOrigin(new URL(referer).origin); } catch(e) { return false; }
 }
 
 // KV-backed rate limiter. Returns true if request is allowed.
