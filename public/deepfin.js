@@ -2871,33 +2871,67 @@ function updateChart(sym) {
   if (!container) return;
 
   var indTabs = document.getElementById('ind-tabs');
-  if (indTabs) indTabs.style.display = 'none';
-
-  var exMeta = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
-  var tvPrefix = exMeta.tvPrefix;
-  var tvSym = tvPrefix ? tvPrefix + ':' + sym : sym;
+  if (indTabs) indTabs.style.display = '';
 
   var ctabEl = document.querySelector('.ctab.on');
   var interval = ctabEl ? (ctabEl.dataset.interval || 'D') : 'D';
 
-  var cfg = {
-    autosize: true,
-    symbol: tvSym,
-    interval: interval,
-    timezone: 'Europe/Istanbul',
-    theme: 'dark',
-    style: '1',
-    locale: 'tr',
-    enable_publishing: false,
-    hide_top_toolbar: false,
-    hide_legend: false,
-    withdateranges: false,
-    range: '3M',
-    calendar: false,
-    support_host: 'https://www.tradingview.com'
-  };
+  var exMeta = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
+  var suffix = encodeURIComponent(exMeta.yahooSuffix || '');
 
-  container.innerHTML = '<iframe scrolling="no" allowtransparency="true" frameborder="0" src="https://s.tradingview.com/embed-widget/advanced-chart/?locale=tr#' + JSON.stringify(cfg) + '" style="width:100%;height:100%;border:none;display:block;" loading="lazy"></iframe>';
+  var isDark = typeof _isDark === 'function' ? _isDark() : false;
+  var bg      = isDark ? '#0e1828' : '#ffffff';
+  var textClr = isDark ? '#7a8fb0' : '#3a4760';
+  var gridClr = isDark ? '#1a2840' : '#e6ebf0';
+  var grid2   = isDark ? '#2d4060' : '#c8d2dd';
+
+  container.innerHTML = '<div id="uc-loading" style="display:flex;align-items:center;justify-content:center;height:100%;color:'+textClr+';font-size:12px;">Grafik yükleniyor…</div>';
+
+  _loadLightweightCharts(function() {
+    if (!window.LightweightCharts) {
+      container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:'+textClr+';font-size:12px;">Grafik yüklenemedi</div>';
+      return;
+    }
+
+    var url = '/api/scan?action=chart&symbol=' + encodeURIComponent(sym) + '&interval=' + interval + '&currency=TL&suffix=' + suffix;
+    fetch(url)
+      .then(function(r){ return r.json(); })
+      .then(function(data) {
+        if (!data || data.s !== 'ok' || !data.candles || !data.candles.length) {
+          container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:'+textClr+';font-size:12px;">Veri bulunamadı</div>';
+          return;
+        }
+        var seen = {};
+        lwCandles = data.candles
+          .map(function(c){ return {time:c.t, open:c.o, high:c.h, low:c.l, close:c.c, volume:c.v||0}; })
+          .filter(function(c){ return c.open!=null && c.close!=null; })
+          .sort(function(a,b){ return a.time - b.time; })
+          .filter(function(c){ if(seen[c.time]) return false; seen[c.time]=1; return true; });
+
+        container.innerHTML = '';
+        if (lwChart) { try { lwChart.remove(); } catch(e){} lwChart=null; lwSeries=null; lwVolSeries=null; lwIndSeries={}; }
+        lwChart = LightweightCharts.createChart(container, {
+          autoSize: true,
+          layout: { background: {color: bg}, textColor: textClr, fontSize: 11, fontFamily: 'Inter, sans-serif' },
+          grid: { vertLines: {color: gridClr, style: 1}, horzLines: {color: gridClr, style: 1} },
+          crosshair: { mode: LightweightCharts.CrosshairMode.Normal, vertLine: {color: grid2, labelBackgroundColor: textClr}, horzLine: {color: grid2, labelBackgroundColor: textClr} },
+          rightPriceScale: { borderColor: gridClr, textColor: textClr },
+          timeScale: { borderColor: gridClr, textColor: textClr, timeVisible: true, secondsVisible: false },
+          handleScroll: true, handleScale: true,
+        });
+        lwSeries = lwChart.addCandlestickSeries({
+          upColor: '#10b981', downColor: '#f43f5e',
+          borderUpColor: '#10b981', borderDownColor: '#f43f5e',
+          wickUpColor: '#10b981', wickDownColor: '#f43f5e',
+        });
+        lwSeries.setData(lwCandles);
+        lwChart.timeScale().fitContent();
+        applyIndicators();
+      })
+      .catch(function() {
+        container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:'+textClr+';font-size:12px;">Grafik yüklenemedi</div>';
+      });
+  });
 }
 
 // ── Yahoo Finance Doğrulama ──────────────────────────────────────────────
