@@ -16,10 +16,7 @@ function safeUrl(u) { var s = String(u||''); return /^https?:\/\//i.test(s) ? s 
 
 // ── Tema ──────────────────────────────────────────────────────
 function _isDark() {
-  var t = document.documentElement.getAttribute('data-theme');
-  if (t === 'dark') return true;
-  if (t === 'light') return false;
-  return window.matchMedia && window.matchMedia('(prefers-color-scheme:dark)').matches;
+  try { return localStorage.getItem('df_theme') === 'dark'; } catch(e) { return false; }
 }
 function _applyTheme(dark) {
   document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
@@ -35,11 +32,6 @@ function toggleTheme() {
 }
 function _initTheme() {
   _applyTheme(_isDark());
-  if (window.matchMedia) {
-    window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change', function(e) {
-      if (!localStorage.getItem('df_theme')) _applyTheme(e.matches);
-    });
-  }
 }
 
 // Auto-attach X-Requested-With to all /api/ fetches (CSRF protection)
