@@ -73,10 +73,10 @@ var _ONB = {
   null: {
     big: 'DEEPFIN', sub: 'Tarama bizden, karar sizden.',
     steps: [
-      {icon:'📌', label:'Varlık Seç',    desc:'Hisse senedi, yatırım fonu veya kripto para seç'},
-      {icon:'🎛', label:'Filtrele',      desc:'Strateji, kategori veya özel filtreni uygula'},
+      {icon:'🌍', label:'Varlık Seç',    desc:'Hisse senedi, yatırım fonu veya kripto para seç'},
+      {icon:'🐐', label:'Filtrele',      desc:'Strateji, kategori veya özel filtreni uygula'},
       {icon:'▶',  label:'Tara',          desc:'Saniyeler içinde tüm piyasa taranır'},
-      {icon:'🔎', label:'İncele',        desc:'Sonuçlara tıkla — metrikler ve detaylı analiz'}
+      {icon:'🔍', label:'İncele',        desc:'Sonuçlara tıkla — metrikler ve detaylı analiz'}
     ]
   },
   hisse: {
