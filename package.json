@@ -6,6 +6,7 @@
     "node": "24.x"
   },
   "devDependencies": {
-    "jsdom": "^29.0.1"
+    "jsdom": "^29.0.1",
+    "playwright": "^1.60.0"
   }
 }
