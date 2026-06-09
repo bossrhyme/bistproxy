@@ -1206,7 +1206,8 @@ async function runScan(){
   var _activeGoat = document.querySelector('.goat-chip.on');
   _scanMeta.strategy = _activeGoat ? (_activeGoat.dataset.goat && GURUS[_activeGoat.dataset.goat] ? GURUS[_activeGoat.dataset.goat].label.split(' — ')[0].split(' (')[0] : _activeGoat.textContent.trim()) : null;
   _scanMeta.exchange = currentExchange;
-  startScanEta(currentExchange);
+  var _scanMinMs = _psvScanFilterCount >= 3 ? 7000 : _psvScanFilterCount >= 1 ? 5000 : 0;
+  startScanEta(currentExchange, _scanMinMs);
 
   // Field isimleri borsa bazlı farklı — exchange'e göre doğru set
   const isBIST = (currentExchange === 'bist');
@@ -1581,7 +1582,7 @@ async function runScan(){
     const _exm = EXCHANGE_META[currentExchange]||EXCHANGE_META.bist;
 
     updateExchangeBadge();
-    applyAndRender(window._chipSpecial || null);
+    _pendingScanResult = window._chipSpecial || null;
     window._chipSpecial = null;
 
   } catch(err) {
@@ -1589,10 +1590,20 @@ async function runScan(){
     console.error('[scan]', err.message);
     document.getElementById('errmsg').textContent = 'Veri alınamadı — bağlantıyı kontrol edip tekrar deneyin.';
   } finally {
+    var _isSuccess = (_pendingScanResult !== undefined);
+    var _spec      = _pendingScanResult;
+    _pendingScanResult = undefined;
     _scanRunning = false;
     btn.disabled = false;
-    stopScanEta();
     document.getElementById('stopbtn').style.display = 'none';
+    var _remaining = _isSuccess ? Math.max(0, _scanMinMs - (Date.now() - scanStartTime)) : 0;
+    _psvScanFilterCount = 0;
+    if (_remaining > 0) {
+      setTimeout(function() { stopScanEta(); applyAndRender(_spec); }, _remaining);
+    } else {
+      stopScanEta();
+      if (_isSuccess) applyAndRender(_spec);
+    }
   }
 }
 
@@ -2085,6 +2096,7 @@ function psvScan() {
   var el = document.getElementById('prescan-view');
   var delay = el ? 280 : 0;
   if (el) el.classList.add('psv-closing');
+  _psvScanFilterCount = _psvTotalSel();
   setTimeout(function() {
     if (el) {
       el.style.display = 'none';
@@ -4380,6 +4392,8 @@ function updateExchangeBadge() {}
 let scanStartTime = null;
 let scanEtaTimer  = null;
 let _scanMeta     = { strategy: null, exchange: null, total: 0, matches: 0, elapsed: 0 };
+var _psvScanFilterCount = 0;   // filter count captured in psvScan, drives minimum display time
+var _pendingScanResult  = undefined; // undefined = error/unset; null/value = success special
 const EXCHANGE_ETA = { bist:4, nasdaq:6, sp500:6, dax:5, lse:5, nikkei:5, nyse:6, moex:5, france:5, amsterdam:5, brussels:5, lisbon:5, dublin:5, oslo:5, milan:5, tsx:6, twse:5, b3:5, hkex:6, china:6, saudi:5, switzerland:5, australia:5, southafrica:5, sweden:5, india:5, uae:5 };
 
 // Phase thresholds in percent
@@ -4394,8 +4408,10 @@ function _setStepperPhase(activeIdx) {
   });
 }
 
-function startScanEta(exchange) {
-  const total = EXCHANGE_ETA[exchange] || 5;
+function startScanEta(exchange, minMs) {
+  var etaSec = EXCHANGE_ETA[exchange] || 5;
+  var minSec = (minMs || 0) / 1000;
+  var total  = Math.max(etaSec, minSec);
   scanStartTime = Date.now();
   clearInterval(scanEtaTimer);
   _setStepperPhase(0);
@@ -4407,7 +4423,6 @@ function startScanEta(exchange) {
       if (pct >= STEPPER_PHASES[i]) { phase = i; break; }
     }
     _setStepperPhase(phase);
-    if (elapsed >= total * 1.5) clearInterval(scanEtaTimer);
   }, 300);
 }
 
