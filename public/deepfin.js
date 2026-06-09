@@ -1904,15 +1904,31 @@ function _psvGetTags(filters, max) {
   return tags;
 }
 
+function _isoFromFlag(emoji) {
+  try {
+    var cps = [];
+    for (var i = 0; i < emoji.length; ) {
+      var cp = emoji.codePointAt(i); cps.push(cp); i += cp > 0xFFFF ? 2 : 1;
+    }
+    if (cps.length === 2 && cps[0] >= 0x1F1E6 && cps[0] <= 0x1F1FF) {
+      return String.fromCharCode(cps[0]-0x1F1A5).toLowerCase() + String.fromCharCode(cps[1]-0x1F1A5).toLowerCase();
+    }
+  } catch(e) {}
+  return '';
+}
+
 function initPrescanView() {
   var el = document.getElementById('prescan-view');
   if (!el) return;
 
   function mkExBtn(key) {
     var m = EXCHANGE_META[key]; if (!m) return '';
+    var iso = _isoFromFlag(m.flag);
+    var flagHtml = iso
+      ? '<img class="psv-ex-flag-img" src="https://flagcdn.com/w40/'+iso+'.png" alt="'+iso+'" loading="lazy">'
+      : '<span class="psv-ex-flag">'+m.flag+'</span>';
     return '<button class="psv-ex-btn" data-exchange="'+key+'" onclick="psvSetExchange(\''+key+'\')">' +
-      '<span class="psv-ex-flag">'+m.flag+'</span>' +
-      '<span class="psv-ex-name">'+m.name+'</span></button>';
+      flagHtml + '<span class="psv-ex-name">'+m.name+'</span></button>';
   }
 
   function mkGoatCard(key) {
@@ -1922,8 +1938,9 @@ function initPrescanView() {
     var sub  = parts[1] ? '<div class="psv-goat-sub">'+parts[1]+'</div>' : '';
     var tags = _psvGetTags(g.filters||{}, 3);
     var tagsHtml = tags.length ? '<div class="psv-goat-tags">'+tags.map(function(t){return '<span class="psv-goat-tag">'+t+'</span>';}).join('')+'</div>' : '';
+    var descHtml = g.desc ? '<div class="psv-goat-desc">'+esc(g.desc)+'</div>' : '';
     return '<div class="psv-goat-card" data-goat="'+key+'" onclick="psvToggleGoat(\''+key+'\')">' +
-      '<div class="psv-goat-name">'+name+'</div>'+sub+tagsHtml+'</div>';
+      '<div class="psv-goat-name">'+name+'</div>'+sub+tagsHtml+descHtml+'</div>';
   }
 
   function mkFilterCard(key, p, cls, toggleFn) {
