@@ -2125,6 +2125,7 @@ function psvScan() {
       el.style.opacity = '';
       el.style.transition = '';
     }
+    collapseSidebar();
     document.querySelectorAll('#goat-chips .goat-chip, #adv-goat-chips .goat-chip').forEach(function(c){
       c.classList.toggle('on', _psvActiveGoats.has(c.dataset.goat));
     });
