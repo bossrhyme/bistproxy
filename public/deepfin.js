@@ -1712,11 +1712,6 @@ const GURUS = {
     desc: 'Einhorn için piyasanın görmezden geldiği şirket en büyük fırsattır. Kazancına göre gerçekten ucuz, serbest nakit akışı güçlü, borcu az ve kârlı şirketlere yatırım yapar. Katalizör beklentisi (yeniden yapılanma, açıklama olayı) asıl tetikleyicidir.',
     filters: {pe_max:15, de_max:50, cr_min:1.5, margin_min:8, roe_min:10}
   },
-  marks: {
-    label: 'Howard Marks — Risk Yönetimi',
-    desc: 'Howard Marks\'ın felsefesinden ilham alınan defansif değer ekranı. Marks hisse screener\'ı yayınlamamıştır; odağı ikinci seviye düşünce, risk kontrolü ve piyasa döngüleridir. Bu filtreler onun risk yönetimi ilkelerini (düşük değerleme, güçlü bilanço) yansıtmaktadır.',
-    filters: {pe_max:18, pb_max:2, de_max:80, cr_min:1.2, margin_min:8}
-  },
   fisher: {
     label: 'Philip Fisher — Scuttlebutt',
     desc: 'Fisher\'ın yaklaşımı temelde niteseldir (15 maddelik scuttlebutt analizi). Bu filtreler, onun büyüyen ve kârlı şirket anlayışının nicel proxyleridir: satışları ve karları istikrarlı büyüyen, hem brüt hem net kar marjı güçlü şirketler. Gerçek metodoloji yönetim kalitesi ve Ar-Ge yetkinliğini ölçmeyi gerektirir.',
@@ -1784,27 +1779,6 @@ const GURUS = {
     desc: 'Soros döviz, tahvil ve emtia üzerine işlem yapan bir makro traderdir — bireysel hisse seçmez. Reflexivity teorisi: güçlü fiyat hareketi beklentileri değiştirir, değişen beklentiler hareketi güçlendirir. Bu filtreler teorinin hisse yorumudur: hem 3 hem 6 aylık güçlü momentum + 26 indikatörlü teknik onay. Temel finansal filtreler bu stratejiye ait değildir.',
     filters: {perf3m_min:10, perf6m_min:20, tech_rating_min:0.3}
   },
-  dalio: {
-    label: 'Ray Dalio — All Weather',
-    desc: 'Dalio\'nun All Weather stratejisi varlık sınıfı tahsisidir (%30 hisse, %40 uzun tahvil, %15 orta tahvil, %7.5 altın, %7.5 emtia). Bu filtreler, onun "her koşulda ayakta kal" felsefesinden ilham alınan defansif hisse ekranıdır: düzenli temettü, düşük borç, güçlü kâr marjı, likit bilanço.',
-    filters: {div_min:2, de_max:60, cr_min:1.3, margin_min:8, roe_min:10, pe_max:25}
-  },
-  citadel: {
-    label: 'Citadel — Wellington',
-    desc: 'Citadel için kurumsal kalite standartları geçerlidir. Özkaynak getirisi ve net kar marjı yüksek, borcu makul, nakit yeterli ve karları büyüyen şirketlere yatırım yapar.',
-    filters: {roe_min:15, margin_min:12, de_max:70, cr_min:1.2, earng_min:10}
-  },
-  deshaw: {
-    label: 'D.E. Shaw — Oculus',
-    desc: 'D.E. Shaw için algoritma üç şeyi aynı anda ister: hızlı büyüme, güçlü karlılık ve fiyat momentumu. Karları ve satışları birlikte hızla büyüyen, özkaynak getirisi ve net kar marjı yüksek şirketlere yatırım yapar.',
-    filters: {earng_min:20, roe_min:18, margin_min:15, revg_min:15, cr_min:1}
-  },
-  millennium: {
-    label: 'Millennium Management',
-    desc: 'Millennium için önce risk, sonra getiri gelir. 1989\'dan bu yana hiç zarar etmeden gelen fonun önceliği buydu. Net kar marjı güçlü, borcu az, büyümesi istikrarlı şirketlere yatırım yapar.',
-    filters: {roe_min:12, margin_min:10, de_max:60, cr_min:1.5, earng_min:8}
-  }
-
 };
 
 function tblScroll(px){
