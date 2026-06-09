@@ -1779,6 +1779,57 @@ const GURUS = {
     desc: 'Soros döviz, tahvil ve emtia üzerine işlem yapan bir makro traderdir — bireysel hisse seçmez. Reflexivity teorisi: güçlü fiyat hareketi beklentileri değiştirir, değişen beklentiler hareketi güçlendirir. Bu filtreler teorinin hisse yorumudur: hem 3 hem 6 aylık güçlü momentum + 26 indikatörlü teknik onay. Temel finansal filtreler bu stratejiye ait değildir.',
     filters: {perf3m_min:10, perf6m_min:20, tech_rating_min:0.3}
   },
+
+  // ── Araştırma doğrulamalı eklenen stratejiler ──────────────────
+
+  neff: {
+    label: 'John Neff — Windsor Fund',
+    desc: 'Neff, 30+ yılda S&P 500\'ü yıllık +3% geçti. Metodoloji "John Neff on Investing" (1999) ve AAII belgelerinden: P/E piyasanın %40-60\'ı, kazanç ve satış büyümesi %7-20 aralığında — %20 üstü çok riskli. Temettü dahil toplam getiri / F/K oranı (temettü ayarlı PEG) piyasa medyanının yarısı altında olmalı. Pozitif serbest nakit akışı ve sektör medyanı üstü faaliyet marjı zorunlu.',
+    filters: {pe_max:12, earng_min:7, revg_min:7, div_min:2, margin_min:8}
+  },
+
+  zweig: {
+    label: 'Martin Zweig — Winning on Wall Street',
+    desc: '"Winning on Wall Street" (1986) kaynaklı GARP hibrit: yıllık EPS büyümesi %20+ (en az 4 yıl tutarlı). P/E piyasa ortalamasının 3 katını ve mutlak 43 sınırını geçemez — büyüme için fazla ödeme edilmez. Satış büyümesi EPS büyümesini desteklemeli: maliyet kısıntısıyla yapay kazanç büyümesi elenir. Borç oranı sektör ortalamasının altında. Zweig GARP yatırım tarzının öncülerinden biri.',
+    filters: {earng_min:20, revg_min:15, pe_max:30, de_max:50}
+  },
+
+  dreman: {
+    label: 'David Dreman — Contrarian',
+    desc: '"Contrarian Investment Strategies" (1998, 2012) kaynaklı: piyasanın en gözden düşmüş %20\'lik dilimine giren hisseler — P/E, P/CF, P/B veya P/D\'de en az ikisinde alt %20. Dreman bu dilimin yıllık +6-7% fazla getiri sağladığını istatistiksel olarak kanıtladı. 1500 büyük şirket evreni, EPS büyümesi S&P 500 üzerinde: ucuz ama batan değil, gözden düşmüş ama kârlı hisse.',
+    filters: {pe_max:12, pb_max:1.5, earng_min:5}
+  },
+
+  kfisher: {
+    label: 'Kenneth Fisher — PSR',
+    desc: '"Super Stocks" (1984) kaynaklı: F/S (Fiyat/Satış) oranı P/E\'nin göremediği değeri yakalar — satışlar kazançtan çok daha istikrarlıdır. Normal hisseler için F/S ≤ 0.75 en iyi, ≤ 1.5 iyi; F/S > 3 asla alınmaz (tek sabit kural). 3 yıllık ortalama net marj ≥ %5, D/Ö ≤ %40, uzun vadeli EPS büyümesi ≥ %15. Teknoloji ve medikal için F/Ar-Ge < 10 ek filtredir.',
+    filters: {ps_max:1.5, margin_min:5, de_max:40, earng_min:15}
+  },
+
+  tsmith: {
+    label: 'Terry Smith — Fundsmith',
+    desc: '"İyi şirket al, fazla ödeme yapma, hiçbir şey yapma" — Fundsmith yıllık mektuplarından: Sermaye Getirisi (ROCE) > %15, gerçek portföyde %32\'ye ulaşıyor. Brüt marj > %40, nakit dönüşüm ≥ %95, faiz karşılama > 10×, FCF büyümesi > %5. Net marj ≥ %15 kaliteli iş modeli göstergesi. Banka, emtia, kamu hizmetleri, telekomdan kaçınır. "İngiltere\'nin Buffett\'ı."',
+    filters: {roe_min:15, gross_min:40, margin_min:15, de_max:50}
+  },
+
+  graham_ncav: {
+    label: 'Graham — Net-Net (NCAV)',
+    desc: '"Security Analysis" (1934)\'dan en saf değer ekranı: NCAV = Dönen Varlıklar − Toplam Borç. Hisse fiyatı NCAV\'ın %66.7\'sinden düşük olmalı — duran varlıklara sıfır değer verilse bile ucuz. F/DD < 0.67 bu koşulun yaklaşımıdır. Cari oran ≥ 2 ve son dönemde net zarar yok zorunlu. Graham 30+ hisselik portföy önerdi. 1970-1983 arası bu strateji yıllık %29.4 ortalama getiri sağladı.',
+    filters: {pb_max:0.67, cr_min:2, de_max:80, margin_min:1}
+  },
+
+  carlisle: {
+    label: "Tobias Carlisle — Acquirer's Multiple",
+    desc: '"The Acquirer\'s Multiple" (2017) kaynaklı: EV / Faaliyet Karı oranının en düşük %10\'luk dilimine giren hisseler. Backtestlerde Greenblatt\'ın Magic Formula\'sını geride bıraktı. Kalite kriteri yoktur — saf ucuzluk prensibi: piyasa tarafından en çok gözardı edilen şirketleri bulur. Not: EV/EBIT bu sistemde hesaplanamadığından düşük F/K ucuzluk proxy\'i olarak kullanılmaktadır.',
+    filters: {pe_max:10, cr_min:1}
+  },
+
+  templeton: {
+    label: 'John Templeton — Global Value',
+    desc: 'Graham\'ı küresel ölçeğe taşıyan Templeton dünyanın en karamsar dönemlerinde ve en ucuz bölgelerinde alım yaptı. AAII Templeton Screen ve "Investing the Templeton Way" kitabından: P/E son 5 yılın ortalamasının altında, 5 yıllık P/E\'lerin hiçbiri 75\'i geçmemeli. EPS büyümesi hem 1 yıl hem 5 yıl pozitif. PEG "en sık kullandığı değerleme ölçütü" olarak belirtilmiştir.',
+    filters: {pe_max:15, pb_max:1.5, earng_min:5}
+  },
+
 };
 
 function tblScroll(px){
