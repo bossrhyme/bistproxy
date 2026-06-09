@@ -1590,19 +1590,27 @@ async function runScan(){
     console.error('[scan]', err.message);
     document.getElementById('errmsg').textContent = 'Veri alınamadı — bağlantıyı kontrol edip tekrar deneyin.';
   } finally {
-    var _isSuccess = (_pendingScanResult !== undefined);
-    var _spec      = _pendingScanResult;
+    var _isSuccess   = (_pendingScanResult !== undefined);
+    var _spec        = _pendingScanResult;
+    var _fromPrescan = _psvScanFilterCount > 0;
     _pendingScanResult = undefined;
+    _psvScanFilterCount = 0;
     _scanRunning = false;
     btn.disabled = false;
     document.getElementById('stopbtn').style.display = 'none';
     var _remaining = _isSuccess ? Math.max(0, _scanMinMs - (Date.now() - scanStartTime)) : 0;
-    _psvScanFilterCount = 0;
     if (_remaining > 0) {
-      setTimeout(function() { stopScanEta(); applyAndRender(_spec); }, _remaining);
+      setTimeout(function() {
+        stopScanEta();
+        applyAndRender(_spec);
+        if (_fromPrescan) collapseSidebar();
+      }, _remaining);
     } else {
       stopScanEta();
-      if (_isSuccess) applyAndRender(_spec);
+      if (_isSuccess) {
+        applyAndRender(_spec);
+        if (_fromPrescan) collapseSidebar();
+      }
     }
   }
 }
@@ -4786,4 +4794,15 @@ function initSidebarState() {
   if (sb)         sb.classList.remove('collapsed');
   if (reopen)     reopen.style.display = 'none';
   if (tickerWrap) tickerWrap.classList.remove('sb-open');
+}
+function collapseSidebar() {
+  if (window.innerWidth <= 768) return;
+  var sb = document.getElementById('sidebar');
+  var reopen = document.getElementById('sb-reopen');
+  var tickerWrap = document.getElementById('ticker-wrap');
+  if (!sb || sb.classList.contains('collapsed')) return;
+  sb.classList.add('collapsed');
+  if (reopen) reopen.style.display = 'flex';
+  if (tickerWrap) tickerWrap.classList.add('sb-open');
+  try { localStorage.setItem('df_sb_collapsed', '1'); } catch(e) {}
 }
