@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <script>(function(){try{var t=localStorage.getItem('df_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
-<link rel="stylesheet" href="/analiz/prf.css?v=arctic71">
+<link rel="stylesheet" href="/analiz/prf.css?v=arctic72">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap"></noscript>
 
@@ -78,7 +78,7 @@ window.addEventListener('DOMContentLoaded', function(){
 
   <div class="topbar">
     <a href="/" class="tlogo" style="cursor:pointer;text-decoration:none;color:inherit;" onclick="event.preventDefault(); goHome()"><div class="tlogo-mark">D</div>DeepFin</a>
-
+    <span id="prf-live-dot" style="display:none;font-size:10px;color:var(--green);align-items:center;gap:4px;"><span style="display:inline-block;width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s ease infinite;"></span>Canlı</span>
     <a href="/" class="hp-nav-btn" onclick="event.preventDefault(); goHome()">Anasayfa</a>
     <a href="/" class="hp-nav-btn" onclick="event.preventDefault(); goScreener()">Tarayıcı</a>
     <a href="/analiz/" class="hp-nav-btn active" onclick="event.preventDefault(); goAnaliz()">Analiz</a>
@@ -103,10 +103,7 @@ window.addEventListener('DOMContentLoaded', function(){
         <span style="color:var(--muted)">/</span>
         <span class="prf-sym" id="prf-bc-sym">—</span>
       </div>
-      <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
-        <span id="prf-live-dot" style="display:none;font-size:10px;color:var(--green);"><span style="display:inline-block;width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s ease infinite;margin-right:4px;"></span>Canlı</span>
-
-      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px;"></div>
     </div>
 
     <div class="prf-layout">
