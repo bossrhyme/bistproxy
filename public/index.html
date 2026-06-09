@@ -130,7 +130,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
 <link rel="stylesheet" href="/deepfin.css?v=arctic70">
-<script src="/deepfin.js?v=97" defer></script>
+<script src="/deepfin.js?v=98" defer></script>
 <link rel="dns-prefetch" href="https://api.coingecko.com">
 <link rel="dns-prefetch" href="https://finnhub.io">
 <link rel="dns-prefetch" href="https://www.tefas.gov.tr">
@@ -1296,6 +1296,7 @@ if('serviceWorker' in navigator){
 
       <!-- STATS BAR -->
       <div class="stats-bar" id="stats-bar">
+        <button id="new-scan-btn" class="new-scan-btn" onclick="openPrescanView()" title="Yeni tarama başlat">🔍 Yeni Tarama</button>
         <button id="mobile-filter-btn" class="mobile-filter-btn" onclick="toggleMobileDrawer()" title="Filtreleri aç">☰ Filtreler</button>
         <button id="fav-filter-btn" class="sb-fav-btn" onclick="toggleFavFilter()" title="Listelerim">☆ Listelerim</button>
         <button class="col-btn" onclick="openColPicker()" title="Kolonları özelleştir">⚙ Kolonlar</button>
@@ -1385,6 +1386,9 @@ if('serviceWorker' in navigator){
         </table>
       </div>
     </div>
+
+    <!-- PRESCAN FULL-SCREEN VIEW -->
+    <div id="prescan-view" style="display:none"></div>
 
     <!-- DETAIL PANEL -->
     <div class="detail" id="detail">

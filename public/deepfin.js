@@ -1878,6 +1878,213 @@ function upgradeGoatChips() {
   });
 }
 
+// ── PRESCAN FULL-SCREEN VIEW ──
+
+var _psvActiveGoats   = new Set();
+var _psvActivePresets = new Set();
+var _psvActiveTech    = new Set();
+
+var PSV_MAIN_EX    = ['bist','nasdaq','nyse','sp500','dax','lse'];
+var PSV_MAIN_GOATS = ['buffett','graham','lynch','fisher','munger'];
+
+var _PSV_FMTS = [
+  ['pe_max',          function(v){ return 'F/K<'+v; }],
+  ['pb_max',          function(v){ return 'F/DD<'+v; }],
+  ['ps_max',          function(v){ return 'F/S<'+v; }],
+  ['pe_min',          function(v){ return 'F/K>'+v; }],
+  ['roe_min',         function(v){ return 'ROE>'+v+'%'; }],
+  ['gross_min',       function(v){ return 'Brüt>'+v+'%'; }],
+  ['margin_min',      function(v){ return 'Marj>'+v+'%'; }],
+  ['earng_min',       function(v){ return 'K↑'+v+'%'; }],
+  ['revg_min',        function(v){ return 'Gel↑'+v+'%'; }],
+  ['de_max',          function(v){ return 'Borç<'+v; }],
+  ['cr_min',          function(v){ return 'Cari>'+v; }],
+  ['div_min',         function(v){ return 'Temettü>'+v+'%'; }],
+  ['tech_rating_min', function(){  return 'Teknik'; }],
+  ['perf3m_min',      function(v){ return '3A>'+v+'%'; }],
+  ['perf6m_min',      function(v){ return '6A>'+v+'%'; }],
+  ['chg_min',         function(v){ return 'Günlük>'+v+'%'; }],
+  ['vol_min',         function(v){ return 'Hacim>'+v+'×'; }],
+  ['rsi_max',         function(v){ return 'RSI<'+v; }],
+  ['rsi_min',         function(v){ return 'RSI>'+v; }],
+  ['from_high_max',   function(v){ return 'Zirve<'+Math.abs(v)+'%'; }],
+  ['from_low_min',    function(v){ return 'Dip>'+v+'%'; }],
+];
+
+function _psvGetTags(filters, max) {
+  var tags = [];
+  for (var i = 0; i < _PSV_FMTS.length && tags.length < max; i++) {
+    var k = _PSV_FMTS[i][0];
+    if (filters[k] !== undefined) tags.push(_PSV_FMTS[i][1](filters[k]));
+  }
+  return tags;
+}
+
+function initPrescanView() {
+  var el = document.getElementById('prescan-view');
+  if (!el) return;
+
+  function mkExBtn(key) {
+    var m = EXCHANGE_META[key]; if (!m) return '';
+    return '<button class="psv-ex-btn" data-exchange="'+key+'" onclick="psvSetExchange(\''+key+'\')">' +
+      '<span class="psv-ex-flag">'+m.flag+'</span>' +
+      '<span class="psv-ex-name">'+m.name+'</span></button>';
+  }
+
+  function mkGoatCard(key) {
+    var g = GURUS[key]; if (!g) return '';
+    var parts = g.label.split(' — ');
+    var name = parts[0].split(' (')[0];
+    var sub  = parts[1] ? '<div class="psv-goat-sub">'+parts[1]+'</div>' : '';
+    var tags = _psvGetTags(g.filters||{}, 3);
+    var tagsHtml = tags.length ? '<div class="psv-goat-tags">'+tags.map(function(t){return '<span class="psv-goat-tag">'+t+'</span>';}).join('')+'</div>' : '';
+    return '<div class="psv-goat-card" data-goat="'+key+'" onclick="psvToggleGoat(\''+key+'\')">' +
+      '<div class="psv-goat-name">'+name+'</div>'+sub+tagsHtml+'</div>';
+  }
+
+  function mkFilterCard(key, p, cls, toggleFn) {
+    if (!p) return '';
+    var tags = _psvGetTags(p.filters||{}, 3);
+    var tagsHtml = tags.length ? '<div class="psv-preset-tags-row">'+tags.map(function(t){return '<span class="psv-preset-tag-sm">'+t+'</span>';}).join('')+'</div>' : '';
+    return '<div class="'+cls+'" data-key="'+key+'" onclick="'+toggleFn+'(\''+key+'\')">' +
+      '<div class="psv-preset-name">'+p.label+'</div>'+tagsHtml+
+      '<div class="psv-preset-desc">'+p.desc+'</div></div>';
+  }
+
+  var allExKeys = Object.keys(EXCHANGE_META).filter(function(k){ return PSV_MAIN_EX.indexOf(k)===-1; });
+  var extraGoatKeys = Object.keys(GURUS).filter(function(k){ return PSV_MAIN_GOATS.indexOf(k)===-1; });
+
+  el.innerHTML =
+    '<div class="psv-inner">'+
+    '<div class="psv-brand"><div class="psv-logo"><div class="tlogo-mark">D</div>DeepFin</div><div class="psv-tagline">Borsa seç · Strateji seç · Tara</div></div>'+
+
+    // Exchange section
+    '<div class="psv-section">'+
+    '<div class="psv-section-hd">🌍 Borsa</div>'+
+    '<div class="psv-ex-grid" id="psv-ex-grid">'+PSV_MAIN_EX.map(mkExBtn).join('')+'</div>'+
+    '<div class="psv-ex-extra" id="psv-ex-extra" style="display:none">'+allExKeys.map(mkExBtn).join('')+'</div>'+
+    '<button class="psv-show-more" id="psv-ex-more" onclick="psvToggleMoreEx()">+ Diğer Borsalar</button>'+
+    '</div>'+
+
+    // GOAT section
+    '<div class="psv-section">'+
+    '<div class="psv-section-hd">🐐 Yatırımcı Stratejisi <span class="psv-opt">isteğe bağlı</span></div>'+
+    '<div class="psv-goat-grid" id="psv-goat-main">'+PSV_MAIN_GOATS.map(mkGoatCard).join('')+'</div>'+
+    '<div class="psv-goat-extra" id="psv-goat-extra" style="display:none">'+extraGoatKeys.map(mkGoatCard).join('')+'</div>'+
+    '<button class="psv-show-more" id="psv-goat-more" onclick="psvToggleMoreGoats()">+ Tüm Stratejiler</button>'+
+    '</div>'+
+
+    // Fundamental + Technical two-col
+    '<div class="psv-two-col">'+
+    '<div class="psv-section">'+
+    '<div class="psv-section-hd">📊 Temel <span class="psv-opt">isteğe bağlı</span></div>'+
+    '<div id="psv-preset-grid">'+Object.keys(PRESETS).map(function(k){ return mkFilterCard(k, PRESETS[k], 'psv-preset-card', 'psvTogglePreset'); }).join('')+'</div>'+
+    '</div>'+
+    '<div class="psv-section">'+
+    '<div class="psv-section-hd">📈 Teknik <span class="psv-opt">isteğe bağlı</span></div>'+
+    '<div id="psv-tech-grid">'+Object.keys(TECH_PRESETS).map(function(k){ return mkFilterCard(k, TECH_PRESETS[k], 'psv-tech-card', 'psvToggleTech'); }).join('')+'</div>'+
+    '</div>'+
+    '</div>'+
+
+    // Scan button
+    '<div class="psv-scan-wrap"><button class="psv-scan-btn" id="psv-scan-btn" onclick="psvScan()">▶ Hisse Tara</button></div>'+
+
+    '</div>';
+
+  psvSetExchange(currentExchange);
+}
+
+function psvSetExchange(key) {
+  currentExchange = key;
+  document.querySelectorAll('.exbtn').forEach(function(b){ b.classList.toggle('on', b.dataset.exchange === key); });
+  document.querySelectorAll('.psv-ex-btn').forEach(function(b){ b.classList.toggle('on', b.dataset.exchange === key); });
+  var meta = EXCHANGE_META[key];
+  if (meta) {
+    var tlTab = document.querySelector('.ctab-cur[data-currency="TL"]');
+    var usdTab = document.querySelector('.ctab-cur[data-currency="USD"]');
+    if (meta.currencyCode !== 'TRY') {
+      if (tlTab) tlTab.style.display = 'none';
+      if (usdTab) { usdTab.classList.add('on'); if (tlTab) tlTab.classList.remove('on'); }
+    } else {
+      if (tlTab) tlTab.style.display = '';
+    }
+  }
+}
+
+function psvToggleGoat(key) {
+  _psvActiveGoats.has(key) ? _psvActiveGoats.delete(key) : _psvActiveGoats.add(key);
+  document.querySelectorAll('.psv-goat-card[data-goat="'+key+'"]').forEach(function(c){ c.classList.toggle('on', _psvActiveGoats.has(key)); });
+}
+
+function psvTogglePreset(key) {
+  _psvActivePresets.has(key) ? _psvActivePresets.delete(key) : _psvActivePresets.add(key);
+  document.querySelectorAll('.psv-preset-card[data-key="'+key+'"]').forEach(function(c){ c.classList.toggle('on', _psvActivePresets.has(key)); });
+}
+
+function psvToggleTech(key) {
+  _psvActiveTech.has(key) ? _psvActiveTech.delete(key) : _psvActiveTech.add(key);
+  document.querySelectorAll('.psv-tech-card[data-key="'+key+'"]').forEach(function(c){ c.classList.toggle('on', _psvActiveTech.has(key)); });
+}
+
+function psvToggleMoreGoats() {
+  var extra = document.getElementById('psv-goat-extra');
+  var btn   = document.getElementById('psv-goat-more');
+  if (!extra) return;
+  var open = extra.style.display !== 'none';
+  extra.style.display = open ? 'none' : 'flex';
+  if (btn) btn.textContent = open ? '+ Tüm Stratejiler' : '— Daha Az';
+}
+
+function psvToggleMoreEx() {
+  var extra = document.getElementById('psv-ex-extra');
+  var btn   = document.getElementById('psv-ex-more');
+  if (!extra) return;
+  var open = extra.style.display !== 'none';
+  extra.style.display = open ? 'none' : 'flex';
+  if (btn) btn.textContent = open ? '+ Diğer Borsalar' : '— Daha Az';
+}
+
+function openPrescanView() {
+  _psvActiveGoats   = new Set();
+  _psvActivePresets = new Set();
+  _psvActiveTech    = new Set();
+  initPrescanView();
+  var el = document.getElementById('prescan-view');
+  if (!el) return;
+  el.style.display = 'flex';
+  el.style.opacity = '0';
+  el.style.transition = 'none';
+  el.offsetHeight;
+  el.style.transition = 'opacity .2s ease';
+  el.style.opacity = '1';
+}
+
+function psvScan() {
+  var el = document.getElementById('prescan-view');
+  if (el) {
+    el.classList.add('psv-closing');
+    setTimeout(function() {
+      el.style.display = 'none';
+      el.classList.remove('psv-closing');
+      el.style.opacity = '';
+      el.style.transition = '';
+    }, 280);
+  }
+
+  // Sync prescan selections to sidebar chip state, then _applyChips calls runScan
+  document.querySelectorAll('#goat-chips .goat-chip, #adv-goat-chips .goat-chip').forEach(function(c){
+    c.classList.toggle('on', _psvActiveGoats.has(c.dataset.goat));
+  });
+  document.querySelectorAll('#presets .chip').forEach(function(c){
+    c.classList.toggle('on', _psvActivePresets.has(c.dataset.preset));
+  });
+  document.querySelectorAll('#tech-presets .chip').forEach(function(c){
+    c.classList.toggle('on', _psvActiveTech.has(c.dataset.tech));
+  });
+
+  _applyChips(BASIC_CHIP_CFG);
+}
+
 // ── UNİFİED CHİP SİSTEMİ — her panel bağımsız çalışır ──
 
 var BASIC_CHIP_CFG = {
@@ -3137,6 +3344,8 @@ function showState(id){
   });
   const smEl = document.getElementById('scan-summary');
   if (smEl) smEl.style.display = id === 'twrap' ? 'flex' : 'none';
+  const nsbEl = document.getElementById('new-scan-btn');
+  if (nsbEl) nsbEl.style.display = id === 'twrap' ? 'inline-flex' : 'none';
 }
 
 function abortScan(){
@@ -4479,7 +4688,7 @@ document.addEventListener('DOMContentLoaded', function(){
   var _investor = _sp.get('investor');
   if (_p === 'profile' || _p === 'screener' || _p === 'analiz' || _path === '/screener' || _hasWl) {
     showScreener();
-    if (!_investor && allData.length === 0 && !_hasWl) runScan();
+    if (!_investor && allData.length === 0 && !_hasWl) openPrescanView();
   } else {
     showHomepage();
   }
