@@ -1202,6 +1202,10 @@ async function runScan(){
   document.getElementById('loadtxt').textContent = 'Taranıyor...';
   const exMeta = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
   document.getElementById('loadsub').textContent = `${exMeta.flag} ${exMeta.name} hisseleri alınıyor...`;
+  // Track active strategy for summary card
+  var _activeGoat = document.querySelector('.goat-chip.on');
+  _scanMeta.strategy = _activeGoat ? (_activeGoat.dataset.goat && GURUS[_activeGoat.dataset.goat] ? GURUS[_activeGoat.dataset.goat].label.split(' — ')[0].split(' (')[0] : _activeGoat.textContent.trim()) : null;
+  _scanMeta.exchange = currentExchange;
   startScanEta(currentExchange);
 
   // Field isimleri borsa bazlı farklı — exchange'e göre doğru set
@@ -1837,6 +1841,43 @@ function tblScroll(px){
   if(w) w.scrollBy({left:px, behavior:'smooth'});
 }
 
+// ── GOAT CHIP MINI-CARD UPGRADE ──
+function upgradeGoatChips() {
+  var FMTS = [
+    ['pe_max',          function(v){ return 'F/K<'+v; }],
+    ['pb_max',          function(v){ return 'F/DD<'+v; }],
+    ['ps_max',          function(v){ return 'F/S<'+v; }],
+    ['pe_min',          function(v){ return 'F/K>'+v; }],
+    ['roe_min',         function(v){ return 'ROE>'+v+'%'; }],
+    ['gross_min',       function(v){ return 'Brüt>'+v+'%'; }],
+    ['margin_min',      function(v){ return 'Marj>'+v+'%'; }],
+    ['earng_min',       function(v){ return 'K↑'+v+'%'; }],
+    ['revg_min',        function(v){ return 'Gel↑'+v+'%'; }],
+    ['de_max',          function(v){ return 'Borç<'+v; }],
+    ['cr_min',          function(v){ return 'Cari>'+v; }],
+    ['div_min',         function(v){ return 'Temettü>'+v+'%'; }],
+    ['tech_rating_min', function(){ return 'Teknik'; }],
+    ['perf3m_min',      function(v){ return '3A>'+v+'%'; }],
+    ['perf6m_min',      function(v){ return '6A>'+v+'%'; }],
+  ];
+  document.querySelectorAll('.goat-chip').forEach(function(chip) {
+    var key = chip.dataset.goat;
+    var guru = GURUS[key];
+    if (!guru) return;
+    var name = chip.textContent.trim();
+    var filters = guru.filters || {};
+    var tags = [];
+    for (var i = 0; i < FMTS.length && tags.length < 3; i++) {
+      var fkey = FMTS[i][0];
+      var fn   = FMTS[i][1];
+      if (filters[fkey] !== undefined) tags.push(fn(filters[fkey]));
+    }
+    chip.classList.add('goat-card-chip');
+    chip.innerHTML = '<span class="gcchip-name">' + name + '</span>' +
+      (tags.length ? '<span class="gcchip-tags">' + tags.map(function(t){ return '<span class="gcchip-tag">'+t+'</span>'; }).join('') + '</span>' : '');
+  });
+}
+
 // ── UNİFİED CHİP SİSTEMİ — her panel bağımsız çalışır ──
 
 var BASIC_CHIP_CFG = {
@@ -2276,6 +2317,7 @@ function applyAndRender(special){
   if (zeroEl) zeroEl.style.display = 'none';
 
   showState('twrap');
+  showScanSummary(allData.length, filtered.length);
   // Virtual scroll render — liste filtresi aktifse uygula
   var _base = filtered;
   if (_dfUser && _dfListFilter) {
@@ -3093,6 +3135,8 @@ function showState(id){
     const el = document.getElementById(s);
     el.style.display = s===id ? (s==='twrap'?'block':'flex') : 'none';
   });
+  const smEl = document.getElementById('scan-summary');
+  if (smEl) smEl.style.display = id === 'twrap' ? 'flex' : 'none';
 }
 
 function abortScan(){
@@ -4103,39 +4147,60 @@ let disclaimerAccepted = false;
 
 
 function updateExchangeBadge() {}
-// ── TARAMA SÜRESİ TAHMİNİ ──
+// ── TARAMA SÜRESİ / PHASE STEPPER ──
 let scanStartTime = null;
 let scanEtaTimer  = null;
-const EXCHANGE_ETA = { bist:4, nasdaq:6, sp500:6, dax:5, lse:5, nikkei:5, nyse:6, moex:5, france:5, amsterdam:5, brussels:5, lisbon:5, dublin:5, oslo:5, milan:5, tsx:6, twse:5, b3:5, hkex:6, china:6, saudi:5, switzerland:5, australia:5, southafrica:5, sweden:5, india:5, uae:5 }; // saniye
+let _scanMeta     = { strategy: null, exchange: null, total: 0, matches: 0, elapsed: 0 };
+const EXCHANGE_ETA = { bist:4, nasdaq:6, sp500:6, dax:5, lse:5, nikkei:5, nyse:6, moex:5, france:5, amsterdam:5, brussels:5, lisbon:5, dublin:5, oslo:5, milan:5, tsx:6, twse:5, b3:5, hkex:6, china:6, saudi:5, switzerland:5, australia:5, southafrica:5, sweden:5, india:5, uae:5 };
+
+// Phase thresholds in percent
+const STEPPER_PHASES = [0, 8, 65, 80, 92];
+
+function _setStepperPhase(activeIdx) {
+  var items = document.querySelectorAll('#scan-stepper .sstep-item');
+  items.forEach(function(item, i) {
+    item.classList.remove('active', 'done');
+    if (i < activeIdx) item.classList.add('done');
+    else if (i === activeIdx) item.classList.add('active');
+  });
+}
 
 function startScanEta(exchange) {
   const total = EXCHANGE_ETA[exchange] || 5;
   scanStartTime = Date.now();
-  const etaEl  = document.getElementById('scan-eta');
-  const txtEl  = document.getElementById('scan-eta-txt');
-  const barEl  = document.getElementById('scan-eta-bar');
-  if (!etaEl) return;
-  etaEl.style.display = 'block';
-  barEl.style.width = '0%';
   clearInterval(scanEtaTimer);
+  _setStepperPhase(0);
   scanEtaTimer = setInterval(function() {
     const elapsed = (Date.now() - scanStartTime) / 1000;
-    const pct     = Math.min((elapsed / total) * 100, 95);
-    const rem     = Math.max(Math.ceil(total - elapsed), 1);
-    barEl.style.width = pct + '%';
-    txtEl.textContent = elapsed < total
-      ? 'Tahmini süre: ~' + rem + ' saniye'
-      : 'Neredeyse hazır...';
+    const pct = Math.min((elapsed / total) * 100, 95);
+    var phase = 0;
+    for (var i = STEPPER_PHASES.length - 1; i >= 0; i--) {
+      if (pct >= STEPPER_PHASES[i]) { phase = i; break; }
+    }
+    _setStepperPhase(phase);
     if (elapsed >= total * 1.5) clearInterval(scanEtaTimer);
   }, 300);
 }
 
 function stopScanEta() {
   clearInterval(scanEtaTimer);
-  const etaEl = document.getElementById('scan-eta');
-  const barEl = document.getElementById('scan-eta-bar');
-  if (barEl) barEl.style.width = '100%';
-  setTimeout(function() { if (etaEl) etaEl.style.display = 'none'; }, 400);
+  var items = document.querySelectorAll('#scan-stepper .sstep-item');
+  items.forEach(function(item) { item.classList.remove('active'); item.classList.add('done'); });
+}
+
+function showScanSummary(total, matches) {
+  const el = document.getElementById('scan-summary');
+  if (!el) return;
+  const elapsed = scanStartTime ? ((Date.now() - scanStartTime) / 1000).toFixed(1) : '—';
+  const exMeta = (typeof EXCHANGE_META !== 'undefined' && EXCHANGE_META[currentExchange]) || {};
+  const exLabel = (exMeta.flag || '') + ' ' + (exMeta.name || currentExchange || '');
+  const stratLabel = _scanMeta.strategy || '';
+  el.innerHTML =
+    (stratLabel ? '<span class="ssm-strategy">' + stratLabel + '</span><span class="ssm-sep">·</span>' : '') +
+    '<span class="ssm-count">' + exLabel.trim() + ' · <strong>' + total + '</strong> hisse tarandı</span>' +
+    '<span class="ssm-sep">·</span>' +
+    '<span class="ssm-matches"><strong>' + matches + '</strong> eşleşti</span>' +
+    '<span class="ssm-dur">' + elapsed + 's</span>';
 }
 
 // ── MOBILE DRAWER ──
@@ -4447,6 +4512,7 @@ document.addEventListener('DOMContentLoaded', function(){
   var total = document.querySelectorAll('[data-goat],[data-preset],[data-tech]').length;
   var el = document.querySelector('[data-strat-count]');
   if(el) el.innerHTML = total + ' <span>strateji</span>';
+  upgradeGoatChips();
 });
 
 

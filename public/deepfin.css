@@ -394,8 +394,43 @@ td:first-child,td:nth-child(2){text-align:left;}
 .drawer-nav-link{flex:1;text-align:center;font-size:11px;font-weight:500;color:var(--text2);background:var(--s1);border:1px solid var(--border);border-radius:6px;padding:8px 4px;cursor:pointer;text-decoration:none;transition:all .12s;touch-action:manipulation;min-height:44px;display:flex;align-items:center;justify-content:center;}
 .drawer-nav-link:hover,.drawer-nav-link.active{background:rgba(14,165,233,.08);border-color:var(--accent);color:var(--accent);}
 
-/* ── SCAN ETA ── */
+/* ── SCAN ETA (legacy — hidden in experiment) ── */
 #scan-eta{margin-top:12px;}
+
+/* ── GOAT CHIP MINI-CARDS ── */
+.goat-card-chip{border-radius:var(--r-lg)!important;padding:7px 10px!important;flex-direction:column!important;align-items:flex-start!important;gap:4px!important;min-width:72px;white-space:normal!important;}
+.gcchip-name{font-size:11px;font-weight:600;color:var(--text);line-height:1.2;}
+.gcchip-tags{display:flex;flex-wrap:wrap;gap:2px;}
+.gcchip-tag{font-size:9px;font-weight:500;padding:1px 5px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--muted2);white-space:nowrap;line-height:1.5;}
+.goat-card-chip:hover .gcchip-name{color:var(--accent);}
+.goat-card-chip.on .gcchip-name{color:#fff;}
+.goat-card-chip.on .gcchip-tag{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.85);}
+
+/* ── PHASE STEPPER (loading state) ── */
+.scan-stepper{display:flex;flex-direction:column;gap:0;width:240px;}
+.sstep-item{display:flex;gap:12px;align-items:flex-start;opacity:.35;transition:opacity .3s ease;}
+.sstep-item.active,.sstep-item.done{opacity:1;}
+.sstep-marker{display:flex;flex-direction:column;align-items:center;width:12px;flex-shrink:0;}
+.sstep-dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--border2);background:var(--s1);flex-shrink:0;transition:all .3s;margin-top:3px;}
+.sstep-conn{width:2px;flex:1;min-height:20px;margin:3px 0;background:var(--border);transition:background .3s;}
+.sstep-item.done .sstep-dot{background:var(--accent);border-color:var(--accent);}
+.sstep-item.done .sstep-conn{background:var(--accent);}
+.sstep-item.active .sstep-dot{background:var(--accent);border-color:var(--accent);animation:dot-pulse 1.4s ease-in-out infinite;}
+@keyframes dot-pulse{0%,100%{box-shadow:0 0 0 0 rgba(14,165,233,.5);}50%{box-shadow:0 0 0 5px rgba(14,165,233,0);}}
+.sstep-body{padding-bottom:18px;display:flex;flex-direction:column;gap:2px;}
+.sstep-label{font-size:12px;font-weight:600;color:var(--muted2);line-height:1.3;transition:color .3s;}
+.sstep-sub{font-size:10px;color:var(--muted);display:none;}
+.sstep-item.active .sstep-label{color:var(--accent);}
+.sstep-item.done .sstep-label{color:var(--text);}
+.sstep-item.active .sstep-sub,.sstep-item.done .sstep-sub{display:block;}
+
+/* ── SCAN SUMMARY CARD ── */
+.scan-summary{padding:5px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted2);background:var(--s2);flex-shrink:0;flex-wrap:wrap;}
+.ssm-strategy{font-weight:600;color:var(--text);background:var(--accent2);border:1px solid rgba(14,165,233,.2);padding:2px 8px;border-radius:var(--r-pill);font-size:11px;white-space:nowrap;}
+.ssm-sep{color:var(--border2);font-size:12px;}
+.ssm-count strong,.ssm-matches strong{font-weight:700;}
+.ssm-matches strong{color:var(--green);}
+.ssm-dur{font-family:var(--ff-mono);font-size:10px;color:var(--muted);margin-left:auto;}
 
 .dxloading{text-align:center;padding:20px;color:var(--muted2);font-size:11px;}
 .dxerror{text-align:center;padding:16px;color:#f6465d;font-size:10px;}
