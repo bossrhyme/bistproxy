@@ -2012,19 +2012,40 @@ function psvSetExchange(key) {
   }
 }
 
+var _PSV_MAX_SEL = 4;
+
+function _psvTotalSel() {
+  return _psvActiveGoats.size + _psvActivePresets.size + _psvActiveTech.size;
+}
+
+function _psvUpdateSelState() {
+  var total = _psvTotalSel();
+  var atLimit = total >= _PSV_MAX_SEL;
+  var pv = document.getElementById('prescan-view');
+  if (pv) pv.classList.toggle('psv-at-limit', atLimit);
+  var btn = document.getElementById('psv-scan-btn');
+  if (btn) btn.textContent = total > 0 ? '▶ ' + total + ' Filtre ile Tara' : '▶ Hisse Tara';
+}
+
 function psvToggleGoat(key) {
+  if (!_psvActiveGoats.has(key) && _psvTotalSel() >= _PSV_MAX_SEL) return;
   _psvActiveGoats.has(key) ? _psvActiveGoats.delete(key) : _psvActiveGoats.add(key);
   document.querySelectorAll('.psv-goat-card[data-goat="'+key+'"]').forEach(function(c){ c.classList.toggle('on', _psvActiveGoats.has(key)); });
+  _psvUpdateSelState();
 }
 
 function psvTogglePreset(key) {
+  if (!_psvActivePresets.has(key) && _psvTotalSel() >= _PSV_MAX_SEL) return;
   _psvActivePresets.has(key) ? _psvActivePresets.delete(key) : _psvActivePresets.add(key);
   document.querySelectorAll('.psv-preset-card[data-key="'+key+'"]').forEach(function(c){ c.classList.toggle('on', _psvActivePresets.has(key)); });
+  _psvUpdateSelState();
 }
 
 function psvToggleTech(key) {
+  if (!_psvActiveTech.has(key) && _psvTotalSel() >= _PSV_MAX_SEL) return;
   _psvActiveTech.has(key) ? _psvActiveTech.delete(key) : _psvActiveTech.add(key);
   document.querySelectorAll('.psv-tech-card[data-key="'+key+'"]').forEach(function(c){ c.classList.toggle('on', _psvActiveTech.has(key)); });
+  _psvUpdateSelState();
 }
 
 function psvToggleMoreGoats() {
