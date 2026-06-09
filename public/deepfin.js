@@ -1729,8 +1729,8 @@ const GURUS = {
   },
   greenblatt: {
     label: 'Joel Greenblatt — Magic Formula',
-    desc: 'Orijinal Magic Formula, ROC ve Kazanç Verimi\'ne göre sıralama yapar — sabit eşik kullanmaz. Bu filtreler sıralama sisteminin nicel proxyleridir: yüksek ROE (ROC\'un yaklaşımı) + düşük F/K (kazanç veriminin yaklaşımı). Gerçek uygulama için tüm hisseleri sıralamak ve en iyi 20–30\'unu seçmek gerekir.',
-    filters: {roe_min:25, pe_max:15, de_max:80, cr_min:1}
+    desc: 'Magic Formula iki metriği kombine eder: Kazanç Verimi = EBIT/EV (ucuzluk) ve ROIC = EBIT/(net işletme sermayesi + sabit varlıklar) (kalite). Gerçek uygulama her iki metrikte tüm hisseleri sıralar, kombine skoru en yüksek 20-30\'unu seçer. Not: EV/EBIT sistemde hesaplanamadığından F/K kazanç verimi proxy\'i, ROE ise ROIC proxy\'i olarak kullanılmaktadır. Orijinal formülde borç/cari oran kriteri yoktur.',
+    filters: {roe_min:25, pe_max:12}
   },
   icahn: {
     label: 'Carl Icahn — Activist Value',
@@ -1764,9 +1764,9 @@ const GURUS = {
     filters: {earng_min:25, revg_min:25, roe_min:17, de_max:100, cr_min:1}
   },
   oshaughnessy: {
-    label: "O'Shaughnessy — What Works on Wall St.",
-    desc: "O'Shaughnessy için his değil, 50 yıllık veri konuşur. Cornerstone Growth: F/S < 1.5, 5 yıllık tutarlı büyüme, güçlü 12 aylık momentum. Cornerstone Value: en yüksek temettü verimi sıralaması. Bu filtreler kitabın temel nicel kriterlerini yansıtmaktadır.",
-    filters: {ps_max:1.5, div_min:2, revg_min:10, roe_min:10}
+    label: "O'Shaughnessy — Cornerstone Growth",
+    desc: "O'Shaughnessy'nin 'What Works on Wall Street' kitabındaki Cornerstone Growth stratejisi: F/S < 1.5 (değer filtresi) + EPS büyümesi pozitif (temel güç) + güçlü 12 aylık fiyat momentumu (ivme). Cornerstone Value farklı bir stratejidir: yüksek temettü verimi sıralamasına dayanır; ikisi aynı anda uygulanmaz. Not: 12 aylık RS sıralaması için 6 aylık performans proxy olarak kullanılmaktadır.",
+    filters: {ps_max:1.5, earng_min:5, perf6m_min:15}
   },
   piotroski: {
     label: 'Piotroski F-Score',
@@ -1781,8 +1781,8 @@ const GURUS = {
   },
   soros: {
     label: 'George Soros — Reflexivity',
-    desc: 'Soros bir makro traderdir; reflexivity teorisinden ilham alınan momentum ekranı. Reflexivity: güçlü fiyat hareketi beklentileri değiştirir, beklentiler piyasayı etkiler. Hisse uyarlaması: güçlü 3–6 aylık fiyat trendi + büyüyen gelir (makro rüzgar) + teknik onay. Not: Soros\'un gerçek stratejisi para birimi/faiz bahislerinden oluşur; bu filtreler teorisinin hisse ekranı yorumudur.',
-    filters: {perf3m_min:10, perf6m_min:15, revg_min:15, earng_min:10, tech_rating_min:0.2}
+    desc: 'Soros döviz, tahvil ve emtia üzerine işlem yapan bir makro traderdir — bireysel hisse seçmez. Reflexivity teorisi: güçlü fiyat hareketi beklentileri değiştirir, değişen beklentiler hareketi güçlendirir. Bu filtreler teorinin hisse yorumudur: hem 3 hem 6 aylık güçlü momentum + 26 indikatörlü teknik onay. Temel finansal filtreler bu stratejiye ait değildir.',
+    filters: {perf3m_min:10, perf6m_min:20, tech_rating_min:0.3}
   },
   dalio: {
     label: 'Ray Dalio — All Weather',
