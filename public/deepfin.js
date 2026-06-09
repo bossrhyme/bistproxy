@@ -1217,6 +1217,9 @@ async function runScan(){
     var k = c.dataset.tech;
     if (k && TECH_PRESETS[k] && !_seenKeys[k]) { _seenKeys[k] = 1; _filterTags.push({ label: TECH_PRESETS[k].label, desc: TECH_PRESETS[k].desc || '' }); }
   });
+  // Deduplicate by label as final safety net
+  var _lblSeen = {};
+  _filterTags = _filterTags.filter(function(f) { if (_lblSeen[f.label]) return false; _lblSeen[f.label] = 1; return true; });
   _scanMeta.filters  = _filterTags;
   _scanMeta.strategy = _filterTags.map(function(f){return f.label;}).join(', ') || null;
   _scanMeta.exchange = currentExchange;
@@ -2530,6 +2533,8 @@ function applyAndRender(special){
 
   if (filtered.length === 0 && allData.length > 0) {
     showState('twrap');
+    showScanSummary(allData.length, 0);
+    var _ztw = document.getElementById('twrap'); if (_ztw) _ztw.scrollTop = 0;
     renderTable(); // boş tablo göster
     updateStatsBar();
     updateTicker();
@@ -3398,7 +3403,7 @@ function showState(id){
     el.style.display = s===id ? (s==='twrap'?'block':'flex') : 'none';
   });
   const smEl = document.getElementById('scan-summary');
-  if (smEl) smEl.style.display = id === 'twrap' ? 'flex' : 'none';
+  if (smEl) smEl.style.display = id === 'twrap' ? 'grid' : 'none';
   const nsbEl = document.getElementById('new-scan-btn');
   if (nsbEl) nsbEl.style.display = id === 'twrap' ? 'inline-flex' : 'none';
 }
