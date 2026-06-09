@@ -1202,22 +1202,23 @@ async function runScan(){
   document.getElementById('loadtxt').textContent = 'Taranıyor...';
   const exMeta = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
   document.getElementById('loadsub').textContent = `${exMeta.flag} ${exMeta.name} hisseleri alınıyor...`;
-  // Collect all active filter tags for summary bar
+  // Collect all active filter tags for summary bar (deduplicated by key)
   var _filterTags = [];
-  document.querySelectorAll('#goat-chips .goat-chip.on, #adv-goat-chips .goat-chip.on').forEach(function(c) {
+  var _seenKeys   = {};
+  document.querySelectorAll('#goat-chips .goat-chip.on').forEach(function(c) {
     var k = c.dataset.goat;
-    if (k && GURUS[k]) _filterTags.push({ label: GURUS[k].label.split(' — ')[0].split(' (')[0], desc: GURUS[k].desc || '' });
+    if (k && GURUS[k] && !_seenKeys[k]) { _seenKeys[k] = 1; _filterTags.push({ label: GURUS[k].label.split(' — ')[0].split(' (')[0], desc: GURUS[k].desc || '' }); }
   });
   document.querySelectorAll('#presets .chip.on').forEach(function(c) {
     var k = c.dataset.preset;
-    if (k && PRESETS[k]) _filterTags.push({ label: PRESETS[k].label, desc: PRESETS[k].desc || '' });
+    if (k && PRESETS[k] && !_seenKeys[k]) { _seenKeys[k] = 1; _filterTags.push({ label: PRESETS[k].label, desc: PRESETS[k].desc || '' }); }
   });
   document.querySelectorAll('#tech-presets .chip.on').forEach(function(c) {
     var k = c.dataset.tech;
-    if (k && TECH_PRESETS[k]) _filterTags.push({ label: TECH_PRESETS[k].label, desc: TECH_PRESETS[k].desc || '' });
+    if (k && TECH_PRESETS[k] && !_seenKeys[k]) { _seenKeys[k] = 1; _filterTags.push({ label: TECH_PRESETS[k].label, desc: TECH_PRESETS[k].desc || '' }); }
   });
   _scanMeta.filters  = _filterTags;
-  _scanMeta.strategy = _filterTags.length === 1 ? _filterTags[0].label : (_filterTags.length > 1 ? _filterTags.map(function(f){return f.label;}).join(', ') : null);
+  _scanMeta.strategy = _filterTags.map(function(f){return f.label;}).join(', ') || null;
   _scanMeta.exchange = currentExchange;
   var _scanMinMs = _psvScanFilterCount >= 3 ? 7000 : _psvScanFilterCount >= 1 ? 5000 : 0;
   startScanEta(currentExchange, _scanMinMs);
@@ -4458,8 +4459,6 @@ function showScanSummary(total, matches) {
   const el = document.getElementById('scan-summary');
   if (!el) return;
   const elapsed = scanStartTime ? ((Date.now() - scanStartTime) / 1000).toFixed(1) : '—';
-  const exMeta = (typeof EXCHANGE_META !== 'undefined' && EXCHANGE_META[currentExchange]) || {};
-  const exLabel = (exMeta.flag || '') + ' ' + (exMeta.name || currentExchange || '');
   const filters = _scanMeta.filters || [];
   var tagsHtml = filters.map(function(f) {
     return '<span class="ssm-tag">' + esc(f.label) +
@@ -4467,11 +4466,9 @@ function showScanSummary(total, matches) {
       '</span>';
   }).join('');
   el.innerHTML =
-    (tagsHtml ? tagsHtml + '<span class="ssm-sep">·</span>' : '') +
-    '<span class="ssm-count">' + exLabel.trim() + ' · <strong>' + total + '</strong> hisse tarandı</span>' +
-    '<span class="ssm-sep">·</span>' +
-    '<span class="ssm-matches"><strong>' + matches + '</strong> eşleşti</span>' +
-    '<span class="ssm-dur">' + elapsed + 's</span>';
+    '<span class="ssm-left">' + (tagsHtml || '<span class="ssm-no-filter">Filtresiz</span>') + '</span>' +
+    '<span class="ssm-center"><strong>' + total + '</strong> tarandı · <strong class="ssm-match-num">' + matches + '</strong> eşleşti</span>' +
+    '<span class="ssm-right ssm-dur">' + elapsed + 's</span>';
 }
 
 // ── MOBILE DRAWER ──
