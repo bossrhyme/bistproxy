@@ -130,7 +130,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
 <link rel="stylesheet" href="/deepfin.css?v=arctic70">
-<script src="/deepfin.js?v=98" defer></script>
+<script src="/deepfin.js?v=99" defer></script>
 <link rel="dns-prefetch" href="https://api.coingecko.com">
 <link rel="dns-prefetch" href="https://finnhub.io">
 <link rel="dns-prefetch" href="https://www.tefas.gov.tr">
@@ -171,7 +171,7 @@ if('serviceWorker' in navigator){
     <div class="tlogo" onclick="showHomepage()" style="cursor:pointer"><div class="tlogo-mark">D</div>DeepFin</div>
     <span class="tlive">Canlı</span>
     <a href="/" class="hp-nav-btn active" id="nav-home" onclick="event.preventDefault(); showHomepage()">Anasayfa</a>
-    <a href="/" class="hp-nav-btn" id="nav-tarama" onclick="event.preventDefault(); showScreener()">Tarayıcı</a>
+    <a href="/" class="hp-nav-btn" id="nav-tarama" onclick="event.preventDefault(); showScreenerOrPrescan()">Tarayıcı</a>
     <a href="/analiz/" class="hp-nav-btn" id="nav-analiz">Analiz</a>
     <button class="hamburger-btn" id="hamburger-btn" onclick="toggleMobileDrawer()" style="display:none;" aria-label="Filtreler">
       <span class="ham-line"></span><span class="ham-line"></span><span class="ham-line"></span>
@@ -210,7 +210,7 @@ if('serviceWorker' in navigator){
       <h1 class="hp-title">Tarama bizden,<br><span>karar sizden.</span></h1>
       <div class="hp-sub">Hisse, fon ve kripto gibi 9 varlık sınıfı tek ekranda. 30.000'den fazla enstrümanı 100+ filtre kriteriyle saniyeler içinde tara, dünyaca ünlü stratejilerle analiz et.</div>
       <div class="hp-cta">
-        <button class="hp-cta-primary" onclick="showScreener()">▶ Taramaya Başla</button>
+        <button class="hp-cta-primary" onclick="showScreenerOrPrescan()">▶ Taramaya Başla</button>
         <button class="hp-cta-secondary" onclick="showScreener();openInfo()">📚 Bilgi Bankası</button>
       </div>
     </div>
@@ -624,7 +624,7 @@ if('serviceWorker' in navigator){
     </div>
     <div class="drawer-nav">
       <a class="drawer-nav-link" id="dnav-home" onclick="closeMobileDrawer(); showHomepage()">🏠 Anasayfa</a>
-      <a class="drawer-nav-link" id="dnav-tarama" onclick="closeMobileDrawer(); showScreener()">🔍 Tarayıcı</a>
+      <a class="drawer-nav-link" id="dnav-tarama" onclick="closeMobileDrawer(); showScreenerOrPrescan()">🔍 Tarayıcı</a>
       <a class="drawer-nav-link" href="/analiz/">📊 Analiz</a>
     </div>
     <div id="drawer-content">

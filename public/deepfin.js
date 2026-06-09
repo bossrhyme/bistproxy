@@ -1843,33 +1843,17 @@ function tblScroll(px){
 
 // ── GOAT CHIP MINI-CARD UPGRADE ──
 function upgradeGoatChips() {
-  var FMTS = [
-    ['pe_max',          function(v){ return 'F/K<'+v; }],
-    ['pb_max',          function(v){ return 'F/DD<'+v; }],
-    ['ps_max',          function(v){ return 'F/S<'+v; }],
-    ['pe_min',          function(v){ return 'F/K>'+v; }],
-    ['roe_min',         function(v){ return 'ROE>'+v+'%'; }],
-    ['gross_min',       function(v){ return 'Brüt>'+v+'%'; }],
-    ['margin_min',      function(v){ return 'Marj>'+v+'%'; }],
-    ['earng_min',       function(v){ return 'K↑'+v+'%'; }],
-    ['revg_min',        function(v){ return 'Gel↑'+v+'%'; }],
-    ['de_max',          function(v){ return 'Borç<'+v; }],
-    ['cr_min',          function(v){ return 'Cari>'+v; }],
-    ['div_min',         function(v){ return 'Temettü>'+v+'%'; }],
-    ['tech_rating_min', function(){ return 'Teknik'; }],
-    ['perf3m_min',      function(v){ return '3A>'+v+'%'; }],
-    ['perf6m_min',      function(v){ return '6A>'+v+'%'; }],
-  ];
   document.querySelectorAll('.goat-chip').forEach(function(chip) {
+    if (chip.classList.contains('goat-card-chip')) return;
     var key = chip.dataset.goat;
     var guru = GURUS[key];
     if (!guru) return;
     var name = chip.textContent.trim();
     var filters = guru.filters || {};
     var tags = [];
-    for (var i = 0; i < FMTS.length && tags.length < 3; i++) {
-      var fkey = FMTS[i][0];
-      var fn   = FMTS[i][1];
+    for (var i = 0; i < _PSV_FMTS.length && tags.length < 3; i++) {
+      var fkey = _PSV_FMTS[i][0];
+      var fn   = _PSV_FMTS[i][1];
       if (filters[fkey] !== undefined) tags.push(fn(filters[fkey]));
     }
     chip.classList.add('goat-card-chip');
@@ -2055,34 +2039,32 @@ function openPrescanView() {
   el.style.opacity = '0';
   el.style.transition = 'none';
   el.offsetHeight;
-  el.style.transition = 'opacity .2s ease';
+  el.style.transition = '';
   el.style.opacity = '1';
 }
 
 function psvScan() {
   var el = document.getElementById('prescan-view');
-  if (el) {
-    el.classList.add('psv-closing');
-    setTimeout(function() {
+  var delay = el ? 280 : 0;
+  if (el) el.classList.add('psv-closing');
+  setTimeout(function() {
+    if (el) {
       el.style.display = 'none';
       el.classList.remove('psv-closing');
       el.style.opacity = '';
       el.style.transition = '';
-    }, 280);
-  }
-
-  // Sync prescan selections to sidebar chip state, then _applyChips calls runScan
-  document.querySelectorAll('#goat-chips .goat-chip, #adv-goat-chips .goat-chip').forEach(function(c){
-    c.classList.toggle('on', _psvActiveGoats.has(c.dataset.goat));
-  });
-  document.querySelectorAll('#presets .chip').forEach(function(c){
-    c.classList.toggle('on', _psvActivePresets.has(c.dataset.preset));
-  });
-  document.querySelectorAll('#tech-presets .chip').forEach(function(c){
-    c.classList.toggle('on', _psvActiveTech.has(c.dataset.tech));
-  });
-
-  _applyChips(BASIC_CHIP_CFG);
+    }
+    document.querySelectorAll('#goat-chips .goat-chip, #adv-goat-chips .goat-chip').forEach(function(c){
+      c.classList.toggle('on', _psvActiveGoats.has(c.dataset.goat));
+    });
+    document.querySelectorAll('#presets .chip').forEach(function(c){
+      c.classList.toggle('on', _psvActivePresets.has(c.dataset.preset));
+    });
+    document.querySelectorAll('#tech-presets .chip').forEach(function(c){
+      c.classList.toggle('on', _psvActiveTech.has(c.dataset.tech));
+    });
+    _applyChips(BASIC_CHIP_CFG);
+  }, delay);
 }
 
 // ── UNİFİED CHİP SİSTEMİ — her panel bağımsız çalışır ──
@@ -4482,6 +4464,10 @@ function acceptDisclaimer() {
 
 function showScreener() {
   _doShowScreener();
+}
+function showScreenerOrPrescan() {
+  _doShowScreener();
+  if (allData.length === 0) openPrescanView();
 }
 function _doShowScreener() {
   hideAnalizPage();
