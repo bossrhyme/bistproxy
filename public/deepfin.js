@@ -1223,7 +1223,7 @@ async function runScan(){
   _scanMeta.filters  = _filterTags;
   _scanMeta.strategy = _filterTags.map(function(f){return f.label;}).join(', ') || null;
   _scanMeta.exchange = currentExchange;
-  var _scanMinMs = _psvScanFilterCount >= 3 ? 7000 : _psvScanFilterCount >= 1 ? 5000 : 0;
+  var _scanMinMs = _psvScanFilterCount >= 3 ? 4500 : _psvScanFilterCount >= 1 ? 3000 : 0;
   startScanEta(currentExchange, _scanMinMs);
 
   // Field isimleri borsa bazlı farklı — exchange'e göre doğru set
@@ -2024,7 +2024,9 @@ function initPrescanView() {
     '</div>'+
 
     // Scan button
-    '<div class="psv-scan-wrap"><button class="psv-scan-btn" id="psv-scan-btn" onclick="psvScan()">▶ Hisse Tara</button></div>'+
+    '<div class="psv-scan-wrap">'+
+    '<div class="psv-limit-hint" id="psv-limit-hint">⚠ En fazla 4 filtre seçilebilir — yenisini eklemek için mevcut bir seçimi kaldır.</div>'+
+    '<button class="psv-scan-btn" id="psv-scan-btn" onclick="psvScan()">▶ Hisse Tara</button></div>'+
 
     '</div>';
 
