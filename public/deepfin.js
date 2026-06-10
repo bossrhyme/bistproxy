@@ -98,12 +98,12 @@ var _ONB = {
     ]
   },
   kripto: {
-    big: 'KRİPTO', sub: 'CoinGecko + TradingView verisiyle coin tara.',
+    big: 'KRİPTO', sub: 'Canlı piyasa verisiyle coin tara.',
     steps: [
       {icon:'🌐', label:'Kategori Seç', desc:'DeFi, Layer 1, GameFi veya tüm coinler'},
       {icon:'📈', label:'Preset Seç',   desc:'Momentum, RSI Dip, ATH Yakın hazır stratejiler'},
-      {icon:'▶',  label:'Kripto Tara',  desc:'CoinGecko + TradingView verisi çekilir'},
-      {icon:'🔎', label:'Coin İncele',  desc:'Fiyat, RSI, ATH%, TradingView rating\'i gör'}
+      {icon:'▶',  label:'Kripto Tara',  desc:'Canlı piyasa verisi çekilir'},
+      {icon:'🔎', label:'Coin İncele',  desc:'Fiyat, RSI, ATH%, teknik sinyali gör'}
     ]
   }
 };
@@ -466,7 +466,7 @@ function _fonSort(field) {
 function runKriptoScan() {
   var btn=document.querySelector('#sbp-kripto .sbp-scan-btn');
   if(btn){btn.textContent='⏳ Taranıyor...';btn.disabled=true;}
-  _showLoading('⏳ CoinGecko · TradingView · DeFiLlama verisi yükleniyor...');
+  _showLoading('⏳ Kripto piyasa verisi yükleniyor...');
 
   var params=new URLSearchParams({limit:'200',sort:'market_cap_desc'});
   var cat=document.querySelector('#sbp-kripto .chip.on[data-cat]');
@@ -572,7 +572,7 @@ function _renderKripto(coins, meta, forceAll) {
   var hasTvl = coins.some(function(c){ return c.tvl != null; });
   var visibleCoins = (_kriptoShowAll || coins.length <= KRIPTO_INIT) ? coins : coins.slice(0, KRIPTO_INIT);
   var rows = visibleCoins.map(function(c, i){ return _kriptoRowHtml(c, i, hasTvl); }).join('');
-  var srcLabel = hasTvl ? 'CoinGecko · TradingView · DeFiLlama' : 'CoinGecko · TradingView';
+  var srcLabel = hasTvl ? 'Çoklu kaynak · Canlı' : 'Canlı veri';
   var hdr='<div class="res-hdr"><b>₿ Kripto</b><span class="res-cnt">'+coins.length+' coin</span>'+(note?'<span class="res-ok">'+note+'</span>':'')+'<span class="res-src">'+srcLabel+'</span></div>';
   var kCols=[
     {k:'price',l:'Fiyat'},{k:'change24h',l:'24s%'},{k:'change7d',l:'7G%'},{k:'change30d',l:'30G%'},
@@ -591,7 +591,7 @@ function _renderKripto(coins, meta, forceAll) {
       +'Tümünü göster — '+(coins.length - KRIPTO_INIT)+' coin daha'
       +'</button></div>'
     : '';
-  var tbl='<table><thead><tr><th style="width:28px"></th><th>Coin</th>'+kThSort+'<th class="right">TV</th></tr></thead><tbody>'+rows+'</tbody></table>'+kMoreBar;
+  var tbl='<table><thead><tr><th style="width:28px"></th><th>Coin</th>'+kThSort+'<th class="right">Sinyal</th></tr></thead><tbody>'+rows+'</tbody></table>'+kMoreBar;
   _showResultArea(hdr, tbl, coins.length);
 }
 
@@ -1059,7 +1059,7 @@ const COL_DEFS = [
   {key:'cr', label:'CARİ', def:true},
   {key:'div', label:'TEMETTÜ%', def:false},
   {key:'peg', label:'PEG', def:false},
-  {key:'tech_rating', label:'TV Rating', def:false},
+  {key:'tech_rating', label:'Teknik Skor', def:false},
   {key:'rsi', label:'RSI', def:true},
   {key:'chg1d', label:'Günlük%', def:true},
   {key:'chg1w', label:'1H Geti%', def:true},
@@ -1240,7 +1240,11 @@ async function runScan(){
     'dividends_yield','debt_to_equity_fq','current_ratio_fq',
     'sector','High.1M','Low.1M','piotroski_f_score',
     'Recommend.All','Recommend.MA','Recommend.Other',
-    'Perf.3M','Perf.6M','Perf.Y','Perf.W','RSI',
+    'Perf.1M','Perf.3M','Perf.6M','Perf.Y','Perf.W','RSI',
+    'price_52_week_high','price_52_week_low',
+    'average_volume_10d_calc','relative_volume_10d_calc',
+    'SMA50','SMA200','MACD.macd','MACD.signal',
+    'ADX','ADX+DI','ADX-DI','BB.lower','Stoch.K','Stoch.D','beta_1_year',
     'float_shares_outstanding_percent'
   ];
   const COLS_US = [
@@ -1255,7 +1259,11 @@ async function runScan(){
     'total_debt_to_equity','debt_to_equity_fq','current_ratio','current_ratio_fq',
     'sector','High.1M','Low.1M','piotroski_f_score',
     'Recommend.All','Recommend.MA','Recommend.Other',
-    'Perf.3M','Perf.6M','Perf.Y','Perf.W','RSI',
+    'Perf.1M','Perf.3M','Perf.6M','Perf.Y','Perf.W','RSI',
+    'price_52_week_high','price_52_week_low',
+    'average_volume_10d_calc','relative_volume_10d_calc',
+    'SMA50','SMA200','MACD.macd','MACD.signal',
+    'ADX','ADX+DI','ADX-DI','BB.lower','Stoch.K','Stoch.D','beta_1_year',
     'float_shares_outstanding_percent'
   ];
   const COLS_GLOBAL = [
@@ -1269,7 +1277,11 @@ async function runScan(){
     'total_debt_to_equity','debt_to_equity_fq','current_ratio','current_ratio_fq',
     'sector','High.1M','Low.1M','piotroski_f_score',
     'Recommend.All','Recommend.MA','Recommend.Other',
-    'Perf.3M','Perf.6M','Perf.Y','Perf.W','RSI',
+    'Perf.1M','Perf.3M','Perf.6M','Perf.Y','Perf.W','RSI',
+    'price_52_week_high','price_52_week_low',
+    'average_volume_10d_calc','relative_volume_10d_calc',
+    'SMA50','SMA200','MACD.macd','MACD.signal',
+    'ADX','ADX+DI','ADX-DI','BB.lower','Stoch.K','Stoch.D','beta_1_year',
     'float_shares_outstanding_percent'
   ];
   const COLUMNS_BY_EXCHANGE = {
@@ -1428,6 +1440,22 @@ async function runScan(){
       const perfW      = g('Perf.W');
       const floatPct   = g('float_shares_outstanding_percent');
       const rsi14      = g('RSI');
+      const perf1m     = g('Perf.1M');
+      const high52w    = g('price_52_week_high');
+      const low52w     = g('price_52_week_low');
+      const avgVol10d  = g('average_volume_10d_calc');
+      const relVol     = g('relative_volume_10d_calc');
+      const sma50      = g('SMA50');
+      const sma200     = g('SMA200');
+      const macdV      = g('MACD.macd');
+      const macdSig    = g('MACD.signal');
+      const adx        = g('ADX');
+      const adxPlusDi  = g('ADX+DI');
+      const adxMinusDi = g('ADX-DI');
+      const bbLower    = g('BB.lower');
+      const stochK     = g('Stoch.K');
+      const stochD     = g('Stoch.D');
+      const beta1y     = g('beta_1_year');
 
       // TradingView sembol formatı: "BIST:THYAO" → "THYAO"
       const rawSym = row.s || '';
@@ -1554,20 +1582,36 @@ async function runScan(){
           return mapped;
         })(),
         sectorRaw: sector || null,
-        '52WeekHigh': high1m || null,
-        '52WeekLow': low1m || null,
+        // Gerçek 52 haftalık zirve/dip; veri yoksa 1 aylık değere düş
+        '52WeekHigh': high52w || high1m || null,
+        '52WeekLow': low52w || low1m || null,
+        high1m: high1m || null,
+        low1m:  low1m  || null,
         piotroski: g('piotroski_f_score') !== null ? Math.round(g('piotroski_f_score')) : null,
-        fromHigh: (high1m && close && high1m > 0) ? ((close - high1m) / high1m * 100) : null,
-        fromLow:  (low1m  && close && low1m  > 0) ? ((close - low1m)  / low1m  * 100) : null,
+        fromHigh: (function(){ var h = high52w || high1m; return (h && close && h > 0) ? ((close - h) / h * 100) : null; })(),
+        fromLow:  (function(){ var l = low52w  || low1m;  return (l && close && l > 0) ? ((close - l) / l * 100) : null; })(),
         techRating: techRating !== null ? techRating : null,
         maRating:   maRating   !== null ? maRating   : null,
         oscRating:  oscRating  !== null ? oscRating  : null,
+        perf1m:     perf1m     !== null ? perf1m     : null,
         perf3m:     perf3m     !== null ? perf3m     : null,
         perf6m:     perf6m     !== null ? perf6m     : null,
         perfY:      perfY      !== null ? perfY      : null,
         perfW:      perfW      !== null ? perfW      : null,
         floatPct:   floatPct   !== null ? floatPct   : (_bistFloatMap[symbol] ?? null),
         rsi14:      rsi14      !== null ? rsi14      : null,
+        avgVol10d:  avgVol10d  !== null ? avgVol10d  : null,
+        relVol:     relVol     !== null ? relVol     : null,
+        beta:       beta1y     !== null ? beta1y     : null,
+        adx:        adx        !== null ? adx        : null,
+        adxDiDiff:  (adxPlusDi !== null && adxMinusDi !== null) ? (adxPlusDi - adxMinusDi) : null,
+        pctAboveSma200: (sma200 && close && sma200 > 0) ? ((close - sma200) / sma200 * 100) : null,
+        smaTrend:   (sma50 !== null && sma200 && sma200 > 0) ? ((sma50 - sma200) / sma200 * 100) : null,
+        macd:       macdV !== null ? macdV : null,
+        macdHist:   (macdV !== null && macdSig !== null) ? (macdV - macdSig) : null,
+        bbDist:     (bbLower && close && bbLower > 0) ? ((close - bbLower) / bbLower * 100) : null,
+        stochK:     stochK !== null ? stochK : null,
+        stochKD:    (stochK !== null && stochD !== null) ? (stochK - stochD) : null,
         peg: (function() {
           if (pe && epsG && epsG > 0) return pe / epsG;
           return null;
@@ -1654,8 +1698,8 @@ const TECH_PRESETS = {
 
   breakout: {
     label: 'Breakout',
-    desc: 'Dar aralıktan hacimli şekilde yukarı kıran hisseleri bulur. Günlük %1.5 üzeri artış, 0.5M üzeri hacim.',
-    filters: { from_high_max: -5, chg_min: 1.5, vol_min: 0.5, tech_rating_min: 0.1 }
+    desc: '52 haftalık zirvesinin dibinde hacimli yukarı hareket yapan hisseleri bulur. Zirveye %5 mesafe, günlük %1.5 üzeri artış.',
+    filters: { from_high_min: -5, chg_min: 1.5, vol_min: 0.5, tech_rating_min: 0.1 }
   },
 
   oversold: {
@@ -1665,15 +1709,15 @@ const TECH_PRESETS = {
   },
 
   nearHigh: {
-    label: 'ATH Yakın',
-    desc: 'Aylık zirvesine yakın seyreden güçlü trenddeki hisseleri bulur. Zirveye %3 mesafe, 3 aylık getiri %5 üzeri.',
-    filters: { from_high_max: -3, perf3m_min: 5 }
+    label: '52H Zirve',
+    desc: '52 haftalık zirvesine yakın seyreden güçlü trenddeki hisseleri bulur. Zirveye %5 mesafe, 3 aylık getiri %5 üzeri.',
+    filters: { from_high_min: -5, perf3m_min: 5 }
   },
 
   pullback: {
     label: 'Düzeltme',
-    desc: 'Güçlü trend içinde kısa geri çekilme yaşayan hisseleri bulur. Zirveden en fazla %10 geride, 6 aylık getiri %10 üzeri.',
-    filters: { from_high_max: -10, from_low_min: 10, perf6m_min: 10 }
+    desc: 'Güçlü trendde kısa geri çekilme yaşayan hisseleri bulur. Zirveden %5-15 geride, 6 aylık getiri %15 üzeri.',
+    filters: { from_high_min: -15, from_high_max: -5, perf6m_min: 15 }
   },
 
   strongDay: {
@@ -1684,11 +1728,9 @@ const TECH_PRESETS = {
 
   highVolume: {
     label: 'Akıllı Para',
-    desc: 'Olağandışı yüksek hacimle işlem gören hisseleri bulur. 5M lot üzeri hacim genellikle kurumsal alım işaretidir.',
-    filters: { vol_min: 5, chg_min: 0 }
+    desc: 'Normalinin en az 2 katı hacimle yükselen hisseleri bulur. Göreli hacim artışı kurumsal ilginin en güvenilir işaretidir.',
+    filters: { rel_vol_min: 2, chg_min: 0 }
   },
-
-  // ── YENİ ──────────────────────────────────────────────────────────────
 
   techBuy: {
     label: 'Güçlü Sinyal',
@@ -1704,7 +1746,7 @@ const TECH_PRESETS = {
 
   trendFollow: {
     label: 'Trend Takibi',
-    desc: 'Dibinden uzaklaşmış ve kazancını koruyan yükseliş trendindeki hisseleri bulur. Dipten %25 üzeri, 6 aylık getiri %10 üzeri.',
+    desc: '52 haftalık dibinden uzaklaşmış, kazancını koruyan hisseleri bulur. Dipten %25 üzeri, 6 aylık getiri %10 üzeri.',
     filters: { from_low_min: 25, perf6m_min: 10 }
   },
 
@@ -1712,6 +1754,62 @@ const TECH_PRESETS = {
     label: 'Toparlanıyor',
     desc: 'Aşırı satıştan çıkıp toparlanmanın erken aşamasında olan hisseleri bulur. RSI 30-50 arası, dipten %3 üzeri.',
     filters: { rsi_min: 30, rsi_max: 50, from_low_min: 3 }
+  },
+
+  // ── GÖSTERGE TABANLI ──────────────────────────────────────────────────
+
+  goldenCross: {
+    label: 'Golden Cross',
+    desc: 'Uzun vadeli yapısal yükseliş trendindeki hisseleri bulur. Fiyat 200 günlük ortalamanın, 50 günlük ortalama 200 günlüğün üzerinde.',
+    filters: { above_sma200_min: 0, sma_trend_min: 0.5 }
+  },
+
+  macdReversal: {
+    label: 'MACD Dönüşü',
+    desc: 'Düşüş sonrası yeni yükseliş sinyali veren hisseleri bulur. MACD sinyal çizgisini yukarı kesmiş, henüz sıfırın altında.',
+    filters: { macd_hist_min: 0, macd_max: 0 }
+  },
+
+  adxTrend: {
+    label: 'Güçlü Trend',
+    desc: 'Gücü ölçülebilir, alıcı yönü baskın trendleri bulur. ADX 25 üzeri, +DI eksi DI üzerinde.',
+    filters: { adx_min: 25, adx_di_diff_min: 0 }
+  },
+
+  bbBounce: {
+    label: 'Bollinger Dibi',
+    desc: 'Alt banda gerileyip ortalamaya dönüş potansiyeli taşıyan hisseleri bulur. Fiyat alt bandın %1 yakınında, RSI 40 altı.',
+    filters: { bb_dist_max: 1, rsi_max: 40 }
+  },
+
+  stochReversal: {
+    label: 'Stokastik Dönüş',
+    desc: 'Aşırı satım bölgesinden yukarı dönen hisseleri bulur. %K 25 altı ve %D çizgisinin üzerine çıkmış.',
+    filters: { stoch_k_max: 25, stoch_kd_min: 0 }
+  },
+
+  maConfirm: {
+    label: 'Ortalama Onayı',
+    desc: '15 hareketli ortalamanın çoğunluğunun üzerinde işlem gören hisseleri bulur. Ortalama skoru 0.5 üzeri.',
+    filters: { ma_rating_min: 0.5 }
+  },
+
+  oscConfirm: {
+    label: 'Osilatör Onayı',
+    desc: 'Momentum osilatörlerinin alım bölgesinde olduğu hisseleri bulur. Osilatör skoru 0.1 üzeri.',
+    filters: { osc_rating_min: 0.1 }
+  },
+
+  lowBeta: {
+    label: 'Defansif',
+    desc: 'Piyasadan az dalgalanan temettülü hisseleri bulur. Beta 0.8 altı, temettü %1 üzeri.',
+    filters: { beta_max: 0.8, div_min: 1 }
+  },
+
+  ytdLeader: {
+    label: '1A Momentum',
+    desc: 'Son bir ayda güçlü ivme kazanan hisseleri bulur. 1 aylık getiri %10, 3 aylık getiri %10 üzeri.',
+    filters: { perf1m_min: 10, perf3m_min: 10 }
   },
 
 };
@@ -1919,11 +2017,24 @@ var _PSV_FMTS = [
   ['perf3m_min',      function(v){ return '3A>'+v+'%'; }],
   ['perf6m_min',      function(v){ return '6A>'+v+'%'; }],
   ['chg_min',         function(v){ return 'Günlük>'+v+'%'; }],
-  ['vol_min',         function(v){ return 'Hacim>'+v+'×'; }],
+  ['vol_min',         function(v){ return 'Hacim>'+v+'M'; }],
+  ['rel_vol_min',     function(v){ return 'Hacim '+v+'×'; }],
   ['rsi_max',         function(v){ return 'RSI<'+v; }],
   ['rsi_min',         function(v){ return 'RSI>'+v; }],
-  ['from_high_max',   function(v){ return 'Zirve<'+Math.abs(v)+'%'; }],
+  ['from_high_min',   function(v){ return 'Zirveye '+Math.abs(v)+'%'; }],
+  ['from_high_max',   function(v){ return 'Zirveden ↓'+Math.abs(v)+'%'; }],
   ['from_low_min',    function(v){ return 'Dip>'+v+'%'; }],
+  ['perf1m_min',      function(v){ return '1A>'+v+'%'; }],
+  ['adx_min',         function(v){ return 'ADX>'+v; }],
+  ['beta_max',        function(v){ return 'Beta<'+v; }],
+  ['ma_rating_min',   function(){  return 'MA Onayı'; }],
+  ['osc_rating_min',  function(){  return 'Osilatör'; }],
+  ['above_sma200_min',function(){  return '>SMA200'; }],
+  ['sma_trend_min',   function(){  return '50>200'; }],
+  ['macd_hist_min',   function(){  return 'MACD↑'; }],
+  ['bb_dist_max',     function(){  return 'BB Alt Bant'; }],
+  ['stoch_k_max',     function(v){ return '%K<'+v; }],
+  ['stoch_kd_min',    function(){  return '%K>%D'; }],
 ];
 
 function _psvGetTags(filters, max) {
@@ -2485,13 +2596,27 @@ function applyAndRender(special){
     ['peg',                            'peg_min',    'peg_max',   1],
     ['marketCapitalization',           'mc_min',     'mc_max',    1],
     ['changePercent',                  'chg_min',    'chg_max',   1],
-    ['fromHigh',                       null,         'from_high_max', 1],
+    ['fromHigh',                       'from_high_min', 'from_high_max', 1],
     ['fromLow',                        'from_low_min', null,      1],
     ['techRating',                     'tech_rating_min', 'tech_rating_max', 1],
+    ['maRating',                       'ma_rating_min', 'ma_rating_max', 1],
+    ['oscRating',                      'osc_rating_min', 'osc_rating_max', 1],
+    ['perf1m',                         'perf1m_min', 'perf1m_max', 1],
     ['perf3m',                         'perf3m_min', 'perf3m_max', 1],
     ['perf6m',                         'perf6m_min', 'perf6m_max', 1],
     ['perfY',                          'perfy_min',  'perfy_max',  1],
     ['rsi14',                          'rsi_min',    'rsi_max',    1],
+    ['relVol',                         'rel_vol_min', 'rel_vol_max', 1],
+    ['beta',                           'beta_min',   'beta_max',  1],
+    ['adx',                            'adx_min',    'adx_max',   1],
+    ['adxDiDiff',                      'adx_di_diff_min', null,   1],
+    ['pctAboveSma200',                 'above_sma200_min', 'above_sma200_max', 1],
+    ['smaTrend',                       'sma_trend_min', 'sma_trend_max', 1],
+    ['macd',                           'macd_min',   'macd_max',  1],
+    ['macdHist',                       'macd_hist_min', 'macd_hist_max', 1],
+    ['bbDist',                         'bb_dist_min', 'bb_dist_max', 1],
+    ['stochK',                         'stoch_k_min', 'stoch_k_max', 1],
+    ['stochKD',                        'stoch_kd_min', null,      1],
     ['currentPrice',                   'price_min',  'price_max', 1],
   ];
   // Hacim ayrı — Milyon lot
@@ -2512,7 +2637,9 @@ function applyAndRender(special){
       const raw = s[field];
       if(raw===null||raw===undefined){
         // Teknik/performans alanları: veri yoksa bu filtreyi atla (eleme)
-        const techFields = ['techRating','maRating','oscRating','perf3m','perf6m','perfY','rsi14'];
+        const techFields = ['techRating','maRating','oscRating','perf1m','perf3m','perf6m','perfY','rsi14',
+          'fromHigh','fromLow','relVol','beta','adx','adxDiDiff','pctAboveSma200','smaTrend',
+          'macd','macdHist','bbDist','stochK','stochKD'];
         if(techFields.indexOf(field) !== -1) continue;
         if(mn!==null||mx!==null) return false;
         continue;
@@ -2998,8 +3125,8 @@ function showDetail(sym){
       ['F/S <tag>TTM</tag>', s.psTTM, v=>v.toFixed(2), 'dval-ps'],
       ['Piyasa Değeri', s.marketCapitalization, v=>fmc(v)],
       ['Sektör', s.sector, v=>v],
-      ['1A Yüksek', s['52WeekHigh'], v=>`${v.toFixed(2)} ₺`],
-      ['1A Düşük', s['52WeekLow'], v=>`${v.toFixed(2)} ₺`],
+      ['52H Yüksek', s['52WeekHigh'], v=>`${v.toFixed(2)} ₺`],
+      ['52H Düşük', s['52WeekLow'], v=>`${v.toFixed(2)} ₺`],
     ]},
     {t:'Kantitatif', rows:[
       ['Piotroski F-Score', s.piotroski, function(v) {
@@ -4202,21 +4329,21 @@ function showFooterModal(type) {
 <p style="font-size:11px;color:var(--muted2);">Son güncelleme: Ocak 2026</p>`,
 
     teknikanaliz: `
-<p style="color:var(--muted);font-size:11px;margin-bottom:16px;">TradingView'in 26 teknik indikatörü kullanılarak hesaplanan gerçek zamanlı sinyaller. Her preset farklı bir piyasa durumuna veya strateji felsefesine karşılık gelir.</p>
+<p style="color:var(--muted);font-size:11px;margin-bottom:16px;">26 teknik gösterge kullanılarak hesaplanan gerçek zamanlı sinyaller. Her preset farklı bir piyasa durumuna veya strateji felsefesine karşılık gelir.</p>
 
 <div class="fbk-section">
   <div class="fbk-section-title">📈 Trend & Kırılım Presetleri</div>
 
   <div class="fbk-card">
     <div class="fbk-card-header"><span class="fbk-chip">Kırılım</span><span class="fbk-tag">Minervini SEPA</span></div>
-    <p>Zirvesine yakın, hacim destekli, 26 indikatör AL sinyali veren hisseler. Mark Minervini'nin SEPA (Specific Entry Point Analysis) kırılım koşuluna dayanır. Güçlü trendlerin başlangıç noktasını yakalar.</p>
-    <div class="fbk-filters">from_high &gt; -5% · hacim &gt; 0.5M lot · TV Rating &gt; 0.1</div>
+    <p>52 haftalık zirvesine yakın, hacim destekli, teknik göstergelerin alım verdiği hisseler. Mark Minervini'nin SEPA (Specific Entry Point Analysis) kırılım koşuluna dayanır. Güçlü trendlerin başlangıç noktasını yakalar.</p>
+    <div class="fbk-filters">zirveye %5 mesafe · günlük &gt; %1.5 · teknik skor &gt; 0.1</div>
   </div>
 
   <div class="fbk-card">
     <div class="fbk-card-header"><span class="fbk-chip">Zirveye Yakın</span><span class="fbk-tag">Trend Devam</span></div>
-    <p>1 aylık zirvesinin %3'ü yakınında VE son 3 ayda en az %5 kazanmış hisseler. Güçlü trendin devam ettiğini gösteren, sürüş biter bitmez alım noktasını işaret eder.</p>
-    <div class="fbk-filters">from_high &gt; -3% · 3 ay getiri &gt; %5</div>
+    <p>52 haftalık zirvesinin %5'i yakınında VE son 3 ayda en az %5 kazanmış hisseler. Güçlü trendin devam ettiğini gösteren, sürüş biter bitmez alım noktasını işaret eder.</p>
+    <div class="fbk-filters">zirveye %5 mesafe · 3 ay getiri &gt; %5</div>
   </div>
 
   <div class="fbk-card">
@@ -4227,8 +4354,8 @@ function showFooterModal(type) {
 
   <div class="fbk-card">
     <div class="fbk-card-header"><span class="fbk-chip">Sağlıklı Çekilme</span><span class="fbk-tag">Trend İçi Fırsat</span></div>
-    <p>Zirveden %10–25 geri çekilen ama 6 aylık trendi hâlâ güçlü olan hisseler. Güçlü bir trendde normal konsolidasyon sırasında alım fırsatı sunar. "Pullback in uptrend" stratejisi.</p>
-    <div class="fbk-filters">from_high: -10% ila -25% · 6 ay getiri &gt; %10</div>
+    <p>Zirveden %5–15 geri çekilen ama 6 aylık trendi hâlâ güçlü olan hisseler. Güçlü bir trendde normal konsolidasyon sırasında alım fırsatı sunar. "Pullback in uptrend" stratejisi.</p>
+    <div class="fbk-filters">zirveden %5–15 geride · 6 ay getiri &gt; %15</div>
   </div>
 </div>
 
@@ -4249,8 +4376,8 @@ function showFooterModal(type) {
 
   <div class="fbk-card">
     <div class="fbk-card-header"><span class="fbk-chip">Kurumsal Hacim</span><span class="fbk-tag">Büyük Para Tespiti</span></div>
-    <p>Normalin çok üzerinde hacim eşliğinde fiyat artışı. Büyük kurumsal oyuncuların (fon, banka) pozisyon açtığının teknik sinyali. "Follow the smart money" yaklaşımı.</p>
-    <div class="fbk-filters">hacim &gt; 5M lot · günlük değişim &gt; 0</div>
+    <p>Normalinin en az 2 katı hacim eşliğinde fiyat artışı. Büyük kurumsal oyuncuların (fon, banka) pozisyon açtığının teknik sinyali. "Follow the smart money" yaklaşımı.</p>
+    <div class="fbk-filters">göreli hacim &gt; 2× · günlük değişim &gt; 0</div>
   </div>
 </div>
 
@@ -4270,9 +4397,9 @@ function showFooterModal(type) {
   </div>
 
   <div class="fbk-card">
-    <div class="fbk-card-header"><span class="fbk-chip">26 İndikatör AL</span><span class="fbk-tag">TradingView Consensus</span></div>
-    <p>TradingView'in 26 teknik indikatörünü (RSI, MACD, ADX, Stochastic, 15 farklı hareketli ortalama) birleştiren "Recommend.All" skorunun 0.5 üzeri olduğu hisseler. Teknik analizin toplu onayı.</p>
-    <div class="fbk-filters">TV Rating &gt; 0.5 (26 indikatör çoğunluğu AL)</div>
+    <div class="fbk-card-header"><span class="fbk-chip">26 Gösterge AL</span><span class="fbk-tag">Teknik Konsensüs</span></div>
+    <p>26 teknik göstergeyi (RSI, MACD, ADX, Stochastic, 15 farklı hareketli ortalama) birleştiren bileşik teknik skorun 0.5 üzeri olduğu hisseler. Teknik analizin toplu onayı.</p>
+    <div class="fbk-filters">Teknik skor &gt; 0.5 (26 gösterge çoğunluğu AL)</div>
   </div>
 </div>
 
@@ -4358,15 +4485,15 @@ function showProfil(sym, ex) {
       dy:  d.dividendYieldIndicatedAnnual||d.dividend_yield_recent||0,
       // Piyasa
       mc:  d.marketCapitalization||d.market_cap_basic||0,
-      av:  d.average_volume_10d_calc||0,
+      av:  d.avgVol10d||d.average_volume_10d_calc||0,
       bt:  d.beta||0,
-      // 52 hafta — allData'da 52WeekHigh
+      // 52 hafta — allData'da 52WeekHigh (gerçek 52H verisi)
       wh:  d['52WeekHigh']||d['52_week_high']||0,
       wl:  d['52WeekLow']||d['52_week_low']||0,
       // Performans
-      pw:  d.Perf_W||0,
-      pm:  d.Perf_1M||0,
-      py:  d.Perf_Y||0,
+      pw:  d.perfW||d.Perf_W||0,
+      pm:  d.perf1m||d.Perf_1M||0,
+      py:  d.perfY||d.Perf_Y||0,
       cf:  d.cash_f_operating_activities||0
     };
     try {

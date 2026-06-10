@@ -130,7 +130,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
 <link rel="stylesheet" href="/deepfin.css?v=arctic80">
-<script src="/deepfin.js?v=117" defer></script>
+<script src="/deepfin.js?v=118" defer></script>
 <link rel="dns-prefetch" href="https://api.coingecko.com">
 <link rel="dns-prefetch" href="https://finnhub.io">
 <link rel="dns-prefetch" href="https://www.tefas.gov.tr">
@@ -901,7 +901,7 @@ if('serviceWorker' in navigator){
           <div class="presets chips" id="tech-presets">
             <div class="chip tech-chip" data-tech="breakout">Breakout</div>
             <div class="chip tech-chip" data-tech="oversold">Aşırı Satış</div>
-            <div class="chip tech-chip" data-tech="nearHigh">ATH Yakın</div>
+            <div class="chip tech-chip" data-tech="nearHigh">52H Zirve</div>
             <div class="chip tech-chip" data-tech="pullback">Düzeltme</div>
             <div class="chip tech-chip" data-tech="strongDay">Günlük Hareket</div>
             <div class="chip tech-chip" data-tech="highVolume">Akıllı Para</div>
@@ -909,6 +909,15 @@ if('serviceWorker' in navigator){
             <div class="chip tech-chip" data-tech="momentum3m">3A Momentum</div>
             <div class="chip tech-chip" data-tech="trendFollow">Trend Takibi</div>
             <div class="chip tech-chip" data-tech="rsiBounce">Toparlanıyor</div>
+            <div class="chip tech-chip" data-tech="goldenCross">Golden Cross</div>
+            <div class="chip tech-chip" data-tech="macdReversal">MACD Dönüşü</div>
+            <div class="chip tech-chip" data-tech="adxTrend">Güçlü Trend</div>
+            <div class="chip tech-chip" data-tech="bbBounce">Bollinger Dibi</div>
+            <div class="chip tech-chip" data-tech="stochReversal">Stokastik Dönüş</div>
+            <div class="chip tech-chip" data-tech="maConfirm">Ortalama Onayı</div>
+            <div class="chip tech-chip" data-tech="oscConfirm">Osilatör Onayı</div>
+            <div class="chip tech-chip" data-tech="lowBeta">Defansif</div>
+            <div class="chip tech-chip" data-tech="ytdLeader">1A Momentum</div>
           </div>
           <div class="goat-info" id="tech-preset-info"></div>
         </div>
@@ -1126,7 +1135,7 @@ if('serviceWorker' in navigator){
           <div class="presets chips" id="adv-tech-presets">
             <div class="chip tech-chip" data-tech="breakout">Breakout</div>
             <div class="chip tech-chip" data-tech="oversold">Aşırı Satış</div>
-            <div class="chip tech-chip" data-tech="nearHigh">ATH Yakın</div>
+            <div class="chip tech-chip" data-tech="nearHigh">52H Zirve</div>
             <div class="chip tech-chip" data-tech="pullback">Düzeltme</div>
             <div class="chip tech-chip" data-tech="strongDay">Günlük Hareket</div>
             <div class="chip tech-chip" data-tech="highVolume">Akıllı Para</div>
@@ -1134,6 +1143,15 @@ if('serviceWorker' in navigator){
             <div class="chip tech-chip" data-tech="momentum3m">3A Momentum</div>
             <div class="chip tech-chip" data-tech="trendFollow">Trend Takibi</div>
             <div class="chip tech-chip" data-tech="rsiBounce">Toparlanıyor</div>
+            <div class="chip tech-chip" data-tech="goldenCross">Golden Cross</div>
+            <div class="chip tech-chip" data-tech="macdReversal">MACD Dönüşü</div>
+            <div class="chip tech-chip" data-tech="adxTrend">Güçlü Trend</div>
+            <div class="chip tech-chip" data-tech="bbBounce">Bollinger Dibi</div>
+            <div class="chip tech-chip" data-tech="stochReversal">Stokastik Dönüş</div>
+            <div class="chip tech-chip" data-tech="maConfirm">Ortalama Onayı</div>
+            <div class="chip tech-chip" data-tech="oscConfirm">Osilatör Onayı</div>
+            <div class="chip tech-chip" data-tech="lowBeta">Defansif</div>
+            <div class="chip tech-chip" data-tech="ytdLeader">1A Momentum</div>
           </div>
           <div class="goat-info" id="tech-preset-info-adv"></div>
         </div>
@@ -2265,12 +2283,39 @@ if('serviceWorker' in navigator){
   <input type="number" id="mc_max">
   <input type="number" id="chg_min">
   <input type="number" id="chg_max">
+  <input type="number" id="from_high_min">
   <input type="number" id="from_high_max">
   <input type="number" id="from_low_min">
   <input type="number" id="tech_rating_min">
   <input type="number" id="tech_rating_max">
+  <input type="number" id="ma_rating_min">
+  <input type="number" id="ma_rating_max">
+  <input type="number" id="osc_rating_min">
+  <input type="number" id="osc_rating_max">
   <input type="number" id="rsi_min">
   <input type="number" id="rsi_max">
+  <input type="number" id="rel_vol_min">
+  <input type="number" id="rel_vol_max">
+  <input type="number" id="beta_min">
+  <input type="number" id="beta_max">
+  <input type="number" id="adx_min">
+  <input type="number" id="adx_max">
+  <input type="number" id="adx_di_diff_min">
+  <input type="number" id="above_sma200_min">
+  <input type="number" id="above_sma200_max">
+  <input type="number" id="sma_trend_min">
+  <input type="number" id="sma_trend_max">
+  <input type="number" id="macd_min">
+  <input type="number" id="macd_max">
+  <input type="number" id="macd_hist_min">
+  <input type="number" id="macd_hist_max">
+  <input type="number" id="bb_dist_min">
+  <input type="number" id="bb_dist_max">
+  <input type="number" id="stoch_k_min">
+  <input type="number" id="stoch_k_max">
+  <input type="number" id="stoch_kd_min">
+  <input type="number" id="perf1m_min">
+  <input type="number" id="perf1m_max">
   <input type="number" id="perf3m_min">
   <input type="number" id="perf3m_max">
   <input type="number" id="perf6m_min">
