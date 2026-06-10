@@ -2125,6 +2125,13 @@ function closePrescanView() {
     el.classList.remove('psv-closing');
     el.style.opacity = '';
     el.style.transition = '';
+    // Önceki sonuçlar varsa ekranı geri yükle
+    if (typeof allData !== 'undefined' && allData.length > 0) {
+      showState('twrap');
+      var tb = document.getElementById('toolbar');
+      if (tb) tb.style.display = 'flex';
+      updateStatsBar();
+    }
   }, 280);
 }
 
