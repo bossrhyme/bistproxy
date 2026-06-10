@@ -4558,7 +4558,7 @@ function showScreener() {
 }
 function showScreenerOrPrescan() {
   _doShowScreener();
-  if (allData.length === 0) openPrescanView();
+  openPrescanView();
 }
 function _doShowScreener() {
   hideAnalizPage();
