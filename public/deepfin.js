@@ -1800,8 +1800,8 @@ const TECH_PRESETS = {
 
   bbBounce: {
     label: 'Bollinger Dibi',
-    desc: 'Alt banda gerileyip ortalamaya dönüş potansiyeli taşıyan hisseleri bulur. Fiyat alt bandın %1 yakınında, RSI 40 altı.',
-    filters: { bb_dist_max: 1, rsi_max: 40 }
+    desc: 'Alt banda gerileyip ortalamaya dönüş potansiyeli taşıyan hisseleri bulur. Fiyat alt bandın %3 yakınında, RSI 40 altı.',
+    filters: { bb_dist_max: 3, rsi_max: 40 }
   },
 
   stochReversal: {
