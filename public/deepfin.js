@@ -1609,7 +1609,6 @@ async function runScan(){
   } finally {
     var _isSuccess   = (_pendingScanResult !== undefined);
     var _spec        = _pendingScanResult;
-    var _fromPrescan = _psvScanFilterCount > 0;
     _pendingScanResult = undefined;
     _psvScanFilterCount = 0;
     _scanRunning = false;
@@ -1620,14 +1619,10 @@ async function runScan(){
       setTimeout(function() {
         stopScanEta();
         applyAndRender(_spec);
-        if (_fromPrescan) collapseSidebar();
       }, _remaining);
     } else {
       stopScanEta();
-      if (_isSuccess) {
-        applyAndRender(_spec);
-        if (_fromPrescan) collapseSidebar();
-      }
+      if (_isSuccess) applyAndRender(_spec);
     }
   }
 }
@@ -2138,6 +2133,8 @@ function psvScan() {
   var delay = el ? 280 : 0;
   if (el) { el.style.transition = ''; el.classList.add('psv-closing'); }
   _psvScanFilterCount = _psvTotalSel();
+  // Sidebar'ı overlay hâlâ ekranı kaplarken animasyonsuz kapat — görünür kayma olmaz
+  collapseSidebar(true);
   setTimeout(function() {
     if (el) {
       el.style.display = 'none';
@@ -2145,7 +2142,6 @@ function psvScan() {
       el.style.opacity = '';
       el.style.transition = '';
     }
-    collapseSidebar();
     // selectAsset(_resetPanel) chip'leri sıfırlıyor; sync'ten ÖNCE çağrılmalı
     if (_activeAsset !== 'hisse') selectAsset('hisse');
     document.querySelectorAll('#goat-chips .goat-chip, #adv-goat-chips .goat-chip').forEach(function(c){
@@ -3425,6 +3421,12 @@ function showState(id){
   if (smEl) smEl.style.display = id === 'twrap' ? 'grid' : 'none';
   const nsbEl = document.getElementById('new-scan-btn');
   if (nsbEl) nsbEl.style.display = id === 'twrap' ? 'inline-flex' : 'none';
+  // Loading/hata/boş durumda stats-bar da gizli — üst bar tek blok halinde değişir,
+  // bayat değerler (önceki taramanın sayıları) loading sırasında görünmez
+  if (id !== 'twrap') {
+    const sbBar = document.getElementById('stats-bar');
+    if (sbBar) sbBar.classList.remove('visible');
+  }
 }
 
 function abortScan(){
@@ -4574,12 +4576,13 @@ function showScreener() {
   _doShowScreener();
 }
 function showScreenerOrPrescan() {
-  _doShowScreener();
+  // Prescan üstte açılacak; alttaki sidebar durumuna dokunma (geri dönüşte kayma olmasın)
+  _doShowScreener(true);
   openPrescanView();
 }
-function _doShowScreener() {
+function _doShowScreener(keepSidebar) {
   hideAnalizPage();
-  setTimeout(initSidebarState, 0);
+  if (!keepSidebar) setTimeout(initSidebarState, 0);
   var _pp=document.getElementById('profile-page'); if(_pp){_pp.style.display='none';_pp.classList.remove('on');}
   var na = document.getElementById('nav-analiz'); if(na) na.classList.remove('active');
   // Disclaimer kontrolü
@@ -4842,12 +4845,17 @@ function initSidebarState() {
   if (reopen)     reopen.style.display = 'none';
   if (tickerWrap) tickerWrap.classList.remove('sb-open');
 }
-function collapseSidebar() {
+function collapseSidebar(instant) {
   if (window.innerWidth <= 768) return;
   var sb = document.getElementById('sidebar');
   var reopen = document.getElementById('sb-reopen');
   var tickerWrap = document.getElementById('ticker-wrap');
   if (!sb || sb.classList.contains('collapsed')) return;
+  if (instant) {
+    // Overlay arkasında görünmez kapanış: animasyonsuz
+    sb.style.transition = 'none';
+    setTimeout(function(){ sb.style.transition = ''; }, 50);
+  }
   sb.classList.add('collapsed');
   if (reopen) reopen.style.display = 'flex';
   if (tickerWrap) tickerWrap.classList.add('sb-open');
