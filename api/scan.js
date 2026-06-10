@@ -748,10 +748,54 @@ module.exports = async function(req, res) {
           floatShares = sJson.data?.summaryData?.ShareFloat?.value || null;
         } catch(e) {}
 
-        res.status(200).json({ source: 'nasdaq', symbol, rows: rows.slice(0, 10), floatShares });
+        res.status(200).json({ source: 'live', symbol, rows: rows.slice(0, 10), floatShares });
       } catch(e) { console.error('[scan]', e.message); res.status(500).json({ error: 'Veri alınamadı' }); }
       resolve();
     });
+  }
+
+  // ── LOGO: şirket logosu proxy (kaynak adresi client'a sızmaz) ──
+  if (action === 'logo') {
+    const sym = (url.searchParams.get('sym') || '').toLowerCase()
+                  .replace(/\.(is|de|l|t)$/i, '').replace(/[^a-z0-9._-]/g, '');
+    const ex  = (url.searchParams.get('ex') || 'bist').toLowerCase();
+    if (!sym) return res.status(400).end();
+
+    const LOGO_PFX = {
+      bist:'bist', nasdaq:'nasdaq', sp500:'nyse', nyse:'nyse', dax:'xetr', lse:'lse',
+      nikkei:'tse', krx:'krx', moex:'moex', france:'euronext', amsterdam:'euronext',
+      brussels:'euronext', lisbon:'euronext', dublin:'euronext', oslo:'ose', milan:'mta',
+      tsx:'tsx', twse:'twse', b3:'bmfbovespa', hkex:'hkex', china:'sse', saudi:'tadawul',
+      switzerland:'six', australia:'asx', southafrica:'jse', sweden:'nasdaq', india:'nse', uae:'dfm'
+    };
+    const pfx = LOGO_PFX[ex] || 'bist';
+    const candidates = ['/' + pfx + '/' + sym + '--big.svg', '/' + sym + '--big.svg'];
+
+    const fetchImg = (path) => new Promise((resolve) => {
+      const r = https.request({
+        hostname: 's3-symbol-logo.tradingview.com', path, method: 'GET',
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
+      }, (rs) => {
+        if (rs.statusCode !== 200) { rs.resume(); return resolve(null); }
+        const chunks = [];
+        rs.on('data', c => chunks.push(c));
+        rs.on('end', () => resolve({ body: Buffer.concat(chunks), type: rs.headers['content-type'] || 'image/svg+xml' }));
+      });
+      r.on('error', () => resolve(null));
+      r.setTimeout(6000, () => { r.destroy(); resolve(null); });
+      r.end();
+    });
+
+    for (const p of candidates) {
+      const img = await fetchImg(p);
+      if (img) {
+        res.setHeader('Content-Type', img.type);
+        res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=2592000, immutable');
+        return res.status(200).end(img.body);
+      }
+    }
+    res.setHeader('Cache-Control', 'public, max-age=3600, s-maxage=86400');
+    return res.status(404).end();
   }
 
   res.status(400).json({ error: 'Unknown action' });

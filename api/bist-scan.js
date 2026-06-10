@@ -149,7 +149,7 @@ module.exports = async function handler(req, res) {
     const data = rows.map(normalizeRow).filter(r => r.symbol);
 
     const response = {
-      source:    'isyatirim',
+      source:    'live',
       count:     data.length,
       data,
       cached_at: new Date().toISOString(),

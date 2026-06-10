@@ -267,7 +267,7 @@ module.exports = async (req, res) => {
       annual:    [],
       quarterly: [],
       symbol:    fullSym,
-      source:    'tradingview',
+      source:    'live',
       _note: type !== 'metrics' ? 'Detaylı tablo TradingView Scanner\'da mevcut değil. Özet metrikler gösteriliyor.' : undefined,
     });
 

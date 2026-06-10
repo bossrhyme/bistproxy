@@ -104,7 +104,7 @@ function normalize(raw, ticker) {
     free_float:   get(['HALKA_ACIKLIK', 'free_float', 'freeFloat']),   // %
     foreign_ratio: get(['YABANCI_ORANI', 'foreign_ratio', 'foreignRatio']), // %
     sector:       raw.SEKTOR || raw.sector || null,
-    source: 'isyatirim',
+    source: 'live',
     fetched_at: new Date().toISOString(),
   };
 }

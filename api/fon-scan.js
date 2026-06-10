@@ -203,7 +203,7 @@ module.exports = async function handler(req, res) {
   const rlCount = await kvIncr('rl:fon-scan:' + ip, 60);
   if (rlCount > 10) {
     trackViolation(ip).catch(() => {});
-    return res.status(200).end(JSON.stringify({ funds: [], total: 0, source: 'tefas', error: 'Çok fazla istek, lütfen bekleyin.' }));
+    return res.status(200).end(JSON.stringify({ funds: [], total: 0, source: 'fon', error: 'Çok fazla istek, lütfen bekleyin.' }));
   }
 
   // Her tarama isteğinde sayacı artır
@@ -226,7 +226,7 @@ module.exports = async function handler(req, res) {
     await sleep(3000);
     const retry = await kvGet(cacheKey);
     if (retry) { res.setHeader('X-Cache', 'HIT'); return res.status(200).end(JSON.stringify(retry)); }
-    return res.status(200).end(JSON.stringify({ funds: [], total: 0, source: 'tefas', error: 'Veri yükleniyor, lütfen tekrar deneyin.' }));
+    return res.status(200).end(JSON.stringify({ funds: [], total: 0, source: 'fon', error: 'Veri yükleniyor, lütfen tekrar deneyin.' }));
   }
 
   try {
@@ -234,7 +234,7 @@ module.exports = async function handler(req, res) {
     const mainData = await tefasFetch(fonTur, 0, 7);
 
     if (!mainData.length) {
-      return res.status(200).end(JSON.stringify({ funds:[], total:0, source:'tefas', error:'Veri yok' }));
+      return res.status(200).end(JSON.stringify({ funds:[], total:0, source:'fon', error:'Veri yok' }));
     }
 
     // Referans pencereler — sıralı + 600ms bekleme (rate limit önlemi)
@@ -296,7 +296,7 @@ module.exports = async function handler(req, res) {
         retYtd:      pct(cur, refYtd[code]?.price),
         ret7d:       pct(cur, old7),
         sharpe:      sharpe(pts.map(p=>p.price)),
-        source:      'tefas',
+        source:      'fon',
         verified:    false
       };
     });
@@ -322,7 +322,7 @@ module.exports = async function handler(req, res) {
     funds.sort((a,b) => (b[sf] ?? -Infinity) - (a[sf] ?? -Infinity));
     funds = funds.slice(0, limit);
 
-    const result = { funds, total: funds.length, source:'tefas', updatedAt: new Date().toISOString() };
+    const result = { funds, total: funds.length, source:'fon', updatedAt: new Date().toISOString() };
     if (kvEnabled()) {
       await kvSet(cacheKey, result, 3600);
       kvDel(lockKey).catch(() => {});
@@ -331,6 +331,6 @@ module.exports = async function handler(req, res) {
 
   } catch(err) {
     console.error('fon-scan fatal:', err.message);
-    return res.status(200).end(JSON.stringify({ funds:[], total:0, source:'tefas', error: 'TEFAS verisi şu an alınamıyor' }));
+    return res.status(200).end(JSON.stringify({ funds:[], total:0, source:'fon', error: 'TEFAS verisi şu an alınamıyor' }));
   }
 };

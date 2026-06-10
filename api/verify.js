@@ -137,7 +137,7 @@ module.exports = async (req, res) => {
   if (rlCount > 20) { trackViolation(ip).catch(() => {}); return res.status(429).json({ error: 'Çok fazla istek, lütfen bekleyin.' }); }
 
   // KV cache
-  const cacheKey = 'df_verify_v1_' + exchange + '_' + sym;
+  const cacheKey = 'df_verify_v2_' + exchange + '_' + sym;
   const cached = await kvGet(cacheKey);
   if (cached) {
     res.setHeader('X-Cache', 'HIT');
@@ -156,9 +156,8 @@ module.exports = async (req, res) => {
     const g = {};
     FIELDS.forEach((f, i) => { g[f] = row[i] ?? null; });
 
-    const yahoo = {
+    const ref = {
       symbol:   sym,
-      source:  'tradingview',
       pe:       num(g.price_earnings_ttm),
       pb:       num(g.price_book_fq) ?? num(g.price_book_ratio),
       ps:       num(g.price_sales_current),
@@ -174,7 +173,7 @@ module.exports = async (req, res) => {
       piotroski:     g.piotroski_f_score != null ? Math.round(g.piotroski_f_score) : null,
     };
 
-    const result = { source: 'tradingview', yahoo, symbol: sym };
+    const result = { ref, symbol: sym };
     kvSet(cacheKey, result, 300).catch(() => {});
     kvSet('stale:' + cacheKey, result, 86400).catch(() => {});
     res.status(200).json(result);

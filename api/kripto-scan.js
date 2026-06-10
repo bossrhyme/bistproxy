@@ -223,9 +223,9 @@ function mergeData(cgList, tvData, llamaMap) {
       ? parseFloat((cg.market_cap / tvl).toFixed(2))
       : null;
 
-    const sources = ['coingecko'];
-    if (tv)  sources.push('tradingview');
-    if (ll)  sources.push('defillama');
+    const sources = ['primary'];
+    if (tv)  sources.push('technical');
+    if (ll)  sources.push('tvl');
 
     return {
       // Temel bilgi (CoinGecko)
@@ -425,7 +425,7 @@ module.exports = async function handler(req, res) {
     }
 
     if (!cgData || !cgData.length) {
-      return res.status(200).json({ coins: [], total: 0, sources: ['coingecko'] });
+      return res.status(200).json({ coins: [], total: 0, sources: ['primary'] });
     }
 
     // 2. TradingView + DeFiLlama — paralel çek
@@ -453,9 +453,6 @@ module.exports = async function handler(req, res) {
       llamaCoverage,
       preset:      preset || null,
       sources: {
-        primary:   'coingecko',
-        secondary: 'tradingview',
-        tertiary:  'defillama',
         note: `${verified}/${coins.length} çapraz doğrulandı · ${llamaCoverage} TVL verisi`
       },
       updatedAt: new Date().toISOString()
