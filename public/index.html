@@ -129,8 +129,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=arctic77">
-<script src="/deepfin.js?v=111" defer></script>
+<link rel="stylesheet" href="/deepfin.css?v=arctic78">
+<script src="/deepfin.js?v=112" defer></script>
 <link rel="dns-prefetch" href="https://api.coingecko.com">
 <link rel="dns-prefetch" href="https://finnhub.io">
 <link rel="dns-prefetch" href="https://www.tefas.gov.tr">
@@ -1297,18 +1297,17 @@ if('serviceWorker' in navigator){
       <!-- STATS BAR -->
       <div class="stats-bar" id="stats-bar">
         <button id="new-scan-btn" class="new-scan-btn" onclick="openPrescanView()" title="Yeni tarama başlat">🔍 Yeni Tarama</button>
-        <button id="mobile-filter-btn" class="mobile-filter-btn" onclick="toggleMobileDrawer()" title="Filtreleri aç">☰ Filtreler</button>
-        <button id="fav-filter-btn" class="sb-fav-btn" onclick="toggleFavFilter()" title="Listelerim">☆ Listelerim</button>
-        <button class="col-btn" onclick="openColPicker()" title="Kolonları özelleştir">⚙ Kolonlar</button>
         <div class="sb-search">
           <span class="sb-search-ico">⌕</span>
           <input type="text" id="sb-searchbox" class="sb-search-input" placeholder="Ara..." oninput="onSearch()" />
         </div>
+        <button id="mobile-filter-btn" class="mobile-filter-btn" onclick="toggleMobileDrawer()" title="Filtreleri aç">☰ Filtreler</button>
         <div class="sb-item"><span class="sb-label">TARAMA</span><span class="sb-val" id="sb-count">—</span></div>
         <div class="sb-item"><span class="sb-label">YÜKSELİŞ</span><span class="sb-val up" id="sb-up">—</span></div>
         <div class="sb-item"><span class="sb-label">DÜŞÜŞ</span><span class="sb-val dn" id="sb-dn">—</span></div>
         <div class="sb-item"><span class="sb-label">BORSA</span><span class="sb-val" id="sb-ex">—</span></div>
         <div class="sb-item"><span class="sb-label">GÜNCELLEME</span><span class="sb-val" id="sb-time">—</span></div>
+        <div class="sb-item" id="sb-result-item" style="display:none"><span class="sb-label">SONUÇ</span><span class="sb-val" id="sb-result">—</span></div>
       </div>
 
       <div id="scan-summary" class="scan-summary" style="display:none"></div>

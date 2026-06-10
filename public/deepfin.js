@@ -4473,9 +4473,16 @@ function showScanSummary(total, matches) {
       '</span>';
   }).join('');
   el.innerHTML =
-    '<span class="ssm-left">' + (tagsHtml || '<span class="ssm-no-filter">Filtresiz</span>') + '</span>' +
-    '<span class="ssm-center"><strong>' + total + '</strong> tarandı · <strong class="ssm-match-num">' + matches + '</strong> eşleşti</span>' +
+    '<span class="ssm-left"></span>' +
+    '<span class="ssm-center ssm-tags-center">' + (tagsHtml || '<span class="ssm-no-filter">Filtresiz</span>') + '</span>' +
     '<span class="ssm-right ssm-dur">' + elapsed + 's</span>';
+  // Tarandı/eşleşti bilgisi stats-bar'da GÜNCELLEME yanında
+  var resItem = document.getElementById('sb-result-item');
+  var resVal  = document.getElementById('sb-result');
+  if (resItem && resVal) {
+    resVal.innerHTML = total + ' tarandı · <span class="up">' + matches + ' eşleşti</span>';
+    resItem.style.display = '';
+  }
 }
 
 // ── MOBILE DRAWER ──
