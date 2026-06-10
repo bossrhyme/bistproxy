@@ -1992,6 +1992,7 @@ function initPrescanView() {
   var extraGoatKeys = Object.keys(GURUS).filter(function(k){ return PSV_MAIN_GOATS.indexOf(k)===-1; });
 
   el.innerHTML =
+    '<button class="psv-close-btn" id="psv-close-btn" onclick="closePrescanView()" style="display:none">✕ Sonuçlara dön</button>'+
     '<div class="psv-inner">'+
     '<div class="psv-brand"><div class="psv-logo"><div class="tlogo-mark">D</div>DeepFin</div><div class="psv-tagline">Borsa seç · Strateji seç · Tara</div></div>'+
 
@@ -2111,15 +2112,31 @@ function openPrescanView() {
   initPrescanView();
   var el = document.getElementById('prescan-view');
   if (!el) return;
+  // Mevcut sonuç varsa geri dönüş butonu göster
+  var cb = document.getElementById('psv-close-btn');
+  if (cb) cb.style.display = (typeof allData !== 'undefined' && allData.length > 0) ? '' : 'none';
   el.style.transition = 'none';
   el.style.opacity = '1';
   el.style.display = 'flex';
 }
 
+function closePrescanView() {
+  var el = document.getElementById('prescan-view');
+  if (!el) return;
+  el.style.transition = '';
+  el.classList.add('psv-closing');
+  setTimeout(function() {
+    el.style.display = 'none';
+    el.classList.remove('psv-closing');
+    el.style.opacity = '';
+    el.style.transition = '';
+  }, 280);
+}
+
 function psvScan() {
   var el = document.getElementById('prescan-view');
   var delay = el ? 280 : 0;
-  if (el) el.classList.add('psv-closing');
+  if (el) { el.style.transition = ''; el.classList.add('psv-closing'); }
   _psvScanFilterCount = _psvTotalSel();
   setTimeout(function() {
     if (el) {

@@ -511,6 +511,8 @@ td:first-child,td:nth-child(2){text-align:left;}
 #prescan-view.psv-at-limit .psv-preset-card:not(.on),
 #prescan-view.psv-at-limit .psv-tech-card:not(.on){opacity:.35;pointer-events:none;}
 .psv-limit-hint{display:none;font-size:12px;font-weight:600;color:#b45309;background:rgba(240,180,41,.1);border:1px solid rgba(240,180,41,.35);border-radius:var(--r-md);padding:8px 16px;}
+.psv-close-btn{position:absolute;top:14px;right:18px;background:var(--s2);border:1px solid var(--border);color:var(--text2);font-size:12px;font-weight:600;padding:7px 14px;border-radius:var(--r-pill);cursor:pointer;z-index:5;transition:border-color .15s,color .15s;}
+.psv-close-btn:hover{border-color:var(--accent);color:var(--accent);}
 #prescan-view.psv-at-limit .psv-limit-hint{display:block;}
 
 /* New-scan fab in stats-bar */
