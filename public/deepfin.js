@@ -2548,7 +2548,8 @@ function applyAndRender(special){
       var twrap = document.getElementById('twrap');
       if (twrap) twrap.appendChild(zeroEl);
     }
-    var activeChips = Array.from(document.querySelectorAll('.chip.on, .goat-chip.on')).map(c => c.textContent.trim());
+    // _scanMeta.filters = tekilleştirilmiş gerçek seçimler (özet barıyla aynı kaynak)
+    var activeChips = (_scanMeta.filters || []).map(function(f){ return f.label; });
     var chipCount = activeChips.length;
     var suggestions = [
       { icon: '📉', title: 'Filtre kriterlerini genişletin', desc: chipCount > 1 ? 'Birden fazla strateji aynı anda uygulanıyor. Tek bir filtre ile başlayın.' : 'Mevcut kriterleri biraz daha esnek bir aralığa taşıyın.' },
