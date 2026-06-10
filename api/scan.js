@@ -533,7 +533,7 @@ module.exports = async function(req, res) {
           }
         }
         resolve();
-      });
+      }, 20000); // geniş kolon setli tarama soğuk istekte 8sn'yi aşabiliyor
     });
   }
 

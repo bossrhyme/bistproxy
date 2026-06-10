@@ -189,6 +189,9 @@
     { "source": "/admin/",            "destination": "/admin/index.html" }
   ],
   "functions": {
+    "api/scan.js": {
+      "maxDuration": 25
+    },
     "api/verify.js": {
       "maxDuration": 10
     },

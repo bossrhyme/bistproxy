@@ -1314,8 +1314,15 @@ async function runScan(){
     india:       COLS_GLOBAL,
     uae:         COLS_GLOBAL,
   };
+  // Yeni eklenen teknik kolonlar — sorun çıkarsa çekirdek sete dönüş için ayrı tutulur
+  const NEW_TECH_COLS = ['price_52_week_high','price_52_week_low',
+    'average_volume_10d_calc','relative_volume_10d_calc',
+    'SMA50','SMA200','MACD.macd','MACD.signal',
+    'ADX','ADX+DI','ADX-DI','BB.lower','Stoch.K','Stoch.D','beta_1_year','Perf.1M'];
+  const _fullCols = COLUMNS_BY_EXCHANGE[currentExchange] || COLS_GLOBAL;
+  const _coreCols = _fullCols.filter(function(c){ return NEW_TECH_COLS.indexOf(c) === -1; });
   const payload = {
-    columns: COLUMNS_BY_EXCHANGE[currentExchange] || COLUMNS_BY_EXCHANGE.default,
+    columns: (window._scanCoreColsOnly ? _coreCols : _fullCols).slice(),
     range: [0, 3000],
     sort: { sortBy: 'market_cap_basic', sortOrder: 'desc' },
     ignore_unknown_fields: true
@@ -1332,7 +1339,7 @@ async function runScan(){
     if (currentExchange === 'moex')   payload.range = [0, 500];
   // Proxy üzerinden — kaynak gizli; BIST için halka açıklık verisi paralel çekilir
   const _isBist = currentExchange === 'bist';
-  const [res, _bistFloatRes] = await Promise.all([
+  const [resInit, _bistFloatRes] = await Promise.all([
     fetch('/api/scan?exchange=' + currentExchange, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1343,38 +1350,43 @@ async function runScan(){
 
     document.getElementById('prog').style.width = '70%';
 
-    const text = await res.text();
-    if(!res.ok) throw new Error(`Proxy hatası: HTTP ${res.status} — ${text.slice(0,200)}`);
-
-    let json;
-    try { json = JSON.parse(text); } catch(e) { throw new Error('Parse hatası: ' + text.slice(0,200)); }
-
-    // Eğer body string olarak geldiyse (eski proxy formatı) içini parse et
-    if(json.body && typeof json.body === 'string') {
-      try { json = JSON.parse(json.body); } catch(e) { throw new Error('Body parse hatası: ' + json.body.slice(0,200)); }
-    }
-
-    if(json.error) {
-      // Hatalı field varsa otomatik kaldır ve tekrar dene
-      const badField = json.error.match(/"([^"]+)"/)?.[1];
-      if (badField) {
-        const cols = payload.columns;
-        const idx = cols.indexOf(badField);
-        if (idx > -1) {
-          cols.splice(idx, 1);
-          // Tekrar dene
-          const exCfg2 = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
-          if (exCfg2.filters.length > 0) payload.filter = exCfg2.filters;
-          const res2 = await fetch('/api/scan?exchange=' + currentExchange, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-          const text2 = await res2.text();
-          const json2 = JSON.parse(text2);
-          if (json2.error) throw new Error('API (retry): ' + json2.error);
-          Object.assign(json, json2);
-        } else {
-          throw new Error('API: ' + json.error);
+    // Yanıtı çöz. Hata durumlarında kademeli telafi:
+    //  1) Hata mesajında kolon adı geçiyorsa o kolonu çıkar, tekrar dene (en fazla 6)
+    //  2) Teşhis edilemeyen hata → kanıtlanmış çekirdek kolon setiyle son bir deneme
+    let json = null;
+    {
+      let resCur = resInit, attempt = 0, coreFallbackDone = window._scanCoreColsOnly === true;
+      while (true) {
+        const text = await resCur.text();
+        let parsed = null;
+        try { parsed = JSON.parse(text); } catch(e) {}
+        if (parsed && parsed.body && typeof parsed.body === 'string') {
+          try { parsed = JSON.parse(parsed.body); } catch(e) {}
         }
-      } else {
-        throw new Error('API: ' + json.error);
+        const errMsg = (parsed && parsed.error) ? String(parsed.error)
+                     : (!resCur.ok ? ('HTTP ' + resCur.status + ' — ' + text.slice(0, 200))
+                     : (!parsed ? ('Parse hatası: ' + text.slice(0, 200)) : null));
+        if (!errMsg) { json = parsed; break; }
+
+        const badField = (errMsg.match(/"([^"]+)"/) || [])[1];
+        attempt++;
+        if (badField && payload.columns.indexOf(badField) > -1 && attempt <= 6) {
+          console.warn('[DeepFin] Kolon reddedildi, çıkarılıyor:', badField);
+          payload.columns.splice(payload.columns.indexOf(badField), 1);
+          // Kalıcı öğren: paylaşılan kolon listesinden de çıkar
+          const sharedIdx = _fullCols.indexOf(badField);
+          if (sharedIdx > -1) _fullCols.splice(sharedIdx, 1);
+        } else if (!coreFallbackDone) {
+          console.warn('[DeepFin] Tarama hatası, çekirdek kolonlarla yeniden deneniyor:', errMsg);
+          coreFallbackDone = true;
+          window._scanCoreColsOnly = true; // sonraki taramalar da çekirdek setle başlasın
+          payload.columns = _coreCols.slice();
+        } else {
+          throw new Error('API: ' + errMsg);
+        }
+        resCur = await fetch('/api/scan?exchange=' + currentExchange, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+        });
       }
     }
     if(!json.data || json.data.length === 0) {
@@ -1649,7 +1661,17 @@ async function runScan(){
   } catch(err) {
     showState('errstate');
     console.error('[scan]', err.message);
-    document.getElementById('errmsg').textContent = 'Veri alınamadı — bağlantıyı kontrol edip tekrar deneyin.';
+    var _em = document.getElementById('errmsg');
+    _em.textContent = 'Veri alınamadı — bağlantıyı kontrol edip tekrar deneyin.';
+    // Teşhis detayı (küçük, soluk satır) — destek bildirimleri için
+    var _ed = document.getElementById('errdetail');
+    if (!_ed) {
+      _ed = document.createElement('p');
+      _ed.id = 'errdetail';
+      _ed.style.cssText = 'color:var(--muted2);font-size:10px;margin-top:6px;max-width:420px;word-break:break-word;';
+      _em.parentNode.appendChild(_ed);
+    }
+    _ed.textContent = String(err.message || '').slice(0, 180);
   } finally {
     var _isSuccess   = (_pendingScanResult !== undefined);
     var _spec        = _pendingScanResult;
