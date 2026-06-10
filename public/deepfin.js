@@ -2109,12 +2109,9 @@ function openPrescanView() {
   initPrescanView();
   var el = document.getElementById('prescan-view');
   if (!el) return;
-  el.style.display = 'flex';
-  el.style.opacity = '0';
   el.style.transition = 'none';
-  el.offsetHeight;
-  el.style.transition = '';
   el.style.opacity = '1';
+  el.style.display = 'flex';
 }
 
 function psvScan() {
@@ -4549,6 +4546,7 @@ function showScreener() {
 }
 function showScreenerOrPrescan() {
   _doShowScreener();
+  if (allData.length === 0) openPrescanView();
 }
 function _doShowScreener() {
   hideAnalizPage();
@@ -4755,6 +4753,7 @@ document.addEventListener('DOMContentLoaded', function(){
   var _investor = _sp.get('investor');
   if (_p === 'profile' || _p === 'screener' || _p === 'analiz' || _path === '/screener' || _hasWl) {
     showScreener();
+    if (!_investor && allData.length === 0 && !_hasWl) openPrescanView();
   } else {
     showHomepage();
   }
