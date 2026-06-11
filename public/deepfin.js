@@ -4787,9 +4787,19 @@ function _initKeyboardNav() {
     }
   });
 
-  // Enter/Space ile chip/button aktivasyonu
   document.addEventListener('keydown', function(e) {
     var el = e.target;
+    var tag = el.tagName;
+    var inInput = tag === 'INPUT' || tag === 'TEXTAREA' || el.isContentEditable;
+
+    // Bloomberg shortcut: '/' focuses symbol search
+    if (e.key === '/' && !inInput && !e.ctrlKey && !e.metaKey) {
+      var si = document.getElementById('sb-searchbox');
+      if (si) { e.preventDefault(); si.focus(); si.select(); }
+      return;
+    }
+
+    // Enter/Space ile chip/button aktivasyonu
     if (e.key === 'Enter' || e.key === ' ') {
       if (el.classList.contains('chip') || el.classList.contains('goat-chip') || el.classList.contains('exbtn')) {
         e.preventDefault();
@@ -4798,7 +4808,7 @@ function _initKeyboardNav() {
       }
     }
     // Tablo satırları: ok tuşlarıyla navigasyon
-    if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && el.tagName === 'TR') {
+    if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && tag === 'TR') {
       e.preventDefault();
       var tbody = el.closest('tbody');
       if (!tbody) return;
@@ -4808,8 +4818,13 @@ function _initKeyboardNav() {
       if (next) { next.setAttribute('tabindex', '-1'); next.focus(); }
     }
     // Enter ile satır açma
-    if (e.key === 'Enter' && el.tagName === 'TR') {
+    if (e.key === 'Enter' && tag === 'TR') {
       el.click();
+    }
+    // Escape: search temizle veya detail kapat
+    if (e.key === 'Escape') {
+      var si = document.getElementById('sb-searchbox');
+      if (si && si === document.activeElement) { si.value = ''; si.dispatchEvent(new Event('input')); si.blur(); return; }
     }
   });
 }
