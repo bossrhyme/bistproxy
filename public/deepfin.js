@@ -2157,15 +2157,19 @@ function initPrescanView() {
     '<div class="psv-inner">'+
     '<div class="psv-brand"><div class="psv-logo"><div class="tlogo-mark">D</div>DeepFin</div><div class="psv-tagline">Varlık seç · Borsa seç · Tara</div></div>'+
 
-    // Asset type section
+    // Asset type section — yatay kaydırmalı
     '<div class="psv-section">'+
     '<div class="psv-section-hd">🏦 Varlık</div>'+
-    '<div class="psv-asset-row">'+
-      '<button class="psv-asset-btn on" data-asset="hisse" onclick="psvSetAsset(\'hisse\')"><span class="psv-asset-icon">📈</span><span class="psv-asset-name">Borsa</span></button>'+
-      '<div class="psv-asset-soon"><span class="psv-asset-icon">₿</span><span class="psv-asset-name">Kripto</span><span class="psv-asset-badge">yakında</span></div>'+
-      '<div class="psv-asset-soon"><span class="psv-asset-icon">💼</span><span class="psv-asset-name">Fon</span><span class="psv-asset-badge">yakında</span></div>'+
-      '<div class="psv-asset-soon"><span class="psv-asset-icon">📦</span><span class="psv-asset-name">ETF</span><span class="psv-asset-badge">yakında</span></div>'+
-      '<div class="psv-asset-soon"><span class="psv-asset-icon">📉</span><span class="psv-asset-name">Viop</span><span class="psv-asset-badge">yakında</span></div>'+
+    '<div class="psv-asset-wrap">'+
+      '<button class="psv-asset-arrow" onclick="psvScrollAssets(-1)" aria-label="Sola kaydır">‹</button>'+
+      '<div class="psv-asset-row" id="psv-asset-row">'+
+        PSV_ASSETS.map(function(a){
+          return a.active
+            ? '<button class="psv-asset-btn on" data-asset="'+a.key+'" onclick="psvSetAsset(\''+a.key+'\')"><span class="psv-asset-icon">'+a.icon+'</span><span class="psv-asset-name">'+a.label+'</span></button>'
+            : '<div class="psv-asset-soon"><span class="psv-asset-icon">'+a.icon+'</span><span class="psv-asset-name">'+a.label+'</span><span class="psv-asset-badge">yakında</span></div>';
+        }).join('')+
+      '</div>'+
+      '<button class="psv-asset-arrow" onclick="psvScrollAssets(1)" aria-label="Sağa kaydır">›</button>'+
     '</div>'+
     '</div>'+
 
@@ -2224,8 +2228,26 @@ function psvSetExchange(key) {
   }
 }
 
+// Varlık sınıfları — prescan yatay kaydırmalı satır
+const PSV_ASSETS = [
+  { key: 'hisse',    label: 'Borsa',       icon: '📈', active: true },
+  { key: 'kripto',   label: 'Kripto',      icon: '₿' },
+  { key: 'fon',      label: 'Fon',         icon: '💼' },
+  { key: 'etf',      label: 'ETF',         icon: '📦' },
+  { key: 'eurobond', label: 'Eurobond',    icon: '💵' },
+  { key: 'bono',     label: 'Bono/Tahvil', icon: '🏛️' },
+  { key: 'viop',     label: 'Viop',        icon: '📉' },
+  { key: 'varant',   label: 'Varant',      icon: '🎫' },
+  { key: 'opsiyon',  label: 'Opsiyon',     icon: '🎯' },
+];
+
 function psvSetAsset(key) {
   document.querySelectorAll('.psv-asset-btn').forEach(function(b){ b.classList.toggle('on', b.dataset.asset === key); });
+}
+
+function psvScrollAssets(dir) {
+  var row = document.getElementById('psv-asset-row');
+  if (row) row.scrollBy({ left: dir * 220, behavior: 'smooth' });
 }
 
 var _PSV_MAX_SEL = 4;
