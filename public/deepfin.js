@@ -5125,25 +5125,30 @@ function _saveScanHistory(resultCount) {
 function _getScanHistory() {
   try { return JSON.parse(localStorage.getItem('df_scan_hist') || '[]'); } catch(e){ return []; }
 }
-function _renderScanHistory(cont) {
+function _renderScanHistory() {
   var hist = _getScanHistory();
   if (!hist.length) return '';
   var ex_names = { bist:'BIST', nasdaq:'NASDAQ', nyse:'NYSE', sp500:'S&P500', dax:'DAX', lse:'LSE', nikkei:'NIKKEI', kucuk:'Küçük BIST' };
-  var rows = hist.map(function(h) {
+  var rows = hist.map(function(h, i) {
     var ago = Math.round((Date.now() - h.ts) / 60000);
     var agoTxt = ago < 60 ? ago + ' dk önce' : Math.round(ago/60) + ' sa önce';
     var filterHtml = h.filters && h.filters.length
-      ? h.filters.map(function(f){ return '<span class="sh-tag sh-tag-'+f.kind+'">'+f.label+'</span>'; }).join('')
+      ? h.filters.map(function(f){ return '<span class="sh-tag sh-tag-'+f.kind+'">'+esc(f.label)+'</span>'; }).join('')
       : '<span class="sh-tag">Özel</span>';
-    var rerunFn = h.filters && h.filters.length
-      ? 'rerunScan(' + JSON.stringify(h) + ')'
-      : '';
-    return '<div class="sh-item" onclick="'+(rerunFn||'')+'">'
+    var canRerun = h.filters && h.filters.length;
+    return '<div class="sh-item' + (canRerun ? ' sh-clickable' : '') + '" data-hidx="'+i+'" onclick="_shItemClick(this)">'
       +'<div class="sh-meta"><span class="sh-ex">'+(ex_names[h.exchange]||h.exchange.toUpperCase())+'</span><span class="sh-count">'+h.count+' sonuç</span><span class="sh-ago">'+agoTxt+'</span></div>'
       +'<div class="sh-tags">'+filterHtml+'</div>'
       +'</div>';
   }).join('');
   return '<div class="scan-history"><div class="sh-title">SON TARAMALAR</div>'+rows+'</div>';
+}
+function _shItemClick(el) {
+  var idx = parseInt(el.dataset.hidx, 10);
+  var hist = _getScanHistory();
+  var h = hist[idx];
+  if (!h || !h.filters || !h.filters.length) return;
+  rerunScan(h);
 }
 function rerunScan(entry) {
   // Navigate to screener

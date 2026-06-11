@@ -1661,3 +1661,4 @@ kbd{font-family:var(--ff-mono);font-size:10px;color:var(--text);background:var(-
 .tb-save-btn:hover{border-color:var(--gold)!important;background:rgba(255,179,0,.08)!important;}
 .tb-templates-btn{color:var(--text2)!important;padding:3px 8px!important;}
 .saved-scans-wrap{display:flex;align-items:center;gap:3px;}
+.sh-item:not(.sh-clickable){cursor:default;}
