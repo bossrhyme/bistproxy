@@ -1193,6 +1193,29 @@ async function runScan(){
     return;
   }
   _track('scan', 'run');
+  // Görünümü İLK iş olarak değiştir — kur isteği beklenirken
+  // önceki taramanın bayat ekranı bir an bile görünmesin
+  const _quick = window._quickRescan === true;
+  window._quickRescan = false;
+  const btn = document.getElementById('scanbtn');
+  btn.disabled = true;
+  scanAborted = false;
+  document.getElementById('stopbtn').style.display = 'none';
+  allData = [];
+  filtered = [];
+  selSym = null;
+  closeDetail();
+  if (_quick) {
+    showQuickScanPill(window._quickRescanLabel);
+    window._quickRescanLabel = null;
+  } else {
+    showState('loading');
+    document.getElementById('toolbar').style.display = 'none';
+    document.getElementById('loadtxt').textContent = 'Taranıyor...';
+    const exMeta = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
+    document.getElementById('loadsub').textContent = `${exMeta.flag} ${exMeta.name} hisseleri alınıyor...`;
+  }
+  document.getElementById('prog').style.width = '30%';
   // Döviz kurları güncelleme (USD bazlı)
   try {
     const rateRes = await fetch('/api/rates');
@@ -1220,29 +1243,6 @@ async function runScan(){
       if(r.AED) fxRates.AED = 1 / r.AED;
     }
   } catch(e) { /* fallback kurlar kullanılır */ }
-  // Hızlı yeniden tarama: filtre ekle/kaldır akışından geliyorsa tablo ekranda kalır,
-  // tam ekran stepper yerine küçük bir pil gösterilir
-  const _quick = window._quickRescan === true;
-  window._quickRescan = false;
-  const btn = document.getElementById('scanbtn');
-  btn.disabled = true;
-  scanAborted = false;
-  document.getElementById('stopbtn').style.display = 'none';
-  allData = [];
-  filtered = [];
-  selSym = null;
-  closeDetail();
-  if (_quick) {
-    showQuickScanPill(window._quickRescanLabel);
-    window._quickRescanLabel = null;
-  } else {
-    showState('loading');
-    document.getElementById('toolbar').style.display = 'none';
-    document.getElementById('loadtxt').textContent = 'Taranıyor...';
-    const exMeta = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
-    document.getElementById('loadsub').textContent = `${exMeta.flag} ${exMeta.name} hisseleri alınıyor...`;
-  }
-  document.getElementById('prog').style.width = '30%';
   // Collect all active filter tags for summary bar (deduplicated by key)
   var _filterTags = [];
   var _seenKeys   = {};
@@ -2390,6 +2390,11 @@ function closePrescanView() {
 function psvScan() {
   var el = document.getElementById('prescan-view');
   var delay = el ? 280 : 0;
+  // Overlay solmaya başlamadan altta yükleme ekranını hazırla —
+  // fade sırasında önceki taramanın bayat tablosu görünmesin
+  showState('loading');
+  document.getElementById('toolbar').style.display = 'none';
+  document.getElementById('loadtxt').textContent = 'Taranıyor...';
   if (el) { el.style.transition = ''; el.classList.add('psv-closing'); }
   _psvScanFilterCount = _psvTotalSel();
   // Sidebar'ı overlay hâlâ ekranı kaplarken animasyonsuz kapat — görünür kayma olmaz
