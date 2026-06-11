@@ -131,8 +131,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=arctic97">
-<script src="/deepfin.js?v=142" defer></script>
+<link rel="stylesheet" href="/deepfin.css?v=arctic98">
+<script src="/deepfin.js?v=143" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -1316,6 +1316,10 @@ if('serviceWorker' in navigator){
         <button id="tb-fav-btn" class="sb-fav-btn" onclick="toggleFavFilter(event)" title="Listelerim" style="display:none">☆ Listelerim</button>
         <button id="tb-col-btn" class="col-btn" onclick="openColPicker()" title="Kolonları özelleştir" style="display:none">⚙ Kolonlar</button>
         <button id="tb-export-btn" class="col-btn tb-export-btn" onclick="exportToCSV()" title="CSV olarak dışa aktar" style="display:none">↓ CSV</button>
+        <div class="saved-scans-wrap" id="saved-scans-wrap" style="display:none">
+          <button class="col-btn tb-save-btn" onclick="saveCurrentScan()" title="Mevcut taramayı kaydet">✦ Kaydet</button>
+          <button class="col-btn tb-templates-btn" onclick="openSavedScans()" title="Kaydedilen taramalar" id="tb-templates-btn">📋</button>
+        </div>
         <div class="density-toggle" id="density-toggle" style="display:none">
           <button class="density-btn active" data-density="compact" onclick="setDensity('compact')" title="Kompakt görünüm">▤</button>
           <button class="density-btn" data-density="normal" onclick="setDensity('normal')" title="Normal görünüm">▥</button>
@@ -2297,6 +2301,18 @@ if('serviceWorker' in navigator){
     </div>
   </div>
 </div>
+<!-- Saved Scans Modal -->
+<div id="saved-scans-modal" class="saved-scans-modal" onclick="if(event.target===this)closeSavedScans()" style="display:none">
+  <div class="ssm-box">
+    <div class="ssm-head">
+      <span class="ssm-title">Kaydedilen Taramalar</span>
+      <button class="ssm-close-btn" onclick="closeSavedScans()">✕</button>
+    </div>
+    <div id="ssm-list" class="ssm-list"></div>
+    <div class="ssm-empty" id="ssm-empty" style="display:none">Henüz kaydedilmiş tarama yok.<br>Bir tarama çalıştırıp "✦ Kaydet"e bas.</div>
+  </div>
+</div>
+
 <div id="hisse-hidden-filters" style="display:none;">
   <input type="number" id="piotroski_min">
   <input type="number" id="piotroski_max">

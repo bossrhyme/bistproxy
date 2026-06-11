@@ -4137,10 +4137,12 @@ function updateStatsBar() {
   var tbCol = document.getElementById('tb-col-btn');
   var tbDens = document.getElementById('density-toggle');
   var tbExp = document.getElementById('tb-export-btn');
+  var tbSaved = document.getElementById('saved-scans-wrap');
   if (tbFav) tbFav.style.display = '';
   if (tbCol) tbCol.style.display = '';
   if (tbDens) tbDens.style.display = 'flex';
   if (tbExp) tbExp.style.display = '';
+  if (tbSaved) tbSaved.style.display = 'flex';
   var upCount = filtered.filter(function(s){ return s.changePercent > 0; }).length;
   var dnCount = filtered.filter(function(s){ return s.changePercent < 0; }).length;
   var ex = (typeof EXCHANGE_META !== 'undefined' ? EXCHANGE_META[currentExchange] : null) || {};
@@ -5010,6 +5012,95 @@ function _initKeyboardNav() {
       }
     }
   });
+}
+
+// ── Saved Scan Templates ─────────────────────────────────────
+function _getSavedScans() {
+  try { return JSON.parse(localStorage.getItem('df_saved_scans') || '[]'); } catch(e){ return []; }
+}
+function _putSavedScans(arr) {
+  try { localStorage.setItem('df_saved_scans', JSON.stringify(arr)); } catch(e){}
+}
+function saveCurrentScan() {
+  // Collect current state
+  var goats = [], presets = [], techs = [], inputs = {};
+  document.querySelectorAll('#goat-chips .goat-chip.on').forEach(function(c){ if(c.dataset.goat) goats.push(c.dataset.goat); });
+  document.querySelectorAll('#presets .chip.on').forEach(function(c){ if(c.dataset.preset) presets.push(c.dataset.preset); });
+  document.querySelectorAll('#tech-presets .chip.on').forEach(function(c){ if(c.dataset.tech) techs.push(c.dataset.tech); });
+  document.querySelectorAll('.finps input, #hisse-hidden-filters input').forEach(function(i){ if(i.value) inputs[i.id] = i.value; });
+  var sf = document.getElementById('sector_filter'); if(sf && sf.value) inputs.sector_filter = sf.value;
+  if (!goats.length && !presets.length && !techs.length && !Object.keys(inputs).length) {
+    alert('Kaydedilecek filtre yok. Önce bir tarama çalıştır.'); return;
+  }
+  var name = prompt('Bu taramaya bir isim ver:', (_scanMeta && _scanMeta.strategy) || 'Özel Tarama');
+  if (!name) return;
+  var scans = _getSavedScans();
+  scans.unshift({ id: Date.now(), name: name, exchange: currentExchange, goats: goats, presets: presets, techs: techs, inputs: inputs, ts: Date.now() });
+  scans = scans.slice(0, 20);
+  _putSavedScans(scans);
+  // Visual feedback
+  var btn = document.querySelector('.tb-save-btn');
+  if (btn) { var orig = btn.textContent; btn.textContent = '✓ Kaydedildi'; setTimeout(function(){ btn.textContent = orig; }, 1500); }
+}
+function openSavedScans() {
+  var modal = document.getElementById('saved-scans-modal');
+  var list = document.getElementById('ssm-list');
+  var empty = document.getElementById('ssm-empty');
+  if (!modal) return;
+  var scans = _getSavedScans();
+  if (!scans.length) { list.innerHTML = ''; empty.style.display = ''; }
+  else {
+    empty.style.display = 'none';
+    var ex_names = { bist:'BIST', nasdaq:'NASDAQ', nyse:'NYSE', sp500:'S&P500', dax:'DAX', lse:'LSE', nikkei:'NIKKEI', kucuk:'Küçük BIST' };
+    list.innerHTML = scans.map(function(sc) {
+      var tags = [].concat(
+        sc.goats.map(function(k){ return '<span class="ssm-tag ssm-goat">'+(GURUS[k]?GURUS[k].label.split(' — ')[0].split(' (')[0]:k)+'</span>'; }),
+        sc.presets.map(function(k){ return '<span class="ssm-tag ssm-preset">'+(PRESETS[k]?PRESETS[k].label:k)+'</span>'; }),
+        sc.techs.map(function(k){ return '<span class="ssm-tag ssm-tech">'+(TECH_PRESETS[k]?TECH_PRESETS[k].label:k)+'</span>'; })
+      ).join('');
+      var date = new Date(sc.ts).toLocaleDateString('tr-TR', {day:'2-digit',month:'short'});
+      return '<div class="ssm-item">'+
+        '<div class="ssm-item-head">'+
+          '<span class="ssm-item-name">'+esc(sc.name)+'</span>'+
+          '<span class="ssm-item-ex">'+(ex_names[sc.exchange]||sc.exchange.toUpperCase())+'</span>'+
+          '<span class="ssm-item-date">'+date+'</span>'+
+          '<button class="ssm-del-btn" onclick="deleteSavedScan('+sc.id+',event)" title="Sil">✕</button>'+
+        '</div>'+
+        '<div class="ssm-item-tags">'+tags+'</div>'+
+        '<button class="ssm-run-btn" onclick="runSavedScan('+sc.id+')">▶ Çalıştır</button>'+
+        '</div>';
+    }).join('');
+  }
+  modal.style.display = 'flex';
+}
+function closeSavedScans() {
+  var m = document.getElementById('saved-scans-modal');
+  if (m) m.style.display = 'none';
+}
+function deleteSavedScan(id, e) {
+  if (e) e.stopPropagation();
+  var scans = _getSavedScans().filter(function(sc){ return sc.id !== id; });
+  _putSavedScans(scans);
+  openSavedScans();
+}
+function runSavedScan(id) {
+  var sc = _getSavedScans().find(function(s){ return s.id === id; });
+  if (!sc) return;
+  closeSavedScans();
+  // Set exchange
+  if (sc.exchange && sc.exchange !== currentExchange) {
+    currentExchange = sc.exchange;
+    document.querySelectorAll('.exbtn').forEach(function(b){ b.classList.toggle('on', b.dataset.exchange === sc.exchange); });
+  }
+  // Clear and restore chips
+  document.querySelectorAll('#goat-chips .goat-chip.on, #presets .chip.on, #tech-presets .chip.on').forEach(function(c){ c.classList.remove('on'); });
+  sc.goats.forEach(function(k){ var c=document.querySelector('#goat-chips .goat-chip[data-goat="'+k+'"]'); if(c) c.classList.add('on'); });
+  sc.presets.forEach(function(k){ var c=document.querySelector('#presets .chip[data-preset="'+k+'"]'); if(c) c.classList.add('on'); });
+  sc.techs.forEach(function(k){ var c=document.querySelector('#tech-presets .chip[data-tech="'+k+'"]'); if(c) c.classList.add('on'); });
+  // Restore inputs
+  document.querySelectorAll('.finps input, #hisse-hidden-filters input').forEach(function(i){ i.value = sc.inputs[i.id] || ''; });
+  var sf = document.getElementById('sector_filter'); if(sf) sf.value = sc.inputs.sector_filter || '';
+  _applyChips(BASIC_CHIP_CFG);
 }
 
 // ── Scan History ─────────────────────────────────────────────
