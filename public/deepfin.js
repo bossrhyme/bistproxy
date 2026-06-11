@@ -1239,15 +1239,15 @@ async function runScan(){
   var _seenKeys   = {};
   document.querySelectorAll('#goat-chips .goat-chip.on').forEach(function(c) {
     var k = c.dataset.goat;
-    if (k && GURUS[k] && !_seenKeys[k]) { _seenKeys[k] = 1; _filterTags.push({ label: GURUS[k].label.split(' — ')[0].split(' (')[0], desc: GURUS[k].desc || '' }); }
+    if (k && GURUS[k] && !_seenKeys[k]) { _seenKeys[k] = 1; _filterTags.push({ label: GURUS[k].label.split(' — ')[0].split(' (')[0], desc: GURUS[k].desc || '', kind: 'goat', key: k }); }
   });
   document.querySelectorAll('#presets .chip.on').forEach(function(c) {
     var k = c.dataset.preset;
-    if (k && PRESETS[k] && !_seenKeys[k]) { _seenKeys[k] = 1; _filterTags.push({ label: PRESETS[k].label, desc: PRESETS[k].desc || '' }); }
+    if (k && PRESETS[k] && !_seenKeys[k]) { _seenKeys[k] = 1; _filterTags.push({ label: PRESETS[k].label, desc: PRESETS[k].desc || '', kind: 'preset', key: k }); }
   });
   document.querySelectorAll('#tech-presets .chip.on').forEach(function(c) {
     var k = c.dataset.tech;
-    if (k && TECH_PRESETS[k] && !_seenKeys[k]) { _seenKeys[k] = 1; _filterTags.push({ label: TECH_PRESETS[k].label, desc: TECH_PRESETS[k].desc || '' }); }
+    if (k && TECH_PRESETS[k] && !_seenKeys[k]) { _seenKeys[k] = 1; _filterTags.push({ label: TECH_PRESETS[k].label, desc: TECH_PRESETS[k].desc || '', kind: 'tech', key: k }); }
   });
   // Deduplicate by label as final safety net
   var _lblSeen = {};
@@ -2393,10 +2393,10 @@ function psvScan() {
     document.querySelectorAll('#goat-chips .goat-chip, #adv-goat-chips .goat-chip').forEach(function(c){
       c.classList.toggle('on', _psvActiveGoats.has(c.dataset.goat));
     });
-    document.querySelectorAll('#presets .chip').forEach(function(c){
+    document.querySelectorAll('#presets .chip, #adv-presets .chip').forEach(function(c){
       c.classList.toggle('on', _psvActivePresets.has(c.dataset.preset));
     });
-    document.querySelectorAll('#tech-presets .chip').forEach(function(c){
+    document.querySelectorAll('#tech-presets .chip, #adv-tech-presets .chip').forEach(function(c){
       c.classList.toggle('on', _psvActiveTech.has(c.dataset.tech));
     });
     _applyChips(BASIC_CHIP_CFG);
@@ -4565,6 +4565,16 @@ function switchSbTab(tab) {
       });
     }
   }
+  // Chip durumlarını terk edilen panelden hedef panele aynala — mevcut filtre her sekmede görünsün
+  var src = tab === 'advanced' ? BASIC_CHIP_CFG : ADV_CHIP_CFG;
+  var dst = tab === 'advanced' ? ADV_CHIP_CFG   : BASIC_CHIP_CFG;
+  [['goatId','goat-chip','goat'],['presetsId','chip','preset'],['techId','chip','tech']].forEach(function(m) {
+    var onKeys = {};
+    document.querySelectorAll('#' + src[m[0]] + ' .' + m[1] + '.on').forEach(function(c){ onKeys[c.dataset[m[2]]] = 1; });
+    document.querySelectorAll('#' + dst[m[0]] + ' .' + m[1]).forEach(function(c){
+      c.classList.toggle('on', !!onKeys[c.dataset[m[2]]]);
+    });
+  });
   document.getElementById('sb-panel-basic').style.display    = tab === 'basic'    ? '' : 'none';
   document.getElementById('sb-panel-advanced').style.display = tab === 'advanced' ? '' : 'none';
   document.getElementById('sb-tab-basic').classList.toggle('active',    tab === 'basic');
@@ -4749,7 +4759,10 @@ function showScanSummary(total, matches) {
   const elapsed = scanStartTime ? ((Date.now() - scanStartTime) / 1000).toFixed(1) : '—';
   const filters = _scanMeta.filters || [];
   var tagsHtml = filters.map(function(f) {
-    return '<span class="ssm-tag">' + esc(f.label) +
+    var xBtn = (f.kind && f.key)
+      ? '<span class="ssm-tag-x" onclick="removeScanFilter(\'' + f.kind + '\',\'' + f.key + '\')" title="Bu filtreyi kaldır">×</span>'
+      : '';
+    return '<span class="ssm-tag">' + esc(f.label) + xBtn +
       (f.desc ? '<span class="ssm-tag-popup">' + esc(f.desc) + '</span>' : '') +
       '</span>';
   }).join('');
@@ -4764,6 +4777,20 @@ function showScanSummary(total, matches) {
     resVal.innerHTML = total + ' tarandı · <span class="up">' + matches + ' eşleşti</span>';
     resItem.style.display = '';
   }
+}
+
+// Özet barındaki × — filtreyi her iki paneldeki chip'lerden kaldırıp kalanlarla yeniden tarar
+function removeScanFilter(kind, key) {
+  var sel = kind === 'goat'   ? '.goat-chip[data-goat="' + key + '"]'
+          : kind === 'preset' ? '.chip[data-preset="' + key + '"]'
+          :                     '.chip[data-tech="' + key + '"]';
+  document.querySelectorAll(sel).forEach(function(c){ c.classList.remove('on'); });
+  // Prescan seçim setlerini de güncelle — "Yeni Tarama"ya dönünce tutarlı kalsın
+  if (kind === 'goat')   _psvActiveGoats.delete(key);
+  if (kind === 'preset') _psvActivePresets.delete(key);
+  if (kind === 'tech')   _psvActiveTech.delete(key);
+  _psvScanFilterCount = Math.max(0, _psvScanFilterCount - 1);
+  _applyChips(BASIC_CHIP_CFG);
 }
 
 // ── MOBILE DRAWER ──
