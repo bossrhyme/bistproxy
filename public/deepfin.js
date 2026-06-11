@@ -1220,6 +1220,10 @@ async function runScan(){
       if(r.AED) fxRates.AED = 1 / r.AED;
     }
   } catch(e) { /* fallback kurlar kullanılır */ }
+  // Hızlı yeniden tarama: filtre ekle/kaldır akışından geliyorsa tablo ekranda kalır,
+  // tam ekran stepper yerine küçük bir pil gösterilir
+  const _quick = window._quickRescan === true;
+  window._quickRescan = false;
   const btn = document.getElementById('scanbtn');
   btn.disabled = true;
   scanAborted = false;
@@ -1228,12 +1232,17 @@ async function runScan(){
   filtered = [];
   selSym = null;
   closeDetail();
-  showState('loading');
-  document.getElementById('toolbar').style.display = 'none';
+  if (_quick) {
+    showQuickScanPill(window._quickRescanLabel);
+    window._quickRescanLabel = null;
+  } else {
+    showState('loading');
+    document.getElementById('toolbar').style.display = 'none';
+    document.getElementById('loadtxt').textContent = 'Taranıyor...';
+    const exMeta = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
+    document.getElementById('loadsub').textContent = `${exMeta.flag} ${exMeta.name} hisseleri alınıyor...`;
+  }
   document.getElementById('prog').style.width = '30%';
-  document.getElementById('loadtxt').textContent = 'Taranıyor...';
-  const exMeta = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
-  document.getElementById('loadsub').textContent = `${exMeta.flag} ${exMeta.name} hisseleri alınıyor...`;
   // Collect all active filter tags for summary bar (deduplicated by key)
   var _filterTags = [];
   var _seenKeys   = {};
@@ -1255,8 +1264,9 @@ async function runScan(){
   _scanMeta.filters  = _filterTags;
   _scanMeta.strategy = _filterTags.map(function(f){return f.label;}).join(', ') || null;
   _scanMeta.exchange = currentExchange;
-  var _scanMinMs = _psvScanFilterCount >= 3 ? 4500 : _psvScanFilterCount >= 1 ? 3000 : 0;
-  startScanEta(currentExchange, _scanMinMs);
+  var _scanMinMs = _quick ? 1500 : (_psvScanFilterCount >= 3 ? 4500 : _psvScanFilterCount >= 1 ? 3000 : 0);
+  if (_quick) scanStartTime = Date.now(); // startScanEta atlanıyor — min süre hesabı için gerekli
+  else startScanEta(currentExchange, _scanMinMs);
 
   // Field isimleri borsa bazlı farklı — exchange'e göre doğru set
   const isBIST = (currentExchange === 'bist');
@@ -1691,6 +1701,7 @@ async function runScan(){
     window._chipSpecial = null;
 
   } catch(err) {
+    hideQuickScanPill();
     showState('errstate');
     console.error('[scan]', err.message);
     var _em = document.getElementById('errmsg');
@@ -1716,10 +1727,12 @@ async function runScan(){
     if (_remaining > 0) {
       setTimeout(function() {
         stopScanEta();
+        hideQuickScanPill();
         applyAndRender(_spec);
       }, _remaining);
     } else {
       stopScanEta();
+      hideQuickScanPill();
       if (_isSuccess) applyAndRender(_spec);
     }
   }
@@ -4784,6 +4797,7 @@ function showScanSummary(total, matches) {
 
 // Özet barındaki × — filtreyi her iki paneldeki chip'lerden kaldırıp kalanlarla yeniden tarar
 function removeScanFilter(kind, key) {
+  if (_scanRunning || document.getElementById('quick-scan-pill')) return;
   var sel = kind === 'goat'   ? '.goat-chip[data-goat="' + key + '"]'
           : kind === 'preset' ? '.chip[data-preset="' + key + '"]'
           :                     '.chip[data-tech="' + key + '"]';
@@ -4793,7 +4807,33 @@ function removeScanFilter(kind, key) {
   if (kind === 'preset') _psvActivePresets.delete(key);
   if (kind === 'tech')   _psvActiveTech.delete(key);
   _psvScanFilterCount = Math.max(0, _psvScanFilterCount - 1);
+  var dict = kind === 'goat' ? GURUS : kind === 'preset' ? PRESETS : TECH_PRESETS;
+  window._quickRescan = true;
+  window._quickRescanLabel = '− ' + (dict[key] ? dict[key].label.split(' — ')[0].split(' (')[0] : key);
   _applyChips(BASIC_CHIP_CFG);
+}
+
+// ── HIZLI YENİDEN TARAMA PİLİ — tablo görünür kalır, ortada küçük durum göstergesi ──
+function showQuickScanPill(label) {
+  hideQuickScanPill();
+  var tw = document.getElementById('twrap');
+  if (tw) tw.classList.add('quick-rescan');
+  var tb = document.getElementById('toolbar');
+  if (tb) tb.classList.add('quick-rescan');
+  var ov = document.createElement('div');
+  ov.id = 'quick-scan-pill';
+  ov.innerHTML = '<span class="qsp-spin"></span><span class="qsp-txt">Yeni filtreyle taranıyor…</span>' +
+    (label ? '<span class="qsp-sub">' + esc(label) + '</span>' : '');
+  document.body.appendChild(ov);
+}
+
+function hideQuickScanPill() {
+  var ov = document.getElementById('quick-scan-pill');
+  if (ov) ov.remove();
+  var tw = document.getElementById('twrap');
+  if (tw) tw.classList.remove('quick-rescan');
+  var tb = document.getElementById('toolbar');
+  if (tb) tb.classList.remove('quick-rescan');
 }
 
 // ── FİLTRE EKLE DROPDOWN — tablodan ayrılmadan chip seçimi ──
@@ -4863,6 +4903,8 @@ function renderFilterDropdown() {
 }
 
 function fdToggleChip(kind, key, el) {
+  // Tarama sürerken (min süre beklemesi dahil) çifte tetiklemeyi önle
+  if (_scanRunning || document.getElementById('quick-scan-pill')) return;
   var wasOn = el.classList.contains('on');
   if (!wasOn && _countChips(BASIC_CHIP_CFG) >= 4) { showToast('En fazla 4 filtre seçilebilir'); return; }
   var sel = kind === 'goat'   ? '.goat-chip[data-goat="' + key + '"]'
@@ -4877,6 +4919,8 @@ function fdToggleChip(kind, key, el) {
   var cnt = document.getElementById('fd-count');
   if (cnt) cnt.textContent = _countChips(BASIC_CHIP_CFG) + '/4';
   _psvScanFilterCount = _countChips(BASIC_CHIP_CFG);
+  window._quickRescan = true;
+  window._quickRescanLabel = (wasOn ? '− ' : '+ ') + el.textContent.trim();
   _applyChips(BASIC_CHIP_CFG);
 }
 

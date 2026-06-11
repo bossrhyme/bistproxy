@@ -558,6 +558,14 @@ td:first-child,td:nth-child(2){text-align:left;}
 .fd-chip:hover{border-color:var(--accent);color:var(--accent);}
 .fd-chip.on{background:var(--accent);border-color:var(--accent);color:#fff;}
 
+/* Hızlı yeniden tarama — tablo soluklaşır, ortada durum pili */
+#twrap.quick-rescan{opacity:.35;pointer-events:none;transition:opacity .25s ease;}
+#toolbar.quick-rescan{opacity:.6;pointer-events:none;}
+#quick-scan-pill{position:fixed;top:45%;left:50%;transform:translate(-50%,-50%);z-index:340;display:flex;align-items:center;gap:10px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r-pill);box-shadow:var(--shadow-lg);padding:10px 18px;font-size:12px;font-weight:600;color:var(--text2);font-family:'Inter',sans-serif;animation:dfFadeIn .15s ease;white-space:nowrap;}
+.qsp-spin{width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:qspSpin .7s linear infinite;flex-shrink:0;}
+@keyframes qspSpin{to{transform:rotate(360deg);}}
+.qsp-sub{font-size:11px;font-weight:500;color:var(--muted2);font-family:'Geist Mono',monospace;}
+
 @media(max-width:640px){.psv-inner{padding:24px 16px 60px;}.psv-ex-btn{padding:10px 12px;min-width:56px;}.psv-ex-flag{font-size:18px;}.psv-goat-card{min-width:80px;}.psv-preset-card,.psv-tech-card{min-width:80px;}.psv-scan-btn{width:100%;padding:14px;}}
 
 /* ══════════════════════════════════
