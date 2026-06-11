@@ -6,7 +6,7 @@
 <title>DeepFin — Hisse Tarama | Buffett, Lynch, Graham Stratejileri</title>
 <meta name="description" content="Hisse, fon ve kripto — 28+ borsa, 30.000+ enstrüman — hisse ve kripto tek ekranda. 50+ strateji ve 34 filtre kriteriyle saniyeler içinde tara, dünyaca ünlü stratejilerle analiz et.">
 <meta name="robots" content="index, follow">
-<meta name="theme-color" content="#f8fafc" id="meta-theme-color">
+<meta name="theme-color" content="#0A0E14" id="meta-theme-color">
 <link rel="canonical" href="https://deepfin.vercel.app/">
 <!-- Open Graph -->
 <meta property="og:type" content="website">
@@ -25,10 +25,31 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap"></noscript>
-<script>(function(){try{var t=localStorage.getItem('df_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
+<script>(function(){try{var t=localStorage.getItem('df_theme');document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}})()</script>
 <style id="critical-css">
 
 :root{
+  /* Bloomberg Terminal Dark — default */
+  --bg:#0A0E14;--s1:#0F1520;--s2:#141C2A;--s3:#1A2335;
+  --border:#1C2940;--border2:#263850;
+  --green:#00C853;--green2:#00A844;--green-bg:rgba(0,200,83,.1);
+  --red:#FF4444;--red-bg:rgba(255,68,68,.08);
+  --blue:#1E90FF;--blue2:#1565C0;
+  --gold:#FFB300;--teal:#00BCD4;
+  --text:#D8E8F8;--text2:#7090B0;--muted:#2E4060;--muted2:#4A6480;
+  --accent:#1E90FF;--accent2:rgba(30,144,255,.12);--hover:rgba(30,144,255,.07);
+  --r-sm:2px;--r-md:3px;--r-lg:5px;--r-xl:8px;--r-pill:9999px;
+}
+[data-theme="dark"]{
+  --bg:#0A0E14;--s1:#0F1520;--s2:#141C2A;--s3:#1A2335;
+  --border:#1C2940;--border2:#263850;
+  --green:#00C853;--green2:#00A844;--green-bg:rgba(0,200,83,.1);
+  --red:#FF4444;--red-bg:rgba(255,68,68,.08);
+  --gold:#FFB300;--teal:#00BCD4;
+  --text:#D8E8F8;--text2:#7090B0;--muted:#2E4060;--muted2:#4A6480;
+  --accent:#1E90FF;--accent2:rgba(30,144,255,.12);--hover:rgba(30,144,255,.07);
+}
+[data-theme="light"]{
   --bg:#ffffff;--s1:#ffffff;--s2:#f8fafc;--s3:#f0f4f8;
   --border:#e6ebf0;--border2:#c8d2dd;
   --green:#059669;--green2:#047857;--green-bg:rgba(5,150,105,.08);
@@ -37,25 +58,6 @@
   --gold:#d97706;--teal:#14b8a6;
   --text:#080e1c;--text2:#3a4760;--muted:#8594ab;--muted2:#566078;
   --accent:#0ea5e9;--accent2:rgba(14,165,233,.10);--hover:rgba(14,165,233,.06);
-  --r-sm:2px;--r-md:4px;--r-lg:6px;--r-xl:10px;--r-pill:9999px;
-}
-[data-theme="dark"]{
-  --bg:#09101e;--s1:#0e1828;--s2:#142033;--s3:#1b2a40;
-  --border:#1e2d45;--border2:#2d4060;
-  --green:#22c55e;--green2:#16a34a;--green-bg:rgba(34,197,94,.1);
-  --red:#f43f5e;--red-bg:rgba(244,63,94,.1);
-  --gold:#f59e0b;--teal:#2dd4bf;
-  --text:#d0daf0;--text2:#7a8fb0;--muted:#3a4f6e;--muted2:#5c7898;
-  --accent2:rgba(14,165,233,.15);--hover:rgba(14,165,233,.1);
-}
-[data-theme="light"]{
-  --bg:#ffffff;--s1:#ffffff;--s2:#f8fafc;--s3:#f0f4f8;
-  --border:#e6ebf0;--border2:#c8d2dd;
-  --green:#059669;--green2:#047857;--green-bg:rgba(5,150,105,.08);
-  --red:#dc2626;--red-bg:rgba(220,38,38,.07);
-  --gold:#d97706;--teal:#14b8a6;
-  --text:#080e1c;--text2:#3a4760;--muted:#8594ab;--muted2:#566078;
-  --accent2:rgba(14,165,233,.10);--hover:rgba(14,165,233,.06);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 *{-webkit-tap-highlight-color:transparent;}
@@ -129,8 +131,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=arctic92">
-<script src="/deepfin.js?v=137" defer></script>
+<link rel="stylesheet" href="/deepfin.css?v=arctic93">
+<script src="/deepfin.js?v=138" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -167,6 +169,25 @@ if('serviceWorker' in navigator){
   <div class="topbar">
     <div class="tlogo" onclick="showHomepage()" style="cursor:pointer"><div class="tlogo-mark">D</div>DeepFin</div>
     <span class="tlive">Canlı</span>
+
+    <!-- Market Indices Ticker -->
+    <div class="tidx" id="topbar-indices">
+      <div class="tidx-item">
+        <span class="tidx-name">USD/TRY</span>
+        <span class="tidx-val" id="tidx-usdtry">—</span>
+      </div>
+      <div class="tidx-sep"></div>
+      <div class="tidx-item">
+        <span class="tidx-name">EUR/TRY</span>
+        <span class="tidx-val" id="tidx-eurtry">—</span>
+      </div>
+      <div class="tidx-sep"></div>
+      <div class="tidx-item">
+        <span class="tidx-name">GBP/TRY</span>
+        <span class="tidx-val" id="tidx-gbptry">—</span>
+      </div>
+    </div>
+
     <a href="/" class="hp-nav-btn active" id="nav-home" onclick="event.preventDefault(); showHomepage()">Anasayfa</a>
     <a href="/" class="hp-nav-btn" id="nav-tarama" onclick="event.preventDefault(); showScreenerOrPrescan()">Tarayıcı</a>
     <a href="/analiz/" class="hp-nav-btn" id="nav-analiz">Analiz</a>
@@ -175,7 +196,7 @@ if('serviceWorker' in navigator){
     </button>
 
     <div class="tright">
-      <button class="topbarbtn theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir" aria-label="Karanlık/Açık mod geçiş">☾</button>
+      <button class="topbarbtn theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir" aria-label="Karanlık/Açık mod geçiş">☀</button>
       <a href="/profil" id="profile-btn" class="topbarbtn infobtn profile-topbtn" title="Profilim">
         <span id="profile-btn-inner">👤</span><span class="prf-btn-lbl">Profil</span><span id="fav-total-badge" style="display:none;background:var(--accent);color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 5px;margin-left:2px;line-height:1.4;align-items:center;"></span>
       </a>

@@ -16,12 +16,13 @@ function safeUrl(u) { var s = String(u||''); return /^https?:\/\//i.test(s) ? s 
 
 // ── Tema ──────────────────────────────────────────────────────
 function _isDark() {
-  try { return localStorage.getItem('df_theme') === 'dark'; } catch(e) { return false; }
+  // Default: dark (terminal mode)
+  try { return localStorage.getItem('df_theme') !== 'light'; } catch(e) { return true; }
 }
 function _applyTheme(dark) {
   document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
   var meta = document.getElementById('meta-theme-color');
-  if (meta) meta.content = dark ? '#09101e' : '#f8fafc';
+  if (meta) meta.content = dark ? '#0A0E14' : '#f8fafc';
   var btn = document.getElementById('theme-toggle');
   if (btn) btn.textContent = dark ? '☀' : '☾';
 }
@@ -32,6 +33,31 @@ function toggleTheme() {
 }
 function _initTheme() {
   _applyTheme(_isDark());
+}
+
+// ── Market Indices Ticker ─────────────────────────────────────
+// Raw /api/rates: TRY=USDTRY, EUR=EURUSD, GBP=GBPUSD
+function _updateIndicesTicker(r) {
+  if (!r || !r.TRY) return;
+  var usdtry = r.TRY;
+  var eurtry = r.EUR ? (r.EUR * r.TRY) : null;
+  var gbptry = r.GBP ? (r.GBP * r.TRY) : null;
+  var el1 = document.getElementById('tidx-usdtry');
+  var el2 = document.getElementById('tidx-eurtry');
+  var el3 = document.getElementById('tidx-gbptry');
+  if (el1) el1.textContent = usdtry.toFixed(2);
+  if (el2 && eurtry) el2.textContent = eurtry.toFixed(2);
+  if (el3 && gbptry) el3.textContent = gbptry.toFixed(2);
+}
+function _startIndicesTicker() {
+  function _fetch() {
+    fetch('/api/rates', { headers: {'X-Requested-With':'XMLHttpRequest'} })
+      .then(function(r){ return r.json(); })
+      .then(function(d){ _updateIndicesTicker(d); })
+      .catch(function(){});
+  }
+  _fetch();
+  setInterval(_fetch, 60000);
 }
 
 // Auto-attach X-Requested-With to all /api/ fetches (CSRF protection)
@@ -4809,6 +4835,7 @@ window.addEventListener('popstate', function(e) {
 // ─────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function(){
   _initTheme();
+  _startIndicesTicker();
   _initWorker();
   _initKeyboardNav();
   _updateFavBadge();
