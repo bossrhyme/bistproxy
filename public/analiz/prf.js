@@ -1075,6 +1075,24 @@ function _fmtN(v) {
   return parseFloat(v).toFixed(2);
 }
 
+// Borsanın yerel kuru: 1 USD kaç yerel birim (_fxRates ham /api/rates formatı)
+function _localRate(ex) {
+  var meta = EXCHANGE_META[ex || _prfEx] || EXCHANGE_META.bist;
+  var code = meta.currencyCode || 'USD';
+  if (code === 'USD') return 1;
+  return _fxRates[code] || null;
+}
+
+// Piyasa değeri çift gösterim: yerel + USD. Girdi: milyon USD.
+function _mcapDual(vUsdM) {
+  if(!vUsdM || isNaN(vUsdM)) return '—';
+  var meta = EXCHANGE_META[_prfEx] || EXCHANGE_META.bist;
+  var usdStr = '$' + _fmtN(vUsdM * 1e6);
+  var rate = _localRate(_prfEx);
+  if (!rate || rate === 1) return usdStr;
+  return (meta.currency || '') + ' ' + _fmtN(vUsdM * rate * 1e6) + ' · ' + usdStr;
+}
+
 function _setScore(id, val, cls) {
   var el = document.getElementById(id);
   if(el){ el.textContent=val; el.className='prf-score-val '+(cls||''); }
@@ -1504,7 +1522,7 @@ function _buildPrfSide() {
     {k:'52H Yüksek',    v: d['52_week_high'] ? cur+' '+d['52_week_high'].toFixed(2) : '—'},
     {k:'52H Düşük',     v: d['52_week_low']  ? cur+' '+d['52_week_low'].toFixed(2)  : '—'},
     {k:'Beta',          v: d.beta ? d.beta.toFixed(2) : '—'},
-    {k:'Piyasa Değeri', v: d.market_cap_basic ? cur+' '+_fmtN(d.market_cap_basic*1e6) : '—'},
+    {k:'Piyasa Değeri', v: _mcapDual(d.market_cap_basic)},
     {k:'Ort. Hacim',    v: d.average_volume_10d_calc ? _fmtN(d.average_volume_10d_calc) : '—'},
     {k:'Temettü',       v: d.dividend_yield_recent ? (d.dividend_yield_recent*100).toFixed(2)+'%' : '—', cls:'g'},
     {k:'Haftalık',      v: d.Perf_W ? (d.Perf_W>=0?'+':'')+d.Perf_W.toFixed(2)+'%' : '—', cls:d.Perf_W>=0?'g':'r'},
@@ -1765,7 +1783,11 @@ async function loadFinData(sym, ex) {
     if(!d.beta            && q.beta)         d.beta                = q.beta;
     if(!d.price_sales     && q.ps)           d.price_sales         = q.ps;
     if(!d.revenue_growth  && q.revenueGrowth) d.revenue_growth     = q.revenueGrowth / 100;
-    if(!d.market_cap_basic && q.marketCap)   d.market_cap_basic    = q.marketCap / 1e6;
+    // Yahoo marketCap yerel para birimi — milyon USD'ye normalize et
+    if(!d.market_cap_basic && q.marketCap) {
+      var _mcr = _localRate(_prfEx) || 1;
+      d.market_cap_basic = (q.marketCap / 1e6) / _mcr;
+    }
     if(!d.average_volume_10d_calc && q.avgVolume) d.average_volume_10d_calc = q.avgVolume;
     if(!d.Perf_W  && q.perfW)  d.Perf_W  = q.perfW;
     if(!d.Perf_1M && q.perf1M) d.Perf_1M = q.perf1M;
@@ -1812,7 +1834,7 @@ async function loadFinData(sym, ex) {
       {k:'52H Yüksek',    v: d['52_week_high'] ? cur+' '+parseFloat(d['52_week_high']).toLocaleString('tr-TR',{minimumFractionDigits:2}) : '—'},
       {k:'52H Düşük',     v: d['52_week_low']  ? cur+' '+parseFloat(d['52_week_low']).toLocaleString('tr-TR',{minimumFractionDigits:2})  : '—'},
       {k:'Beta',          v: d.beta ? parseFloat(d.beta).toFixed(2) : '—'},
-      {k:'Piyasa Değeri', v: d.market_cap_basic ? cur+' '+_fmtN(d.market_cap_basic*1e6) : (q.marketCap ? cur+' '+_fmtN(q.marketCap) : '—')},
+      {k:'Piyasa Değeri', v: _mcapDual(d.market_cap_basic)},
       {k:'Ort. Hacim',    v: d.average_volume_10d_calc ? _fmtN(d.average_volume_10d_calc) : (q.avgVolume?_fmtN(q.avgVolume):'—')},
       {k:'Temettü',       v: d.dividend_yield_recent ? (d.dividend_yield_recent*100).toFixed(2)+'%' : '—', cls:'g'},
       {k:'Sektör',        v: q.sector || d.sector || '—'},

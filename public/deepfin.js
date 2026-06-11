@@ -2988,6 +2988,46 @@ function fmc(v){
   return `$${v.toFixed(0)}M`;
 }
 
+// USD → yerel para çarpanı (parse'taki yerel→USD zincirinin tersi)
+function _usdToLocalFactor(ex) {
+  switch (ex) {
+    case 'bist':        return fxRates.TRY;
+    case 'moex':        return fxRates.RUB;
+    case 'twse':        return fxRates.TWD;
+    case 'b3':          return fxRates.BRL;
+    case 'hkex':        return fxRates.HKD;
+    case 'china':       return fxRates.CNY;
+    case 'saudi':       return fxRates.SAR;
+    case 'southafrica': return fxRates.ZAR;
+    case 'dax': case 'france': case 'amsterdam': case 'brussels':
+    case 'lisbon': case 'dublin': case 'milan': return 1 / fxRates.EUR;
+    case 'lse':         return 1 / fxRates.GBP;
+    case 'nikkei':      return 1 / fxRates.JPY;
+    case 'krx':         return 1 / fxRates.KRW;
+    case 'oslo':        return 1 / fxRates.NOK;
+    case 'tsx':         return 1 / fxRates.CAD;
+    case 'switzerland': return 1 / fxRates.CHF;
+    case 'australia':   return 1 / fxRates.AUD;
+    case 'sweden':      return 1 / fxRates.SEK;
+    case 'india':       return 1 / fxRates.INR;
+    case 'uae':         return 1 / fxRates.AED;
+    default: return null; // USD borsaları (nasdaq/sp500/nyse)
+  }
+}
+
+// Piyasa değeri çift gösterim: yerel para + USD (detay paneli için)
+function fmcDual(v, ex) {
+  if(!v) return nil;
+  var f = _usdToLocalFactor(ex);
+  if(!f || !isFinite(f)) return fmc(v);
+  var exMeta = EXCHANGE_META[ex] || EXCHANGE_META.bist;
+  var loc = v * f; // milyon yerel para
+  var locStr = loc>=1000000 ? (loc/1000000).toFixed(2)+'T'
+             : loc>=1000    ? (loc/1000).toFixed(1)+'B'
+             : loc.toFixed(0)+'M';
+  return exMeta.currency + locStr + ' · ' + fmc(v);
+}
+
 
 
 // ── WEB WORKER (filter + sort) ───────────────────
@@ -3245,7 +3285,7 @@ function showDetail(sym){
       ['F/K <tag>TTM</tag>', s.peNormalizedAnnual, v=>v.toFixed(1), 'dval-pe'],
       ['PD/DD <tag>FQ</tag>', s.pbAnnual, v=>v.toFixed(2), 'dval-pb'],
       ['F/S <tag>TTM</tag>', s.psTTM, v=>v.toFixed(2), 'dval-ps'],
-      ['Piyasa Değeri', s.marketCapitalization, v=>fmc(v)],
+      ['Piyasa Değeri', s.marketCapitalization, v=>fmcDual(v, s.exchangeId||currentExchange)],
       ['Sektör', s.sector, v=>v],
       ['52H Yüksek', s['52WeekHigh'], v=>`${v.toFixed(2)} ₺`],
       ['52H Düşük', s['52WeekLow'], v=>`${v.toFixed(2)} ₺`],
