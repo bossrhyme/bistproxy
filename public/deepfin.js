@@ -3181,7 +3181,6 @@ function _vsRowHtml(s, idx) {
 
 function buildProfile(s) {
   const profileEl = document.getElementById('dprofile');
-  const nameEl = document.getElementById('dprofile-name');
   const metaEl = document.getElementById('dprofile-meta');
   const linksEl = document.getElementById('dprofile-links');
   if(!profileEl) return;
@@ -3189,9 +3188,6 @@ function buildProfile(s) {
   const sym = s.symbol;
   const ex = s.exchangeId || currentExchange;
   const symClean = sym.replace('.IS','');
-
-  nameEl.textContent = s.name || sym;
-  nameEl.title = s.name || sym;
 
   const exMeta = EXCHANGE_META[ex] || EXCHANGE_META.bist;
   var metaParts = [];

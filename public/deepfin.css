@@ -233,7 +233,6 @@ td:first-child,td:nth-child(2){text-align:left;}
 .dhead{padding:16px 16px 14px;border-bottom:1px solid var(--border);position:relative;background:var(--s2);}
 .dsym{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.5px;line-height:1;font-family:var(--ff-mono);}
 .dprofile{padding:10px 14px 0;border-bottom:1px solid var(--border);margin-bottom:0;}
-.dprofile-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.3;}
 .dprofile-meta{font-size:10px;color:var(--muted2);margin-bottom:8px;line-height:1.6;}
 .dprofile-links{display:flex;flex-wrap:wrap;gap:5px;padding-bottom:10px;}
 .dpl{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500;padding:3px 9px;border-radius:var(--r-sm);border:1px solid var(--border);color:var(--text2);text-decoration:none;background:var(--s2);transition:all .15s;white-space:nowrap;}
