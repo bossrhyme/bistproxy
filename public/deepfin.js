@@ -1740,7 +1740,11 @@ const PRESETS = {
   // Az borçlu: Buffett "borçsuz şirket" prensibi
   lowdebt:  { label: 'Az Borçlu Şirketler', desc: 'Borcu çok düşük, nakdi güçlü, krize dayanıklı şirketleri bulur. Borç/özkaynak %30 altı, cari oran 2 üzeri.', filters: {de_max:30, cr_min:2} },
   // Momentum: güçlü ivme, hem büyüme hem fiyat güç
-  momentum: { label: 'Momentum Hisseleri', desc: 'Satış ve kar büyümesi aynı anda ivmelenen şirketleri bulur. Her ikisi de %20 üzeri.', filters: {revg_min:20, earng_min:20} }
+  momentum: { label: 'Momentum Hisseleri', desc: 'Satış ve kar büyümesi aynı anda ivmelenen şirketleri bulur. Her ikisi de %20 üzeri.', filters: {revg_min:20, earng_min:20} },
+  // Boyut: kurumların radarına girmemiş küçük ama karlı şirketler
+  smallcap: { label: 'Küçük Şirketler',   desc: 'Kurumların radarına girmemiş küçük ama karlı şirketleri bulur. Piyasa değeri 500M dolar altı, ROE %15 ve kazanç büyümesi %15 üzeri.', filters: {mc_max:500, roe_min:15, earng_min:15} },
+  // Boyut: oturmuş, güvenilir devler
+  megacap:  { label: 'Dev Şirketler',     desc: 'Oturmuş, güvenilir büyük şirketleri bulur. Piyasa değeri 10 milyar dolar üzeri, ROE %12 üzeri ve temettü ödeyen.', filters: {mc_min:10000, roe_min:12, div_min:1} }
 };
 
 // Teknik Analiz Presetleri
@@ -2070,6 +2074,8 @@ var _PSV_FMTS = [
   ['de_max',          function(v){ return 'Borç<'+v; }],
   ['cr_min',          function(v){ return 'Cari>'+v; }],
   ['div_min',         function(v){ return 'Temettü>'+v+'%'; }],
+  ['mc_max',          function(v){ return v>=1000 ? 'PD<$'+(v/1000)+'B' : 'PD<$'+v+'M'; }],
+  ['mc_min',          function(v){ return v>=1000 ? 'PD>$'+(v/1000)+'B' : 'PD>$'+v+'M'; }],
   ['tech_rating_min', function(){  return 'Teknik'; }],
   ['perf3m_min',      function(v){ return '3A>'+v+'%'; }],
   ['perf6m_min',      function(v){ return '6A>'+v+'%'; }],
