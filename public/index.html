@@ -129,8 +129,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=arctic86">
-<script src="/deepfin.js?v=128" defer></script>
+<link rel="stylesheet" href="/deepfin.css?v=arctic87">
+<script src="/deepfin.js?v=129" defer></script>
 <link rel="dns-prefetch" href="https://api.coingecko.com">
 <link rel="dns-prefetch" href="https://finnhub.io">
 <link rel="dns-prefetch" href="https://www.tefas.gov.tr">
@@ -1319,6 +1319,10 @@ if('serviceWorker' in navigator){
       <!-- STATS BAR -->
       <div class="stats-bar" id="stats-bar">
         <button id="new-scan-btn" class="new-scan-btn" onclick="openPrescanView()" title="Yeni tarama başlat">🔍 Yeni Tarama</button>
+        <div class="add-filter-wrap" id="add-filter-wrap" style="display:none">
+          <button id="add-filter-btn" class="new-scan-btn add-filter-btn" onclick="toggleFilterDropdown(event)" title="Mevcut taramaya filtre ekle">➕ Filtre Ekle</button>
+          <div id="filter-dropdown" class="filter-dropdown" style="display:none"></div>
+        </div>
         <div class="sb-search">
           <span class="sb-search-ico">⌕</span>
           <input type="text" id="sb-searchbox" class="sb-search-input" placeholder="Ara..." oninput="onSearch()" />

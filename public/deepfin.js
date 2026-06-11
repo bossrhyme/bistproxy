@@ -3683,6 +3683,9 @@ function showState(id){
   if (smEl) smEl.style.display = id === 'twrap' ? 'grid' : 'none';
   const nsbEl = document.getElementById('new-scan-btn');
   if (nsbEl) nsbEl.style.display = id === 'twrap' ? 'inline-flex' : 'none';
+  const afwEl = document.getElementById('add-filter-wrap');
+  if (afwEl) afwEl.style.display = id === 'twrap' ? 'inline-flex' : 'none';
+  if (id !== 'twrap') closeFilterDropdown();
   // Loading/hata/boş durumda stats-bar da gizli — üst bar tek blok halinde değişir,
   // bayat değerler (önceki taramanın sayıları) loading sırasında görünmez
   if (id !== 'twrap') {
@@ -4790,6 +4793,81 @@ function removeScanFilter(kind, key) {
   if (kind === 'preset') _psvActivePresets.delete(key);
   if (kind === 'tech')   _psvActiveTech.delete(key);
   _psvScanFilterCount = Math.max(0, _psvScanFilterCount - 1);
+  _applyChips(BASIC_CHIP_CFG);
+}
+
+// ── FİLTRE EKLE DROPDOWN — tablodan ayrılmadan chip seçimi ──
+var FD_GROUPS = [
+  { kind: 'goat',   title: 'Usta Yatırımcılar', containerId: 'goat-chips',   attr: 'data-goat' },
+  { kind: 'preset', title: 'Temel Analiz',      containerId: 'presets',      attr: 'data-preset' },
+  { kind: 'tech',   title: 'Teknik Analiz',     containerId: 'tech-presets', attr: 'data-tech' }
+];
+
+function toggleFilterDropdown(e) {
+  if (e) e.stopPropagation();
+  var dd = document.getElementById('filter-dropdown');
+  if (!dd) return;
+  if (dd.style.display !== 'none') { closeFilterDropdown(); return; }
+  renderFilterDropdown();
+  dd.style.display = 'block';
+  var btn = document.getElementById('add-filter-btn');
+  if (btn) btn.classList.add('open');
+  setTimeout(function() { document.addEventListener('click', _fdOutsideClick); }, 0);
+}
+
+function _fdOutsideClick(e) {
+  var dd = document.getElementById('filter-dropdown');
+  if (dd && !dd.contains(e.target)) closeFilterDropdown();
+}
+
+function closeFilterDropdown() {
+  var dd = document.getElementById('filter-dropdown');
+  if (dd) dd.style.display = 'none';
+  var btn = document.getElementById('add-filter-btn');
+  if (btn) btn.classList.remove('open');
+  document.removeEventListener('click', _fdOutsideClick);
+}
+
+function renderFilterDropdown() {
+  var dd = document.getElementById('filter-dropdown');
+  if (!dd) return;
+  var html = '<div class="fd-head"><span>Filtre Ekle</span><span class="fd-count" id="fd-count">' +
+    _countChips(BASIC_CHIP_CFG) + '/4</span></div>';
+  FD_GROUPS.forEach(function(g) {
+    var dict = g.kind === 'goat' ? GURUS : g.kind === 'preset' ? PRESETS : TECH_PRESETS;
+    var chips = document.querySelectorAll('#' + g.containerId + ' [' + g.attr + ']');
+    if (!chips.length) return;
+    html += '<div class="fd-group-title">' + g.title + '</div><div class="fd-chips">';
+    chips.forEach(function(c) {
+      var key = c.getAttribute(g.attr);
+      var def = dict[key];
+      var tip = def && def.desc ? ' title="' + esc(def.desc) + '"' : '';
+      // Goat chip'ler mini-card'a dönüştürülmüş olabilir — sadece isim span'ini al
+      var nameEl = c.querySelector('.gcchip-name');
+      var label = (nameEl ? nameEl.textContent : c.textContent).trim();
+      html += '<span class="fd-chip' + (c.classList.contains('on') ? ' on' : '') + '"' + tip +
+        ' onclick="fdToggleChip(\'' + g.kind + '\',\'' + key + '\',this)">' + esc(label) + '</span>';
+    });
+    html += '</div>';
+  });
+  dd.innerHTML = html;
+}
+
+function fdToggleChip(kind, key, el) {
+  var wasOn = el.classList.contains('on');
+  if (!wasOn && _countChips(BASIC_CHIP_CFG) >= 4) { showToast('En fazla 4 filtre seçilebilir'); return; }
+  var sel = kind === 'goat'   ? '.goat-chip[data-goat="' + key + '"]'
+          : kind === 'preset' ? '.chip[data-preset="' + key + '"]'
+          :                     '.chip[data-tech="' + key + '"]';
+  document.querySelectorAll(sel).forEach(function(c) { c.classList.toggle('on', !wasOn); });
+  el.classList.toggle('on', !wasOn);
+  // Prescan seçim setleri tutarlı kalsın — "Yeni Tarama"ya dönünce aynı seçimler görünür
+  var set = kind === 'goat' ? _psvActiveGoats : kind === 'preset' ? _psvActivePresets : _psvActiveTech;
+  if (wasOn) set.delete(key); else set.add(key);
+  if (!wasOn) _track(kind, key);
+  var cnt = document.getElementById('fd-count');
+  if (cnt) cnt.textContent = _countChips(BASIC_CHIP_CFG) + '/4';
+  _psvScanFilterCount = _countChips(BASIC_CHIP_CFG);
   _applyChips(BASIC_CHIP_CFG);
 }
 
