@@ -3832,7 +3832,6 @@ function switchXTab(el) {
   const panel = document.getElementById('dxpanel-' + tab);
   if (panel) panel.classList.add('on');
   if (tab === 'news'   && selSym)       fetchNews(selSym);
-  if (tab === 'dcf'    && _detailStock) renderDCF(_detailStock);
   if (tab === 'sector' && _detailStock) {
     if (_detailStock.sectorRaw) {
       fetchSectorComps(_detailStock);
@@ -3902,82 +3901,6 @@ async function fetchSectorComps(s) {
     var el2 = document.getElementById('sector-body');
     if(el2) el2.innerHTML = '<div class="dxerror">&#9888; Sektör verisi alınamadı.</div>';
   }
-}
-
-// ── DCF Hesaplayıcı ───────────────────────────────────────────
-function renderDCF(s) {
-  var el = document.getElementById('dcf-body');
-  if (!el) return;
-  var price = s.currentPrice || 0;
-  var pe    = s.peNormalizedAnnual;
-  var eps   = (pe && pe > 0 && price > 0) ? (price / pe) : null;
-  var gDef  = s.epsGrowthTTMYoy != null ? Math.max(-50, Math.min(50, s.epsGrowthTTMYoy)) : 10;
-  var epsStr = eps != null ? eps.toFixed(2) : '';
-  el.innerHTML =
-    '<div style="padding:4px 0 8px;font-size:9px;color:var(--muted2)">İndirgenmiş Nakit Akımı modeli — varsayılanlar mevcut veriden dolduruldu.</div>'
-    + '<div class="dcf-grid">'
-    + _dcfField('dcf-eps',   'Mevcut EPS',            epsStr,     '',   'Hisse başı kazanç (₺)')
-    + _dcfField('dcf-g',     'Büyüme Oranı %',        gDef.toFixed(1), '', 'Yıllık EPS büyüme beklentisi')
-    + _dcfField('dcf-wacc',  'İskonto Oranı % (WACC)','12',       '',   'Fırsat maliyeti / gerekli getiri')
-    + _dcfField('dcf-tg',    'Terminal Büyüme %',      '4',        '',   'Sonsuza dek sürdürülebilir büyüme')
-    + _dcfField('dcf-yrs',   'Projeksiyon (yıl)',      '10',       '',   'Detaylı nakit akımı dönemi')
-    + '</div>'
-    + '<button onclick="_calcDCF(' + price.toFixed(2) + ')" style="margin-top:10px;width:100%;background:var(--accent);color:#fff;border:none;padding:8px;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer">Hesapla</button>'
-    + '<div id="dcf-result" style="margin-top:10px"></div>';
-}
-function _dcfField(id, label, val, unit, hint) {
-  return '<div style="margin-bottom:8px">'
-    + '<div style="font-size:9px;color:var(--muted2);margin-bottom:3px" title="' + esc(hint) + '">' + label + '</div>'
-    + '<input id="' + id + '" type="number" value="' + esc(val) + '" step="any"'
-    + ' style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:6px 8px;font-size:12px;border-radius:4px;outline:none">'
-    + '</div>';
-}
-function _calcDCF(currentPrice) {
-  var eps  = parseFloat(document.getElementById('dcf-eps').value);
-  var g    = parseFloat(document.getElementById('dcf-g').value) / 100;
-  var wacc = parseFloat(document.getElementById('dcf-wacc').value) / 100;
-  var tg   = parseFloat(document.getElementById('dcf-tg').value) / 100;
-  var yrs  = parseInt(document.getElementById('dcf-yrs').value, 10);
-  var el   = document.getElementById('dcf-result');
-  if (!el) return;
-  if (isNaN(eps)||eps<=0||isNaN(g)||isNaN(wacc)||wacc<=0||isNaN(tg)||isNaN(yrs)||yrs<1||wacc<=tg) {
-    el.innerHTML = '<div style="color:var(--red);font-size:10px">&#9888; Geçersiz giriş — WACC > terminal büyüme ve EPS > 0 olmalı.</div>';
-    return;
-  }
-  var pv = 0, cf = eps;
-  for (var t = 1; t <= yrs; t++) {
-    cf = cf * (1 + g);
-    pv += cf / Math.pow(1 + wacc, t);
-  }
-  // Terminal value
-  var tv = cf * (1 + tg) / (wacc - tg);
-  pv += tv / Math.pow(1 + wacc, yrs);
-
-  var mos = currentPrice > 0 ? ((pv - currentPrice) / pv * 100) : null;
-  var mosColor = mos == null ? 'var(--muted2)' : mos > 30 ? 'var(--green)' : mos > 0 ? '#f0b429' : 'var(--red)';
-  var signal = mos == null ? '—' : mos > 30 ? 'AL' : mos > 0 ? 'İZLE' : 'PAHAL';
-  var sigColor = mos == null ? 'var(--muted2)' : mos > 30 ? 'var(--green)' : mos > 0 ? '#f0b429' : 'var(--red)';
-
-  el.innerHTML =
-    '<div style="background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:12px">'
-    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
-    + '<span style="font-size:11px;color:var(--muted2)">İçsel Değer</span>'
-    + '<span style="font-size:18px;font-weight:800;color:var(--text)">' + pv.toFixed(2) + '</span>'
-    + '</div>'
-    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
-    + '<span style="font-size:11px;color:var(--muted2)">Mevcut Fiyat</span>'
-    + '<span style="font-size:14px;font-weight:600;color:var(--text)">' + currentPrice.toFixed(2) + '</span>'
-    + '</div>'
-    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
-    + '<span style="font-size:11px;color:var(--muted2)">Güvenlik Payı</span>'
-    + '<span style="font-size:14px;font-weight:700;color:' + mosColor + '">'
-    + (mos != null ? (mos > 0 ? '+' : '') + mos.toFixed(1) + '%' : '—') + '</span>'
-    + '</div>'
-    + '<div style="border-top:1px solid var(--border);padding-top:8px;text-align:center">'
-    + '<span style="font-size:13px;font-weight:800;color:' + sigColor + ';letter-spacing:.5px">' + signal + '</span>'
-    + '</div>'
-    + '</div>'
-    + '<div style="font-size:8px;color:var(--muted);margin-top:6px;text-align:center">Bu hesaplama yatırım tavsiyesi değildir.</div>';
 }
 
 function selectExchange(el) {
