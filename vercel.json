@@ -161,6 +161,10 @@
       "destination": "/api/bist-scan.js"
     },
     {
+      "source": "/api/preset-snapshot",
+      "destination": "/api/bist-scan.js"
+    },
+    {
       "source": "/api/bist-quote",
       "destination": "/api/bist-quote.js"
     },
@@ -198,9 +202,6 @@
     "api/scan.js": {
       "maxDuration": 25
     },
-    "api/preset-snapshot.js": {
-      "maxDuration": 25
-    },
     "api/verify.js": {
       "maxDuration": 10
     },
@@ -214,7 +215,7 @@
       "maxDuration": 20
     },
     "api/bist-scan.js": {
-      "maxDuration": 15
+      "maxDuration": 25
     },
     "api/bist-quote.js": {
       "maxDuration": 10
