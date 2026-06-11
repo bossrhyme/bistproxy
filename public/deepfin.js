@@ -4798,9 +4798,9 @@ function removeScanFilter(kind, key) {
 
 // ── FİLTRE EKLE DROPDOWN — tablodan ayrılmadan chip seçimi ──
 var FD_GROUPS = [
-  { kind: 'goat',   title: 'Usta Yatırımcılar', containerId: 'goat-chips',   attr: 'data-goat' },
-  { kind: 'preset', title: 'Temel Analiz',      containerId: 'presets',      attr: 'data-preset' },
-  { kind: 'tech',   title: 'Teknik Analiz',     containerId: 'tech-presets', attr: 'data-tech' }
+  { kind: 'goat',   title: 'Yatırımcı Stratejileri', containerId: 'goat-chips',   attr: 'data-goat' },
+  { kind: 'preset', title: 'Temel Stratejiler',      containerId: 'presets',      attr: 'data-preset' },
+  { kind: 'tech',   title: 'Teknik Stratejiler',     containerId: 'tech-presets', attr: 'data-tech' }
 ];
 
 function toggleFilterDropdown(e) {
@@ -4838,15 +4838,24 @@ function renderFilterDropdown() {
     var chips = document.querySelectorAll('#' + g.containerId + ' [' + g.attr + ']');
     if (!chips.length) return;
     html += '<div class="fd-group-title">' + g.title + '</div><div class="fd-chips">';
+    var items = [];
     chips.forEach(function(c) {
       var key = c.getAttribute(g.attr);
       var def = dict[key];
-      var tip = def && def.desc ? ' title="' + esc(def.desc) + '"' : '';
       // Goat chip'ler mini-card'a dönüştürülmüş olabilir — sadece isim span'ini al
       var nameEl = c.querySelector('.gcchip-name');
-      var label = (nameEl ? nameEl.textContent : c.textContent).trim();
-      html += '<span class="fd-chip' + (c.classList.contains('on') ? ' on' : '') + '"' + tip +
-        ' onclick="fdToggleChip(\'' + g.kind + '\',\'' + key + '\',this)">' + esc(label) + '</span>';
+      items.push({
+        key: key,
+        label: (nameEl ? nameEl.textContent : c.textContent).trim(),
+        desc: def && def.desc ? def.desc : '',
+        on: c.classList.contains('on')
+      });
+    });
+    items.sort(function(a, b) { return a.label.localeCompare(b.label, 'tr'); });
+    items.forEach(function(it) {
+      var tip = it.desc ? ' title="' + esc(it.desc) + '"' : '';
+      html += '<span class="fd-chip' + (it.on ? ' on' : '') + '"' + tip +
+        ' onclick="fdToggleChip(\'' + g.kind + '\',\'' + it.key + '\',this)">' + esc(it.label) + '</span>';
     });
     html += '</div>';
   });
