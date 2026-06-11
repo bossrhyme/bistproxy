@@ -2644,6 +2644,49 @@ function _applyChips(cfg) {
 function applyAllChips()    { _applyChips(BASIC_CHIP_CFG); }
 function applyAllChipsAdv() { _applyChips(ADV_CHIP_CFG); }
 
+// ── Quick Scan Bar ────────────────────────────────────────────
+function quickScan(presetKey) {
+  // Ensure we're in screener view
+  var hp = document.getElementById('homepage');
+  if (hp && hp.style.display !== 'none') showScreener();
+  // Close prescan if open
+  var pv = document.getElementById('prescan-view');
+  if (pv && pv.style.display !== 'none') { pv.style.display = 'none'; }
+  // Clear all chips
+  document.querySelectorAll('#goat-chips .goat-chip.on, #presets .chip.on, #tech-presets .chip.on').forEach(function(c){ c.classList.remove('on'); });
+  // Activate the requested chip
+  var techChip = document.querySelector('#tech-presets .chip[data-tech="' + presetKey + '"]');
+  var presetChip = document.querySelector('#presets .chip[data-preset="' + presetKey + '"]');
+  if (techChip) { techChip.classList.add('on'); }
+  else if (presetChip) { presetChip.classList.add('on'); }
+  // Clear inputs and apply
+  document.querySelectorAll('.finps input, #hisse-hidden-filters input').forEach(function(i){ i.value = ''; });
+  var preset = TECH_PRESETS[presetKey] || PRESETS[presetKey];
+  if (preset && preset.filters) {
+    Object.keys(preset.filters).forEach(function(k){ var el = document.getElementById(k); if (el) el.value = preset.filters[k]; });
+  }
+  // Mark active quick-scan button
+  document.querySelectorAll('.qs-btn').forEach(function(b){ b.classList.remove('active'); });
+  var btn = document.querySelector('.qs-btn[onclick*="quickScan(\'' + presetKey + '\')"]');
+  if (btn) btn.classList.add('active');
+  updateClrBtn();
+  runScan();
+}
+
+function quickGoat(goatKey) {
+  var hp = document.getElementById('homepage');
+  if (hp && hp.style.display !== 'none') showScreener();
+  var pv = document.getElementById('prescan-view');
+  if (pv && pv.style.display !== 'none') { pv.style.display = 'none'; }
+  document.querySelectorAll('#goat-chips .goat-chip.on, #presets .chip.on, #tech-presets .chip.on').forEach(function(c){ c.classList.remove('on'); });
+  var chip = document.querySelector('#goat-chips .goat-chip[data-goat="' + goatKey + '"]');
+  if (chip) chip.classList.add('on');
+  document.querySelectorAll('.qs-btn').forEach(function(b){ b.classList.remove('active'); });
+  var btn = document.querySelector('.qs-btn[onclick*="quickGoat(\'' + goatKey + '\')"]');
+  if (btn) btn.classList.add('active');
+  _applyChips(BASIC_CHIP_CFG);
+}
+
 function _countChips(cfg) {
   return document.querySelectorAll(
     '#' + cfg.goatId + ' .goat-chip.on, #' + cfg.presetsId + ' .chip.on, #' + cfg.techId + ' .chip.on'
@@ -2735,6 +2778,7 @@ function clearFilters(resetChips=true){
   const sf = document.getElementById('sector_filter'); if(sf) sf.value = '';
   const sfAdv = document.getElementById('sector_filter_adv'); if(sfAdv) sfAdv.value = '';
   if(resetChips) { document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on')); ['goat-info','preset-info','tech-preset-info','goat-info-adv','preset-info-adv','tech-preset-info-adv'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.display='none';el.innerHTML='';}});}
+  document.querySelectorAll('.qs-btn.active').forEach(function(b){ b.classList.remove('active'); });
   updateClrBtn();
   if(allData.length) applyAndRender();
 }
@@ -4799,6 +4843,44 @@ function _initKeyboardNav() {
       return;
     }
 
+    // '?' — keyboard shortcut help overlay
+    if ((e.key === '?' || (e.key === '/' && e.shiftKey)) && !inInput) {
+      e.preventDefault();
+      _toggleShortcutHelp();
+      return;
+    }
+
+    // Single-key nav shortcuts (only when not in input)
+    if (!inInput && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      // S → Screener/Tarayıcı
+      if (e.key === 's' || e.key === 'S') {
+        var sl = document.getElementById('screener-layout');
+        var hp = document.getElementById('homepage');
+        if (hp && hp.style.display !== 'none') { e.preventDefault(); showScreenerOrPrescan(); return; }
+      }
+      // H → Homepage/Anasayfa
+      if (e.key === 'h' || e.key === 'H') {
+        var hp2 = document.getElementById('homepage');
+        if (hp2 && hp2.style.display === 'none') { e.preventDefault(); showHomepage(); return; }
+      }
+      // T → Toggle theme
+      if (e.key === 't' || e.key === 'T') {
+        e.preventDefault();
+        toggleTheme();
+        return;
+      }
+      // D → Close detail panel
+      if (e.key === 'd' || e.key === 'D') {
+        var det = document.getElementById('detail');
+        if (det && det.classList.contains('open')) { e.preventDefault(); closeDetail(); return; }
+      }
+      // F → Focus on favori tab
+      if (e.key === 'f' || e.key === 'F') {
+        var favBtn = document.querySelector('.exbtn[data-exchange="fav"]');
+        if (favBtn) { e.preventDefault(); favBtn.click(); return; }
+      }
+    }
+
     // Enter/Space ile chip/button aktivasyonu
     if (e.key === 'Enter' || e.key === ' ') {
       if (el.classList.contains('chip') || el.classList.contains('goat-chip') || el.classList.contains('exbtn')) {
@@ -4821,12 +4903,50 @@ function _initKeyboardNav() {
     if (e.key === 'Enter' && tag === 'TR') {
       el.click();
     }
-    // Escape: search temizle veya detail kapat
+    // Escape: search temizle, detail kapat veya shortcut help kapat
     if (e.key === 'Escape') {
+      var shm = document.getElementById('shortcut-help-modal');
+      if (shm && shm.classList.contains('open')) { shm.classList.remove('open'); return; }
       var si = document.getElementById('sb-searchbox');
       if (si && si === document.activeElement) { si.value = ''; si.dispatchEvent(new Event('input')); si.blur(); return; }
+      var det2 = document.getElementById('detail');
+      if (det2 && det2.classList.contains('open')) { closeDetail(); return; }
     }
   });
+}
+
+// ── Keyboard Shortcut Help Overlay ──
+function _toggleShortcutHelp() {
+  var m = document.getElementById('shortcut-help-modal');
+  if (!m) {
+    m = document.createElement('div');
+    m.id = 'shortcut-help-modal';
+    m.className = 'shortcut-help-modal';
+    m.innerHTML =
+      '<div class="shm-inner">'+
+      '<div class="shm-head"><span class="shm-title">Klavye Kısayolları</span><button class="shm-close" onclick="document.getElementById(\'shortcut-help-modal\').classList.remove(\'open\')">✕</button></div>'+
+      '<div class="shm-grid">'+
+      '<div class="shm-section"><div class="shm-section-title">Navigasyon</div>'+
+      '<div class="shm-row"><kbd>/</kbd><span>Sembol ara</span></div>'+
+      '<div class="shm-row"><kbd>S</kbd><span>Tarayıcı\'ya git</span></div>'+
+      '<div class="shm-row"><kbd>H</kbd><span>Anasayfaya git</span></div>'+
+      '<div class="shm-row"><kbd>T</kbd><span>Tema değiştir</span></div>'+
+      '</div>'+
+      '<div class="shm-section"><div class="shm-section-title">Tablo</div>'+
+      '<div class="shm-row"><kbd>↑</kbd><kbd>↓</kbd><span>Satır seç</span></div>'+
+      '<div class="shm-row"><kbd>Enter</kbd><span>Detay aç</span></div>'+
+      '<div class="shm-row"><kbd>D</kbd><span>Detay kapat</span></div>'+
+      '<div class="shm-row"><kbd>F</kbd><span>Favoriler</span></div>'+
+      '</div>'+
+      '<div class="shm-section"><div class="shm-section-title">Genel</div>'+
+      '<div class="shm-row"><kbd>Esc</kbd><span>Kapat / Temizle</span></div>'+
+      '<div class="shm-row"><kbd>?</kbd><span>Bu yardım</span></div>'+
+      '</div>'+
+      '</div></div>';
+    m.addEventListener('click', function(e){ if (e.target === m) m.classList.remove('open'); });
+    document.body.appendChild(m);
+  }
+  m.classList.toggle('open');
 }
 
 // ── Favori Toplam Sayısı (Item 12 — birleştirme yardımcısı) ──

@@ -131,8 +131,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=arctic93">
-<script src="/deepfin.js?v=138" defer></script>
+<link rel="stylesheet" href="/deepfin.css?v=arctic94">
+<script src="/deepfin.js?v=139" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -196,7 +196,8 @@ if('serviceWorker' in navigator){
     </button>
 
     <div class="tright">
-      <button class="topbarbtn theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir" aria-label="Karanlık/Açık mod geçiş">☀</button>
+      <button class="topbarbtn kbd-help-btn" onclick="_toggleShortcutHelp()" title="Klavye kısayolları (?)" aria-label="Klavye kısayolları">?</button>
+      <button class="topbarbtn theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir (T)" aria-label="Karanlık/Açık mod geçiş">☀</button>
       <a href="/profil" id="profile-btn" class="topbarbtn infobtn profile-topbtn" title="Profilim">
         <span id="profile-btn-inner">👤</span><span class="prf-btn-lbl">Profil</span><span id="fav-total-badge" style="display:none;background:var(--accent);color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 5px;margin-left:2px;line-height:1.4;align-items:center;"></span>
       </a>
@@ -1353,6 +1354,23 @@ if('serviceWorker' in navigator){
         <div class="sb-item"><span class="sb-label">BORSA</span><span class="sb-val" id="sb-ex">—</span></div>
         <div class="sb-item"><span class="sb-label">GÜNCELLEME</span><span class="sb-val" id="sb-time">—</span></div>
         <div class="sb-item" id="sb-result-item" style="display:none"><span class="sb-label">SONUÇ</span><span class="sb-val" id="sb-result">—</span></div>
+      </div>
+
+      <!-- Quick Scan Bar -->
+      <div class="quick-scan-bar" id="quick-scan-bar">
+        <span class="qs-label">HIZLI TARA</span>
+        <button class="qs-btn" onclick="quickScan('momentum')" title="Satış ve kazanç büyümesi &gt;20%">⚡ Momentum</button>
+        <button class="qs-btn" onclick="quickScan('breakout')" title="52H zirvesine yakın, hacimli yükseliş">↗ Breakout</button>
+        <button class="qs-btn" onclick="quickScan('oversold')" title="RSI &lt;35, zirveden %20 uzak">↙ Aşırı Satış</button>
+        <button class="qs-btn" onclick="quickScan('nearHigh')" title="52H zirvesine %5 mesafe">▲ 52H Zirve</button>
+        <button class="qs-btn qs-val" onclick="quickScan('value')" title="F/K &lt;15, PD/DD &lt;2, temettü">◆ Değer</button>
+        <button class="qs-btn qs-grw" onclick="quickScan('growth')" title="Kazanç büyümesi %20, ROE %15">▶ Büyüme</button>
+        <button class="qs-btn qs-div" onclick="quickScan('dividend')" title="Temettü %4+, borç makul">★ Temettü</button>
+        <button class="qs-btn qs-qual" onclick="quickScan('quality')" title="ROE %20, net marj %15">✦ Kalite</button>
+        <div class="qs-sep"></div>
+        <button class="qs-btn qs-goat" onclick="quickGoat('buffett')" title="Warren Buffett kriterleri">W.Buffett</button>
+        <button class="qs-btn qs-goat" onclick="quickGoat('graham')" title="Benjamin Graham kriterleri">B.Graham</button>
+        <button class="qs-btn qs-goat" onclick="quickGoat('lynch')" title="Peter Lynch kriterleri">P.Lynch</button>
       </div>
 
       <div id="scan-summary" class="scan-summary" style="display:none"></div>
