@@ -23,6 +23,14 @@ var INV_TYPES = {
   bal:    {name:'Çevik Dengeleyici',   color:'#64748b', desc:'Dengeli ve çeşitlendirilmiş portföy stratejisi izler.',      preset:'bal'},
 };
 
+// ── Streak badges ─────────────────────────────
+var STREAK_BADGES = [
+  { key: 'streak_7',  days: 7,  icon: '🔥', label: '1 Hafta',  color: '#f97316', bonus: 300 },
+  { key: 'streak_14', days: 14, icon: '⚡', label: '2 Hafta',  color: '#eab308', bonus: 400 },
+  { key: 'streak_21', days: 21, icon: '💫', label: '3 Hafta',  color: '#a855f7', bonus: 500 },
+  { key: 'streak_28', days: 28, icon: '👑', label: '4 Hafta',  color: '#0ea5e9', bonus: 600 },
+];
+
 // ── Rank tiers ────────────────────────────────
 var RANKS = [
   {tier:1, name:'Çaylak Asker',      color:'#6b7280'},
@@ -359,8 +367,13 @@ async function init() {
           if (dd.ok && !dd.alreadyChecked && dd.pointsAdded > 0) {
             _user.points = dd.points;
             _user.loginStreak = dd.streak;
+            if (dd.badges) _user.badges = dd.badges;
             renderIdentity();
-            toast('+100 XP — ' + dd.streak + ' günlük giriş serisi!');
+            var mb = dd.milestoneBonus || 0;
+            var toastMsg = mb > 0
+              ? '+' + dd.pointsAdded + ' XP 🎉 ' + dd.streak + '. gün bonusu +' + mb + ' XP!'
+              : '+100 XP — ' + dd.streak + ' günlük giriş serisi!';
+            toast(toastMsg);
           }
         }).catch(function(){});
     } else {
@@ -429,6 +442,19 @@ function renderIdentity() {
   if (pv) pv.textContent = pts.toLocaleString('tr-TR');
   var sv = document.getElementById('pf-streak-val');
   if (sv) sv.textContent = _user.loginStreak || 0;
+
+  // Seri rozetleri
+  var bw2 = document.getElementById('pf-streak-badges');
+  if (bw2) {
+    var earned = _user.badges || [];
+    bw2.innerHTML = STREAK_BADGES.map(function(b) {
+      var has = earned.includes(b.key);
+      return '<div class="pf-sbadge' + (has ? ' earned' : '') + '" title="' + b.label + ' serisi — ' + b.bonus + ' XP bonus">' +
+        '<span class="pf-sbadge-icon">' + b.icon + '</span>' +
+        '<span class="pf-sbadge-label">' + b.label + '</span>' +
+        '</div>';
+    }).join('');
+  }
 
   // Tara button
   var taraBtn = document.getElementById('pf-tara-btn');
@@ -1142,8 +1168,13 @@ window.submitAuth = async function(e) {
           if (dd.ok && !dd.alreadyChecked && dd.pointsAdded > 0) {
             _user.points = dd.points;
             _user.loginStreak = dd.streak;
+            if (dd.badges) _user.badges = dd.badges;
             renderIdentity();
-            toast('+100 XP — ' + dd.streak + ' günlük giriş serisi!');
+            var mb = dd.milestoneBonus || 0;
+            var toastMsg = mb > 0
+              ? '+' + dd.pointsAdded + ' XP 🎉 ' + dd.streak + '. gün bonusu +' + mb + ' XP!'
+              : '+100 XP — ' + dd.streak + ' günlük giriş serisi!';
+            toast(toastMsg);
           }
         }).catch(function(){});
     } else {
