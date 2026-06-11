@@ -122,7 +122,153 @@ const ALLOWED_ORIGINS = [
   'https://www.deepfin.com',
 ];
 
+// ─────────────────────────────────────────────────────────────
+// Günlük BIST snapshot — cron ile kapanış sonrası 1 kez çalışır.
+// /api/preset-snapshot rewrite'i buraya gelir (Vercel Hobby 12
+// fonksiyon limiti nedeniyle ayrı dosya değil).
+// Koruma: CRON_SECRET env tanımlıysa Bearer token veya ?key= ister.
+// ─────────────────────────────────────────────────────────────
+const https = require('https');
+
+const SNAP_COLS = [
+  'close', 'change', 'volume', 'market_cap_basic',
+  'price_earnings_ttm', 'price_book_fq',
+  'return_on_equity_fq', 'net_margin', 'gross_margin',
+  'revenue_growth_ttm_yoy', 'earnings_per_share_change_ttm_yoy',
+  'dividends_yield', 'debt_to_equity_fq', 'current_ratio_fq',
+  'sector',
+  'Recommend.All', 'Recommend.MA', 'Recommend.Other',
+  'Perf.1M', 'Perf.3M', 'Perf.6M', 'RSI',
+  'price_52_week_high', 'price_52_week_low',
+  'relative_volume_10d_calc', 'beta_1_year',
+  'SMA50', 'SMA200', 'MACD.macd', 'MACD.signal',
+  'ADX', 'ADX+DI', 'ADX-DI', 'BB.lower', 'Stoch.K', 'Stoch.D'
+];
+
+const SNAP_TTL = 400 * 86400;   // ~13 ay sakla
+const SNAP_INDEX_KEY = 'dfsnap:index:bist';
+
+function snapRound4(v) {
+  if (typeof v !== 'number' || !isFinite(v)) return v == null ? null : v;
+  return Math.round(v * 10000) / 10000;
+}
+
+// kvSet sessiz hata yutuyor — snapshot yazımı başarısızsa bilmemiz gerek
+async function snapKvSet(key, value, ttlSec) {
+  const url   = process.env.KV_REST_API_URL;
+  const token = process.env.KV_REST_API_TOKEN;
+  const r = await fetch(`${url}/set/${encodeURIComponent(key)}?ex=${ttlSec}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(value)
+  });
+  if (!r.ok) throw new Error('KV yazma hatası: ' + r.status);
+}
+
+function snapFetchScanner(payload) {
+  return new Promise((resolve, reject) => {
+    const body = JSON.stringify(payload);
+    const req = https.request({
+      hostname: 'scanner.tradingview.com',
+      path: '/turkey/scan',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(body),
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        'Origin': 'https://www.tradingview.com',
+        'Referer': 'https://www.tradingview.com/',
+      },
+      timeout: 20000,
+    }, (res) => {
+      let data = '';
+      res.on('data', c => data += c);
+      res.on('end', () => {
+        try { resolve(JSON.parse(data)); }
+        catch (e) { reject(new Error('Tarama yanıtı çözülemedi (HTTP ' + res.statusCode + ')')); }
+      });
+    });
+    req.on('error', reject);
+    req.on('timeout', () => { req.destroy(); reject(new Error('Tarama zaman aşımı')); });
+    req.write(body);
+    req.end();
+  });
+}
+
+async function handleSnapshot(req, res) {
+  res.setHeader('Content-Type', 'application/json');
+  if (req.method !== 'GET') return res.status(405).json({ ok: false, error: 'GET bekleniyor' });
+
+  // Cron koruması
+  const url = new URL(req.url, 'http://localhost');
+  const secret = process.env.CRON_SECRET || '';
+  if (secret) {
+    const auth = req.headers.authorization || '';
+    const key = url.searchParams.get('key') || '';
+    if (auth !== 'Bearer ' + secret && key !== secret) {
+      return res.status(401).json({ ok: false, error: 'Yetkisiz' });
+    }
+  }
+
+  if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
+    return res.status(500).json({ ok: false, error: 'KV yapılandırılmamış' });
+  }
+
+  const force = url.searchParams.get('force') === '1';
+  const now = new Date();
+  const day = now.getUTCDay();
+  if (!force && (day === 0 || day === 6)) {
+    return res.status(200).json({ ok: true, skipped: 'hafta sonu' });
+  }
+
+  const dateStr = now.toISOString().slice(0, 10); // YYYY-MM-DD
+  const snapKey = 'dfsnap:bist:' + dateStr;
+
+  // Idempotent: bugünün kaydı varsa tekrar çekme
+  if (!force) {
+    const existing = await kvGet(snapKey);
+    if (existing) return res.status(200).json({ ok: true, skipped: 'mevcut', date: dateStr, count: existing.rows.length });
+  }
+
+  try {
+    const parsed = await snapFetchScanner({
+      columns: SNAP_COLS,
+      sort: { sortBy: 'market_cap_basic', sortOrder: 'desc' },
+      range: [0, 800],
+      markets: ['turkey'],
+    });
+    const tvRows = parsed.data || [];
+    if (!tvRows.length) throw new Error('Tarama boş döndü');
+
+    const rows = tvRows.map(r => {
+      const sym = (r.s || '').split(':')[1] || r.s;
+      return [sym].concat((r.d || []).map(snapRound4));
+    });
+
+    const snapshot = { d: dateStr, cols: SNAP_COLS, rows };
+    await snapKvSet(snapKey, snapshot, SNAP_TTL);
+
+    // Tarih indeksini güncelle (aralık sorguları için)
+    const index = (await kvGet(SNAP_INDEX_KEY)) || [];
+    if (!index.includes(dateStr)) {
+      index.push(dateStr);
+      index.sort();
+      while (index.length > 400) index.shift();
+      await snapKvSet(SNAP_INDEX_KEY, index, SNAP_TTL);
+    }
+
+    return res.status(200).json({ ok: true, date: dateStr, count: rows.length, cols: SNAP_COLS.length });
+  } catch (e) {
+    return res.status(502).json({ ok: false, error: e.message });
+  }
+}
+
 module.exports = async function handler(req, res) {
+  // Cron snapshot rotası — protect()/CORS'tan ÖNCE: cron isteğinde
+  // tarayıcı UA ve Origin yok, UA taraması onu engellerdi.
+  const urlPath = (req.url || '').split('?')[0];
+  if (urlPath === '/api/preset-snapshot') return handleSnapshot(req, res);
+
   const origin = req.headers.origin || '';
   const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
   res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
