@@ -1613,3 +1613,14 @@ kbd{font-family:var(--ff-mono);font-size:10px;color:var(--text);background:var(-
 .sh-tag-goat{color:#FFB300;border-color:rgba(255,179,0,.3);background:rgba(255,179,0,.06);}
 .sh-tag-preset{color:var(--blue);border-color:rgba(30,144,255,.25);background:var(--accent2);}
 .sh-tag-tech{color:var(--green);border-color:rgba(0,200,83,.25);background:var(--green-bg);}
+
+/* ── CSV Export Button ───────────────────────────────────────── */
+.tb-export-btn{color:var(--teal)!important;border-color:rgba(0,188,212,.3)!important;}
+.tb-export-btn:hover{border-color:var(--teal)!important;background:rgba(0,188,212,.08)!important;}
+
+/* ── Market Cap Tier Row Indicators ─────────────────────────── */
+#hisse-table tbody tr td:first-child+td{border-left:2px solid transparent;}
+#hisse-table tbody tr.mcap-mega td:first-child+td{border-left-color:var(--blue);}
+#hisse-table tbody tr.mcap-large td:first-child+td{border-left-color:var(--teal);}
+#hisse-table tbody tr.mcap-mid td:first-child+td{border-left-color:var(--gold);}
+#hisse-table tbody tr.mcap-small td:first-child+td{border-left-color:var(--muted2);}

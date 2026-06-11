@@ -131,8 +131,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=arctic95">
-<script src="/deepfin.js?v=140" defer></script>
+<link rel="stylesheet" href="/deepfin.css?v=arctic96">
+<script src="/deepfin.js?v=141" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -1315,6 +1315,7 @@ if('serviceWorker' in navigator){
         </div>
         <button id="tb-fav-btn" class="sb-fav-btn" onclick="toggleFavFilter(event)" title="Listelerim" style="display:none">☆ Listelerim</button>
         <button id="tb-col-btn" class="col-btn" onclick="openColPicker()" title="Kolonları özelleştir" style="display:none">⚙ Kolonlar</button>
+        <button id="tb-export-btn" class="col-btn tb-export-btn" onclick="exportToCSV()" title="CSV olarak dışa aktar" style="display:none">↓ CSV</button>
         <div class="density-toggle" id="density-toggle" style="display:none">
           <button class="density-btn active" data-density="compact" onclick="setDensity('compact')" title="Kompakt görünüm">▤</button>
           <button class="density-btn" data-density="normal" onclick="setDensity('normal')" title="Normal görünüm">▥</button>

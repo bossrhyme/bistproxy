@@ -1168,6 +1168,52 @@ function toggleCol(key, vis) { loadColPrefs(); _colVisible[key]=vis; saveColPref
 function closeColPicker() { var m=document.getElementById('col-picker-modal'); if(m) m.classList.remove('open'); }
 function resetColPrefs() { _colVisible=null; loadColPrefs(); saveColPrefs(); openColPicker(); applyColVisibility(); renderTable(); }
 
+// ── CSV Export ────────────────────────────────────────────────
+function exportToCSV() {
+  if (!filtered || !filtered.length) return;
+  var ex = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
+  var cur = ex.currency || '₺';
+  var cols = [
+    { key: 'symbol',                    label: 'Sembol' },
+    { key: 'name',                      label: 'Şirket Adı' },
+    { key: 'currentPrice',              label: 'Fiyat (' + cur + ')' },
+    { key: 'changePercent',             label: 'Değişim %' },
+    { key: 'marketCapitalization',      label: 'Piyasa Değeri (M$)' },
+    { key: 'peNormalizedAnnual',        label: 'F/K' },
+    { key: 'pbAnnual',                  label: 'PD/DD' },
+    { key: 'psTTM',                     label: 'F/S' },
+    { key: 'roeTTM',                    label: 'ROE %' },
+    { key: 'roaTTM',                    label: 'ROA %' },
+    { key: 'netProfitMarginTTM',        label: 'Net Marj %' },
+    { key: 'grossMarginTTM',            label: 'Brüt Marj %' },
+    { key: 'revenueGrowthTTMYoy',       label: 'Gelir Büy %' },
+    { key: 'epsGrowthTTMYoy',           label: 'EPS Büy %' },
+    { key: 'dividendYieldIndicatedAnnual', label: 'Temettü %' },
+    { key: 'currentRatioAnnual',        label: 'Cari Oran' },
+    { key: 'sector',                    label: 'Sektör' },
+  ];
+  var rows = [cols.map(function(c){ return '"' + c.label + '"'; }).join(',')];
+  filtered.forEach(function(s) {
+    rows.push(cols.map(function(c) {
+      var v = s[c.key];
+      if (v === null || v === undefined) return '';
+      if (typeof v === 'string') return '"' + v.replace(/"/g, '""') + '"';
+      return v;
+    }).join(','));
+  });
+  var csv = '﻿' + rows.join('\n'); // BOM for Excel Turkish support
+  var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  var stamp = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = 'deepfin-' + (currentExchange || 'bist') + '-' + stamp + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 // ── Row Density Toggle ──
 var _rowDensity = (function(){ try { return localStorage.getItem('df_density') || 'compact'; } catch(e){ return 'compact'; } })();
 function setDensity(d) {
@@ -3251,7 +3297,9 @@ function _vsRowHtml(s, idx) {
     favClick  = "event.stopPropagation();toggleFav('" + escJS(s.symbol) + "')";
     favTitle  = isFav ? 'Favorilerden çıkar' : 'Favorilere ekle';
   }
-  return `<tr onclick="showDetail('${escJS(s.symbol)}')" tabindex="0" class="${selSym===s.symbol?'selrow':''}">
+  var _mcap = s.marketCapitalization;
+  var _mcapTier = _mcap == null ? '' : _mcap >= 200000 ? ' mcap-mega' : _mcap >= 10000 ? ' mcap-large' : _mcap >= 2000 ? ' mcap-mid' : _mcap >= 300 ? ' mcap-small' : ' mcap-micro';
+  return `<tr onclick="showDetail('${escJS(s.symbol)}')" tabindex="0" class="${selSym===s.symbol?'selrow':''}${_mcapTier}">
       <td class="nfav"><span class="fav-icon${isFav?' fav-on':''}" onclick="${favClick}" title="${esc(favTitle)}">★</span></td>
       <td data-col="symbol" style="display:table-cell;"><span class="row-num">${idx+1}</span><span class="sym-wrap"><span class="row-arrow">›</span><span class="sym">${s.symbol}</span></span></td>
       <td data-col="name" style="${cv('name')}font-size:11px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.name}">${s.name}</td>
@@ -4072,9 +4120,11 @@ function updateStatsBar() {
   var tbFav = document.getElementById('tb-fav-btn');
   var tbCol = document.getElementById('tb-col-btn');
   var tbDens = document.getElementById('density-toggle');
+  var tbExp = document.getElementById('tb-export-btn');
   if (tbFav) tbFav.style.display = '';
   if (tbCol) tbCol.style.display = '';
   if (tbDens) tbDens.style.display = 'flex';
+  if (tbExp) tbExp.style.display = '';
   var upCount = filtered.filter(function(s){ return s.changePercent > 0; }).length;
   var dnCount = filtered.filter(function(s){ return s.changePercent < 0; }).length;
   var ex = (typeof EXCHANGE_META !== 'undefined' ? EXCHANGE_META[currentExchange] : null) || {};
