@@ -2122,7 +2122,19 @@ function initPrescanView() {
   el.innerHTML =
     '<button class="psv-close-btn" id="psv-close-btn" onclick="closePrescanView()" style="display:none">✕ Sonuçlara dön</button>'+
     '<div class="psv-inner">'+
-    '<div class="psv-brand"><div class="psv-logo"><div class="tlogo-mark">D</div>DeepFin</div><div class="psv-tagline">Borsa seç · Strateji seç · Tara</div></div>'+
+    '<div class="psv-brand"><div class="psv-logo"><div class="tlogo-mark">D</div>DeepFin</div><div class="psv-tagline">Varlık seç · Borsa seç · Tara</div></div>'+
+
+    // Asset type section
+    '<div class="psv-section">'+
+    '<div class="psv-section-hd">🏦 Varlık</div>'+
+    '<div class="psv-asset-row">'+
+      '<button class="psv-asset-btn on" data-asset="hisse" onclick="psvSetAsset(\'hisse\')"><span class="psv-asset-icon">📈</span><span class="psv-asset-name">Borsa</span></button>'+
+      '<div class="psv-asset-soon"><span class="psv-asset-icon">₿</span><span class="psv-asset-name">Kripto</span><span class="psv-asset-badge">yakında</span></div>'+
+      '<div class="psv-asset-soon"><span class="psv-asset-icon">💼</span><span class="psv-asset-name">Fon</span><span class="psv-asset-badge">yakında</span></div>'+
+      '<div class="psv-asset-soon"><span class="psv-asset-icon">📦</span><span class="psv-asset-name">ETF</span><span class="psv-asset-badge">yakında</span></div>'+
+      '<div class="psv-asset-soon"><span class="psv-asset-icon">📉</span><span class="psv-asset-name">Viop</span><span class="psv-asset-badge">yakında</span></div>'+
+    '</div>'+
+    '</div>'+
 
     // Exchange section
     '<div class="psv-section">'+
@@ -2177,6 +2189,10 @@ function psvSetExchange(key) {
       if (tlTab) tlTab.style.display = '';
     }
   }
+}
+
+function psvSetAsset(key) {
+  document.querySelectorAll('.psv-asset-btn').forEach(function(b){ b.classList.toggle('on', b.dataset.asset === key); });
 }
 
 var _PSV_MAX_SEL = 4;
