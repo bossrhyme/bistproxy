@@ -506,8 +506,8 @@ td:first-child,td:nth-child(2){text-align:left;}
 .psv-goat-card:hover .psv-goat-desc{opacity:1;transform:translateX(-50%) translateY(0);transition-delay:.35s;}
 .psv-goat-card.on .psv-goat-tag{background:rgba(14,165,233,.12);border-color:rgba(14,165,233,.25);color:var(--accent);}
 
-/* Chip grid — ortalı yatay satır (Temel + Teknik) */
-.psv-chip-grid,.psv-chip-extra{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+/* Chip grid — sola hizalı yatay satır (Temel + Teknik) */
+.psv-chip-grid,.psv-chip-extra{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-start;}
 .psv-chip-extra{margin-top:8px;}
 
 /* Preset + Tech cards */

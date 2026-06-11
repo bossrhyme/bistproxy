@@ -2205,7 +2205,7 @@ function initPrescanView() {
     '<div class="psv-section-hd">📊 Temel <span class="psv-opt">isteğe bağlı</span></div>'+
     '<div class="psv-chip-grid" id="psv-preset-main">'+PSV_MAIN_PRESETS.map(function(k){ return mkFilterCard(k, PRESETS[k], 'psv-preset-card', 'psvTogglePreset'); }).join('')+'</div>'+
     '<div class="psv-chip-extra" id="psv-preset-extra" style="display:none">'+extraPresetKeys.map(function(k){ return mkFilterCard(k, PRESETS[k], 'psv-preset-card', 'psvTogglePreset'); }).join('')+'</div>'+
-    (extraPresetKeys.length ? '<button class="psv-show-more" id="psv-preset-more" onclick="psvToggleMorePresets()">+ Daha Fazla</button>' : '')+
+    (extraPresetKeys.length ? '<button class="psv-show-more" id="psv-preset-more" onclick="psvToggleMorePresets()">+ Daha Fazla ('+extraPresetKeys.length+')</button>' : '')+
     '</div>'+
 
     // Teknik — yatay satır, ortalı
@@ -2324,8 +2324,9 @@ function psvToggleMorePresets() {
   var btn   = document.getElementById('psv-preset-more');
   if (!extra) return;
   var open = extra.style.display !== 'none';
+  var extraCount = Object.keys(PRESETS).filter(function(k){ return PSV_MAIN_PRESETS.indexOf(k)===-1; }).length;
   extra.style.display = open ? 'none' : 'flex';
-  if (btn) btn.textContent = open ? '+ Daha Fazla' : '— Daha Az';
+  if (btn) btn.textContent = open ? '+ Daha Fazla (' + extraCount + ')' : '— Daha Az';
 }
 
 function psvToggleMoreTech() {
