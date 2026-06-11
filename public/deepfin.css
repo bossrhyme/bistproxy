@@ -506,11 +506,12 @@ td:first-child,td:nth-child(2){text-align:left;}
 .psv-goat-card:hover .psv-goat-desc{opacity:1;transform:translateX(-50%) translateY(0);transition-delay:.35s;}
 .psv-goat-card.on .psv-goat-tag{background:rgba(14,165,233,.12);border-color:rgba(14,165,233,.25);color:var(--accent);}
 
-/* Two-column preset layout */
-.psv-two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px;}
+/* Chip grid — ortalı yatay satır (Temel + Teknik) */
+.psv-chip-grid,.psv-chip-extra{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+.psv-chip-extra{margin-top:8px;}
 
 /* Preset + Tech cards */
-.psv-preset-card,.psv-tech-card{position:relative;display:flex;flex-direction:column;gap:4px;padding:10px 12px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r-lg);cursor:pointer;transition:border-color .15s,background .15s;margin-bottom:6px;}
+.psv-preset-card,.psv-tech-card{position:relative;display:flex;flex-direction:column;gap:4px;padding:10px 12px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r-lg);cursor:pointer;transition:border-color .15s,background .15s;min-width:96px;max-width:176px;}
 .psv-preset-card:hover,.psv-tech-card:hover{border-color:var(--accent);}
 .psv-preset-card.on,.psv-tech-card.on{border-color:var(--accent);background:var(--accent2);}
 .psv-preset-name,.psv-tech-name{font-size:12px;font-weight:600;color:var(--text);}
@@ -540,7 +541,7 @@ td:first-child,td:nth-child(2){text-align:left;}
 .new-scan-btn{background:var(--s2);border:1px solid var(--border);color:var(--text2);font-size:11px;font-weight:500;padding:4px 10px;border-radius:var(--r-md);cursor:pointer;display:none;align-items:center;gap:5px;transition:all .12s;white-space:nowrap;}
 .new-scan-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--hover);}
 
-@media(max-width:640px){.psv-two-col{grid-template-columns:1fr;}.psv-inner{padding:24px 16px 60px;}.psv-ex-btn{padding:10px 12px;min-width:56px;}.psv-ex-flag{font-size:18px;}.psv-goat-card{min-width:80px;}.psv-scan-btn{width:100%;padding:14px;}}
+@media(max-width:640px){.psv-inner{padding:24px 16px 60px;}.psv-ex-btn{padding:10px 12px;min-width:56px;}.psv-ex-flag{font-size:18px;}.psv-goat-card{min-width:80px;}.psv-preset-card,.psv-tech-card{min-width:80px;}.psv-scan-btn{width:100%;padding:14px;}}
 
 /* ══════════════════════════════════
    MOBİLE RESPONSIVE

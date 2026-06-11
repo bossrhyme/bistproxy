@@ -2051,6 +2051,9 @@ var _psvActiveGoats   = new Set();
 var _psvActivePresets = new Set();
 var _psvActiveTech    = new Set();
 
+var PSV_MAIN_PRESETS = ['value','growth','dividend','quality'];
+var PSV_MAIN_TECH    = ['breakout','oversold','nearHigh','pullback','highVolume'];
+
 var PSV_MAIN_EX    = ['bist','nasdaq','nyse','sp500','dax','lse'];
 var PSV_MAIN_GOATS = ['buffett','graham','lynch','fisher','munger'];
 
@@ -2149,8 +2152,10 @@ function initPrescanView() {
       '<div class="psv-preset-desc">'+p.desc+'</div></div>';
   }
 
-  var allExKeys = Object.keys(EXCHANGE_META).filter(function(k){ return PSV_MAIN_EX.indexOf(k)===-1; });
-  var extraGoatKeys = Object.keys(GURUS).filter(function(k){ return PSV_MAIN_GOATS.indexOf(k)===-1; });
+  var allExKeys      = Object.keys(EXCHANGE_META).filter(function(k){ return PSV_MAIN_EX.indexOf(k)===-1; });
+  var extraGoatKeys  = Object.keys(GURUS).filter(function(k){ return PSV_MAIN_GOATS.indexOf(k)===-1; });
+  var extraPresetKeys = Object.keys(PRESETS).filter(function(k){ return PSV_MAIN_PRESETS.indexOf(k)===-1; });
+  var extraTechKeys   = Object.keys(TECH_PRESETS).filter(function(k){ return PSV_MAIN_TECH.indexOf(k)===-1; });
 
   el.innerHTML =
     '<button class="psv-close-btn" id="psv-close-btn" onclick="closePrescanView()" style="display:none">✕ Sonuçlara dön</button>'+
@@ -2189,16 +2194,20 @@ function initPrescanView() {
     '<button class="psv-show-more" id="psv-goat-more" onclick="psvToggleMoreGoats()">+ Tüm Stratejiler</button>'+
     '</div>'+
 
-    // Fundamental + Technical two-col
-    '<div class="psv-two-col">'+
+    // Temel — yatay satır, ortalı
     '<div class="psv-section">'+
     '<div class="psv-section-hd">📊 Temel <span class="psv-opt">isteğe bağlı</span></div>'+
-    '<div id="psv-preset-grid">'+Object.keys(PRESETS).map(function(k){ return mkFilterCard(k, PRESETS[k], 'psv-preset-card', 'psvTogglePreset'); }).join('')+'</div>'+
+    '<div class="psv-chip-grid" id="psv-preset-main">'+PSV_MAIN_PRESETS.map(function(k){ return mkFilterCard(k, PRESETS[k], 'psv-preset-card', 'psvTogglePreset'); }).join('')+'</div>'+
+    '<div class="psv-chip-extra" id="psv-preset-extra" style="display:none">'+extraPresetKeys.map(function(k){ return mkFilterCard(k, PRESETS[k], 'psv-preset-card', 'psvTogglePreset'); }).join('')+'</div>'+
+    (extraPresetKeys.length ? '<button class="psv-show-more" id="psv-preset-more" onclick="psvToggleMorePresets()">+ Daha Fazla</button>' : '')+
     '</div>'+
+
+    // Teknik — yatay satır, ortalı
     '<div class="psv-section">'+
     '<div class="psv-section-hd">📈 Teknik <span class="psv-opt">isteğe bağlı</span></div>'+
-    '<div id="psv-tech-grid">'+Object.keys(TECH_PRESETS).map(function(k){ return mkFilterCard(k, TECH_PRESETS[k], 'psv-tech-card', 'psvToggleTech'); }).join('')+'</div>'+
-    '</div>'+
+    '<div class="psv-chip-grid" id="psv-tech-main">'+PSV_MAIN_TECH.map(function(k){ return mkFilterCard(k, TECH_PRESETS[k], 'psv-tech-card', 'psvToggleTech'); }).join('')+'</div>'+
+    '<div class="psv-chip-extra" id="psv-tech-extra" style="display:none">'+extraTechKeys.map(function(k){ return mkFilterCard(k, TECH_PRESETS[k], 'psv-tech-card', 'psvToggleTech'); }).join('')+'</div>'+
+    '<button class="psv-show-more" id="psv-tech-more" onclick="psvToggleMoreTech()">+ Daha Fazla ('+extraTechKeys.length+')</button>'+
     '</div>'+
 
     // Scan button
@@ -2302,6 +2311,25 @@ function psvToggleMoreEx() {
   var open = extra.style.display !== 'none';
   extra.style.display = open ? 'none' : 'flex';
   if (btn) btn.textContent = open ? '+ Diğer Borsalar' : '— Daha Az';
+}
+
+function psvToggleMorePresets() {
+  var extra = document.getElementById('psv-preset-extra');
+  var btn   = document.getElementById('psv-preset-more');
+  if (!extra) return;
+  var open = extra.style.display !== 'none';
+  extra.style.display = open ? 'none' : 'flex';
+  if (btn) btn.textContent = open ? '+ Daha Fazla' : '— Daha Az';
+}
+
+function psvToggleMoreTech() {
+  var extra = document.getElementById('psv-tech-extra');
+  var btn   = document.getElementById('psv-tech-more');
+  if (!extra) return;
+  var open = extra.style.display !== 'none';
+  var extraCount = Object.keys(TECH_PRESETS).filter(function(k){ return PSV_MAIN_TECH.indexOf(k)===-1; }).length;
+  extra.style.display = open ? 'none' : 'flex';
+  if (btn) btn.textContent = open ? '+ Daha Fazla (' + extraCount + ')' : '— Daha Az';
 }
 
 function openPrescanView() {
