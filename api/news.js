@@ -82,7 +82,7 @@ module.exports = async function(req, res) {
   if (rlCount > 30) { trackViolation(ip).catch(() => {}); return res.status(429).json({ news: [] }); }
 
   // KV cache
-  const cacheKey = 'df_news_v1_' + (ex || 'bist') + '_' + sym;
+  const cacheKey = 'df_news_v2_' + (ex || 'bist') + '_' + sym;
   const cachedNews = await kvGet(cacheKey);
   if (cachedNews) {
     res.setHeader('Content-Type', 'application/json');
@@ -93,14 +93,12 @@ module.exports = async function(req, res) {
   // Exchange → TradingView prefix mapping
   const PREFIX = { bist:'BIST:', nasdaq:'NASDAQ:', sp500:'NYSE:', dax:'XETR:', lse:'LSE:', nikkei:'TSE:' };
   const tvSym = (PREFIX[ex] || 'BIST:') + sym;
-
-  const newsUrl = 'https://news-headlines.tradingview.com/v2/headlines?symbol='
-    + encodeURIComponent(tvSym)
-    + '&lang=en&client=web&streaming=false';
+  // BIST için Türkçe akış: KAP bildirimleri TradingView'in tr akışında geliyor
+  const lang = ex === 'bist' ? 'tr' : 'en';
 
   const options = {
     hostname: 'news-headlines.tradingview.com',
-    path: '/v2/headlines?symbol=' + encodeURIComponent(tvSym) + '&lang=en&client=web&streaming=false',
+    path: '/v2/headlines?symbol=' + encodeURIComponent(tvSym) + '&lang=' + lang + '&client=web&streaming=false',
     method: 'GET',
     headers: {
       'User-Agent': 'Mozilla/5.0',
