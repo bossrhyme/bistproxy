@@ -3239,26 +3239,6 @@ function showDetail(sym){
   // Şirket Profili
   buildProfile(s);
 
-  // ── Graham Sayısı ─────────────────────────────────────────────
-  // Graham = price × √(22.5 / (PE × PB))  [√(22.5 × EPS × BV_per_share)]
-  const _pe = s.peNormalizedAnnual, _pb = s.pbAnnual, _price = s.currentPrice;
-  const grahamNum = (_pe > 0 && _pb > 0 && _price > 0)
-    ? _price * Math.sqrt(22.5 / (_pe * _pb)) : null;
-
-  // ── Bileşik Skor (0-10) ───────────────────────────────────────
-  var _cscore = 0, _cscount = 0;
-  function _cs(val, good, ok) { _cscount++; if(val!=null){ if(val>=good)_cscore+=2; else if(val>=ok)_cscore+=1; } }
-  function _csLow(val, good, ok) { _cscount++; if(val!=null){ if(val<=good)_cscore+=2; else if(val<=ok)_cscore+=1; } }
-  _cs(s.roeTTM, 15, 5);
-  _cs(s.netProfitMarginTTM, 10, 0);
-  _cs(s.revenueGrowthTTMYoy, 10, 0);
-  _cs(s.epsGrowthTTMYoy, 10, 0);
-  _csLow(s['totalDebt/totalEquityAnnual'], 0.5, 1);
-  _cs(s.currentRatioAnnual, 2, 1);
-  if(s.piotroski!=null){ _cscount++; if(s.piotroski>=7)_cscore+=2; else if(s.piotroski>=5)_cscore+=1; }
-  if(s.peg!=null){ _cscount++; if(s.peg<1)_cscore+=2; else if(s.peg<2)_cscore+=1; }
-  const compositeScore = _cscount>0 ? Math.min(10, Math.round(_cscore*10/_cscount)) : null;
-
   const G = [
     {t:'Değerleme', rows:[
       ['F/K <tag>TTM</tag>', s.peNormalizedAnnual, v=>v.toFixed(1), 'dval-pe'],
@@ -3268,34 +3248,6 @@ function showDetail(sym){
       ['Sektör', s.sector, v=>v],
       ['52H Yüksek', s['52WeekHigh'], v=>`${v.toFixed(2)} ₺`],
       ['52H Düşük', s['52WeekLow'], v=>`${v.toFixed(2)} ₺`],
-    ]},
-    {t:'Kantitatif', rows:[
-      ['Piotroski F-Score', s.piotroski, function(v) {
-        var color = v>=8?'#00c076':v>=6?'#f0b429':'#f6465d';
-        var label = v>=8?'Güçlü':v>=6?'Orta':'Zayıf';
-        return '<span style="color:'+color+';font-weight:700">'+v+'/9</span> <span style="color:'+color+';font-size:9px">'+label+'</span>';
-      }],
-      ['PEG Oranı', s.peg, function(v) {
-        var color = v<1?'#00c076':v<2?'#f0b429':'#f6465d';
-        var label = v<1?'Ucuz':v<2?'Makul':'Pahalı';
-        return '<span style="color:'+color+';font-weight:700">'+v.toFixed(2)+'</span> <span style="color:'+color+';font-size:9px">'+label+'</span>';
-      }],
-      ['Graham Sayısı', grahamNum, function(v) {
-        var pct = ((_price - v) / v * 100);
-        var isUnder = _price < v;
-        var color = isUnder ? '#00c076' : (Math.abs(pct)<20 ? '#f0b429' : '#f6465d');
-        var sign = isUnder ? '−' : '+';
-        var pctAbs = Math.abs(pct);
-        return '<span style="font-weight:700">'+v.toFixed(2)+'</span>'
-          + ' <span style="font-size:9px;color:'+color+'">fiyat '+sign+pctAbs.toFixed(0)+'%</span>';
-      }],
-      ['Bileşik Skor', compositeScore, function(v) {
-        var color = v>=7?'#00c076':v>=4?'#f0b429':'#f6465d';
-        var label = v>=7?'Güçlü':v>=4?'Orta':'Zayıf';
-        var bars = '';
-        for(var i=0;i<10;i++) bars += '<span style="display:inline-block;width:6px;height:8px;border-radius:1px;margin-right:1px;background:'+(i<v?color:'var(--border2)')+'"></span>';
-        return bars + ' <span style="color:'+color+';font-size:9px;font-weight:700;margin-left:3px">'+v+'/10 '+label+'</span>';
-      }],
     ]},
     {t:'Karlılık', rows:[
       ['ROE <tag>FQ</tag>', s.roeTTM, v=>`<span class="${v>=0?'up':'dn'}">${v.toFixed(1)}%</span>`, 'dval-roe'],
@@ -3328,19 +3280,9 @@ function showDetail(sym){
   // Panel transition bitmesini bekle (200ms)
   setTimeout(function(){ updateChart(sym); }, 260);
 
-  // Insider & Short Interest — sadece US hisseleri için
-  const isUS = ['nasdaq','sp500'].includes(currentExchange);
   document.getElementById('dextra-tabs').style.display = 'flex';
-  var insTab = document.querySelector('.dxtab[data-xtab="insider"]');
-  var shrTab = document.querySelector('.dxtab[data-xtab="short"]');
-  if(insTab) insTab.style.display = isUS?'':'none';
-  if(shrTab) shrTab.style.display = isUS?'':'none';
   _detailStock = s;
   switchXTab(document.querySelector('.dxtab[data-xtab="fundamentals"]'));
-  if (isUS) { fetchInsider(sym); fetchShortInterest(sym); }
-
-  // Yahoo Finance doğrulama — TV verisiyle karşılaştır
-  fetchYahooVerify(sym, currentExchange);
 }
 
 let lwChart = null;
@@ -3418,26 +3360,6 @@ function _loadLightweightCharts(cb) {
   document.head.appendChild(script);
 }
 // ────────────────────────────────────────────────────
-
-function initChart(container) {
-  if (lwChart) { try { lwChart.remove(); } catch(e){} lwChart = null; lwSeries = null; lwVolSeries = null; lwIndSeries = {}; }
-  lwChart = LightweightCharts.createChart(container, {
-    width: (container.offsetWidth > 50 ? container.offsetWidth : (document.querySelector('.detail.open')?.offsetWidth - 20 || 340)),
-    height: 260,
-    layout: { background: { color: '#f8fafc' }, textColor: '#94a3b8', fontSize: 11, fontFamily: 'Inter, sans-serif' },
-    grid: { vertLines: { color: '#edf2f7', style: 1 }, horzLines: { color: '#edf2f7', style: 1 } },
-    crosshair: { mode: LightweightCharts.CrosshairMode.Normal, vertLine: { color: '#cbd5e1', labelBackgroundColor: '#64748b' }, horzLine: { color: '#cbd5e1', labelBackgroundColor: '#64748b' } },
-    rightPriceScale: { borderColor: '#e2e8f0', textColor: '#94a3b8' },
-    timeScale: { borderColor: '#e2e8f0', textColor: '#94a3b8', timeVisible: true, secondsVisible: false },
-    handleScroll: true, handleScale: true,
-  });
-  lwSeries = lwChart.addCandlestickSeries({
-    upColor: '#10b981', downColor: '#f43f5e',
-    borderUpColor: '#10b981', borderDownColor: '#f43f5e',
-    wickUpColor: '#10b981', wickDownColor: '#f43f5e',
-  });
-  if (window._attachChartResizeObserver) window._attachChartResizeObserver(container);
-}
 
 function applyIndicators() {
   if (!lwCandles.length || !lwChart) return;
@@ -3558,84 +3480,6 @@ function updateChart(sym) {
   });
 }
 
-// ── Yahoo Finance Doğrulama ──────────────────────────────────────────────
-function fetchYahooVerify(sym, ex) {
-  var url = '/api/verify?symbol=' + encodeURIComponent(sym) + '&exchange=' + (ex || 'bist');
-
-  fetch(url)
-    .then(function(r){ return r.json(); })
-    .then(function(data) {
-      if(!data || !data.yahoo) return;
-      var y = data.yahoo;
-      var s = allData.find(function(x){ return x.symbol === sym; });
-      if(!s) return;
-
-      // TV → Yahoo karşılaştırma
-      var pairs = [
-        { key:'peNormalizedAnnual', yVal:y.pe,           dId:'dval-pe',    label:'F/K' },
-        { key:'pbAnnual',           yVal:y.pb,           dId:'dval-pb',    label:'PD/DD' },
-        { key:'psTTM',              yVal:y.ps,           dId:'dval-ps',    label:'F/S' },
-        { key:'roeTTM',             yVal:y.roe,          dId:'dval-roe',   label:'ROE' },
-        { key:'roaTTM',             yVal:y.roa,          dId:'dval-roa',   label:'ROA' },
-        { key:'netProfitMarginTTM', yVal:y.netMargin,    dId:'dval-nm',    label:'Net Marj' },
-        { key:'grossMarginTTM',     yVal:y.grossMargin,  dId:'dval-gm',    label:'Brüt Marj' },
-        { key:'dividendYieldIndicatedAnnual', yVal:y.dividendYield, dId:'dval-div', label:'Temettü' },
-        { key:'currentRatioAnnual', yVal:y.currentRatio, dId:'dval-cr',    label:'Cari Oran' },
-        { key:'totalDebt/totalEquityAnnual',  yVal:y.debtToEquity,  dId:'dval-de',  label:'Borç/Özkaynak' },
-      ];
-
-      var mismatch = [];
-
-      pairs.forEach(function(p) {
-        var tvVal = s[p.key];
-        var yhVal = p.yVal;
-
-        if(tvVal == null || yhVal == null) return;
-
-        // Fark yüzdesi
-        var diff = Math.abs(tvVal - yhVal);
-        var pct  = tvVal !== 0 ? (diff / Math.abs(tvVal)) * 100 : diff;
-
-        // %15'ten fazla fark → uyarı
-        if(pct > 15) {
-          mismatch.push({
-            label: p.label,
-            tv:    tvVal,
-            yh:    yhVal,
-            pct:   pct.toFixed(0)
-          });
-        }
-
-        // Yahoo değerini UI'a yaz (daha güvenilir kaynak)
-        // dRow'larda dval-* ID'si kullan
-        var el = document.getElementById(p.dId);
-        if(el && yhVal != null) {
-          var formatted = yhVal.toFixed(
-            p.key === 'peNormalizedAnnual' || p.key === 'pbAnnual' || p.key === 'currentRatioAnnual' ||
-            p.key === 'totalDebt/totalEquityAnnual' || p.key === 'psTTM' ? 2 : 1
-          );
-          var pctSuffix = ['roeTTM','roaTTM','netProfitMarginTTM','grossMarginTTM',
-                           'dividendYieldIndicatedAnnual','revenueGrowthTTMYoy','epsGrowthTTMYoy'].includes(p.key);
-          var isColored  = ['roeTTM','roaTTM','netProfitMarginTTM','grossMarginTTM'].includes(p.key);
-          var colorClass = isColored ? (yhVal >= 0 ? 'up' : 'dn') : '';
-
-          el.innerHTML = colorClass
-            ? '<span class="'+colorClass+'">' + formatted + (pctSuffix ? '%' : '') + '</span>'
-            : formatted + (pctSuffix ? '%' : '');
-
-          if(pct > 15) {
-            el.innerHTML += ' <span title="TV: '+tvVal.toFixed(2)+' | Yahoo: '+yhVal.toFixed(2)+
-              ' (%'+Math.round(pct)+' fark)" style="cursor:help;color:#f0b429;font-size:9px;">⚠</span>';
-          }
-        }
-      });
-
-
-      console.log('[DeepFin] Yahoo verify:', sym, mismatch.length === 0 ? '✅ uyumlu' : '⚠ '+mismatch.length+' fark', mismatch);
-    })
-    .catch(function(e){ console.warn('[DeepFin] Yahoo verify hatası:', e.message); });
-}
-// ─────────────────────────────────────────────────────────────────────────
 
 
 function closeDetail(){
@@ -3976,7 +3820,7 @@ document.getElementById('ind-tabs').addEventListener('click', e => {
 });
 
 // ══════════════════════════════════════════
-// INSIDER TRADING & SHORT INTEREST
+// DETAY ALT SEKMELERİ
 // ══════════════════════════════════════════
 
 function switchXTab(el) {
@@ -3997,170 +3841,6 @@ function switchXTab(el) {
       if (sb) sb.innerHTML = '<div class="dxloading" style="color:var(--muted2)">Bu hisse için sektör verisi mevcut değil.</div>';
     }
   }
-}
-
-// SEC EDGAR — Form 4 Insider Trading
-async function fetchInsider(symbol) {
-  const el = document.getElementById('insider-body');
-  el.innerHTML = '<div class="dxloading">SEC EDGAR Form 4 yukleniyor...</div>';
-  try {
-    const r = await fetch(PROXY_URL + '?action=insider&symbol=' + symbol);
-    const data = await r.json();
-    if (data.error) throw new Error(data.error);
-    const rows = data.results || [];
-    if (rows.length === 0) {
-      el.innerHTML = '<div class="dxloading">Form 4 verisi bulunamadi</div>';
-      return;
-    }
-    const typeLabel = {
-      'P': { label: 'ALIM',    cls: 'insider-buy'  },
-      'S': { label: 'SATIM',   cls: 'insider-sell' },
-      'A': { label: 'AWARD',   cls: 'insider-buy'  },
-      'D': { label: 'DISPOSE', cls: 'insider-sell' },
-      'M': { label: 'OPSIYON', cls: '' },
-      'G': { label: 'HEDIYE',  cls: '' },
-    };
-    let tbody = '';
-    rows.forEach(function(r) {
-      const tl  = typeLabel[r.type] || { label: r.type, cls: '' };
-      const val = r.value >= 1e6 ? '$' + (r.value/1e6).toFixed(1) + 'M'
-                : r.value >= 1e3 ? '$' + (r.value/1e3).toFixed(0) + 'K'
-                : '$' + r.value.toFixed(0);
-      const sh  = r.shares >= 1e6 ? (r.shares/1e6).toFixed(1) + 'M'
-                : r.shares >= 1e3 ? (r.shares/1e3).toFixed(0) + 'K'
-                : String(r.shares.toFixed(0));
-      tbody += '<tr>' +
-        '<td style="color:var(--muted2)">' + r.date + '</td>' +
-        '<td><div style="font-weight:600;color:var(--text)">' + r.owner + '</div>' +
-        '<div style="font-size:8px;color:var(--muted2)">' + r.title + '</div></td>' +
-        '<td class="' + tl.cls + '">' + tl.label + '</td>' +
-        '<td style="font-family:\'Geist Mono\',monospace">' + sh + '</td>' +
-        '<td style="font-family:\'Geist Mono\',monospace;font-weight:600">' + val + '</td>' +
-        '</tr>';
-    });
-    const edgarLink = 'https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=' + data.cik + '&type=4&owner=include&count=40';
-    el.innerHTML =
-      '<div style="font-size:9px;color:var(--muted2);margin-bottom:6px;">' +
-      'SEC EDGAR Form 4 &nbsp;&middot;&nbsp;' +
-      '<a href="' + edgarLink + '" target="_blank" style="color:var(--accent);text-decoration:none;">EDGAR\'da gor &#8599;</a>' +
-      '</div>' +
-      '<table class="insider-table"><thead><tr>' +
-      '<th>Tarih</th><th>Kisi / Unvan</th><th>Islem</th><th>Adet</th><th>Tutar</th>' +
-      '</tr></thead><tbody>' + tbody + '</tbody></table>';
-  } catch(e) {
-    console.error('[insider]', e.message);
-    el.innerHTML = '<div class="dxerror">&#9888; İçeriden işlem verisi yüklenemedi.</div>';
-  }
-}
-
-async function fetchShortInterest(symbol) {
-  const el = document.getElementById('short-body');
-  el.innerHTML = '<div class="dxloading">Short interest yukleniyor...</div>';
-  try {
-    const r = await fetch(PROXY_URL + '?action=short&symbol=' + symbol);
-    const data = await r.json();
-    if (data.error) throw new Error(data.error);
-    renderShortInterest(el, data, symbol);
-  } catch(e) {
-    const nasdaqUrl = 'https://www.nasdaq.com/market-activity/stocks/' + symbol.toLowerCase() + '/short-interest';
-    const finvizUrl = 'https://finviz.com/quote.ashx?t=' + symbol;
-    el.innerHTML =
-      '<div style="text-align:center;padding:16px;">' +
-      '<div style="font-size:28px;margin-bottom:8px;">&#128202;</div>' +
-      '<div style="font-size:10px;color:var(--muted2);margin-bottom:12px;">Short interest verisi alinamadi</div>' +
-      '<a href="' + nasdaqUrl + '" target="_blank" ' +
-      'style="display:inline-block;background:var(--accent);color:#fff;padding:7px 16px;border-radius:5px;font-size:10px;text-decoration:none;font-weight:600;">' +
-      symbol + ' &rarr; Nasdaq Short Interest &#8599;</a>' +
-      '<div style="margin-top:8px;"><a href="' + finvizUrl + '" target="_blank" ' +
-      'style="color:var(--accent);font-size:9px;text-decoration:none;">Finviz\'de gor &#8599;</a></div>' +
-      '</div>';
-  }
-}
-
-function renderShortInterest(el, d, symbol) {
-  // Nasdaq API formatı — rows dizisi
-  const rows = d.rows || [];
-  if (rows.length === 0) {
-    el.innerHTML = '<div class="dxloading">Veri bulunamadi</div>';
-    return;
-  }
-
-  // En son satır = en güncel veri
-  const latest = rows[0];
-  // Nasdaq format: { settlementDate, shortInterest, avgDailyShareVolume, daysToCover, ... }
-  const parseNum = function(s) {
-    if (!s) return 0;
-    return parseFloat(String(s).replace(/,/g, '')) || 0;
-  };
-
-  const settleDate  = latest.settlementDate || latest.date || '—';
-  const shortVol    = parseNum(latest.shortInterest);
-  const daysToCover = parseNum(latest.daysToCover);
-  const avgVol      = parseNum(latest.avgDailyShareVolume);
-
-  // Short % of float
-  const floatNum = parseNum(d.floatShares);
-  const shortPct = floatNum > 0 ? (shortVol / floatNum) * 100 : 0;
-  const pct      = Math.min(shortPct, 100);
-  const barColor = pct > 20 ? '#f6465d' : pct > 10 ? '#f0b429' : '#00c076';
-
-  const fmtNum = function(n) {
-    return n >= 1e9 ? (n/1e9).toFixed(2) + 'B'
-         : n >= 1e6 ? (n/1e6).toFixed(1) + 'M'
-         : n >= 1e3 ? (n/1e3).toFixed(0) + 'K'
-         : String(Math.round(n));
-  };
-
-  // Tablo satırları (son 6 dönem)
-  let tableRows = '';
-  rows.slice(0, 6).forEach(function(r) {
-    const si  = parseNum(r.shortInterest);
-    const dtc = parseNum(r.daysToCover);
-    const chg = parseNum(r.shortInterest) - parseNum((rows[rows.indexOf(r)+1] || {}).shortInterest);
-    const chgColor = chg >= 0 ? '#f6465d' : '#00c076';
-    const chgStr  = chg !== 0 ? (chg > 0 ? '+' : '') + fmtNum(chg) : '—';
-    tableRows +=
-      '<tr>' +
-      '<td style="color:var(--muted2)">' + r.settlementDate + '</td>' +
-      '<td style="font-weight:600;font-family:monospace">' + fmtNum(si) + '</td>' +
-      '<td style="color:' + chgColor + ';font-family:monospace">' + chgStr + '</td>' +
-      '<td style="color:' + (dtc > 5 ? '#f6465d' : dtc > 2 ? '#f0b429' : '#00c076') + '">' + dtc.toFixed(1) + 'g</td>' +
-      '</tr>';
-  });
-
-  const nasdaqUrl = 'https://www.nasdaq.com/market-activity/stocks/' + symbol.toLowerCase() + '/short-interest';
-
-  el.innerHTML =
-    '<div style="font-size:9px;color:var(--muted2);margin-bottom:8px;">Son guncelleme: ' + settleDate + ' &middot; Kaynak: Nasdaq</div>' +
-    '<div class="si-grid">' +
-      '<div class="si-card">' +
-        '<div class="si-card-title">SHORT INTEREST</div>' +
-        '<div class="si-card-val">' + fmtNum(shortVol) + '</div>' +
-        '<div class="si-card-sub">Aciga satilan hisse</div>' +
-      '</div>' +
-      '<div class="si-card">' +
-        '<div class="si-card-title">DAYS TO COVER</div>' +
-        '<div class="si-card-val" style="color:' + (daysToCover > 5 ? '#f6465d' : daysToCover > 2 ? '#f0b429' : '#00c076') + '">' + daysToCover.toFixed(1) + '</div>' +
-        '<div class="si-card-sub">Ort. gunluk hacim: ' + fmtNum(avgVol) + '</div>' +
-      '</div>' +
-    '</div>' +
-    (floatNum > 0 ?
-      '<div class="si-bar-wrap" style="margin-bottom:8px;">' +
-        '<div class="si-bar-label"><span>Float Yuzdesi</span>' +
-          '<span style="font-weight:700;color:' + barColor + '">' + pct.toFixed(1) + '%</span>' +
-        '</div>' +
-        '<div class="si-bar-track"><div class="si-bar-fill" style="width:' + pct + '%;background:' + barColor + '"></div></div>' +
-        '<div style="display:flex;justify-content:space-between;font-size:8px;color:var(--muted2);margin-top:3px;">' +
-          '<span>Dusuk</span><span>10%</span><span>20%</span><span>Yuksek</span>' +
-        '</div>' +
-      '</div>' : '') +
-    '<table class="insider-table">' +
-      '<thead><tr><th>Tarih</th><th>Short Hacim</th><th>Degisim</th><th>DTC</th></tr></thead>' +
-      '<tbody>' + tableRows + '</tbody>' +
-    '</table>' +
-    '<div style="margin-top:8px;text-align:center;">' +
-      '<a href="' + nasdaqUrl + '" target="_blank" style="color:var(--accent);font-size:9px;text-decoration:none;">Tum gecmis &rarr; Nasdaq &#8599;</a>' +
-    '</div>';
 }
 
 // ── Sektör Karşılaştırması ────────────────────────────────────
