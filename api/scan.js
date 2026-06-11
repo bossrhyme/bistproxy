@@ -102,7 +102,7 @@ function getCacheTTL(exchange) {
     southafrica:  { open: 7,  close: 15 }, // 09:00-17:00 SAST (UTC+2)
   };
   const h = hours[exchange] || { open: 8, close: 16 };
-  return (hour >= h.open && hour < h.close) ? 300 : 1800; // açık:5dk kapalı:30dk
+  return (hour >= h.open && hour < h.close) ? 900 : 1800; // açık:15dk kapalı:30dk
 }
 
 // ─────────────────────────────────────────────

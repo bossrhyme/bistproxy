@@ -155,7 +155,7 @@ module.exports = async function handler(req, res) {
       cached_at: new Date().toISOString(),
     };
 
-    await kvSet(cacheKey, response, 300); // 5dk cache
+    await kvSet(cacheKey, response, 3600); // 1 saat cache (halka açıklık verisi nadiren değişir)
     fetch(process.env.KV_REST_API_URL + '/incr/df_total_scans', {
       method: 'POST', headers: { Authorization: 'Bearer ' + process.env.KV_REST_API_TOKEN }
     }).catch(() => {});

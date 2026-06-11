@@ -188,8 +188,17 @@
     { "source": "/admin",             "destination": "/admin/index.html" },
     { "source": "/admin/",            "destination": "/admin/index.html" }
   ],
+  "crons": [
+    {
+      "path": "/api/preset-snapshot",
+      "schedule": "30 15 * * *"
+    }
+  ],
   "functions": {
     "api/scan.js": {
+      "maxDuration": 25
+    },
+    "api/preset-snapshot.js": {
       "maxDuration": 25
     },
     "api/verify.js": {
