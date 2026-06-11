@@ -1577,3 +1577,39 @@ kbd{font-family:var(--ff-mono);font-size:10px;color:var(--text);background:var(-
 .qs-goat.active{background:rgba(255,179,0,.1);color:#FFB300;border-color:#FFB300;}
 .qs-sep{width:1px;height:16px;background:var(--border2);margin:0 4px;flex-shrink:0;}
 @media(max-width:768px){.quick-scan-bar{gap:3px;padding:4px 8px;}.qs-btn{font-size:9px;padding:3px 6px;}}
+
+/* ── Row Density Toggle ──────────────────────────────────────── */
+.density-toggle{display:flex;align-items:center;gap:1px;border:1px solid var(--border2);border-radius:var(--r-sm);overflow:hidden;}
+.density-btn{background:var(--s2);border:none;color:var(--muted2);font-size:13px;padding:3px 7px;cursor:pointer;transition:all .1s;line-height:1;}
+.density-btn:hover{background:var(--s3);color:var(--text);}
+.density-btn.active{background:var(--accent2);color:var(--accent);}
+/* Compact: current default — already ~28px rows */
+#hisse-table.density-compact tbody td{padding:3px 5px;}
+#hisse-table.density-compact tbody tr{height:26px;}
+/* Normal */
+#hisse-table.density-normal tbody td{padding:6px 6px;}
+#hisse-table.density-normal tbody tr{height:34px;}
+/* Comfortable */
+#hisse-table.density-comfortable tbody td{padding:9px 7px;}
+#hisse-table.density-comfortable tbody tr{height:42px;}
+/* Sort column highlight */
+#hisse-table thead th.sorted{background:var(--s3);color:var(--accent);}
+#hisse-table thead th.sorted::after{content:' ↓';font-size:9px;opacity:.8;}
+#hisse-table thead th.sorted.asc::after{content:' ↑';}
+/* Market cap tier indicator — mini colored left border on row by data */
+
+/* ── Scan History in Empty State ─────────────────────────────── */
+.scan-history{margin:0 auto 16px;max-width:560px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;}
+.sh-title{font-family:var(--ff-mono);font-size:9px;font-weight:700;color:var(--muted2);letter-spacing:.1em;padding:8px 12px 6px;border-bottom:1px solid var(--border);background:var(--s2);}
+.sh-item{padding:7px 12px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;}
+.sh-item:last-child{border-bottom:none;}
+.sh-item:hover{background:var(--hover);}
+.sh-meta{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.sh-ex{font-family:var(--ff-mono);font-size:10px;font-weight:700;color:var(--accent);background:var(--accent2);padding:1px 5px;border-radius:2px;}
+.sh-count{font-family:var(--ff-mono);font-size:10px;color:var(--green);font-weight:600;}
+.sh-ago{font-family:var(--ff-mono);font-size:9px;color:var(--muted2);margin-left:auto;}
+.sh-tags{display:flex;flex-wrap:wrap;gap:4px;}
+.sh-tag{font-size:9px;font-family:var(--ff-mono);padding:1px 5px;border-radius:2px;border:1px solid var(--border2);color:var(--text2);}
+.sh-tag-goat{color:#FFB300;border-color:rgba(255,179,0,.3);background:rgba(255,179,0,.06);}
+.sh-tag-preset{color:var(--blue);border-color:rgba(30,144,255,.25);background:var(--accent2);}
+.sh-tag-tech{color:var(--green);border-color:rgba(0,200,83,.25);background:var(--green-bg);}

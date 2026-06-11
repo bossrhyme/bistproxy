@@ -151,7 +151,8 @@ function _updateOnboarding(type) {
       + '</div>'
       + (i < data.steps.length - 1 ? '<div class="onb-arrow">→</div>' : '');
   }).join('');
-  cont.innerHTML = '<div class="onb-title">Nasıl Kullanılır?</div><div class="onb-steps">' + stepsHtml + '</div>';
+  var histHtml = _renderScanHistory();
+  cont.innerHTML = (histHtml || '') + '<div class="onb-title">Nasıl Kullanılır?</div><div class="onb-steps">' + stepsHtml + '</div>';
 }
 
 function selectAsset(type) {
@@ -1166,6 +1167,21 @@ function openColPicker() {
 function toggleCol(key, vis) { loadColPrefs(); _colVisible[key]=vis; saveColPrefs(); applyColVisibility(); }
 function closeColPicker() { var m=document.getElementById('col-picker-modal'); if(m) m.classList.remove('open'); }
 function resetColPrefs() { _colVisible=null; loadColPrefs(); saveColPrefs(); openColPicker(); applyColVisibility(); renderTable(); }
+
+// ── Row Density Toggle ──
+var _rowDensity = (function(){ try { return localStorage.getItem('df_density') || 'compact'; } catch(e){ return 'compact'; } })();
+function setDensity(d) {
+  _rowDensity = d;
+  try { localStorage.setItem('df_density', d); } catch(e){}
+  var tbl = document.getElementById('hisse-table');
+  if (tbl) { tbl.classList.remove('density-compact','density-normal','density-comfortable'); tbl.classList.add('density-'+d); }
+  document.querySelectorAll('.density-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.density === d); });
+}
+function _initDensity() {
+  setDensity(_rowDensity);
+  // Update buttons if already rendered
+  document.querySelectorAll('.density-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.density === _rowDensity); });
+}
 
 // ═══════════════════════════════════════════
 // HABERLER
@@ -2964,6 +2980,7 @@ function applyAndRender(special){
   _vsRender();
   updateStatsBar();
   updateTicker();
+  _saveScanHistory(filtered.length);
   setTimeout(applyColVisibility, 0);
   // Mobil: tablo görünür alana scroll et
   if (window.innerWidth <= 768) {
@@ -3262,6 +3279,9 @@ function _vsRowHtml(s, idx) {
       <td data-col="sector" style="${cv('sector')}font-size:10px;color:var(--muted2)">${s.sector||'—'}</td>
     </tr>`;
 }function renderTable(){
+  // Apply density class
+  var _tbl = document.getElementById('hisse-table');
+  if (_tbl) { _tbl.classList.remove('density-compact','density-normal','density-comfortable'); _tbl.classList.add('density-'+(_rowDensity||'compact')); }
   // Sort header güncelle
   document.querySelectorAll('thead th').forEach(function(th){
     var oc = th.getAttribute('onclick')||'';
@@ -4051,8 +4071,10 @@ function updateStatsBar() {
   // Toolbar'daki hisse-only butonları göster
   var tbFav = document.getElementById('tb-fav-btn');
   var tbCol = document.getElementById('tb-col-btn');
+  var tbDens = document.getElementById('density-toggle');
   if (tbFav) tbFav.style.display = '';
   if (tbCol) tbCol.style.display = '';
+  if (tbDens) tbDens.style.display = 'flex';
   var upCount = filtered.filter(function(s){ return s.changePercent > 0; }).length;
   var dnCount = filtered.filter(function(s){ return s.changePercent < 0; }).length;
   var ex = (typeof EXCHANGE_META !== 'undefined' ? EXCHANGE_META[currentExchange] : null) || {};
@@ -4915,6 +4937,73 @@ function _initKeyboardNav() {
   });
 }
 
+// ── Scan History ─────────────────────────────────────────────
+function _saveScanHistory(resultCount) {
+  if (!_scanMeta || !_scanMeta.exchange) return;
+  var strategy = _scanMeta.strategy;
+  if (!strategy && resultCount === 0) return;
+  var entry = {
+    ts: Date.now(),
+    exchange: _scanMeta.exchange,
+    strategy: strategy || 'Özel Filtre',
+    count: resultCount,
+    filters: (_scanMeta.filters || []).map(function(f){ return { kind: f.kind, key: f.key, label: f.label }; })
+  };
+  var hist = _getScanHistory();
+  // Remove duplicate same strategy+exchange
+  hist = hist.filter(function(h){ return !(h.exchange === entry.exchange && h.strategy === entry.strategy); });
+  hist.unshift(entry);
+  hist = hist.slice(0, 5);
+  try { localStorage.setItem('df_scan_hist', JSON.stringify(hist)); } catch(e){}
+}
+function _getScanHistory() {
+  try { return JSON.parse(localStorage.getItem('df_scan_hist') || '[]'); } catch(e){ return []; }
+}
+function _renderScanHistory(cont) {
+  var hist = _getScanHistory();
+  if (!hist.length) return '';
+  var ex_names = { bist:'BIST', nasdaq:'NASDAQ', nyse:'NYSE', sp500:'S&P500', dax:'DAX', lse:'LSE', nikkei:'NIKKEI', kucuk:'Küçük BIST' };
+  var rows = hist.map(function(h) {
+    var ago = Math.round((Date.now() - h.ts) / 60000);
+    var agoTxt = ago < 60 ? ago + ' dk önce' : Math.round(ago/60) + ' sa önce';
+    var filterHtml = h.filters && h.filters.length
+      ? h.filters.map(function(f){ return '<span class="sh-tag sh-tag-'+f.kind+'">'+f.label+'</span>'; }).join('')
+      : '<span class="sh-tag">Özel</span>';
+    var rerunFn = h.filters && h.filters.length
+      ? 'rerunScan(' + JSON.stringify(h) + ')'
+      : '';
+    return '<div class="sh-item" onclick="'+(rerunFn||'')+'">'
+      +'<div class="sh-meta"><span class="sh-ex">'+(ex_names[h.exchange]||h.exchange.toUpperCase())+'</span><span class="sh-count">'+h.count+' sonuç</span><span class="sh-ago">'+agoTxt+'</span></div>'
+      +'<div class="sh-tags">'+filterHtml+'</div>'
+      +'</div>';
+  }).join('');
+  return '<div class="scan-history"><div class="sh-title">SON TARAMALAR</div>'+rows+'</div>';
+}
+function rerunScan(entry) {
+  // Navigate to screener
+  var hp = document.getElementById('homepage');
+  if (hp && hp.style.display !== 'none') showScreener();
+  var pv = document.getElementById('prescan-view');
+  if (pv) pv.style.display = 'none';
+  // Clear all chips
+  document.querySelectorAll('#goat-chips .goat-chip.on, #presets .chip.on, #tech-presets .chip.on').forEach(function(c){ c.classList.remove('on'); });
+  document.querySelectorAll('.finps input, #hisse-hidden-filters input').forEach(function(i){ i.value = ''; });
+  // Re-apply filters
+  (entry.filters || []).forEach(function(f) {
+    if (f.kind === 'goat') {
+      var chip = document.querySelector('#goat-chips .goat-chip[data-goat="'+f.key+'"]');
+      if (chip) chip.classList.add('on');
+    } else if (f.kind === 'preset') {
+      var chip = document.querySelector('#presets .chip[data-preset="'+f.key+'"]');
+      if (chip) chip.classList.add('on');
+    } else if (f.kind === 'tech') {
+      var chip = document.querySelector('#tech-presets .chip[data-tech="'+f.key+'"]');
+      if (chip) chip.classList.add('on');
+    }
+  });
+  _applyChips(BASIC_CHIP_CFG);
+}
+
 // ── Keyboard Shortcut Help Overlay ──
 function _toggleShortcutHelp() {
   var m = document.getElementById('shortcut-help-modal');
@@ -4973,6 +5062,7 @@ document.addEventListener('DOMContentLoaded', function(){
   _startIndicesTicker();
   _initWorker();
   _initKeyboardNav();
+  _initDensity();
   _updateFavBadge();
   _updateOnboarding(null); // Varsayılan: genel onboarding
   // Sidebar borsa chiplerine hover açıklaması
