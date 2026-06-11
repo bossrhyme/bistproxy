@@ -3456,6 +3456,7 @@ function showDetail(sym){
     </div>`).join('');
 
   document.getElementById('detail').classList.add('open');
+  _updateDetailNavPos();
   // Panel transition bitmesini bekle (200ms)
   setTimeout(function(){ updateChart(sym); }, 260);
 
@@ -3664,9 +3665,24 @@ function updateChart(sym) {
 function closeDetail(){
   document.getElementById('detail').classList.remove('open');
   selSym = null;
-  // Chart'ı sıfırla ki bir sonraki hisse doğru yüklensin
-  // chart temizleme updateChart'ta yapılıyor
   if(allData.length) renderTable();
+}
+
+function detailNav(dir) {
+  if (!selSym || !filtered || !filtered.length) return;
+  var sorted_data = sorted(filtered);
+  var idx = sorted_data.findIndex(function(s){ return s.symbol === selSym; });
+  if (idx === -1) return;
+  var next = sorted_data[idx + dir];
+  if (next) showDetail(next.symbol);
+}
+
+function _updateDetailNavPos() {
+  var posEl = document.getElementById('dhead-pos');
+  if (!posEl || !selSym || !filtered || !filtered.length) return;
+  var sorted_data = sorted(filtered);
+  var idx = sorted_data.findIndex(function(s){ return s.symbol === selSym; });
+  posEl.textContent = (idx + 1) + ' / ' + sorted_data.length;
 }
 
 // ═══════════════════════════════════════════
@@ -4984,6 +5000,15 @@ function _initKeyboardNav() {
       var det2 = document.getElementById('detail');
       if (det2 && det2.classList.contains('open')) { closeDetail(); return; }
     }
+    // ← → detail panel navigation
+    if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && !inInput && !e.ctrlKey && !e.metaKey) {
+      var det3 = document.getElementById('detail');
+      if (det3 && det3.classList.contains('open')) {
+        e.preventDefault();
+        detailNav(e.key === 'ArrowRight' ? 1 : -1);
+        return;
+      }
+    }
   });
 }
 
@@ -5071,9 +5096,10 @@ function _toggleShortcutHelp() {
       '<div class="shm-row"><kbd>H</kbd><span>Anasayfaya git</span></div>'+
       '<div class="shm-row"><kbd>T</kbd><span>Tema değiştir</span></div>'+
       '</div>'+
-      '<div class="shm-section"><div class="shm-section-title">Tablo</div>'+
+      '<div class="shm-section"><div class="shm-section-title">Tablo & Detay</div>'+
       '<div class="shm-row"><kbd>↑</kbd><kbd>↓</kbd><span>Satır seç</span></div>'+
       '<div class="shm-row"><kbd>Enter</kbd><span>Detay aç</span></div>'+
+      '<div class="shm-row"><kbd>←</kbd><kbd>→</kbd><span>Önceki / Sonraki</span></div>'+
       '<div class="shm-row"><kbd>D</kbd><span>Detay kapat</span></div>'+
       '<div class="shm-row"><kbd>F</kbd><span>Favoriler</span></div>'+
       '</div>'+

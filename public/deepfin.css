@@ -1624,3 +1624,10 @@ kbd{font-family:var(--ff-mono);font-size:10px;color:var(--text);background:var(-
 #hisse-table tbody tr.mcap-large td:first-child+td{border-left-color:var(--teal);}
 #hisse-table tbody tr.mcap-mid td:first-child+td{border-left-color:var(--gold);}
 #hisse-table tbody tr.mcap-small td:first-child+td{border-left-color:var(--muted2);}
+
+/* ── Detail Panel Navigation ─────────────────────────────────── */
+.dhead{position:relative;padding:12px 14px 8px;}
+.dhead-nav{display:flex;align-items:center;gap:4px;margin-top:4px;}
+.dhead-nav-btn{background:none;border:1px solid var(--border2);color:var(--muted2);font-size:14px;padding:1px 7px;border-radius:var(--r-sm);cursor:pointer;line-height:1.4;transition:all .1s;}
+.dhead-nav-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--hover);}
+.dhead-nav-pos{font-family:var(--ff-mono);font-size:9px;color:var(--muted2);min-width:40px;text-align:center;}
