@@ -839,6 +839,38 @@ const EXCHANGE_META = {
   uae:         { name: 'DFM',             currency: 'د.إ',  currencyCode: 'AED', flag: '🇦🇪', yahooSuffix: '.DU', tvPrefix: 'DFM',        filters: [] },
 };
 
+// Borsa açıklamaları — chip hover tooltipleri
+const EXCHANGE_TIPS = {
+  bist:        'Türkiye — Borsa İstanbul',
+  nasdaq:      'ABD — teknoloji ağırlıklı borsa',
+  sp500:       'ABD — en büyük 500 şirket',
+  dax:         'Almanya — Frankfurt Borsası',
+  lse:         'İngiltere — Londra Borsası',
+  nikkei:      'Japonya — Tokyo Borsası',
+  nyse:        'ABD — New York Borsası',
+  krx:         'Güney Kore Borsası',
+  moex:        'Rusya — Moskova Borsası',
+  france:      'Fransa — Paris Borsası',
+  amsterdam:   'Hollanda — Amsterdam Borsası',
+  brussels:    'Belçika — Brüksel Borsası',
+  lisbon:      'Portekiz — Lizbon Borsası',
+  dublin:      'İrlanda — Dublin Borsası',
+  oslo:        'Norveç — Oslo Borsası',
+  milan:       'İtalya — Milano Borsası',
+  tsx:         'Kanada — Toronto Borsası',
+  twse:        'Tayvan Borsası',
+  b3:          'Brezilya — São Paulo Borsası',
+  hkex:        'Hong Kong Borsası',
+  china:       'Çin — Şanghay/Şenzhen Borsaları',
+  saudi:       'Suudi Arabistan — Tadawul',
+  switzerland: 'İsviçre — Zürih Borsası',
+  australia:   'Avustralya — Sidney Borsası',
+  southafrica: 'Güney Afrika — Johannesburg Borsası',
+  sweden:      'İsveç — Stockholm Borsası',
+  india:       'Hindistan — Ulusal Borsa (NSE)',
+  uae:         'BAE — Dubai Finans Borsası',
+};
+
 let allData = [];
 let filtered = [];
 let searchQ = '';
@@ -2091,7 +2123,8 @@ function initPrescanView() {
     var flagHtml = iso
       ? '<img class="psv-ex-flag-img" src="https://flagcdn.com/w40/'+iso+'.png" alt="'+iso+'" loading="lazy">'
       : '<span class="psv-ex-flag">'+m.flag+'</span>';
-    return '<button class="psv-ex-btn" data-exchange="'+key+'" onclick="psvSetExchange(\''+key+'\')">' +
+    var tip = EXCHANGE_TIPS[key] || '';
+    return '<button class="psv-ex-btn" data-exchange="'+key+'"'+(tip ? ' data-tip="'+tip+'"' : '')+' onclick="psvSetExchange(\''+key+'\')">' +
       flagHtml + '<span class="psv-ex-name">'+m.name+'</span></button>';
   }
 
@@ -4921,6 +4954,11 @@ document.addEventListener('DOMContentLoaded', function(){
   _initKeyboardNav();
   _updateFavBadge();
   _updateOnboarding(null); // Varsayılan: genel onboarding
+  // Sidebar borsa chiplerine hover açıklaması
+  document.querySelectorAll('.exbtn[data-exchange]').forEach(function(b){
+    var t = EXCHANGE_TIPS[b.dataset.exchange];
+    if (t) b.title = t;
+  });
   // Canlı istatistikleri çek ve her 60s güncelle
   function _fmtStatNum(n) {
     if (!n || n === 0) return '—';
