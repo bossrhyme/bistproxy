@@ -1,11 +1,4 @@
 
-function openTradingView() {
-  var ex = _prfEx || 'bist';
-  var sym = _prfSym || '';
-  var prefixes = {bist:'BIST',nasdaq:'NASDAQ',sp500:'NYSE',dax:'XETR',lse:'LSE',nikkei:'TSE',sweden:'NASDAQ',india:'NSE',uae:'DFM',southafrica:'JSE',krx:'KRX',moex:'MOEX',hkex:'HKEX',saudi:'TADAWUL',australia:'ASX'};
-  var pfx = prefixes[ex] || 'BIST';
-  window.open('https://www.tradingview.com/chart/?symbol='+pfx+'%3A'+sym, '_blank');
-}
 
 // ── Chart state ──────────────────────────────────────────────────────────
 var _chartInst  = null;
@@ -381,7 +374,7 @@ function setChartPct() {
 
 function _fetchChart(sym, ex) {
   var exMeta = EXCHANGE_META[ex]||EXCHANGE_META.bist;
-  var suffix = encodeURIComponent(exMeta.yahooSuffix||'');
+  var suffix = encodeURIComponent(exMeta.symSuffix||'');
   var url = '/api/scan?action=chart&symbol='+sym+'&interval='+_chartIval+'&currency=TL&suffix='+suffix;
   fetch(url)
     .then(function(r){return r.json();})
@@ -1034,34 +1027,34 @@ function showToast(msg) {
 
 
 var EXCHANGE_META = {
-  bist:   { name: 'BIST',    currency: '₺', currencyCode: 'TRY', yahooSuffix: '.IS', flag: '🇹🇷', tvUrl: 'https://scanner.tradingview.com/turkey/scan',  filters: [] },
-  nasdaq: { name: 'NASDAQ',  currency: '$',  currencyCode: 'USD', yahooSuffix: '',    flag: '🇺🇸', tvUrl: 'https://scanner.tradingview.com/america/scan', filters: [{ left: 'exchange', operation: 'equal', right: 'NASDAQ' }] },
-  sp500:  { name: 'S&P 500', currency: '$',  currencyCode: 'USD', yahooSuffix: '',    flag: '🇺🇸', tvUrl: 'https://scanner.tradingview.com/america/scan', filters: [] },
-  dax:    { name: 'DAX',     currency: '€',  currencyCode: 'EUR', yahooSuffix: '.DE', flag: '🇩🇪', tvUrl: 'https://scanner.tradingview.com/germany/scan', filters: [] },
-  lse:    { name: 'LSE',     currency: '£',  currencyCode: 'GBP', yahooSuffix: '.L',  flag: '🇬🇧', tvUrl: 'https://scanner.tradingview.com/uk/scan',      filters: [] },
-  nikkei: { name: 'Nikkei',  currency: '¥',  currencyCode: 'JPY', yahooSuffix: '.T',  flag: '🇯🇵', tvUrl: 'https://scanner.tradingview.com/japan/scan',   filters: [] },
-  nyse:   { name: 'NYSE',   currency: '$',  currencyCode: 'USD', yahooSuffix: '',    flag: '🇺🇸', tvUrl: 'https://scanner.tradingview.com/america/scan', filters: [{ left: 'exchange', operation: 'equal', right: 'NYSE' }] },
-  krx:    { name: 'KRX',   currency: '₩',  currencyCode: 'KRW', yahooSuffix: '.KS', flag: '🇰🇷', tvUrl: 'https://scanner.tradingview.com/korea/scan',   filters: [] },
-  moex:   { name: 'MOEX',  currency: '₽',  currencyCode: 'RUB', yahooSuffix: '.ME', flag: '🇷🇺', tvUrl: 'https://scanner.tradingview.com/russia/scan',  filters: [] },
-  france:    { name: 'Euronext Paris',     currency: '€', currencyCode: 'EUR', yahooSuffix: '.PA', flag: '🇫🇷', tvUrl: 'https://scanner.tradingview.com/france/scan',       filters: [] },
-  amsterdam: { name: 'Euronext Amsterdam', currency: '€', currencyCode: 'EUR', yahooSuffix: '.AS', flag: '🇳🇱', tvUrl: 'https://scanner.tradingview.com/netherlands/scan', filters: [] },
-  brussels:  { name: 'Euronext Brussels',  currency: '€', currencyCode: 'EUR', yahooSuffix: '.BR', flag: '🇧🇪', tvUrl: 'https://scanner.tradingview.com/belgium/scan',      filters: [] },
-  lisbon:    { name: 'Euronext Lisbon',    currency: '€', currencyCode: 'EUR', yahooSuffix: '.LS', flag: '🇵🇹', tvUrl: 'https://scanner.tradingview.com/portugal/scan',    filters: [] },
-  dublin:    { name: 'Euronext Dublin',   currency: '€', currencyCode: 'EUR', yahooSuffix: '.IR', flag: '🇮🇪', tvUrl: 'https://scanner.tradingview.com/ireland/scan',     filters: [] },
-  oslo:      { name: 'Oslo Bors',         currency: 'kr', currencyCode: 'NOK', yahooSuffix: '.OL', flag: '🇳🇴', tvUrl: 'https://scanner.tradingview.com/norway/scan',      filters: [] },
-  milan:     { name: 'Borsa Italiana',    currency: '€', currencyCode: 'EUR', yahooSuffix: '.MI', flag: '🇮🇹', tvUrl: 'https://scanner.tradingview.com/italy/scan',       filters: [] },
-  tsx:       { name: 'TSX',              currency: 'C$', currencyCode: 'CAD', yahooSuffix: '.TO', flag: '🇨🇦', tvUrl: 'https://scanner.tradingview.com/canada/scan',     filters: [] },
-  twse:      { name: 'TWSE',             currency: 'NT$', currencyCode: 'TWD', yahooSuffix: '.TW', flag: '🇹🇼', tvUrl: 'https://scanner.tradingview.com/taiwan/scan',     filters: [] },
-  b3:        { name: 'B3',              currency: 'R$',  currencyCode: 'BRL', yahooSuffix: '.SA', flag: '🇧🇷', tvUrl: 'https://scanner.tradingview.com/brazil/scan',     filters: [] },
-  hkex:      { name: 'HKEX',           currency: 'HK$', currencyCode: 'HKD', yahooSuffix: '.HK', flag: '🇭🇰', tvUrl: 'https://scanner.tradingview.com/hongkong/scan',  filters: [] },
-  china:     { name: 'SSE/SZSE',       currency: '¥',   currencyCode: 'CNY', yahooSuffix: '.SS', flag: '🇨🇳', tvUrl: 'https://scanner.tradingview.com/china/scan',       filters: [] },
-  saudi:       { name: 'Tadawul',        currency: '﷼',   currencyCode: 'SAR', yahooSuffix: '.SR', flag: '🇸🇦', tvUrl: 'https://scanner.tradingview.com/saudi_arabia/scan', filters: [] },
-  switzerland: { name: 'SIX',            currency: 'Fr',  currencyCode: 'CHF', yahooSuffix: '.SW', flag: '🇨🇭', tvUrl: 'https://scanner.tradingview.com/switzerland/scan',    filters: [] },
-  australia:   { name: 'ASX',            currency: 'A$',  currencyCode: 'AUD', yahooSuffix: '.AX', flag: '🇦🇺', tvUrl: 'https://scanner.tradingview.com/australia/scan',       filters: [] },
-  southafrica: { name: 'JSE',            currency: 'R',   currencyCode: 'ZAR', yahooSuffix: '.JO', flag: '🇿🇦', tvUrl: 'https://scanner.tradingview.com/south_africa/scan',    filters: [] },
-  sweden:      { name: 'Nasdaq Stockholm', currency: 'kr', currencyCode: 'SEK', yahooSuffix: '.ST', flag: '🇸🇪', tvUrl: 'https://scanner.tradingview.com/sweden/scan',           filters: [] },
-  india:       { name: 'NSE',            currency: '₹',   currencyCode: 'INR', yahooSuffix: '.NS', flag: '🇮🇳', tvUrl: 'https://scanner.tradingview.com/india/scan',            filters: [] },
-  uae:         { name: 'DFM/ADX',        currency: 'د.إ', currencyCode: 'AED', yahooSuffix: '.DU', flag: '🇦🇪', tvUrl: 'https://scanner.tradingview.com/uae/scan',              filters: [] },
+  bist:   { name: 'BIST',    currency: '₺', currencyCode: 'TRY', symSuffix: '.IS', flag: '🇹🇷',  filters: [] },
+  nasdaq: { name: 'NASDAQ',  currency: '$',  currencyCode: 'USD', symSuffix: '',    flag: '🇺🇸', filters: [{ left: 'exchange', operation: 'equal', right: 'NASDAQ' }] },
+  sp500:  { name: 'S&P 500', currency: '$',  currencyCode: 'USD', symSuffix: '',    flag: '🇺🇸', filters: [] },
+  dax:    { name: 'DAX',     currency: '€',  currencyCode: 'EUR', symSuffix: '.DE', flag: '🇩🇪', filters: [] },
+  lse:    { name: 'LSE',     currency: '£',  currencyCode: 'GBP', symSuffix: '.L',  flag: '🇬🇧',      filters: [] },
+  nikkei: { name: 'Nikkei',  currency: '¥',  currencyCode: 'JPY', symSuffix: '.T',  flag: '🇯🇵',   filters: [] },
+  nyse:   { name: 'NYSE',   currency: '$',  currencyCode: 'USD', symSuffix: '',    flag: '🇺🇸', filters: [{ left: 'exchange', operation: 'equal', right: 'NYSE' }] },
+  krx:    { name: 'KRX',   currency: '₩',  currencyCode: 'KRW', symSuffix: '.KS', flag: '🇰🇷',   filters: [] },
+  moex:   { name: 'MOEX',  currency: '₽',  currencyCode: 'RUB', symSuffix: '.ME', flag: '🇷🇺',  filters: [] },
+  france:    { name: 'Euronext Paris',     currency: '€', currencyCode: 'EUR', symSuffix: '.PA', flag: '🇫🇷',       filters: [] },
+  amsterdam: { name: 'Euronext Amsterdam', currency: '€', currencyCode: 'EUR', symSuffix: '.AS', flag: '🇳🇱', filters: [] },
+  brussels:  { name: 'Euronext Brussels',  currency: '€', currencyCode: 'EUR', symSuffix: '.BR', flag: '🇧🇪',      filters: [] },
+  lisbon:    { name: 'Euronext Lisbon',    currency: '€', currencyCode: 'EUR', symSuffix: '.LS', flag: '🇵🇹',    filters: [] },
+  dublin:    { name: 'Euronext Dublin',   currency: '€', currencyCode: 'EUR', symSuffix: '.IR', flag: '🇮🇪',     filters: [] },
+  oslo:      { name: 'Oslo Bors',         currency: 'kr', currencyCode: 'NOK', symSuffix: '.OL', flag: '🇳🇴',      filters: [] },
+  milan:     { name: 'Borsa Italiana',    currency: '€', currencyCode: 'EUR', symSuffix: '.MI', flag: '🇮🇹',       filters: [] },
+  tsx:       { name: 'TSX',              currency: 'C$', currencyCode: 'CAD', symSuffix: '.TO', flag: '🇨🇦',     filters: [] },
+  twse:      { name: 'TWSE',             currency: 'NT$', currencyCode: 'TWD', symSuffix: '.TW', flag: '🇹🇼',     filters: [] },
+  b3:        { name: 'B3',              currency: 'R$',  currencyCode: 'BRL', symSuffix: '.SA', flag: '🇧🇷',     filters: [] },
+  hkex:      { name: 'HKEX',           currency: 'HK$', currencyCode: 'HKD', symSuffix: '.HK', flag: '🇭🇰',  filters: [] },
+  china:     { name: 'SSE/SZSE',       currency: '¥',   currencyCode: 'CNY', symSuffix: '.SS', flag: '🇨🇳',       filters: [] },
+  saudi:       { name: 'Tadawul',        currency: '﷼',   currencyCode: 'SAR', symSuffix: '.SR', flag: '🇸🇦', filters: [] },
+  switzerland: { name: 'SIX',            currency: 'Fr',  currencyCode: 'CHF', symSuffix: '.SW', flag: '🇨🇭',    filters: [] },
+  australia:   { name: 'ASX',            currency: 'A$',  currencyCode: 'AUD', symSuffix: '.AX', flag: '🇦🇺',       filters: [] },
+  southafrica: { name: 'JSE',            currency: 'R',   currencyCode: 'ZAR', symSuffix: '.JO', flag: '🇿🇦',    filters: [] },
+  sweden:      { name: 'Nasdaq Stockholm', currency: 'kr', currencyCode: 'SEK', symSuffix: '.ST', flag: '🇸🇪',           filters: [] },
+  india:       { name: 'NSE',            currency: '₹',   currencyCode: 'INR', symSuffix: '.NS', flag: '🇮🇳',            filters: [] },
+  uae:         { name: 'DFM/ADX',        currency: 'د.إ', currencyCode: 'AED', symSuffix: '.DU', flag: '🇦🇪',              filters: [] },
 };
 
 var allData = [];
@@ -1285,7 +1278,7 @@ function showProfil(sym, ex) {
   // TV logo CDN: BIST için TUPRS → BIST:TUPRS → logo slug
   var _logoEl = document.getElementById('prf-logo');
   if(_logoEl) {
-    // TradingView logo CDN - birden fazla format denenir
+    // Sembol logo CDN - birden fazla format denenir
     var _tvPfxMap = { bist:'BIST', nasdaq:'NASDAQ', sp500:'NYSE', dax:'XETR', lse:'LSE', nikkei:'TSE', krx:'KRX', moex:'MOEX', france:'EURONEXT', amsterdam:'EURONEXT', brussels:'EURONEXT', lisbon:'EURONEXT', dublin:'EURONEXT', oslo:'OSE', milan:'MTA', tsx:'TSX', twse:'TWSE', b3:'BMFBOVESPA', hkex:'HKEX', china:'SSE', saudi:'TADAWUL', switzerland:'SIX', australia:'ASX', southafrica:'JSE', sweden:'NASDAQ', india:'NSE', uae:'DFM' };
     var _tvPfx = _tvPfxMap[_prfEx] || 'BIST';
     var _symLow = sym.toLowerCase();
@@ -1735,7 +1728,7 @@ function _renderFV(el, price, cur, d, v) {
 
 
 // ── Twelve Data: fiyat + şirket bilgisi ──
-async function loadYahooData(sym, ex) {
+async function loadFinData(sym, ex) {
   try {
     var exParam = '&ex='+encodeURIComponent(ex);
     var [qRes, nRes] = await Promise.all([
@@ -1886,7 +1879,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if(sym) {
     document.title = 'DeepFin — ' + sym;
     showProfil(sym, ex);
-    loadYahooData(sym, ex);
+    loadFinData(sym, ex);
   }
 });
 
@@ -1931,7 +1924,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 // ══════════════════════════════════════════════════════════════════════════
-// YENİ PANELLER: Bilanço, Nakit Akışı, Haberler (Yahoo Finance + Finnhub)
+// YENİ PANELLER: Bilanço, Nakit Akışı, Haberler
 // ══════════════════════════════════════════════════════════════════════════
 
 var _fundCache = {}; // {type_period: data}
@@ -2089,15 +2082,15 @@ prfTab = function(id, el) {
 };
 
 
-// Finansallar paneli — Yahoo gelir tablosu
+// Finansallar paneli — gelir tablosu
 function _unusedOldFinPanel() {
-  var el = document.getElementById('prf-fin-yahoo');
+  var el = document.getElementById('prf-fin-income');
   if (!el) {
     // Container yoksa oluştur
     var sec = document.querySelector('#prf-panel-financials .prf-section');
     if (!sec) return;
     var div = document.createElement('div');
-    div.id = 'prf-fin-yahoo';
+    div.id = 'prf-fin-income';
     div.style.cssText = 'margin-top:16px;overflow-x:auto;';
     div.innerHTML = '<div style="padding:10px;color:var(--muted2);font-size:12px;">Yükleniyor...</div>';
     sec.appendChild(div);
@@ -2113,7 +2106,7 @@ function _unusedOldFinPanel() {
       var cols = data.annual || [];
       if (!cols.length) { el.innerHTML = ''; return; }
       var rows = ['totalRevenue','grossProfit','operatingIncome','netIncome','ebitda'];
-      var title = '<div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">Yahoo Finance · Gelir Tablosu (Yıllık)</div>';
+      var title = '<div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">Gelir Tablosu (Yıllık)</div>';
       el.innerHTML = title + _buildFinTable(rows, cols);
     })
     .catch(function(){ el.innerHTML = ''; });
@@ -2121,7 +2114,7 @@ function _unusedOldFinPanel() {
 
 function loadFinancialsPanel() { renderFundPanel('income', 'annual'); }
 
-// ── Finnhub/TV metrics özet kartı ─────────────────────────────────────────
+// ── Özet metrik kartı ─────────────────────────────────────────
 function _buildMetricsCard(m, type) {
   if (!m) return '<div style="padding:16px;color:var(--muted2);font-size:12px;">Veri yüklenemedi.</div>';
   var cur = (EXCHANGE_META[_prfEx] || {}).currency || '$';
@@ -2161,7 +2154,7 @@ function _buildMetricsCard(m, type) {
 
   var html = '<div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-top:8px;">';
   html += '<div style="padding:8px 14px;background:rgba(30,39,51,.5);font-size:9px;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;font-weight:600;">';
-  html += 'TradingView · Özet Metrikler</div>';
+  html += 'Özet Metrikler</div>';
   rows.forEach(function(row) {
     html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border-top:1px solid rgba(255,255,255,.04);">';
     html += '<span style="font-size:11px;color:var(--text2);">' + row[0] + '</span>';

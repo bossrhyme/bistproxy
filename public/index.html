@@ -130,10 +130,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
 <link rel="stylesheet" href="/deepfin.css?v=arctic91">
-<script src="/deepfin.js?v=133" defer></script>
-<link rel="dns-prefetch" href="https://api.coingecko.com">
-<link rel="dns-prefetch" href="https://finnhub.io">
-<link rel="dns-prefetch" href="https://www.tefas.gov.tr">
+<script src="/deepfin.js?v=134" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -556,7 +553,7 @@ if('serviceWorker' in navigator){
               <button class="hp-chip" onclick="applyTechAndGo('pullback')" data-tip="Zirveden %10 geri, dibinden %10 yukarı — sağlıklı düzeltme, trende giriş">🔄 Düzeltme</button>
               <button class="hp-chip" onclick="applyTechAndGo('strongDay')" data-tip="Günlük %2+ yükseliş, normalin üzerinde hacim — bugün dikkat çeken">☀️ Günlük Hareket</button>
               <button class="hp-chip" onclick="applyTechAndGo('highVolume')" data-tip="Hacim &gt; 5M lot — büyük kurumsal alıcıların pozisyon açtığı sinyal">🏦 Akıllı Para</button>
-              <button class="hp-chip" onclick="applyTechAndGo('techBuy')" data-tip="TradingView skoru &gt; 0.5 — 26 indikatörün büyük çoğunluğu AL sinyali veriyor">📊 Güçlü Sinyal</button>
+              <button class="hp-chip" onclick="applyTechAndGo('techBuy')" data-tip="Teknik skor &gt; 0.5 — 26 indikatörün büyük çoğunluğu AL sinyali veriyor">📊 Güçlü Sinyal</button>
               <button class="hp-chip" onclick="applyTechAndGo('momentum3m')" data-tip="3A getiri &gt; %15, 6A getiri &gt; %20 — sürdürülebilir orta vadeli momentum">🏃 3A Momentum</button>
               <button class="hp-chip" onclick="applyTechAndGo('trendFollow')" data-tip="Yıllık dibinden %25+ yukarı, 6A getiri &gt; %10 — trend hâlâ güçlü">🌊 Trend Takibi</button>
               <button class="hp-chip" onclick="applyTechAndGo('rsiBounce')" data-tip="RSI 30–50 arası, dibi geride bırakmış — toparlanmanın erken aşaması">🔋 Toparlanıyor</button>
@@ -1399,7 +1396,7 @@ if('serviceWorker' in navigator){
               <th onclick="colSort('currentRatioAnnual')" data-col="cr" data-tip="Cari Oran: Kısa vadeli borç karşılama gücü. 1.5+ sağlıklı.">CARİ</th>
               <th onclick="colSort('dividendYieldIndicatedAnnual')" data-col="div" data-tip="Temettü Verimi: Hisse fiyatına oranla yıllık ödenen temettü.">TEMETTÜ%</th>
               <th onclick="colSort('peg')" data-col="peg" data-tip="Fiyat/Kazanç Büyüme: PEG < 1 büyüme hızına göre ucuz demek. Peter Lynch'in favori metriği.">PEG<span class="th-tip">Fiyat/Kazanç Büyüme: PEG<1 ucuz büyüme, PEG>2 pahalı. Lynch'in favori metriği.</span></th>
-              <th onclick="colSort('techRating')" data-col="tech_rating" data-tip="Teknik Rating: TradingView'nin RSI, MACD, ADX, Stochastic ve 15 hareketli ortalama dahil 26 indikatöre dayalı puanı. +1 = Güçlü Al, -1 = Güçlü Sat.">TV Rating</th>
+              <th onclick="colSort('techRating')" data-col="tech_rating" data-tip="Teknik Rating: RSI, MACD, ADX, Stochastic ve 15 hareketli ortalama dahil 26 indikatöre dayalı konsensüs puanı. +1 = Güçlü Al, -1 = Güçlü Sat.">Teknik Skor</th>
               <th onclick="colSort('rsi14')" data-col="rsi" data-tip="RSI (14) — Günlük: 0-100 arasında momentum göstergesi. 30 altı aşırı satım (alım fırsatı), 70 üstü aşırı alım (dikkat). Günlük kapanış fiyatlarına göre hesaplanır.">RSI</th>
               <th onclick="colSort('changePercent')" data-col="chg1d" data-tip="Günlük Getiri: Hissenin bugünkü yüzdesel değişimi.">Günlük%</th>
               <th onclick="colSort('perfW')" data-col="chg1w" data-tip="1 Haftalık Getiri: Hissenin son 5 işlem gününde yüzdesel değişimi.">1H Geti%</th>
@@ -1586,7 +1583,7 @@ if('serviceWorker' in navigator){
           <div class="ib-item">
             <div class="ib-name">Quant Fonlar — Citadel / D.E. Shaw / Millennium</div>
             <div class="ib-desc">Binlerce veriyi aynı anda analiz eden algoritma tabanlı yatırım fonları. Hisse seçiminde birden fazla faktörü aynı anda değerlendirirler: karlılık, büyüme, fiyat momentumu. Kurumsal kalite standardı.</div>
-            <div class="ib-crit">TV Rating &gt;0.3 · ROE &gt;%15 · F/K 8–20 · Net marj &gt;%10 · B/Ö &lt;%70</div>
+            <div class="ib-crit">Teknik Skor &gt;0.3 · ROE &gt;%15 · F/K 8–20 · Net marj &gt;%10 · B/Ö &lt;%70</div>
           </div>
 
           <div class="ib-item">
@@ -1664,7 +1661,7 @@ if('serviceWorker' in navigator){
 <div class="ib-item">
             <div class="ib-name">Güçlü Sinyal</div>
             <div class="ib-desc">26 farklı teknik analiz aracının büyük çoğunluğu bu hisse için 'al' diyor. Tek bir göstergeye güvenmek yerine hepsini birden değerlendiren en kapsamlı teknik filtre.</div>
-            <div class="ib-crit">TV Rating &gt;0.5</div>
+            <div class="ib-crit">Teknik Skor &gt;0.5</div>
           </div>
 
           <div class="ib-item">
@@ -1694,7 +1691,7 @@ if('serviceWorker' in navigator){
           <div class="ib-item">
             <div class="ib-name">Breakout</div>
             <div class="ib-desc">Uzun süre dar bir aralıkta kalan hisse, güçlü bir yükselişle o aralığı geçiyor. Hacimin de artması bu hareketin sahte olmadığının işareti. Trendin başlangıcını yakalamak için kullanılır.</div>
-            <div class="ib-crit">Zirveden &gt;-%5 · Değişim &gt;%1.5 · Hacim &gt;0.5M · TV Rating &gt;0.1</div>
+            <div class="ib-crit">Zirveden &gt;-%5 · Değişim &gt;%1.5 · Hacim &gt;0.5M · Teknik Skor &gt;0.1</div>
           </div>
 
           <div class="ib-item">
@@ -1925,7 +1922,7 @@ if('serviceWorker' in navigator){
 
           <div class="ib-item">
             <div class="ib-name">TV Puanı</div>
-            <div class="ib-desc">TradingView teknik analiz konsensüs skoru. RSI, MACD, hareketli ortalamalar dahil 26 indikatörün ortalaması.</div>
+            <div class="ib-desc">Teknik analiz konsensüs skoru. RSI, MACD, hareketli ortalamalar dahil 26 indikatörün ortalaması.</div>
             <div class="ib-crit ib-crit-multi"><span class="ibt good">✓ &gt;0.5 AL</span><span class="ibt mid">△ -0.5–0.5 nötr</span><span class="ibt bad">✕ &lt;-0.5 SAT</span></div>
           </div>
 

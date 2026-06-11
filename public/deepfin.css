@@ -754,7 +754,7 @@ td:first-child,td:nth-child(2){text-align:left;}
   thead th:first-child, thead th:nth-child(2) { z-index: 6; background: var(--s2); }
   tbody tr.selrow td:first-child, tbody tr.selrow td:nth-child(2) { background: rgba(14,165,233,.12); }
 
-  /* Mobilde sadece: #, Sembol, Fiyat, P.Değeri, F/K, ROE%, TV Rating, Günlük% */
+  /* Mobilde sadece: #, Sembol, Fiyat, P.Değeri, F/K, ROE%, Teknik Skor, Günlük% */
   [data-col="name"], [data-col="pb"], [data-col="ps"],
   [data-col="roa"], [data-col="margin"], [data-col="revg"], [data-col="epsg"],
   [data-col="fscore"], [data-col="de"], [data-col="cr"],

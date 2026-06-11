@@ -611,7 +611,7 @@ var _tvCurrentSym = null;
 
 // ═══════════════════════════════════════════
 // BIST SYMBOLS — Full list (150+ hisse)
-// Finnhub uses SYMBOL.IS format for BIST
+// BIST sembol formatı: SYMBOL.IS
 // ═══════════════════════════════════════════
 const BIST_SYMBOLS = [
   // BIST-100 Ana hisseler
@@ -809,34 +809,34 @@ const PROXY_URL = '/api/scan';
 // ── EXCHANGE CONFIG ──
 let currentExchange = 'bist';
 const EXCHANGE_META = {
-  bist:        { name: 'BIST',             currency: '₺',   currencyCode: 'TRY', flag: '🇹🇷', yahooSuffix: '.IS', tvPrefix: 'BIST',       filters: [] },
-  nasdaq:      { name: 'NASDAQ',           currency: '$',   currencyCode: 'USD', flag: '🇺🇸', yahooSuffix: '',    tvPrefix: 'NASDAQ',     filters: [{ left: 'exchange', operation: 'equal', right: 'NASDAQ' }] },
-  sp500:       { name: 'S&P 500',          currency: '$',   currencyCode: 'USD', flag: '🇺🇸', yahooSuffix: '',    tvPrefix: '',           filters: [] },
-  dax:         { name: 'DAX',              currency: '€',   currencyCode: 'EUR', flag: '🇩🇪', yahooSuffix: '.DE', tvPrefix: 'XETR',       filters: [] },
-  lse:         { name: 'LSE',              currency: '£',   currencyCode: 'GBP', flag: '🇬🇧', yahooSuffix: '.L',  tvPrefix: 'LSE',        filters: [] },
-  nikkei:      { name: 'Nikkei',           currency: '¥',   currencyCode: 'JPY', flag: '🇯🇵', yahooSuffix: '.T',  tvPrefix: 'TSE',        filters: [] },
-  nyse:        { name: 'NYSE',             currency: '$',   currencyCode: 'USD', flag: '🇺🇸', yahooSuffix: '',    tvPrefix: 'NYSE',       filters: [{ left: 'exchange', operation: 'equal', right: 'NYSE' }] },
-  krx:         { name: 'KRX',             currency: '₩',   currencyCode: 'KRW', flag: '🇰🇷', yahooSuffix: '.KS', tvPrefix: 'KRX',        filters: [] },
-  moex:        { name: 'MOEX',            currency: '₽',   currencyCode: 'RUB', flag: '🇷🇺', yahooSuffix: '.ME', tvPrefix: 'MOEX',       filters: [] },
-  france:      { name: 'Euronext Paris',   currency: '€',   currencyCode: 'EUR', flag: '🇫🇷', yahooSuffix: '.PA', tvPrefix: 'EURONEXT',   filters: [] },
-  amsterdam:   { name: 'Euronext Amsterdam', currency: '€', currencyCode: 'EUR', flag: '🇳🇱', yahooSuffix: '.AS', tvPrefix: 'EURONEXT',   filters: [] },
-  brussels:    { name: 'Euronext Brussels', currency: '€',  currencyCode: 'EUR', flag: '🇧🇪', yahooSuffix: '.BR', tvPrefix: 'EURONEXT',   filters: [] },
-  lisbon:      { name: 'Euronext Lisbon',  currency: '€',   currencyCode: 'EUR', flag: '🇵🇹', yahooSuffix: '.LS', tvPrefix: 'EURONEXT',   filters: [] },
-  dublin:      { name: 'Euronext Dublin',  currency: '€',   currencyCode: 'EUR', flag: '🇮🇪', yahooSuffix: '.IR', tvPrefix: 'EURONEXT',   filters: [] },
-  oslo:        { name: 'Oslo Bors',        currency: 'kr',  currencyCode: 'NOK', flag: '🇳🇴', yahooSuffix: '.OL', tvPrefix: 'OSL',        filters: [] },
-  milan:       { name: 'Borsa Italiana',   currency: '€',   currencyCode: 'EUR', flag: '🇮🇹', yahooSuffix: '.MI', tvPrefix: 'MIL',        filters: [] },
-  tsx:         { name: 'TSX',              currency: 'C$',  currencyCode: 'CAD', flag: '🇨🇦', yahooSuffix: '.TO', tvPrefix: 'TSX',        filters: [] },
-  twse:        { name: 'TWSE',             currency: 'NT$', currencyCode: 'TWD', flag: '🇹🇼', yahooSuffix: '.TW', tvPrefix: 'TWSE',       filters: [] },
-  b3:          { name: 'B3',              currency: 'R$',   currencyCode: 'BRL', flag: '🇧🇷', yahooSuffix: '.SA', tvPrefix: 'BMFBOVESPA', filters: [] },
-  hkex:        { name: 'HKEX',           currency: 'HK$',  currencyCode: 'HKD', flag: '🇭🇰', yahooSuffix: '.HK', tvPrefix: 'HKEX',       filters: [] },
-  china:       { name: 'SSE/SZSE',       currency: '¥',    currencyCode: 'CNY', flag: '🇨🇳', yahooSuffix: '.SS', tvPrefix: 'SSE',        filters: [] },
-  saudi:       { name: 'Tadawul',         currency: '﷼',    currencyCode: 'SAR', flag: '🇸🇦', yahooSuffix: '.SR', tvPrefix: 'TADAWUL',    filters: [] },
-  switzerland: { name: 'SIX',             currency: 'Fr',   currencyCode: 'CHF', flag: '🇨🇭', yahooSuffix: '.SW', tvPrefix: 'SIX',        filters: [] },
-  australia:   { name: 'ASX',             currency: 'A$',   currencyCode: 'AUD', flag: '🇦🇺', yahooSuffix: '.AX', tvPrefix: 'ASX',        filters: [] },
-  southafrica: { name: 'JSE',             currency: 'R',    currencyCode: 'ZAR', flag: '🇿🇦', yahooSuffix: '.JO', tvPrefix: 'JSE',        filters: [] },
-  sweden:      { name: 'Nasdaq S.',        currency: 'kr',   currencyCode: 'SEK', flag: '🇸🇪', yahooSuffix: '.ST', tvPrefix: 'STO',        filters: [] },
-  india:       { name: 'NSE',             currency: '₹',    currencyCode: 'INR', flag: '🇮🇳', yahooSuffix: '.NS', tvPrefix: 'NSE',        filters: [] },
-  uae:         { name: 'DFM',             currency: 'د.إ',  currencyCode: 'AED', flag: '🇦🇪', yahooSuffix: '.DU', tvPrefix: 'DFM',        filters: [] },
+  bist:        { name: 'BIST',             currency: '₺',   currencyCode: 'TRY', flag: '🇹🇷', symSuffix: '.IS', exCode: 'BIST',       filters: [] },
+  nasdaq:      { name: 'NASDAQ',           currency: '$',   currencyCode: 'USD', flag: '🇺🇸', symSuffix: '',    exCode: 'NASDAQ',     filters: [{ left: 'exchange', operation: 'equal', right: 'NASDAQ' }] },
+  sp500:       { name: 'S&P 500',          currency: '$',   currencyCode: 'USD', flag: '🇺🇸', symSuffix: '',    exCode: '',           filters: [] },
+  dax:         { name: 'DAX',              currency: '€',   currencyCode: 'EUR', flag: '🇩🇪', symSuffix: '.DE', exCode: 'XETR',       filters: [] },
+  lse:         { name: 'LSE',              currency: '£',   currencyCode: 'GBP', flag: '🇬🇧', symSuffix: '.L',  exCode: 'LSE',        filters: [] },
+  nikkei:      { name: 'Nikkei',           currency: '¥',   currencyCode: 'JPY', flag: '🇯🇵', symSuffix: '.T',  exCode: 'TSE',        filters: [] },
+  nyse:        { name: 'NYSE',             currency: '$',   currencyCode: 'USD', flag: '🇺🇸', symSuffix: '',    exCode: 'NYSE',       filters: [{ left: 'exchange', operation: 'equal', right: 'NYSE' }] },
+  krx:         { name: 'KRX',             currency: '₩',   currencyCode: 'KRW', flag: '🇰🇷', symSuffix: '.KS', exCode: 'KRX',        filters: [] },
+  moex:        { name: 'MOEX',            currency: '₽',   currencyCode: 'RUB', flag: '🇷🇺', symSuffix: '.ME', exCode: 'MOEX',       filters: [] },
+  france:      { name: 'Euronext Paris',   currency: '€',   currencyCode: 'EUR', flag: '🇫🇷', symSuffix: '.PA', exCode: 'EURONEXT',   filters: [] },
+  amsterdam:   { name: 'Euronext Amsterdam', currency: '€', currencyCode: 'EUR', flag: '🇳🇱', symSuffix: '.AS', exCode: 'EURONEXT',   filters: [] },
+  brussels:    { name: 'Euronext Brussels', currency: '€',  currencyCode: 'EUR', flag: '🇧🇪', symSuffix: '.BR', exCode: 'EURONEXT',   filters: [] },
+  lisbon:      { name: 'Euronext Lisbon',  currency: '€',   currencyCode: 'EUR', flag: '🇵🇹', symSuffix: '.LS', exCode: 'EURONEXT',   filters: [] },
+  dublin:      { name: 'Euronext Dublin',  currency: '€',   currencyCode: 'EUR', flag: '🇮🇪', symSuffix: '.IR', exCode: 'EURONEXT',   filters: [] },
+  oslo:        { name: 'Oslo Bors',        currency: 'kr',  currencyCode: 'NOK', flag: '🇳🇴', symSuffix: '.OL', exCode: 'OSL',        filters: [] },
+  milan:       { name: 'Borsa Italiana',   currency: '€',   currencyCode: 'EUR', flag: '🇮🇹', symSuffix: '.MI', exCode: 'MIL',        filters: [] },
+  tsx:         { name: 'TSX',              currency: 'C$',  currencyCode: 'CAD', flag: '🇨🇦', symSuffix: '.TO', exCode: 'TSX',        filters: [] },
+  twse:        { name: 'TWSE',             currency: 'NT$', currencyCode: 'TWD', flag: '🇹🇼', symSuffix: '.TW', exCode: 'TWSE',       filters: [] },
+  b3:          { name: 'B3',              currency: 'R$',   currencyCode: 'BRL', flag: '🇧🇷', symSuffix: '.SA', exCode: 'BMFBOVESPA', filters: [] },
+  hkex:        { name: 'HKEX',           currency: 'HK$',  currencyCode: 'HKD', flag: '🇭🇰', symSuffix: '.HK', exCode: 'HKEX',       filters: [] },
+  china:       { name: 'SSE/SZSE',       currency: '¥',    currencyCode: 'CNY', flag: '🇨🇳', symSuffix: '.SS', exCode: 'SSE',        filters: [] },
+  saudi:       { name: 'Tadawul',         currency: '﷼',    currencyCode: 'SAR', flag: '🇸🇦', symSuffix: '.SR', exCode: 'TADAWUL',    filters: [] },
+  switzerland: { name: 'SIX',             currency: 'Fr',   currencyCode: 'CHF', flag: '🇨🇭', symSuffix: '.SW', exCode: 'SIX',        filters: [] },
+  australia:   { name: 'ASX',             currency: 'A$',   currencyCode: 'AUD', flag: '🇦🇺', symSuffix: '.AX', exCode: 'ASX',        filters: [] },
+  southafrica: { name: 'JSE',             currency: 'R',    currencyCode: 'ZAR', flag: '🇿🇦', symSuffix: '.JO', exCode: 'JSE',        filters: [] },
+  sweden:      { name: 'Nasdaq S.',        currency: 'kr',   currencyCode: 'SEK', flag: '🇸🇪', symSuffix: '.ST', exCode: 'STO',        filters: [] },
+  india:       { name: 'NSE',             currency: '₹',    currencyCode: 'INR', flag: '🇮🇳', symSuffix: '.NS', exCode: 'NSE',        filters: [] },
+  uae:         { name: 'DFM',             currency: 'د.إ',  currencyCode: 'AED', flag: '🇦🇪', symSuffix: '.DU', exCode: 'DFM',        filters: [] },
 };
 
 // Borsa açıklamaları — chip hover tooltipleri
@@ -1179,7 +1179,7 @@ function showApp(){
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 // ═══════════════════════════════════════════
-// TRADINGVIEW SCANNER — tek istekte tüm BIST
+// TARAMA MOTORU — tek istekte tüm BIST
 // ═══════════════════════════════════════════
 var _scanRunning = false;
 async function runScan(){
@@ -1270,7 +1270,7 @@ async function runScan(){
 
   // Field isimleri borsa bazlı farklı — exchange'e göre doğru set
   const isBIST = (currentExchange === 'bist');
-  // TradingView field isimleri — konsoldan teyit edildi ✓
+  // Alan isimleri — konsoldan teyit edildi ✓
   const COLS_BIST = [
     'name','description','close','change','volume','market_cap_basic',
     'price_earnings_ttm','price_to_revenue_ratio',
@@ -1451,7 +1451,7 @@ async function runScan(){
       } catch(e) { console.warn('[DeepFin] bist-scan float verisi alınamadı:', e.message); }
     }
 
-    // Parse TradingView response — index bazlı, sıra garantili
+    // Tarama yanıtını parse et — index bazlı, sıra garantili
     const results = [];
     // CI map: response'dan gelen gerçek columns sırası (scan.js'nin safeCols filtrelemesi
     // sırayı bozabilir). Yoksa client listesine fallback.
@@ -1511,7 +1511,7 @@ async function runScan(){
       const stochD     = g('Stoch.D');
       const beta1y     = g('beta_1_year');
 
-      // TradingView sembol formatı: "BIST:THYAO" → "THYAO"
+      // Sembol formatı: "BIST:THYAO" → "THYAO"
       const rawSym = row.s || '';
       const symbol = rawSym.replace(/^[A-Z0-9]+:/, '');
 
@@ -2977,7 +2977,7 @@ function fPerf(v) {
 
 function fmc(v){
   if(!v) return nil;
-  // TradingView market_cap_basic her zaman USD — milyon USD olarak saklıyoruz
+  // Piyasa değeri her zaman USD — milyon USD olarak saklıyoruz
   if(v>=1000000) return `$${(v/1000000).toFixed(2)}T`;
   if(v>=1000)    return `$${(v/1000).toFixed(1)}B`;
   return `$${v.toFixed(0)}M`;
@@ -3423,7 +3423,7 @@ function updateChart(sym) {
   var interval = ctabEl ? (ctabEl.dataset.interval || 'D') : 'D';
 
   var exMeta = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
-  var suffix = encodeURIComponent(exMeta.yahooSuffix || '');
+  var suffix = encodeURIComponent(exMeta.symSuffix || '');
 
   var isDark = typeof _isDark === 'function' ? _isDark() : false;
   var bg      = isDark ? '#0e1828' : '#ffffff';
@@ -4043,12 +4043,12 @@ function showFooterModal(type) {
 <p>Platform üzerindeki hiçbir içerik; herhangi bir menkul kıymetin alım, satım veya elde tutulmasına yönelik tavsiye, öneri veya teşvik olarak yorumlanamaz.</p>
 <p>Yatırım kararları kişisel mali durumunuza, risk toleransınıza ve yatırım hedeflerinize göre değişir. Her türlü yatırım kararından önce lisanslı bir yatırım danışmanına başvurmanız tavsiye edilir.</p>
 <p>Geçmiş performans gelecekteki sonuçları garanti etmez. Tüm yatırımlar risk içerir ve yatırılan tutarın tamamı kaybedilebilir.</p>
-<p style="font-size:11px;color:var(--muted2);margin-top:16px;">Veri sağlayıcıların (TradingView, Yahoo Finance vb.) hizmet kesintileri veya veri hataları nedeniyle oluşabilecek zararlardan DeepFin sorumlu tutulamaz.</p>`,
+<p style="font-size:11px;color:var(--muted2);margin-top:16px;">Veri sağlayıcılarının hizmet kesintileri veya veri hataları nedeniyle oluşabilecek zararlardan DeepFin sorumlu tutulamaz.</p>`,
 
     privacy: `<p><strong style="color:var(--text)">Gizlilik Politikası</strong></p>
 <p>DeepFin olarak kullanıcı gizliliğine büyük önem veriyoruz.</p>
 <p><strong style="color:var(--text)">Topladığımız veriler:</strong> Platform tamamen istemci taraflı çalışır. Kişisel veri toplamaz, üye kaydı gerektirmez. Kullanım istatistikleri (sayfa görüntüleme, anonim) analitik amaçlı toplanabilir.</p>
-<p><strong style="color:var(--text)">Üçüncü taraf servisleri:</strong> TradingView Scanner API, Yahoo Finance ve SEC EDGAR'dan veri çekilir. Bu servislerin kendi gizlilik politikaları geçerlidir.</p>
+<p><strong style="color:var(--text)">Üçüncü taraf servisleri:</strong> Veriler çeşitli ulusal ve uluslararası finansal veri sağlayıcılarından çekilir. Bu servislerin kendi gizlilik politikaları geçerlidir.</p>
 <p><strong style="color:var(--text)">Çerezler:</strong> Oturum ve tercih bilgilerini saklamak için minimal çerez kullanılabilir. Reklam amaçlı çerez kullanılmaz.</p>
 <p style="font-size:11px;color:var(--muted2);margin-top:16px;">Son güncelleme: Ocak 2026</p>`,
 
