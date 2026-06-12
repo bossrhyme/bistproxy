@@ -40,8 +40,10 @@ function _initTheme() {
 function _updateIndicesTicker(r) {
   if (!r || !r.TRY) return;
   var usdtry = r.TRY;
-  var eurtry = r.EUR ? (r.EUR * r.TRY) : null;
-  var gbptry = r.GBP ? (r.GBP * r.TRY) : null;
+  // r.EUR ve r.GBP open.er-api'den "USD başına kaç EUR/GBP" şeklinde gelir (< 1).
+  // TRY/EUR = TRY/USD ÷ EUR/USD = r.TRY / r.EUR
+  var eurtry = r.EUR ? (r.TRY / r.EUR) : null;
+  var gbptry = r.GBP ? (r.TRY / r.GBP) : null;
   var el1 = document.getElementById('tidx-usdtry');
   var el2 = document.getElementById('tidx-eurtry');
   var el3 = document.getElementById('tidx-gbptry');
