@@ -39,7 +39,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self' https://*.tradingview.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://s3.tradingview.com https://*.tradingview.com https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.tradingview.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.coingecko.com https://www.tefas.gov.tr https://finnhub.io https://*.tradingview.com https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com; frame-ancestors 'none'; frame-src https://s3.tradingview.com https://s.tradingview.com https://www.tradingview.com https://*.tradingview.com https://widget.tradingview.com; worker-src 'self'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests;"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com; frame-ancestors 'none'; frame-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests;"
         }
       ]
     },
@@ -161,6 +161,10 @@
       "destination": "/api/bist-scan.js"
     },
     {
+      "source": "/api/preset-snapshot",
+      "destination": "/api/bist-scan.js"
+    },
+    {
       "source": "/api/bist-quote",
       "destination": "/api/bist-quote.js"
     },
@@ -188,7 +192,16 @@
     { "source": "/admin",             "destination": "/admin/index.html" },
     { "source": "/admin/",            "destination": "/admin/index.html" }
   ],
+  "crons": [
+    {
+      "path": "/api/preset-snapshot",
+      "schedule": "30 15 * * *"
+    }
+  ],
   "functions": {
+    "api/scan.js": {
+      "maxDuration": 25
+    },
     "api/verify.js": {
       "maxDuration": 10
     },
@@ -202,7 +215,7 @@
       "maxDuration": 20
     },
     "api/bist-scan.js": {
-      "maxDuration": 15
+      "maxDuration": 25
     },
     "api/bist-quote.js": {
       "maxDuration": 10

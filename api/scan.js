@@ -102,7 +102,7 @@ function getCacheTTL(exchange) {
     southafrica:  { open: 7,  close: 15 }, // 09:00-17:00 SAST (UTC+2)
   };
   const h = hours[exchange] || { open: 8, close: 16 };
-  return (hour >= h.open && hour < h.close) ? 300 : 1800; // açık:5dk kapalı:30dk
+  return (hour >= h.open && hour < h.close) ? 900 : 1800; // açık:15dk kapalı:30dk
 }
 
 // ─────────────────────────────────────────────
@@ -399,8 +399,12 @@ module.exports = async function(req, res) {
       'earnings_per_share_diluted_yoy_growth_ttm','earnings_per_share_change_ttm_yoy',
       'earnings_per_share_diluted_ttm',
       'Recommend.All','Recommend.MA','Recommend.Other',
-      'Perf.3M','Perf.6M','Perf.Y','Perf.W',
+      'Perf.1M','Perf.3M','Perf.6M','Perf.Y','Perf.W',
       'RSI',
+      'price_52_week_high','price_52_week_low',
+      'relative_volume_10d_calc',
+      'SMA50','SMA200','MACD.macd','MACD.signal',
+      'ADX','ADX+DI','ADX-DI','BB.lower','Stoch.K','Stoch.D','beta_1_year',
       'float_shares_outstanding_percent',
       'is_primary','typespecs','exchange','index',
     ]);
@@ -529,7 +533,7 @@ module.exports = async function(req, res) {
           }
         }
         resolve();
-      });
+      }, 20000); // geniş kolon setli tarama soğuk istekte 8sn'yi aşabiliyor
     });
   }
 

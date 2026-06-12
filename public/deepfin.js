@@ -102,8 +102,8 @@ var _ONB = {
     steps: [
       {icon:'🌐', label:'Kategori Seç', desc:'DeFi, Layer 1, GameFi veya tüm coinler'},
       {icon:'📈', label:'Preset Seç',   desc:'Momentum, RSI Dip, ATH Yakın hazır stratejiler'},
-      {icon:'▶',  label:'Kripto Tara',  desc:'Canlı kripto verisi çekilir'},
-      {icon:'🔎', label:'Coin İncele',  desc:'Fiyat, RSI, ATH%, teknik rating\'i gör'}
+      {icon:'▶',  label:'Kripto Tara',  desc:'Canlı piyasa verisi çekilir'},
+      {icon:'🔎', label:'Coin İncele',  desc:'Fiyat, RSI, ATH%, teknik sinyali gör'}
     ]
   }
 };
@@ -466,7 +466,7 @@ function _fonSort(field) {
 function runKriptoScan() {
   var btn=document.querySelector('#sbp-kripto .sbp-scan-btn');
   if(btn){btn.textContent='⏳ Taranıyor...';btn.disabled=true;}
-  _showLoading('⏳ Kripto verileri yükleniyor...');
+  _showLoading('⏳ Kripto piyasa verisi yükleniyor...');
 
   var params=new URLSearchParams({limit:'200',sort:'market_cap_desc'});
   var cat=document.querySelector('#sbp-kripto .chip.on[data-cat]');
@@ -572,7 +572,7 @@ function _renderKripto(coins, meta, forceAll) {
   var hasTvl = coins.some(function(c){ return c.tvl != null; });
   var visibleCoins = (_kriptoShowAll || coins.length <= KRIPTO_INIT) ? coins : coins.slice(0, KRIPTO_INIT);
   var rows = visibleCoins.map(function(c, i){ return _kriptoRowHtml(c, i, hasTvl); }).join('');
-  var srcLabel = 'Canlı Piyasa Verisi';
+  var srcLabel = hasTvl ? 'Çoklu kaynak · Canlı' : 'Canlı veri';
   var hdr='<div class="res-hdr"><b>₿ Kripto</b><span class="res-cnt">'+coins.length+' coin</span>'+(note?'<span class="res-ok">'+note+'</span>':'')+'<span class="res-src">'+srcLabel+'</span></div>';
   var kCols=[
     {k:'price',l:'Fiyat'},{k:'change24h',l:'24s%'},{k:'change7d',l:'7G%'},{k:'change30d',l:'30G%'},
@@ -591,7 +591,7 @@ function _renderKripto(coins, meta, forceAll) {
       +'Tümünü göster — '+(coins.length - KRIPTO_INIT)+' coin daha'
       +'</button></div>'
     : '';
-  var tbl='<table><thead><tr><th style="width:28px"></th><th>Coin</th>'+kThSort+'<th class="right">Teknik</th></tr></thead><tbody>'+rows+'</tbody></table>'+kMoreBar;
+  var tbl='<table><thead><tr><th style="width:28px"></th><th>Coin</th>'+kThSort+'<th class="right">Sinyal</th></tr></thead><tbody>'+rows+'</tbody></table>'+kMoreBar;
   _showResultArea(hdr, tbl, coins.length);
 }
 
@@ -611,7 +611,7 @@ var _tvCurrentSym = null;
 
 // ═══════════════════════════════════════════
 // BIST SYMBOLS — Full list (150+ hisse)
-// BIST sembolleri SYMBOL.IS formatında
+// BIST sembol formatı: SYMBOL.IS
 // ═══════════════════════════════════════════
 const BIST_SYMBOLS = [
   // BIST-100 Ana hisseler
@@ -809,34 +809,66 @@ const PROXY_URL = '/api/scan';
 // ── EXCHANGE CONFIG ──
 let currentExchange = 'bist';
 const EXCHANGE_META = {
-  bist:        { name: 'BIST',             currency: '₺',   currencyCode: 'TRY', flag: '🇹🇷', symSuffix: '.IS', exPrefix: 'BIST',       filters: [] },
-  nasdaq:      { name: 'NASDAQ',           currency: '$',   currencyCode: 'USD', flag: '🇺🇸', symSuffix: '',    exPrefix: 'NASDAQ',     filters: [{ left: 'exchange', operation: 'equal', right: 'NASDAQ' }] },
-  sp500:       { name: 'S&P 500',          currency: '$',   currencyCode: 'USD', flag: '🇺🇸', symSuffix: '',    exPrefix: '',           filters: [] },
-  dax:         { name: 'DAX',              currency: '€',   currencyCode: 'EUR', flag: '🇩🇪', symSuffix: '.DE', exPrefix: 'XETR',       filters: [] },
-  lse:         { name: 'LSE',              currency: '£',   currencyCode: 'GBP', flag: '🇬🇧', symSuffix: '.L',  exPrefix: 'LSE',        filters: [] },
-  nikkei:      { name: 'Nikkei',           currency: '¥',   currencyCode: 'JPY', flag: '🇯🇵', symSuffix: '.T',  exPrefix: 'TSE',        filters: [] },
-  nyse:        { name: 'NYSE',             currency: '$',   currencyCode: 'USD', flag: '🇺🇸', symSuffix: '',    exPrefix: 'NYSE',       filters: [{ left: 'exchange', operation: 'equal', right: 'NYSE' }] },
-  krx:         { name: 'KRX',             currency: '₩',   currencyCode: 'KRW', flag: '🇰🇷', symSuffix: '.KS', exPrefix: 'KRX',        filters: [] },
-  moex:        { name: 'MOEX',            currency: '₽',   currencyCode: 'RUB', flag: '🇷🇺', symSuffix: '.ME', exPrefix: 'MOEX',       filters: [] },
-  france:      { name: 'Euronext Paris',   currency: '€',   currencyCode: 'EUR', flag: '🇫🇷', symSuffix: '.PA', exPrefix: 'EURONEXT',   filters: [] },
-  amsterdam:   { name: 'Euronext Amsterdam', currency: '€', currencyCode: 'EUR', flag: '🇳🇱', symSuffix: '.AS', exPrefix: 'EURONEXT',   filters: [] },
-  brussels:    { name: 'Euronext Brussels', currency: '€',  currencyCode: 'EUR', flag: '🇧🇪', symSuffix: '.BR', exPrefix: 'EURONEXT',   filters: [] },
-  lisbon:      { name: 'Euronext Lisbon',  currency: '€',   currencyCode: 'EUR', flag: '🇵🇹', symSuffix: '.LS', exPrefix: 'EURONEXT',   filters: [] },
-  dublin:      { name: 'Euronext Dublin',  currency: '€',   currencyCode: 'EUR', flag: '🇮🇪', symSuffix: '.IR', exPrefix: 'EURONEXT',   filters: [] },
-  oslo:        { name: 'Oslo Bors',        currency: 'kr',  currencyCode: 'NOK', flag: '🇳🇴', symSuffix: '.OL', exPrefix: 'OSL',        filters: [] },
-  milan:       { name: 'Borsa Italiana',   currency: '€',   currencyCode: 'EUR', flag: '🇮🇹', symSuffix: '.MI', exPrefix: 'MIL',        filters: [] },
-  tsx:         { name: 'TSX',              currency: 'C$',  currencyCode: 'CAD', flag: '🇨🇦', symSuffix: '.TO', exPrefix: 'TSX',        filters: [] },
-  twse:        { name: 'TWSE',             currency: 'NT$', currencyCode: 'TWD', flag: '🇹🇼', symSuffix: '.TW', exPrefix: 'TWSE',       filters: [] },
-  b3:          { name: 'B3',              currency: 'R$',   currencyCode: 'BRL', flag: '🇧🇷', symSuffix: '.SA', exPrefix: 'BMFBOVESPA', filters: [] },
-  hkex:        { name: 'HKEX',           currency: 'HK$',  currencyCode: 'HKD', flag: '🇭🇰', symSuffix: '.HK', exPrefix: 'HKEX',       filters: [] },
-  china:       { name: 'SSE/SZSE',       currency: '¥',    currencyCode: 'CNY', flag: '🇨🇳', symSuffix: '.SS', exPrefix: 'SSE',        filters: [] },
-  saudi:       { name: 'Tadawul',         currency: '﷼',    currencyCode: 'SAR', flag: '🇸🇦', symSuffix: '.SR', exPrefix: 'TADAWUL',    filters: [] },
-  switzerland: { name: 'SIX',             currency: 'Fr',   currencyCode: 'CHF', flag: '🇨🇭', symSuffix: '.SW', exPrefix: 'SIX',        filters: [] },
-  australia:   { name: 'ASX',             currency: 'A$',   currencyCode: 'AUD', flag: '🇦🇺', symSuffix: '.AX', exPrefix: 'ASX',        filters: [] },
-  southafrica: { name: 'JSE',             currency: 'R',    currencyCode: 'ZAR', flag: '🇿🇦', symSuffix: '.JO', exPrefix: 'JSE',        filters: [] },
-  sweden:      { name: 'Nasdaq S.',        currency: 'kr',   currencyCode: 'SEK', flag: '🇸🇪', symSuffix: '.ST', exPrefix: 'STO',        filters: [] },
-  india:       { name: 'NSE',             currency: '₹',    currencyCode: 'INR', flag: '🇮🇳', symSuffix: '.NS', exPrefix: 'NSE',        filters: [] },
-  uae:         { name: 'DFM',             currency: 'د.إ',  currencyCode: 'AED', flag: '🇦🇪', symSuffix: '.DU', exPrefix: 'DFM',        filters: [] },
+  bist:        { name: 'BIST',             currency: '₺',   currencyCode: 'TRY', flag: '🇹🇷', symSuffix: '.IS', exCode: 'BIST',       filters: [] },
+  nasdaq:      { name: 'NASDAQ',           currency: '$',   currencyCode: 'USD', flag: '🇺🇸', symSuffix: '',    exCode: 'NASDAQ',     filters: [{ left: 'exchange', operation: 'equal', right: 'NASDAQ' }] },
+  sp500:       { name: 'S&P 500',          currency: '$',   currencyCode: 'USD', flag: '🇺🇸', symSuffix: '',    exCode: '',           filters: [] },
+  dax:         { name: 'DAX',              currency: '€',   currencyCode: 'EUR', flag: '🇩🇪', symSuffix: '.DE', exCode: 'XETR',       filters: [] },
+  lse:         { name: 'LSE',              currency: '£',   currencyCode: 'GBP', flag: '🇬🇧', symSuffix: '.L',  exCode: 'LSE',        filters: [] },
+  nikkei:      { name: 'Nikkei',           currency: '¥',   currencyCode: 'JPY', flag: '🇯🇵', symSuffix: '.T',  exCode: 'TSE',        filters: [] },
+  nyse:        { name: 'NYSE',             currency: '$',   currencyCode: 'USD', flag: '🇺🇸', symSuffix: '',    exCode: 'NYSE',       filters: [{ left: 'exchange', operation: 'equal', right: 'NYSE' }] },
+  krx:         { name: 'KRX',             currency: '₩',   currencyCode: 'KRW', flag: '🇰🇷', symSuffix: '.KS', exCode: 'KRX',        filters: [] },
+  moex:        { name: 'MOEX',            currency: '₽',   currencyCode: 'RUB', flag: '🇷🇺', symSuffix: '.ME', exCode: 'MOEX',       filters: [] },
+  france:      { name: 'Euronext Paris',   currency: '€',   currencyCode: 'EUR', flag: '🇫🇷', symSuffix: '.PA', exCode: 'EURONEXT',   filters: [] },
+  amsterdam:   { name: 'Euronext Amsterdam', currency: '€', currencyCode: 'EUR', flag: '🇳🇱', symSuffix: '.AS', exCode: 'EURONEXT',   filters: [] },
+  brussels:    { name: 'Euronext Brussels', currency: '€',  currencyCode: 'EUR', flag: '🇧🇪', symSuffix: '.BR', exCode: 'EURONEXT',   filters: [] },
+  lisbon:      { name: 'Euronext Lisbon',  currency: '€',   currencyCode: 'EUR', flag: '🇵🇹', symSuffix: '.LS', exCode: 'EURONEXT',   filters: [] },
+  dublin:      { name: 'Euronext Dublin',  currency: '€',   currencyCode: 'EUR', flag: '🇮🇪', symSuffix: '.IR', exCode: 'EURONEXT',   filters: [] },
+  oslo:        { name: 'Oslo Bors',        currency: 'kr',  currencyCode: 'NOK', flag: '🇳🇴', symSuffix: '.OL', exCode: 'OSL',        filters: [] },
+  milan:       { name: 'Borsa Italiana',   currency: '€',   currencyCode: 'EUR', flag: '🇮🇹', symSuffix: '.MI', exCode: 'MIL',        filters: [] },
+  tsx:         { name: 'TSX',              currency: 'C$',  currencyCode: 'CAD', flag: '🇨🇦', symSuffix: '.TO', exCode: 'TSX',        filters: [] },
+  twse:        { name: 'TWSE',             currency: 'NT$', currencyCode: 'TWD', flag: '🇹🇼', symSuffix: '.TW', exCode: 'TWSE',       filters: [] },
+  b3:          { name: 'B3',              currency: 'R$',   currencyCode: 'BRL', flag: '🇧🇷', symSuffix: '.SA', exCode: 'BMFBOVESPA', filters: [] },
+  hkex:        { name: 'HKEX',           currency: 'HK$',  currencyCode: 'HKD', flag: '🇭🇰', symSuffix: '.HK', exCode: 'HKEX',       filters: [] },
+  china:       { name: 'SSE/SZSE',       currency: '¥',    currencyCode: 'CNY', flag: '🇨🇳', symSuffix: '.SS', exCode: 'SSE',        filters: [] },
+  saudi:       { name: 'Tadawul',         currency: '﷼',    currencyCode: 'SAR', flag: '🇸🇦', symSuffix: '.SR', exCode: 'TADAWUL',    filters: [] },
+  switzerland: { name: 'SIX',             currency: 'Fr',   currencyCode: 'CHF', flag: '🇨🇭', symSuffix: '.SW', exCode: 'SIX',        filters: [] },
+  australia:   { name: 'ASX',             currency: 'A$',   currencyCode: 'AUD', flag: '🇦🇺', symSuffix: '.AX', exCode: 'ASX',        filters: [] },
+  southafrica: { name: 'JSE',             currency: 'R',    currencyCode: 'ZAR', flag: '🇿🇦', symSuffix: '.JO', exCode: 'JSE',        filters: [] },
+  sweden:      { name: 'Nasdaq S.',        currency: 'kr',   currencyCode: 'SEK', flag: '🇸🇪', symSuffix: '.ST', exCode: 'STO',        filters: [] },
+  india:       { name: 'NSE',             currency: '₹',    currencyCode: 'INR', flag: '🇮🇳', symSuffix: '.NS', exCode: 'NSE',        filters: [] },
+  uae:         { name: 'DFM',             currency: 'د.إ',  currencyCode: 'AED', flag: '🇦🇪', symSuffix: '.DU', exCode: 'DFM',        filters: [] },
+};
+
+// Borsa açıklamaları — chip hover tooltipleri
+const EXCHANGE_TIPS = {
+  bist:        'Borsa İstanbul, Türkiye',
+  nasdaq:      'ABD teknoloji borsası',
+  sp500:       'ABD\'nin en büyük 500 şirketi',
+  dax:         'Frankfurt Borsası, Almanya',
+  lse:         'Londra Borsası, İngiltere',
+  nikkei:      'Tokyo Borsası, Japonya',
+  nyse:        'New York Borsası, ABD',
+  krx:         'Güney Kore borsası',
+  moex:        'Moskova Borsası, Rusya',
+  france:      'Paris Borsası, Fransa',
+  amsterdam:   'Amsterdam Borsası, Hollanda',
+  brussels:    'Brüksel Borsası, Belçika',
+  lisbon:      'Lizbon Borsası, Portekiz',
+  dublin:      'Dublin Borsası, İrlanda',
+  oslo:        'Oslo Borsası, Norveç',
+  milan:       'Milano Borsası, İtalya',
+  tsx:         'Toronto Borsası, Kanada',
+  twse:        'Tayvan borsası',
+  b3:          'São Paulo Borsası, Brezilya',
+  hkex:        'Hong Kong borsası',
+  china:       'Şanghay ve Şenzhen borsaları, Çin',
+  saudi:       'Tadawul, Suudi Arabistan',
+  switzerland: 'Zürih Borsası, İsviçre',
+  australia:   'Sidney Borsası, Avustralya',
+  southafrica: 'Johannesburg Borsası, Güney Afrika',
+  sweden:      'Stockholm Borsası, İsveç',
+  india:       'Hindistan ulusal borsası (NSE)',
+  uae:         'Dubai Finans Borsası, BAE',
 };
 
 let allData = [];
@@ -1147,7 +1179,7 @@ function showApp(){
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 // ═══════════════════════════════════════════
-// PİYASA TARAYICI — tek istekte tüm borsa
+// TARAMA MOTORU — tek istekte tüm BIST
 // ═══════════════════════════════════════════
 var _scanRunning = false;
 async function runScan(){
@@ -1161,6 +1193,29 @@ async function runScan(){
     return;
   }
   _track('scan', 'run');
+  // Görünümü İLK iş olarak değiştir — kur isteği beklenirken
+  // önceki taramanın bayat ekranı bir an bile görünmesin
+  const _quick = window._quickRescan === true;
+  window._quickRescan = false;
+  const btn = document.getElementById('scanbtn');
+  btn.disabled = true;
+  scanAborted = false;
+  document.getElementById('stopbtn').style.display = 'none';
+  allData = [];
+  filtered = [];
+  selSym = null;
+  closeDetail();
+  if (_quick) {
+    showQuickScanPill(window._quickRescanLabel);
+    window._quickRescanLabel = null;
+  } else {
+    showState('loading');
+    document.getElementById('toolbar').style.display = 'none';
+    document.getElementById('loadtxt').textContent = 'Taranıyor...';
+    const exMeta = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
+    document.getElementById('loadsub').textContent = `${exMeta.flag} ${exMeta.name} hisseleri alınıyor...`;
+  }
+  document.getElementById('prog').style.width = '30%';
   // Döviz kurları güncelleme (USD bazlı)
   try {
     const rateRes = await fetch('/api/rates');
@@ -1188,25 +1243,34 @@ async function runScan(){
       if(r.AED) fxRates.AED = 1 / r.AED;
     }
   } catch(e) { /* fallback kurlar kullanılır */ }
-  const btn = document.getElementById('scanbtn');
-  btn.disabled = true;
-  scanAborted = false;
-  document.getElementById('stopbtn').style.display = 'none';
-  allData = [];
-  filtered = [];
-  selSym = null;
-  closeDetail();
-  showState('loading');
-  document.getElementById('toolbar').style.display = 'none';
-  document.getElementById('prog').style.width = '30%';
-  document.getElementById('loadtxt').textContent = 'Taranıyor...';
-  const exMeta = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
-  document.getElementById('loadsub').textContent = `${exMeta.flag} ${exMeta.name} hisseleri alınıyor...`;
-  startScanEta(currentExchange);
+  // Collect all active filter tags for summary bar (deduplicated by key)
+  var _filterTags = [];
+  var _seenKeys   = {};
+  document.querySelectorAll('#goat-chips .goat-chip.on').forEach(function(c) {
+    var k = c.dataset.goat;
+    if (k && GURUS[k] && !_seenKeys[k]) { _seenKeys[k] = 1; _filterTags.push({ label: GURUS[k].label.split(' — ')[0].split(' (')[0], desc: GURUS[k].desc || '', kind: 'goat', key: k }); }
+  });
+  document.querySelectorAll('#presets .chip.on').forEach(function(c) {
+    var k = c.dataset.preset;
+    if (k && PRESETS[k] && !_seenKeys[k]) { _seenKeys[k] = 1; _filterTags.push({ label: PRESETS[k].label, desc: PRESETS[k].desc || '', kind: 'preset', key: k }); }
+  });
+  document.querySelectorAll('#tech-presets .chip.on').forEach(function(c) {
+    var k = c.dataset.tech;
+    if (k && TECH_PRESETS[k] && !_seenKeys[k]) { _seenKeys[k] = 1; _filterTags.push({ label: TECH_PRESETS[k].label, desc: TECH_PRESETS[k].desc || '', kind: 'tech', key: k }); }
+  });
+  // Deduplicate by label as final safety net
+  var _lblSeen = {};
+  _filterTags = _filterTags.filter(function(f) { if (_lblSeen[f.label]) return false; _lblSeen[f.label] = 1; return true; });
+  _scanMeta.filters  = _filterTags;
+  _scanMeta.strategy = _filterTags.map(function(f){return f.label;}).join(', ') || null;
+  _scanMeta.exchange = currentExchange;
+  var _scanMinMs = _quick ? 1500 : (_psvScanFilterCount >= 3 ? 4500 : _psvScanFilterCount >= 1 ? 3000 : 0);
+  if (_quick) scanStartTime = Date.now(); // startScanEta atlanıyor — min süre hesabı için gerekli
+  else startScanEta(currentExchange, _scanMinMs);
 
   // Field isimleri borsa bazlı farklı — exchange'e göre doğru set
   const isBIST = (currentExchange === 'bist');
-  // Veri alan isimleri — teyit edildi ✓
+  // Alan isimleri — konsoldan teyit edildi ✓
   const COLS_BIST = [
     'name','description','close','change','volume','market_cap_basic',
     'price_earnings_ttm','price_to_revenue_ratio',
@@ -1218,7 +1282,11 @@ async function runScan(){
     'dividends_yield','debt_to_equity_fq','current_ratio_fq',
     'sector','High.1M','Low.1M','piotroski_f_score',
     'Recommend.All','Recommend.MA','Recommend.Other',
-    'Perf.3M','Perf.6M','Perf.Y','Perf.W','RSI',
+    'Perf.1M','Perf.3M','Perf.6M','Perf.Y','Perf.W','RSI',
+    'price_52_week_high','price_52_week_low',
+    'average_volume_10d_calc','relative_volume_10d_calc',
+    'SMA50','SMA200','MACD.macd','MACD.signal',
+    'ADX','ADX+DI','ADX-DI','BB.lower','Stoch.K','Stoch.D','beta_1_year',
     'float_shares_outstanding_percent'
   ];
   const COLS_US = [
@@ -1233,7 +1301,11 @@ async function runScan(){
     'total_debt_to_equity','debt_to_equity_fq','current_ratio','current_ratio_fq',
     'sector','High.1M','Low.1M','piotroski_f_score',
     'Recommend.All','Recommend.MA','Recommend.Other',
-    'Perf.3M','Perf.6M','Perf.Y','Perf.W','RSI',
+    'Perf.1M','Perf.3M','Perf.6M','Perf.Y','Perf.W','RSI',
+    'price_52_week_high','price_52_week_low',
+    'average_volume_10d_calc','relative_volume_10d_calc',
+    'SMA50','SMA200','MACD.macd','MACD.signal',
+    'ADX','ADX+DI','ADX-DI','BB.lower','Stoch.K','Stoch.D','beta_1_year',
     'float_shares_outstanding_percent'
   ];
   const COLS_GLOBAL = [
@@ -1247,7 +1319,11 @@ async function runScan(){
     'total_debt_to_equity','debt_to_equity_fq','current_ratio','current_ratio_fq',
     'sector','High.1M','Low.1M','piotroski_f_score',
     'Recommend.All','Recommend.MA','Recommend.Other',
-    'Perf.3M','Perf.6M','Perf.Y','Perf.W','RSI',
+    'Perf.1M','Perf.3M','Perf.6M','Perf.Y','Perf.W','RSI',
+    'price_52_week_high','price_52_week_low',
+    'average_volume_10d_calc','relative_volume_10d_calc',
+    'SMA50','SMA200','MACD.macd','MACD.signal',
+    'ADX','ADX+DI','ADX-DI','BB.lower','Stoch.K','Stoch.D','beta_1_year',
     'float_shares_outstanding_percent'
   ];
   const COLUMNS_BY_EXCHANGE = {
@@ -1280,8 +1356,15 @@ async function runScan(){
     india:       COLS_GLOBAL,
     uae:         COLS_GLOBAL,
   };
+  // Yeni eklenen teknik kolonlar — sorun çıkarsa çekirdek sete dönüş için ayrı tutulur
+  const NEW_TECH_COLS = ['price_52_week_high','price_52_week_low',
+    'average_volume_10d_calc','relative_volume_10d_calc',
+    'SMA50','SMA200','MACD.macd','MACD.signal',
+    'ADX','ADX+DI','ADX-DI','BB.lower','Stoch.K','Stoch.D','beta_1_year','Perf.1M'];
+  const _fullCols = COLUMNS_BY_EXCHANGE[currentExchange] || COLS_GLOBAL;
+  const _coreCols = _fullCols.filter(function(c){ return NEW_TECH_COLS.indexOf(c) === -1; });
   const payload = {
-    columns: COLUMNS_BY_EXCHANGE[currentExchange] || COLUMNS_BY_EXCHANGE.default,
+    columns: (window._scanCoreColsOnly ? _coreCols : _fullCols).slice(),
     range: [0, 3000],
     sort: { sortBy: 'market_cap_basic', sortOrder: 'desc' },
     ignore_unknown_fields: true
@@ -1298,7 +1381,7 @@ async function runScan(){
     if (currentExchange === 'moex')   payload.range = [0, 500];
   // Proxy üzerinden — kaynak gizli; BIST için halka açıklık verisi paralel çekilir
   const _isBist = currentExchange === 'bist';
-  const [res, _bistFloatRes] = await Promise.all([
+  const [resInit, _bistFloatRes] = await Promise.all([
     fetch('/api/scan?exchange=' + currentExchange, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1309,38 +1392,43 @@ async function runScan(){
 
     document.getElementById('prog').style.width = '70%';
 
-    const text = await res.text();
-    if(!res.ok) throw new Error(`Proxy hatası: HTTP ${res.status} — ${text.slice(0,200)}`);
-
-    let json;
-    try { json = JSON.parse(text); } catch(e) { throw new Error('Parse hatası: ' + text.slice(0,200)); }
-
-    // Eğer body string olarak geldiyse (eski proxy formatı) içini parse et
-    if(json.body && typeof json.body === 'string') {
-      try { json = JSON.parse(json.body); } catch(e) { throw new Error('Body parse hatası: ' + json.body.slice(0,200)); }
-    }
-
-    if(json.error) {
-      // Hatalı field varsa otomatik kaldır ve tekrar dene
-      const badField = json.error.match(/"([^"]+)"/)?.[1];
-      if (badField) {
-        const cols = payload.columns;
-        const idx = cols.indexOf(badField);
-        if (idx > -1) {
-          cols.splice(idx, 1);
-          // Tekrar dene
-          const exCfg2 = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
-          if (exCfg2.filters.length > 0) payload.filter = exCfg2.filters;
-          const res2 = await fetch('/api/scan?exchange=' + currentExchange, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-          const text2 = await res2.text();
-          const json2 = JSON.parse(text2);
-          if (json2.error) throw new Error('API (retry): ' + json2.error);
-          Object.assign(json, json2);
-        } else {
-          throw new Error('API: ' + json.error);
+    // Yanıtı çöz. Hata durumlarında kademeli telafi:
+    //  1) Hata mesajında kolon adı geçiyorsa o kolonu çıkar, tekrar dene (en fazla 6)
+    //  2) Teşhis edilemeyen hata → kanıtlanmış çekirdek kolon setiyle son bir deneme
+    let json = null;
+    {
+      let resCur = resInit, attempt = 0, coreFallbackDone = window._scanCoreColsOnly === true;
+      while (true) {
+        const text = await resCur.text();
+        let parsed = null;
+        try { parsed = JSON.parse(text); } catch(e) {}
+        if (parsed && parsed.body && typeof parsed.body === 'string') {
+          try { parsed = JSON.parse(parsed.body); } catch(e) {}
         }
-      } else {
-        throw new Error('API: ' + json.error);
+        const errMsg = (parsed && parsed.error) ? String(parsed.error)
+                     : (!resCur.ok ? ('HTTP ' + resCur.status + ' — ' + text.slice(0, 200))
+                     : (!parsed ? ('Parse hatası: ' + text.slice(0, 200)) : null));
+        if (!errMsg) { json = parsed; break; }
+
+        const badField = (errMsg.match(/"([^"]+)"/) || [])[1];
+        attempt++;
+        if (badField && payload.columns.indexOf(badField) > -1 && attempt <= 6) {
+          console.warn('[DeepFin] Kolon reddedildi, çıkarılıyor:', badField);
+          payload.columns.splice(payload.columns.indexOf(badField), 1);
+          // Kalıcı öğren: paylaşılan kolon listesinden de çıkar
+          const sharedIdx = _fullCols.indexOf(badField);
+          if (sharedIdx > -1) _fullCols.splice(sharedIdx, 1);
+        } else if (!coreFallbackDone) {
+          console.warn('[DeepFin] Tarama hatası, çekirdek kolonlarla yeniden deneniyor:', errMsg);
+          coreFallbackDone = true;
+          window._scanCoreColsOnly = true; // sonraki taramalar da çekirdek setle başlasın
+          payload.columns = _coreCols.slice();
+        } else {
+          throw new Error('API: ' + errMsg);
+        }
+        resCur = await fetch('/api/scan?exchange=' + currentExchange, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+        });
       }
     }
     if(!json.data || json.data.length === 0) {
@@ -1363,7 +1451,7 @@ async function runScan(){
       } catch(e) { console.warn('[DeepFin] bist-scan float verisi alınamadı:', e.message); }
     }
 
-    // Parse tarayıcı yanıtı — index bazlı, sıra garantili
+    // Tarama yanıtını parse et — index bazlı, sıra garantili
     const results = [];
     // CI map: response'dan gelen gerçek columns sırası (scan.js'nin safeCols filtrelemesi
     // sırayı bozabilir). Yoksa client listesine fallback.
@@ -1406,6 +1494,22 @@ async function runScan(){
       const perfW      = g('Perf.W');
       const floatPct   = g('float_shares_outstanding_percent');
       const rsi14      = g('RSI');
+      const perf1m     = g('Perf.1M');
+      const high52w    = g('price_52_week_high');
+      const low52w     = g('price_52_week_low');
+      const avgVol10d  = g('average_volume_10d_calc');
+      const relVol     = g('relative_volume_10d_calc');
+      const sma50      = g('SMA50');
+      const sma200     = g('SMA200');
+      const macdV      = g('MACD.macd');
+      const macdSig    = g('MACD.signal');
+      const adx        = g('ADX');
+      const adxPlusDi  = g('ADX+DI');
+      const adxMinusDi = g('ADX-DI');
+      const bbLower    = g('BB.lower');
+      const stochK     = g('Stoch.K');
+      const stochD     = g('Stoch.D');
+      const beta1y     = g('beta_1_year');
 
       // Sembol formatı: "BIST:THYAO" → "THYAO"
       const rawSym = row.s || '';
@@ -1532,20 +1636,36 @@ async function runScan(){
           return mapped;
         })(),
         sectorRaw: sector || null,
-        '52WeekHigh': high1m || null,
-        '52WeekLow': low1m || null,
+        // Gerçek 52 haftalık zirve/dip; veri yoksa 1 aylık değere düş
+        '52WeekHigh': high52w || high1m || null,
+        '52WeekLow': low52w || low1m || null,
+        high1m: high1m || null,
+        low1m:  low1m  || null,
         piotroski: g('piotroski_f_score') !== null ? Math.round(g('piotroski_f_score')) : null,
-        fromHigh: (high1m && close && high1m > 0) ? ((close - high1m) / high1m * 100) : null,
-        fromLow:  (low1m  && close && low1m  > 0) ? ((close - low1m)  / low1m  * 100) : null,
+        fromHigh: (function(){ var h = high52w || high1m; return (h && close && h > 0) ? ((close - h) / h * 100) : null; })(),
+        fromLow:  (function(){ var l = low52w  || low1m;  return (l && close && l > 0) ? ((close - l) / l * 100) : null; })(),
         techRating: techRating !== null ? techRating : null,
         maRating:   maRating   !== null ? maRating   : null,
         oscRating:  oscRating  !== null ? oscRating  : null,
+        perf1m:     perf1m     !== null ? perf1m     : null,
         perf3m:     perf3m     !== null ? perf3m     : null,
         perf6m:     perf6m     !== null ? perf6m     : null,
         perfY:      perfY      !== null ? perfY      : null,
         perfW:      perfW      !== null ? perfW      : null,
         floatPct:   floatPct   !== null ? floatPct   : (_bistFloatMap[symbol] ?? null),
         rsi14:      rsi14      !== null ? rsi14      : null,
+        avgVol10d:  avgVol10d  !== null ? avgVol10d  : null,
+        relVol:     relVol     !== null ? relVol     : null,
+        beta:       beta1y     !== null ? beta1y     : null,
+        adx:        adx        !== null ? adx        : null,
+        adxDiDiff:  (adxPlusDi !== null && adxMinusDi !== null) ? (adxPlusDi - adxMinusDi) : null,
+        pctAboveSma200: (sma200 && close && sma200 > 0) ? ((close - sma200) / sma200 * 100) : null,
+        smaTrend:   (sma50 !== null && sma200 && sma200 > 0) ? ((sma50 - sma200) / sma200 * 100) : null,
+        macd:       macdV !== null ? macdV : null,
+        macdHist:   (macdV !== null && macdSig !== null) ? (macdV - macdSig) : null,
+        bbDist:     (bbLower && close && bbLower > 0) ? ((close - bbLower) / bbLower * 100) : null,
+        stochK:     stochK !== null ? stochK : null,
+        stochKD:    (stochK !== null && stochD !== null) ? (stochK - stochD) : null,
         peg: (function() {
           if (pe && epsG && epsG > 0) return pe / epsG;
           return null;
@@ -1577,18 +1697,44 @@ async function runScan(){
     const _exm = EXCHANGE_META[currentExchange]||EXCHANGE_META.bist;
 
     updateExchangeBadge();
-    applyAndRender(window._chipSpecial || null);
+    _pendingScanResult = window._chipSpecial || null;
     window._chipSpecial = null;
 
   } catch(err) {
+    hideQuickScanPill();
     showState('errstate');
     console.error('[scan]', err.message);
-    document.getElementById('errmsg').textContent = 'Veri alınamadı — bağlantıyı kontrol edip tekrar deneyin.';
+    var _em = document.getElementById('errmsg');
+    _em.textContent = 'Veri alınamadı — bağlantıyı kontrol edip tekrar deneyin.';
+    // Teşhis detayı (küçük, soluk satır) — destek bildirimleri için
+    var _ed = document.getElementById('errdetail');
+    if (!_ed) {
+      _ed = document.createElement('p');
+      _ed.id = 'errdetail';
+      _ed.style.cssText = 'color:var(--muted2);font-size:10px;margin-top:6px;max-width:420px;word-break:break-word;';
+      _em.parentNode.appendChild(_ed);
+    }
+    _ed.textContent = String(err.message || '').slice(0, 180);
   } finally {
+    var _isSuccess   = (_pendingScanResult !== undefined);
+    var _spec        = _pendingScanResult;
+    _pendingScanResult = undefined;
+    _psvScanFilterCount = 0;
     _scanRunning = false;
     btn.disabled = false;
-    stopScanEta();
     document.getElementById('stopbtn').style.display = 'none';
+    var _remaining = _isSuccess ? Math.max(0, _scanMinMs - (Date.now() - scanStartTime)) : 0;
+    if (_remaining > 0) {
+      setTimeout(function() {
+        stopScanEta();
+        hideQuickScanPill();
+        applyAndRender(_spec);
+      }, _remaining);
+    } else {
+      stopScanEta();
+      hideQuickScanPill();
+      if (_isSuccess) applyAndRender(_spec);
+    }
   }
 }
 
@@ -1597,17 +1743,21 @@ async function runScan(){
 // ═══════════════════════════════════════════
 const PRESETS = {
   // Klasik değer yatırımı: F/K<15, PD/DD<2, temettü ödeyen
-  value:    { label: 'Değer Hisseleri',    desc: 'Değer yatırımcısı için asıl mesele şirketin gerçek değeri ile piyasa fiyatı arasındaki açığı bulmaktır. Kazancına göre ucuz, borsa değeri defter değerine yakın ve temettü ödeyen şirketler aranır. Piyasa bu farkı er ya da geç kapatır — sabır şart.', filters: {pe_max:15, pb_max:2, div_min:2} },
+  value:    { label: 'Değer Hisseleri',    desc: 'Kazancına göre ucuz, defter değerine yakın fiyatlı ve temettü ödeyen şirketleri bulur. F/K 15 altı, PD/DD 2 altı, temettü %2 üzeri.', filters: {pe_max:15, pb_max:2, div_min:2} },
   // Büyüme: kazanç+gelir ivmesi, güçlü özkaynak getirisi
-  growth:   { label: 'Büyüme Hisseleri',   desc: 'Büyüme yatırımcısı için bugünkü fiyat değil yarınki büyüklük önemlidir. Hem satışları hem karları hızla artan, özkaynaklarını verimli kullanan şirketler aranır. Kısa vadede pahalı görünebilir ama büyüme sürdüğü sürece fiyat da onu takip eder.', filters: {earng_min:20, revg_min:15, roe_min:15} },
+  growth:   { label: 'Büyüme Hisseleri',   desc: 'Satışları ve karları hızla büyüyen, özkaynağını verimli kullanan şirketleri bulur. Kazanç büyümesi %20, gelir büyümesi %15, ROE %15 üzeri.', filters: {earng_min:20, revg_min:15, roe_min:15} },
   // Temettü: yüksek verim, sürdürülebilir ödeme kapasitesi
-  dividend: { label: 'Temettü Hisseleri',  desc: 'Temettü yatırımcısı için hisse fiyatının dalgalanması değil, düzenli nakit akışı önemlidir. Yüksek temettü dağıtan, borcu makul, ödeme kapasitesi güçlü şirketler aranır. Hisse değer kazanmasa bile temettü geliri başlı başına bir getiridir.', filters: {div_min:4, de_max:80, cr_min:1.2} },
+  dividend: { label: 'Temettü Hisseleri',  desc: 'Yüksek ve sürdürülebilir temettü ödeyen, borcu makul şirketleri bulur. Temettü %4 üzeri, borç/özkaynak %80 altı, cari oran 1.2 üzeri.', filters: {div_min:4, de_max:80, cr_min:1.2} },
   // Kalite: Buffett/Munger "wonderful company at fair price"
-  quality:  { label: 'Kaliteli Şirketler', desc: 'Kalite yatırımcısı için hangi piyasada olursa olsun ayakta kalan şirket önemlidir. Özkaynak getirisi yüksek, hem brüt hem net kar marjı güçlü, borcu az şirketler aranır. Kriz dönemlerinde bu tür şirketler en az hasar görür.', filters: {roe_min:20, margin_min:15, gross_min:35, de_max:80, cr_min:1.5} },
+  quality:  { label: 'Kaliteli Şirketler', desc: 'Yüksek karlılık ve düşük borçla her koşulda ayakta kalan şirketleri bulur. ROE %20, net marj %15, brüt marj %35 üzeri.', filters: {roe_min:20, margin_min:15, gross_min:35, de_max:80, cr_min:1.5} },
   // Az borçlu: Buffett "borçsuz şirket" prensibi
-  lowdebt:  { label: 'Az Borçlu Şirketler', desc: 'Borç düşmanı yatırımcı için ekonomi kötüye gittiğinde en başta borçlu şirketler çöker. Toplam borcu özkaynaklarının küçük bir kısmı olan, elinde bol nakit bulunduran şirketler aranır. Faiz baskısı yok, kriz dayanımı yüksek.', filters: {de_max:30, cr_min:2} },
+  lowdebt:  { label: 'Az Borçlu Şirketler', desc: 'Borcu çok düşük, nakdi güçlü, krize dayanıklı şirketleri bulur. Borç/özkaynak %30 altı, cari oran 2 üzeri.', filters: {de_max:30, cr_min:2} },
   // Momentum: güçlü ivme, hem büyüme hem fiyat güç
-  momentum: { label: 'Momentum Hisseleri', desc: 'Momentum yatırımcısı için hem satışları hem karları aynı anda hızlanan şirket nadir ve değerlidir. İkisi birlikte artıyorsa şirket gerçekten ivme kazanıyor demektir. Piyasa bunu fark edince fiyat da bunu yansıtmaya başlar.', filters: {revg_min:20, earng_min:20} }
+  momentum: { label: 'Momentum Hisseleri', desc: 'Satış ve kar büyümesi aynı anda ivmelenen şirketleri bulur. Her ikisi de %20 üzeri.', filters: {revg_min:20, earng_min:20} },
+  // Boyut: kurumların radarına girmemiş küçük ama karlı şirketler
+  smallcap: { label: 'Küçük Şirketler',   desc: 'Kurumların radarına girmemiş küçük ama karlı şirketleri bulur. Piyasa değeri 500M dolar altı, ROE %15 ve kazanç büyümesi %15 üzeri.', filters: {mc_max:500, roe_min:15, earng_min:15} },
+  // Boyut: oturmuş, güvenilir devler
+  megacap:  { label: 'Dev Şirketler',     desc: 'Oturmuş, güvenilir büyük şirketleri bulur. Piyasa değeri 10 milyar dolar üzeri, ROE %12 üzeri ve temettü ödeyen.', filters: {mc_min:10000, roe_min:12, div_min:1} }
 };
 
 // Teknik Analiz Presetleri
@@ -1619,64 +1769,118 @@ const TECH_PRESETS = {
 
   breakout: {
     label: 'Breakout',
-    desc: 'Kırılım takipçisi için uzun süre dar bir aralıkta sıkışan ve ardından güçlü bir hareketle o aralığı kıran hisse ilgi çeker. Hacimin de artması bu kırılımın sahte olmadığının işareti. Trendin tam başlangıç noktasını yakalamak için.',
-    filters: { from_high_max: -5, chg_min: 1.5, vol_min: 0.5, tech_rating_min: 0.1 }
+    desc: '52 haftalık zirvesinin dibinde hacimli yukarı hareket yapan hisseleri bulur. Zirveye %5 mesafe, günlük %1.5 üzeri artış.',
+    filters: { from_high_min: -5, chg_min: 1.5, vol_min: 0.5, tech_rating_min: 0.1 }
   },
 
   oversold: {
     label: 'Aşırı Satış',
-    desc: 'Dip avcısı için herkes satarken almak cesaret ister ama fırsat da getirir. Sert bir düşüşün ardından teknik göstergeler aşırı satılmış bölgesine giren hisseler aranır. Temel değerleri hâlâ sağlamsa toparlanma potansiyeli taşır.',
+    desc: 'Sert düşüş sonrası aşırı satılmış bölgeye giren hisseleri bulur. RSI 35 altı, zirveden %20 üzeri uzaklık.',
     filters: { from_high_max: -20, chg_min: 0, rsi_max: 35 }
   },
 
   nearHigh: {
-    label: 'ATH Yakın',
-    desc: 'Trend takipçisi için zirvesine yakın olmak genellikle trendin devam ettiğinin işareti. Son bir ayın en yüksek fiyatına çok yakın, orta vadede de kazanmış hisseler aranır. Güçlü trendde olan hisseyi yakalamak isteyenler için.',
-    filters: { from_high_max: -3, perf3m_min: 5 }
+    label: '52H Zirve',
+    desc: '52 haftalık zirvesine yakın seyreden güçlü trenddeki hisseleri bulur. Zirveye %5 mesafe, 3 aylık getiri %5 üzeri.',
+    filters: { from_high_min: -5, perf3m_min: 5 }
   },
 
   pullback: {
     label: 'Düzeltme',
-    desc: 'Düzeltme avcısı için güçlü bir trendin içindeki kısa süreli geri çekilme, hem trend güçlü hem fiyat daha makul anlamına gelir. Zirveden sınırlı geri çekilmiş, yıllık dibinden ise uzaklaşmış hisseler aranır. Trende daha iyi fiyattan girmek için.',
-    filters: { from_high_max: -10, from_low_min: 10, perf6m_min: 10 }
+    desc: 'Güçlü trendde kısa geri çekilme yaşayan hisseleri bulur. Zirveden %5-15 geride, 6 aylık getiri %15 üzeri.',
+    filters: { from_high_min: -15, from_high_max: -5, perf6m_min: 15 }
   },
 
   strongDay: {
     label: 'Günlük Hareket',
-    desc: 'Kısa vadeli takipçi için bugün ciddi miktarda yükselen ve normalden fazla el değiştiren hisse dikkat çeker. Arkasında bir haber, açıklama ya da büyük bir alım olabilir. Ani kısa vadeli bir hareketin başlangıcını yakalamak için.',
+    desc: 'Bugün yüksek hacimle sert yükselen hisseleri bulur. Günlük %2 üzeri artış, 0.5M üzeri hacim.',
     filters: { chg_min: 2, vol_min: 0.5 }
   },
 
   highVolume: {
     label: 'Akıllı Para',
-    desc: 'Kurumsal akışı izleyen yatırımcı için normalden çok daha fazla işlem hacmi önemli bir sinyal taşır. Bu ölçekte hacim genellikle büyük kurumsal alıcıların pozisyon açtığını gösterir. Akıllı paranın nereye gittiğini izlemek isteyenler için.',
-    filters: { vol_min: 5, chg_min: 0 }
+    desc: 'Normalinin en az 2 katı hacimle yükselen hisseleri bulur. Göreli hacim artışı kurumsal ilginin en güvenilir işaretidir.',
+    filters: { rel_vol_min: 2, chg_min: 0 }
   },
-
-  // ── YENİ ──────────────────────────────────────────────────────────────
 
   techBuy: {
     label: 'Güçlü Sinyal',
-    desc: 'Teknik analist için tek bir indikatör yeterli değil, hepsinin aynı yönü göstermesi lazım. RSI, MACD, Stochastic ve hareketli ortalamalar dahil 26 göstergenin büyük çoğunluğu alım sinyali veriyor. En kapsamlı teknik onay.',
+    desc: '26 teknik göstergenin çoğunluğunun alım sinyali verdiği hisseleri bulur. Teknik skor 0.5 üzeri.',
     filters: { tech_rating_min: 0.5 }
   },
 
   momentum3m: {
     label: '3A Momentum',
-    desc: 'Orta vadeli momentum takipçisi için kısa vadede değil, birkaç aydır güçlü olan hisse daha güvenilir bir sinyal verir. Son üç ve altı ayda piyasanın önünde giden hisseler aranır. Her iki dönemde de güçlü olan momentum devam eder.',
+    desc: 'Hem 3 hem 6 aydır piyasanın önünde giden hisseleri bulur. 3 aylık %15, 6 aylık %20 üzeri getiri.',
     filters: { perf3m_min: 15, perf6m_min: 20 }
   },
 
   trendFollow: {
     label: 'Trend Takibi',
-    desc: 'Trend takipçisi için dip geride kalmış ve trendi yukarı olan hisse en güçlü adaydır. Yıllık en düşük seviyesinden önemli ölçüde yükseliş yapmış ve bu kazancını koruyan hisseler aranır. Düşükten uzak, güçlü kalmaya devam eden profil.',
+    desc: '52 haftalık dibinden uzaklaşmış, kazancını koruyan hisseleri bulur. Dipten %25 üzeri, 6 aylık getiri %10 üzeri.',
     filters: { from_low_min: 25, perf6m_min: 10 }
   },
 
   rsiBounce: {
     label: 'Toparlanıyor',
-    desc: 'Toparlanma avcısı için aşırı satılmış bölgeden çıkmış ama henüz pahalı bölgeye girmemiş hisse iyi bir konumda. Dibi geride bırakmış, fiyatı hâlâ makul seviyede. Toparlanmanın erken aşamasını yakalamak için.',
+    desc: 'Aşırı satıştan çıkıp toparlanmanın erken aşamasında olan hisseleri bulur. RSI 30-50 arası, dipten %3 üzeri.',
     filters: { rsi_min: 30, rsi_max: 50, from_low_min: 3 }
+  },
+
+  // ── GÖSTERGE TABANLI ──────────────────────────────────────────────────
+
+  goldenCross: {
+    label: 'Golden Cross',
+    desc: 'Uzun vadeli yapısal yükseliş trendindeki hisseleri bulur. Fiyat 200 günlük ortalamanın, 50 günlük ortalama 200 günlüğün üzerinde.',
+    filters: { above_sma200_min: 0, sma_trend_min: 0.5 }
+  },
+
+  macdReversal: {
+    label: 'MACD Dönüşü',
+    desc: 'Düşüş sonrası yeni yükseliş sinyali veren hisseleri bulur. MACD sinyal çizgisini yukarı kesmiş, henüz sıfırın altında.',
+    filters: { macd_hist_min: 0, macd_max: 0 }
+  },
+
+  adxTrend: {
+    label: 'Güçlü Trend',
+    desc: 'Gücü ölçülebilir, alıcı yönü baskın trendleri bulur. ADX 25 üzeri, +DI eksi DI üzerinde.',
+    filters: { adx_min: 25, adx_di_diff_min: 0 }
+  },
+
+  bbBounce: {
+    label: 'Bollinger Dibi',
+    desc: 'Alt banda gerileyip ortalamaya dönüş potansiyeli taşıyan hisseleri bulur. Fiyat alt bandın %3 yakınında, RSI 40 altı.',
+    filters: { bb_dist_max: 3, rsi_max: 40 }
+  },
+
+  stochReversal: {
+    label: 'Stokastik Dönüş',
+    desc: 'Aşırı satım bölgesinden yukarı dönen hisseleri bulur. %K 25 altı ve %D çizgisinin üzerine çıkmış.',
+    filters: { stoch_k_max: 25, stoch_kd_min: 0 }
+  },
+
+  maConfirm: {
+    label: 'Ortalama Onayı',
+    desc: '15 hareketli ortalamanın çoğunluğunun üzerinde işlem gören hisseleri bulur. Ortalama skoru 0.5 üzeri.',
+    filters: { ma_rating_min: 0.5 }
+  },
+
+  oscConfirm: {
+    label: 'Osilatör Onayı',
+    desc: 'Momentum osilatörlerinin alım bölgesinde olduğu hisseleri bulur. Osilatör skoru 0.1 üzeri.',
+    filters: { osc_rating_min: 0.1 }
+  },
+
+  lowBeta: {
+    label: 'Defansif',
+    desc: 'Piyasadan az dalgalanan temettülü hisseleri bulur. Beta 0.8 altı, temettü %1 üzeri.',
+    filters: { beta_max: 0.8, div_min: 1 }
+  },
+
+  ytdLeader: {
+    label: '1A Momentum',
+    desc: 'Son bir ayda güçlü ivme kazanan hisseleri bulur. 1 aylık getiri %10, 3 aylık getiri %10 üzeri.',
+    filters: { perf1m_min: 10, perf3m_min: 10 }
   },
 
 };
@@ -1694,89 +1898,89 @@ const GURUS = {
 
   ackman: {
     label: 'Bill Ackman — Activist',
-    desc: 'Ackman için kalite şart ama piyasanın henüz fark etmemesi de şart. Özkaynak getirisi ve net kar marjı yüksek, serbest nakit akışı güçlü, borcu makul, kazancına göre ucuz kalmış şirketlere yatırım yapar. Tahmin edilebilir iş modeli ve dominant pazar pozisyonu öncelikli kriterlerdir.',
+    desc: 'Karlı, nakit üreten ama ucuz kalmış kaliteli şirketleri bulur. ROE %15, net marj %10 üzeri, F/K 20 altı.',
     filters: {roe_min:15, margin_min:10, de_max:80, cr_min:1.2, pe_max:20}
   },
   ark: {
     label: 'Cathie Wood / ARK',
-    desc: 'Cathie Wood için bugünkü kâr değil yarınki pazar büyüklüğü önemlidir. Yapay zeka, biyoteknoloji, fintech gibi geleceğin teknolojilerini geliştiren şirketler aranır. Bugün zarar ediyor olabilir ama 5-10 yıl içinde piyasayı dönüştürme potansiyeli taşımalı.',
+    desc: 'Yüksek büyüme potansiyelli yenilikçi teknoloji şirketlerini bulur. Gelir büyümesi %30 üzeri.',
     filters: {revg_min:30, cr_min:1}
   },
   buffett: {
     label: 'Warren Buffett',
-    desc: 'Buffett için rakiplerin kolayca kopyalayamadığı iş modeli her şeyden önce gelir. Hem brüt hem net kar marjı yüksek, özkaynak getirisi güçlü, borcu az. Not: Gerçek metodoloji 10 yıllık tutarlı EPS büyümesi ve DCF tabanlı içsel değer hesabı gerektirir; bu filtreler nicel bir ön eleme sunmaktadır.',
+    desc: 'Yüksek karlılık ve düşük borca sahip kaliteli şirketleri bulur. ROE %20, net marj %20, brüt marj %40 üzeri, F/K 5-25 arası.',
     filters: {pe_min:5, pe_max:25, roe_min:20, margin_min:20, gross_min:40, de_max:50, cr_min:1.5}
   },
   einhorn: {
     label: 'David Einhorn — Deep Value',
-    desc: 'Einhorn için piyasanın görmezden geldiği şirket en büyük fırsattır. Kazancına göre gerçekten ucuz, serbest nakit akışı güçlü, borcu az ve kârlı şirketlere yatırım yapar. Katalizör beklentisi (yeniden yapılanma, açıklama olayı) asıl tetikleyicidir.',
+    desc: 'Piyasanın gözardı ettiği ucuz ama karlı şirketleri bulur. F/K 15 altı, ROE %10 üzeri, düşük borç.',
     filters: {pe_max:15, de_max:50, cr_min:1.5, margin_min:8, roe_min:10}
   },
   fisher: {
     label: 'Philip Fisher — Scuttlebutt',
-    desc: 'Fisher\'ın yaklaşımı temelde niteseldir (15 maddelik scuttlebutt analizi). Bu filtreler, onun büyüyen ve kârlı şirket anlayışının nicel proxyleridir: satışları ve karları istikrarlı büyüyen, hem brüt hem net kar marjı güçlü şirketler. Gerçek metodoloji yönetim kalitesi ve Ar-Ge yetkinliğini ölçmeyi gerektirir.',
+    desc: 'Satış ve karı istikrarlı büyüyen, yüksek marjlı şirketleri bulur. Büyüme %15, brüt marj %35, net marj %12 üzeri.',
     filters: {revg_min:15, earng_min:15, gross_min:35, margin_min:12, de_max:60}
   },
   graham: {
     label: 'Benjamin Graham',
-    desc: 'Graham için ucuz olmak yetmez — güvende olmak da şart. "The Intelligent Investor"ın Savunmacı Yatırımcı kriterleri: F/K < 15, F/DD < 1.5, cari oran > 2, kesintisiz temettü. Kazancına ve defter değerine göre gerçekten ucuz, borcu az, likit bilançolu şirketleri arar.',
+    desc: 'Savunmacı yatırımcı kriterleriyle ucuz ve güvenli şirketleri bulur. F/K 15 altı, F/DD 1.5 altı, cari oran 2 üzeri, temettü ödeyen.',
     filters: {pe_max:15, pb_max:1.5, de_max:50, cr_min:2, div_min:1}
   },
   greenblatt: {
     label: 'Joel Greenblatt — Magic Formula',
-    desc: 'Magic Formula iki metriği kombine eder: Kazanç Verimi = EBIT/EV (ucuzluk) ve ROIC = EBIT/(net işletme sermayesi + sabit varlıklar) (kalite). Gerçek uygulama her iki metrikte tüm hisseleri sıralar, kombine skoru en yüksek 20-30\'unu seçer. Not: EV/EBIT sistemde hesaplanamadığından F/K kazanç verimi proxy\'i, ROE ise ROIC proxy\'i olarak kullanılmaktadır. Orijinal formülde borç/cari oran kriteri yoktur.',
+    desc: 'Magic Formula yaklaşımıyla hem ucuz hem yüksek getirili şirketleri bulur. ROE %25 üzeri, F/K 12 altı.',
     filters: {roe_min:25, pe_max:12}
   },
   icahn: {
     label: 'Carl Icahn — Activist Value',
-    desc: 'Icahn için nakit bol ama fiyat düşükse harekete geçme zamanıdır. Borsa değeri defter değerine yakın, kazancına göre ucuz şirketlere yatırım yapar. Asıl hedef: zayıf yönetim, gizli varlıklar veya fazla nakit barındıran, aktivisizm potansiyeli taşıyan şirketler.',
+    desc: 'Defter değerine yakın fiyatlı, nakit zengini şirketleri bulur. F/DD 1.5 altı, F/K 12 altı, temettü ödeyen.',
     filters: {pb_max:1.5, pe_max:12, de_max:60, cr_min:1.5, div_min:1}
   },
   klarman: {
     label: 'Seth Klarman — Margin of Safety',
-    desc: 'Klarman için hata payı büyük olmak şarttır — Graham\'dan bile daha temkinli. Kazancına ve defter değerine göre çok ucuz, borcu minimal, nakit güçlü şirketlere yatırım yapar. Not: Klarman sabit eşik vermez; içsel değere göre iskonto (NAV, DCF, likidite değeri) asıl kriterdir.',
+    desc: 'Geniş güvenlik marjıyla çok ucuz ve sağlam bilançolu şirketleri bulur. F/K 10 altı, F/DD 1.2 altı, borç minimal.',
     filters: {pe_max:10, pb_max:1.2, de_max:40, cr_min:2, margin_min:5}
   },
   lynch: {
     label: 'Peter Lynch — GARP',
-    desc: 'Lynch için büyüyen ama buna rağmen hâlâ ucuz olan şirket nadir ve değerlidir. PEG < 1 asıl kriter: büyüme hızı F/K oranını geçiyorsa ucuz sayılır. Fast-grower tanımı %20+ yıllık EPS büyümesidir.',
+    desc: 'Büyüme hızına göre ucuz kalmış (GARP) şirketleri bulur. EPS büyümesi %20 üzeri, PEG 1.5 altı önceliklendirilir.',
     filters: {pe_min:5, pe_max:35, earng_min:20, de_max:80, cr_min:1},
     special: 'peg'
   },
   minervini: {
     label: 'Mark Minervini — SEPA',
-    desc: 'Minervini için hem temel hem teknik aynı anda güçlü olmalı. Karı hızla artıyor, özkaynak getirisi ve net kar marjı güçlü, borcu kontrollü şirketlere yatırım yapar. Not: SEPA\'nın kalbi Trend Template filtresidir (200MA üstü, yükselen MA, güçlü RS) — teknik tarama ile tamamlanmalıdır.',
+    desc: 'Temel verileri güçlü, kar ivmesi yüksek şirketleri bulur. EPS büyümesi %25, ROE %17 üzeri.',
     filters: {earng_min:25, roe_min:17, margin_min:10, de_max:100, cr_min:1}
   },
   munger: {
     label: 'Charlie Munger — Quality Compounder',
-    desc: 'Munger için adil fiyata mükemmel şirket, ucuz fiyata vasat şirketten çok daha iyidir. Brüt ve net kar marjı çok yüksek, özkaynak getirisi güçlü, neredeyse borçsuz şirketler arar. Geniş ve dayanıklı ekonomik hendek (moat) ile güçlü fiyatlama gücü temel kriterleridir.',
+    desc: 'Çok yüksek marjlı, neredeyse borçsuz kaliteli şirketleri bulur. Brüt marj %50, ROE %20 üzeri, borç/özkaynak %30 altı.',
     filters: {gross_min:50, roe_min:20, de_max:30, margin_min:20, cr_min:1.5}
   },
   oneil: {
     label: "William O'Neil — CAN SLIM",
-    desc: "O'Neil için hem temeller hem fiyat aynı yönde hareket etmeli. C: çeyreklik EPS büyümesi, A: yıllık kazanç, N: yeni katalizör, S: arz/talep. Not: CAN SLIM'in L (liderlik/RS), I (kurumsal sponsorluk) ve M (piyasa yönü) bileşenleri teknik analiz gerektirir; bu filtreler temel ön elemedir.",
+    desc: "CAN SLIM kriterleriyle kazanç ve satış ivmesi güçlü şirketleri bulur. EPS ve gelir büyümesi %25 üzeri, ROE %17 üzeri.",
     filters: {earng_min:25, revg_min:25, roe_min:17, de_max:100, cr_min:1}
   },
   oshaughnessy: {
     label: "O'Shaughnessy — Cornerstone Growth",
-    desc: "O'Shaughnessy'nin 'What Works on Wall Street' kitabındaki Cornerstone Growth stratejisi: F/S < 1.5 (değer filtresi) + EPS büyümesi pozitif (temel güç) + güçlü 12 aylık fiyat momentumu (ivme). Cornerstone Value farklı bir stratejidir: yüksek temettü verimi sıralamasına dayanır; ikisi aynı anda uygulanmaz. Not: 12 aylık RS sıralaması için 6 aylık performans proxy olarak kullanılmaktadır.",
+    desc: "Düşük F/S oranını büyüme ve momentumla birleştirir. F/S 1.5 altı, 6 aylık getiri %15 üzeri.",
     filters: {ps_max:1.5, earng_min:5, perf6m_min:15}
   },
   piotroski: {
     label: 'Piotroski F-Score',
-    desc: 'Piotroski F-Score, düşük F/DD hisseler arasında kaliteyi ölçer (P/B < 1 giriş koşulu). 9 binary sinyalin toplamı: kârlılık (ROA, OCF, değişim), kaldıraç (borç azalıyor, cari oran artıyor, seyreltme yok), verimlilik (brüt marj ve varlık devir hızı artıyor). 7–9 arası güçlü, 0–2 arası zayıf.',
+    desc: 'Düşük F/DD hisseler arasında finansal sağlamlığı yüksek olanları bulur. F-Score 7-9 arası önceliklendirilir, F/DD 1 altı.',
     filters: {pb_max:1, roe_min:3, cr_min:1},
     special: 'piotroski'
   },
   schloss: {
     label: 'Walter Schloss — Deep Value',
-    desc: 'Schloss için strateji son derece basit: defter değerinin altında, borcu kontrollü, temettü ödeyen hisseyi al ve bekle. 45 yılda bunu yaparak yıllık %15\'in üzerinde getiri elde etti. Borçsuzluğu tercih etti; içeriden sahiplik (insider ownership) ve uzun şirket geçmişi kritik ek kriterlerdir.',
+    desc: 'Defter değerinin altında, temettü ödeyen klasik ucuz hisseleri bulur. F/DD 1 altı, F/K 12 altı, temettü %2 üzeri.',
     filters: {pb_max:1, pe_max:12, de_max:100, div_min:2, cr_min:1.5}
   },
   soros: {
     label: 'George Soros — Reflexivity',
-    desc: 'Soros döviz, tahvil ve emtia üzerine işlem yapan bir makro traderdir — bireysel hisse seçmez. Reflexivity teorisi: güçlü fiyat hareketi beklentileri değiştirir, değişen beklentiler hareketi güçlendirir. Bu filtreler teorinin hisse yorumudur: hem 3 hem 6 aylık güçlü momentum + 26 indikatörlü teknik onay. Temel finansal filtreler bu stratejiye ait değildir.',
+    desc: 'Güçlü fiyat momentumunu teknik onayla birleştirir. 3 aylık %10, 6 aylık %20 üzeri getiri, teknik skor 0.3 üzeri.',
     filters: {perf3m_min:10, perf6m_min:20, tech_rating_min:0.3}
   },
 
@@ -1784,49 +1988,49 @@ const GURUS = {
 
   neff: {
     label: 'John Neff — Windsor Fund',
-    desc: 'Neff, 30+ yılda S&P 500\'ü yıllık +3% geçti. Metodoloji "John Neff on Investing" (1999) ve AAII belgelerinden: P/E piyasanın %40-60\'ı, kazanç ve satış büyümesi %7-20 aralığında — %20 üstü çok riskli. Temettü dahil toplam getiri / F/K oranı (temettü ayarlı PEG) piyasa medyanının yarısı altında olmalı. Pozitif serbest nakit akışı ve sektör medyanı üstü faaliyet marjı zorunlu.',
+    desc: 'Düşük F/K ile makul büyüme ve temettüyü birleştirir. F/K 12 altı, büyüme %7 üzeri, temettü %2 üzeri.',
     filters: {pe_max:12, earng_min:7, revg_min:7, div_min:2, margin_min:8}
   },
 
   zweig: {
     label: 'Martin Zweig — Winning on Wall Street',
-    desc: '"Winning on Wall Street" (1986) kaynaklı GARP hibrit: yıllık EPS büyümesi %20+ (en az 4 yıl tutarlı). P/E piyasa ortalamasının 3 katını ve mutlak 43 sınırını geçemez — büyüme için fazla ödeme edilmez. Satış büyümesi EPS büyümesini desteklemeli: maliyet kısıntısıyla yapay kazanç büyümesi elenir. Borç oranı sektör ortalamasının altında. Zweig GARP yatırım tarzının öncülerinden biri.',
+    desc: 'Yüksek kazanç büyümesini makul fiyatla birleştirir. EPS büyümesi %20, satış büyümesi %15 üzeri, F/K 30 altı.',
     filters: {earng_min:20, revg_min:15, pe_max:30, de_max:50}
   },
 
   dreman: {
     label: 'David Dreman — Contrarian',
-    desc: '"Contrarian Investment Strategies" (1998, 2012) kaynaklı: piyasanın en gözden düşmüş %20\'lik dilimine giren hisseler — P/E, P/CF, P/B veya P/D\'de en az ikisinde alt %20. Dreman bu dilimin yıllık +6-7% fazla getiri sağladığını istatistiksel olarak kanıtladı. 1500 büyük şirket evreni, EPS büyümesi S&P 500 üzerinde: ucuz ama batan değil, gözden düşmüş ama kârlı hisse.',
+    desc: 'Piyasanın en gözden düşmüş ama karlı hisselerini bulur. F/K 12 altı, F/DD 1.5 altı, EPS büyümesi pozitif.',
     filters: {pe_max:12, pb_max:1.5, earng_min:5}
   },
 
   kfisher: {
     label: 'Kenneth Fisher — PSR',
-    desc: '"Super Stocks" (1984) kaynaklı: F/S (Fiyat/Satış) oranı P/E\'nin göremediği değeri yakalar — satışlar kazançtan çok daha istikrarlıdır. Normal hisseler için F/S ≤ 0.75 en iyi, ≤ 1.5 iyi; F/S > 3 asla alınmaz (tek sabit kural). 3 yıllık ortalama net marj ≥ %5, D/Ö ≤ %40, uzun vadeli EPS büyümesi ≥ %15. Teknoloji ve medikal için F/Ar-Ge < 10 ek filtredir.',
+    desc: 'Düşük Fiyat/Satış oranıyla istikrarlı karlı şirketleri bulur. F/S 1.5 altı, net marj %5, EPS büyümesi %15 üzeri.',
     filters: {ps_max:1.5, margin_min:5, de_max:40, earng_min:15}
   },
 
   tsmith: {
     label: 'Terry Smith — Fundsmith',
-    desc: '"İyi şirket al, fazla ödeme yapma, hiçbir şey yapma" — Fundsmith yıllık mektuplarından: Sermaye Getirisi (ROCE) > %15, gerçek portföyde %32\'ye ulaşıyor. Brüt marj > %40, nakit dönüşüm ≥ %95, faiz karşılama > 10×, FCF büyümesi > %5. Net marj ≥ %15 kaliteli iş modeli göstergesi. Banka, emtia, kamu hizmetleri, telekomdan kaçınır. "İngiltere\'nin Buffett\'ı."',
+    desc: 'Yüksek sermaye getirili, yüksek marjlı kaliteli şirketleri bulur. ROE %15, brüt marj %40, net marj %15 üzeri.',
     filters: {roe_min:15, gross_min:40, margin_min:15, de_max:50}
   },
 
   graham_ncav: {
     label: 'Graham — Net-Net (NCAV)',
-    desc: '"Security Analysis" (1934)\'dan en saf değer ekranı: NCAV = Dönen Varlıklar − Toplam Borç. Hisse fiyatı NCAV\'ın %66.7\'sinden düşük olmalı — duran varlıklara sıfır değer verilse bile ucuz. F/DD < 0.67 bu koşulun yaklaşımıdır. Cari oran ≥ 2 ve son dönemde net zarar yok zorunlu. Graham 30+ hisselik portföy önerdi. 1970-1983 arası bu strateji yıllık %29.4 ortalama getiri sağladı.',
+    desc: 'Net dönen varlık değerinin altında işlem gören en ucuz hisseleri bulur. F/DD 0.67 altı, cari oran 2 üzeri.',
     filters: {pb_max:0.67, cr_min:2, de_max:80, margin_min:1}
   },
 
   carlisle: {
     label: "Tobias Carlisle — Acquirer's Multiple",
-    desc: '"The Acquirer\'s Multiple" (2017) kaynaklı: EV / Faaliyet Karı oranının en düşük %10\'luk dilimine giren hisseler. Backtestlerde Greenblatt\'ın Magic Formula\'sını geride bıraktı. Kalite kriteri yoktur — saf ucuzluk prensibi: piyasa tarafından en çok gözardı edilen şirketleri bulur. Not: EV/EBIT bu sistemde hesaplanamadığından düşük F/K ucuzluk proxy\'i olarak kullanılmaktadır.',
+    desc: 'Saf ucuzluk prensibiyle en düşük çarpanlı hisseleri bulur. F/K 10 altı.',
     filters: {pe_max:10, cr_min:1}
   },
 
   templeton: {
     label: 'John Templeton — Global Value',
-    desc: 'Graham\'ı küresel ölçeğe taşıyan Templeton dünyanın en karamsar dönemlerinde ve en ucuz bölgelerinde alım yaptı. AAII Templeton Screen ve "Investing the Templeton Way" kitabından: P/E son 5 yılın ortalamasının altında, 5 yıllık P/E\'lerin hiçbiri 75\'i geçmemeli. EPS büyümesi hem 1 yıl hem 5 yıl pozitif. PEG "en sık kullandığı değerleme ölçütü" olarak belirtilmiştir.',
+    desc: 'Küresel değer yaklaşımıyla ucuz ve büyüyen şirketleri bulur. F/K 15 altı, F/DD 1.5 altı, EPS büyümesi pozitif.',
     filters: {pe_max:15, pb_max:1.5, earng_min:5}
   },
 
@@ -1835,6 +2039,386 @@ const GURUS = {
 function tblScroll(px){
   var w = document.getElementById('twrap');
   if(w) w.scrollBy({left:px, behavior:'smooth'});
+}
+
+// ── GOAT CHIP MINI-CARD UPGRADE ──
+function upgradeGoatChips() {
+  document.querySelectorAll('.goat-chip').forEach(function(chip) {
+    if (chip.classList.contains('goat-card-chip')) return;
+    var key = chip.dataset.goat;
+    var guru = GURUS[key];
+    if (!guru) return;
+    var name = chip.textContent.trim();
+    var filters = guru.filters || {};
+    var tags = [];
+    for (var i = 0; i < _PSV_FMTS.length && tags.length < 3; i++) {
+      var fkey = _PSV_FMTS[i][0];
+      var fn   = _PSV_FMTS[i][1];
+      if (filters[fkey] !== undefined) tags.push(fn(filters[fkey]));
+    }
+    chip.classList.add('goat-card-chip');
+    chip.innerHTML = '<span class="gcchip-name">' + name + '</span>' +
+      (tags.length ? '<span class="gcchip-tags">' + tags.map(function(t){ return '<span class="gcchip-tag">'+t+'</span>'; }).join('') + '</span>' : '');
+  });
+}
+
+// ── PRESCAN FULL-SCREEN VIEW ──
+
+var _psvActiveGoats   = new Set();
+var _psvActivePresets = new Set();
+var _psvActiveTech    = new Set();
+
+var PSV_MAIN_PRESETS = ['value','growth','dividend','quality'];
+var PSV_MAIN_TECH    = ['breakout','oversold','nearHigh','pullback','highVolume'];
+
+var PSV_MAIN_EX    = ['bist','nasdaq','nyse','sp500','dax','lse'];
+var PSV_MAIN_GOATS = ['buffett','graham','lynch','fisher','munger'];
+
+var _PSV_FMTS = [
+  ['pe_max',          function(v){ return 'F/K<'+v; }],
+  ['pb_max',          function(v){ return 'F/DD<'+v; }],
+  ['ps_max',          function(v){ return 'F/S<'+v; }],
+  ['pe_min',          function(v){ return 'F/K>'+v; }],
+  ['roe_min',         function(v){ return 'ROE>'+v+'%'; }],
+  ['gross_min',       function(v){ return 'Brüt>'+v+'%'; }],
+  ['margin_min',      function(v){ return 'Marj>'+v+'%'; }],
+  ['earng_min',       function(v){ return 'K↑'+v+'%'; }],
+  ['revg_min',        function(v){ return 'Gel↑'+v+'%'; }],
+  ['de_max',          function(v){ return 'Borç<'+v; }],
+  ['cr_min',          function(v){ return 'Cari>'+v; }],
+  ['div_min',         function(v){ return 'Temettü>'+v+'%'; }],
+  ['mc_max',          function(v){ return v>=1000 ? 'PD<$'+(v/1000)+'B' : 'PD<$'+v+'M'; }],
+  ['mc_min',          function(v){ return v>=1000 ? 'PD>$'+(v/1000)+'B' : 'PD>$'+v+'M'; }],
+  ['tech_rating_min', function(){  return 'Teknik'; }],
+  ['perf3m_min',      function(v){ return '3A>'+v+'%'; }],
+  ['perf6m_min',      function(v){ return '6A>'+v+'%'; }],
+  ['chg_min',         function(v){ return 'Günlük>'+v+'%'; }],
+  ['vol_min',         function(v){ return 'Hacim>'+v+'M'; }],
+  ['rel_vol_min',     function(v){ return 'Hacim '+v+'×'; }],
+  ['rsi_max',         function(v){ return 'RSI<'+v; }],
+  ['rsi_min',         function(v){ return 'RSI>'+v; }],
+  ['from_high_min',   function(v){ return 'Zirveye '+Math.abs(v)+'%'; }],
+  ['from_high_max',   function(v){ return 'Zirveden ↓'+Math.abs(v)+'%'; }],
+  ['from_low_min',    function(v){ return 'Dip>'+v+'%'; }],
+  ['perf1m_min',      function(v){ return '1A>'+v+'%'; }],
+  ['adx_min',         function(v){ return 'ADX>'+v; }],
+  ['beta_max',        function(v){ return 'Beta<'+v; }],
+  ['ma_rating_min',   function(){  return 'MA Onayı'; }],
+  ['osc_rating_min',  function(){  return 'Osilatör'; }],
+  ['above_sma200_min',function(){  return '>SMA200'; }],
+  ['sma_trend_min',   function(){  return '50>200'; }],
+  ['macd_hist_min',   function(){  return 'MACD↑'; }],
+  ['bb_dist_max',     function(){  return 'BB Alt Bant'; }],
+  ['stoch_k_max',     function(v){ return '%K<'+v; }],
+  ['stoch_kd_min',    function(){  return '%K>%D'; }],
+];
+
+function _psvGetTags(filters, max) {
+  var tags = [];
+  for (var i = 0; i < _PSV_FMTS.length && tags.length < max; i++) {
+    var k = _PSV_FMTS[i][0];
+    if (filters[k] !== undefined) tags.push(_PSV_FMTS[i][1](filters[k]));
+  }
+  return tags;
+}
+
+function _isoFromFlag(emoji) {
+  try {
+    var cps = [];
+    for (var i = 0; i < emoji.length; ) {
+      var cp = emoji.codePointAt(i); cps.push(cp); i += cp > 0xFFFF ? 2 : 1;
+    }
+    if (cps.length === 2 && cps[0] >= 0x1F1E6 && cps[0] <= 0x1F1FF) {
+      return String.fromCharCode(cps[0]-0x1F1A5).toLowerCase() + String.fromCharCode(cps[1]-0x1F1A5).toLowerCase();
+    }
+  } catch(e) {}
+  return '';
+}
+
+function initPrescanView() {
+  var el = document.getElementById('prescan-view');
+  if (!el) return;
+
+  function mkExBtn(key) {
+    var m = EXCHANGE_META[key]; if (!m) return '';
+    var iso = _isoFromFlag(m.flag);
+    var flagHtml = iso
+      ? '<img class="psv-ex-flag-img" src="https://flagcdn.com/w40/'+iso+'.png" alt="'+iso+'" loading="lazy">'
+      : '<span class="psv-ex-flag">'+m.flag+'</span>';
+    var tip = EXCHANGE_TIPS[key] || '';
+    return '<button class="psv-ex-btn" data-exchange="'+key+'"'+(tip ? ' data-tip="'+tip+'"' : '')+' onclick="psvSetExchange(\''+key+'\')">' +
+      flagHtml + '<span class="psv-ex-name">'+m.name+'</span></button>';
+  }
+
+  function mkGoatCard(key) {
+    var g = GURUS[key]; if (!g) return '';
+    var parts = g.label.split(' — ');
+    var name = parts[0].split(' (')[0];
+    var sub  = parts[1] ? '<div class="psv-goat-sub">'+parts[1]+'</div>' : '';
+    var tags = _psvGetTags(g.filters||{}, 3);
+    var tagsHtml = tags.length ? '<div class="psv-goat-tags">'+tags.map(function(t){return '<span class="psv-goat-tag">'+t+'</span>';}).join('')+'</div>' : '';
+    var descHtml = g.desc ? '<div class="psv-goat-desc">'+esc(g.desc)+'</div>' : '';
+    return '<div class="psv-goat-card" data-goat="'+key+'" onclick="psvToggleGoat(\''+key+'\')">' +
+      '<div class="psv-goat-name">'+name+'</div>'+sub+tagsHtml+descHtml+'</div>';
+  }
+
+  function mkFilterCard(key, p, cls, toggleFn) {
+    if (!p) return '';
+    var tags = _psvGetTags(p.filters||{}, 3);
+    var tagsHtml = tags.length ? '<div class="psv-preset-tags-row">'+tags.map(function(t){return '<span class="psv-preset-tag-sm">'+t+'</span>';}).join('')+'</div>' : '';
+    return '<div class="'+cls+'" data-key="'+key+'" onclick="'+toggleFn+'(\''+key+'\')">' +
+      '<div class="psv-preset-name">'+p.label+'</div>'+tagsHtml+
+      '<div class="psv-preset-desc">'+p.desc+'</div></div>';
+  }
+
+  var allExKeys      = Object.keys(EXCHANGE_META).filter(function(k){ return PSV_MAIN_EX.indexOf(k)===-1; });
+  var extraGoatKeys  = Object.keys(GURUS).filter(function(k){ return PSV_MAIN_GOATS.indexOf(k)===-1; });
+  var extraPresetKeys = Object.keys(PRESETS).filter(function(k){ return PSV_MAIN_PRESETS.indexOf(k)===-1; });
+  var extraTechKeys   = Object.keys(TECH_PRESETS).filter(function(k){ return PSV_MAIN_TECH.indexOf(k)===-1; });
+
+  el.innerHTML =
+    '<button class="psv-close-btn" id="psv-close-btn" onclick="closePrescanView()" style="display:none">✕ Sonuçlara dön</button>'+
+    '<div class="psv-inner">'+
+    '<div class="psv-brand"><div class="psv-logo"><div class="tlogo-mark">D</div>DeepFin</div><div class="psv-tagline">Varlık seç · Borsa seç · Tara</div></div>'+
+
+    // Asset type section — yatay kaydırmalı
+    '<div class="psv-section">'+
+    '<div class="psv-section-hd">🏦 Varlık</div>'+
+    '<div class="psv-asset-wrap">'+
+      '<button class="psv-asset-arrow" onclick="psvScrollAssets(-1)" aria-label="Sola kaydır">‹</button>'+
+      '<div class="psv-asset-row" id="psv-asset-row">'+
+        PSV_ASSETS.map(function(a){
+          return a.active
+            ? '<button class="psv-asset-btn on" data-asset="'+a.key+'" onclick="psvSetAsset(\''+a.key+'\')"><span class="psv-asset-icon">'+a.icon+'</span><span class="psv-asset-name">'+a.label+'</span></button>'
+            : '<div class="psv-asset-soon"><span class="psv-asset-icon">'+a.icon+'</span><span class="psv-asset-name">'+a.label+'</span><span class="psv-asset-badge">yakında</span></div>';
+        }).join('')+
+      '</div>'+
+      '<button class="psv-asset-arrow" onclick="psvScrollAssets(1)" aria-label="Sağa kaydır">›</button>'+
+    '</div>'+
+    '</div>'+
+
+    // Exchange section
+    '<div class="psv-section">'+
+    '<div class="psv-section-hd">🌍 Borsa</div>'+
+    '<div class="psv-ex-grid" id="psv-ex-grid">'+PSV_MAIN_EX.map(mkExBtn).join('')+'</div>'+
+    '<div class="psv-ex-extra" id="psv-ex-extra" style="display:none">'+allExKeys.map(mkExBtn).join('')+'</div>'+
+    '<button class="psv-show-more" id="psv-ex-more" onclick="psvToggleMoreEx()">+ Diğer Borsalar</button>'+
+    '</div>'+
+
+    // GOAT section
+    '<div class="psv-section">'+
+    '<div class="psv-section-hd">🐐 Yatırımcı Stratejisi <span class="psv-opt">isteğe bağlı</span></div>'+
+    '<div class="psv-goat-grid" id="psv-goat-main">'+PSV_MAIN_GOATS.map(mkGoatCard).join('')+'</div>'+
+    '<div class="psv-goat-extra" id="psv-goat-extra" style="display:none">'+extraGoatKeys.map(mkGoatCard).join('')+'</div>'+
+    '<button class="psv-show-more" id="psv-goat-more" onclick="psvToggleMoreGoats()">+ Tüm Stratejiler</button>'+
+    '</div>'+
+
+    // Temel — yatay satır, ortalı
+    '<div class="psv-section">'+
+    '<div class="psv-section-hd">📊 Temel <span class="psv-opt">isteğe bağlı</span></div>'+
+    '<div class="psv-chip-grid" id="psv-preset-main">'+PSV_MAIN_PRESETS.map(function(k){ return mkFilterCard(k, PRESETS[k], 'psv-preset-card', 'psvTogglePreset'); }).join('')+'</div>'+
+    '<div class="psv-chip-extra" id="psv-preset-extra" style="display:none">'+extraPresetKeys.map(function(k){ return mkFilterCard(k, PRESETS[k], 'psv-preset-card', 'psvTogglePreset'); }).join('')+'</div>'+
+    (extraPresetKeys.length ? '<button class="psv-show-more" id="psv-preset-more" onclick="psvToggleMorePresets()">+ Daha Fazla ('+extraPresetKeys.length+')</button>' : '')+
+    '</div>'+
+
+    // Teknik — yatay satır, ortalı
+    '<div class="psv-section">'+
+    '<div class="psv-section-hd">📈 Teknik <span class="psv-opt">isteğe bağlı</span></div>'+
+    '<div class="psv-chip-grid" id="psv-tech-main">'+PSV_MAIN_TECH.map(function(k){ return mkFilterCard(k, TECH_PRESETS[k], 'psv-tech-card', 'psvToggleTech'); }).join('')+'</div>'+
+    '<div class="psv-chip-extra" id="psv-tech-extra" style="display:none">'+extraTechKeys.map(function(k){ return mkFilterCard(k, TECH_PRESETS[k], 'psv-tech-card', 'psvToggleTech'); }).join('')+'</div>'+
+    '<button class="psv-show-more" id="psv-tech-more" onclick="psvToggleMoreTech()">+ Daha Fazla ('+extraTechKeys.length+')</button>'+
+    '</div>'+
+
+    // Scan button
+    '<div class="psv-scan-wrap">'+
+    '<div class="psv-limit-hint" id="psv-limit-hint">⚠ En fazla 4 filtre seçilebilir — yenisini eklemek için mevcut bir seçimi kaldır.</div>'+
+    '<button class="psv-scan-btn" id="psv-scan-btn" onclick="psvScan()">▶ Hisse Tara</button></div>'+
+
+    '</div>';
+
+  psvSetExchange(currentExchange);
+}
+
+function psvSetExchange(key) {
+  currentExchange = key;
+  document.querySelectorAll('.exbtn').forEach(function(b){ b.classList.toggle('on', b.dataset.exchange === key); });
+  document.querySelectorAll('.psv-ex-btn').forEach(function(b){ b.classList.toggle('on', b.dataset.exchange === key); });
+  var meta = EXCHANGE_META[key];
+  if (meta) {
+    var tlTab = document.querySelector('.ctab-cur[data-currency="TL"]');
+    var usdTab = document.querySelector('.ctab-cur[data-currency="USD"]');
+    if (meta.currencyCode !== 'TRY') {
+      if (tlTab) tlTab.style.display = 'none';
+      if (usdTab) { usdTab.classList.add('on'); if (tlTab) tlTab.classList.remove('on'); }
+    } else {
+      if (tlTab) tlTab.style.display = '';
+    }
+  }
+}
+
+// Varlık sınıfları — prescan yatay kaydırmalı satır
+const PSV_ASSETS = [
+  { key: 'hisse',    label: 'Borsa',       icon: '📈', active: true },
+  { key: 'kripto',   label: 'Kripto',      icon: '₿' },
+  { key: 'fon',      label: 'Fon',         icon: '💼' },
+  { key: 'etf',      label: 'ETF',         icon: '📦' },
+  { key: 'eurobond', label: 'Eurobond',    icon: '💵' },
+  { key: 'bono',     label: 'Bono/Tahvil', icon: '🏛️' },
+  { key: 'viop',     label: 'Viop',        icon: '📉' },
+  { key: 'varant',   label: 'Varant',      icon: '🎫' },
+  { key: 'opsiyon',  label: 'Opsiyon',     icon: '🎯' },
+];
+
+function psvSetAsset(key) {
+  document.querySelectorAll('.psv-asset-btn').forEach(function(b){ b.classList.toggle('on', b.dataset.asset === key); });
+}
+
+function psvScrollAssets(dir) {
+  var row = document.getElementById('psv-asset-row');
+  if (row) row.scrollBy({ left: dir * 220, behavior: 'smooth' });
+}
+
+var _PSV_MAX_SEL = 4;
+
+function _psvTotalSel() {
+  return _psvActiveGoats.size + _psvActivePresets.size + _psvActiveTech.size;
+}
+
+function _psvUpdateSelState() {
+  var total = _psvTotalSel();
+  var atLimit = total >= _PSV_MAX_SEL;
+  var pv = document.getElementById('prescan-view');
+  if (pv) pv.classList.toggle('psv-at-limit', atLimit);
+  var btn = document.getElementById('psv-scan-btn');
+  if (btn) btn.textContent = total > 0 ? '▶ ' + total + ' Filtre ile Tara' : '▶ Hisse Tara';
+}
+
+function psvToggleGoat(key) {
+  if (!_psvActiveGoats.has(key) && _psvTotalSel() >= _PSV_MAX_SEL) return;
+  _psvActiveGoats.has(key) ? _psvActiveGoats.delete(key) : _psvActiveGoats.add(key);
+  document.querySelectorAll('.psv-goat-card[data-goat="'+key+'"]').forEach(function(c){ c.classList.toggle('on', _psvActiveGoats.has(key)); });
+  _psvUpdateSelState();
+}
+
+function psvTogglePreset(key) {
+  if (!_psvActivePresets.has(key) && _psvTotalSel() >= _PSV_MAX_SEL) return;
+  _psvActivePresets.has(key) ? _psvActivePresets.delete(key) : _psvActivePresets.add(key);
+  document.querySelectorAll('.psv-preset-card[data-key="'+key+'"]').forEach(function(c){ c.classList.toggle('on', _psvActivePresets.has(key)); });
+  _psvUpdateSelState();
+}
+
+function psvToggleTech(key) {
+  if (!_psvActiveTech.has(key) && _psvTotalSel() >= _PSV_MAX_SEL) return;
+  _psvActiveTech.has(key) ? _psvActiveTech.delete(key) : _psvActiveTech.add(key);
+  document.querySelectorAll('.psv-tech-card[data-key="'+key+'"]').forEach(function(c){ c.classList.toggle('on', _psvActiveTech.has(key)); });
+  _psvUpdateSelState();
+}
+
+function psvToggleMoreGoats() {
+  var extra = document.getElementById('psv-goat-extra');
+  var btn   = document.getElementById('psv-goat-more');
+  if (!extra) return;
+  var open = extra.style.display !== 'none';
+  extra.style.display = open ? 'none' : 'flex';
+  if (btn) btn.textContent = open ? '+ Tüm Stratejiler' : '— Daha Az';
+}
+
+function psvToggleMoreEx() {
+  var extra = document.getElementById('psv-ex-extra');
+  var btn   = document.getElementById('psv-ex-more');
+  if (!extra) return;
+  var open = extra.style.display !== 'none';
+  extra.style.display = open ? 'none' : 'flex';
+  if (btn) btn.textContent = open ? '+ Diğer Borsalar' : '— Daha Az';
+}
+
+function psvToggleMorePresets() {
+  var extra = document.getElementById('psv-preset-extra');
+  var btn   = document.getElementById('psv-preset-more');
+  if (!extra) return;
+  var open = extra.style.display !== 'none';
+  var extraCount = Object.keys(PRESETS).filter(function(k){ return PSV_MAIN_PRESETS.indexOf(k)===-1; }).length;
+  extra.style.display = open ? 'none' : 'flex';
+  if (btn) btn.textContent = open ? '+ Daha Fazla (' + extraCount + ')' : '— Daha Az';
+}
+
+function psvToggleMoreTech() {
+  var extra = document.getElementById('psv-tech-extra');
+  var btn   = document.getElementById('psv-tech-more');
+  if (!extra) return;
+  var open = extra.style.display !== 'none';
+  var extraCount = Object.keys(TECH_PRESETS).filter(function(k){ return PSV_MAIN_TECH.indexOf(k)===-1; }).length;
+  extra.style.display = open ? 'none' : 'flex';
+  if (btn) btn.textContent = open ? '+ Daha Fazla (' + extraCount + ')' : '— Daha Az';
+}
+
+function openPrescanView() {
+  _psvActiveGoats   = new Set();
+  _psvActivePresets = new Set();
+  _psvActiveTech    = new Set();
+  initPrescanView();
+  var el = document.getElementById('prescan-view');
+  if (!el) return;
+  // Mevcut sonuç varsa geri dönüş butonu göster
+  var cb = document.getElementById('psv-close-btn');
+  if (cb) cb.style.display = (typeof allData !== 'undefined' && allData.length > 0) ? '' : 'none';
+  el.style.transition = 'none';
+  el.style.opacity = '1';
+  el.style.display = 'flex';
+}
+
+function closePrescanView() {
+  var el = document.getElementById('prescan-view');
+  if (!el) return;
+  el.style.transition = '';
+  el.classList.add('psv-closing');
+  setTimeout(function() {
+    el.style.display = 'none';
+    el.classList.remove('psv-closing');
+    el.style.opacity = '';
+    el.style.transition = '';
+    // Önceki sonuçlar varsa ekranı geri yükle
+    if (typeof allData !== 'undefined' && allData.length > 0) {
+      showState('twrap');
+      var tb = document.getElementById('toolbar');
+      if (tb) tb.style.display = 'flex';
+      updateStatsBar();
+    }
+  }, 280);
+}
+
+function psvScan() {
+  var el = document.getElementById('prescan-view');
+  var delay = el ? 280 : 0;
+  // Overlay solmaya başlamadan altta yükleme ekranını hazırla —
+  // fade sırasında önceki taramanın bayat tablosu görünmesin
+  showState('loading');
+  document.getElementById('toolbar').style.display = 'none';
+  document.getElementById('loadtxt').textContent = 'Taranıyor...';
+  if (el) { el.style.transition = ''; el.classList.add('psv-closing'); }
+  _psvScanFilterCount = _psvTotalSel();
+  // Sidebar'ı overlay hâlâ ekranı kaplarken animasyonsuz kapat — görünür kayma olmaz
+  collapseSidebar(true);
+  setTimeout(function() {
+    if (el) {
+      el.style.display = 'none';
+      el.classList.remove('psv-closing');
+      el.style.opacity = '';
+      el.style.transition = '';
+    }
+    // selectAsset(_resetPanel) chip'leri sıfırlıyor; sync'ten ÖNCE çağrılmalı
+    if (_activeAsset !== 'hisse') selectAsset('hisse');
+    document.querySelectorAll('#goat-chips .goat-chip, #adv-goat-chips .goat-chip').forEach(function(c){
+      c.classList.toggle('on', _psvActiveGoats.has(c.dataset.goat));
+    });
+    document.querySelectorAll('#presets .chip, #adv-presets .chip').forEach(function(c){
+      c.classList.toggle('on', _psvActivePresets.has(c.dataset.preset));
+    });
+    document.querySelectorAll('#tech-presets .chip, #adv-tech-presets .chip').forEach(function(c){
+      c.classList.toggle('on', _psvActiveTech.has(c.dataset.tech));
+    });
+    _applyChips(BASIC_CHIP_CFG);
+  }, delay);
 }
 
 // ── UNİFİED CHİP SİSTEMİ — her panel bağımsız çalışır ──
@@ -2158,13 +2742,27 @@ function applyAndRender(special){
     ['peg',                            'peg_min',    'peg_max',   1],
     ['marketCapitalization',           'mc_min',     'mc_max',    1],
     ['changePercent',                  'chg_min',    'chg_max',   1],
-    ['fromHigh',                       null,         'from_high_max', 1],
+    ['fromHigh',                       'from_high_min', 'from_high_max', 1],
     ['fromLow',                        'from_low_min', null,      1],
     ['techRating',                     'tech_rating_min', 'tech_rating_max', 1],
+    ['maRating',                       'ma_rating_min', 'ma_rating_max', 1],
+    ['oscRating',                      'osc_rating_min', 'osc_rating_max', 1],
+    ['perf1m',                         'perf1m_min', 'perf1m_max', 1],
     ['perf3m',                         'perf3m_min', 'perf3m_max', 1],
     ['perf6m',                         'perf6m_min', 'perf6m_max', 1],
     ['perfY',                          'perfy_min',  'perfy_max',  1],
     ['rsi14',                          'rsi_min',    'rsi_max',    1],
+    ['relVol',                         'rel_vol_min', 'rel_vol_max', 1],
+    ['beta',                           'beta_min',   'beta_max',  1],
+    ['adx',                            'adx_min',    'adx_max',   1],
+    ['adxDiDiff',                      'adx_di_diff_min', null,   1],
+    ['pctAboveSma200',                 'above_sma200_min', 'above_sma200_max', 1],
+    ['smaTrend',                       'sma_trend_min', 'sma_trend_max', 1],
+    ['macd',                           'macd_min',   'macd_max',  1],
+    ['macdHist',                       'macd_hist_min', 'macd_hist_max', 1],
+    ['bbDist',                         'bb_dist_min', 'bb_dist_max', 1],
+    ['stochK',                         'stoch_k_min', 'stoch_k_max', 1],
+    ['stochKD',                        'stoch_kd_min', null,      1],
     ['currentPrice',                   'price_min',  'price_max', 1],
   ];
   // Hacim ayrı — Milyon lot
@@ -2185,7 +2783,9 @@ function applyAndRender(special){
       const raw = s[field];
       if(raw===null||raw===undefined){
         // Teknik/performans alanları: veri yoksa bu filtreyi atla (eleme)
-        const techFields = ['techRating','maRating','oscRating','perf3m','perf6m','perfY','rsi14'];
+        const techFields = ['techRating','maRating','oscRating','perf1m','perf3m','perf6m','perfY','rsi14',
+          'fromHigh','fromLow','relVol','beta','adx','adxDiDiff','pctAboveSma200','smaTrend',
+          'macd','macdHist','bbDist','stochK','stochKD'];
         if(techFields.indexOf(field) !== -1) continue;
         if(mn!==null||mx!==null) return false;
         continue;
@@ -2227,6 +2827,8 @@ function applyAndRender(special){
 
   if (filtered.length === 0 && allData.length > 0) {
     showState('twrap');
+    showScanSummary(allData.length, 0);
+    var _ztw = document.getElementById('twrap'); if (_ztw) _ztw.scrollTop = 0;
     renderTable(); // boş tablo göster
     updateStatsBar();
     updateTicker();
@@ -2239,7 +2841,8 @@ function applyAndRender(special){
       var twrap = document.getElementById('twrap');
       if (twrap) twrap.appendChild(zeroEl);
     }
-    var activeChips = Array.from(document.querySelectorAll('.chip.on, .goat-chip.on')).map(c => c.textContent.trim());
+    // _scanMeta.filters = tekilleştirilmiş gerçek seçimler (özet barıyla aynı kaynak)
+    var activeChips = (_scanMeta.filters || []).map(function(f){ return f.label; });
     var chipCount = activeChips.length;
     var suggestions = [
       { icon: '📉', title: 'Filtre kriterlerini genişletin', desc: chipCount > 1 ? 'Birden fazla strateji aynı anda uygulanıyor. Tek bir filtre ile başlayın.' : 'Mevcut kriterleri biraz daha esnek bir aralığa taşıyın.' },
@@ -2267,7 +2870,7 @@ function applyAndRender(special){
         '</div>' +
         chipBadge +
         '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">' + sugg_html + '</div>' +
-        '<button onclick="clearFilters()" style="padding:9px 24px;background:var(--accent);color:#000;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.3px;">Tüm Filtreleri Temizle</button>' +
+        '<button onclick="clearFilters();openPrescanView()" style="padding:9px 24px;background:var(--accent);color:#000;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.3px;">Tüm Filtreleri Temizle</button>' +
       '</div>';
     return;
   }
@@ -2276,6 +2879,7 @@ function applyAndRender(special){
   if (zeroEl) zeroEl.style.display = 'none';
 
   showState('twrap');
+  showScanSummary(allData.length, filtered.length);
   // Virtual scroll render — liste filtresi aktifse uygula
   var _base = filtered;
   if (_dfUser && _dfListFilter) {
@@ -2378,10 +2982,50 @@ function fPerf(v) {
 
 function fmc(v){
   if(!v) return nil;
-  // market_cap_basic her zaman USD — milyon USD olarak saklıyoruz
+  // Piyasa değeri her zaman USD — milyon USD olarak saklıyoruz
   if(v>=1000000) return `$${(v/1000000).toFixed(2)}T`;
   if(v>=1000)    return `$${(v/1000).toFixed(1)}B`;
   return `$${v.toFixed(0)}M`;
+}
+
+// USD → yerel para çarpanı (parse'taki yerel→USD zincirinin tersi)
+function _usdToLocalFactor(ex) {
+  switch (ex) {
+    case 'bist':        return fxRates.TRY;
+    case 'moex':        return fxRates.RUB;
+    case 'twse':        return fxRates.TWD;
+    case 'b3':          return fxRates.BRL;
+    case 'hkex':        return fxRates.HKD;
+    case 'china':       return fxRates.CNY;
+    case 'saudi':       return fxRates.SAR;
+    case 'southafrica': return fxRates.ZAR;
+    case 'dax': case 'france': case 'amsterdam': case 'brussels':
+    case 'lisbon': case 'dublin': case 'milan': return 1 / fxRates.EUR;
+    case 'lse':         return 1 / fxRates.GBP;
+    case 'nikkei':      return 1 / fxRates.JPY;
+    case 'krx':         return 1 / fxRates.KRW;
+    case 'oslo':        return 1 / fxRates.NOK;
+    case 'tsx':         return 1 / fxRates.CAD;
+    case 'switzerland': return 1 / fxRates.CHF;
+    case 'australia':   return 1 / fxRates.AUD;
+    case 'sweden':      return 1 / fxRates.SEK;
+    case 'india':       return 1 / fxRates.INR;
+    case 'uae':         return 1 / fxRates.AED;
+    default: return null; // USD borsaları (nasdaq/sp500/nyse)
+  }
+}
+
+// Piyasa değeri çift gösterim: yerel para + USD (detay paneli için)
+function fmcDual(v, ex) {
+  if(!v) return nil;
+  var f = _usdToLocalFactor(ex);
+  if(!f || !isFinite(f)) return fmc(v);
+  var exMeta = EXCHANGE_META[ex] || EXCHANGE_META.bist;
+  var loc = v * f; // milyon yerel para
+  var locStr = loc>=1000000 ? (loc/1000000).toFixed(2)+'T'
+             : loc>=1000    ? (loc/1000).toFixed(1)+'B'
+             : loc.toFixed(0)+'M';
+  return exMeta.currency + locStr + ' · ' + fmc(v);
 }
 
 
@@ -2582,7 +3226,6 @@ function _vsRowHtml(s, idx) {
 
 function buildProfile(s) {
   const profileEl = document.getElementById('dprofile');
-  const nameEl = document.getElementById('dprofile-name');
   const metaEl = document.getElementById('dprofile-meta');
   const linksEl = document.getElementById('dprofile-links');
   if(!profileEl) return;
@@ -2590,9 +3233,6 @@ function buildProfile(s) {
   const sym = s.symbol;
   const ex = s.exchangeId || currentExchange;
   const symClean = sym.replace('.IS','');
-
-  nameEl.textContent = s.name || sym;
-  nameEl.title = s.name || sym;
 
   const exMeta = EXCHANGE_META[ex] || EXCHANGE_META.bist;
   var metaParts = [];
@@ -2640,63 +3280,15 @@ function showDetail(sym){
   // Şirket Profili
   buildProfile(s);
 
-  // ── Graham Sayısı ─────────────────────────────────────────────
-  // Graham = price × √(22.5 / (PE × PB))  [√(22.5 × EPS × BV_per_share)]
-  const _pe = s.peNormalizedAnnual, _pb = s.pbAnnual, _price = s.currentPrice;
-  const grahamNum = (_pe > 0 && _pb > 0 && _price > 0)
-    ? _price * Math.sqrt(22.5 / (_pe * _pb)) : null;
-
-  // ── Bileşik Skor (0-10) ───────────────────────────────────────
-  var _cscore = 0, _cscount = 0;
-  function _cs(val, good, ok) { _cscount++; if(val!=null){ if(val>=good)_cscore+=2; else if(val>=ok)_cscore+=1; } }
-  function _csLow(val, good, ok) { _cscount++; if(val!=null){ if(val<=good)_cscore+=2; else if(val<=ok)_cscore+=1; } }
-  _cs(s.roeTTM, 15, 5);
-  _cs(s.netProfitMarginTTM, 10, 0);
-  _cs(s.revenueGrowthTTMYoy, 10, 0);
-  _cs(s.epsGrowthTTMYoy, 10, 0);
-  _csLow(s['totalDebt/totalEquityAnnual'], 0.5, 1);
-  _cs(s.currentRatioAnnual, 2, 1);
-  if(s.piotroski!=null){ _cscount++; if(s.piotroski>=7)_cscore+=2; else if(s.piotroski>=5)_cscore+=1; }
-  if(s.peg!=null){ _cscount++; if(s.peg<1)_cscore+=2; else if(s.peg<2)_cscore+=1; }
-  const compositeScore = _cscount>0 ? Math.min(10, Math.round(_cscore*10/_cscount)) : null;
-
   const G = [
     {t:'Değerleme', rows:[
       ['F/K <tag>TTM</tag>', s.peNormalizedAnnual, v=>v.toFixed(1), 'dval-pe'],
       ['PD/DD <tag>FQ</tag>', s.pbAnnual, v=>v.toFixed(2), 'dval-pb'],
       ['F/S <tag>TTM</tag>', s.psTTM, v=>v.toFixed(2), 'dval-ps'],
-      ['Piyasa Değeri', s.marketCapitalization, v=>fmc(v)],
+      ['Piyasa Değeri', s.marketCapitalization, v=>fmcDual(v, s.exchangeId||currentExchange)],
       ['Sektör', s.sector, v=>v],
-      ['1A Yüksek', s['52WeekHigh'], v=>`${v.toFixed(2)} ₺`],
-      ['1A Düşük', s['52WeekLow'], v=>`${v.toFixed(2)} ₺`],
-    ]},
-    {t:'Kantitatif', rows:[
-      ['Piotroski F-Score', s.piotroski, function(v) {
-        var color = v>=8?'#00c076':v>=6?'#f0b429':'#f6465d';
-        var label = v>=8?'Güçlü':v>=6?'Orta':'Zayıf';
-        return '<span style="color:'+color+';font-weight:700">'+v+'/9</span> <span style="color:'+color+';font-size:9px">'+label+'</span>';
-      }],
-      ['PEG Oranı', s.peg, function(v) {
-        var color = v<1?'#00c076':v<2?'#f0b429':'#f6465d';
-        var label = v<1?'Ucuz':v<2?'Makul':'Pahalı';
-        return '<span style="color:'+color+';font-weight:700">'+v.toFixed(2)+'</span> <span style="color:'+color+';font-size:9px">'+label+'</span>';
-      }],
-      ['Graham Sayısı', grahamNum, function(v) {
-        var pct = ((_price - v) / v * 100);
-        var isUnder = _price < v;
-        var color = isUnder ? '#00c076' : (Math.abs(pct)<20 ? '#f0b429' : '#f6465d');
-        var sign = isUnder ? '−' : '+';
-        var pctAbs = Math.abs(pct);
-        return '<span style="font-weight:700">'+v.toFixed(2)+'</span>'
-          + ' <span style="font-size:9px;color:'+color+'">fiyat '+sign+pctAbs.toFixed(0)+'%</span>';
-      }],
-      ['Bileşik Skor', compositeScore, function(v) {
-        var color = v>=7?'#00c076':v>=4?'#f0b429':'#f6465d';
-        var label = v>=7?'Güçlü':v>=4?'Orta':'Zayıf';
-        var bars = '';
-        for(var i=0;i<10;i++) bars += '<span style="display:inline-block;width:6px;height:8px;border-radius:1px;margin-right:1px;background:'+(i<v?color:'var(--border2)')+'"></span>';
-        return bars + ' <span style="color:'+color+';font-size:9px;font-weight:700;margin-left:3px">'+v+'/10 '+label+'</span>';
-      }],
+      ['52H Yüksek', s['52WeekHigh'], v=>`${v.toFixed(2)} ₺`],
+      ['52H Düşük', s['52WeekLow'], v=>`${v.toFixed(2)} ₺`],
     ]},
     {t:'Karlılık', rows:[
       ['ROE <tag>FQ</tag>', s.roeTTM, v=>`<span class="${v>=0?'up':'dn'}">${v.toFixed(1)}%</span>`, 'dval-roe'],
@@ -2729,19 +3321,9 @@ function showDetail(sym){
   // Panel transition bitmesini bekle (200ms)
   setTimeout(function(){ updateChart(sym); }, 260);
 
-  // Insider & Short Interest — sadece US hisseleri için
-  const isUS = ['nasdaq','sp500'].includes(currentExchange);
   document.getElementById('dextra-tabs').style.display = 'flex';
-  var insTab = document.querySelector('.dxtab[data-xtab="insider"]');
-  var shrTab = document.querySelector('.dxtab[data-xtab="short"]');
-  if(insTab) insTab.style.display = isUS?'':'none';
-  if(shrTab) shrTab.style.display = isUS?'':'none';
   _detailStock = s;
   switchXTab(document.querySelector('.dxtab[data-xtab="fundamentals"]'));
-  if (isUS) { fetchInsider(sym); fetchShortInterest(sym); }
-
-  // İkincil kaynak doğrulaması — tarama verisiyle karşılaştır
-  fetchQuoteVerify(sym, currentExchange);
 }
 
 let lwChart = null;
@@ -2819,26 +3401,6 @@ function _loadLightweightCharts(cb) {
   document.head.appendChild(script);
 }
 // ────────────────────────────────────────────────────
-
-function initChart(container) {
-  if (lwChart) { try { lwChart.remove(); } catch(e){} lwChart = null; lwSeries = null; lwVolSeries = null; lwIndSeries = {}; }
-  lwChart = LightweightCharts.createChart(container, {
-    width: (container.offsetWidth > 50 ? container.offsetWidth : (document.querySelector('.detail.open')?.offsetWidth - 20 || 340)),
-    height: 260,
-    layout: { background: { color: '#f8fafc' }, textColor: '#94a3b8', fontSize: 11, fontFamily: 'Inter, sans-serif' },
-    grid: { vertLines: { color: '#edf2f7', style: 1 }, horzLines: { color: '#edf2f7', style: 1 } },
-    crosshair: { mode: LightweightCharts.CrosshairMode.Normal, vertLine: { color: '#cbd5e1', labelBackgroundColor: '#64748b' }, horzLine: { color: '#cbd5e1', labelBackgroundColor: '#64748b' } },
-    rightPriceScale: { borderColor: '#e2e8f0', textColor: '#94a3b8' },
-    timeScale: { borderColor: '#e2e8f0', textColor: '#94a3b8', timeVisible: true, secondsVisible: false },
-    handleScroll: true, handleScale: true,
-  });
-  lwSeries = lwChart.addCandlestickSeries({
-    upColor: '#10b981', downColor: '#f43f5e',
-    borderUpColor: '#10b981', borderDownColor: '#f43f5e',
-    wickUpColor: '#10b981', wickDownColor: '#f43f5e',
-  });
-  if (window._attachChartResizeObserver) window._attachChartResizeObserver(container);
-}
 
 function applyIndicators() {
   if (!lwCandles.length || !lwChart) return;
@@ -2959,84 +3521,6 @@ function updateChart(sym) {
   });
 }
 
-// ── İkincil Kaynak Doğrulaması ───────────────────────────────────────────
-function fetchQuoteVerify(sym, ex) {
-  var url = '/api/verify?symbol=' + encodeURIComponent(sym) + '&exchange=' + (ex || 'bist');
-
-  fetch(url)
-    .then(function(r){ return r.json(); })
-    .then(function(data) {
-      var y = (data && data.ref) || null;
-      if(!y) return;
-      var s = allData.find(function(x){ return x.symbol === sym; });
-      if(!s) return;
-
-      // Birincil → ikincil kaynak karşılaştırma
-      var pairs = [
-        { key:'peNormalizedAnnual', yVal:y.pe,           dId:'dval-pe',    label:'F/K' },
-        { key:'pbAnnual',           yVal:y.pb,           dId:'dval-pb',    label:'PD/DD' },
-        { key:'psTTM',              yVal:y.ps,           dId:'dval-ps',    label:'F/S' },
-        { key:'roeTTM',             yVal:y.roe,          dId:'dval-roe',   label:'ROE' },
-        { key:'roaTTM',             yVal:y.roa,          dId:'dval-roa',   label:'ROA' },
-        { key:'netProfitMarginTTM', yVal:y.netMargin,    dId:'dval-nm',    label:'Net Marj' },
-        { key:'grossMarginTTM',     yVal:y.grossMargin,  dId:'dval-gm',    label:'Brüt Marj' },
-        { key:'dividendYieldIndicatedAnnual', yVal:y.dividendYield, dId:'dval-div', label:'Temettü' },
-        { key:'currentRatioAnnual', yVal:y.currentRatio, dId:'dval-cr',    label:'Cari Oran' },
-        { key:'totalDebt/totalEquityAnnual',  yVal:y.debtToEquity,  dId:'dval-de',  label:'Borç/Özkaynak' },
-      ];
-
-      var mismatch = [];
-
-      pairs.forEach(function(p) {
-        var tvVal = s[p.key];
-        var yhVal = p.yVal;
-
-        if(tvVal == null || yhVal == null) return;
-
-        // Fark yüzdesi
-        var diff = Math.abs(tvVal - yhVal);
-        var pct  = tvVal !== 0 ? (diff / Math.abs(tvVal)) * 100 : diff;
-
-        // %15'ten fazla fark → uyarı
-        if(pct > 15) {
-          mismatch.push({
-            label: p.label,
-            tv:    tvVal,
-            yh:    yhVal,
-            pct:   pct.toFixed(0)
-          });
-        }
-
-        // Doğrulanmış değeri UI'a yaz
-        // dRow'larda dval-* ID'si kullan
-        var el = document.getElementById(p.dId);
-        if(el && yhVal != null) {
-          var formatted = yhVal.toFixed(
-            p.key === 'peNormalizedAnnual' || p.key === 'pbAnnual' || p.key === 'currentRatioAnnual' ||
-            p.key === 'totalDebt/totalEquityAnnual' || p.key === 'psTTM' ? 2 : 1
-          );
-          var pctSuffix = ['roeTTM','roaTTM','netProfitMarginTTM','grossMarginTTM',
-                           'dividendYieldIndicatedAnnual','revenueGrowthTTMYoy','epsGrowthTTMYoy'].includes(p.key);
-          var isColored  = ['roeTTM','roaTTM','netProfitMarginTTM','grossMarginTTM'].includes(p.key);
-          var colorClass = isColored ? (yhVal >= 0 ? 'up' : 'dn') : '';
-
-          el.innerHTML = colorClass
-            ? '<span class="'+colorClass+'">' + formatted + (pctSuffix ? '%' : '') + '</span>'
-            : formatted + (pctSuffix ? '%' : '');
-
-          if(pct > 15) {
-            el.innerHTML += ' <span title="Tarama: '+tvVal.toFixed(2)+' | Doğrulama: '+yhVal.toFixed(2)+
-              ' (%'+Math.round(pct)+' fark)" style="cursor:help;color:#f0b429;font-size:9px;">⚠</span>';
-          }
-        }
-      });
-
-
-      console.log('[DeepFin] veri doğrulama:', sym, mismatch.length === 0 ? '✅ uyumlu' : '⚠ '+mismatch.length+' fark', mismatch);
-    })
-    .catch(function(e){ console.warn('[DeepFin] veri doğrulama hatası:', e.message); });
-}
-// ─────────────────────────────────────────────────────────────────────────
 
 
 function closeDetail(){
@@ -3093,6 +3577,19 @@ function showState(id){
     const el = document.getElementById(s);
     el.style.display = s===id ? (s==='twrap'?'block':'flex') : 'none';
   });
+  const smEl = document.getElementById('scan-summary');
+  if (smEl) smEl.style.display = id === 'twrap' ? 'grid' : 'none';
+  const nsbEl = document.getElementById('new-scan-btn');
+  if (nsbEl) nsbEl.style.display = id === 'twrap' ? 'inline-flex' : 'none';
+  const afwEl = document.getElementById('add-filter-wrap');
+  if (afwEl) afwEl.style.display = id === 'twrap' ? 'inline-flex' : 'none';
+  if (id !== 'twrap') closeFilterDropdown();
+  // Loading/hata/boş durumda stats-bar da gizli — üst bar tek blok halinde değişir,
+  // bayat değerler (önceki taramanın sayıları) loading sırasında görünmez
+  if (id !== 'twrap') {
+    const sbBar = document.getElementById('stats-bar');
+    if (sbBar) sbBar.classList.remove('visible');
+  }
 }
 
 function abortScan(){
@@ -3364,7 +3861,7 @@ document.getElementById('ind-tabs').addEventListener('click', e => {
 });
 
 // ══════════════════════════════════════════
-// INSIDER TRADING & SHORT INTEREST
+// DETAY ALT SEKMELERİ
 // ══════════════════════════════════════════
 
 function switchXTab(el) {
@@ -3376,7 +3873,6 @@ function switchXTab(el) {
   const panel = document.getElementById('dxpanel-' + tab);
   if (panel) panel.classList.add('on');
   if (tab === 'news'   && selSym)       fetchNews(selSym);
-  if (tab === 'dcf'    && _detailStock) renderDCF(_detailStock);
   if (tab === 'sector' && _detailStock) {
     if (_detailStock.sectorRaw) {
       fetchSectorComps(_detailStock);
@@ -3385,170 +3881,6 @@ function switchXTab(el) {
       if (sb) sb.innerHTML = '<div class="dxloading" style="color:var(--muted2)">Bu hisse için sektör verisi mevcut değil.</div>';
     }
   }
-}
-
-// SEC EDGAR — Form 4 Insider Trading
-async function fetchInsider(symbol) {
-  const el = document.getElementById('insider-body');
-  el.innerHTML = '<div class="dxloading">SEC EDGAR Form 4 yukleniyor...</div>';
-  try {
-    const r = await fetch(PROXY_URL + '?action=insider&symbol=' + symbol);
-    const data = await r.json();
-    if (data.error) throw new Error(data.error);
-    const rows = data.results || [];
-    if (rows.length === 0) {
-      el.innerHTML = '<div class="dxloading">Form 4 verisi bulunamadi</div>';
-      return;
-    }
-    const typeLabel = {
-      'P': { label: 'ALIM',    cls: 'insider-buy'  },
-      'S': { label: 'SATIM',   cls: 'insider-sell' },
-      'A': { label: 'AWARD',   cls: 'insider-buy'  },
-      'D': { label: 'DISPOSE', cls: 'insider-sell' },
-      'M': { label: 'OPSIYON', cls: '' },
-      'G': { label: 'HEDIYE',  cls: '' },
-    };
-    let tbody = '';
-    rows.forEach(function(r) {
-      const tl  = typeLabel[r.type] || { label: r.type, cls: '' };
-      const val = r.value >= 1e6 ? '$' + (r.value/1e6).toFixed(1) + 'M'
-                : r.value >= 1e3 ? '$' + (r.value/1e3).toFixed(0) + 'K'
-                : '$' + r.value.toFixed(0);
-      const sh  = r.shares >= 1e6 ? (r.shares/1e6).toFixed(1) + 'M'
-                : r.shares >= 1e3 ? (r.shares/1e3).toFixed(0) + 'K'
-                : String(r.shares.toFixed(0));
-      tbody += '<tr>' +
-        '<td style="color:var(--muted2)">' + r.date + '</td>' +
-        '<td><div style="font-weight:600;color:var(--text)">' + r.owner + '</div>' +
-        '<div style="font-size:8px;color:var(--muted2)">' + r.title + '</div></td>' +
-        '<td class="' + tl.cls + '">' + tl.label + '</td>' +
-        '<td style="font-family:\'Geist Mono\',monospace">' + sh + '</td>' +
-        '<td style="font-family:\'Geist Mono\',monospace;font-weight:600">' + val + '</td>' +
-        '</tr>';
-    });
-    const edgarLink = 'https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=' + data.cik + '&type=4&owner=include&count=40';
-    el.innerHTML =
-      '<div style="font-size:9px;color:var(--muted2);margin-bottom:6px;">' +
-      'SEC EDGAR Form 4 &nbsp;&middot;&nbsp;' +
-      '<a href="' + edgarLink + '" target="_blank" style="color:var(--accent);text-decoration:none;">EDGAR\'da gor &#8599;</a>' +
-      '</div>' +
-      '<table class="insider-table"><thead><tr>' +
-      '<th>Tarih</th><th>Kisi / Unvan</th><th>Islem</th><th>Adet</th><th>Tutar</th>' +
-      '</tr></thead><tbody>' + tbody + '</tbody></table>';
-  } catch(e) {
-    console.error('[insider]', e.message);
-    el.innerHTML = '<div class="dxerror">&#9888; İçeriden işlem verisi yüklenemedi.</div>';
-  }
-}
-
-async function fetchShortInterest(symbol) {
-  const el = document.getElementById('short-body');
-  el.innerHTML = '<div class="dxloading">Short interest yukleniyor...</div>';
-  try {
-    const r = await fetch(PROXY_URL + '?action=short&symbol=' + symbol);
-    const data = await r.json();
-    if (data.error) throw new Error(data.error);
-    renderShortInterest(el, data, symbol);
-  } catch(e) {
-    const nasdaqUrl = 'https://www.nasdaq.com/market-activity/stocks/' + symbol.toLowerCase() + '/short-interest';
-    const finvizUrl = 'https://finviz.com/quote.ashx?t=' + symbol;
-    el.innerHTML =
-      '<div style="text-align:center;padding:16px;">' +
-      '<div style="font-size:28px;margin-bottom:8px;">&#128202;</div>' +
-      '<div style="font-size:10px;color:var(--muted2);margin-bottom:12px;">Short interest verisi alinamadi</div>' +
-      '<a href="' + nasdaqUrl + '" target="_blank" ' +
-      'style="display:inline-block;background:var(--accent);color:#fff;padding:7px 16px;border-radius:5px;font-size:10px;text-decoration:none;font-weight:600;">' +
-      symbol + ' &rarr; Nasdaq Short Interest &#8599;</a>' +
-      '<div style="margin-top:8px;"><a href="' + finvizUrl + '" target="_blank" ' +
-      'style="color:var(--accent);font-size:9px;text-decoration:none;">Finviz\'de gor &#8599;</a></div>' +
-      '</div>';
-  }
-}
-
-function renderShortInterest(el, d, symbol) {
-  // Nasdaq API formatı — rows dizisi
-  const rows = d.rows || [];
-  if (rows.length === 0) {
-    el.innerHTML = '<div class="dxloading">Veri bulunamadi</div>';
-    return;
-  }
-
-  // En son satır = en güncel veri
-  const latest = rows[0];
-  // Nasdaq format: { settlementDate, shortInterest, avgDailyShareVolume, daysToCover, ... }
-  const parseNum = function(s) {
-    if (!s) return 0;
-    return parseFloat(String(s).replace(/,/g, '')) || 0;
-  };
-
-  const settleDate  = latest.settlementDate || latest.date || '—';
-  const shortVol    = parseNum(latest.shortInterest);
-  const daysToCover = parseNum(latest.daysToCover);
-  const avgVol      = parseNum(latest.avgDailyShareVolume);
-
-  // Short % of float
-  const floatNum = parseNum(d.floatShares);
-  const shortPct = floatNum > 0 ? (shortVol / floatNum) * 100 : 0;
-  const pct      = Math.min(shortPct, 100);
-  const barColor = pct > 20 ? '#f6465d' : pct > 10 ? '#f0b429' : '#00c076';
-
-  const fmtNum = function(n) {
-    return n >= 1e9 ? (n/1e9).toFixed(2) + 'B'
-         : n >= 1e6 ? (n/1e6).toFixed(1) + 'M'
-         : n >= 1e3 ? (n/1e3).toFixed(0) + 'K'
-         : String(Math.round(n));
-  };
-
-  // Tablo satırları (son 6 dönem)
-  let tableRows = '';
-  rows.slice(0, 6).forEach(function(r) {
-    const si  = parseNum(r.shortInterest);
-    const dtc = parseNum(r.daysToCover);
-    const chg = parseNum(r.shortInterest) - parseNum((rows[rows.indexOf(r)+1] || {}).shortInterest);
-    const chgColor = chg >= 0 ? '#f6465d' : '#00c076';
-    const chgStr  = chg !== 0 ? (chg > 0 ? '+' : '') + fmtNum(chg) : '—';
-    tableRows +=
-      '<tr>' +
-      '<td style="color:var(--muted2)">' + r.settlementDate + '</td>' +
-      '<td style="font-weight:600;font-family:monospace">' + fmtNum(si) + '</td>' +
-      '<td style="color:' + chgColor + ';font-family:monospace">' + chgStr + '</td>' +
-      '<td style="color:' + (dtc > 5 ? '#f6465d' : dtc > 2 ? '#f0b429' : '#00c076') + '">' + dtc.toFixed(1) + 'g</td>' +
-      '</tr>';
-  });
-
-  const nasdaqUrl = 'https://www.nasdaq.com/market-activity/stocks/' + symbol.toLowerCase() + '/short-interest';
-
-  el.innerHTML =
-    '<div style="font-size:9px;color:var(--muted2);margin-bottom:8px;">Son guncelleme: ' + settleDate + ' &middot; Kaynak: Nasdaq</div>' +
-    '<div class="si-grid">' +
-      '<div class="si-card">' +
-        '<div class="si-card-title">SHORT INTEREST</div>' +
-        '<div class="si-card-val">' + fmtNum(shortVol) + '</div>' +
-        '<div class="si-card-sub">Aciga satilan hisse</div>' +
-      '</div>' +
-      '<div class="si-card">' +
-        '<div class="si-card-title">DAYS TO COVER</div>' +
-        '<div class="si-card-val" style="color:' + (daysToCover > 5 ? '#f6465d' : daysToCover > 2 ? '#f0b429' : '#00c076') + '">' + daysToCover.toFixed(1) + '</div>' +
-        '<div class="si-card-sub">Ort. gunluk hacim: ' + fmtNum(avgVol) + '</div>' +
-      '</div>' +
-    '</div>' +
-    (floatNum > 0 ?
-      '<div class="si-bar-wrap" style="margin-bottom:8px;">' +
-        '<div class="si-bar-label"><span>Float Yuzdesi</span>' +
-          '<span style="font-weight:700;color:' + barColor + '">' + pct.toFixed(1) + '%</span>' +
-        '</div>' +
-        '<div class="si-bar-track"><div class="si-bar-fill" style="width:' + pct + '%;background:' + barColor + '"></div></div>' +
-        '<div style="display:flex;justify-content:space-between;font-size:8px;color:var(--muted2);margin-top:3px;">' +
-          '<span>Dusuk</span><span>10%</span><span>20%</span><span>Yuksek</span>' +
-        '</div>' +
-      '</div>' : '') +
-    '<table class="insider-table">' +
-      '<thead><tr><th>Tarih</th><th>Short Hacim</th><th>Degisim</th><th>DTC</th></tr></thead>' +
-      '<tbody>' + tableRows + '</tbody>' +
-    '</table>' +
-    '<div style="margin-top:8px;text-align:center;">' +
-      '<a href="' + nasdaqUrl + '" target="_blank" style="color:var(--accent);font-size:9px;text-decoration:none;">Tum gecmis &rarr; Nasdaq &#8599;</a>' +
-    '</div>';
 }
 
 // ── Sektör Karşılaştırması ────────────────────────────────────
@@ -3610,82 +3942,6 @@ async function fetchSectorComps(s) {
     var el2 = document.getElementById('sector-body');
     if(el2) el2.innerHTML = '<div class="dxerror">&#9888; Sektör verisi alınamadı.</div>';
   }
-}
-
-// ── DCF Hesaplayıcı ───────────────────────────────────────────
-function renderDCF(s) {
-  var el = document.getElementById('dcf-body');
-  if (!el) return;
-  var price = s.currentPrice || 0;
-  var pe    = s.peNormalizedAnnual;
-  var eps   = (pe && pe > 0 && price > 0) ? (price / pe) : null;
-  var gDef  = s.epsGrowthTTMYoy != null ? Math.max(-50, Math.min(50, s.epsGrowthTTMYoy)) : 10;
-  var epsStr = eps != null ? eps.toFixed(2) : '';
-  el.innerHTML =
-    '<div style="padding:4px 0 8px;font-size:9px;color:var(--muted2)">İndirgenmiş Nakit Akımı modeli — varsayılanlar mevcut veriden dolduruldu.</div>'
-    + '<div class="dcf-grid">'
-    + _dcfField('dcf-eps',   'Mevcut EPS',            epsStr,     '',   'Hisse başı kazanç (₺)')
-    + _dcfField('dcf-g',     'Büyüme Oranı %',        gDef.toFixed(1), '', 'Yıllık EPS büyüme beklentisi')
-    + _dcfField('dcf-wacc',  'İskonto Oranı % (WACC)','12',       '',   'Fırsat maliyeti / gerekli getiri')
-    + _dcfField('dcf-tg',    'Terminal Büyüme %',      '4',        '',   'Sonsuza dek sürdürülebilir büyüme')
-    + _dcfField('dcf-yrs',   'Projeksiyon (yıl)',      '10',       '',   'Detaylı nakit akımı dönemi')
-    + '</div>'
-    + '<button onclick="_calcDCF(' + price.toFixed(2) + ')" style="margin-top:10px;width:100%;background:var(--accent);color:#fff;border:none;padding:8px;border-radius:5px;font-size:12px;font-weight:600;cursor:pointer">Hesapla</button>'
-    + '<div id="dcf-result" style="margin-top:10px"></div>';
-}
-function _dcfField(id, label, val, unit, hint) {
-  return '<div style="margin-bottom:8px">'
-    + '<div style="font-size:9px;color:var(--muted2);margin-bottom:3px" title="' + esc(hint) + '">' + label + '</div>'
-    + '<input id="' + id + '" type="number" value="' + esc(val) + '" step="any"'
-    + ' style="width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:6px 8px;font-size:12px;border-radius:4px;outline:none">'
-    + '</div>';
-}
-function _calcDCF(currentPrice) {
-  var eps  = parseFloat(document.getElementById('dcf-eps').value);
-  var g    = parseFloat(document.getElementById('dcf-g').value) / 100;
-  var wacc = parseFloat(document.getElementById('dcf-wacc').value) / 100;
-  var tg   = parseFloat(document.getElementById('dcf-tg').value) / 100;
-  var yrs  = parseInt(document.getElementById('dcf-yrs').value, 10);
-  var el   = document.getElementById('dcf-result');
-  if (!el) return;
-  if (isNaN(eps)||eps<=0||isNaN(g)||isNaN(wacc)||wacc<=0||isNaN(tg)||isNaN(yrs)||yrs<1||wacc<=tg) {
-    el.innerHTML = '<div style="color:var(--red);font-size:10px">&#9888; Geçersiz giriş — WACC > terminal büyüme ve EPS > 0 olmalı.</div>';
-    return;
-  }
-  var pv = 0, cf = eps;
-  for (var t = 1; t <= yrs; t++) {
-    cf = cf * (1 + g);
-    pv += cf / Math.pow(1 + wacc, t);
-  }
-  // Terminal value
-  var tv = cf * (1 + tg) / (wacc - tg);
-  pv += tv / Math.pow(1 + wacc, yrs);
-
-  var mos = currentPrice > 0 ? ((pv - currentPrice) / pv * 100) : null;
-  var mosColor = mos == null ? 'var(--muted2)' : mos > 30 ? 'var(--green)' : mos > 0 ? '#f0b429' : 'var(--red)';
-  var signal = mos == null ? '—' : mos > 30 ? 'AL' : mos > 0 ? 'İZLE' : 'PAHAL';
-  var sigColor = mos == null ? 'var(--muted2)' : mos > 30 ? 'var(--green)' : mos > 0 ? '#f0b429' : 'var(--red)';
-
-  el.innerHTML =
-    '<div style="background:var(--s2);border:1px solid var(--border);border-radius:6px;padding:12px">'
-    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
-    + '<span style="font-size:11px;color:var(--muted2)">İçsel Değer</span>'
-    + '<span style="font-size:18px;font-weight:800;color:var(--text)">' + pv.toFixed(2) + '</span>'
-    + '</div>'
-    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
-    + '<span style="font-size:11px;color:var(--muted2)">Mevcut Fiyat</span>'
-    + '<span style="font-size:14px;font-weight:600;color:var(--text)">' + currentPrice.toFixed(2) + '</span>'
-    + '</div>'
-    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
-    + '<span style="font-size:11px;color:var(--muted2)">Güvenlik Payı</span>'
-    + '<span style="font-size:14px;font-weight:700;color:' + mosColor + '">'
-    + (mos != null ? (mos > 0 ? '+' : '') + mos.toFixed(1) + '%' : '—') + '</span>'
-    + '</div>'
-    + '<div style="border-top:1px solid var(--border);padding-top:8px;text-align:center">'
-    + '<span style="font-size:13px;font-weight:800;color:' + sigColor + ';letter-spacing:.5px">' + signal + '</span>'
-    + '</div>'
-    + '</div>'
-    + '<div style="font-size:8px;color:var(--muted);margin-top:6px;text-align:center">Bu hesaplama yatırım tavsiyesi değildir.</div>';
 }
 
 function selectExchange(el) {
@@ -3828,12 +4084,12 @@ function showFooterModal(type) {
 <p>Platform üzerindeki hiçbir içerik; herhangi bir menkul kıymetin alım, satım veya elde tutulmasına yönelik tavsiye, öneri veya teşvik olarak yorumlanamaz.</p>
 <p>Yatırım kararları kişisel mali durumunuza, risk toleransınıza ve yatırım hedeflerinize göre değişir. Her türlü yatırım kararından önce lisanslı bir yatırım danışmanına başvurmanız tavsiye edilir.</p>
 <p>Geçmiş performans gelecekteki sonuçları garanti etmez. Tüm yatırımlar risk içerir ve yatırılan tutarın tamamı kaybedilebilir.</p>
-<p style="font-size:11px;color:var(--muted2);margin-top:16px;">Veri sağlayıcıların (TradingView, Yahoo Finance vb.) hizmet kesintileri veya veri hataları nedeniyle oluşabilecek zararlardan DeepFin sorumlu tutulamaz.</p>`,
+<p style="font-size:11px;color:var(--muted2);margin-top:16px;">Veri sağlayıcılarının hizmet kesintileri veya veri hataları nedeniyle oluşabilecek zararlardan DeepFin sorumlu tutulamaz.</p>`,
 
     privacy: `<p><strong style="color:var(--text)">Gizlilik Politikası</strong></p>
 <p>DeepFin olarak kullanıcı gizliliğine büyük önem veriyoruz.</p>
 <p><strong style="color:var(--text)">Topladığımız veriler:</strong> Platform tamamen istemci taraflı çalışır. Kişisel veri toplamaz, üye kaydı gerektirmez. Kullanım istatistikleri (sayfa görüntüleme, anonim) analitik amaçlı toplanabilir.</p>
-<p><strong style="color:var(--text)">Üçüncü taraf servisleri:</strong> TradingView Scanner API, Yahoo Finance ve SEC EDGAR'dan veri çekilir. Bu servislerin kendi gizlilik politikaları geçerlidir.</p>
+<p><strong style="color:var(--text)">Üçüncü taraf servisleri:</strong> Veriler çeşitli ulusal ve uluslararası finansal veri sağlayıcılarından çekilir. Bu servislerin kendi gizlilik politikaları geçerlidir.</p>
 <p><strong style="color:var(--text)">Çerezler:</strong> Oturum ve tercih bilgilerini saklamak için minimal çerez kullanılabilir. Reklam amaçlı çerez kullanılmaz.</p>
 <p style="font-size:11px;color:var(--muted2);margin-top:16px;">Son güncelleme: Ocak 2026</p>`,
 
@@ -3861,21 +4117,21 @@ function showFooterModal(type) {
 <p style="font-size:11px;color:var(--muted2);">Son güncelleme: Ocak 2026</p>`,
 
     teknikanaliz: `
-<p style="color:var(--muted);font-size:11px;margin-bottom:16px;">26 teknik indikatör kullanılarak hesaplanan gerçek zamanlı sinyaller. Her preset farklı bir piyasa durumuna veya strateji felsefesine karşılık gelir.</p>
+<p style="color:var(--muted);font-size:11px;margin-bottom:16px;">26 teknik gösterge kullanılarak hesaplanan gerçek zamanlı sinyaller. Her preset farklı bir piyasa durumuna veya strateji felsefesine karşılık gelir.</p>
 
 <div class="fbk-section">
   <div class="fbk-section-title">📈 Trend & Kırılım Presetleri</div>
 
   <div class="fbk-card">
     <div class="fbk-card-header"><span class="fbk-chip">Kırılım</span><span class="fbk-tag">Minervini SEPA</span></div>
-    <p>Zirvesine yakın, hacim destekli, 26 indikatör AL sinyali veren hisseler. Mark Minervini'nin SEPA (Specific Entry Point Analysis) kırılım koşuluna dayanır. Güçlü trendlerin başlangıç noktasını yakalar.</p>
-    <div class="fbk-filters">from_high &gt; -5% · hacim &gt; 0.5M lot · Teknik Skor &gt; 0.1</div>
+    <p>52 haftalık zirvesine yakın, hacim destekli, teknik göstergelerin alım verdiği hisseler. Mark Minervini'nin SEPA (Specific Entry Point Analysis) kırılım koşuluna dayanır. Güçlü trendlerin başlangıç noktasını yakalar.</p>
+    <div class="fbk-filters">zirveye %5 mesafe · günlük &gt; %1.5 · teknik skor &gt; 0.1</div>
   </div>
 
   <div class="fbk-card">
     <div class="fbk-card-header"><span class="fbk-chip">Zirveye Yakın</span><span class="fbk-tag">Trend Devam</span></div>
-    <p>1 aylık zirvesinin %3'ü yakınında VE son 3 ayda en az %5 kazanmış hisseler. Güçlü trendin devam ettiğini gösteren, sürüş biter bitmez alım noktasını işaret eder.</p>
-    <div class="fbk-filters">from_high &gt; -3% · 3 ay getiri &gt; %5</div>
+    <p>52 haftalık zirvesinin %5'i yakınında VE son 3 ayda en az %5 kazanmış hisseler. Güçlü trendin devam ettiğini gösteren, sürüş biter bitmez alım noktasını işaret eder.</p>
+    <div class="fbk-filters">zirveye %5 mesafe · 3 ay getiri &gt; %5</div>
   </div>
 
   <div class="fbk-card">
@@ -3886,8 +4142,8 @@ function showFooterModal(type) {
 
   <div class="fbk-card">
     <div class="fbk-card-header"><span class="fbk-chip">Sağlıklı Çekilme</span><span class="fbk-tag">Trend İçi Fırsat</span></div>
-    <p>Zirveden %10–25 geri çekilen ama 6 aylık trendi hâlâ güçlü olan hisseler. Güçlü bir trendde normal konsolidasyon sırasında alım fırsatı sunar. "Pullback in uptrend" stratejisi.</p>
-    <div class="fbk-filters">from_high: -10% ila -25% · 6 ay getiri &gt; %10</div>
+    <p>Zirveden %5–15 geri çekilen ama 6 aylık trendi hâlâ güçlü olan hisseler. Güçlü bir trendde normal konsolidasyon sırasında alım fırsatı sunar. "Pullback in uptrend" stratejisi.</p>
+    <div class="fbk-filters">zirveden %5–15 geride · 6 ay getiri &gt; %15</div>
   </div>
 </div>
 
@@ -3908,8 +4164,8 @@ function showFooterModal(type) {
 
   <div class="fbk-card">
     <div class="fbk-card-header"><span class="fbk-chip">Kurumsal Hacim</span><span class="fbk-tag">Büyük Para Tespiti</span></div>
-    <p>Normalin çok üzerinde hacim eşliğinde fiyat artışı. Büyük kurumsal oyuncuların (fon, banka) pozisyon açtığının teknik sinyali. "Follow the smart money" yaklaşımı.</p>
-    <div class="fbk-filters">hacim &gt; 5M lot · günlük değişim &gt; 0</div>
+    <p>Normalinin en az 2 katı hacim eşliğinde fiyat artışı. Büyük kurumsal oyuncuların (fon, banka) pozisyon açtığının teknik sinyali. "Follow the smart money" yaklaşımı.</p>
+    <div class="fbk-filters">göreli hacim &gt; 2× · günlük değişim &gt; 0</div>
   </div>
 </div>
 
@@ -3929,9 +4185,9 @@ function showFooterModal(type) {
   </div>
 
   <div class="fbk-card">
-    <div class="fbk-card-header"><span class="fbk-chip">26 İndikatör AL</span><span class="fbk-tag">Teknik Konsensüs</span></div>
-    <p>26 teknik indikatörü (RSI, MACD, ADX, Stochastic, 15 farklı hareketli ortalama) birleştiren konsensüs skorunun 0.5 üzeri olduğu hisseler. Teknik analizin toplu onayı.</p>
-    <div class="fbk-filters">Teknik Skor &gt; 0.5 (26 indikatör çoğunluğu AL)</div>
+    <div class="fbk-card-header"><span class="fbk-chip">26 Gösterge AL</span><span class="fbk-tag">Teknik Konsensüs</span></div>
+    <p>26 teknik göstergeyi (RSI, MACD, ADX, Stochastic, 15 farklı hareketli ortalama) birleştiren bileşik teknik skorun 0.5 üzeri olduğu hisseler. Teknik analizin toplu onayı.</p>
+    <div class="fbk-filters">Teknik skor &gt; 0.5 (26 gösterge çoğunluğu AL)</div>
   </div>
 </div>
 
@@ -3969,6 +4225,16 @@ function switchSbTab(tab) {
       });
     }
   }
+  // Chip durumlarını terk edilen panelden hedef panele aynala — mevcut filtre her sekmede görünsün
+  var src = tab === 'advanced' ? BASIC_CHIP_CFG : ADV_CHIP_CFG;
+  var dst = tab === 'advanced' ? ADV_CHIP_CFG   : BASIC_CHIP_CFG;
+  [['goatId','goat-chip','goat'],['presetsId','chip','preset'],['techId','chip','tech']].forEach(function(m) {
+    var onKeys = {};
+    document.querySelectorAll('#' + src[m[0]] + ' .' + m[1] + '.on').forEach(function(c){ onKeys[c.dataset[m[2]]] = 1; });
+    document.querySelectorAll('#' + dst[m[0]] + ' .' + m[1]).forEach(function(c){
+      c.classList.toggle('on', !!onKeys[c.dataset[m[2]]]);
+    });
+  });
   document.getElementById('sb-panel-basic').style.display    = tab === 'basic'    ? '' : 'none';
   document.getElementById('sb-panel-advanced').style.display = tab === 'advanced' ? '' : 'none';
   document.getElementById('sb-tab-basic').classList.toggle('active',    tab === 'basic');
@@ -4017,15 +4283,15 @@ function showProfil(sym, ex) {
       dy:  d.dividendYieldIndicatedAnnual||d.dividend_yield_recent||0,
       // Piyasa
       mc:  d.marketCapitalization||d.market_cap_basic||0,
-      av:  d.average_volume_10d_calc||0,
+      av:  d.avgVol10d||d.average_volume_10d_calc||0,
       bt:  d.beta||0,
-      // 52 hafta — allData'da 52WeekHigh
+      // 52 hafta — allData'da 52WeekHigh (gerçek 52H verisi)
       wh:  d['52WeekHigh']||d['52_week_high']||0,
       wl:  d['52WeekLow']||d['52_week_low']||0,
       // Performans
-      pw:  d.Perf_W||0,
-      pm:  d.Perf_1M||0,
-      py:  d.Perf_Y||0,
+      pw:  d.perfW||d.Perf_W||0,
+      pm:  d.perf1m||d.Perf_1M||0,
+      py:  d.perfY||d.Perf_Y||0,
       cf:  d.cash_f_operating_activities||0
     };
     try {
@@ -4103,39 +4369,203 @@ let disclaimerAccepted = false;
 
 
 function updateExchangeBadge() {}
-// ── TARAMA SÜRESİ TAHMİNİ ──
+// ── TARAMA SÜRESİ / PHASE STEPPER ──
 let scanStartTime = null;
 let scanEtaTimer  = null;
-const EXCHANGE_ETA = { bist:4, nasdaq:6, sp500:6, dax:5, lse:5, nikkei:5, nyse:6, moex:5, france:5, amsterdam:5, brussels:5, lisbon:5, dublin:5, oslo:5, milan:5, tsx:6, twse:5, b3:5, hkex:6, china:6, saudi:5, switzerland:5, australia:5, southafrica:5, sweden:5, india:5, uae:5 }; // saniye
+let _scanMeta     = { strategy: null, exchange: null, total: 0, matches: 0, elapsed: 0 };
+var _psvScanFilterCount = 0;   // filter count captured in psvScan, drives minimum display time
+var _pendingScanResult  = undefined; // undefined = error/unset; null/value = success special
+const EXCHANGE_ETA = { bist:4, nasdaq:6, sp500:6, dax:5, lse:5, nikkei:5, nyse:6, moex:5, france:5, amsterdam:5, brussels:5, lisbon:5, dublin:5, oslo:5, milan:5, tsx:6, twse:5, b3:5, hkex:6, china:6, saudi:5, switzerland:5, australia:5, southafrica:5, sweden:5, india:5, uae:5 };
 
-function startScanEta(exchange) {
-  const total = EXCHANGE_ETA[exchange] || 5;
+// Phase thresholds in percent
+const STEPPER_PHASES = [0, 8, 65, 80, 92];
+
+function _setStepperPhase(activeIdx) {
+  var items = document.querySelectorAll('#scan-stepper .sstep-item');
+  items.forEach(function(item, i) {
+    item.classList.remove('active', 'done');
+    if (i < activeIdx) item.classList.add('done');
+    else if (i === activeIdx) item.classList.add('active');
+  });
+}
+
+function startScanEta(exchange, minMs) {
+  var etaSec = EXCHANGE_ETA[exchange] || 5;
+  var minSec = (minMs || 0) / 1000;
+  var total  = Math.max(etaSec, minSec);
   scanStartTime = Date.now();
-  const etaEl  = document.getElementById('scan-eta');
-  const txtEl  = document.getElementById('scan-eta-txt');
-  const barEl  = document.getElementById('scan-eta-bar');
-  if (!etaEl) return;
-  etaEl.style.display = 'block';
-  barEl.style.width = '0%';
   clearInterval(scanEtaTimer);
+  _setStepperPhase(0);
   scanEtaTimer = setInterval(function() {
     const elapsed = (Date.now() - scanStartTime) / 1000;
-    const pct     = Math.min((elapsed / total) * 100, 95);
-    const rem     = Math.max(Math.ceil(total - elapsed), 1);
-    barEl.style.width = pct + '%';
-    txtEl.textContent = elapsed < total
-      ? 'Tahmini süre: ~' + rem + ' saniye'
-      : 'Neredeyse hazır...';
-    if (elapsed >= total * 1.5) clearInterval(scanEtaTimer);
+    const pct = Math.min((elapsed / total) * 100, 95);
+    var phase = 0;
+    for (var i = STEPPER_PHASES.length - 1; i >= 0; i--) {
+      if (pct >= STEPPER_PHASES[i]) { phase = i; break; }
+    }
+    _setStepperPhase(phase);
   }, 300);
 }
 
 function stopScanEta() {
   clearInterval(scanEtaTimer);
-  const etaEl = document.getElementById('scan-eta');
-  const barEl = document.getElementById('scan-eta-bar');
-  if (barEl) barEl.style.width = '100%';
-  setTimeout(function() { if (etaEl) etaEl.style.display = 'none'; }, 400);
+  var items = document.querySelectorAll('#scan-stepper .sstep-item');
+  items.forEach(function(item) { item.classList.remove('active'); item.classList.add('done'); });
+}
+
+function showScanSummary(total, matches) {
+  const el = document.getElementById('scan-summary');
+  if (!el) return;
+  const elapsed = scanStartTime ? ((Date.now() - scanStartTime) / 1000).toFixed(1) : '—';
+  const filters = _scanMeta.filters || [];
+  var tagsHtml = filters.map(function(f) {
+    var xBtn = (f.kind && f.key)
+      ? '<span class="ssm-tag-x" onclick="removeScanFilter(\'' + f.kind + '\',\'' + f.key + '\')" title="Bu filtreyi kaldır">×</span>'
+      : '';
+    return '<span class="ssm-tag">' + esc(f.label) + xBtn +
+      (f.desc ? '<span class="ssm-tag-popup">' + esc(f.desc) + '</span>' : '') +
+      '</span>';
+  }).join('');
+  el.innerHTML =
+    '<span class="ssm-left"></span>' +
+    '<span class="ssm-center ssm-tags-center">' + (tagsHtml || '<span class="ssm-no-filter">Filtresiz</span>') + '</span>' +
+    '<span class="ssm-right ssm-dur">' + elapsed + 's</span>';
+  // Tarandı/eşleşti bilgisi stats-bar'da GÜNCELLEME yanında
+  var resItem = document.getElementById('sb-result-item');
+  var resVal  = document.getElementById('sb-result');
+  if (resItem && resVal) {
+    resVal.innerHTML = total + ' tarandı · <span class="up">' + matches + ' eşleşti</span>';
+    resItem.style.display = '';
+  }
+}
+
+// Özet barındaki × — filtreyi her iki paneldeki chip'lerden kaldırıp kalanlarla yeniden tarar
+function removeScanFilter(kind, key) {
+  if (_scanRunning || document.getElementById('quick-scan-pill')) return;
+  var sel = kind === 'goat'   ? '.goat-chip[data-goat="' + key + '"]'
+          : kind === 'preset' ? '.chip[data-preset="' + key + '"]'
+          :                     '.chip[data-tech="' + key + '"]';
+  document.querySelectorAll(sel).forEach(function(c){ c.classList.remove('on'); });
+  // Prescan seçim setlerini de güncelle — "Yeni Tarama"ya dönünce tutarlı kalsın
+  if (kind === 'goat')   _psvActiveGoats.delete(key);
+  if (kind === 'preset') _psvActivePresets.delete(key);
+  if (kind === 'tech')   _psvActiveTech.delete(key);
+  _psvScanFilterCount = Math.max(0, _psvScanFilterCount - 1);
+  var dict = kind === 'goat' ? GURUS : kind === 'preset' ? PRESETS : TECH_PRESETS;
+  window._quickRescan = true;
+  window._quickRescanLabel = '− ' + (dict[key] ? dict[key].label.split(' — ')[0].split(' (')[0] : key);
+  _applyChips(BASIC_CHIP_CFG);
+}
+
+// ── HIZLI YENİDEN TARAMA PİLİ — tablo görünür kalır, ortada küçük durum göstergesi ──
+function showQuickScanPill(label) {
+  hideQuickScanPill();
+  var tw = document.getElementById('twrap');
+  if (tw) tw.classList.add('quick-rescan');
+  var tb = document.getElementById('toolbar');
+  if (tb) tb.classList.add('quick-rescan');
+  var ov = document.createElement('div');
+  ov.id = 'quick-scan-pill';
+  ov.innerHTML = '<span class="qsp-spin"></span><span class="qsp-txt">Yeni filtreyle taranıyor…</span>' +
+    (label ? '<span class="qsp-sub">' + esc(label) + '</span>' : '');
+  document.body.appendChild(ov);
+}
+
+function hideQuickScanPill() {
+  var ov = document.getElementById('quick-scan-pill');
+  if (ov) ov.remove();
+  var tw = document.getElementById('twrap');
+  if (tw) tw.classList.remove('quick-rescan');
+  var tb = document.getElementById('toolbar');
+  if (tb) tb.classList.remove('quick-rescan');
+}
+
+// ── FİLTRE EKLE DROPDOWN — tablodan ayrılmadan chip seçimi ──
+var FD_GROUPS = [
+  { kind: 'goat',   title: 'Yatırımcı Stratejileri', containerId: 'goat-chips',   attr: 'data-goat' },
+  { kind: 'preset', title: 'Temel Stratejiler',      containerId: 'presets',      attr: 'data-preset' },
+  { kind: 'tech',   title: 'Teknik Stratejiler',     containerId: 'tech-presets', attr: 'data-tech' }
+];
+
+function toggleFilterDropdown(e) {
+  if (e) e.stopPropagation();
+  var dd = document.getElementById('filter-dropdown');
+  if (!dd) return;
+  if (dd.style.display !== 'none') { closeFilterDropdown(); return; }
+  renderFilterDropdown();
+  dd.style.display = 'block';
+  var btn = document.getElementById('add-filter-btn');
+  if (btn) btn.classList.add('open');
+  setTimeout(function() { document.addEventListener('click', _fdOutsideClick); }, 0);
+}
+
+function _fdOutsideClick(e) {
+  var dd = document.getElementById('filter-dropdown');
+  if (dd && !dd.contains(e.target)) closeFilterDropdown();
+}
+
+function closeFilterDropdown() {
+  var dd = document.getElementById('filter-dropdown');
+  if (dd) dd.style.display = 'none';
+  var btn = document.getElementById('add-filter-btn');
+  if (btn) btn.classList.remove('open');
+  document.removeEventListener('click', _fdOutsideClick);
+}
+
+function renderFilterDropdown() {
+  var dd = document.getElementById('filter-dropdown');
+  if (!dd) return;
+  var html = '<div class="fd-head"><span>Filtre Ekle</span><span class="fd-count" id="fd-count">' +
+    _countChips(BASIC_CHIP_CFG) + '/4</span></div>';
+  FD_GROUPS.forEach(function(g) {
+    var dict = g.kind === 'goat' ? GURUS : g.kind === 'preset' ? PRESETS : TECH_PRESETS;
+    var chips = document.querySelectorAll('#' + g.containerId + ' [' + g.attr + ']');
+    if (!chips.length) return;
+    html += '<div class="fd-group-title">' + g.title + '</div><div class="fd-chips">';
+    var items = [];
+    chips.forEach(function(c) {
+      var key = c.getAttribute(g.attr);
+      var def = dict[key];
+      // Goat chip'ler mini-card'a dönüştürülmüş olabilir — sadece isim span'ini al
+      var nameEl = c.querySelector('.gcchip-name');
+      items.push({
+        key: key,
+        label: (nameEl ? nameEl.textContent : c.textContent).trim(),
+        desc: def && def.desc ? def.desc : '',
+        on: c.classList.contains('on')
+      });
+    });
+    items.sort(function(a, b) { return a.label.localeCompare(b.label, 'tr'); });
+    items.forEach(function(it) {
+      var tip = it.desc ? ' title="' + esc(it.desc) + '"' : '';
+      html += '<span class="fd-chip' + (it.on ? ' on' : '') + '"' + tip +
+        ' onclick="fdToggleChip(\'' + g.kind + '\',\'' + it.key + '\',this)">' + esc(it.label) + '</span>';
+    });
+    html += '</div>';
+  });
+  dd.innerHTML = html;
+}
+
+function fdToggleChip(kind, key, el) {
+  // Tarama sürerken (min süre beklemesi dahil) çifte tetiklemeyi önle
+  if (_scanRunning || document.getElementById('quick-scan-pill')) return;
+  var wasOn = el.classList.contains('on');
+  if (!wasOn && _countChips(BASIC_CHIP_CFG) >= 4) { showToast('En fazla 4 filtre seçilebilir'); return; }
+  var sel = kind === 'goat'   ? '.goat-chip[data-goat="' + key + '"]'
+          : kind === 'preset' ? '.chip[data-preset="' + key + '"]'
+          :                     '.chip[data-tech="' + key + '"]';
+  document.querySelectorAll(sel).forEach(function(c) { c.classList.toggle('on', !wasOn); });
+  el.classList.toggle('on', !wasOn);
+  // Prescan seçim setleri tutarlı kalsın — "Yeni Tarama"ya dönünce aynı seçimler görünür
+  var set = kind === 'goat' ? _psvActiveGoats : kind === 'preset' ? _psvActivePresets : _psvActiveTech;
+  if (wasOn) set.delete(key); else set.add(key);
+  if (!wasOn) _track(kind, key);
+  var cnt = document.getElementById('fd-count');
+  if (cnt) cnt.textContent = _countChips(BASIC_CHIP_CFG) + '/4';
+  _psvScanFilterCount = _countChips(BASIC_CHIP_CFG);
+  window._quickRescan = true;
+  window._quickRescanLabel = (wasOn ? '− ' : '+ ') + el.textContent.trim();
+  _applyChips(BASIC_CHIP_CFG);
 }
 
 // ── MOBILE DRAWER ──
@@ -4209,9 +4639,14 @@ function acceptDisclaimer() {
 function showScreener() {
   _doShowScreener();
 }
-function _doShowScreener() {
+function showScreenerOrPrescan() {
+  // Prescan üstte açılacak; alttaki sidebar durumuna dokunma (geri dönüşte kayma olmasın)
+  _doShowScreener(true);
+  openPrescanView();
+}
+function _doShowScreener(keepSidebar) {
   hideAnalizPage();
-  setTimeout(initSidebarState, 0);
+  if (!keepSidebar) setTimeout(initSidebarState, 0);
   var _pp=document.getElementById('profile-page'); if(_pp){_pp.style.display='none';_pp.classList.remove('on');}
   var na = document.getElementById('nav-analiz'); if(na) na.classList.remove('active');
   // Disclaimer kontrolü
@@ -4378,6 +4813,11 @@ document.addEventListener('DOMContentLoaded', function(){
   _initKeyboardNav();
   _updateFavBadge();
   _updateOnboarding(null); // Varsayılan: genel onboarding
+  // Sidebar borsa chiplerine hover açıklaması
+  document.querySelectorAll('.exbtn[data-exchange]').forEach(function(b){
+    var t = EXCHANGE_TIPS[b.dataset.exchange];
+    if (t) b.title = t;
+  });
   // Canlı istatistikleri çek ve her 60s güncelle
   function _fmtStatNum(n) {
     if (!n || n === 0) return '—';
@@ -4414,7 +4854,7 @@ document.addEventListener('DOMContentLoaded', function(){
   var _investor = _sp.get('investor');
   if (_p === 'profile' || _p === 'screener' || _p === 'analiz' || _path === '/screener' || _hasWl) {
     showScreener();
-    if (!_investor && allData.length === 0 && !_hasWl) runScan();
+    if (!_investor && allData.length === 0 && !_hasWl) openPrescanView();
   } else {
     showHomepage();
   }
@@ -4447,6 +4887,7 @@ document.addEventListener('DOMContentLoaded', function(){
   var total = document.querySelectorAll('[data-goat],[data-preset],[data-tech]').length;
   var el = document.querySelector('[data-strat-count]');
   if(el) el.innerHTML = total + ' <span>strateji</span>';
+  upgradeGoatChips();
 });
 
 
@@ -4472,4 +4913,20 @@ function initSidebarState() {
   if (sb)         sb.classList.remove('collapsed');
   if (reopen)     reopen.style.display = 'none';
   if (tickerWrap) tickerWrap.classList.remove('sb-open');
+}
+function collapseSidebar(instant) {
+  if (window.innerWidth <= 768) return;
+  var sb = document.getElementById('sidebar');
+  var reopen = document.getElementById('sb-reopen');
+  var tickerWrap = document.getElementById('ticker-wrap');
+  if (!sb || sb.classList.contains('collapsed')) return;
+  if (instant) {
+    // Overlay arkasında görünmez kapanış: animasyonsuz
+    sb.style.transition = 'none';
+    setTimeout(function(){ sb.style.transition = ''; }, 50);
+  }
+  sb.classList.add('collapsed');
+  if (reopen) reopen.style.display = 'flex';
+  if (tickerWrap) tickerWrap.classList.add('sb-open');
+  try { localStorage.setItem('df_sb_collapsed', '1'); } catch(e) {}
 }

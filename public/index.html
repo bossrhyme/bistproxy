@@ -129,8 +129,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=arctic70">
-<script src="/deepfin.js?v=97" defer></script>
+<link rel="stylesheet" href="/deepfin.css?v=arctic92m1">
+<script src="/deepfin.js?v=137m1" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -168,7 +168,7 @@ if('serviceWorker' in navigator){
     <div class="tlogo" onclick="showHomepage()" style="cursor:pointer"><div class="tlogo-mark">D</div>DeepFin</div>
     <span class="tlive">Canlı</span>
     <a href="/" class="hp-nav-btn active" id="nav-home" onclick="event.preventDefault(); showHomepage()">Anasayfa</a>
-    <a href="/" class="hp-nav-btn" id="nav-tarama" onclick="event.preventDefault(); showScreener()">Tarayıcı</a>
+    <a href="/" class="hp-nav-btn" id="nav-tarama" onclick="event.preventDefault(); showScreenerOrPrescan()">Tarayıcı</a>
     <a href="/analiz/" class="hp-nav-btn" id="nav-analiz">Analiz</a>
     <button class="hamburger-btn" id="hamburger-btn" onclick="toggleMobileDrawer()" style="display:none;" aria-label="Filtreler">
       <span class="ham-line"></span><span class="ham-line"></span><span class="ham-line"></span>
@@ -207,7 +207,7 @@ if('serviceWorker' in navigator){
       <h1 class="hp-title">Tarama bizden,<br><span>karar sizden.</span></h1>
       <div class="hp-sub">Hisse, fon ve kripto gibi 9 varlık sınıfı tek ekranda. 30.000'den fazla enstrümanı 100+ filtre kriteriyle saniyeler içinde tara, dünyaca ünlü stratejilerle analiz et.</div>
       <div class="hp-cta">
-        <button class="hp-cta-primary" onclick="showScreener()">▶ Taramaya Başla</button>
+        <button class="hp-cta-primary" onclick="showScreenerOrPrescan()">▶ Taramaya Başla</button>
         <button class="hp-cta-secondary" onclick="showScreener();openInfo()">📚 Bilgi Bankası</button>
       </div>
     </div>
@@ -621,7 +621,7 @@ if('serviceWorker' in navigator){
     </div>
     <div class="drawer-nav">
       <a class="drawer-nav-link" id="dnav-home" onclick="closeMobileDrawer(); showHomepage()">🏠 Anasayfa</a>
-      <a class="drawer-nav-link" id="dnav-tarama" onclick="closeMobileDrawer(); showScreener()">🔍 Tarayıcı</a>
+      <a class="drawer-nav-link" id="dnav-tarama" onclick="closeMobileDrawer(); showScreenerOrPrescan()">🔍 Tarayıcı</a>
       <a class="drawer-nav-link" href="/analiz/">📊 Analiz</a>
     </div>
     <div id="drawer-content">
@@ -892,13 +892,15 @@ if('serviceWorker' in navigator){
             <div class="chip" data-preset="quality">Kaliteli</div>
             <div class="chip" data-preset="momentum">Momentum</div>
             <div class="chip" data-preset="dividend">Temettü</div>
+            <div class="chip" data-preset="smallcap">Küçük Şirketler</div>
+            <div class="chip" data-preset="megacap">Dev Şirketler</div>
           </div>
           <div class="goat-info" id="preset-info"></div>
           <div class="filter-group-title" style="margin-top:10px;">📈 Hazır Teknik Analiz</div>
           <div class="presets chips" id="tech-presets">
             <div class="chip tech-chip" data-tech="breakout">Breakout</div>
             <div class="chip tech-chip" data-tech="oversold">Aşırı Satış</div>
-            <div class="chip tech-chip" data-tech="nearHigh">ATH Yakın</div>
+            <div class="chip tech-chip" data-tech="nearHigh">52H Zirve</div>
             <div class="chip tech-chip" data-tech="pullback">Düzeltme</div>
             <div class="chip tech-chip" data-tech="strongDay">Günlük Hareket</div>
             <div class="chip tech-chip" data-tech="highVolume">Akıllı Para</div>
@@ -906,6 +908,15 @@ if('serviceWorker' in navigator){
             <div class="chip tech-chip" data-tech="momentum3m">3A Momentum</div>
             <div class="chip tech-chip" data-tech="trendFollow">Trend Takibi</div>
             <div class="chip tech-chip" data-tech="rsiBounce">Toparlanıyor</div>
+            <div class="chip tech-chip" data-tech="goldenCross">Golden Cross</div>
+            <div class="chip tech-chip" data-tech="macdReversal">MACD Dönüşü</div>
+            <div class="chip tech-chip" data-tech="adxTrend">Güçlü Trend</div>
+            <div class="chip tech-chip" data-tech="bbBounce">Bollinger Dibi</div>
+            <div class="chip tech-chip" data-tech="stochReversal">Stokastik Dönüş</div>
+            <div class="chip tech-chip" data-tech="maConfirm">Ortalama Onayı</div>
+            <div class="chip tech-chip" data-tech="oscConfirm">Osilatör Onayı</div>
+            <div class="chip tech-chip" data-tech="lowBeta">Defansif</div>
+            <div class="chip tech-chip" data-tech="ytdLeader">1A Momentum</div>
           </div>
           <div class="goat-info" id="tech-preset-info"></div>
         </div>
@@ -1117,13 +1128,15 @@ if('serviceWorker' in navigator){
             <div class="chip" data-preset="quality">Kaliteli</div>
             <div class="chip" data-preset="momentum">Momentum</div>
             <div class="chip" data-preset="dividend">Temettü</div>
+            <div class="chip" data-preset="smallcap">Küçük Şirketler</div>
+            <div class="chip" data-preset="megacap">Dev Şirketler</div>
           </div>
           <div class="goat-info" id="preset-info-adv"></div>
           <div class="filter-group-title" style="margin-top:10px;">📈 Hazır Teknik Analiz</div>
           <div class="presets chips" id="adv-tech-presets">
             <div class="chip tech-chip" data-tech="breakout">Breakout</div>
             <div class="chip tech-chip" data-tech="oversold">Aşırı Satış</div>
-            <div class="chip tech-chip" data-tech="nearHigh">ATH Yakın</div>
+            <div class="chip tech-chip" data-tech="nearHigh">52H Zirve</div>
             <div class="chip tech-chip" data-tech="pullback">Düzeltme</div>
             <div class="chip tech-chip" data-tech="strongDay">Günlük Hareket</div>
             <div class="chip tech-chip" data-tech="highVolume">Akıllı Para</div>
@@ -1131,6 +1144,15 @@ if('serviceWorker' in navigator){
             <div class="chip tech-chip" data-tech="momentum3m">3A Momentum</div>
             <div class="chip tech-chip" data-tech="trendFollow">Trend Takibi</div>
             <div class="chip tech-chip" data-tech="rsiBounce">Toparlanıyor</div>
+            <div class="chip tech-chip" data-tech="goldenCross">Golden Cross</div>
+            <div class="chip tech-chip" data-tech="macdReversal">MACD Dönüşü</div>
+            <div class="chip tech-chip" data-tech="adxTrend">Güçlü Trend</div>
+            <div class="chip tech-chip" data-tech="bbBounce">Bollinger Dibi</div>
+            <div class="chip tech-chip" data-tech="stochReversal">Stokastik Dönüş</div>
+            <div class="chip tech-chip" data-tech="maConfirm">Ortalama Onayı</div>
+            <div class="chip tech-chip" data-tech="oscConfirm">Osilatör Onayı</div>
+            <div class="chip tech-chip" data-tech="lowBeta">Defansif</div>
+            <div class="chip tech-chip" data-tech="ytdLeader">1A Momentum</div>
           </div>
           <div class="goat-info" id="tech-preset-info-adv"></div>
         </div>
@@ -1293,19 +1315,25 @@ if('serviceWorker' in navigator){
 
       <!-- STATS BAR -->
       <div class="stats-bar" id="stats-bar">
-        <button id="mobile-filter-btn" class="mobile-filter-btn" onclick="toggleMobileDrawer()" title="Filtreleri aç">☰ Filtreler</button>
-        <button id="fav-filter-btn" class="sb-fav-btn" onclick="toggleFavFilter()" title="Listelerim">☆ Listelerim</button>
-        <button class="col-btn" onclick="openColPicker()" title="Kolonları özelleştir">⚙ Kolonlar</button>
+        <button id="new-scan-btn" class="new-scan-btn" onclick="openPrescanView()" title="Yeni tarama başlat">🔍 Yeni Tarama</button>
+        <div class="add-filter-wrap" id="add-filter-wrap" style="display:none">
+          <button id="add-filter-btn" class="new-scan-btn add-filter-btn" onclick="toggleFilterDropdown(event)" title="Mevcut taramaya filtre ekle">➕ Filtre Ekle</button>
+          <div id="filter-dropdown" class="filter-dropdown" style="display:none"></div>
+        </div>
         <div class="sb-search">
           <span class="sb-search-ico">⌕</span>
           <input type="text" id="sb-searchbox" class="sb-search-input" placeholder="Ara..." oninput="onSearch()" />
         </div>
+        <button id="mobile-filter-btn" class="mobile-filter-btn" onclick="toggleMobileDrawer()" title="Filtreleri aç">☰ Filtreler</button>
         <div class="sb-item"><span class="sb-label">TARAMA</span><span class="sb-val" id="sb-count">—</span></div>
         <div class="sb-item"><span class="sb-label">YÜKSELİŞ</span><span class="sb-val up" id="sb-up">—</span></div>
         <div class="sb-item"><span class="sb-label">DÜŞÜŞ</span><span class="sb-val dn" id="sb-dn">—</span></div>
         <div class="sb-item"><span class="sb-label">BORSA</span><span class="sb-val" id="sb-ex">—</span></div>
         <div class="sb-item"><span class="sb-label">GÜNCELLEME</span><span class="sb-val" id="sb-time">—</span></div>
+        <div class="sb-item" id="sb-result-item" style="display:none"><span class="sb-label">SONUÇ</span><span class="sb-val" id="sb-result">—</span></div>
       </div>
+
+      <div id="scan-summary" class="scan-summary" style="display:none"></div>
 
       <div class="cstate" id="empty">
         <div class="big" id="onb-big">DEEPFIN</div>
@@ -1314,13 +1342,28 @@ if('serviceWorker' in navigator){
         <div class="onboarding" id="onb-container"></div>
       </div>
       <div class="cstate" id="loading" style="display:none">
-        <div class="spinner"></div>
-        <p id="loadtxt">Veriler yükleniyor...</p>
-        <small id="loadsub"></small>
-        <div id="scan-eta" style="margin-top:12px;font-size:11px;color:var(--muted2);display:none;">
-          <span id="scan-eta-txt"></span>
-          <div style="margin-top:8px;width:180px;height:3px;background:var(--border);border-radius:2px;overflow:hidden;">
-            <div id="scan-eta-bar" style="height:100%;background:var(--accent);border-radius:2px;width:0%;transition:width .4s ease;"></div>
+        <span id="loadtxt" style="display:none"></span>
+        <span id="loadsub" style="display:none"></span>
+        <div class="scan-stepper" id="scan-stepper">
+          <div class="sstep-item" data-phase="0">
+            <div class="sstep-marker"><div class="sstep-dot"></div><div class="sstep-conn"></div></div>
+            <div class="sstep-body"><span class="sstep-label">Hazırlık</span><span class="sstep-sub">Parametreler hazırlanıyor...</span></div>
+          </div>
+          <div class="sstep-item" data-phase="1">
+            <div class="sstep-marker"><div class="sstep-dot"></div><div class="sstep-conn"></div></div>
+            <div class="sstep-body"><span class="sstep-label">Veri Toplama</span><span class="sstep-sub" id="sstep-sub-1">Veriler alınıyor...</span></div>
+          </div>
+          <div class="sstep-item" data-phase="2">
+            <div class="sstep-marker"><div class="sstep-dot"></div><div class="sstep-conn"></div></div>
+            <div class="sstep-body"><span class="sstep-label">Analiz</span><span class="sstep-sub">Filtreler uygulanıyor...</span></div>
+          </div>
+          <div class="sstep-item" data-phase="3">
+            <div class="sstep-marker"><div class="sstep-dot"></div><div class="sstep-conn"></div></div>
+            <div class="sstep-body"><span class="sstep-label">Doğrulama</span><span class="sstep-sub">Sonuçlar kontrol ediliyor...</span></div>
+          </div>
+          <div class="sstep-item" data-phase="4">
+            <div class="sstep-marker"><div class="sstep-dot"></div></div>
+            <div class="sstep-body"><span class="sstep-label">Sonuçlar</span><span class="sstep-sub">Tablo hazırlanıyor...</span></div>
           </div>
         </div>
       </div>
@@ -1366,6 +1409,9 @@ if('serviceWorker' in navigator){
       </div>
     </div>
 
+    <!-- PRESCAN FULL-SCREEN VIEW -->
+    <div id="prescan-view" style="display:none"></div>
+
     <!-- DETAIL PANEL -->
     <div class="detail" id="detail">
       <div class="dhead">
@@ -1378,7 +1424,6 @@ if('serviceWorker' in navigator){
 
       <!-- ŞİRKET PROFİLİ -->
       <div class="dprofile" id="dprofile" style="display:none">
-        <div class="dprofile-name" id="dprofile-name"></div>
         <div class="dprofile-meta" id="dprofile-meta"></div>
         <div class="dprofile-links" id="dprofile-links"></div>
       </div>
@@ -1410,25 +1455,17 @@ if('serviceWorker' in navigator){
           </div>
         </div>
       </div>
-      <!-- Insider & Short Interest Tabs -->
+      <!-- Detay alt sekmeleri -->
       <div class="dextra-tabs" id="dextra-tabs" style="display:none;">
         <div class="dxtab on" data-xtab="fundamentals" onclick="switchXTab(this)">Temel</div>
         <div class="dxtab" data-xtab="sector" onclick="switchXTab(this)">Sektör</div>
-        <div class="dxtab" data-xtab="dcf" onclick="switchXTab(this)">DCF</div>
-        <div class="dxtab" data-xtab="insider" onclick="switchXTab(this)">Insider</div>
-        <div class="dxtab" data-xtab="short" onclick="switchXTab(this)">Short Interest</div>
         <div class="dxtab" data-xtab="news" onclick="switchXTab(this)">📰 Haberler</div>
       </div>
       <div id="dxpanel-fundamentals" class="dxpanel on"><div id="dbody"></div></div>
       <div id="dxpanel-sector" class="dxpanel"><div id="sector-body" style="padding:4px 0"></div></div>
-      <div id="dxpanel-dcf"    class="dxpanel"><div id="dcf-body"    style="padding:4px 0"></div></div>
-      <div id="dxpanel-insider"       class="dxpanel"><div id="insider-body"><div class="dxloading">Yükleniyor...</div></div></div>
-      <div id="dxpanel-short"         class="dxpanel"><div id="short-body"><div class="dxloading">Yükleniyor...</div>
       <div id="dxpanel-news" class="dxpanel">
-        <div id="dnews-list" style="padding:4px 0;color:var(--muted2);font-size:11px;text-align:center;padding:20px;">
-          Haber yükleniyor...
-        </div>
-      </div></div></div>
+        <div id="dnews-list" style="padding:4px 0"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -2242,12 +2279,39 @@ if('serviceWorker' in navigator){
   <input type="number" id="mc_max">
   <input type="number" id="chg_min">
   <input type="number" id="chg_max">
+  <input type="number" id="from_high_min">
   <input type="number" id="from_high_max">
   <input type="number" id="from_low_min">
   <input type="number" id="tech_rating_min">
   <input type="number" id="tech_rating_max">
+  <input type="number" id="ma_rating_min">
+  <input type="number" id="ma_rating_max">
+  <input type="number" id="osc_rating_min">
+  <input type="number" id="osc_rating_max">
   <input type="number" id="rsi_min">
   <input type="number" id="rsi_max">
+  <input type="number" id="rel_vol_min">
+  <input type="number" id="rel_vol_max">
+  <input type="number" id="beta_min">
+  <input type="number" id="beta_max">
+  <input type="number" id="adx_min">
+  <input type="number" id="adx_max">
+  <input type="number" id="adx_di_diff_min">
+  <input type="number" id="above_sma200_min">
+  <input type="number" id="above_sma200_max">
+  <input type="number" id="sma_trend_min">
+  <input type="number" id="sma_trend_max">
+  <input type="number" id="macd_min">
+  <input type="number" id="macd_max">
+  <input type="number" id="macd_hist_min">
+  <input type="number" id="macd_hist_max">
+  <input type="number" id="bb_dist_min">
+  <input type="number" id="bb_dist_max">
+  <input type="number" id="stoch_k_min">
+  <input type="number" id="stoch_k_max">
+  <input type="number" id="stoch_kd_min">
+  <input type="number" id="perf1m_min">
+  <input type="number" id="perf1m_max">
   <input type="number" id="perf3m_min">
   <input type="number" id="perf3m_max">
   <input type="number" id="perf6m_min">

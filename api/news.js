@@ -82,7 +82,7 @@ module.exports = async function(req, res) {
   if (rlCount > 30) { trackViolation(ip).catch(() => {}); return res.status(429).json({ news: [] }); }
 
   // KV cache
-  const cacheKey = 'df_news_v1_' + (ex || 'bist') + '_' + sym;
+  const cacheKey = 'df_news_v3_' + (ex || 'bist') + '_' + sym;
   const cachedNews = await kvGet(cacheKey);
   if (cachedNews) {
     res.setHeader('Content-Type', 'application/json');
@@ -93,14 +93,12 @@ module.exports = async function(req, res) {
   // Exchange → TradingView prefix mapping
   const PREFIX = { bist:'BIST:', nasdaq:'NASDAQ:', sp500:'NYSE:', dax:'XETR:', lse:'LSE:', nikkei:'TSE:' };
   const tvSym = (PREFIX[ex] || 'BIST:') + sym;
-
-  const newsUrl = 'https://news-headlines.tradingview.com/v2/headlines?symbol='
-    + encodeURIComponent(tvSym)
-    + '&lang=en&client=web&streaming=false';
+  // BIST için Türkçe akış: KAP bildirimleri TradingView'in tr akışında geliyor
+  const lang = ex === 'bist' ? 'tr' : 'en';
 
   const options = {
     hostname: 'news-headlines.tradingview.com',
-    path: '/v2/headlines?symbol=' + encodeURIComponent(tvSym) + '&lang=en&client=web&streaming=false',
+    path: '/v2/headlines?symbol=' + encodeURIComponent(tvSym) + '&lang=' + lang + '&client=web&streaming=false',
     method: 'GET',
     headers: {
       'User-Agent': 'Mozilla/5.0',
@@ -115,11 +113,14 @@ module.exports = async function(req, res) {
     res2.on('end', async () => {
       try {
         const parsed = JSON.parse(data);
+        // KAP gibi TV-hosted haberlerde dış link yok, sadece storyPath gelir
+        const tvHost = lang === 'tr' ? 'https://tr.tradingview.com' : 'https://www.tradingview.com';
         const items = (parsed.items || []).slice(0, 10).map(item => ({
           headline: item.title || item.headline || '',
-          source:   item.source?.name || item.provider || '',
+          source:   item.source?.name || item.provider?.name
+                    || (typeof item.provider === 'string' ? item.provider : ''),
           published: item.published,
-          url:      item.link || item.url || '',
+          url:      item.link || item.url || (item.storyPath ? tvHost + item.storyPath : ''),
         }));
         const newsResult = { news: items };
         kvSet(cacheKey, newsResult, 300).catch(() => {});

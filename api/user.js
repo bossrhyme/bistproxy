@@ -244,17 +244,30 @@ async function handleDailyCheckin(req, res) {
 
   const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
   if (full.lastLoginDate === today) {
-    jsonRes(res, 200, { ok: true, pointsAdded: 0, points: full.points || 0, streak: full.loginStreak || 0, alreadyChecked: true });
+    jsonRes(res, 200, { ok: true, pointsAdded: 0, milestoneBonus: 0, points: full.points || 0, streak: full.loginStreak || 0, badges: full.badges || [], alreadyChecked: true });
     return;
   }
 
   const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
   const streak = full.lastLoginDate === yesterday ? (full.loginStreak || 0) + 1 : 1;
-  full.points       = (full.points || 0) + 100;
+
+  const MILESTONE_BONUS = { 7: 300, 14: 400, 21: 500, 28: 600 };
+  const MILESTONE_BADGE = { 7: 'streak_7', 14: 'streak_14', 21: 'streak_21', 28: 'streak_28' };
+  const milestoneBonus = MILESTONE_BONUS[streak] || 0;
+  const totalAdded = 100 + milestoneBonus;
+
+  full.points        = (full.points || 0) + totalAdded;
   full.lastLoginDate = today;
   full.loginStreak   = streak;
+
+  if (milestoneBonus > 0) {
+    const badgeKey = MILESTONE_BADGE[streak];
+    if (!full.badges) full.badges = [];
+    if (!full.badges.includes(badgeKey)) full.badges.push(badgeKey);
+  }
+
   await kvSet('usr:' + user.id, full);
-  jsonRes(res, 200, { ok: true, pointsAdded: 100, points: full.points, streak, alreadyChecked: false });
+  jsonRes(res, 200, { ok: true, pointsAdded: totalAdded, milestoneBonus, points: full.points, streak, badges: full.badges || [], alreadyChecked: false });
 }
 
 async function handleLogout(req, res) {
