@@ -43,6 +43,15 @@ body{overflow-y:auto;}
 .pf-inv-sb-scrollhint{text-align:center;font-size:10px;color:var(--muted2);margin-top:8px;}
 .pf-inv-sb-change-btn{width:100%;background:var(--s2);border:1px dashed var(--border2);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;margin-bottom:14px;transition:all .15s;text-align:center;display:block;}
 .pf-inv-sb-change-btn:hover{border-color:var(--accent);color:var(--accent);border-style:solid;}
+.pf-inv-sb-empty{text-align:center;padding:8px 4px;}
+.pf-inv-sb-empty-emoji{font-size:32px;margin-bottom:10px;}
+.pf-inv-sb-empty-text{font-size:12px;color:var(--muted2);line-height:1.6;margin-bottom:14px;}
+.pf-inv-brief{margin-top:12px;display:flex;flex-direction:column;gap:10px;}
+.pf-inv-brief-block{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:11px 13px;}
+.pf-inv-brief-label{font-size:10px;font-weight:700;color:var(--muted2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;}
+.pf-inv-brief-text{font-size:12px;color:var(--text2);line-height:1.6;}
+.pf-inv-brief-mentor{border-width:1.5px;}
+.pf-inv-brief-mentor-name{font-size:13px;font-weight:800;margin-bottom:5px;}
 
 /* Loading */
 #pf-loading{display:flex;align-items:center;justify-content:center;padding:80px 20px;gap:10px;color:var(--muted2);font-size:13px;}
@@ -591,7 +600,7 @@ body{overflow-y:auto;}
 
 <div class="pf-toast" id="pf-toast"></div>
 
-<script src="/profil/profil.js?v=16"></script>
+<script src="/profil/profil.js?v=17"></script>
 <script>
 function toggleTheme(){
   var dark = document.documentElement.getAttribute('data-theme') !== 'dark';
