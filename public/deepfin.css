@@ -1835,3 +1835,8 @@ kbd{font-family:var(--ff-mono);font-size:10px;color:var(--text);background:var(-
 #hisse-table thead th.col-dragging{opacity:.45;cursor:grabbing;}
 #hisse-table thead th.col-drop-l{box-shadow:inset 3px 0 0 var(--accent);}
 #hisse-table thead th.col-drop-r{box-shadow:inset -3px 0 0 var(--accent);}
+
+/* Kolay: filtre 'daha fazla' + Pro 'Filtre Ekle'yi Kolay'da gizle */
+.kfil-more{background:none;border:none;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;padding:7px 10px;font-family:'Inter',sans-serif;}
+.kfil-more:hover{text-decoration:underline;}
+[data-scan-mode="kolay"] #add-filter-wrap{display:none !important;}

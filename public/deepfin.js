@@ -3431,6 +3431,7 @@ function _applyScanMode() {
   var resultsVisible = tw && tw.style.display && tw.style.display !== 'none';
   if (kw) kw.style.display = (_scanMode === 'kolay' && resultsVisible) ? 'block' : 'none';
   if (_scanMode === 'kolay' && typeof renderKolaySide === 'function') renderKolaySide();
+  if (_scanMode === 'kolay' && typeof renderKolayFilters === 'function') renderKolayFilters();
 }
 
 function renderKolay() {
@@ -3505,18 +3506,82 @@ function _runDefaultScan() {
 
 // Kolay moddaki 4 basit filtre (temel + teknik) + Tümü
 var _kolayFilterKey = 'all';
-var _kolayExpanded = false;
-function kolayFilter(key, el) {
-  _kolayFilterKey = key;
-  var chips = document.querySelectorAll('.kfil');
-  for (var i = 0; i < chips.length; i++) chips[i].classList.remove('on');
-  if (el) el.classList.add('on');
-  if (key === 'all') _runDefaultScan();
-  else quickScan(key);
+var _kolayExpanded = false;        // borsa listesi genişletme
+var _kolayFiltExpanded = false;    // filtre listesi genişletme
+var _kolayAssetExpanded = false;   // varlık listesi genişletme
+
+// Kolay filtreler (temel + teknik + goat) — basit isimlerle
+var KOLAY_FILTERS = [
+  { key: 'value',    name: 'Ucuz' },
+  { key: 'quality',  name: 'Kaliteli' },
+  { key: 'breakout', name: 'Yükselişte' },
+  { key: 'oversold', name: 'Aşırı Satılmış' },
+  { key: 'growth',   name: 'Büyüyen' },
+  { key: 'dividend', name: 'Temettü' },
+  { key: 'momentum', name: 'Momentum' },
+  { key: 'nearHigh', name: '52H Zirve' },
+  { key: 'buffett',  name: 'Buffett' },
+  { key: 'graham',   name: 'Graham' },
+  { key: 'lynch',    name: 'Lynch' },
+];
+var _KOLAY_FILT_VIS = 3; // ilk 3 görünür, gerisi "Daha Fazla"
+
+function renderKolayFilters() {
+  var c = document.getElementById('kolay-filters');
+  if (!c) return;
+  var html = '<button class="kfil' + (_kolayFilterKey === 'all' ? ' on' : '') + '" onclick="kolayFilter(\'all\',this)">Tümü</button>';
+  KOLAY_FILTERS.forEach(function(f, i) {
+    var hide = (i >= _KOLAY_FILT_VIS && !_kolayFiltExpanded) ? ' style="display:none"' : '';
+    html += '<button class="kfil' + (_kolayFilterKey === f.key ? ' on' : '') + '"' + hide + ' onclick="kolayFilter(\'' + f.key + '\',this)">' + f.name + '</button>';
+  });
+  if (KOLAY_FILTERS.length > _KOLAY_FILT_VIS) {
+    html += '<button class="kfil-more" onclick="kolayToggleMoreFilters()">' + (_kolayFiltExpanded ? '− Daha Az' : '+ Daha Fazla') + '</button>';
+  }
+  c.innerHTML = html;
+}
+function kolayToggleMoreFilters() { _kolayFiltExpanded = !_kolayFiltExpanded; renderKolayFilters(); }
+
+// Bir Kolay filtreyi yüklü veriye uygula (kategoriyi otomatik bul)
+function _kolayApplyChip(key) {
+  var chip = null;
+  if (typeof GURUS !== 'undefined' && GURUS[key]) chip = document.querySelector('#goat-chips .goat-chip[data-goat="' + key + '"]');
+  else if (typeof TECH_PRESETS !== 'undefined' && TECH_PRESETS[key]) chip = document.querySelector('#tech-presets .chip[data-tech="' + key + '"]');
+  else if (typeof PRESETS !== 'undefined' && PRESETS[key]) chip = document.querySelector('#presets .chip[data-preset="' + key + '"]');
+  if (chip) chip.classList.add('on');
+  if (typeof _applyChips === 'function') _applyChips(BASIC_CHIP_CFG);
 }
 
-// Kolay sol panel: borsa listesi
+function kolayFilter(key, el) {
+  _kolayFilterKey = key;
+  renderKolayFilters(); // aktif durumu güncelle
+  // Önce tüm filtreleri temizle (seçim takılmasını önler)
+  document.querySelectorAll('#goat-chips .goat-chip.on, #presets .chip.on, #tech-presets .chip.on, #adv-goat-chips .goat-chip.on, #adv-presets .chip.on, #adv-tech-presets .chip.on').forEach(function(c){ c.classList.remove('on'); });
+  document.querySelectorAll('.finps input, #hisse-hidden-filters input').forEach(function(i){ i.value = ''; });
+  document.querySelectorAll('.qs-btn.active').forEach(function(b){ b.classList.remove('active'); });
+  if (typeof updateClrBtn === 'function') updateClrBtn();
+  var hasData = (typeof allData !== 'undefined' && allData && allData.length);
+  if (key === 'all') {
+    if (hasData) { if (typeof applyAndRender === 'function') applyAndRender(); } else { _runDefaultScan(); }
+    return;
+  }
+  if (hasData) _kolayApplyChip(key);
+  else _runDefaultScan();
+}
+
+// Kolay sol panel: Varlık + Borsa listesi
 function renderKolaySide() {
+  // ── Varlık listesi (ilk 3 + daha fazla) ──
+  var aList = document.getElementById('kolay-asset-list');
+  if (aList && typeof PSV_ASSETS !== 'undefined') {
+    aList.innerHTML = PSV_ASSETS.map(function(a, i) {
+      var hide = (i >= 3 && !_kolayAssetExpanded) ? ' style="display:none"' : '';
+      if (a.active) return '<button class="ks-asset on"' + hide + '>' + a.label + '</button>';
+      return '<div class="ks-soon"' + hide + '>' + a.label + ' <span>yakında</span></div>';
+    }).join('');
+    var aMore = document.getElementById('kolay-asset-more');
+    if (aMore) { aMore.style.display = PSV_ASSETS.length > 3 ? '' : 'none'; aMore.textContent = _kolayAssetExpanded ? '− Daha Az' : '+ Daha Fazla'; }
+  }
+  // ── Borsa listesi (ana 6 + diğer borsalar) ──
   var list = document.getElementById('kolay-ex-list');
   if (!list || typeof EXCHANGE_META === 'undefined') return;
   var main = (typeof PSV_MAIN_EX !== 'undefined') ? PSV_MAIN_EX : ['bist','nasdaq','nyse','sp500','dax','lse'];
@@ -3536,6 +3601,7 @@ function kolayToggleMoreEx() {
   var ex = document.getElementById('kolay-ex-extra'); if (ex) ex.style.display = _kolayExpanded ? 'block' : 'none';
   var btn = document.getElementById('kolay-ex-more'); if (btn) btn.textContent = _kolayExpanded ? '− Daha Az' : '+ Diğer Borsalar';
 }
+function kolayToggleMoreAssets() { _kolayAssetExpanded = !_kolayAssetExpanded; renderKolaySide(); }
 
 function kolaySelectExchange(key) {
   if (typeof EXCHANGE_META === 'undefined' || !EXCHANGE_META[key]) return;
@@ -3545,9 +3611,12 @@ function kolaySelectExchange(key) {
   allData = []; filtered = []; selSym = null;
   if (typeof closeDetail === 'function') closeDetail();
   renderKolaySide();
-  // Mevcut Kolay filtresiyle yeni borsada tekrar tara
-  if (_kolayFilterKey && _kolayFilterKey !== 'all') quickScan(_kolayFilterKey);
-  else _runDefaultScan();
+  // Yeni borsada taze tara; veri gelince mevcut filtre uygulanır
+  _runDefaultScan();
+  if (_kolayFilterKey && _kolayFilterKey !== 'all') {
+    var k = _kolayFilterKey;
+    setTimeout(function(){ if (allData && allData.length) _kolayApplyChip(k); }, 1400);
+  }
 }
 
 

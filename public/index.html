@@ -132,8 +132,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=warm12">
-<script src="/deepfin.js?v=157" defer></script>
+<link rel="stylesheet" href="/deepfin.css?v=warm13">
+<script src="/deepfin.js?v=158" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -401,10 +401,8 @@ if('serviceWorker' in navigator){
     <div id="kolay-side">
       <div class="ks-sec">
         <div class="ks-label">Varlık</div>
-        <button class="ks-asset on">Borsa</button>
-        <div class="ks-soon">Kripto <span>yakında</span></div>
-        <div class="ks-soon">Fon <span>yakında</span></div>
-        <div class="ks-soon">ETF <span>yakında</span></div>
+        <div id="kolay-asset-list"></div>
+        <button class="ks-more" id="kolay-asset-more" onclick="kolayToggleMoreAssets()">+ Daha Fazla</button>
       </div>
       <div class="ks-sec">
         <div class="ks-label">Borsa</div>
@@ -1227,13 +1225,7 @@ if('serviceWorker' in navigator){
           </div>
           <a class="kolay-pro-link" onclick="chooseScanMode('pro')">Gelişmiş filtreler →</a>
         </div>
-        <div class="kolay-filters" id="kolay-filters">
-          <button class="kfil on" onclick="kolayFilter('all',this)">Tümü</button>
-          <button class="kfil" onclick="kolayFilter('value',this)" title="Düşük F/K, güçlü bilanço">Ucuz</button>
-          <button class="kfil" onclick="kolayFilter('quality',this)" title="Yüksek ROE, sağlam kâr">Kaliteli</button>
-          <button class="kfil" onclick="kolayFilter('breakout',this)" title="Zirveye yakın, hacimli yükseliş">Yükselişte</button>
-          <button class="kfil" onclick="kolayFilter('oversold',this)" title="RSI düşük, dipten dönüş fırsatı">Aşırı Satılmış</button>
-        </div>
+        <div class="kolay-filters" id="kolay-filters"></div>
         <div class="kolay-tablewrap">
           <table class="kolay-table">
             <thead>
