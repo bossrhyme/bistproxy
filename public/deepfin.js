@@ -1104,27 +1104,27 @@ function _doShowListFilterPicker(rect) {
 // KOLON SEÇİCİ
 // ═══════════════════════════════════════════
 const COL_DEFS = [
-  {key:'name', label:'ŞİRKET ADI', def:false},
   {key:'price', label:'FİYAT', def:true},
   {key:'mcap', label:'P.Değeri', def:true},
-  {key:'pe', label:'F/K', def:true},
+  {key:'chg1d', label:'Günlük%', def:true},
   {key:'pb', label:'PD/DD', def:true},
-  {key:'ps', label:'F/S', def:true},
-  {key:'roe', label:'ROE%', def:true},
-  {key:'roa', label:'ROA%', def:true},
-  {key:'margin', label:'MARJ%', def:true},
+  {key:'pe', label:'F/K', def:true},
   {key:'revg', label:'GELİR↑%', def:true},
-  {key:'epsg', label:'K.BÜY%', def:true},
-  {key:'fscore', label:'F-Score', def:false},
+  {key:'roe', label:'ROE%', def:true},
+  {key:'margin', label:'MARJ%', def:true},
   {key:'de', label:'B/Ö', def:true},
-  {key:'cr', label:'CARİ', def:true},
+  {key:'rsi', label:'RSI', def:true},
+  {key:'name', label:'ŞİRKET ADI', def:false},
+  {key:'ps', label:'F/S', def:false},
+  {key:'roa', label:'ROA%', def:false},
+  {key:'epsg', label:'K.BÜY%', def:false},
+  {key:'fscore', label:'F-Score', def:false},
+  {key:'cr', label:'CARİ', def:false},
   {key:'div', label:'TEMETTÜ%', def:false},
   {key:'peg', label:'PEG', def:false},
   {key:'tech_rating', label:'Teknik Skor', def:false},
-  {key:'rsi', label:'RSI', def:true},
-  {key:'chg1d', label:'Günlük%', def:true},
-  {key:'chg1w', label:'1H Geti%', def:true},
-  {key:'perf3m', label:'3A Geti%', def:true},
+  {key:'chg1w', label:'1H Geti%', def:false},
+  {key:'perf3m', label:'3A Geti%', def:false},
   {key:'float_pct', label:'H.Açık%', def:false},
   {key:'sector', label:'SEKTÖR', def:false},
 ];
@@ -1133,7 +1133,7 @@ var _colVisible = null;
 function loadColPrefs() {
   if (_colVisible) return;
   try {
-    var saved = localStorage.getItem('df_cols_v6');
+    var saved = localStorage.getItem('df_cols_v7');
     if (saved) { _colVisible = {}; JSON.parse(saved).forEach(function(k){ _colVisible[k]=true; }); return; }
   } catch(e) {}
   // Varsayılan: def:false olan sütunlar gizli
@@ -1142,7 +1142,7 @@ function loadColPrefs() {
 }
 
 function saveColPrefs() {
-  localStorage.setItem('df_cols_v6', JSON.stringify(Object.keys(_colVisible).filter(function(k){ return _colVisible[k]; })));
+  localStorage.setItem('df_cols_v7', JSON.stringify(Object.keys(_colVisible).filter(function(k){ return _colVisible[k]; })));
 }
 
 function isColVisible(key) { loadColPrefs(); return !!_colVisible[key]; }
@@ -1161,7 +1161,7 @@ function applyColVisibility() {
 var _colOrder = null;
 function _loadColOrder() {
   if (_colOrder) return;
-  try { var s = localStorage.getItem('df_col_order'); if (s) { var arr = JSON.parse(s); if (Array.isArray(arr) && arr.length) { _colOrder = arr.filter(function(k){ return COL_DEFS.some(function(d){return d.key===k;}); }); COL_DEFS.forEach(function(d){ if(_colOrder.indexOf(d.key)===-1) _colOrder.push(d.key); }); return; } } } catch(e) {}
+  try { var s = localStorage.getItem('df_col_order_v2'); if (s) { var arr = JSON.parse(s); if (Array.isArray(arr) && arr.length) { _colOrder = arr.filter(function(k){ return COL_DEFS.some(function(d){return d.key===k;}); }); COL_DEFS.forEach(function(d){ if(_colOrder.indexOf(d.key)===-1) _colOrder.push(d.key); }); return; } } } catch(e) {}
   _colOrder = COL_DEFS.map(function(d){ return d.key; });
 }
 function _reorderRowCells(row) {
@@ -1196,7 +1196,7 @@ function _moveCol(from, to, after) {
   _colOrder.splice(fi, 1);
   var ti = _colOrder.indexOf(to); if (ti < 0) { _colOrder.splice(fi, 0, from); return; }
   _colOrder.splice(after ? ti + 1 : ti, 0, from);
-  try { localStorage.setItem('df_col_order', JSON.stringify(_colOrder)); } catch(e) {}
+  try { localStorage.setItem('df_col_order_v2', JSON.stringify(_colOrder)); } catch(e) {}
   applyColOrder();
 }
 
