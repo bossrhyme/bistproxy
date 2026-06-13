@@ -658,7 +658,7 @@ function renderAll() {
   });
   html += sectionHtml('🧬 Yatırımcı Stratejileri', profItems);
 
-  // Reklam 1: stratejiler ile detay arası
+  // Reklam (orta): yatırımcı stratejileri ile "tümünü göster" arası
   html += '<div class="ad-slot" id="ad-mid">' +
     '<span class="ad-label">Reklam</span>' +
     '<div class="ad-placeholder"></div>' +
@@ -685,12 +685,6 @@ function renderAll() {
     var total = Object.keys(GURUS).length + Object.keys(PRESETS).length + Object.keys(TECH_PRESETS).length;
     html += '<button class="sr-toggle" onclick="toggleAll()">▼ Tüm Filtreler &amp; Stratejileri Göster (' + total + ')</button>';
   }
-
-  // Reklam 2: sayfa altı
-  html += '<div class="ad-slot" id="ad-bottom">' +
-    '<span class="ad-label">Reklam</span>' +
-    '<div class="ad-placeholder ad-placeholder-lg"></div>' +
-  '</div>';
 
   wrap.innerHTML = html;
 }
