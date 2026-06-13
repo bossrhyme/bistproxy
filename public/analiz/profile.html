@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <script>(function(){try{var t=localStorage.getItem('df_theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})()</script>
-<link rel="stylesheet" href="/analiz/prf.css?v=warm1">
+<link rel="stylesheet" href="/analiz/prf.css?v=warm2">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap"></noscript>
 
@@ -95,253 +95,147 @@ window.addEventListener('DOMContentLoaded', function(){
     </div>
   </div>
 
-  <div id="profile-page" class="mode-sade" style="display:flex;flex:1;flex-direction:column;overflow:hidden;min-height:0;">
-    <div class="prf-topbar">
-      <button class="prf-back" onclick="closeProfil()">← Geri</button>
-      <div class="prf-crumb">
-        <span id="prf-bc-ex" style="color:var(--text2)">BIST</span>
-        <span style="color:var(--muted)">/</span>
-        <span class="prf-sym" id="prf-bc-sym">—</span>
-      </div>
-      <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
-        <button class="prf-view-toggle" id="prf-to-detay" onclick="prfSetMode('detay')">Detaylı Analiz</button>
-        <button class="prf-view-toggle" id="prf-to-sade" onclick="prfSetMode('sade')" style="display:none;">Genel Bakış</button>
-      </div>
-    </div>
+  <div id="profile-page" style="display:flex;flex:1;flex-direction:column;overflow:hidden;min-height:0;">
+    <span id="prf-bc-ex" style="display:none">BIST</span><span id="prf-bc-sym" style="display:none">—</span>
 
-    <div class="prf-layout">
-      <div class="prf-main">
-        <div class="prf-hero">
-          <div class="prf-hero-top">
-            <div class="prf-logo" id="prf-logo">—</div>
-            <div class="prf-company">
-              <h1 class="prf-name" id="prf-fullname">Yükleniyor...</h1>
-              <div class="prf-meta">
-                <span class="prf-tag blue" id="prf-sym-tag">—</span>
-                <span class="prf-tag" id="prf-ex-tag">—</span>
-                <span class="prf-tag" id="prf-sector-tag">—</span>
-              </div>
+    <div class="an-scroll">
+      <div class="an-top">
+        <div class="an-head">
+          <div class="an-head-l">
+            <div class="an-sub"><span id="prf-fullname">Yükleniyor...</span> · <span id="prf-sector-tag">—</span> · <span id="prf-ex-tag">—</span></div>
+            <div class="an-price-row">
+              <span class="an-sym" id="prf-sym-tag">—</span>
+              <span class="an-price" id="prf-price">—</span>
+              <span class="an-chg" id="prf-chg">—</span>
             </div>
-            <div class="prf-price-block">
-              <div class="prf-price" id="prf-price">—</div>
-              <div class="prf-chg" id="prf-chg">—</div>
-            </div>
+            <div class="an-badges" id="prf-badges"></div>
           </div>
-          <div class="prf-badges" id="prf-badges"></div>
-        </div>
-
-        <!-- Grafik -->
-        <div id="prf-tv-widget" style="border-bottom:1px solid var(--border);background:var(--s1);overflow:hidden;">
-          <div id="prf-tv-placeholder" style="display:flex;align-items:center;justify-content:center;height:48px;color:var(--muted);font-size:12px;">Grafik yükleniyor…</div>
-        </div>
-
-        <!-- ═══ SADE GENEL BAKIŞ ═══ -->
-        <div id="prf-sade">
-          <div class="prf-section">
-            <div class="prf-sec-title">Temel Göstergeler</div>
-            <div class="prf-sade-mgrid" id="prf-sade-metrics"><div style="padding:20px;color:var(--muted);font-size:12px;">Veriler yükleniyor...</div></div>
-          </div>
-          <div class="prf-section" style="border-bottom:none;">
-            <div class="prf-sec-title">Stratejilere Göre Uygunluk</div>
-            <div class="prf-compat" id="prf-compat"><div style="padding:12px 0;color:var(--muted);font-size:12px;">Hesaplanıyor...</div></div>
-            <button class="prf-detay-cta" onclick="prfSetMode('detay')">Detaylı Analiz →</button>
+          <div class="an-actions">
+            <button class="an-back" onclick="closeProfil()">← Geri</button>
+            <button class="an-btn-p" id="prf-buy-btn" onclick="onHemenAl('','')">Takip Listesi</button>
           </div>
         </div>
-
-        <div class="prf-tabs">
-          <div class="prf-tab on" onclick="prfTab('overview',this)">Genel Bakış</div>
-          <div class="prf-tab" onclick="prfTab('financials',this)">Finansallar</div>
-          <div class="prf-tab" onclick="prfTab('news',this)">Haberler</div>
-          <div class="prf-tab" onclick="prfTab('guru',this)">GOAT Analizi</div>
-          <div class="prf-tab" onclick="prfTab('fairvalue',this)">Adil Fiyat</div>
+        <div class="an-tabs">
+          <div class="atab on" onclick="anTab('ov',this)">Genel Bakış</div>
+          <div class="atab" onclick="anTab('fu',this)">Temel</div>
+          <div class="atab" onclick="anTab('te',this)">Teknik</div>
+          <div class="atab" onclick="anTab('de',this)">Detaylı</div>
+          <div class="atab" onclick="anTab('go',this)">GOAT</div>
+          <div class="atab" onclick="anTab('fv',this)">Adil Fiyat</div>
+          <div class="atab" onclick="anTab('ne',this)">Haberler</div>
         </div>
-
-        <div id="prf-panel-overview" class="prf-panel on">
-
-
-          <!-- Temel Metrikler -->
-          <div class="prf-section">
-            <div class="prf-sec-title">Temel Metrikler</div>
-            <div class="prf-mgrid" id="prf-metrics"><div style="padding:20px;color:var(--muted);font-size:12px;grid-column:span 4">Veriler yükleniyor...</div></div>
-          </div>
-
-          <!-- AD M1: 728×90 -->
-          <div style="padding:12px 24px;border-bottom:1px solid var(--border);background:var(--s1);">
-            <div class="ad-slot" style="width:100%;height:90px;border-radius:6px;">
-              
-              <span class="ad-slot-label">728 × 90 — Reklam</span>
-            </div>
-          </div>
-
-          <!-- Hangi Yatırımcı Alır? -->
-          <div class="prf-section" style="border-bottom:none;">
-            <div class="prf-sec-title">Hangi Yatırımcı Neden Alabilir?</div>
-            <div id="prf-investor-fit"></div>
-          </div>
-        </div>
-
-        <!-- ═══ FİNANSALLAR ═══ -->
-        <div id="prf-panel-financials" class="prf-panel">
-          <!-- Gelir & Kâr Trendi -->
-          <div class="prf-section">
-            <div class="prf-sec-title">Gelir & Kâr Trendi</div>
-            <div style="display:flex;gap:10px;margin-bottom:12px;" id="prf-trend-cards">
-              <div style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;">
-                <div style="font-size:9px;color:var(--text2);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">Gelir Büyümesi</div>
-                <div id="prf-rev-spark" style="height:44px;margin-bottom:6px;"></div>
-                <div style="font-family:'Geist Mono',monospace;font-size:16px;font-weight:700;color:var(--text);" id="prf-rev-val">—</div>
-                <div style="font-size:10px;font-family:'Geist Mono',monospace;" id="prf-rev-chg">YoY TTM</div>
-              </div>
-              <div style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;">
-                <div style="font-size:9px;color:var(--text2);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">Kazanç Büyümesi</div>
-                <div id="prf-earn-spark" style="height:44px;margin-bottom:6px;"></div>
-                <div style="font-family:'Geist Mono',monospace;font-size:16px;font-weight:700;color:var(--text);" id="prf-earn-val">—</div>
-                <div style="font-size:10px;font-family:'Geist Mono',monospace;" id="prf-earn-chg">YoY TTM</div>
-              </div>
-              <div style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;">
-                <div style="font-size:9px;color:var(--text2);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">Performans</div>
-                <div id="prf-perf-bars" style="display:flex;flex-direction:column;gap:5px;margin-top:4px;"></div>
-              </div>
-            </div>
-          </div>
-          <!-- Şirket Hakkında -->
-          <div class="prf-section">
-            <div class="prf-sec-title">Şirket Hakkında</div>
-            <p id="prf-desc" style="font-size:12px;color:var(--text2);line-height:1.7;">Yükleniyor...</p>
-          </div>
-          <div class="prf-section">
-            <div class="prf-sec-title">Temel Finansal Göstergeler</div>
-            <div id="prf-fin-summary" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:20px;"></div>
-          </div>
-          <div class="prf-section">
-            <div class="prf-sec-title">Kârlılık Göstergeleri</div>
-            <div id="prf-fin-gauges" style="display:flex;flex-direction:column;gap:12px;"></div>
-          </div>
-          <div class="prf-section">
-            <div class="prf-sec-title">Borç & Likidite</div>
-            <div id="prf-fin-debt" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;"></div>
-          </div>
-
-          <!-- Sektör Karşılaştırması -->
-          <div class="prf-section">
-            <div class="prf-sec-title">Sektör Karşılaştırması</div>
-            <div id="prf-sector-cmp" style="min-height:40px;"></div>
-          </div>
-
-          <!-- Gelir Tablosu -->
-          <div class="prf-section">
-            <div class="prf-sec-title" style="display:flex;align-items:center;gap:6px;">
-              Gelir Tablosu
-              <span id="inc-annual" onclick="setPeriod('income','annual',this)" class="prf-period-active" style="margin-left:auto;">Yıllık</span>
-              <span id="inc-quarterly" onclick="setPeriod('income','quarterly',this)" class="prf-period-btn">Çeyreklik</span>
-            </div>
-            <div id="prf-income-table" style="overflow-x:auto;"><div style="padding:16px;color:var(--muted2);font-size:12px;">Yükleniyor...</div></div>
-          </div>
-
-          <!-- Bilanço -->
-          <div class="prf-section">
-            <div class="prf-sec-title" style="display:flex;align-items:center;gap:6px;">
-              Bilanço
-              <span id="bal-annual" onclick="setPeriod('balance','annual',this)" class="prf-period-active" style="margin-left:auto;">Yıllık</span>
-              <span id="bal-quarterly" onclick="setPeriod('balance','quarterly',this)" class="prf-period-btn">Çeyreklik</span>
-            </div>
-            <div id="prf-balance-table" style="overflow-x:auto;"><div style="padding:16px;color:var(--muted2);font-size:12px;">Yükleniyor...</div></div>
-          </div>
-
-          <!-- Nakit Akışı -->
-          <div class="prf-section" style="border-bottom:none;">
-            <div class="prf-sec-title" style="display:flex;align-items:center;gap:6px;">
-              Nakit Akışı
-              <span id="cf-annual" onclick="setPeriod('cashflow','annual',this)" class="prf-period-active" style="margin-left:auto;">Yıllık</span>
-              <span id="cf-quarterly" onclick="setPeriod('cashflow','quarterly',this)" class="prf-period-btn">Çeyreklik</span>
-            </div>
-            <div id="prf-cashflow-table" style="overflow-x:auto;"><div style="padding:16px;color:var(--muted2);font-size:12px;">Yükleniyor...</div></div>
-          </div>
-        </div>
-
-        <!-- ═══ HABERLER ═══ -->
-        <div id="prf-panel-news" class="prf-panel">
-          <div class="prf-section" style="border-bottom:none;">
-            <div class="prf-sec-title">Son Haberler</div>
-            <div id="prf-news-list"><div style="padding:20px;color:var(--muted2);font-size:12px;">Haberler yükleniyor...</div></div>
-          </div>
-        </div>
-
-        <div id="prf-panel-guru" class="prf-panel"><!-- GOAT Analizi -->
-          <div class="prf-section">
-            <div class="prf-sec-title">Efsane Yatırımcı Kriterleri</div>
-            <div class="prf-ggrid" id="prf-ggrid"></div>
-          </div>
-        </div>
-
-        <!-- ADİL FİYAT PANELİ -->
-        <div id="prf-panel-fairvalue" class="prf-panel">
-          <div class="prf-section">
-            <div class="prf-sec-title">Adil Fiyat Analizi</div>
-            <div id="fv-content"><div style="padding:30px;text-align:center;color:var(--muted2);font-size:12px;">Veriler yükleniyor...</div></div>
-          </div>
-        </div>
-
       </div>
 
-      <div class="prf-side">
-        <div class="prf-sside" id="prf-score-sside">
-          <div class="df-sc-hdr">
-            <span class="df-sc-title">DeepFin Skoru</span>
-            <button class="df-sc-wbtn" onclick="toggleDfScoreSliders()">Ağırlık</button>
-          </div>
-          <div class="df-sc-ring-wrap">
-            <div class="df-sc-ring">
-              <svg viewBox="0 0 100 100" class="df-sc-svg">
-                <circle cx="50" cy="50" r="40" fill="none" stroke="var(--s3)" stroke-width="10"/>
-                <circle id="df-sc-arc" cx="50" cy="50" r="40" fill="none" stroke="var(--muted)" stroke-width="10"
-                  stroke-linecap="round" stroke-dasharray="251.3 251.3" stroke-dashoffset="251.3"
-                  transform="rotate(-90 50 50)" style="transition:stroke-dashoffset .8s ease,stroke .4s;"/>
-              </svg>
-              <div class="df-sc-inner">
-                <div class="df-sc-num" id="df-sc-num">—</div>
-                <div class="df-sc-lbl" id="df-sc-sublbl">Bekliyor</div>
+      <div class="an-body">
+        <!-- GENEL BAKIŞ -->
+        <div class="an-panel on" id="anp-ov">
+          <div id="prf-tv-widget" class="an-chart"><div id="prf-tv-placeholder" style="display:flex;align-items:center;justify-content:center;height:48px;color:var(--muted);font-size:12px;">Grafik yükleniyor…</div></div>
+          <div class="mgrid" id="prf-sade-metrics"><div style="padding:20px;color:var(--muted);font-size:12px;">Veriler yükleniyor...</div></div>
+          <div class="an-sec-head">Stratejilere Göre Uygunluk</div>
+          <div class="prf-compat" id="prf-compat"><div style="padding:12px 0;color:var(--muted);font-size:12px;">Hesaplanıyor...</div></div>
+          <div class="an-sec-head">DeepFin Skoru</div>
+          <div class="df-sc-block">
+            <div class="df-sc-ring-wrap">
+              <div class="df-sc-ring">
+                <svg viewBox="0 0 100 100" class="df-sc-svg">
+                  <circle cx="50" cy="50" r="40" fill="none" stroke="var(--s3)" stroke-width="10"/>
+                  <circle id="df-sc-arc" cx="50" cy="50" r="40" fill="none" stroke="var(--muted)" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.3 251.3" stroke-dashoffset="251.3" transform="rotate(-90 50 50)" style="transition:stroke-dashoffset .8s ease,stroke .4s;"/>
+                </svg>
+                <div class="df-sc-inner"><div class="df-sc-num" id="df-sc-num">—</div><div class="df-sc-lbl" id="df-sc-sublbl">Bekliyor</div></div>
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div class="df-sc-subs" id="df-sc-subs"></div>
+                <button class="df-sc-wbtn" onclick="toggleDfScoreSliders()" style="margin-top:8px;">Ağırlık</button>
+                <div class="df-sc-sliders" id="df-sc-sliders" style="display:none;">
+                  <div class="df-sc-slider-hint">Ağırlıklar toplamı = %100</div>
+                  <div class="df-sl-row"><span class="df-sl-lbl">Temel</span><input type="range" id="dfs-temel" min="0" max="100" step="5" oninput="onDfSlider('temel',this.value)"><span class="df-sl-val" id="dfsv-temel">35%</span></div>
+                  <div class="df-sl-row"><span class="df-sl-lbl">Teknik</span><input type="range" id="dfs-teknik" min="0" max="100" step="5" oninput="onDfSlider('teknik',this.value)"><span class="df-sl-val" id="dfsv-teknik">25%</span></div>
+                  <div class="df-sl-row"><span class="df-sl-lbl">Değerleme</span><input type="range" id="dfs-deger" min="0" max="100" step="5" oninput="onDfSlider('deger',this.value)"><span class="df-sl-val" id="dfsv-deger">25%</span></div>
+                  <div class="df-sl-row"><span class="df-sl-lbl">Momentum</span><input type="range" id="dfs-mom" min="0" max="100" step="5" oninput="onDfSlider('mom',this.value)"><span class="df-sl-val" id="dfsv-mom">15%</span></div>
+                </div>
               </div>
             </div>
           </div>
-          <div class="df-sc-subs" id="df-sc-subs"></div>
-          <div class="df-sc-sliders" id="df-sc-sliders">
-            <div class="df-sc-slider-hint">Ağırlıklar toplamı = %100</div>
-            <div class="df-sl-row"><span class="df-sl-lbl">Temel</span><input type="range" id="dfs-temel" min="0" max="100" step="5" oninput="onDfSlider('temel',this.value)"><span class="df-sl-val" id="dfsv-temel">35%</span></div>
-            <div class="df-sl-row"><span class="df-sl-lbl">Teknik</span><input type="range" id="dfs-teknik" min="0" max="100" step="5" oninput="onDfSlider('teknik',this.value)"><span class="df-sl-val" id="dfsv-teknik">25%</span></div>
-            <div class="df-sl-row"><span class="df-sl-lbl">Değerleme</span><input type="range" id="dfs-deger" min="0" max="100" step="5" oninput="onDfSlider('deger',this.value)"><span class="df-sl-val" id="dfsv-deger">25%</span></div>
-            <div class="df-sl-row"><span class="df-sl-lbl">Momentum</span><input type="range" id="dfs-mom" min="0" max="100" step="5" oninput="onDfSlider('mom',this.value)"><span class="df-sl-val" id="dfsv-mom">15%</span></div>
-          </div>
         </div>
-        <div class="prf-sside">
-          <button class="prf-buy-btn" id="prf-buy-btn" onclick="onHemenAl('','')">Hemen Al</button>
-          <div class="ad-slot" style="width:100%;height:250px;margin-top:10px;border-radius:8px;">
-            
-            <span class="ad-slot-label">300 × 250 — Reklam</span>
-          </div>
+
+        <!-- TEMEL -->
+        <div class="an-panel" id="anp-fu">
+          <div class="an-sec-head">Temel Oranlar</div>
+          <div class="prf-mgrid" id="prf-metrics"><div style="padding:20px;color:var(--muted);font-size:12px;grid-column:span 4">Veriler yükleniyor...</div></div>
+          <div id="prf-fin-gauges" style="display:none;"></div>
+          <div id="prf-fin-debt" style="display:none;"></div>
+          <div class="an-sec-head">Temel Finansal Göstergeler</div>
+          <div id="prf-fin-summary" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;"></div>
+          <div class="an-sec-head">Hangi Yatırımcı Neden Alabilir?</div>
+          <div id="prf-investor-fit"></div>
         </div>
-        <div class="prf-sside">
-          <div class="prf-stitle">Fiyat Bilgileri</div>
+
+        <!-- TEKNİK -->
+        <div class="an-panel" id="anp-te">
+          <div class="an-sec-head">Teknik Göstergeler</div>
+          <div class="mgrid" id="prf-tech-metrics"><div style="padding:20px;color:var(--muted);font-size:12px;">Veriler yükleniyor...</div></div>
+          <div class="an-badges" id="prf-tech-badges" style="margin-top:14px;"></div>
+          <div class="an-sec-head">Fiyat Bilgileri</div>
           <div id="prf-price-stats"></div>
         </div>
-        <div class="prf-sside">
-          <div class="prf-stitle">Son Haberler</div>
-          <div id="prf-news"><div style="font-size:11px;color:var(--muted)">Yükleniyor...</div></div>
-        </div>
-        <div class="prf-sside">
-          <div class="prf-stitle">Benzer Hisseler</div>
+
+        <!-- DETAYLI -->
+        <div class="an-panel" id="anp-de">
+          <div class="an-sec-head">Gelir & Kâr Trendi</div>
+          <div style="display:flex;gap:10px;margin-bottom:6px;" id="prf-trend-cards">
+            <div style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;">
+              <div style="font-size:9px;color:var(--text2);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">Gelir Büyümesi</div>
+              <div id="prf-rev-spark" style="height:44px;margin-bottom:6px;"></div>
+              <div style="font-family:'Inter',sans-serif;font-size:16px;font-weight:700;color:var(--text);" id="prf-rev-val">—</div>
+              <div style="font-size:10px;font-family:'Inter',sans-serif;" id="prf-rev-chg">YoY TTM</div>
+            </div>
+            <div style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;">
+              <div style="font-size:9px;color:var(--text2);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">Kazanç Büyümesi</div>
+              <div id="prf-earn-spark" style="height:44px;margin-bottom:6px;"></div>
+              <div style="font-family:'Inter',sans-serif;font-size:16px;font-weight:700;color:var(--text);" id="prf-earn-val">—</div>
+              <div style="font-size:10px;font-family:'Inter',sans-serif;" id="prf-earn-chg">YoY TTM</div>
+            </div>
+            <div style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;">
+              <div style="font-size:9px;color:var(--text2);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">Performans</div>
+              <div id="prf-perf-bars" style="display:flex;flex-direction:column;gap:5px;margin-top:4px;"></div>
+            </div>
+          </div>
+          <div class="an-sec-head">Şirket Hakkında</div>
+          <p id="prf-desc" style="font-size:12px;color:var(--text2);line-height:1.7;">Yükleniyor...</p>
+          <div class="an-sec-head">Sektör Karşılaştırması</div>
+          <div id="prf-sector-cmp" style="min-height:40px;"></div>
+          <div class="an-sec-head" style="display:flex;align-items:center;gap:6px;">Gelir Tablosu<span id="inc-annual" onclick="setPeriod('income','annual',this)" class="prf-period-active" style="margin-left:auto;">Yıllık</span><span id="inc-quarterly" onclick="setPeriod('income','quarterly',this)" class="prf-period-btn">Çeyreklik</span></div>
+          <div id="prf-income-table" style="overflow-x:auto;"><div style="padding:16px;color:var(--muted2);font-size:12px;">Yükleniyor...</div></div>
+          <div class="an-sec-head" style="display:flex;align-items:center;gap:6px;">Bilanço<span id="bal-annual" onclick="setPeriod('balance','annual',this)" class="prf-period-active" style="margin-left:auto;">Yıllık</span><span id="bal-quarterly" onclick="setPeriod('balance','quarterly',this)" class="prf-period-btn">Çeyreklik</span></div>
+          <div id="prf-balance-table" style="overflow-x:auto;"><div style="padding:16px;color:var(--muted2);font-size:12px;">Yükleniyor...</div></div>
+          <div class="an-sec-head" style="display:flex;align-items:center;gap:6px;">Nakit Akışı<span id="cf-annual" onclick="setPeriod('cashflow','annual',this)" class="prf-period-active" style="margin-left:auto;">Yıllık</span><span id="cf-quarterly" onclick="setPeriod('cashflow','quarterly',this)" class="prf-period-btn">Çeyreklik</span></div>
+          <div id="prf-cashflow-table" style="overflow-x:auto;"><div style="padding:16px;color:var(--muted2);font-size:12px;">Yükleniyor...</div></div>
+          <div class="an-sec-head">Benzer Hisseler</div>
           <div id="prf-similar"><div style="font-size:11px;color:var(--muted)">Önce tarama yapın</div></div>
         </div>
- 
 
+        <!-- GOAT -->
+        <div class="an-panel" id="anp-go">
+          <div class="an-sec-head">Efsane Yatırımcı Kriterleri</div>
+          <div class="prf-ggrid" id="prf-ggrid"></div>
+        </div>
 
-     </div>
+        <!-- ADİL FİYAT -->
+        <div class="an-panel" id="anp-fv">
+          <div class="an-sec-head">Adil Fiyat Analizi</div>
+          <div id="fv-content"><div style="padding:30px;text-align:center;color:var(--muted2);font-size:12px;">Veriler yükleniyor...</div></div>
+        </div>
+
+        <!-- HABERLER -->
+        <div class="an-panel" id="anp-ne">
+          <div class="an-sec-head">Son Haberler</div>
+          <div id="prf-news-list"><div style="padding:20px;color:var(--muted2);font-size:12px;">Haberler yükleniyor...</div></div>
+        </div>
+      </div>
     </div>
   </div>
 
 </div>
-
-
 
 <!-- DISCLAIMER MODAL -->
 <div class="modal-overlay" id="disclaimerModal">
@@ -366,6 +260,6 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js" defer></script>
-<script src="/analiz/prf.js?v=9546699"></script>
+<script src="/analiz/prf.js?v=warm2"></script>
 </body>
 </html>

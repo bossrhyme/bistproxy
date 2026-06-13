@@ -958,9 +958,9 @@ function _buildFinancials(d) {
   var finSum = document.getElementById('prf-fin-summary');
   if(finSum){ finSum.style.cssText='margin-bottom:0'; finSum.innerHTML=tbl; }
   var finGauge = document.getElementById('prf-fin-gauges');
-  if(finGauge){ finGauge.closest('.prf-section').style.display='none'; }
+  if(finGauge){ var _fg=finGauge.closest('.prf-section'); if(_fg) _fg.style.display='none'; }
   var finDebt = document.getElementById('prf-fin-debt');
-  if(finDebt){ finDebt.closest('.prf-section').style.display='none'; }
+  if(finDebt){ var _fd=finDebt.closest('.prf-section'); if(_fd) _fd.style.display='none'; }
 
   // Tooltip - native title yeterli değilse özel tooltip
   if (finSum) {
@@ -1341,7 +1341,6 @@ function showProfil(sym, ex) {
   _buildPrfHero();
   _buildPrfMetrics();
   _buildSadeView();
-  prfTab('overview', document.querySelector('.prf-tab'));
   requestAnimationFrame(function(){
     _buildPrfPiotroski();
     _buildDeepFinScore();
@@ -1583,6 +1582,63 @@ function _buildSadeView() {
   _buildSadeMetrics();
   renderStrategyCompat();
   _buildBadges();
+  _buildTechMetrics();
+}
+
+// ── Mockup sekme geçişi ──
+function anTab(id, el) {
+  var tabs = document.querySelectorAll('.an-tabs .atab');
+  for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('on');
+  if (el) el.classList.add('on');
+  ['ov','fu','te','de','go','fv','ne'].forEach(function(x){
+    var p = document.getElementById('anp-'+x);
+    if (p) p.classList.toggle('on', x === id);
+  });
+  if (id === 'fv' && typeof _startFairValue === 'function') _startFairValue();
+  if (id === 'te') _buildTechMetrics();
+  var sc = document.querySelector('.an-scroll'); if (sc) sc.scrollTop = 0;
+}
+
+function prfChartRange(el) {
+  var pills = el.parentElement.querySelectorAll('.an-pill');
+  for (var i = 0; i < pills.length; i++) pills[i].classList.remove('on');
+  el.classList.add('on');
+}
+
+// ── Teknik göstergeler grid (mevcut verilerden) ──
+function _buildTechMetrics() {
+  var el = document.getElementById('prf-tech-metrics');
+  if (!el) return;
+  var d = _prfData;
+  if (!d) { el.innerHTML = '<div style="padding:20px;color:var(--muted);font-size:12px;">Veri yok.</div>'; return; }
+  var exMeta = (typeof EXCHANGE_META !== 'undefined' && EXCHANGE_META[_prfEx]) || {currency:'₺'};
+  var cur = exMeta.currency || '₺';
+  var rsi = d.RSI!=null?d.RSI:(d.rsi!=null?d.rsi:null);
+  var sma50 = d.SMA50!=null?d.SMA50:null, sma200 = d.SMA200!=null?d.SMA200:null;
+  var hi=d['52_week_high'], lo=d['52_week_low'];
+  function f(v){ return v!=null&&!isNaN(v)?(+v).toFixed(2):'—'; }
+  var metrics = [
+    {l:'RSI (14)', v: rsi!=null&&!isNaN(rsi)?(+rsi).toFixed(1):'—', cls: rsi!=null&&rsi<30?'g':(rsi>70?'b':'')},
+    {l:'50G Ort.', v: sma50!=null?cur+' '+f(sma50):'—', cls:''},
+    {l:'200G Ort.', v: sma200!=null?cur+' '+f(sma200):'—', cls:''},
+    {l:'52H Aralık', v: (hi&&lo)?f(lo)+' – '+f(hi):'—', cls:''},
+    {l:'Beta', v: d.beta!=null?f(d.beta):'—', cls:''},
+    {l:'Haftalık Perf.', v: d.Perf_W!=null?((d.Perf_W>=0?'+':'')+d.Perf_W.toFixed(2)+'%'):'—', cls: d.Perf_W>=0?'g':'b'},
+  ];
+  el.innerHTML = metrics.map(function(m){
+    return '<div class="prf-sade-mcell"><div class="prf-sade-mlabel">'+m.l+'</div>'+
+      '<div class="prf-sade-mval '+(m.cls||'')+'">'+m.v+'</div></div>';
+  }).join('');
+  // teknik rozetler
+  var bel = document.getElementById('prf-tech-badges');
+  if (bel) {
+    var bs = [];
+    var price = d.close||d.price;
+    if (sma200!=null && price) bs.push({t: price>=sma200?'200G MA üstü':'200G MA altı', good: price>=sma200});
+    if (sma50!=null && price) bs.push({t: price>=sma50?'50G MA üstü':'50G MA altı', good: price>=sma50});
+    if (rsi!=null && !isNaN(rsi)) bs.push({t: rsi<30?'RSI aşırı satım':rsi>70?'RSI aşırı alım':'RSI nötr', good: rsi<30});
+    bel.innerHTML = bs.map(function(b){ return '<span class="prf-badge'+(b.good?' g':'')+'">'+b.t+'</span>'; }).join('');
+  }
 }
 
 function prfSetMode(mode) {
@@ -1929,7 +1985,8 @@ async function loadFinData(sym, ex) {
     }).join('');
 
     if(n.news && n.news.length) {
-      document.getElementById('prf-news').innerHTML = n.news.slice(0,5).map(function(item){
+      var _pnews = document.getElementById('prf-news');
+      if(_pnews) _pnews.innerHTML = n.news.slice(0,5).map(function(item){
         var date = item.datetime ? new Date(item.datetime).toLocaleDateString('tr-TR') : '';
         return '<div class="prf-news-item">'+
           '<div class="prf-news-src">'+(item.source||'Haber')+'</div>'+
