@@ -3438,15 +3438,14 @@ function chooseScanMode(mode) {
   setScanMode(mode);
   // Profesyonel → tarama yapılandırma ekranı (prescan: varlık/borsa/strateji/tara)
   if (mode === 'pro') { openPrescanView(); return; }
-  // Kolay → varsayılan tarama sonuçları (veri varsa yeniden taramadan göster)
-  if (typeof allData !== 'undefined' && allData && allData.length > 0) {
-    showState('twrap');
-    var tb = document.getElementById('toolbar'); if (tb) tb.style.display = 'none';
-    updateStatsBar();
-    if (typeof renderKolay === 'function') renderKolay();
-  } else {
-    _runDefaultScan();
-  }
+  // Kolay → varsayılan: BIST borsası + Tümü filtresi
+  currentExchange = 'bist';
+  _kolayFilterKey = 'all';
+  document.querySelectorAll('.kfil').forEach(function(c){ c.classList.remove('on'); });
+  var _tumu = document.querySelector('.kfil'); if (_tumu) _tumu.classList.add('on');
+  document.querySelectorAll('.exbtn').forEach(function(b){ b.classList.toggle('on', b.dataset.exchange === 'bist'); });
+  if (typeof renderKolaySide === 'function') renderKolaySide();
+  _runDefaultScan();
 }
 
 // Temiz varsayılan tarama (tüm hisseler, filtresiz)
