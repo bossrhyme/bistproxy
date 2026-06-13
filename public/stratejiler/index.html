@@ -26,19 +26,20 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
 <link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
 <link rel="apple-touch-icon" href="/icons/icon-180.png">
-<script>(function(){try{var t=localStorage.getItem('df_theme');document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}catch(e){}})()</script>
+<script>(function(){try{var t=localStorage.getItem('df_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
 <style>
-/* ── Tokens (dark default, light override) ── */
+/* ── Tokens (light default, dark override) ── */
 :root{
-  --bg:#0A0E14;--s1:#0f1520;--s2:#141d2b;--s3:#1a2435;--border:#1e2d42;--border2:#253548;
-  --text:#e8edf5;--text2:#c5cfe0;--muted:#6b7fa0;--muted2:#8a9bbf;
-  --accent:#3b82f6;--green:#22c55e;--red:#ef4444;--yellow:#f59e0b;
+  --bg:#f4f7fc;--s1:#fff;--s2:#f0f4fb;--s3:#e8eef8;--border:#dde5f0;--border2:#c8d5eb;
+  --text:#0f172a;--text2:#334155;--muted:#94a3b8;--muted2:#64748b;
+  --accent:#3b82f6;--green:#16a34a;--red:#dc2626;--yellow:#d97706;
   --r:8px;--r2:12px;--r-pill:20px;
   --topbar-h:52px;
 }
-[data-theme="light"]{
-  --bg:#f4f7fc;--s1:#fff;--s2:#f0f4fb;--s3:#e8eef8;--border:#dde5f0;--border2:#c8d5eb;
-  --text:#0f172a;--text2:#334155;--muted:#94a3b8;--muted2:#64748b;
+[data-theme="dark"]{
+  --bg:#0A0E14;--s1:#0f1520;--s2:#141d2b;--s3:#1a2435;--border:#1e2d42;--border2:#253548;
+  --text:#e8edf5;--text2:#c5cfe0;--muted:#6b7fa0;--muted2:#8a9bbf;
+  --accent:#3b82f6;--green:#22c55e;--red:#ef4444;--yellow:#f59e0b;
 }
 
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -70,7 +71,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 /* ── Borsa tabları ── */
 .ex-tabs{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;padding:0 20px 28px;}
 .ex-tab{background:var(--s2);border:1.5px solid var(--border);border-radius:var(--r-pill);padding:7px 18px;font-size:12px;font-weight:600;color:var(--muted2);cursor:pointer;transition:all .15s;}
-.ex-tab.on{background:var(--accent)18;border-color:var(--accent);color:var(--accent);}
+.ex-tab.on{background:color-mix(in srgb, var(--accent) 12%, transparent);border-color:var(--accent);color:var(--accent);}
 .ex-tab:hover:not(.on){border-color:var(--border2);color:var(--text2);}
 
 /* ── Reklam slotları ── */
@@ -253,7 +254,7 @@ window.addEventListener('DOMContentLoaded',function(){
   if(btn) btn.textContent = dark?'☀':'☾';
 });
 </script>
-<script src="/stratejiler/stratejiler.js?v=3" defer></script>
+<script src="/stratejiler/stratejiler.js?v=4" defer></script>
 
 </body>
 </html>
