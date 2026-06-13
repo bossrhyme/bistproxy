@@ -1124,6 +1124,10 @@ td:nth-child(2){font-family:var(--ff);}
 .hpx-step{text-align:center;}
 .hpx-step .hpx-step-icon{margin-left:auto;margin-right:auto;}
 .hp-footer-top,.hp-footer-bottom{max-width:1160px;margin-left:auto;margin-right:auto;}
+/* Borsalar & Stratejiler: sola yaslı (ortalı kolon içinde) */
+.hpx-section-left .hpx-eye{text-align:left;}
+.hpx-section-left .hpx-tabs{justify-content:flex-start;}
+.hpx-section-left .hpx-more{margin-left:0;margin-right:auto;}
 @media(max-width:880px){
   .hpx-hero,.hpx-section,.hpx-disc{padding-left:24px;padding-right:24px;}
 }
