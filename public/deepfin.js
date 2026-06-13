@@ -2269,18 +2269,18 @@ function initPrescanView() {
   el.innerHTML =
     '<button class="psv-close-btn" id="psv-close-btn" onclick="closePrescanView()" style="display:none">✕ Sonuçlara dön</button>'+
     '<div class="psv-inner">'+
-    '<div class="psv-brand"><div class="psv-logo"><div class="tlogo-mark" style="width:24px;height:24px;font-size:12px;">D</div>DEEPFIN TERMINAL</div><div class="psv-tagline">VARLIK · BORSA · STRATEJİ · TARA</div></div>'+
+    '<div class="psv-brand"><div class="psv-logo"><div class="tlogo-mark" style="width:24px;height:24px;font-size:12px;">D</div>DeepFin</div><div class="psv-tagline">VARLIK · BORSA · STRATEJİ · TARA</div></div>'+
 
     // Asset type section — yatay kaydırmalı
     '<div class="psv-section">'+
-    '<div class="psv-section-hd">🏦 Varlık</div>'+
+    '<div class="psv-section-hd">Varlık</div>'+
     '<div class="psv-asset-wrap">'+
       '<button class="psv-asset-arrow" onclick="psvScrollAssets(-1)" aria-label="Sola kaydır">‹</button>'+
       '<div class="psv-asset-row" id="psv-asset-row">'+
         PSV_ASSETS.map(function(a){
           return a.active
-            ? '<button class="psv-asset-btn on" data-asset="'+a.key+'" onclick="psvSetAsset(\''+a.key+'\')"><span class="psv-asset-icon">'+a.icon+'</span><span class="psv-asset-name">'+a.label+'</span></button>'
-            : '<div class="psv-asset-soon"><span class="psv-asset-icon">'+a.icon+'</span><span class="psv-asset-name">'+a.label+'</span><span class="psv-asset-badge">yakında</span></div>';
+            ? '<button class="psv-asset-btn on" data-asset="'+a.key+'" onclick="psvSetAsset(\''+a.key+'\')"><span class="psv-asset-name">'+a.label+'</span></button>'
+            : '<div class="psv-asset-soon"><span class="psv-asset-name">'+a.label+'</span><span class="psv-asset-badge">yakında</span></div>';
         }).join('')+
       '</div>'+
       '<button class="psv-asset-arrow" onclick="psvScrollAssets(1)" aria-label="Sağa kaydır">›</button>'+
@@ -2289,7 +2289,7 @@ function initPrescanView() {
 
     // Exchange section
     '<div class="psv-section">'+
-    '<div class="psv-section-hd">🌍 Borsa</div>'+
+    '<div class="psv-section-hd">Borsa</div>'+
     '<div class="psv-ex-grid" id="psv-ex-grid">'+PSV_MAIN_EX.map(mkExBtn).join('')+'</div>'+
     '<div class="psv-ex-extra" id="psv-ex-extra" style="display:none">'+allExKeys.map(mkExBtn).join('')+'</div>'+
     '<button class="psv-show-more" id="psv-ex-more" onclick="psvToggleMoreEx()">+ Diğer Borsalar</button>'+
@@ -2297,7 +2297,7 @@ function initPrescanView() {
 
     // GOAT section
     '<div class="psv-section">'+
-    '<div class="psv-section-hd">🐐 Yatırımcı Stratejisi <span class="psv-opt">isteğe bağlı</span></div>'+
+    '<div class="psv-section-hd">Yatırımcı Stratejisi <span class="psv-opt">isteğe bağlı</span></div>'+
     '<div class="psv-goat-grid" id="psv-goat-main">'+PSV_MAIN_GOATS.map(mkGoatCard).join('')+'</div>'+
     '<div class="psv-goat-extra" id="psv-goat-extra" style="display:none">'+extraGoatKeys.map(mkGoatCard).join('')+'</div>'+
     '<button class="psv-show-more" id="psv-goat-more" onclick="psvToggleMoreGoats()">+ Tüm Stratejiler</button>'+
@@ -2305,7 +2305,7 @@ function initPrescanView() {
 
     // Temel — yatay satır, ortalı
     '<div class="psv-section">'+
-    '<div class="psv-section-hd">📊 Temel <span class="psv-opt">isteğe bağlı</span></div>'+
+    '<div class="psv-section-hd">Temel <span class="psv-opt">isteğe bağlı</span></div>'+
     '<div class="psv-chip-grid" id="psv-preset-main">'+PSV_MAIN_PRESETS.map(function(k){ return mkFilterCard(k, PRESETS[k], 'psv-preset-card', 'psvTogglePreset'); }).join('')+'</div>'+
     '<div class="psv-chip-extra" id="psv-preset-extra" style="display:none">'+extraPresetKeys.map(function(k){ return mkFilterCard(k, PRESETS[k], 'psv-preset-card', 'psvTogglePreset'); }).join('')+'</div>'+
     (extraPresetKeys.length ? '<button class="psv-show-more" id="psv-preset-more" onclick="psvToggleMorePresets()">+ Daha Fazla ('+extraPresetKeys.length+')</button>' : '')+
@@ -2313,7 +2313,7 @@ function initPrescanView() {
 
     // Teknik — yatay satır, ortalı
     '<div class="psv-section">'+
-    '<div class="psv-section-hd">📈 Teknik <span class="psv-opt">isteğe bağlı</span></div>'+
+    '<div class="psv-section-hd">Teknik <span class="psv-opt">isteğe bağlı</span></div>'+
     '<div class="psv-chip-grid" id="psv-tech-main">'+PSV_MAIN_TECH.map(function(k){ return mkFilterCard(k, TECH_PRESETS[k], 'psv-tech-card', 'psvToggleTech'); }).join('')+'</div>'+
     '<div class="psv-chip-extra" id="psv-tech-extra" style="display:none">'+extraTechKeys.map(function(k){ return mkFilterCard(k, TECH_PRESETS[k], 'psv-tech-card', 'psvToggleTech'); }).join('')+'</div>'+
     '<button class="psv-show-more" id="psv-tech-more" onclick="psvToggleMoreTech()">+ Daha Fazla ('+extraTechKeys.length+')</button>'+
@@ -2321,8 +2321,8 @@ function initPrescanView() {
 
     // Scan button
     '<div class="psv-scan-wrap">'+
-    '<div class="psv-limit-hint" id="psv-limit-hint">⚠ En fazla 4 filtre seçilebilir — yenisini eklemek için mevcut bir seçimi kaldır.</div>'+
-    '<button class="psv-scan-btn" id="psv-scan-btn" onclick="psvScan()">▶ Hisse Tara</button></div>'+
+    '<div class="psv-limit-hint" id="psv-limit-hint">En fazla 4 filtre seçilebilir — yenisini eklemek için mevcut bir seçimi kaldır.</div>'+
+    '<button class="psv-scan-btn" id="psv-scan-btn" onclick="psvScan()">Hisse Tara</button></div>'+
 
     '</div>';
 
@@ -2380,7 +2380,7 @@ function _psvUpdateSelState() {
   var pv = document.getElementById('prescan-view');
   if (pv) pv.classList.toggle('psv-at-limit', atLimit);
   var btn = document.getElementById('psv-scan-btn');
-  if (btn) btn.textContent = total > 0 ? '▶ ' + total + ' Filtre ile Tara' : '▶ Hisse Tara';
+  if (btn) btn.textContent = total > 0 ? total + ' Filtre ile Tara' : 'Hisse Tara';
 }
 
 function psvToggleGoat(key) {
