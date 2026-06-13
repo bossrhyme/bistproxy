@@ -3384,6 +3384,7 @@ function _applyScanMode() {
   var kw = document.getElementById('kolay-wrap');
   var resultsVisible = tw && tw.style.display && tw.style.display !== 'none';
   if (kw) kw.style.display = (_scanMode === 'kolay' && resultsVisible) ? 'block' : 'none';
+  if (_scanMode === 'kolay' && typeof renderKolaySide === 'function') renderKolaySide();
 }
 
 function renderKolay() {
@@ -3458,12 +3459,50 @@ function _runDefaultScan() {
 }
 
 // Kolay moddaki 4 basit filtre (temel + teknik) + Tümü
+var _kolayFilterKey = 'all';
+var _kolayExpanded = false;
 function kolayFilter(key, el) {
+  _kolayFilterKey = key;
   var chips = document.querySelectorAll('.kfil');
   for (var i = 0; i < chips.length; i++) chips[i].classList.remove('on');
   if (el) el.classList.add('on');
   if (key === 'all') _runDefaultScan();
   else quickScan(key);
+}
+
+// Kolay sol panel: borsa listesi
+function renderKolaySide() {
+  var list = document.getElementById('kolay-ex-list');
+  if (!list || typeof EXCHANGE_META === 'undefined') return;
+  var main = (typeof PSV_MAIN_EX !== 'undefined') ? PSV_MAIN_EX : ['bist','nasdaq','nyse','sp500','dax','lse'];
+  var extra = Object.keys(EXCHANGE_META).filter(function(k){ return main.indexOf(k) === -1; });
+  function exItem(key) {
+    var m = EXCHANGE_META[key]; if (!m) return '';
+    var iso = (typeof _isoFromFlag === 'function') ? _isoFromFlag(m.flag) : '';
+    var flag = iso ? '<img class="ks-flag" src="https://flagcdn.com/w20/' + iso + '.png" alt="" loading="lazy">' : '<span class="ks-flag-e">' + m.flag + '</span>';
+    return '<button class="ks-ex' + (currentExchange === key ? ' on' : '') + '" onclick="kolaySelectExchange(\'' + key + '\')">' + flag + '<span class="ks-ex-name">' + m.name + '</span></button>';
+  }
+  list.innerHTML = main.map(exItem).join('') +
+    '<div class="ks-ex-extra" id="kolay-ex-extra"' + (_kolayExpanded ? '' : ' style="display:none"') + '>' + extra.map(exItem).join('') + '</div>';
+}
+
+function kolayToggleMoreEx() {
+  _kolayExpanded = !_kolayExpanded;
+  var ex = document.getElementById('kolay-ex-extra'); if (ex) ex.style.display = _kolayExpanded ? 'block' : 'none';
+  var btn = document.getElementById('kolay-ex-more'); if (btn) btn.textContent = _kolayExpanded ? '− Daha Az' : '+ Diğer Borsalar';
+}
+
+function kolaySelectExchange(key) {
+  if (typeof EXCHANGE_META === 'undefined' || !EXCHANGE_META[key]) return;
+  currentExchange = key;
+  document.querySelectorAll('.exbtn').forEach(function(b){ b.classList.toggle('on', b.dataset.exchange === key); });
+  document.querySelectorAll('#adv-ex-grid .exbtn').forEach(function(b){ b.classList.toggle('on', b.dataset.exchange === key); });
+  allData = []; filtered = []; selSym = null;
+  if (typeof closeDetail === 'function') closeDetail();
+  renderKolaySide();
+  // Mevcut Kolay filtresiyle yeni borsada tekrar tara
+  if (_kolayFilterKey && _kolayFilterKey !== 'all') quickScan(_kolayFilterKey);
+  else _runDefaultScan();
 }
 
 

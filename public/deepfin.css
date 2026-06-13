@@ -1807,3 +1807,24 @@ kbd{font-family:var(--ff-mono);font-size:10px;color:var(--text);background:var(-
 .kfil:hover:not(.on){border-color:var(--accent);color:var(--accent);}
 .kfil.on{background:var(--accent);color:#fff;border-color:transparent;}
 .kolay-head,.kolay-filters,.kolay-tablewrap{max-width:1280px;margin-left:auto;margin-right:auto;}
+
+/* ═══ Kolay Mod: Varlık + Borsa sol paneli ═══ */
+#kolay-side{display:none;flex-direction:column;width:212px;min-width:212px;border-right:1px solid var(--border);background:var(--s1);padding:16px 0;overflow-y:auto;overscroll-behavior:contain;}
+[data-scan-mode="kolay"] #kolay-side{display:flex;}
+[data-scan-mode="pro"] #kolay-side{display:none !important;}
+.ks-sec{padding:0 0 12px;margin-bottom:12px;border-bottom:1px solid var(--border);}
+.ks-sec:last-child{border-bottom:none;margin-bottom:0;}
+.ks-label{font-size:10px;font-weight:600;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;padding:0 16px 8px;}
+.ks-asset{display:block;width:calc(100% - 20px);margin:0 10px 4px;text-align:left;padding:8px 12px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#fff;font-size:13px;font-weight:600;cursor:default;font-family:'Inter',sans-serif;}
+.ks-soon{padding:7px 16px;font-size:12px;color:var(--muted);display:flex;align-items:center;justify-content:space-between;}
+.ks-soon span{font-size:9px;font-weight:600;background:var(--s3);color:var(--muted2);padding:1px 6px;border-radius:8px;text-transform:uppercase;}
+.ks-ex{display:flex;align-items:center;gap:9px;width:calc(100% - 12px);margin:0 6px 1px;padding:8px 10px;border:none;background:transparent;border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;transition:background .12s;text-align:left;}
+.ks-ex:hover{background:var(--s3);}
+.ks-ex.on{background:var(--accent2);}
+.ks-ex.on .ks-ex-name{color:var(--accent);font-weight:600;}
+.ks-flag{width:20px;height:14px;border-radius:2px;object-fit:cover;flex-shrink:0;}
+.ks-flag-e{font-size:15px;flex-shrink:0;line-height:1;}
+.ks-ex-name{font-size:13px;color:var(--text);}
+.ks-more{margin:8px 16px 0;background:none;border:none;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;padding:4px 0;font-family:'Inter',sans-serif;text-align:left;display:block;}
+.ks-more:hover{text-decoration:underline;}
+@media(max-width:760px){#kolay-side{display:none !important;}}
