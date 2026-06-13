@@ -363,6 +363,10 @@ function match(s, filters, special) {
   return true;
 }
 
+function matchList(filters, special) {
+  return allData.filter(function(s){ return match(s, filters, special); });
+}
+
 function stats(filters, special) {
   var n=0, s1=0,c1=0, s3=0,c3=0, s6=0,c6=0;
   allData.forEach(function(s) {
@@ -383,7 +387,83 @@ function profileFilters(p) {
   return { f:f, sp:sp };
 }
 
+// ── Kriterleri okunabilir metne çevir ─────────────────────────
+function fmtMc(v) {
+  if (v >= 1000) return '$' + (v % 1000 === 0 ? (v / 1000) : (v / 1000).toFixed(1)) + ' Mr';
+  return '$' + v + 'M';
+}
+var FILTER_LABELS = {
+  pe_min:  function(v){ return 'F/K > ' + v; },
+  pe_max:  function(v){ return 'F/K < ' + v; },
+  pb_min:  function(v){ return 'PD/DD > ' + v; },
+  pb_max:  function(v){ return 'PD/DD < ' + v; },
+  ps_min:  function(v){ return 'PD/Satış > ' + v; },
+  ps_max:  function(v){ return 'PD/Satış < ' + v; },
+  roe_min: function(v){ return 'Özkaynak kârlılığı (ROE) > %' + v; },
+  roe_max: function(v){ return 'ROE < %' + v; },
+  roa_min: function(v){ return 'Aktif kârlılığı (ROA) > %' + v; },
+  margin_min: function(v){ return 'Net kâr marjı > %' + v; },
+  margin_max: function(v){ return 'Net kâr marjı < %' + v; },
+  gross_min:  function(v){ return 'Brüt kâr marjı > %' + v; },
+  revg_min: function(v){ return 'Gelir büyümesi > %' + v; },
+  revg_max: function(v){ return 'Gelir büyümesi < %' + v; },
+  earng_min: function(v){ return 'Kâr (EPS) büyümesi > %' + v; },
+  earng_max: function(v){ return 'Kâr (EPS) büyümesi < %' + v; },
+  div_min: function(v){ return 'Temettü verimi > %' + v; },
+  div_max: function(v){ return 'Temettü verimi < %' + v; },
+  de_min:  function(v){ return 'Borç/Özsermaye > %' + v; },
+  de_max:  function(v){ return 'Borç/Özsermaye < %' + v; },
+  cr_min:  function(v){ return 'Cari oran > ' + v; },
+  cr_max:  function(v){ return 'Cari oran < ' + v; },
+  piotroski_min: function(v){ return 'Piotroski F-Skoru ≥ ' + v; },
+  peg_min: function(v){ return 'PEG > ' + v; },
+  peg_max: function(v){ return 'PEG < ' + v; },
+  mc_min:  function(v){ return 'Piyasa değeri > ' + fmtMc(v); },
+  mc_max:  function(v){ return 'Piyasa değeri < ' + fmtMc(v); },
+  chg_min: function(v){ return 'Günlük değişim > %' + v; },
+  chg_max: function(v){ return 'Günlük değişim < %' + v; },
+  from_high_min: function(v){ return '52H zirvesine yakın (en çok %' + Math.abs(v) + ' altında)'; },
+  from_high_max: function(v){ return '52H zirvesinden en az %' + Math.abs(v) + ' uzak'; },
+  from_low_min:  function(v){ return '52H dibinden en az %' + v + ' yukarıda'; },
+  tech_rating_min: function(v){ return 'Teknik skor > ' + v + ' (al sinyali)'; },
+  ma_rating_min:   function(v){ return 'Hareketli ortalama skoru > ' + v; },
+  osc_rating_min:  function(v){ return 'Osilatör skoru > ' + v; },
+  perf1m_min: function(v){ return '1 aylık getiri > %' + v; },
+  perf3m_min: function(v){ return '3 aylık getiri > %' + v; },
+  perf6m_min: function(v){ return '6 aylık getiri > %' + v; },
+  perfy_min:  function(v){ return 'Yıllık getiri > %' + v; },
+  rsi_min: function(v){ return 'RSI > ' + v; },
+  rsi_max: function(v){ return 'RSI < ' + v; },
+  rel_vol_min: function(v){ return 'Göreli hacim > ' + v + 'x normal'; },
+  vol_min: function(v){ return 'Hacim > ' + v + 'M lot'; },
+  beta_min: function(v){ return 'Beta > ' + v; },
+  beta_max: function(v){ return 'Beta < ' + v + ' (düşük oynaklık)'; },
+  adx_min: function(v){ return 'ADX > ' + v + ' (güçlü trend)'; },
+  adx_di_diff_min: function(){ return '+DI > −DI (alıcı baskın)'; },
+  above_sma200_min: function(){ return 'Fiyat 200 günlük ortalamanın üzerinde'; },
+  sma_trend_min: function(){ return 'SMA50 > SMA200 (yükseliş trendi)'; },
+  macd_min: function(v){ return 'MACD > ' + v; },
+  macd_max: function(v){ return 'MACD < ' + v; },
+  macd_hist_min: function(){ return 'MACD sinyal çizgisini yukarı kesmiş'; },
+  bb_dist_max: function(v){ return 'Bollinger alt bandına yakın (< %' + v + ')'; },
+  stoch_k_max: function(v){ return 'Stokastik %K < ' + v + ' (aşırı satım)'; },
+  stoch_kd_min: function(){ return '%K > %D (yukarı kesişim)'; },
+};
+function fmtCriteria(filters, special) {
+  var out = [];
+  for (var k in filters) {
+    var fn = FILTER_LABELS[k];
+    out.push(fn ? fn(filters[k]) : (k + ': ' + filters[k]));
+  }
+  if (special === 'peg')       out.push('PEG < 1.5 (büyümeye göre ucuz)');
+  if (special === 'piotroski') out.push('Piotroski F-Skoru ≥ 7 (sağlam bilanço)');
+  return out;
+}
+
 // ── Render ────────────────────────────────────────────────────
+var _rows = {};      // id → {icon,label,st,filters,special}
+var _rowSeq = 0;
+
 function pctClass(v) {
   if (v === null || v === undefined) return 'na';
   return v >= 0 ? 'pos' : 'neg';
@@ -393,15 +473,57 @@ function pctFmt(v) {
   return (v >= 0 ? '+' : '') + v.toFixed(1) + '%';
 }
 
-function rowHtml(icon, label, st) {
-  return '<div class="sr-row' + (st.n === 0 ? ' sr-row-empty':'') + '">' +
-    '<span class="sr-icon">' + icon + '</span>' +
-    '<span class="sr-label">' + label + '</span>' +
-    '<span class="sr-n">' + st.n + '</span>' +
-    '<span class="sr-val ' + pctClass(st.p1) + '">' + pctFmt(st.p1) + '</span>' +
-    '<span class="sr-val ' + pctClass(st.p3) + '">' + pctFmt(st.p3) + '</span>' +
-    '<span class="sr-val ' + pctClass(st.p6) + '">' + pctFmt(st.p6) + '</span>' +
+function rowHtml(it) {
+  var st = it.st;
+  var id = 'r' + (_rowSeq++);
+  _rows[id] = it;
+  return '<div class="sr-item">' +
+    '<div class="sr-row' + (st.n === 0 ? ' sr-row-empty':'') + '" id="row_' + id + '"' +
+        ' onclick="toggleRow(\'' + id + '\')"' +
+        ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();toggleRow(\'' + id + '\');}"' +
+        ' role="button" tabindex="0">' +
+      '<span class="sr-icon"><span class="sr-caret">▸</span>' + it.icon + '</span>' +
+      '<span class="sr-label">' + it.label + '</span>' +
+      '<span class="sr-n">' + st.n + '</span>' +
+      '<span class="sr-val ' + pctClass(st.p1) + '">' + pctFmt(st.p1) + '</span>' +
+      '<span class="sr-val ' + pctClass(st.p3) + '">' + pctFmt(st.p3) + '</span>' +
+      '<span class="sr-val ' + pctClass(st.p6) + '">' + pctFmt(st.p6) + '</span>' +
+    '</div>' +
+    '<div class="sr-detail" id="det_' + id + '" hidden></div>' +
   '</div>';
+}
+
+function detailHtml(it) {
+  var crit = fmtCriteria(it.filters, it.special);
+  var critHtml = '<div class="sr-crit-hd">🔎 Bu strateji neye göre tarıyor?</div>' +
+    '<div class="sr-crit-chips">' +
+      crit.map(function(c){ return '<span class="sr-crit-chip">' + c + '</span>'; }).join('') +
+    '</div>';
+
+  var list = matchList(it.filters, it.special).slice();
+  list.sort(function(a,b){ return (b.perf3m===null?-1e9:b.perf3m) - (a.perf3m===null?-1e9:a.perf3m); });
+
+  var stockHtml;
+  if (!list.length) {
+    stockHtml = '<div class="sr-stk-empty">Bu kriterlere uyan hisse bulunamadı.</div>';
+  } else {
+    var capped = list.slice(0, 60);
+    var hint = list.length > 60 ? (' · en iyi 60 (3A getiriye göre)') : '';
+    stockHtml = '<div class="sr-stk-hd">📋 Listedeki hisseler — ' + list.length + ' adet' + hint + '</div>' +
+      '<div class="sr-stk-grid">' +
+        '<div class="sr-stk-head"><span>Sembol</span><span>1A</span><span>3A</span><span>6A</span></div>' +
+        capped.map(function(s){
+          var href = '/analiz/profile.html?sym=' + encodeURIComponent(s.symbol) + '&ex=' + currentEx;
+          return '<a class="sr-stk-row" href="' + href + '" title="' + s.symbol + ' analizini aç">' +
+            '<span class="sr-sym">' + s.symbol + '</span>' +
+            '<span class="sr-sval ' + pctClass(s.perf1m) + '">' + pctFmt(s.perf1m) + '</span>' +
+            '<span class="sr-sval ' + pctClass(s.perf3m) + '">' + pctFmt(s.perf3m) + '</span>' +
+            '<span class="sr-sval ' + pctClass(s.perf6m) + '">' + pctFmt(s.perf6m) + '</span>' +
+          '</a>';
+        }).join('') +
+      '</div>';
+  }
+  return '<div class="sr-detail-inner">' + critHtml + stockHtml + '</div>';
 }
 
 function sectionHtml(title, items) {
@@ -413,23 +535,25 @@ function sectionHtml(title, items) {
   });
   return '<div class="sr-section-hd">' + title + '</div>' +
     '<div class="sr-head-row"><span></span><span>Strateji</span><span>Hisse</span><span>1A</span><span>3A</span><span>6A</span></div>' +
-    items.map(function(it){ return rowHtml(it.icon, it.label, it.st); }).join('');
+    items.map(function(it){ return rowHtml(it); }).join('');
 }
 
 function renderAll() {
   var wrap = document.getElementById('sr-wrap');
   var exm  = EX_META[currentEx] || EX_META.bist;
+  _rows = {}; _rowSeq = 0;
 
   var html = '<div class="sr-note">' +
     exm.flag + ' <b>' + exm.name + '</b> · ' + allData.length + ' hisse tarandı. ' +
     'Bugünkü filtreden geçen hisselerin son 1&nbsp;/&nbsp;3&nbsp;/&nbsp;6 aydaki eşit ağırlıklı ortalama getirisi. ' +
+    'Bir stratejinin üstüne tıklayarak tarama kriterlerini ve listedeki hisseleri görebilirsin. ' +
     'Geçmişe dönük göstergedir; gelecek getiriyi garanti etmez.' +
   '</div>';
 
   // Yatırımcı stratejileri
   var profItems = INVESTOR_PROFILES.map(function(p) {
     var pf = profileFilters(p);
-    return { icon:p.icon, label:p.label, st:stats(pf.f, pf.sp) };
+    return { icon:p.icon, label:p.label, st:stats(pf.f, pf.sp), filters:pf.f, special:pf.sp };
   });
   html += sectionHtml('🧬 Yatırımcı Stratejileri', profItems);
 
@@ -441,17 +565,17 @@ function renderAll() {
 
   if (showAllGroups) {
     var goatItems = Object.keys(GURUS).map(function(k) {
-      var g = GURUS[k]; return { icon:'🐐', label:g.label, st:stats(g.filters, g.special||null) };
+      var g = GURUS[k]; return { icon:'🐐', label:g.label, st:stats(g.filters, g.special||null), filters:g.filters, special:g.special||null };
     });
     html += sectionHtml('🏆 GOAT Stratejileri', goatItems);
 
     var presetItems = Object.keys(PRESETS).map(function(k) {
-      var p = PRESETS[k]; return { icon:'📊', label:p.label, st:stats(p.filters, null) };
+      var p = PRESETS[k]; return { icon:'📊', label:p.label, st:stats(p.filters, null), filters:p.filters, special:null };
     });
     html += sectionHtml('📐 Temel Filtreler', presetItems);
 
     var techItems = Object.keys(TECH_PRESETS).map(function(k) {
-      var p = TECH_PRESETS[k]; return { icon:'📈', label:p.label, st:stats(p.filters, null) };
+      var p = TECH_PRESETS[k]; return { icon:'📈', label:p.label, st:stats(p.filters, null), filters:p.filters, special:null };
     });
     html += sectionHtml('⚙️ Teknik Filtreler', techItems);
 
@@ -484,6 +608,22 @@ window.setEx = function(key) {
 window.toggleAll = function() {
   showAllGroups = !showAllGroups;
   renderAll();
+};
+window.toggleRow = function(id) {
+  var det = document.getElementById('det_' + id);
+  var row = document.getElementById('row_' + id);
+  if (!det || !row) return;
+  if (!det.hasAttribute('hidden')) {
+    det.setAttribute('hidden', '');
+    det.innerHTML = '';
+    row.classList.remove('sr-row-open');
+    return;
+  }
+  var it = _rows[id];
+  if (!it) return;
+  det.innerHTML = detailHtml(it);
+  det.removeAttribute('hidden');
+  row.classList.add('sr-row-open');
 };
 window.currentEx = currentEx; // expose for error handler
 
