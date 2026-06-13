@@ -1089,7 +1089,7 @@ function _mcapDual(vUsdM) {
   var usdStr = '$' + _fmtN(vUsdM * 1e6);
   var rate = _localRate(_prfEx);
   if (!rate || rate === 1) return usdStr;
-  return (meta.currency || '') + ' ' + _fmtN(vUsdM * rate * 1e6) + ' · ' + usdStr;
+  return (meta.currency || '') + ' ' + _fmtN(vUsdM * rate * 1e6) + ' / ' + usdStr;
 }
 
 function _setScore(id, val, cls) {
