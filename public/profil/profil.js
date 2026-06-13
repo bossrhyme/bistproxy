@@ -96,48 +96,126 @@ var INV_META = {
   bal:    { emoji:'⚖️', risk:'Orta',         vade:'5+ yıl',    tags:['Çeşitlendirme','Sharpe oranı','Korelasyon','Risk/getiri dengesi'] },
 };
 
+// ── Investor type briefs (detaylı açıklama) ───
+var INV_BRIEF = {
+  growth: {
+    hisse: 'Geliri ve hisse başı kârı yıllar boyu %15–25+ büyüyen, pazar payını sürekli artıran şirketleri alır: teknoloji, e-ticaret, sağlık ve yükselen tüketici markaları. Büyüme hikâyesi bozulmadığı sürece pahalı görünen çarpanlara katlanır.',
+    neden: 'Hisse fiyatını uzun vadede kâr büyümesi sürükler. Bugün makul bir prim ödeyip 5 yıl sonra kârını ikiye katlayacak şirkete ortak olmak, ucuz ama durağan şirkete ortak olmaktan daha çok kazandırır.',
+    benzer: 'Peter Lynch',
+    benzerNot: '"Bildiğin şirketi al, büyümesini takip et" diyen Lynch gibi PEG oranına bakar; T. Rowe Price\'ın büyüme yatırımı geleneğini izler.'
+  },
+  div: {
+    hisse: 'Onlarca yıldır kesintisiz ve artan temettü ödeyen, nakit akışı güçlü şirketleri alır: bankalar, holdingler, enerji dağıtım, telekom ve temel tüketim. Temettü verimi kadar ödeme oranının sürdürülebilirliğine bakar.',
+    neden: 'Yeniden yatırılan temettüler bileşik getirinin en güvenilir motorudur. Fiyat düşse bile temettü gelmeye devam eder; bu hem psikolojik dayanıklılık hem de ayı piyasasında düzenli nakit sağlar.',
+    benzer: 'John Neff',
+    benzerNot: 'Neff gibi "temettü + büyüme / F-K" toplam getiri oranıyla düşünür; Geraldine Weiss\'in temettü verimine dayalı değerleme okulundan beslenir.'
+  },
+  value: {
+    hisse: 'Piyasanın gözden çıkardığı ama bilançosu sağlam şirketleri alır: düşük F/K, düşük PD/DD, net nakit pozisyonu, geçici kötü haberle dibe vurmuş kaliteli işler. İçsel değerin belirgin altında fiyatlanan her sektöre bakar.',
+    neden: 'Fiyat ile değer arasındaki fark — güvenlik marjı — hem kaybı sınırlar hem getiriyi büyütür. Piyasa kısa vadede oy makinesi, uzun vadede terazidir; terazi eninde sonunda doğru tartar.',
+    benzer: 'Benjamin Graham & Warren Buffett',
+    benzerNot: 'Graham\'ın güvenlik marjı disiplinini, Buffett\'ın "harika şirketi makul fiyata al" evrimiyle birleştirir.'
+  },
+  mom: {
+    hisse: '52 hafta zirvesine yakın, göreceli gücü piyasayı yenen, hacmi artarak yükselen hisseleri alır. Sektör rotasyonunu izler, lider sektörün lider hissesine biner; trend kırılınca beklemeden çıkar.',
+    neden: 'Kazanan hisseler kazanmaya devam etme eğilimindedir (momentum etkisi). Önemli olan ucuz almak değil, doğru yönde giden ata binmek; zarar hızla kesilir, kâr koşturulur.',
+    benzer: 'William O\'Neil',
+    benzerNot: 'CAN SLIM sisteminin kırılım + hacim + göreceli güç üçlüsünü uygular; Richard Driehaus\'un "yüksekten al, daha yüksekten sat" felsefesine yakındır.'
+  },
+  def: {
+    hisse: 'Düşük betalı, borcu az, kârı ekonomik döngüden az etkilenen şirketleri alır: temel tüketim, elektrik-gaz dağıtımı, sağlık ve güçlü temettü ödeyen köklü sanayiler. Kriz testinden geçmiş bilançolar önceliklidir.',
+    neden: 'Önce sermayeyi korumak, sonra büyütmek. %50 kaybeden %100 kazanmak zorundadır; düşüşlerde az kaybeden, toparlanmada öne geçer. İstikrar uzun vadede heyecandan daha çok kazandırır.',
+    benzer: 'Benjamin Graham (Savunmacı Yatırımcı)',
+    benzerNot: 'Graham\'ın "Akıllı Yatırımcı"daki savunmacı yatırımcı kriterlerini izler; Ray Dalio\'nun her koşula dayanıklı portföy anlayışıyla akrabadır.'
+  },
+  small: {
+    hisse: 'Analistlerin takip etmediği, kurumsal yatırımcıların henüz giremediği küçük ölçekli ama büyüme potansiyeli yüksek şirketleri alır. Niş pazarında lider, içeriden alımları olan, ucuz kalmış küçük işletmeler hedeftir.',
+    neden: 'Küçük ve takipsiz şirketlerde fiyatlama hatası çoktur; bilgiyi önce bulan kazanır. Küçük şirketin 10 katına çıkması, dev şirketin 10 katına çıkmasından çok daha olasıdır.',
+    benzer: 'Peter Lynch & genç Warren Buffett',
+    benzerNot: 'Lynch\'in "on-bagger" avcılığını, Buffett\'ın ortaklık yıllarındaki küçük-değer stratejisiyle harmanlar; Ralph Wanger\'ın küçük şirket okuluna yakındır.'
+  },
+  spec: {
+    hisse: 'Katalizörü olan yüksek volatilite hisselerini alır: hacim patlaması yaşayan, önemli haber/ihale/yeniden yapılandırma beklentisi olan, teknik kırılım yapan kâğıtlar. Pozisyon süresi günlerle aylar arasındadır.',
+    neden: 'Asimetrik fırsat: riskin sınırlandığı (stop), getirinin katlanabildiği kurgular arar. Piyasa duyarlılığı ve akış, kısa vadede temellerden daha belirleyicidir; doğru anda agresif olmak gerekir.',
+    benzer: 'Jesse Livermore & George Soros',
+    benzerNot: 'Livermore\'un trend ve hacim okumasını, Soros\'un dönüşlülük (reflexivity) — algının fiyatı, fiyatın algıyı beslediği — anlayışıyla birleştirir.'
+  },
+  tech: {
+    hisse: 'Ar-Ge\'ye yoğun yatırım yapan, ölçeklenebilir iş modeline (yazılım, platform, yapay zekâ) sahip, büyük adreslenebilir pazarı olan inovasyon şirketlerini alır. Bugünkü kârdan çok 5-10 yıllık dönüşüm potansiyeline bakar.',
+    neden: 'Teknolojik kırılım doğrusal değil üstel büyür; kazanan platform pazarın tamamını alır. Erken ve sabırlı olan, dönüşümün tamamından pay alır.',
+    benzer: 'Philip Fisher & Cathie Wood',
+    benzerNot: 'Fisher\'ın "olağanüstü şirketi bul, neredeyse hiç satma" ve Ar-Ge odaklı kalitatif analizini, Wood\'un yıkıcı inovasyon temalarıyla günceller.'
+  },
+  bal: {
+    hisse: 'Tek tip hisse değil, denge alır: büyüme + temettü + savunma hisselerini sektörlere yayarak birlikte taşır. Birbiriyle düşük korelasyonlu varlıkları harmanlar, ağırlıkları piyasa koşuluna göre çevikçe ayarlar.',
+    neden: 'Geleceği kimse bilemez; çeşitlendirme "bedava öğle yemeğidir". Amaç en yüksek getiri değil, birim risk başına en iyi getiridir (Sharpe) — istikrarlı bileşik büyüme uzun vadede turta kazanır.',
+    benzer: 'Ray Dalio & Harry Markowitz',
+    benzerNot: 'Dalio\'nun her mevsime dayanıklı (All Weather) denge anlayışını, Markowitz\'in modern portföy teorisiyle uygular.'
+  },
+};
+
 function renderInvestorSidebar() {
   var sb = document.getElementById('pf-inv-sidebar');
   if (!sb) return;
   var current = _user && _user.investorType;
 
-  var html = '<div class="pf-inv-sb-title">Yatırımcı Profilleri</div>';
+  var html = '<div class="pf-inv-sb-title">Yatırımcı Profilin</div>';
 
-  if (_user) {
-    html += '<button class="pf-inv-sb-change-btn" onclick="startQuizForExistingUser()">Kimliğini Güncelle</button>';
+  if (!current || !INV_TYPES[current]) {
+    html +=
+      '<div class="pf-inv-sb-empty">' +
+        '<div class="pf-inv-sb-empty-emoji">🧬</div>' +
+        '<div class="pf-inv-sb-empty-text">Henüz yatırımcı profilin belirlenmedi. Kısa kişilik testini çözerek hangi yatırımcı tipine girdiğini öğren.</div>' +
+        (_user ? '<button class="pf-inv-sb-change-btn" onclick="startQuizForExistingUser()">Testi Çöz</button>' : '') +
+      '</div>';
+    sb.innerHTML = html;
+    return;
   }
 
-  Object.keys(INV_TYPES).forEach(function(key) {
-    var inv  = INV_TYPES[key];
-    var meta = INV_META[key];
-    var isMe = current === key;
-    var borderStyle = isMe ? 'border-color:' + inv.color + ';' : '';
-    var bgStyle     = isMe ? 'background:' + inv.color + '12;' : '';
-    html +=
-      '<div class="pf-inv-sb-item' + (isMe ? ' pf-inv-sb-me' : '') + '" style="' + borderStyle + bgStyle + '">' +
-        '<div class="pf-inv-sb-head">' +
-          '<span class="pf-inv-sb-emoji">' + meta.emoji + '</span>' +
-          '<div style="flex:1;min-width:0;">' +
-            '<div class="pf-inv-sb-name">' +
-              '<span style="color:' + inv.color + '">' + inv.name + '</span>' +
-              (isMe ? '<span class="pf-inv-sb-me-badge" style="background:' + inv.color + '">SEN</span>' : '') +
-            '</div>' +
-            '<div class="pf-inv-sb-desc">' + inv.desc + '</div>' +
+  var inv   = INV_TYPES[current];
+  var meta  = INV_META[current];
+  var brief = INV_BRIEF[current];
+
+  html +=
+    '<div class="pf-inv-sb-item pf-inv-sb-me" style="border-color:' + inv.color + ';background:' + inv.color + '12;">' +
+      '<div class="pf-inv-sb-head">' +
+        '<span class="pf-inv-sb-emoji">' + meta.emoji + '</span>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div class="pf-inv-sb-name">' +
+            '<span style="color:' + inv.color + '">' + inv.name + '</span>' +
+            '<span class="pf-inv-sb-me-badge" style="background:' + inv.color + '">SEN</span>' +
           '</div>' +
+          '<div class="pf-inv-sb-desc">' + inv.desc + '</div>' +
         '</div>' +
-        '<div class="pf-inv-sb-meta">' +
-          '<span class="pf-inv-sb-chip">⏱ ' + meta.vade + '</span>' +
-          '<span class="pf-inv-sb-chip">⚠ ' + meta.risk + '</span>' +
+      '</div>' +
+      '<div class="pf-inv-sb-meta">' +
+        '<span class="pf-inv-sb-chip">⏱ ' + meta.vade + '</span>' +
+        '<span class="pf-inv-sb-chip">⚠ ' + meta.risk + '</span>' +
+      '</div>' +
+      '<div class="pf-inv-sb-tags">' +
+        meta.tags.map(function(t){ return '<span class="pf-inv-sb-tag">' + t + '</span>'; }).join('') +
+      '</div>' +
+    '</div>';
+
+  if (brief) {
+    html +=
+      '<div class="pf-inv-brief">' +
+        '<div class="pf-inv-brief-block">' +
+          '<div class="pf-inv-brief-label">📈 Hangi hisseleri alırsın?</div>' +
+          '<div class="pf-inv-brief-text">' + brief.hisse + '</div>' +
         '</div>' +
-        '<div class="pf-inv-sb-tags">' +
-          meta.tags.map(function(t){ return '<span class="pf-inv-sb-tag">' + t + '</span>'; }).join('') +
+        '<div class="pf-inv-brief-block">' +
+          '<div class="pf-inv-brief-label">💡 Neden?</div>' +
+          '<div class="pf-inv-brief-text">' + brief.neden + '</div>' +
+        '</div>' +
+        '<div class="pf-inv-brief-block pf-inv-brief-mentor" style="border-color:' + inv.color + '55;">' +
+          '<div class="pf-inv-brief-label">🎓 Benzediğin yatırımcı</div>' +
+          '<div class="pf-inv-brief-mentor-name" style="color:' + inv.color + '">' + brief.benzer + '</div>' +
+          '<div class="pf-inv-brief-text">' + brief.benzerNot + '</div>' +
         '</div>' +
       '</div>';
-  });
-
-  if (!current) {
-    html += '<div class="pf-inv-sb-scrollhint">Quiz yaparak tipini belirle 👆</div>';
   }
+
   sb.innerHTML = html;
 }
 

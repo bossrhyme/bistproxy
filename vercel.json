@@ -85,7 +85,7 @@
       ]
     },
     {
-      "source": "/(|index\\.html|screener|analiz/|analiz/index\\.html|analiz/profil\\.html|analiz/profile\\.html|profil|profil/|profil/index\\.html|admin|admin/|admin/index\\.html)",
+      "source": "/(|index\\.html|screener|analiz/|analiz/index\\.html|analiz/profil\\.html|analiz/profile\\.html|stratejiler/|stratejiler/index\\.html|profil|profil/|profil/index\\.html|admin|admin/|admin/index\\.html)",
       "headers": [
         {
           "key": "Cache-Control",
@@ -131,6 +131,14 @@
     {
       "source": "/analiz/",
       "destination": "/analiz/index.html"
+    },
+    {
+      "source": "/stratejiler",
+      "destination": "/stratejiler/index.html"
+    },
+    {
+      "source": "/stratejiler/",
+      "destination": "/stratejiler/index.html"
     },
     {
       "source": "/analiz/profil",
