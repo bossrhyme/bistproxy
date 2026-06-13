@@ -3435,12 +3435,14 @@ function openScanModeChoice() {
 function chooseScanMode(mode) {
   var ch = document.getElementById('scan-mode-choice'); if (ch) ch.style.display = 'none';
   setScanMode(mode);
+  // Profesyonel → tarama yapılandırma ekranı (prescan: varlık/borsa/strateji/tara)
+  if (mode === 'pro') { openPrescanView(); return; }
+  // Kolay → varsayılan tarama sonuçları (veri varsa yeniden taramadan göster)
   if (typeof allData !== 'undefined' && allData && allData.length > 0) {
     showState('twrap');
-    var tb = document.getElementById('toolbar'); if (tb) tb.style.display = (mode === 'pro') ? 'flex' : 'none';
+    var tb = document.getElementById('toolbar'); if (tb) tb.style.display = 'none';
     updateStatsBar();
-    if (mode === 'kolay') { if (typeof renderKolay === 'function') renderKolay(); }
-    else { try { renderTable(); } catch(e) {} }
+    if (typeof renderKolay === 'function') renderKolay();
   } else {
     _runDefaultScan();
   }
