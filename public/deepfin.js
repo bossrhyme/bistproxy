@@ -3423,6 +3423,47 @@ function renderKolay() {
 }
 try { _applyScanMode(); } catch(e) {}
 
+// ── Tarayıcıya girişte Kolay/Pro seçim ekranı ──
+function openScanModeChoice() {
+  var pv = document.getElementById('prescan-view'); if (pv) pv.style.display = 'none';
+  ['empty','loading','errstate','twrap'].forEach(function(id){ var e = document.getElementById(id); if (e) e.style.display = 'none'; });
+  var kw = document.getElementById('kolay-wrap'); if (kw) kw.style.display = 'none';
+  var sb = document.getElementById('stats-bar'); if (sb) sb.classList.remove('visible');
+  var ch = document.getElementById('scan-mode-choice'); if (ch) ch.style.display = 'flex';
+}
+
+function chooseScanMode(mode) {
+  var ch = document.getElementById('scan-mode-choice'); if (ch) ch.style.display = 'none';
+  setScanMode(mode);
+  if (typeof allData !== 'undefined' && allData && allData.length > 0) {
+    showState('twrap');
+    var tb = document.getElementById('toolbar'); if (tb) tb.style.display = (mode === 'pro') ? 'flex' : 'none';
+    updateStatsBar();
+    if (mode === 'kolay') { if (typeof renderKolay === 'function') renderKolay(); }
+    else { try { renderTable(); } catch(e) {} }
+  } else {
+    _runDefaultScan();
+  }
+}
+
+// Temiz varsayılan tarama (tüm hisseler, filtresiz)
+function _runDefaultScan() {
+  document.querySelectorAll('#goat-chips .goat-chip.on, #presets .chip.on, #tech-presets .chip.on').forEach(function(c){ c.classList.remove('on'); });
+  document.querySelectorAll('.finps input, #hisse-hidden-filters input').forEach(function(i){ i.value = ''; });
+  document.querySelectorAll('.qs-btn').forEach(function(b){ b.classList.remove('active'); });
+  if (typeof updateClrBtn === 'function') updateClrBtn();
+  runScan();
+}
+
+// Kolay moddaki 4 basit filtre (temel + teknik) + Tümü
+function kolayFilter(key, el) {
+  var chips = document.querySelectorAll('.kfil');
+  for (var i = 0; i < chips.length; i++) chips[i].classList.remove('on');
+  if (el) el.classList.add('on');
+  if (key === 'all') _runDefaultScan();
+  else quickScan(key);
+}
+
 
 // ═══════════════════════════════════════════
 // DETAIL PANEL
@@ -4871,7 +4912,7 @@ function showScreener() {
 function showScreenerOrPrescan() {
   // Prescan üstte açılacak; alttaki sidebar durumuna dokunma (geri dönüşte kayma olmasın)
   _doShowScreener(true);
-  openPrescanView();
+  openScanModeChoice();
 }
 function _doShowScreener(keepSidebar) {
   hideAnalizPage();

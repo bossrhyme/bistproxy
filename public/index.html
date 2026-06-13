@@ -132,8 +132,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=warm8">
-<script src="/deepfin.js?v=150" defer></script>
+<link rel="stylesheet" href="/deepfin.css?v=warm9">
+<script src="/deepfin.js?v=151" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -1215,11 +1215,12 @@ if('serviceWorker' in navigator){
           </div>
           <a class="kolay-pro-link" onclick="setScanMode('pro')">Gelişmiş filtreler →</a>
         </div>
-        <div class="kolay-presets">
-          <button class="kolay-card" onclick="quickScan('value')"><span class="kc-name">Ucuz &amp; Sağlam</span><span class="kc-desc">Düşük F/K, güçlü bilanço</span></button>
-          <button class="kolay-card" onclick="quickScan('growth')"><span class="kc-name">Büyüyen Şirketler</span><span class="kc-desc">Hızlı gelir ve kâr artışı</span></button>
-          <button class="kolay-card" onclick="quickScan('dividend')"><span class="kc-name">Yüksek Temettü</span><span class="kc-desc">Düzenli nakit getiri</span></button>
-          <button class="kolay-card" onclick="quickScan('quality')"><span class="kc-name">Kaliteli Şirketler</span><span class="kc-desc">Yüksek ROE, sağlam kâr</span></button>
+        <div class="kolay-filters" id="kolay-filters">
+          <button class="kfil on" onclick="kolayFilter('all',this)">Tümü</button>
+          <button class="kfil" onclick="kolayFilter('value',this)" title="Düşük F/K, güçlü bilanço">Ucuz</button>
+          <button class="kfil" onclick="kolayFilter('quality',this)" title="Yüksek ROE, sağlam kâr">Kaliteli</button>
+          <button class="kfil" onclick="kolayFilter('breakout',this)" title="Zirveye yakın, hacimli yükseliş">Yükselişte</button>
+          <button class="kfil" onclick="kolayFilter('oversold',this)" title="RSI düşük, dipten dönüş fırsatı">Aşırı Satılmış</button>
         </div>
         <div class="kolay-tablewrap">
           <table class="kolay-table">
@@ -1236,6 +1237,26 @@ if('serviceWorker' in navigator){
             </thead>
             <tbody id="kolay-tbody"></tbody>
           </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- KOLAY/PRO SEÇİM EKRANI -->
+    <div id="scan-mode-choice" style="display:none">
+      <div class="smc-inner">
+        <div class="smc-title">Nasıl taramak istersin?</div>
+        <div class="smc-sub">İstediğin an üstteki Kolay / Pro anahtarından değiştirebilirsin.</div>
+        <div class="smc-cards">
+          <button class="smc-card" onclick="chooseScanMode('kolay')">
+            <div class="smc-card-name">Kolay</div>
+            <div class="smc-card-desc">Birkaç hazır filtre ile hızlı tarama. Sade, anlaşılır görünüm — yeni başlayanlar için.</div>
+            <div class="smc-card-go">Başla →</div>
+          </button>
+          <button class="smc-card" onclick="chooseScanMode('pro')">
+            <div class="smc-card-name">Profesyonel</div>
+            <div class="smc-card-desc">Tüm filtreler, kolonlar ve stratejiler. Tam donanımlı terminal — güç kullanıcıları için.</div>
+            <div class="smc-card-go">Başla →</div>
+          </button>
         </div>
       </div>
     </div>

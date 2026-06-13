@@ -1787,3 +1787,23 @@ kbd{font-family:var(--ff-mono);font-size:10px;color:var(--text);background:var(-
   .kolay-table thead th:nth-child(4),.kolay-table td:nth-child(4),
   .kolay-table thead th:nth-child(7),.kolay-table td:nth-child(7){display:none;}
 }
+
+/* ═══ Kolay/Pro Seçim Ekranı ═══ */
+#scan-mode-choice{position:absolute;inset:0;z-index:21;background:var(--bg);overflow-y:auto;align-items:center;justify-content:center;padding:40px 5%;}
+.smc-inner{max-width:760px;width:100%;text-align:center;}
+.smc-title{font-size:clamp(22px,3vw,30px);font-weight:600;color:var(--text);letter-spacing:-.5px;margin-bottom:8px;}
+.smc-sub{font-size:14px;color:var(--text2);margin-bottom:32px;}
+.smc-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.smc-card{display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left;padding:26px 24px;border:1px solid var(--border);border-radius:14px;background:var(--s1);cursor:pointer;transition:border-color .15s,box-shadow .15s;font-family:'Inter',sans-serif;}
+.smc-card:hover{border-color:var(--accent);box-shadow:var(--shadow-md);}
+.smc-card-name{font-size:18px;font-weight:600;color:var(--text);}
+.smc-card-desc{font-size:13px;color:var(--text2);line-height:1.6;}
+.smc-card-go{margin-top:6px;font-size:13px;font-weight:600;color:var(--accent);}
+@media(max-width:640px){.smc-cards{grid-template-columns:1fr;}#scan-mode-choice{padding:28px 5%;}}
+
+/* Kolay filtre çipleri + dengeli kenar boşlukları */
+.kolay-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+.kfil{font-size:13px;font-weight:500;padding:7px 16px;border-radius:8px;border:1px solid var(--border2);background:var(--s1);color:var(--text2);cursor:pointer;font-family:'Inter',sans-serif;transition:all .12s;}
+.kfil:hover:not(.on){border-color:var(--accent);color:var(--accent);}
+.kfil.on{background:var(--accent);color:#fff;border-color:transparent;}
+.kolay-head,.kolay-filters,.kolay-tablewrap{max-width:1280px;margin-left:auto;margin-right:auto;}
