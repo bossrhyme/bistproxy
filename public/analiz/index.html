@@ -161,28 +161,28 @@ window.addEventListener('DOMContentLoaded', function(){
 <!-- DISCLAIMER MODAL -->
 <div class="modal-overlay" id="disclaimerModal" style="z-index:9999;">
   <div class="modal" onclick="event.stopPropagation()" style="max-width:520px;padding:0;overflow:hidden;">
-    <div style="background:#0a0a0a;border-bottom:1px solid #1a1a1a;padding:20px 24px;display:flex;align-items:center;gap:10px;">
+    <div style="background:var(--s1);border-bottom:1px solid var(--border);padding:20px 24px;display:flex;align-items:center;gap:10px;">
       <span style="font-size:20px;">⚖️</span>
       <div>
-        <div style="font-size:14px;font-weight:700;color:#ededed;">Yasal Uyarı</div>
-        <div style="font-size:11px;color:#666;margin-top:2px;">Devam etmeden önce lütfen okuyun</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);">Yasal Uyarı</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">Devam etmeden önce lütfen okuyun</div>
       </div>
     </div>
-    <div style="padding:24px;background:#0d0d0d;">
-      <p style="font-size:12px;color:#888;line-height:1.85;margin:0 0 16px;">
-        DeepFin'de sunulan tüm veriler, filtreler ve stratejiler yalnızca <strong style="color:#ccc;">bilgilendirme amaçlıdır.</strong>
+    <div style="padding:24px;background:var(--s1);">
+      <p style="font-size:12px;color:var(--text2);line-height:1.85;margin:0 0 16px;">
+        DeepFin'de sunulan tüm veriler, filtreler ve stratejiler yalnızca <strong style="color:var(--text);">bilgilendirme amaçlıdır.</strong>
       </p>
-      <p style="font-size:12px;color:#888;line-height:1.85;margin:0 0 16px;">
-        Bu platform; herhangi bir finansal araç için <strong style="color:#ccc;">alım, satım veya elde tutma tavsiyesi vermez</strong> ve yatırım danışmanlığı hizmeti sunmaz.
+      <p style="font-size:12px;color:var(--text2);line-height:1.85;margin:0 0 16px;">
+        Bu platform; herhangi bir finansal araç için <strong style="color:var(--text);">alım, satım veya elde tutma tavsiyesi vermez</strong> ve yatırım danışmanlığı hizmeti sunmaz.
       </p>
-      <p style="font-size:12px;color:#888;line-height:1.85;margin:0;">
-        Yatırım kararlarınızı almadan önce lisanslı bir finansal danışmana başvurmanızı tavsiye ederiz. <strong style="color:#ccc;">Tüm yatırım işlemleri kullanıcının kendi sorumluluğundadır.</strong>
+      <p style="font-size:12px;color:var(--text2);line-height:1.85;margin:0;">
+        Yatırım kararlarınızı almadan önce lisanslı bir finansal danışmana başvurmanızı tavsiye ederiz. <strong style="color:var(--text);">Tüm yatırım işlemleri kullanıcının kendi sorumluluğundadır.</strong>
       </p>
-      <div style="margin-top:24px;border-top:1px solid #1a1a1a;padding-top:20px;">
-        <button id="disclaimerBtn" disabled style="width:100%;padding:13px;border-radius:8px;font-size:13px;font-weight:700;cursor:not-allowed;transition:all .3s;background:#1a1a1a;border:1px solid #333;color:#555;">
+      <div style="margin-top:24px;border-top:1px solid var(--border);padding-top:20px;">
+        <button id="disclaimerBtn" disabled style="width:100%;padding:13px;border-radius:8px;font-size:13px;font-weight:600;cursor:not-allowed;transition:all .3s;background:var(--s3);border:1px solid var(--border);color:var(--muted);">
           Okudum, Anladım &amp; Devam Et <span id="disclaimerCountdown">(5)</span>
         </button>
-        <p style="text-align:center;font-size:10px;color:#444;margin:10px 0 0;">Bu uyarı yalnızca ilk girişte gösterilir.</p>
+        <p style="text-align:center;font-size:10px;color:var(--muted);margin:10px 0 0;">Bu uyarı yalnızca ilk girişte gösterilir.</p>
       </div>
     </div>
   </div>

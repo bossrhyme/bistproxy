@@ -211,7 +211,7 @@ function _showDisclaimer(onAccept) {
   var cd  = document.getElementById('disclaimerCountdown');
   var secs = 5;
   btn.disabled = true; btn.style.cursor = 'not-allowed';
-  btn.style.cssText += ';background:#1a1a1a;border:1px solid #333;color:#555;';
+  btn.style.cssText += ';background:var(--s3);border:1px solid var(--border);color:var(--muted);';
   if (_disclaimerTimer) clearInterval(_disclaimerTimer);
   _disclaimerTimer = setInterval(function() {
     secs--;
@@ -219,7 +219,7 @@ function _showDisclaimer(onAccept) {
     if (secs <= 0) {
       clearInterval(_disclaimerTimer);
       btn.disabled = false; btn.style.cursor = 'pointer';
-      btn.style.cssText += ';background:#3b82f6;border-color:transparent;color:#fff;';
+      btn.style.cssText += ';background:var(--accent);border-color:transparent;color:#fff;';
       if (cd) cd.textContent = '';
     }
   }, 1000);

@@ -8,8 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"></noscript>
-<script>(function(){try{var t=localStorage.getItem('df_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
-<link rel="stylesheet" href="/deepfin.css?v=arctic70">
+<script>(function(){try{var t=localStorage.getItem('df_theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})()</script>
+<link rel="stylesheet" href="/deepfin.css?v=warm1">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;}
@@ -138,8 +138,8 @@ body{overflow-y:auto;}
 .pf-list-name-input:focus{background:var(--s2);border-radius:4px;padding:2px 6px;}
 .pf-list-del-btn{font-size:11px;color:var(--muted2);background:transparent;border:1px solid var(--border);padding:3px 8px;border-radius:5px;cursor:pointer;transition:all .15s;}
 .pf-list-del-btn:hover{border-color:var(--red);color:var(--red);}
-.pf-scan-btn{font-size:11px;font-weight:600;color:var(--accent);background:rgba(14,165,233,.08);border:1px solid rgba(14,165,233,.25);padding:4px 10px;border-radius:5px;cursor:pointer;text-decoration:none;transition:all .15s;}
-.pf-scan-btn:hover{background:rgba(14,165,233,.15);}
+.pf-scan-btn{font-size:11px;font-weight:600;color:var(--accent);background:rgba(30,41,59,.08);border:1px solid rgba(30,41,59,.25);padding:4px 10px;border-radius:5px;cursor:pointer;text-decoration:none;transition:all .15s;}
+.pf-scan-btn:hover{background:rgba(30,41,59,.15);}
 
 /* Stock table */
 .pf-stock-table{width:100%;border-collapse:collapse;font-size:12px;}
@@ -166,7 +166,7 @@ body{overflow-y:auto;}
 .pf-add-btn:disabled{opacity:.4;cursor:not-allowed;}
 .pf-sym-pick-btn{display:flex;align-items:center;gap:6px;background:var(--s1);border:1px solid var(--border2);color:var(--text);padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;}
 .pf-sym-pick-btn:hover{border-color:var(--accent);color:var(--accent);}
-.pf-sym-pick-btn.selected{border-color:var(--accent);color:var(--accent);background:rgba(14,165,233,.08);}
+.pf-sym-pick-btn.selected{border-color:var(--accent);color:var(--accent);background:rgba(30,41,59,.08);}
 
 /* Price cells */
 .pf-price-cell{font-size:12px;font-weight:600;color:var(--text);}
@@ -259,8 +259,8 @@ body{overflow-y:auto;}
 .quiz-q{font-size:14px;font-weight:700;margin-bottom:18px;line-height:1.5;}
 .quiz-opts{display:flex;flex-direction:column;gap:8px;}
 .quiz-opt{background:var(--s2);border:1.5px solid var(--border);border-radius:9px;padding:12px 16px;font-size:13px;cursor:pointer;transition:all .15s;text-align:left;color:var(--text);line-height:1.4;}
-.quiz-opt:hover{border-color:var(--accent);background:rgba(14,165,233,.06);}
-.quiz-opt.selected{border-color:var(--accent);background:rgba(14,165,233,.1);font-weight:600;}
+.quiz-opt:hover{border-color:var(--accent);background:rgba(30,41,59,.06);}
+.quiz-opt.selected{border-color:var(--accent);background:rgba(30,41,59,.1);font-weight:600;}
 .quiz-footer{padding:16px 24px 20px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);}
 .quiz-back-btn{background:transparent;border:1px solid var(--border);border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;color:var(--muted2);cursor:pointer;transition:all .15s;}
 .quiz-back-btn:hover{border-color:var(--text);color:var(--text);}

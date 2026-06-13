@@ -1920,7 +1920,7 @@ function _showDisclaimer(onAccept) {
   var cd  = document.getElementById('disclaimerCountdown');
   var secs = 5;
   btn.disabled = true;
-  btn.style.cssText = 'width:100%;padding:13px;border-radius:8px;font-size:13px;font-weight:700;cursor:not-allowed;transition:all .3s;background:#1a1a1a;border:1px solid #333;color:#555;';
+  btn.style.cssText = 'width:100%;padding:13px;border-radius:8px;font-size:13px;font-weight:700;cursor:not-allowed;transition:all .3s;background:var(--s3);border:1px solid var(--border);color:var(--muted);';
   if (_disclaimerTimer) clearInterval(_disclaimerTimer);
   _disclaimerTimer = setInterval(function() {
     secs--;
@@ -1928,7 +1928,7 @@ function _showDisclaimer(onAccept) {
     if (secs <= 0) {
       clearInterval(_disclaimerTimer);
       btn.disabled = false;
-      btn.style.cssText = 'width:100%;padding:13px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:all .3s;background:#3b82f6;border:1px solid transparent;color:#fff;';
+      btn.style.cssText = 'width:100%;padding:13px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:all .3s;background:var(--accent);border:1px solid transparent;color:#fff;';
       if (cd) cd.textContent = '';
     }
   }, 1000);
