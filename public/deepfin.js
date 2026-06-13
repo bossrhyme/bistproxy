@@ -4841,6 +4841,16 @@ function selectExchangeAndGo(exKey) {
   if(btn) selectExchange(btn);
 }
 
+// Homepage "Borsalar" — ilk 5 + diğerleri aç/kapa
+function hpToggleEx() {
+  var ex = document.getElementById('hpx-ex-extra');
+  var btn = document.getElementById('hpx-ex-more');
+  if (!ex || !btn) return;
+  var hidden = getComputedStyle(ex).display === 'none';
+  ex.style.display = hidden ? 'grid' : 'none';
+  btn.textContent = hidden ? '− Daha Az' : '+ Diğer Borsalar';
+}
+
 // Homepage "Popüler Stratejiler" tab switch
 function hpStratTab(el, id) {
   var tabs = el.parentElement.querySelectorAll('.hpx-tab');

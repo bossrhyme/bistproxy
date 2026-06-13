@@ -1090,6 +1090,8 @@ td:nth-child(2){font-family:var(--ff);}
 .hpx-spill:hover{border-color:var(--border2);background:var(--s3);}
 .hpx-spill-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px;}
 .hpx-spill-tag{font-size:11px;color:var(--text2);}
+.hpx-more{margin-top:14px;background:none;border:none;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;padding:4px 0;display:inline-flex;align-items:center;gap:4px;font-family:var(--ff);}
+.hpx-more:hover{text-decoration:underline;}
 
 .hpx-disc{padding:18px 7%;background:rgba(0,0,0,0.02);border-bottom:1px solid var(--border);}
 .hpx-disc p{font-size:11px;color:var(--muted);line-height:1.7;margin:0 0 8px;}

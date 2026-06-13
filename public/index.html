@@ -132,8 +132,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=warm2">
-<script src="/deepfin.js?v=148" defer></script>
+<link rel="stylesheet" href="/deepfin.css?v=warm3">
+<script src="/deepfin.js?v=149" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -258,6 +258,8 @@ if('serviceWorker' in navigator){
           <div class="hpx-spill" onclick="selectExchangeAndGo('nyse')"><div class="hpx-spill-name">NYSE</div><div class="hpx-spill-tag">New York</div></div>
           <div class="hpx-spill" onclick="selectExchangeAndGo('sp500')"><div class="hpx-spill-name">S&P 500</div><div class="hpx-spill-tag">ABD endeksi</div></div>
           <div class="hpx-spill" onclick="selectExchangeAndGo('dax')"><div class="hpx-spill-name">DAX</div><div class="hpx-spill-tag">Frankfurt</div></div>
+      </div>
+      <div class="hpx-spill-wrap hpx-ex-extra" id="hpx-ex-extra" style="display:none;margin-top:8px;">
           <div class="hpx-spill" onclick="selectExchangeAndGo('lse')"><div class="hpx-spill-name">LSE</div><div class="hpx-spill-tag">Londra</div></div>
           <div class="hpx-spill" onclick="selectExchangeAndGo('nikkei')"><div class="hpx-spill-name">Nikkei</div><div class="hpx-spill-tag">Tokyo</div></div>
           <div class="hpx-spill" onclick="selectExchangeAndGo('krx')"><div class="hpx-spill-name">KRX</div><div class="hpx-spill-tag">Seul</div></div>
@@ -282,6 +284,7 @@ if('serviceWorker' in navigator){
           <div class="hpx-spill" onclick="selectExchangeAndGo('india')"><div class="hpx-spill-name">NSE</div><div class="hpx-spill-tag">Hindistan</div></div>
           <div class="hpx-spill" onclick="selectExchangeAndGo('uae')"><div class="hpx-spill-name">DFM</div><div class="hpx-spill-tag">BAE</div></div>
       </div>
+      <button class="hpx-more" id="hpx-ex-more" onclick="hpToggleEx()">+ Diğer Borsalar</button>
     </div>
 
     <!-- POPÜLER STRATEJİLER -->
