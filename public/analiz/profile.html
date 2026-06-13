@@ -6,7 +6,7 @@
 <title>DeepFin — Hisse Profili</title>
 <meta name="description" content="Detaylı hisse senedi analizi: finansal oranlar, Piotroski F-Score, guru stratejisi değerlendirmesi ve YZ destekli yorum.">
 <meta name="robots" content="index, follow">
-<meta name="theme-color" content="#f8fafc">
+<meta name="theme-color" content="#FAFAF7">
 <link rel="canonical" href="https://deepfin.vercel.app/analiz/profile.html">
 <!-- Open Graph -->
 <meta property="og:type" content="website">
@@ -23,8 +23,8 @@
 <meta name="twitter:image" content="https://deepfin.vercel.app/og-image.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<script>(function(){try{var t=localStorage.getItem('df_theme');document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}})()</script>
-<link rel="stylesheet" href="/analiz/prf.css?v=arctic72">
+<script>(function(){try{var t=localStorage.getItem('df_theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})()</script>
+<link rel="stylesheet" href="/analiz/prf.css?v=warm1">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap"></noscript>
 
@@ -64,7 +64,7 @@ function toggleTheme(){
   var btn = document.getElementById('theme-toggle');
   if(btn) btn.textContent = dark?'☀':'☾';
   var m = document.getElementById('meta-theme-color');
-  if(m) m.content = dark?'#0d1117':'#f8fafc';
+  if(m) m.content = dark?'#0d1117':'#FAFAF7';
 }
 window.addEventListener('DOMContentLoaded', function(){
   var dark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -85,7 +85,7 @@ window.addEventListener('DOMContentLoaded', function(){
     <div class="tright">
       <button class="topbarbtn theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir" aria-label="Karanlık/Açık mod geçiş">☾</button>
       <a href="/profil" id="profile-btn" class="topbarbtn infobtn profile-topbtn" title="Profilim">
-        <span id="profile-btn-inner">👤</span><span class="prf-btn-lbl">Profil</span>
+        <span id="profile-btn-inner"></span><span class="prf-btn-lbl">Profil</span>
       </a>
       <button class="topbarbtn infobtn" onclick="openInfo()">Bilgi Bankası</button>
       <button class="topbarbtn supportbtn" onclick="openSupport()">
@@ -95,7 +95,7 @@ window.addEventListener('DOMContentLoaded', function(){
     </div>
   </div>
 
-  <div id="profile-page" style="display:flex;flex:1;flex-direction:column;overflow:hidden;min-height:0;">
+  <div id="profile-page" class="mode-sade" style="display:flex;flex:1;flex-direction:column;overflow:hidden;min-height:0;">
     <div class="prf-topbar">
       <button class="prf-back" onclick="closeProfil()">← Geri</button>
       <div class="prf-crumb">
@@ -103,7 +103,10 @@ window.addEventListener('DOMContentLoaded', function(){
         <span style="color:var(--muted)">/</span>
         <span class="prf-sym" id="prf-bc-sym">—</span>
       </div>
-      <div style="margin-left:auto;display:flex;align-items:center;gap:8px;"></div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+        <button class="prf-view-toggle" id="prf-to-detay" onclick="prfSetMode('detay')">Detaylı Analiz</button>
+        <button class="prf-view-toggle" id="prf-to-sade" onclick="prfSetMode('sade')" style="display:none;">Genel Bakış</button>
+      </div>
     </div>
 
     <div class="prf-layout">
@@ -124,6 +127,7 @@ window.addEventListener('DOMContentLoaded', function(){
               <div class="prf-chg" id="prf-chg">—</div>
             </div>
           </div>
+          <div class="prf-badges" id="prf-badges"></div>
         </div>
 
         <!-- Grafik -->
@@ -131,12 +135,25 @@ window.addEventListener('DOMContentLoaded', function(){
           <div id="prf-tv-placeholder" style="display:flex;align-items:center;justify-content:center;height:48px;color:var(--muted);font-size:12px;">Grafik yükleniyor…</div>
         </div>
 
+        <!-- ═══ SADE GENEL BAKIŞ ═══ -->
+        <div id="prf-sade">
+          <div class="prf-section">
+            <div class="prf-sec-title">Temel Göstergeler</div>
+            <div class="prf-sade-mgrid" id="prf-sade-metrics"><div style="padding:20px;color:var(--muted);font-size:12px;">Veriler yükleniyor...</div></div>
+          </div>
+          <div class="prf-section" style="border-bottom:none;">
+            <div class="prf-sec-title">Stratejilere Göre Uygunluk</div>
+            <div class="prf-compat" id="prf-compat"><div style="padding:12px 0;color:var(--muted);font-size:12px;">Hesaplanıyor...</div></div>
+            <button class="prf-detay-cta" onclick="prfSetMode('detay')">Detaylı Analiz →</button>
+          </div>
+        </div>
+
         <div class="prf-tabs">
           <div class="prf-tab on" onclick="prfTab('overview',this)">Genel Bakış</div>
           <div class="prf-tab" onclick="prfTab('financials',this)">Finansallar</div>
           <div class="prf-tab" onclick="prfTab('news',this)">Haberler</div>
           <div class="prf-tab" onclick="prfTab('guru',this)">GOAT Analizi</div>
-          <div class="prf-tab" onclick="prfTab('fairvalue',this)">💰 Adil Fiyat</div>
+          <div class="prf-tab" onclick="prfTab('fairvalue',this)">Adil Fiyat</div>
         </div>
 
         <div id="prf-panel-overview" class="prf-panel on">
@@ -151,7 +168,7 @@ window.addEventListener('DOMContentLoaded', function(){
           <!-- AD M1: 728×90 -->
           <div style="padding:12px 24px;border-bottom:1px solid var(--border);background:var(--s1);">
             <div class="ad-slot" style="width:100%;height:90px;border-radius:6px;">
-              <span style="font-size:14px;">📢</span>
+              
               <span class="ad-slot-label">728 × 90 — Reklam</span>
             </div>
           </div>
@@ -260,8 +277,8 @@ window.addEventListener('DOMContentLoaded', function(){
         <!-- ADİL FİYAT PANELİ -->
         <div id="prf-panel-fairvalue" class="prf-panel">
           <div class="prf-section">
-            <div class="prf-sec-title">💰 Adil Fiyat Analizi</div>
-            <div id="fv-content"><div style="padding:30px;text-align:center;color:var(--muted2);font-size:12px;">⏳ Veriler yükleniyor...</div></div>
+            <div class="prf-sec-title">Adil Fiyat Analizi</div>
+            <div id="fv-content"><div style="padding:30px;text-align:center;color:var(--muted2);font-size:12px;">Veriler yükleniyor...</div></div>
           </div>
         </div>
 
@@ -271,7 +288,7 @@ window.addEventListener('DOMContentLoaded', function(){
         <div class="prf-sside" id="prf-score-sside">
           <div class="df-sc-hdr">
             <span class="df-sc-title">DeepFin Skoru</span>
-            <button class="df-sc-wbtn" onclick="toggleDfScoreSliders()">⚙ Ağırlık</button>
+            <button class="df-sc-wbtn" onclick="toggleDfScoreSliders()">Ağırlık</button>
           </div>
           <div class="df-sc-ring-wrap">
             <div class="df-sc-ring">
@@ -297,9 +314,9 @@ window.addEventListener('DOMContentLoaded', function(){
           </div>
         </div>
         <div class="prf-sside">
-          <button class="prf-buy-btn" id="prf-buy-btn" onclick="onHemenAl('','')">🛒 Hemen Al</button>
+          <button class="prf-buy-btn" id="prf-buy-btn" onclick="onHemenAl('','')">Hemen Al</button>
           <div class="ad-slot" style="width:100%;height:250px;margin-top:10px;border-radius:8px;">
-            <span style="font-size:16px;">📢</span>
+            
             <span class="ad-slot-label">300 × 250 — Reklam</span>
           </div>
         </div>
@@ -328,23 +345,22 @@ window.addEventListener('DOMContentLoaded', function(){
 
 <!-- DISCLAIMER MODAL -->
 <div class="modal-overlay" id="disclaimerModal">
-  <div onclick="event.stopPropagation()" style="background:#0d0d0d;border:1px solid #1a1a1a;border-radius:12px;max-width:520px;width:calc(100% - 32px);overflow:hidden;">
-    <div style="background:#0a0a0a;border-bottom:1px solid #1a1a1a;padding:20px 24px;display:flex;align-items:center;gap:10px;">
-      <span style="font-size:20px;">⚖️</span>
+  <div onclick="event.stopPropagation()" style="background:var(--s1);border:1px solid var(--border);border-radius:12px;max-width:520px;width:calc(100% - 32px);overflow:hidden;">
+    <div style="background:var(--s1);border-bottom:1px solid var(--border);padding:20px 24px;display:flex;align-items:center;gap:10px;">
       <div>
-        <div style="font-size:14px;font-weight:700;color:#ededed;">Yasal Uyarı</div>
-        <div style="font-size:11px;color:#666;margin-top:2px;">Devam etmeden önce lütfen okuyun</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);">Yasal Uyarı</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">Devam etmeden önce lütfen okuyun</div>
       </div>
     </div>
     <div style="padding:24px;">
-      <p style="font-size:12px;color:#888;line-height:1.85;margin:0 0 16px;">DeepFin'de sunulan tüm veriler, filtreler ve stratejiler yalnızca <strong style="color:#ccc;">bilgilendirme amaçlıdır.</strong></p>
-      <p style="font-size:12px;color:#888;line-height:1.85;margin:0 0 16px;">Bu platform; herhangi bir finansal araç için <strong style="color:#ccc;">alım, satım veya elde tutma tavsiyesi vermez</strong> ve yatırım danışmanlığı hizmeti sunmaz.</p>
-      <p style="font-size:12px;color:#888;line-height:1.85;margin:0;">Yatırım kararlarınızı almadan önce lisanslı bir finansal danışmana başvurmanızı tavsiye ederiz. <strong style="color:#ccc;">Tüm yatırım işlemleri kullanıcının kendi sorumluluğundadır.</strong></p>
-      <div style="margin-top:24px;border-top:1px solid #1a1a1a;padding-top:20px;">
-        <button id="disclaimerBtn" disabled style="width:100%;padding:13px;border-radius:8px;font-size:13px;font-weight:700;cursor:not-allowed;transition:all .3s;background:#1a1a1a;border:1px solid #333;color:#555;">
+      <p style="font-size:12px;color:var(--text2);line-height:1.85;margin:0 0 16px;">DeepFin'de sunulan tüm veriler, filtreler ve stratejiler yalnızca <strong style="color:var(--text);">bilgilendirme amaçlıdır.</strong></p>
+      <p style="font-size:12px;color:var(--text2);line-height:1.85;margin:0 0 16px;">Bu platform; herhangi bir finansal araç için <strong style="color:var(--text);">alım, satım veya elde tutma tavsiyesi vermez</strong> ve yatırım danışmanlığı hizmeti sunmaz.</p>
+      <p style="font-size:12px;color:var(--text2);line-height:1.85;margin:0;">Yatırım kararlarınızı almadan önce lisanslı bir finansal danışmana başvurmanızı tavsiye ederiz. <strong style="color:var(--text);">Tüm yatırım işlemleri kullanıcının kendi sorumluluğundadır.</strong></p>
+      <div style="margin-top:24px;border-top:1px solid var(--border);padding-top:20px;">
+        <button id="disclaimerBtn" disabled style="width:100%;padding:13px;border-radius:8px;font-size:13px;font-weight:600;cursor:not-allowed;transition:all .3s;background:var(--s3);border:1px solid var(--border);color:var(--muted);">
           Okudum, Anladım &amp; Devam Et <span id="disclaimerCountdown">(5)</span>
         </button>
-        <p style="text-align:center;font-size:10px;color:#444;margin:10px 0 0;">Bu uyarı yalnızca ilk girişte gösterilir.</p>
+        <p style="text-align:center;font-size:10px;color:var(--muted);margin:10px 0 0;">Bu uyarı yalnızca ilk girişte gösterilir.</p>
       </div>
     </div>
   </div>
