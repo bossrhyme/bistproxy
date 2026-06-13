@@ -51,8 +51,8 @@ function isoFromFlag(emoji) {
 function flagImg(flag) {
   var iso = isoFromFlag(flag);
   return iso
-    ? '<img class="ex-flag-img" src="https://flagcdn.com/w40/' + iso + '.png" alt="" loading="lazy">'
-    : '<span class="ex-flag-emoji">' + flag + '</span>';
+    ? '<img class="ps-ex-flag-img" src="https://flagcdn.com/w40/' + iso + '.png" alt="" loading="lazy">'
+    : '<span class="ps-ex-flag-emoji">' + flag + '</span>';
 }
 
 // Piyasa değeri yerel para → USD (deepfin.js ile birebir aynı dönüşüm)
@@ -692,9 +692,9 @@ function renderAll() {
 // ── Borsa sekmeleri (ilk 6 + Diğer Borsalar) ──────────────────
 function exTabHtml(key) {
   var m = EX_META[key]; if (!m) return '';
-  return '<button class="ex-tab' + (key === currentEx ? ' on' : '') + '" data-ex="' + key + '"' +
+  return '<button class="ps-ex-btn' + (key === currentEx ? ' on' : '') + '" data-ex="' + key + '"' +
     ' onclick="setEx(\'' + key + '\')">' + flagImg(m.flag) +
-    '<span class="ex-name">' + m.name + '</span></button>';
+    '<span class="ps-ex-name">' + m.name + '</span></button>';
 }
 function renderExchangeTabs() {
   var mainEl  = document.getElementById('ex-main');
@@ -710,11 +710,15 @@ window.setEx = function(key) {
   if (key === currentEx) return;
   currentEx = key;
   allData = [];
-  document.querySelectorAll('.ex-tab').forEach(function(b){
+  document.querySelectorAll('.ps-ex-btn').forEach(function(b){
     b.classList.toggle('on', b.dataset.ex === key);
   });
   document.getElementById('sr-wrap').innerHTML = '';
   loadData(key);
+};
+window.scrollAssets = function(dir) {
+  var row = document.getElementById('ps-asset-row');
+  if (row) row.scrollBy({ left: dir * 170, behavior: 'smooth' });
 };
 window.toggleMoreEx = function() {
   var extra = document.getElementById('ex-extra');

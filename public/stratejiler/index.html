@@ -3,20 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Strateji Getirileri — DeepFin</title>
+<title>Strateji Karşılaştırma — DeepFin</title>
 <meta name="description" content="Büyüme, değer, temettü ve momentum stratejilerinin son 1-3-6 aylık ortalama getirilerini karşılaştırın. BIST, NASDAQ, S&P 500 ve daha fazlası.">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#f8fafc">
 <link rel="canonical" href="https://deepfin.vercel.app/stratejiler/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://deepfin.vercel.app/stratejiler/">
-<meta property="og:title" content="Strateji Getirileri — DeepFin">
+<meta property="og:title" content="Strateji Karşılaştırma — DeepFin">
 <meta property="og:description" content="Yatırım stratejilerinin gerçek piyasa verisiyle hesaplanan getirileri.">
 <meta property="og:image" content="https://deepfin.vercel.app/og-image.svg">
 <meta property="og:site_name" content="DeepFin">
 <meta property="og:locale" content="tr_TR">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Strateji Getirileri — DeepFin">
+<meta name="twitter:title" content="Strateji Karşılaştırma — DeepFin">
 <meta name="twitter:description" content="Yatırım stratejilerinin gerçek piyasa verisiyle hesaplanan getirileri.">
 <meta name="twitter:image" content="https://deepfin.vercel.app/og-image.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -68,18 +68,37 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 .hero h1 span{color:var(--accent);}
 .hero-sub{font-size:14px;color:var(--muted2);max-width:520px;margin:0 auto;line-height:1.65;}
 
-/* ── Borsa tabları ── */
-.ex-tabs-wrap{padding:0 20px 24px;}
-.ex-tabs{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;}
-.ex-tabs-extra{margin-top:8px;}
-.ex-tabs-extra[hidden]{display:none;}
-.ex-tab{display:inline-flex;align-items:center;gap:7px;background:var(--s2);border:1.5px solid var(--border);border-radius:var(--r-pill);padding:6px 14px;font-size:12px;font-weight:600;color:var(--muted2);cursor:pointer;transition:all .15s;font-family:inherit;}
-.ex-tab.on{background:color-mix(in srgb, var(--accent) 12%, transparent);border-color:var(--accent);color:var(--accent);}
-.ex-tab:hover:not(.on){border-color:var(--border2);color:var(--text2);}
-.ex-flag-img{width:18px;height:12px;border-radius:2px;object-fit:cover;display:block;box-shadow:0 0 0 1px rgba(0,0,0,.08);}
-.ex-flag-emoji{font-size:14px;line-height:1;}
-.ex-more-btn{display:block;margin:12px auto 0;background:none;border:1px dashed var(--border2);border-radius:var(--r-pill);padding:6px 16px;font-size:11.5px;font-weight:600;color:var(--muted2);cursor:pointer;transition:all .15s;font-family:inherit;}
-.ex-more-btn:hover{border-color:var(--accent);color:var(--accent);}
+/* ── Varlık + Borsa seçimi (prescan stili) ── */
+.ps-select{max-width:1000px;margin:0 auto;padding:0 20px 16px;}
+.ps-section{margin-bottom:22px;}
+.ps-section-hd{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.6px;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+/* Varlık satırı */
+.ps-asset-wrap{display:flex;align-items:center;gap:6px;}
+.ps-asset-row{display:flex;flex-wrap:nowrap;gap:8px;overflow-x:auto;scroll-behavior:smooth;scrollbar-width:none;-ms-overflow-style:none;flex:1;min-width:0;padding:2px 0;}
+.ps-asset-row::-webkit-scrollbar{display:none;}
+.ps-asset-arrow{flex-shrink:0;width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--s1);color:var(--text2);font-size:16px;font-weight:700;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.ps-asset-arrow:hover{border-color:var(--accent);color:var(--accent);}
+@media(hover:none){.ps-asset-arrow{display:none;}}
+.ps-asset-btn{display:flex;align-items:center;gap:8px;padding:10px 18px;background:var(--s1);border:1.5px solid var(--border);border-radius:10px;cursor:pointer;font-family:inherit;transition:all .15s;flex-shrink:0;}
+.ps-asset-btn.on{border-color:var(--accent);background:color-mix(in srgb, var(--accent) 12%, transparent);}
+.ps-asset-btn.on .ps-asset-name{color:var(--accent);}
+.ps-asset-soon{display:flex;align-items:center;gap:8px;padding:10px 18px;background:var(--s1);border:1.5px solid var(--border);border-radius:10px;opacity:.4;cursor:default;flex-shrink:0;}
+.ps-asset-icon{font-size:16px;line-height:1;}
+.ps-asset-name{font-size:12px;font-weight:700;color:var(--text2);white-space:nowrap;}
+.ps-asset-badge{font-size:9px;font-weight:700;color:#fff;background:var(--muted);padding:2px 6px;border-radius:10px;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0;}
+/* Borsa kart grid */
+.ps-ex-grid{display:flex;flex-wrap:wrap;gap:10px;}
+.ps-ex-extra{margin-top:10px;}
+.ps-ex-extra[hidden]{display:none;}
+.ps-ex-btn{display:flex;flex-direction:column;align-items:center;gap:7px;padding:14px 20px;background:var(--s1);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .15s;min-width:84px;font-family:inherit;}
+.ps-ex-btn:hover{border-color:var(--accent);background:color-mix(in srgb, var(--accent) 6%, transparent);}
+.ps-ex-btn.on{border-color:var(--accent);background:color-mix(in srgb, var(--accent) 10%, transparent);box-shadow:0 0 0 1px var(--accent) inset;}
+.ps-ex-flag-img{width:36px;height:auto;border-radius:3px;display:block;box-shadow:0 0 0 1px rgba(0,0,0,.10);}
+.ps-ex-flag-emoji{font-size:28px;line-height:1;}
+.ps-ex-name{font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;}
+.ps-ex-btn.on .ps-ex-name{color:var(--accent);}
+.ps-show-more{margin-top:12px;background:none;border:none;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;padding:4px 0;display:inline-flex;align-items:center;gap:4px;}
+.ps-show-more:hover{text-decoration:underline;}
 
 /* ── Reklam slotları ── */
 .ad-slot{margin:18px 0;text-align:center;position:relative;}
@@ -172,6 +191,10 @@ footer a:hover{color:var(--text2);}
 /* ── Responsive ── */
 @media(max-width:560px){
   .main{padding:0 12px 60px;}
+  .ps-select{padding:0 12px 12px;}
+  .ps-ex-grid{gap:8px;}
+  .ps-ex-btn{padding:11px 14px;min-width:0;flex:1 0 calc(33.33% - 8px);}
+  .ps-ex-flag-img{width:30px;}
   .sr-head-row,.sr-row{grid-template-columns:30px minmax(0,1fr) 44px 50px 50px 50px;gap:4px;padding:8px 10px;}
   .sr-head-row{padding:4px 10px;}
   .sr-label{font-size:12px;}
@@ -207,19 +230,34 @@ footer a:hover{color:var(--text2);}
 
 <!-- ── HERO ── -->
 <div class="hero">
-  <div class="hero-badge">📊 STRATEJİ GETİRİLERİ</div>
+  <div class="hero-badge">📊 STRATEJİ KARŞILAŞTIRMA</div>
   <h1>Hangi Strateji <span>Ne Kadar Kazandırdı?</span></h1>
-  <p class="hero-sub">Büyüme, değer, temettü ve 50+ stratejinin filtre kriterlerinden geçen hisselerin son 1–6 ay ortalama getirisini gerçek piyasa verisiyle hesapla.</p>
-  <div class="hero-cta">
-    <a href="/" class="hero-cta-btn">Hisse Tara →</a>
-  </div>
+  <p class="hero-sub">Büyüme, değer, temettü ve 50+ stratejinin filtre kriterlerinden geçen hisselerin son 1–6 ay ortalama getirisini gerçek piyasa verisiyle karşılaştır.</p>
 </div>
 
-<!-- ── BORSA TABLARI (JS ile render) ── -->
-<div class="ex-tabs-wrap">
-  <div class="ex-tabs" id="ex-main"></div>
-  <div class="ex-tabs ex-tabs-extra" id="ex-extra" hidden></div>
-  <button class="ex-more-btn" id="ex-more-btn" onclick="toggleMoreEx()">+ Diğer Borsalar</button>
+<!-- ── VARLIK + BORSA SEÇİMİ (prescan stili) ── -->
+<div class="ps-select">
+  <div class="ps-section">
+    <div class="ps-section-hd">🏦 Varlık</div>
+    <div class="ps-asset-wrap">
+      <button class="ps-asset-arrow" onclick="scrollAssets(-1)" aria-label="Sola kaydır">‹</button>
+      <div class="ps-asset-row" id="ps-asset-row">
+        <button class="ps-asset-btn on"><span class="ps-asset-icon">📈</span><span class="ps-asset-name">Borsa</span></button>
+        <div class="ps-asset-soon"><span class="ps-asset-icon">₿</span><span class="ps-asset-name">Kripto</span><span class="ps-asset-badge">yakında</span></div>
+        <div class="ps-asset-soon"><span class="ps-asset-icon">💼</span><span class="ps-asset-name">Fon</span><span class="ps-asset-badge">yakında</span></div>
+        <div class="ps-asset-soon"><span class="ps-asset-icon">📦</span><span class="ps-asset-name">ETF</span><span class="ps-asset-badge">yakında</span></div>
+        <div class="ps-asset-soon"><span class="ps-asset-icon">💵</span><span class="ps-asset-name">Eurobond</span><span class="ps-asset-badge">yakında</span></div>
+        <div class="ps-asset-soon"><span class="ps-asset-icon">🏛️</span><span class="ps-asset-name">Bono/Tahvil</span><span class="ps-asset-badge">yakında</span></div>
+      </div>
+      <button class="ps-asset-arrow" onclick="scrollAssets(1)" aria-label="Sağa kaydır">›</button>
+    </div>
+  </div>
+  <div class="ps-section">
+    <div class="ps-section-hd">🌍 Borsa</div>
+    <div class="ps-ex-grid" id="ex-main"></div>
+    <div class="ps-ex-grid ps-ex-extra" id="ex-extra" hidden></div>
+    <button class="ps-show-more" id="ex-more-btn" onclick="toggleMoreEx()">+ Diğer Borsalar</button>
+  </div>
 </div>
 
 <!-- ── ÜSTTE REKLAM BANNER ── -->
@@ -266,7 +304,7 @@ window.addEventListener('DOMContentLoaded',function(){
   if(btn) btn.textContent = dark?'☀':'☾';
 });
 </script>
-<script src="/stratejiler/stratejiler.js?v=5" defer></script>
+<script src="/stratejiler/stratejiler.js?v=6" defer></script>
 
 </body>
 </html>

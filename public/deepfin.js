@@ -2179,8 +2179,7 @@ function initPrescanView() {
   el.innerHTML =
     '<button class="psv-close-btn" id="psv-close-btn" onclick="closePrescanView()" style="display:none">✕ Sonuçlara dön</button>'+
     '<div class="psv-inner">'+
-    '<div class="psv-brand"><div class="psv-logo"><div class="tlogo-mark">D</div>DeepFin</div><div class="psv-tagline">Varlık seç · Borsa seç · Tara</div>'+
-    '<button class="psv-perf-link" onclick="openPerfPanel()">📊 Strateji Getirileri</button></div>'+
+    '<div class="psv-brand"><div class="psv-logo"><div class="tlogo-mark">D</div>DeepFin</div><div class="psv-tagline">Varlık seç · Borsa seç · Tara</div></div>'+
 
     // Asset type section — yatay kaydırmalı
     '<div class="psv-section">'+
