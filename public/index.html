@@ -132,8 +132,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=warm6">
-<script src="/deepfin.js?v=149" defer></script>
+<link rel="stylesheet" href="/deepfin.css?v=warm8">
+<script src="/deepfin.js?v=150" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -1091,6 +1091,10 @@ if('serviceWorker' in navigator){
 
       <!-- STATS BAR -->
       <div class="stats-bar" id="stats-bar">
+        <div class="scanmode-toggle" id="scanmode-toggle" role="group" aria-label="Tarayıcı modu">
+          <button class="smt-btn" data-mode="kolay" onclick="setScanMode('kolay')" title="Sade görünüm">Kolay</button>
+          <button class="smt-btn" data-mode="pro" onclick="setScanMode('pro')" title="Tüm filtreler ve kolonlar">Pro</button>
+        </div>
         <button id="new-scan-btn" class="new-scan-btn" onclick="openPrescanView()" title="Yeni tarama başlat">🔍 Yeni Tarama</button>
         <div class="add-filter-wrap" id="add-filter-wrap" style="display:none">
           <button id="add-filter-btn" class="new-scan-btn add-filter-btn" onclick="toggleFilterDropdown(event)" title="Mevcut taramaya filtre ekle">➕ Filtre Ekle</button>
@@ -1200,6 +1204,39 @@ if('serviceWorker' in navigator){
             </tr>
           </thead>         <tbody id="tbody"></tbody>
         </table>
+      </div>
+
+      <!-- ─── KOLAY MOD GÖRÜNÜMÜ ─── -->
+      <div id="kolay-wrap" style="display:none;">
+        <div class="kolay-head">
+          <div>
+            <div class="kolay-title">Tüm Hisseler</div>
+            <div class="kolay-sub" id="kolay-sub">—</div>
+          </div>
+          <a class="kolay-pro-link" onclick="setScanMode('pro')">Gelişmiş filtreler →</a>
+        </div>
+        <div class="kolay-presets">
+          <button class="kolay-card" onclick="quickScan('value')"><span class="kc-name">Ucuz &amp; Sağlam</span><span class="kc-desc">Düşük F/K, güçlü bilanço</span></button>
+          <button class="kolay-card" onclick="quickScan('growth')"><span class="kc-name">Büyüyen Şirketler</span><span class="kc-desc">Hızlı gelir ve kâr artışı</span></button>
+          <button class="kolay-card" onclick="quickScan('dividend')"><span class="kc-name">Yüksek Temettü</span><span class="kc-desc">Düzenli nakit getiri</span></button>
+          <button class="kolay-card" onclick="quickScan('quality')"><span class="kc-name">Kaliteli Şirketler</span><span class="kc-desc">Yüksek ROE, sağlam kâr</span></button>
+        </div>
+        <div class="kolay-tablewrap">
+          <table class="kolay-table">
+            <thead>
+              <tr>
+                <th>Hisse</th>
+                <th class="r">Fiyat</th>
+                <th class="r">Değişim</th>
+                <th class="r" title="Fiyat/Kazanç oranı — düşükse hisse görece ucuz">F/K</th>
+                <th class="r" title="Özsermaye Kârlılığı — %15 üzeri iyi kabul edilir">ROE</th>
+                <th class="r" title="RSI (14) — 30 altı aşırı satım, 70 üstü aşırı alım">RSI</th>
+                <th class="r">Piyasa Değeri</th>
+              </tr>
+            </thead>
+            <tbody id="kolay-tbody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 

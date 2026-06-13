@@ -3357,7 +3357,71 @@ function _vsRowHtml(s, idx) {
   _vsRender();
   updateStatsBar();
   setTimeout(applyColVisibility, 0);
+  if (_scanMode === 'kolay') renderKolay();
 }
+
+// ═══════════════════════════════════════════
+// KOLAY MOD — sade tarayıcı görünümü
+// ═══════════════════════════════════════════
+var _scanMode = 'kolay';
+try { var _sm0 = localStorage.getItem('df_scan_mode'); if (_sm0 === 'pro' || _sm0 === 'kolay') _scanMode = _sm0; } catch(e) {}
+
+function setScanMode(mode) {
+  _scanMode = (mode === 'pro') ? 'pro' : 'kolay';
+  try { localStorage.setItem('df_scan_mode', _scanMode); } catch(e) {}
+  _applyScanMode();
+  if (typeof _vsData !== 'undefined' && _vsData && _vsData.length) {
+    if (_scanMode === 'kolay') renderKolay();
+    else { try { renderTable(); } catch(e) {} }
+  }
+}
+
+function _applyScanMode() {
+  document.documentElement.setAttribute('data-scan-mode', _scanMode);
+  var btns = document.querySelectorAll('.smt-btn');
+  for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('on', btns[i].getAttribute('data-mode') === _scanMode);
+  var tw = document.getElementById('twrap');
+  var kw = document.getElementById('kolay-wrap');
+  var resultsVisible = tw && tw.style.display && tw.style.display !== 'none';
+  if (kw) kw.style.display = (_scanMode === 'kolay' && resultsVisible) ? 'block' : 'none';
+}
+
+function renderKolay() {
+  var tb = document.getElementById('kolay-tbody');
+  if (!tb) return;
+  var data = (typeof _vsData !== 'undefined' && _vsData) ? _vsData : [];
+  var ex = currentExchange;
+  var exMeta = EXCHANGE_META[ex] || EXCHANGE_META.bist;
+  var curr = exMeta.currency || '';
+  var sub = document.getElementById('kolay-sub');
+  if (sub) sub.textContent = (exMeta.name || ex.toUpperCase()) + ' · ' + data.length + ' hisse';
+  var f = (typeof _usdToLocalFactor === 'function') ? _usdToLocalFactor(ex) : null;
+  function mcapStr(v) {
+    if (!v) return '—';
+    if (f && isFinite(f)) { var loc = v * f; return curr + (loc >= 1e6 ? (loc/1e6).toFixed(1)+'T' : loc >= 1e3 ? (loc/1e3).toFixed(0)+'B' : loc.toFixed(0)+'M'); }
+    return fmc(v);
+  }
+  function peC(v) { if (v == null || v <= 0) return ''; return 'font-weight:600;color:' + (v < 15 ? 'var(--green)' : v < 25 ? 'var(--gold)' : 'var(--red)'); }
+  function roeC(v) { if (v == null) return ''; return 'font-weight:600;color:' + (v > 15 ? 'var(--green)' : v > 8 ? 'var(--gold)' : 'var(--red)'); }
+  var cap = data.length > 500 ? 500 : data.length;
+  var rows = '';
+  for (var i = 0; i < cap; i++) {
+    var s = data[i];
+    rows += '<tr onclick="showDetail(\'' + escJS(s.symbol) + '\')" tabindex="0">' +
+      '<td class="kt-hisse"><span class="kt-sym">' + s.symbol + '</span><span class="kt-name">' + (s.name || '') + '</span></td>' +
+      '<td class="r kt-price">' + (s.currentPrice != null ? s.currentPrice.toFixed(2) + ' ' + curr : '—') + '</td>' +
+      '<td class="r">' + (s.changePercent != null ? fPerf(s.changePercent) : '—') + '</td>' +
+      '<td class="r"><span style="' + peC(s.peNormalizedAnnual) + '">' + (s.peNormalizedAnnual != null && s.peNormalizedAnnual > 0 ? s.peNormalizedAnnual.toFixed(1) : '—') + '</span></td>' +
+      '<td class="r"><span style="' + roeC(s.roeTTM) + '">' + (s.roeTTM != null ? s.roeTTM.toFixed(1) + '%' : '—') + '</span></td>' +
+      '<td class="r">' + (s.rsi14 != null ? fRsi(s.rsi14) : '—') + '</td>' +
+      '<td class="r kt-mcap">' + mcapStr(s.marketCapitalization) + '</td>' +
+    '</tr>';
+  }
+  if (data.length > cap) rows += '<tr class="kt-more"><td colspan="7">+ ' + (data.length - cap) + ' hisse daha — tümünü görmek için Pro moda geç</td></tr>';
+  tb.innerHTML = rows || '<tr><td colspan="7" style="padding:24px;text-align:center;color:var(--muted)">Sonuç yok</td></tr>';
+  _applyScanMode();
+}
+try { _applyScanMode(); } catch(e) {}
 
 
 // ═══════════════════════════════════════════
@@ -3740,6 +3804,9 @@ function showState(id){
   const afwEl = document.getElementById('add-filter-wrap');
   if (afwEl) afwEl.style.display = id === 'twrap' ? 'inline-flex' : 'none';
   if (id !== 'twrap') closeFilterDropdown();
+  // Kolay görünümü twrap durumunu yansıtır
+  if (typeof _applyScanMode === 'function') _applyScanMode();
+  if (id === 'twrap' && _scanMode === 'kolay' && typeof renderKolay === 'function') renderKolay();
   // Loading/hata/boş durumda stats-bar da gizli — üst bar tek blok halinde değişir,
   // bayat değerler (önceki taramanın sayıları) loading sırasında görünmez
   if (id !== 'twrap') {
