@@ -69,10 +69,17 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 .hero-sub{font-size:14px;color:var(--muted2);max-width:520px;margin:0 auto;line-height:1.65;}
 
 /* ── Borsa tabları ── */
-.ex-tabs{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;padding:0 20px 28px;}
-.ex-tab{background:var(--s2);border:1.5px solid var(--border);border-radius:var(--r-pill);padding:7px 18px;font-size:12px;font-weight:600;color:var(--muted2);cursor:pointer;transition:all .15s;}
+.ex-tabs-wrap{padding:0 20px 24px;}
+.ex-tabs{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;}
+.ex-tabs-extra{margin-top:8px;}
+.ex-tabs-extra[hidden]{display:none;}
+.ex-tab{display:inline-flex;align-items:center;gap:7px;background:var(--s2);border:1.5px solid var(--border);border-radius:var(--r-pill);padding:6px 14px;font-size:12px;font-weight:600;color:var(--muted2);cursor:pointer;transition:all .15s;font-family:inherit;}
 .ex-tab.on{background:color-mix(in srgb, var(--accent) 12%, transparent);border-color:var(--accent);color:var(--accent);}
 .ex-tab:hover:not(.on){border-color:var(--border2);color:var(--text2);}
+.ex-flag-img{width:18px;height:12px;border-radius:2px;object-fit:cover;display:block;box-shadow:0 0 0 1px rgba(0,0,0,.08);}
+.ex-flag-emoji{font-size:14px;line-height:1;}
+.ex-more-btn{display:block;margin:12px auto 0;background:none;border:1px dashed var(--border2);border-radius:var(--r-pill);padding:6px 16px;font-size:11.5px;font-weight:600;color:var(--muted2);cursor:pointer;transition:all .15s;font-family:inherit;}
+.ex-more-btn:hover{border-color:var(--accent);color:var(--accent);}
 
 /* ── Reklam slotları ── */
 .ad-slot{margin:18px 0;text-align:center;position:relative;}
@@ -201,13 +208,11 @@ footer a:hover{color:var(--text2);}
   </div>
 </div>
 
-<!-- ── BORSA TABLARI ── -->
-<div class="ex-tabs">
-  <button class="ex-tab on" data-ex="bist"   onclick="setEx('bist')"  >🇹🇷 BIST</button>
-  <button class="ex-tab"    data-ex="nasdaq" onclick="setEx('nasdaq')">🇺🇸 NASDAQ</button>
-  <button class="ex-tab"    data-ex="sp500"  onclick="setEx('sp500')" >🇺🇸 S&amp;P 500</button>
-  <button class="ex-tab"    data-ex="dax"    onclick="setEx('dax')"   >🇩🇪 DAX</button>
-  <button class="ex-tab"    data-ex="lse"    onclick="setEx('lse')"   >🇬🇧 LSE</button>
+<!-- ── BORSA TABLARI (JS ile render) ── -->
+<div class="ex-tabs-wrap">
+  <div class="ex-tabs" id="ex-main"></div>
+  <div class="ex-tabs ex-tabs-extra" id="ex-extra" hidden></div>
+  <button class="ex-more-btn" id="ex-more-btn" onclick="toggleMoreEx()">+ Diğer Borsalar</button>
 </div>
 
 <!-- ── ÜSTTE REKLAM BANNER ── -->
@@ -254,7 +259,7 @@ window.addEventListener('DOMContentLoaded',function(){
   if(btn) btn.textContent = dark?'☀':'☾';
 });
 </script>
-<script src="/stratejiler/stratejiler.js?v=4" defer></script>
+<script src="/stratejiler/stratejiler.js?v=5" defer></script>
 
 </body>
 </html>

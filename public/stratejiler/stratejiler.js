@@ -3,15 +3,83 @@
 (function () {
 'use strict';
 
-// ── Borsa tanımları ───────────────────────────────────────────
+// ── Borsa tanımları (tarayıcı ile aynı) ───────────────────────
 var EX_META = {
-  bist:   { name:'BIST',    flag:'🇹🇷', label:'BIST',    range:[0,800],  currency:'TRY', market:'turkey'   },
-  nasdaq: { name:'NASDAQ',  flag:'🇺🇸', label:'NASDAQ',  range:[0,4500], currency:'USD', market:'america'  },
-  sp500:  { name:'S&P 500', flag:'🇺🇸', label:'S&P 500', range:[0,503],  currency:'USD', market:'america'  },
-  dax:    { name:'DAX',     flag:'🇩🇪', label:'DAX',     range:[0,500],  currency:'EUR', market:'germany'  },
-  lse:    { name:'LSE',     flag:'🇬🇧', label:'LSE',     range:[0,2000], currency:'GBP', market:'uk'       },
+  bist:        { name:'BIST',               flag:'🇹🇷', range:[0,800]  },
+  nasdaq:      { name:'NASDAQ',             flag:'🇺🇸', range:[0,4500] },
+  nyse:        { name:'NYSE',               flag:'🇺🇸', range:[0,3000] },
+  sp500:       { name:'S&P 500',            flag:'🇺🇸', range:[0,503]  },
+  dax:         { name:'DAX',                flag:'🇩🇪', range:[0,500]  },
+  lse:         { name:'LSE',                flag:'🇬🇧', range:[0,2000] },
+  nikkei:      { name:'Nikkei',             flag:'🇯🇵', range:[0,4000] },
+  krx:         { name:'KRX',                flag:'🇰🇷', range:[0,3000] },
+  moex:        { name:'MOEX',               flag:'🇷🇺', range:[0,500]  },
+  france:      { name:'Euronext Paris',     flag:'🇫🇷', range:[0,3000] },
+  amsterdam:   { name:'Euronext Amsterdam', flag:'🇳🇱', range:[0,3000] },
+  brussels:    { name:'Euronext Brussels',  flag:'🇧🇪', range:[0,3000] },
+  lisbon:      { name:'Euronext Lisbon',    flag:'🇵🇹', range:[0,3000] },
+  dublin:      { name:'Euronext Dublin',    flag:'🇮🇪', range:[0,3000] },
+  oslo:        { name:'Oslo Bors',          flag:'🇳🇴', range:[0,3000] },
+  milan:       { name:'Borsa Italiana',     flag:'🇮🇹', range:[0,3000] },
+  tsx:         { name:'TSX',                flag:'🇨🇦', range:[0,3000] },
+  twse:        { name:'TWSE',               flag:'🇹🇼', range:[0,3000] },
+  b3:          { name:'B3',                 flag:'🇧🇷', range:[0,3000] },
+  hkex:        { name:'HKEX',               flag:'🇭🇰', range:[0,3000] },
+  china:       { name:'SSE/SZSE',           flag:'🇨🇳', range:[0,3000] },
+  saudi:       { name:'Tadawul',            flag:'🇸🇦', range:[0,3000] },
+  switzerland: { name:'SIX',                flag:'🇨🇭', range:[0,3000] },
+  australia:   { name:'ASX',                flag:'🇦🇺', range:[0,3000] },
+  southafrica: { name:'JSE',                flag:'🇿🇦', range:[0,3000] },
+  sweden:      { name:'Nasdaq Stockholm',   flag:'🇸🇪', range:[0,3000] },
+  india:       { name:'NSE',                flag:'🇮🇳', range:[0,3000] },
+  uae:         { name:'DFM',                flag:'🇦🇪', range:[0,3000] },
 };
+var MAIN_EX = ['bist','nasdaq','nyse','sp500','dax','lse'];
 var EX_KEYS = Object.keys(EX_META);
+
+// Emoji bayrağı ISO koduna çevir → flagcdn görseli (tarayıcı ile aynı)
+function isoFromFlag(emoji) {
+  try {
+    var cps = [];
+    for (var i = 0; i < emoji.length;) { var cp = emoji.codePointAt(i); cps.push(cp); i += cp > 0xFFFF ? 2 : 1; }
+    if (cps.length === 2 && cps[0] >= 0x1F1E6 && cps[0] <= 0x1F1FF) {
+      return String.fromCharCode(cps[0]-0x1F1A5).toLowerCase() + String.fromCharCode(cps[1]-0x1F1A5).toLowerCase();
+    }
+  } catch(e) {}
+  return '';
+}
+function flagImg(flag) {
+  var iso = isoFromFlag(flag);
+  return iso
+    ? '<img class="ex-flag-img" src="https://flagcdn.com/w40/' + iso + '.png" alt="" loading="lazy">'
+    : '<span class="ex-flag-emoji">' + flag + '</span>';
+}
+
+// Piyasa değeri yerel para → USD (deepfin.js ile birebir aynı dönüşüm)
+function convertMcap(val, ex) {
+  if (ex === 'bist')            val = val / (fxRates.TRY || 38);
+  else if (ex === 'dax')       val = val * (fxRates.EUR || 0.93);
+  else if (ex === 'lse')       val = val * (fxRates.GBP || 0.79) / 100;
+  else if (ex === 'nikkei')    val = val * (fxRates.JPY || 0.0065);
+  else if (ex === 'krx')       val = val * (fxRates.KRW || 0.00074);
+  else if (ex === 'moex')      val = val / (fxRates.RUB || 90);
+  else if (['france','amsterdam','brussels','lisbon','dublin','milan'].indexOf(ex) !== -1) val = val * (fxRates.EUR || 0.93);
+  else if (ex === 'oslo')      val = val * (fxRates.NOK || 0.092);
+  else if (ex === 'tsx')       val = val * (fxRates.CAD || 0.73);
+  else if (ex === 'twse')      val = val / (fxRates.TWD || 32);
+  else if (ex === 'b3')        val = val / (fxRates.BRL || 5.5);
+  else if (ex === 'hkex')      val = val / (fxRates.HKD || 7.8);
+  else if (ex === 'china')     val = val / (fxRates.CNY || 7.2);
+  else if (ex === 'saudi')     val = val / (fxRates.SAR || 3.75);
+  else if (ex === 'switzerland') val = val * (fxRates.CHF || 1.1);
+  else if (ex === 'australia') val = val * (fxRates.AUD || 0.66);
+  else if (ex === 'southafrica') val = val / (fxRates.ZAR || 18);
+  else if (ex === 'sweden')    val = val * (fxRates.SEK || 0.095);
+  else if (ex === 'india')     val = val * (fxRates.INR || 0.012);
+  else if (ex === 'uae')       val = val * (fxRates.AED || 0.27);
+  // nasdaq / nyse / sp500: zaten USD
+  return val / 1e6;
+}
 
 // ── Kolon setleri ─────────────────────────────────────────────
 var COLS_BIST = [
@@ -45,7 +113,12 @@ var COLS_US = [
   'ADX','ADX+DI','ADX-DI','BB.lower','Stoch.K','Stoch.D','beta_1_year'
 ];
 var COLS_GLOBAL = COLS_US;
-var COLS_BY_EX = { bist:COLS_BIST, nasdaq:COLS_US, sp500:COLS_US, dax:COLS_GLOBAL, lse:COLS_GLOBAL };
+// bist→BIST, nasdaq/nyse/sp500→US, diğer tümü→GLOBAL (tarayıcı ile aynı)
+function colsFor(ex) {
+  if (ex === 'bist') return COLS_BIST;
+  if (ex === 'nasdaq' || ex === 'nyse' || ex === 'sp500') return COLS_US;
+  return COLS_GLOBAL;
+}
 
 // ── Filtre kuralları (deepfin.js FILTER_RULES ile birebir aynı) ─
 var FILTER_RULES = [
@@ -165,25 +238,46 @@ var INVESTOR_PROFILES = [
 // ── Durum ─────────────────────────────────────────────────────
 var allData       = [];
 var currentEx     = 'bist';
-var fxRates       = { TRY:38, EUR:1/1.08, GBP:1/1.27, JPY:1/153, KRW:1/1350 };
+// USD bazında "1 birim yerel para kaç USD" (TRY/RUB/TWD/BRL/HKD/CNY/SAR/ZAR hariç — onlar yerel/USD)
+var fxRates       = {TRY:44.1, EUR:1.163, GBP:1.333, JPY:0.00633, KRW:0.00074, RUB:89.0, NOK:0.090, CAD:0.73, TWD:32.0, BRL:5.70, HKD:7.78, CNY:7.25, SAR:3.75, CHF:1.12, AUD:0.633, ZAR:18.5, SEK:0.095, INR:0.012, AED:0.272};
 var showAllGroups = false;
 
 // ── Veri çekimi ───────────────────────────────────────────────
+// /api/rates USD bazlı döner (r.EUR ≈ 0.92 = USD başına EUR). Tarayıcı (deepfin.js)
+// ile birebir aynı yön dönüşümü: bazı kurlar 1/r, bazıları r olarak saklanır.
 function loadRates() {
-  return fetch('/api/rates').then(function(r){ return r.json(); }).then(function(d) {
-    var r = d && d.rates;
-    if (r) fxRates = r;
+  return fetch('/api/rates').then(function(res){ return res.json(); }).then(function(r) {
+    if (!r) return;
+    if (r.TRY) fxRates.TRY = r.TRY;
+    if (r.EUR) fxRates.EUR = 1 / r.EUR;
+    if (r.GBP) fxRates.GBP = 1 / r.GBP;
+    if (r.JPY) fxRates.JPY = 1 / r.JPY;
+    if (r.KRW) fxRates.KRW = 1 / r.KRW;
+    if (r.RUB) fxRates.RUB = r.RUB;
+    if (r.NOK) fxRates.NOK = 1 / r.NOK;
+    if (r.CAD) fxRates.CAD = 1 / r.CAD;
+    if (r.TWD) fxRates.TWD = r.TWD;
+    if (r.BRL) fxRates.BRL = r.BRL;
+    if (r.HKD) fxRates.HKD = r.HKD;
+    if (r.CNY) fxRates.CNY = r.CNY;
+    if (r.SAR) fxRates.SAR = r.SAR;
+    if (r.CHF) fxRates.CHF = 1 / r.CHF;
+    if (r.AUD) fxRates.AUD = 1 / r.AUD;
+    if (r.ZAR) fxRates.ZAR = r.ZAR;
+    if (r.SEK) fxRates.SEK = 1 / r.SEK;
+    if (r.INR) fxRates.INR = 1 / r.INR;
+    if (r.AED) fxRates.AED = 1 / r.AED;
   }).catch(function(){});
 }
 
 function buildPayload(ex) {
-  var cols = COLS_BY_EX[ex] || COLS_US;
+  var cols = colsFor(ex);
   var range = (EX_META[ex] && EX_META[ex].range) || [0, 3000];
   return { columns: cols, range: range, sort:{ sortBy:'market_cap_basic', sortOrder:'desc' }, ignore_unknown_fields:true };
 }
 
 function parseRows(tvRows, ex) {
-  var cols_arr = COLS_BY_EX[ex] || COLS_US;
+  var cols_arr = colsFor(ex);
   var results = [];
   for (var i = 0; i < tvRows.length; i++) {
     var row = tvRows[i];
@@ -237,14 +331,7 @@ function parseRows(tvRows, ex) {
     var sym = (row.s || '').replace(/^[A-Z0-9]+:/, '');
     if (!close || close === 0) continue;
 
-    var mcapUSD = null;
-    if (mcap !== null) {
-      var v = mcap;
-      if (ex === 'bist')   v = v / (fxRates.TRY || 38);
-      else if (ex === 'dax') v = v * (fxRates.EUR || 0.93);
-      else if (ex === 'lse') v = v * (fxRates.GBP || 0.79) / 100;
-      mcapUSD = v / 1e6;
-    }
+    var mcapUSD = (mcap !== null) ? convertMcap(mcap, ex) : null;
 
     results.push({
       symbol: sym,
@@ -608,6 +695,22 @@ function renderAll() {
   wrap.innerHTML = html;
 }
 
+// ── Borsa sekmeleri (ilk 6 + Diğer Borsalar) ──────────────────
+function exTabHtml(key) {
+  var m = EX_META[key]; if (!m) return '';
+  return '<button class="ex-tab' + (key === currentEx ? ' on' : '') + '" data-ex="' + key + '"' +
+    ' onclick="setEx(\'' + key + '\')">' + flagImg(m.flag) +
+    '<span class="ex-name">' + m.name + '</span></button>';
+}
+function renderExchangeTabs() {
+  var mainEl  = document.getElementById('ex-main');
+  var extraEl = document.getElementById('ex-extra');
+  if (!mainEl || !extraEl) return;
+  mainEl.innerHTML = MAIN_EX.map(exTabHtml).join('');
+  var others = EX_KEYS.filter(function(k){ return MAIN_EX.indexOf(k) === -1; });
+  extraEl.innerHTML = others.map(exTabHtml).join('');
+}
+
 // ── Global fonksiyonlar (HTML onclick) ───────────────────────
 window.setEx = function(key) {
   if (key === currentEx) return;
@@ -618,6 +721,13 @@ window.setEx = function(key) {
   });
   document.getElementById('sr-wrap').innerHTML = '';
   loadData(key);
+};
+window.toggleMoreEx = function() {
+  var extra = document.getElementById('ex-extra');
+  var btn   = document.getElementById('ex-more-btn');
+  if (!extra || !btn) return;
+  if (extra.hasAttribute('hidden')) { extra.removeAttribute('hidden'); btn.textContent = '− Daha Az Borsa'; }
+  else { extra.setAttribute('hidden', ''); btn.textContent = '+ Diğer Borsalar'; }
 };
 window.toggleAll = function() {
   showAllGroups = !showAllGroups;
@@ -643,6 +753,7 @@ window.currentEx = currentEx; // expose for error handler
 
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
+  renderExchangeTabs();
   loadData(currentEx);
 });
 })();
