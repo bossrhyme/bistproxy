@@ -391,7 +391,7 @@ function _fetchChart(sym, ex) {
       _chartIndCache={};
       Object.keys(_chartInds).forEach(function(k){if(_chartInds[k])_removeIndSeries(k);});
       _chartApply();
-
+      _fillTechFromCandles();
     })
     .catch(function(e){console.error('Chart error:',e);});
 }
@@ -1639,6 +1639,43 @@ function _buildTechMetrics() {
     if (rsi!=null && !isNaN(rsi)) bs.push({t: rsi<30?'RSI aşırı satım':rsi>70?'RSI aşırı alım':'RSI nötr', good: rsi<30});
     bel.innerHTML = bs.map(function(b){ return '<span class="prf-badge'+(b.good?' g':'')+'">'+b.t+'</span>'; }).join('');
   }
+}
+
+// RSI (Wilder, 14) — mum kapanışlarından
+function _calcRSI(data, period) {
+  if (!data || data.length < period + 1) return null;
+  var avgG = 0, avgL = 0, i, ch;
+  for (i = 1; i <= period; i++) { ch = data[i].close - data[i-1].close; if (ch >= 0) avgG += ch; else avgL -= ch; }
+  avgG /= period; avgL /= period;
+  for (i = period + 1; i < data.length; i++) {
+    ch = data[i].close - data[i-1].close;
+    var g = ch >= 0 ? ch : 0, l = ch < 0 ? -ch : 0;
+    avgG = (avgG * (period - 1) + g) / period;
+    avgL = (avgL * (period - 1) + l) / period;
+  }
+  if (avgL === 0) return 100;
+  var rs = avgG / avgL;
+  return 100 - (100 / (1 + rs));
+}
+
+// Grafik mum verisinden RSI / SMA50 / SMA200 / 52H hesapla ve metrikleri tazele
+function _fillTechFromCandles() {
+  if (!_prfData || !_chartData || !_chartData.length) return;
+  var c = _chartData;
+  var rsi = _calcRSI(c, 14);
+  if (rsi != null && (_prfData.RSI == null)) _prfData.RSI = rsi;
+  if (_prfData.SMA50 == null) { var s50 = _calcSMA(c, 50); if (s50.length) _prfData.SMA50 = s50[s50.length-1].value; }
+  if (_prfData.SMA200 == null) { var s200 = _calcSMA(c, 200); if (s200.length) _prfData.SMA200 = s200[s200.length-1].value; }
+  if (!_prfData['52_week_high'] || !_prfData['52_week_low']) {
+    var hi = -Infinity, lo = Infinity, start = Math.max(0, c.length - 252);
+    for (var i = start; i < c.length; i++) { if (c[i].high > hi) hi = c[i].high; if (c[i].low < lo) lo = c[i].low; }
+    if (hi > -Infinity && !_prfData['52_week_high']) _prfData['52_week_high'] = hi;
+    if (lo < Infinity && !_prfData['52_week_low']) _prfData['52_week_low'] = lo;
+  }
+  try { _buildSadeMetrics(); } catch(e) {}
+  try { _buildBadges(); } catch(e) {}
+  try { _buildTechMetrics(); } catch(e) {}
+  try { if (typeof _buildPrfSide === 'function') _buildPrfSide(); } catch(e) {}
 }
 
 function prfSetMode(mode) {
