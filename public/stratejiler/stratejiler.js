@@ -545,9 +545,23 @@ function renderAll() {
 
   var html = '<div class="sr-note">' +
     exm.flag + ' <b>' + exm.name + '</b> · ' + allData.length + ' hisse tarandı. ' +
-    'Bugünkü filtreden geçen hisselerin son 1&nbsp;/&nbsp;3&nbsp;/&nbsp;6 aydaki eşit ağırlıklı ortalama getirisi. ' +
-    'Bir stratejinin üstüne tıklayarak tarama kriterlerini ve listedeki hisseleri görebilirsin. ' +
-    'Geçmişe dönük göstergedir; gelecek getiriyi garanti etmez.' +
+    'Her stratejinin <b>bugünkü</b> filtre kriterlerinden geçen hisselerin son 1&nbsp;/&nbsp;3&nbsp;/&nbsp;6 aydaki ' +
+    '<b>eşit ağırlıklı (aritmetik) ortalama</b> getirisi gösterilir. ' +
+    'Bir stratejinin üstüne tıklayarak tarama kriterlerini ve listedeki hisseleri görebilirsin.' +
+  '</div>';
+
+  html += '<div class="sr-warn">' +
+    '<div class="sr-warn-hd"><span class="sr-warn-ico">⚠️</span> Bu getiriler bir geçmiş performans testi (backtest) DEĞİLDİR</div>' +
+    '<ul class="sr-warn-list">' +
+      '<li>Filtre <b>bugünün</b> verisine uygulanır, ama getiriler <b>geçmiş</b> döneme aittir. Yani burası ' +
+        '“bu kritere <b>bugün</b> uyan hisseler son dönemde ne yapmış?” sorusunu yanıtlar — ' +
+        '“bu stratejiyi 3 ay önce kursaydım ne kazanırdım?” sorusunu <b>değil</b>.</li>' +
+      '<li>Bu nedenle <b>seçim yanlılığı</b> (look-ahead / survivorship bias) içerir: çok yükseldiği için ' +
+        'pahalılaşıp değer filtresinden elenen hisseler listede görünmez; bu da değer stratejilerini olduğundan ' +
+        'düşük, momentum stratejilerini olduğundan yüksek gösterebilir.</li>' +
+      '<li>Getiri, hisseleri piyasa değerine göre değil <b>eşit ağırlıkla</b> ortalar; küçük ve büyük şirket eşit sayılır.</li>' +
+      '<li>Geçmiş getiri gelecek getiriyi <b>garanti etmez</b>. Yatırım tavsiyesi değildir.</li>' +
+    '</ul>' +
   '</div>';
 
   // Yatırımcı stratejileri
