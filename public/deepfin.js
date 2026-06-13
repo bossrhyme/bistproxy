@@ -4841,6 +4841,17 @@ function selectExchangeAndGo(exKey) {
   if(btn) selectExchange(btn);
 }
 
+// Homepage "Popüler Stratejiler" tab switch
+function hpStratTab(el, id) {
+  var tabs = el.parentElement.querySelectorAll('.hpx-tab');
+  for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('on');
+  el.classList.add('on');
+  ['goat', 'fund', 'tech'].forEach(function(x) {
+    var g = document.getElementById('hpx-sg-' + x);
+    if (g) g.style.display = (x === id) ? 'grid' : 'none';
+  });
+}
+
 function _track(type, key) {
   fetch('/api/track', { method:'POST', headers:{'Content-Type':'application/json'},
     body: JSON.stringify({type: type, key: key}) }).catch(function(){});
