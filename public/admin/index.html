@@ -5,9 +5,19 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>DeepFin Admin</title>
 <meta name="robots" content="noindex,nofollow">
+<script>(function(){try{var t=localStorage.getItem('df_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
+/* Açık tema varsayılan (site geneliyle tutarlı) */
 :root{
+  --bg:#f6f8fa;--s1:#ffffff;--s2:#f6f8fa;--s3:#eaeef2;
+  --border:#d0d7de;--border2:#afb8c1;
+  --text:#1f2328;--muted:#656d76;--muted2:#818b98;
+  --accent:#0969da;--accent2:#218bff;
+  --green:#1a7f37;--red:#cf222e;--yellow:#9a6700;--purple:#8250df;
+  --orange:#bc4c00;
+}
+[data-theme="dark"]{
   --bg:#0d1117;--s1:#161b22;--s2:#1c2128;--s3:#21262d;
   --border:#30363d;--border2:#484f58;
   --text:#e6edf3;--muted:#8b949e;--muted2:#6e7681;
@@ -91,11 +101,11 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .ad-badge.value{background:rgba(14,165,233,.15);color:var(--accent);}
 .ad-badge.tech{background:rgba(163,113,247,.15);color:var(--purple);}
 .ad-badge.div{background:rgba(227,179,65,.15);color:var(--orange);}
-.ad-badge.mom{background:rgba(249,115,22,.15);color:#fb923c;}
+.ad-badge.mom{background:rgba(249,115,22,.15);color:var(--orange);}
 .ad-badge.spec{background:rgba(248,81,73,.2);color:var(--red);}
 .ad-badge.bal{background:rgba(139,148,158,.15);color:var(--muted);}
-.ad-badge.def{background:rgba(63,185,80,.1);color:#6ee7b7;}
-.ad-badge.small{background:rgba(139,92,246,.15);color:#c4b5fd;}
+.ad-badge.def{background:rgba(63,185,80,.12);color:var(--green);}
+.ad-badge.small{background:rgba(139,92,246,.15);color:var(--purple);}
 .ad-badge.other{background:var(--s3);color:var(--muted);}
 .ad-search{width:100%;background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--text);outline:none;font-family:inherit;margin-bottom:14px;}
 .ad-search:focus{border-color:var(--accent);}
@@ -154,6 +164,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 <div id="ad-shell">
   <div class="ad-topbar">
     <div class="ad-logo">DeepFin Admin <span id="ad-cache-ts"></span></div>
+    <button class="ad-topbar-btn" id="ad-theme-btn" onclick="toggleTheme()" title="Tema değiştir">☾</button>
     <button class="ad-topbar-btn" onclick="refreshAll()">↻ Yenile</button>
     <button class="ad-topbar-btn danger" onclick="doLogout()">Çıkış</button>
   </div>
@@ -249,6 +260,20 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 var _key = '';
 var _reportData = null;
 var _usersData  = null;
+
+// ── Tema (beyaz / karanlık) ──
+function _syncThemeBtn() {
+  var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  var btn = document.getElementById('ad-theme-btn');
+  if (btn) btn.textContent = dark ? '☀' : '☾';
+}
+function toggleTheme() {
+  var dark = document.documentElement.getAttribute('data-theme') !== 'dark';
+  try { localStorage.setItem('df_theme', dark ? 'dark' : 'light'); } catch(e) {}
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  _syncThemeBtn();
+}
+document.addEventListener('DOMContentLoaded', _syncThemeBtn);
 
 var STRAT_LABELS = {
   tech:   { breakout:'💥 Breakout', oversold:'📉 Aşırı Satış', nearhigh:'🏔️ ATH Yakın', pullback:'🔄 Düzeltme',
