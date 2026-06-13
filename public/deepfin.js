@@ -16,13 +16,13 @@ function safeUrl(u) { var s = String(u||''); return /^https?:\/\//i.test(s) ? s 
 
 // ── Tema ──────────────────────────────────────────────────────
 function _isDark() {
-  // Default: dark (terminal mode)
-  try { return localStorage.getItem('df_theme') !== 'light'; } catch(e) { return true; }
+  // Default: light (DeepFin warm mode)
+  try { return localStorage.getItem('df_theme') === 'dark'; } catch(e) { return false; }
 }
 function _applyTheme(dark) {
   document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
   var meta = document.getElementById('meta-theme-color');
-  if (meta) meta.content = dark ? '#0A0E14' : '#f8fafc';
+  if (meta) meta.content = dark ? '#0A0E14' : '#FAFAF7';
   var btn = document.getElementById('theme-toggle');
   if (btn) btn.textContent = dark ? '☀' : '☾';
 }
@@ -4770,9 +4770,9 @@ function showDisclaimerModal() {
   const cdEl = document.getElementById('disclaimerCountdown');
   btn.disabled = true;
   btn.style.cursor = 'not-allowed';
-  btn.style.background = '#1a1a1a';
-  btn.style.color = '#555';
-  btn.style.borderColor = '#333';
+  btn.style.background = 'var(--s3)';
+  btn.style.color = 'var(--muted)';
+  btn.style.borderColor = 'var(--border)';
 
   disclaimerTimer = setInterval(function() {
     secs--;
@@ -4783,9 +4783,9 @@ function showDisclaimerModal() {
       cdEl.textContent = '';
       btn.disabled = false;
       btn.style.cursor = 'pointer';
-      btn.style.background = '#ededed';
-      btn.style.color = '#000';
-      btn.style.borderColor = '#ededed';
+      btn.style.background = 'var(--accent)';
+      btn.style.color = '#fff';
+      btn.style.borderColor = 'var(--accent)';
     }
   }, 1000);
 }
