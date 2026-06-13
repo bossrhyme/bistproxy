@@ -1774,9 +1774,9 @@ kbd{font-family:var(--ff-mono);font-size:10px;color:var(--text);background:var(-
 .kolay-table tbody tr:hover{background:var(--s3);}
 .kolay-table td{padding:13px 16px;color:var(--text);font-variant-numeric:tabular-nums;vertical-align:middle;}
 .kolay-table td.r{text-align:right;}
-.kt-hisse{display:flex;flex-direction:column;gap:1px;}
-.kt-sym{font-size:14px;font-weight:600;color:var(--text);}
-.kt-name{font-size:11px;color:var(--text2);}
+.kt-hisse{line-height:1.35;}
+.kt-sym{display:block;font-size:14px;font-weight:600;color:var(--text);}
+.kt-name{display:block;font-size:11px;color:var(--text2);margin-top:1px;}
 .kt-price{font-weight:600;}
 .kt-mcap{color:var(--text2);}
 .kt-more td{text-align:center;color:var(--accent);font-size:12px;font-weight:600;padding:14px;cursor:default;}
