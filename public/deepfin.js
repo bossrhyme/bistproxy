@@ -1153,6 +1153,51 @@ function applyColVisibility() {
     var vis = isColVisible(d.key);
     document.querySelectorAll('[data-col="'+d.key+'"]').forEach(function(el){ el.style.display = vis ? '' : 'none'; });
   });
+  _initColDrag();
+  applyColOrder();
+}
+
+// ── Kolon sırası (sürükle-bırak) ──
+var _colOrder = null;
+function _loadColOrder() {
+  if (_colOrder) return;
+  try { var s = localStorage.getItem('df_col_order'); if (s) { var arr = JSON.parse(s); if (Array.isArray(arr) && arr.length) { _colOrder = arr.filter(function(k){ return COL_DEFS.some(function(d){return d.key===k;}); }); COL_DEFS.forEach(function(d){ if(_colOrder.indexOf(d.key)===-1) _colOrder.push(d.key); }); return; } } } catch(e) {}
+  _colOrder = COL_DEFS.map(function(d){ return d.key; });
+}
+function _reorderRowCells(row) {
+  var cells = row.children, map = {}, i;
+  for (i = 0; i < cells.length; i++) { var k = cells[i].getAttribute && cells[i].getAttribute('data-col'); if (k) map[k] = cells[i]; }
+  for (i = 0; i < _colOrder.length; i++) { var el = map[_colOrder[i]]; if (el) row.appendChild(el); }
+}
+function applyColOrder() {
+  _loadColOrder();
+  var head = document.querySelector('#hisse-table thead tr');
+  if (head) _reorderRowCells(head);
+  var rows = document.querySelectorAll('#hisse-table tbody tr');
+  for (var i = 0; i < rows.length; i++) _reorderRowCells(rows[i]);
+}
+var _dragCol = null;
+function _initColDrag() {
+  var ths = document.querySelectorAll('#hisse-table thead th[data-col]');
+  ths.forEach(function(th) {
+    if (th._cdInit) return; th._cdInit = true;
+    th.setAttribute('draggable', 'true');
+    th.addEventListener('dragstart', function(e) { _dragCol = th.getAttribute('data-col'); try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', _dragCol); } catch(_) {} th.classList.add('col-dragging'); });
+    th.addEventListener('dragend', function() { th.classList.remove('col-dragging'); document.querySelectorAll('.col-drop-l,.col-drop-r').forEach(function(x){ x.classList.remove('col-drop-l','col-drop-r'); }); _dragCol = null; });
+    th.addEventListener('dragover', function(e) { if (!_dragCol || _dragCol === th.getAttribute('data-col')) return; e.preventDefault(); try { e.dataTransfer.dropEffect = 'move'; } catch(_) {} var r = th.getBoundingClientRect(); var after = (e.clientX - r.left) > r.width / 2; th.classList.toggle('col-drop-r', after); th.classList.toggle('col-drop-l', !after); });
+    th.addEventListener('dragleave', function() { th.classList.remove('col-drop-l','col-drop-r'); });
+    th.addEventListener('drop', function(e) { e.preventDefault(); var target = th.getAttribute('data-col'); var r = th.getBoundingClientRect(); var after = (e.clientX - r.left) > r.width / 2; th.classList.remove('col-drop-l','col-drop-r'); _moveCol(_dragCol, target, after); });
+  });
+}
+function _moveCol(from, to, after) {
+  if (!from || from === to) return;
+  _loadColOrder();
+  var fi = _colOrder.indexOf(from); if (fi < 0) return;
+  _colOrder.splice(fi, 1);
+  var ti = _colOrder.indexOf(to); if (ti < 0) { _colOrder.splice(fi, 0, from); return; }
+  _colOrder.splice(after ? ti + 1 : ti, 0, from);
+  try { localStorage.setItem('df_col_order', JSON.stringify(_colOrder)); } catch(e) {}
+  applyColOrder();
 }
 
 function openColPicker() {
@@ -3227,6 +3272,7 @@ function _vsRender() {
     rows += '<tr class="vs-pad vs-sentinel" style="height:' + botPad + 'px"><td colspan="22"></td></tr>';
   }
   tbody.innerHTML = rows;
+  if (typeof applyColOrder === 'function') applyColOrder();
 
   // Sentinel observer: botPad row görünürce daha fazla yükle
   _vsBindSentinel();

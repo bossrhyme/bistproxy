@@ -1828,3 +1828,10 @@ kbd{font-family:var(--ff-mono);font-size:10px;color:var(--text);background:var(-
 .ks-more{margin:8px 16px 0;background:none;border:none;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;padding:4px 0;font-family:'Inter',sans-serif;text-align:left;display:block;}
 .ks-more:hover{text-decoration:underline;}
 @media(max-width:760px){#kolay-side{display:none !important;}}
+
+/* ═══ Pro tablo: ortalama + kolon sürükle-bırak ═══ */
+#hisse-table thead th, #hisse-table tbody td{text-align:center !important;}
+#hisse-table thead th[data-col]{cursor:grab;}
+#hisse-table thead th.col-dragging{opacity:.45;cursor:grabbing;}
+#hisse-table thead th.col-drop-l{box-shadow:inset 3px 0 0 var(--accent);}
+#hisse-table thead th.col-drop-r{box-shadow:inset -3px 0 0 var(--accent);}
