@@ -5013,6 +5013,10 @@ function _recordRecentScan(filters, total, matches) {
     var asset = (_activeAsset === 'kripto') ? 'kripto' : (_activeAsset === 'fon') ? 'fon' : 'borsa';
     if (asset !== 'borsa') return;                 // şimdilik yalnız hisse taramaları
     if (!total || total < 1) return;
+    // Yalnızca ANLAMLI filtreli tarama kaydet: eşleşen 1..total-1 arası olmalı.
+    // matches>=total → filtre etkisiz (tüm hisseler eşleşmiş); matches<1 → boş/loading.
+    var m = (matches != null ? matches : 0);
+    if (m < 1 || m >= total) return;
     var primary = (filters || []).find(function(f) { return f.kind && f.key; });
     if (!primary) return;                          // filtresiz/özel filtre → deep-link yok
     var exMeta = (typeof EXCHANGE_META !== 'undefined' ? EXCHANGE_META[currentExchange] : null) || {};
@@ -5407,37 +5411,20 @@ function _track(type, key) {
     body: JSON.stringify({type: type, key: key}) }).catch(function(){});
 }
 
-function applyStrategyAndGo(goatKey) {
-  _track('goat', goatKey);
-  clearFilters();
-  showScreener();
-  setTimeout(function(){
-    var chip = document.querySelector('#goat-chips .goat-chip[data-goat="' + goatKey + '"]');
-    if (chip) { chip.classList.add('on'); applyAllChips(); }
-    else runScan();
-  }, 150);
-}
+function applyStrategyAndGo(goatKey) { _track('goat', goatKey); _homeStrategy('goat', goatKey); }
+function applyPresetAndGo(presetKey) { _track('preset', presetKey); _homeStrategy('preset', presetKey); }
+function applyTechAndGo(techKey)     { _track('tech', techKey);    _homeStrategy('tech', techKey); }
 
-function applyPresetAndGo(presetKey) {
-  _track('preset', presetKey);
-  clearFilters();
+// Anasayfa hazır filtreleri — tarayıcıyı aç, sonra KANITLANMIŞ quickGoat/quickScan
+// ile filtreyi DOĞRUDAN veri sözlüğünden uygula. Önceki sürüm chip render/timing
+// yarışına ve yanlış selektöre (.tech-chip) takılıp bazen filtresiz tarıyordu
+// (→ "607 bulundu" gibi tutarsız sonuçlar). Artık tek, filtreli tarama.
+function _homeStrategy(kind, key) {
   showScreener();
-  setTimeout(function(){
-    var chip = document.querySelector('#presets .chip[data-preset="' + presetKey + '"]');
-    if (chip) { chip.classList.add('on'); applyAllChips(); }
-    else runScan();
-  }, 150);
-}
-
-function applyTechAndGo(techKey) {
-  _track('tech', techKey);
-  clearFilters();
-  showScreener();
-  setTimeout(function(){
-    var chip = document.querySelector('#tech-presets .tech-chip[data-tech="' + techKey + '"]');
-    if (chip) { chip.classList.add('on'); applyAllChips(); }
-    else runScan();
-  }, 150);
+  setTimeout(function() {
+    if (kind === 'goat') quickGoat(key);
+    else quickScan(key); // quickScan hem preset hem tech anahtarını işler
+  }, 80);
 }
 
 

@@ -744,7 +744,7 @@ async function handleStats(req, res) {
 
 // ── Son Taramalar (site-geneli) — GET son 10 / POST ekle (KV LPUSH+LTRIM) ──
 async function handleRecentScans(req, res) {
-  const LIST_KEY = 'df_recent_scans_v1';
+  const LIST_KEY = 'df_recent_scans_v2'; // v2: eski hatalı (filtresiz/607) kayıtları bırak, taze başla
   res.setHeader('Cache-Control', 'no-store');
   if (req.method === 'GET') {
     try {
