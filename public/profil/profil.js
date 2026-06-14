@@ -593,7 +593,7 @@ function renderTabs() {
   var tabs = document.getElementById('pf-list-tabs');
   tabs.innerHTML = _lists.map(function(l) {
     return '<button class="pf-list-tab' + (l.id === _activeListId ? ' active' : '') +
-      '" onclick="switchList(\'' + l.id + '\')">' + esc(l.icon || '⭐') + ' ' + esc(l.name) + '</button>';
+      '" onclick="switchList(\'' + l.id + '\')">' + esc(l.name) + '</button>';
   }).join('') + '<button class="pf-new-list-btn" onclick="openModal(\'watchlist\')">+ Yeni</button>';
 }
 
@@ -630,7 +630,7 @@ function renderListPanel() {
     '<div class="pf-list-header">' +
       '<input class="pf-list-name-input" value="' + esc(list.name) +
         '" onblur="renameList(\'' + list.id + '\',this.value)" maxlength="40">' +
-      '<a href="' + scanUrl + '" class="pf-scan-btn">↗ Tara</a>' +
+      '<a href="' + scanUrl + '" class="pf-scan-btn">Tara</a>' +
       (canDel ? '<button class="pf-list-del-btn" onclick="deleteList(\'' + list.id + '\')">Sil</button>' : '') +
     '</div>' +
     '<div class="pf-stock-table-wrap"><table class="pf-stock-table"><thead><tr>' +
@@ -639,7 +639,7 @@ function renderListPanel() {
       (rows || '<tr><td colspan="7"><div class="pf-empty">Liste boş — aşağıdan hisse ekle.</div></td></tr>') +
     '</tbody></table></div>' +
     '<div class="pf-add-form">' +
-      '<button class="pf-add-btn" onclick="openSymPicker()">🔍 Hisse Ekle</button>' +
+      '<button class="pf-add-btn" onclick="openSymPicker()">Hisse Ekle</button>' +
     '</div>';
 
   if (items.length) fetchWatchlistPrices(items);
@@ -749,7 +749,7 @@ window.addItem = async function() {
       body: JSON.stringify({ listId: _activeListId, symbol: sym, exchange: ex }) });
     var d = await r.json();
     if (d.watchlists) {
-      _lists = d.watchlists; document.getElementById('pf-add-sym').value = ''; renderTabs(); renderListPanel(); toast('✓ ' + sym + ' eklendi');
+      _lists = d.watchlists; document.getElementById('pf-add-sym').value = ''; renderTabs(); renderListPanel(); toast('' + sym + ' eklendi');
       fetch('/api/track', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'wl',key:sym})}).catch(function(){});
     }
   } catch(e) { toast('Hata oluştu'); }
@@ -761,7 +761,7 @@ window.removeItem = async function(listId, symbol) {
     var r = await fetch('/api/watchlists/item', { method:'DELETE', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ listId: listId, symbol: symbol }) });
     var d = await r.json();
-    if (d.watchlists) { _lists = d.watchlists; renderTabs(); renderListPanel(); toast('✕ ' + symbol + ' çıkarıldı'); }
+    if (d.watchlists) { _lists = d.watchlists; renderTabs(); renderListPanel(); toast('' + symbol + ' çıkarıldı'); }
   } catch(e) {}
 };
 
@@ -874,7 +874,7 @@ window.addFromPicker = async function(sym, ex) {
     document.getElementById('pf-pos-sym').value  = sym;
     document.getElementById('pf-pos-ex').value   = ex;
     var btn = document.getElementById('pf-pos-sym-btn');
-    if (btn) { btn.textContent = '✓ ' + sym + ' (' + ex.toUpperCase() + ')'; btn.classList.add('selected'); }
+    if (btn) { btn.textContent = '' + sym + ' (' + ex.toUpperCase() + ')'; btn.classList.add('selected'); }
     var addBtn = document.getElementById('pf-pos-add-btn');
     if (addBtn) addBtn.disabled = false;
     setTimeout(function() { var q = document.getElementById('pf-pos-qty'); if (q) q.focus(); }, 50);
@@ -886,7 +886,7 @@ window.addFromPicker = async function(sym, ex) {
       body: JSON.stringify({ listId: _activeListId, symbol: sym, exchange: ex })
     });
     var d = await r.json();
-    if (d.watchlists) { _lists = d.watchlists; renderTabs(); renderListPanel(); toast('✓ ' + sym + ' eklendi'); }
+    if (d.watchlists) { _lists = d.watchlists; renderTabs(); renderListPanel(); toast('' + sym + ' eklendi'); }
     else if (d.error) toast('Hata: ' + d.error);
   } catch(e) { toast('Bağlantı hatası'); }
 };
@@ -900,7 +900,7 @@ async function createList(name) {
     var r = await fetch('/api/watchlists', { method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ name: name }) });
     var d = await r.json();
-    if (d.watchlists) { _lists = d.watchlists; _activeListId = _lists[_lists.length-1].id; renderTabs(); renderListPanel(); toast('✓ "' + name + '" oluşturuldu'); }
+    if (d.watchlists) { _lists = d.watchlists; _activeListId = _lists[_lists.length-1].id; renderTabs(); renderListPanel(); toast('"' + name + '" oluşturuldu'); }
   } catch(e) {}
 }
 
@@ -925,7 +925,7 @@ function renderPfTabs() {
   if (!tabs) return;
   tabs.innerHTML = _portfolios.map(function(pf) {
     return '<button class="pf-list-tab' + (pf.id === _activePfId ? ' active' : '') +
-      '" onclick="switchPf(\'' + pf.id + '\')">' + esc(pf.icon || '📊') + ' ' + esc(pf.name) + '</button>';
+      '" onclick="switchPf(\'' + pf.id + '\')">' + esc(pf.name) + '</button>';
   }).join('') + '<button class="pf-new-list-btn" onclick="openModal(\'portfolio\')">+ Yeni</button>';
 }
 
@@ -968,7 +968,7 @@ function renderPfPanel() {
       (rows || '<tr><td colspan="8"><div class="pf-empty">Henüz pozisyon yok — aşağıdan ekle.</div></td></tr>') +
     '</tbody></table></div>' +
     '<div class="pf-add-form" style="flex-wrap:wrap">' +
-      '<button class="pf-sym-pick-btn" id="pf-pos-sym-btn" onclick="openSymPicker(\'portfolio\')">🔍 Hisse Seç</button>' +
+      '<button class="pf-sym-pick-btn" id="pf-pos-sym-btn" onclick="openSymPicker(\'portfolio\')">Hisse Seç</button>' +
       '<input type="number" id="pf-pos-qty"  placeholder="Adet"    min="0.001" step="any" style="width:80px">' +
       '<input type="number" id="pf-pos-cost" placeholder="Maliyet" min="0"     step="any" style="width:90px">' +
       '<button class="pf-add-btn" id="pf-pos-add-btn" onclick="addPosition()" disabled>+ Ekle</button>' +
@@ -1020,8 +1020,8 @@ window.addPosition = async function() {
     if (d.portfolios) {
       _portfolios = d.portfolios;
       var pickBtn = document.getElementById('pf-pos-sym-btn');
-      if (pickBtn) { pickBtn.textContent = '🔍 Hisse Seç'; pickBtn.classList.remove('selected'); }
-      renderPfTabs(); renderPfPanel(); toast('✓ ' + sym + ' eklendi');
+      if (pickBtn) { pickBtn.textContent = 'Hisse Seç'; pickBtn.classList.remove('selected'); }
+      renderPfTabs(); renderPfPanel(); toast('' + sym + ' eklendi');
     }
   } catch(e) { toast('Hata oluştu'); addBtn.disabled = false; }
 };
@@ -1070,7 +1070,7 @@ async function createPortfolio(name) {
     if (d.portfolios) {
       _portfolios = d.portfolios;
       _activePfId = _portfolios[_portfolios.length-1].id;
-      renderPfTabs(); renderPfPanel(); toast('✓ "' + name + '" oluşturuldu');
+      renderPfTabs(); renderPfPanel(); toast('"' + name + '" oluşturuldu');
     }
   } catch(e) {}
 }
@@ -1135,7 +1135,7 @@ window.saveName = async function() {
       _user.name = d.name;
       var dn = document.getElementById('pf-display-name');
       if (dn) dn.textContent = d.name;
-      toast('✓ İsim güncellendi');
+      toast('İsim güncellendi');
     } else toast(d.error || 'Hata oluştu');
   } catch(e) { toast('Hata oluştu'); }
   btn.disabled = false;
@@ -1160,7 +1160,7 @@ window.changePassword = async function() {
       document.getElementById('pf-pw-cur').value = '';
       document.getElementById('pf-pw-new').value = '';
       document.getElementById('pf-pw-conf').value = '';
-      toast('✓ Şifre güncellendi');
+      toast('Şifre güncellendi');
     } else errEl.textContent = d.error || 'Hata oluştu';
   } catch(e) { errEl.textContent = 'Hata oluştu'; }
   btn.disabled = false;
