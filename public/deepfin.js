@@ -3497,11 +3497,15 @@ function chooseScanMode(mode) {
 
 // Temiz varsayılan tarama (tüm hisseler, filtresiz)
 function _runDefaultScan() {
-  document.querySelectorAll('#goat-chips .goat-chip.on, #presets .chip.on, #tech-presets .chip.on').forEach(function(c){ c.classList.remove('on'); });
+  // Tüm chip/inputları temizle
+  document.querySelectorAll('#goat-chips .goat-chip.on, #presets .chip.on, #tech-presets .chip.on, #adv-goat-chips .goat-chip.on, #adv-presets .chip.on, #adv-tech-presets .chip.on').forEach(function(c){ c.classList.remove('on'); });
   document.querySelectorAll('.finps input, #hisse-hidden-filters input').forEach(function(i){ i.value = ''; });
-  document.querySelectorAll('.qs-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.qs-btn.active').forEach(function(b){ b.classList.remove('active'); });
+  window._chipSpecial = null;
   if (typeof updateClrBtn === 'function') updateClrBtn();
-  runScan();
+  // _applyChips kanıtlanmış yol: selectAsset('hisse') yapar, özel filtreyi sıfırlar, temiz tarar
+  if (typeof _applyChips === 'function') _applyChips(BASIC_CHIP_CFG);
+  else { if (_activeAsset !== 'hisse' && typeof selectAsset === 'function') selectAsset('hisse'); runScan(); }
 }
 
 // Kolay moddaki 4 basit filtre (temel + teknik) + Tümü
