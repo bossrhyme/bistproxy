@@ -133,7 +133,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
 <link rel="stylesheet" href="/deepfin.css?v=warm14">
-<script src="/deepfin.js?v=162" defer></script>
+<script src="/deepfin.js?v=163" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -291,7 +291,7 @@ if('serviceWorker' in navigator){
     <div class="hpx-section hpx-section-left">
       <div class="hpx-eye">Popüler Stratejiler</div>
       <div class="hpx-tabs">
-        <button class="hpx-tab on" onclick="hpStratTab(this,'goat')">GOAT Yatırımcıları</button>
+        <button class="hpx-tab on" onclick="hpStratTab(this,'goat')">Yatırımcı Lensleri</button>
         <button class="hpx-tab" onclick="hpStratTab(this,'fund')">Temel Analiz</button>
         <button class="hpx-tab" onclick="hpStratTab(this,'tech')">Teknik Analiz</button>
       </div>
@@ -350,7 +350,7 @@ if('serviceWorker' in navigator){
           <div class="footer-col">
             <div class="footer-col-title">Platform</div>
             <a class="footer-link" onclick="showScreener();openInfo()">Bilgi Bankası</a>
-            <a class="footer-link" onclick="showScreener();openInfo()">GOAT Stratejileri</a>
+            <a class="footer-link" onclick="showScreener();openInfo()">Yatırımcı Lensleri</a>
             <a class="footer-link" onclick="showScreener();openInfo()">Terimler Sözlüğü</a>
             <a class="footer-link" onclick="showScreener();openInfo()">Filtre Presetleri</a>
             <a class="footer-link" onclick="showFooterModal('teknikanaliz')">Teknik Analiz Presetleri</a>
@@ -632,7 +632,7 @@ if('serviceWorker' in navigator){
         </div>
         
         <div class="filter-group">
-          <div class="filter-group-title">🐐 GOAT Yatırımcı ve Traderlar</div>
+          <div class="filter-group-title">Yatırımcı Lensleri</div>
           <div class="chips" id="goat-chips">
             <div class="chip goat-chip" data-goat="ackman">Ackman</div>
             <div class="chip goat-chip" data-goat="ark">ARK/Wood</div>
@@ -869,7 +869,7 @@ if('serviceWorker' in navigator){
           </div>
         </div>
         <div class="filter-group">
-          <div class="filter-group-title">🐐 GOAT Yatırımcı ve Traderlar</div>
+          <div class="filter-group-title">Yatırımcı Lensleri</div>
           <div class="chips" id="adv-goat-chips">
             <div class="chip goat-chip" data-goat="ackman">Ackman</div>
             <div class="chip goat-chip" data-goat="ark">ARK/Wood</div>
@@ -1220,7 +1220,7 @@ if('serviceWorker' in navigator){
       <div id="kolay-wrap" style="display:none;">
         <div class="kolay-head">
           <div>
-            <div class="kolay-title">Tüm Hisseler</div>
+            <div class="kolay-title" id="kolay-title">Tüm Hisseler</div>
             <div class="kolay-sub" id="kolay-sub">—</div>
           </div>
           <a class="kolay-pro-link" onclick="chooseScanMode('pro')">Gelişmiş filtreler →</a>
@@ -1363,7 +1363,7 @@ if('serviceWorker' in navigator){
       <div class="ib-panel active" id="asset-panel-hisse">
 
         <div class="ib-section">
-          <div class="ib-sec-hdr">🐐 GOAT Stratejiler</div>
+          <div class="ib-sec-hdr">Yatırımcı Lensleri</div>
           <div class="ib-intro">Dünyaca tanınan yatırımcıların formüle ettiği stratejiler. Bir chip seçerek o yatırımcının gözüyle piyasayı tarayabilirsiniz.</div>
 
           

@@ -3457,6 +3457,13 @@ function renderKolay() {
   var curr = exMeta.currency || '';
   var sub = document.getElementById('kolay-sub');
   if (sub) sub.textContent = (exMeta.name || ex.toUpperCase()) + ' · ' + data.length + ' hisse';
+  // Başlık: seçili filtre adı (Tümü ise "Tüm Hisseler")
+  var titleEl = document.getElementById('kolay-title');
+  if (titleEl) {
+    var _kf = (_kolayFilterKey && _kolayFilterKey !== 'all')
+      ? KOLAY_FILTERS.find(function(f){ return f.key === _kolayFilterKey; }) : null;
+    titleEl.textContent = _kf ? _kf.name : 'Tüm Hisseler';
+  }
   var f = (typeof _usdToLocalFactor === 'function') ? _usdToLocalFactor(ex) : null;
   function mcapStr(v) {
     if (!v) return '—';
@@ -3538,9 +3545,9 @@ var KOLAY_FILTERS = [
   { key: 'dividend', name: 'Temettü Odaklı' },
   { key: 'momentum', name: 'Momentum Odaklı' },
   { key: 'nearHigh', name: 'Zirveye Yakın' },
-  { key: 'buffett',  name: 'Buffett' },
-  { key: 'graham',   name: 'Graham' },
-  { key: 'lynch',    name: 'Lynch' },
+  { key: 'buffett',  name: 'Buffett Lensi' },
+  { key: 'graham',   name: 'Graham Lensi' },
+  { key: 'lynch',    name: 'Lynch Lensi' },
 ];
 var _KOLAY_FILT_VIS = 3; // (eski) — artık tüm filtreler gösteriliyor
 
