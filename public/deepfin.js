@@ -5750,9 +5750,10 @@ document.addEventListener('DOMContentLoaded', function(){
       else if (typeof TECH_PRESETS !== 'undefined' && TECH_PRESETS[_strat] && typeof applyTechAndGo === 'function') applyTechAndGo(_strat);
     }, 200);
   }
-  var total = document.querySelectorAll('[data-goat],[data-preset],[data-tech]').length;
+  // Filtre & Strateji toplamı = tüm strateji/lens chip'leri + 34 filtre kriteri
+  var total = document.querySelectorAll('[data-goat],[data-preset],[data-tech]').length + 34;
   var el = document.querySelector('[data-strat-count]');
-  if(el) el.innerHTML = total + ' <span>strateji</span>';
+  if(el) el.textContent = total + '+';
   upgradeGoatChips();
 });
 
