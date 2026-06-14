@@ -868,6 +868,17 @@ const EXCHANGE_META = {
   uae:         { name: 'DFM',             currency: 'د.إ',  currencyCode: 'AED', flag: '🇦🇪', symSuffix: '.DU', exCode: 'DFM',        filters: [] },
 };
 
+// Borsa → ülke (etiketlerde tutarlı ülke bazlı isimlendirme için tek kaynak)
+const EXCHANGE_COUNTRY = {
+  bist:'Türkiye', nasdaq:'ABD', sp500:'ABD', dax:'Almanya', lse:'İngiltere',
+  nikkei:'Japonya', nyse:'ABD', krx:'Güney Kore', moex:'Rusya', france:'Fransa',
+  amsterdam:'Hollanda', brussels:'Belçika', lisbon:'Portekiz', dublin:'İrlanda',
+  oslo:'Norveç', milan:'İtalya', tsx:'Kanada', twse:'Tayvan', b3:'Brezilya',
+  hkex:'Hong Kong', china:'Çin', saudi:'Suudi Arabistan', switzerland:'İsviçre',
+  australia:'Avustralya', southafrica:'Güney Afrika', sweden:'İsveç',
+  india:'Hindistan', uae:'BAE'
+};
+
 // Borsa açıklamaları — chip hover tooltipleri
 const EXCHANGE_TIPS = {
   bist:        'Borsa İstanbul, Türkiye',
@@ -2292,8 +2303,9 @@ function initPrescanView() {
       ? '<img class="psv-ex-flag-img" src="https://flagcdn.com/w40/'+iso+'.png" alt="'+iso+'" loading="lazy">'
       : '<span class="psv-ex-flag">'+m.flag+'</span>';
     var tip = EXCHANGE_TIPS[key] || '';
+    var country = EXCHANGE_COUNTRY[key] ? '<span class="psv-ex-country">'+EXCHANGE_COUNTRY[key]+'</span>' : '';
     return '<button class="psv-ex-btn" data-exchange="'+key+'"'+(tip ? ' data-tip="'+tip+'"' : '')+' onclick="psvSetExchange(\''+key+'\')">' +
-      flagHtml + '<span class="psv-ex-name">'+m.name+'</span></button>';
+      flagHtml + '<span class="psv-ex-name">'+m.name+'</span>'+country+'</button>';
   }
 
   function mkGoatCard(key) {
@@ -3677,7 +3689,8 @@ function renderKolaySide() {
     var m = EXCHANGE_META[key]; if (!m) return '';
     var iso = (typeof _isoFromFlag === 'function') ? _isoFromFlag(m.flag) : '';
     var flag = iso ? '<img class="ks-flag" src="https://flagcdn.com/w20/' + iso + '.png" alt="" loading="lazy">' : '<span class="ks-flag-e">' + m.flag + '</span>';
-    return '<button class="ks-ex' + (currentExchange === key ? ' on' : '') + '" onclick="kolaySelectExchange(\'' + key + '\')">' + flag + '<span class="ks-ex-name">' + m.name + '</span></button>';
+    var country = EXCHANGE_COUNTRY[key] ? '<span class="ks-ex-country">' + EXCHANGE_COUNTRY[key] + '</span>' : '';
+    return '<button class="ks-ex' + (currentExchange === key ? ' on' : '') + '" onclick="kolaySelectExchange(\'' + key + '\')">' + flag + '<span class="ks-ex-name">' + m.name + '</span>' + country + '</button>';
   }
   list.innerHTML = main.map(exItem).join('') +
     '<div class="ks-ex-extra" id="kolay-ex-extra"' + (_kolayExpanded ? '' : ' style="display:none"') + '>' + extra.map(exItem).join('') + '</div>';

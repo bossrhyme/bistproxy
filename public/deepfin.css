@@ -502,6 +502,8 @@ td:nth-child(2){font-family:var(--ff);}
 .psv-ex-flag-img{width:36px;height:auto;border-radius:3px;display:block;}
 .psv-ex-name{font-size:10px;font-weight:600;color:var(--text2);white-space:nowrap;}
 .psv-ex-btn.on .psv-ex-name{color:var(--accent);}
+.psv-ex-country{font-size:9px;font-weight:500;color:var(--muted);white-space:nowrap;letter-spacing:.2px;}
+.psv-ex-btn.on .psv-ex-country{color:var(--blue2);}
 .psv-show-more{margin-top:8px;background:none;border:none;color:var(--accent);font-size:11px;font-weight:600;cursor:pointer;padding:4px 0;display:inline-flex;align-items:center;gap:4px;}
 .psv-show-more:hover{text-decoration:underline;}
 
@@ -1822,6 +1824,8 @@ kbd{font-family:var(--ff-mono);font-size:10px;color:var(--text);background:var(-
 .ks-ex:hover{background:var(--s3);}
 .ks-ex.on{background:var(--accent2);}
 .ks-ex.on .ks-ex-name{color:var(--accent);font-weight:600;}
+.ks-ex-country{font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap;}
+.ks-ex.on .ks-ex-country{color:var(--blue2);}
 .ks-flag{width:20px;height:14px;border-radius:2px;object-fit:cover;flex-shrink:0;}
 .ks-flag-e{font-size:15px;flex-shrink:0;line-height:1;}
 .ks-ex-name{font-size:13px;color:var(--text);}
