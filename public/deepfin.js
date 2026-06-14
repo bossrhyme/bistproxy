@@ -5925,12 +5925,14 @@ function toggleSidebar() {
 
 function initSidebarState() {
   if (window.innerWidth <= 768) { closeMobileDrawer(); return; }
+  // Varsayılan: sol filtre paneli GİZLİ (collapsed) — sonuçlara tam alan.
+  // #sb-reopen sekmesiyle istendiğinde açılır (borsa/sektör/lens erişimi korunur).
   var sb         = document.getElementById('sidebar');
   var reopen     = document.getElementById('sb-reopen');
   var tickerWrap = document.getElementById('ticker-wrap');
-  if (sb)         sb.classList.remove('collapsed');
-  if (reopen)     reopen.style.display = 'none';
-  if (tickerWrap) tickerWrap.classList.remove('sb-open');
+  if (sb)         sb.classList.add('collapsed');
+  if (reopen)     reopen.style.display = 'flex';
+  if (tickerWrap) tickerWrap.classList.add('sb-open');
 }
 function collapseSidebar(instant) {
   if (window.innerWidth <= 768) return;
