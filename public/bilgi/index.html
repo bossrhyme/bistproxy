@@ -54,6 +54,10 @@ body{overflow-y:auto;}
 .bk-eng{font-size:11px;font-weight:400;color:var(--muted);}
 .bk-item-desc{font-size:12.5px;color:var(--text2);line-height:1.6;margin-top:7px;}
 .bk-item-crit{font-size:11.5px;color:var(--gold);margin-top:8px;font-weight:500;}
+.bk-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:11px;}
+.bk-tag{font-size:10.5px;font-weight:500;color:var(--text2);background:var(--s2);border:1px solid var(--border);border-radius:5px;padding:2px 7px;white-space:nowrap;font-variant-numeric:tabular-nums;}
+.bk-grp{font-size:12.5px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin:28px 0 14px;}
+.bk-content > .bk-sec-intro + .bk-grp{margin-top:6px;}
 .bk-sec-intro{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:20px;max-width:640px;}
 
 /* Makale okuyucu */
@@ -127,7 +131,7 @@ body{overflow-y:auto;}
   <p>Bu içerikler yalnızca eğitim ve bilgilendirme amaçlıdır; yatırım tavsiyesi değildir. Sunulan strateji ve kriterler kamuya açık kaynaklara dayanır ve özgün yorumlar içerir. Geçmiş performans gelecekteki sonuçların garantisi değildir.</p>
 </div>
 
-<script src="/bilgi/bilgi.js?v=1"></script>
+<script src="/bilgi/bilgi.js?v=2"></script>
 <script>
 function bkToggleTheme(){
   var dark = document.documentElement.getAttribute('data-theme') !== 'dark';
