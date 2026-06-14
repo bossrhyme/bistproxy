@@ -1889,21 +1889,21 @@ async function runScan(){
 // ═══════════════════════════════════════════
 const PRESETS = {
   // Klasik değer yatırımı: F/K<15, PD/DD<2, temettü ödeyen
-  value:    { label: 'Değer Hisseleri',    desc: 'Kazancına göre ucuz, defter değerine yakın fiyatlı ve temettü ödeyen şirketleri bulur. F/K 15 altı, PD/DD 2 altı, temettü %2 üzeri.', filters: {pe_max:15, pb_max:2, div_min:2} },
+  value:    { label: 'Değer Odaklı',    desc: 'Kazancına göre ucuz, defter değerine yakın fiyatlı ve temettü ödeyen şirketleri bulur. F/K 15 altı, PD/DD 2 altı, temettü %2 üzeri.', filters: {pe_max:15, pb_max:2, div_min:2} },
   // Büyüme: kazanç+gelir ivmesi, güçlü özkaynak getirisi
-  growth:   { label: 'Büyüme Hisseleri',   desc: 'Satışları ve karları hızla büyüyen, özkaynağını verimli kullanan şirketleri bulur. Kazanç büyümesi %20, gelir büyümesi %15, ROE %15 üzeri.', filters: {earng_min:20, revg_min:15, roe_min:15} },
+  growth:   { label: 'Büyüme Odaklı',   desc: 'Satışları ve karları hızla büyüyen, özkaynağını verimli kullanan şirketleri bulur. Kazanç büyümesi %20, gelir büyümesi %15, ROE %15 üzeri.', filters: {earng_min:20, revg_min:15, roe_min:15} },
   // Temettü: yüksek verim, sürdürülebilir ödeme kapasitesi
-  dividend: { label: 'Temettü Hisseleri',  desc: 'Yüksek ve sürdürülebilir temettü ödeyen, borcu makul şirketleri bulur. Temettü %4 üzeri, borç/özkaynak %80 altı, cari oran 1.2 üzeri.', filters: {div_min:4, de_max:80, cr_min:1.2} },
+  dividend: { label: 'Temettü Odaklı',  desc: 'Yüksek ve sürdürülebilir temettü ödeyen, borcu makul şirketleri bulur. Temettü %4 üzeri, borç/özkaynak %80 altı, cari oran 1.2 üzeri.', filters: {div_min:4, de_max:80, cr_min:1.2} },
   // Kalite: Buffett/Munger "wonderful company at fair price"
-  quality:  { label: 'Kaliteli Şirketler', desc: 'Yüksek karlılık ve düşük borçla her koşulda ayakta kalan şirketleri bulur. ROE %20, net marj %15, brüt marj %35 üzeri.', filters: {roe_min:20, margin_min:15, gross_min:35, de_max:80, cr_min:1.5} },
+  quality:  { label: 'Kalite Odaklı', desc: 'Yüksek karlılık ve düşük borçla her koşulda ayakta kalan şirketleri bulur. ROE %20, net marj %15, brüt marj %35 üzeri.', filters: {roe_min:20, margin_min:15, gross_min:35, de_max:80, cr_min:1.5} },
   // Az borçlu: Buffett "borçsuz şirket" prensibi
-  lowdebt:  { label: 'Az Borçlu Şirketler', desc: 'Borcu çok düşük, nakdi güçlü, krize dayanıklı şirketleri bulur. Borç/özkaynak %30 altı, cari oran 2 üzeri.', filters: {de_max:30, cr_min:2} },
+  lowdebt:  { label: 'Düşük Borç Odaklı', desc: 'Borcu çok düşük, nakdi güçlü, krize dayanıklı şirketleri bulur. Borç/özkaynak %30 altı, cari oran 2 üzeri.', filters: {de_max:30, cr_min:2} },
   // Momentum: güçlü ivme, hem büyüme hem fiyat güç
-  momentum: { label: 'Momentum Hisseleri', desc: 'Satış ve kar büyümesi aynı anda ivmelenen şirketleri bulur. Her ikisi de %20 üzeri.', filters: {revg_min:20, earng_min:20} },
+  momentum: { label: 'Momentum Odaklı', desc: 'Satış ve kar büyümesi aynı anda ivmelenen şirketleri bulur. Her ikisi de %20 üzeri.', filters: {revg_min:20, earng_min:20} },
   // Boyut: kurumların radarına girmemiş küçük ama karlı şirketler
-  smallcap: { label: 'Küçük Şirketler',   desc: 'Kurumların radarına girmemiş küçük ama karlı şirketleri bulur. Piyasa değeri 500M dolar altı, ROE %15 ve kazanç büyümesi %15 üzeri.', filters: {mc_max:500, roe_min:15, earng_min:15} },
+  smallcap: { label: 'Küçük Ölçek',   desc: 'Kurumların radarına girmemiş küçük ama karlı şirketleri bulur. Piyasa değeri 500M dolar altı, ROE %15 ve kazanç büyümesi %15 üzeri.', filters: {mc_max:500, roe_min:15, earng_min:15} },
   // Boyut: oturmuş, güvenilir devler
-  megacap:  { label: 'Dev Şirketler',     desc: 'Oturmuş, güvenilir büyük şirketleri bulur. Piyasa değeri 10 milyar dolar üzeri, ROE %12 üzeri ve temettü ödeyen.', filters: {mc_min:10000, roe_min:12, div_min:1} }
+  megacap:  { label: 'Büyük Ölçek',     desc: 'Oturmuş, güvenilir büyük şirketleri bulur. Piyasa değeri 10 milyar dolar üzeri, ROE %12 üzeri ve temettü ödeyen.', filters: {mc_min:10000, roe_min:12, div_min:1} }
 };
 
 // Teknik Analiz Presetleri
@@ -1944,13 +1944,13 @@ const TECH_PRESETS = {
   },
 
   highVolume: {
-    label: 'Akıllı Para',
+    label: 'Yüksek Hacim',
     desc: 'Normalinin en az 2 katı hacimle yükselen hisseleri bulur. Göreli hacim artışı kurumsal ilginin en güvenilir işaretidir.',
     filters: { rel_vol_min: 2, chg_min: 0 }
   },
 
   techBuy: {
-    label: 'Güçlü Sinyal',
+    label: 'Teknik Alım',
     desc: '26 teknik göstergenin çoğunluğunun alım sinyali verdiği hisseleri bulur. Teknik skor 0.5 üzeri.',
     filters: { tech_rating_min: 0.5 }
   },
@@ -1968,7 +1968,7 @@ const TECH_PRESETS = {
   },
 
   rsiBounce: {
-    label: 'Toparlanıyor',
+    label: 'Dip Tepkisi',
     desc: 'Aşırı satıştan çıkıp toparlanmanın erken aşamasında olan hisseleri bulur. RSI 30-50 arası, dipten %3 üzeri.',
     filters: { rsi_min: 30, rsi_max: 50, from_low_min: 3 }
   },
@@ -1988,7 +1988,7 @@ const TECH_PRESETS = {
   },
 
   adxTrend: {
-    label: 'Güçlü Trend',
+    label: 'Belirgin Trend',
     desc: 'Gücü ölçülebilir, alıcı yönü baskın trendleri bulur. ADX 25 üzeri, +DI eksi DI üzerinde.',
     filters: { adx_min: 25, adx_di_diff_min: 0 }
   },
@@ -3530,14 +3530,14 @@ var _kolayAssetExpanded = false;   // varlık listesi genişletme
 
 // Kolay filtreler (temel + teknik + goat) — basit isimlerle
 var KOLAY_FILTERS = [
-  { key: 'value',    name: 'Ucuz' },
-  { key: 'quality',  name: 'Kaliteli' },
-  { key: 'breakout', name: 'Yükselişte' },
-  { key: 'oversold', name: 'Aşırı Satılmış' },
-  { key: 'growth',   name: 'Büyüyen' },
-  { key: 'dividend', name: 'Temettü' },
-  { key: 'momentum', name: 'Momentum' },
-  { key: 'nearHigh', name: '52H Zirve' },
+  { key: 'value',    name: 'Değer Odaklı' },
+  { key: 'quality',  name: 'Kalite Odaklı' },
+  { key: 'breakout', name: 'Yükseliş Eğilimi' },
+  { key: 'oversold', name: 'Geri Çekilmiş' },
+  { key: 'growth',   name: 'Büyüme Odaklı' },
+  { key: 'dividend', name: 'Temettü Odaklı' },
+  { key: 'momentum', name: 'Momentum Odaklı' },
+  { key: 'nearHigh', name: 'Zirveye Yakın' },
   { key: 'buffett',  name: 'Buffett' },
   { key: 'graham',   name: 'Graham' },
   { key: 'lynch',    name: 'Lynch' },
@@ -4639,7 +4639,7 @@ function showFooterModal(type) {
   </div>
 
   <div class="fbk-card">
-    <div class="fbk-card-header"><span class="fbk-chip">Güçlü Trendde</span><span class="fbk-tag">Minervini Template</span></div>
+    <div class="fbk-card-header"><span class="fbk-chip">Belirgin Trend</span><span class="fbk-tag">Minervini Template</span></div>
     <p>52 hafta düşüğünden %25+ yukarıda, 6 aylık getiri pozitif. Minervini'nin "Trend Template" kriterinin basitleştirilmiş versiyonu — sadece yapısal olarak güçlü hisseler taranır.</p>
     <div class="fbk-filters">52H düşüğünden %25+ · 6 ay getiri &gt; %10</div>
   </div>

@@ -133,7 +133,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
 <link rel="stylesheet" href="/deepfin.css?v=warm14">
-<script src="/deepfin.js?v=161" defer></script>
+<script src="/deepfin.js?v=162" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -316,11 +316,11 @@ if('serviceWorker' in navigator){
           <div class="hpx-spill" onclick="applyTechAndGo('nearHigh')"><div class="hpx-spill-name">ATH Yakın</div><div class="hpx-spill-tag">52H zirve</div></div>
           <div class="hpx-spill" onclick="applyTechAndGo('pullback')"><div class="hpx-spill-name">Düzeltme</div><div class="hpx-spill-tag">Sağlıklı geri çekilme</div></div>
           <div class="hpx-spill" onclick="applyTechAndGo('strongDay')"><div class="hpx-spill-name">Günlük Hareket</div><div class="hpx-spill-tag">Günlük %2+</div></div>
-          <div class="hpx-spill" onclick="applyTechAndGo('highVolume')"><div class="hpx-spill-name">Akıllı Para</div><div class="hpx-spill-tag">Yüksek hacim</div></div>
-          <div class="hpx-spill" onclick="applyTechAndGo('techBuy')"><div class="hpx-spill-name">Güçlü Sinyal</div><div class="hpx-spill-tag">Teknik skor</div></div>
+          <div class="hpx-spill" onclick="applyTechAndGo('highVolume')"><div class="hpx-spill-name">Yüksek Hacim</div><div class="hpx-spill-tag">Yüksek hacim</div></div>
+          <div class="hpx-spill" onclick="applyTechAndGo('techBuy')"><div class="hpx-spill-name">Teknik Alım</div><div class="hpx-spill-tag">Teknik skor</div></div>
           <div class="hpx-spill" onclick="applyTechAndGo('momentum3m')"><div class="hpx-spill-name">3A Momentum</div><div class="hpx-spill-tag">Orta vadeli ivme</div></div>
           <div class="hpx-spill" onclick="applyTechAndGo('trendFollow')"><div class="hpx-spill-name">Trend Takibi</div><div class="hpx-spill-tag">Güçlü trend</div></div>
-          <div class="hpx-spill" onclick="applyTechAndGo('rsiBounce')"><div class="hpx-spill-name">Toparlanıyor</div><div class="hpx-spill-tag">RSI dönüşü</div></div>
+          <div class="hpx-spill" onclick="applyTechAndGo('rsiBounce')"><div class="hpx-spill-name">Dip Tepkisi</div><div class="hpx-spill-tag">RSI dönüşü</div></div>
       </div>
     </div>
 
@@ -669,11 +669,11 @@ if('serviceWorker' in navigator){
             <div class="chip" data-preset="lowdebt">Az Borç</div>
             <div class="chip" data-preset="growth">Büyüme</div>
             <div class="chip" data-preset="value">Değer</div>
-            <div class="chip" data-preset="quality">Kaliteli</div>
+            <div class="chip" data-preset="quality">Kalite</div>
             <div class="chip" data-preset="momentum">Momentum</div>
             <div class="chip" data-preset="dividend">Temettü</div>
-            <div class="chip" data-preset="smallcap">Küçük Şirketler</div>
-            <div class="chip" data-preset="megacap">Dev Şirketler</div>
+            <div class="chip" data-preset="smallcap">Küçük Ölçek</div>
+            <div class="chip" data-preset="megacap">Büyük Ölçek</div>
           </div>
           <div class="goat-info" id="preset-info"></div>
           <div class="filter-group-title" style="margin-top:10px;">📈 Hazır Teknik Analiz</div>
@@ -683,14 +683,14 @@ if('serviceWorker' in navigator){
             <div class="chip tech-chip" data-tech="nearHigh">52H Zirve</div>
             <div class="chip tech-chip" data-tech="pullback">Düzeltme</div>
             <div class="chip tech-chip" data-tech="strongDay">Günlük Hareket</div>
-            <div class="chip tech-chip" data-tech="highVolume">Akıllı Para</div>
-            <div class="chip tech-chip" data-tech="techBuy">Güçlü Sinyal</div>
+            <div class="chip tech-chip" data-tech="highVolume">Yüksek Hacim</div>
+            <div class="chip tech-chip" data-tech="techBuy">Teknik Alım</div>
             <div class="chip tech-chip" data-tech="momentum3m">3A Momentum</div>
             <div class="chip tech-chip" data-tech="trendFollow">Trend Takibi</div>
-            <div class="chip tech-chip" data-tech="rsiBounce">Toparlanıyor</div>
+            <div class="chip tech-chip" data-tech="rsiBounce">Dip Tepkisi</div>
             <div class="chip tech-chip" data-tech="goldenCross">Golden Cross</div>
             <div class="chip tech-chip" data-tech="macdReversal">MACD Dönüşü</div>
-            <div class="chip tech-chip" data-tech="adxTrend">Güçlü Trend</div>
+            <div class="chip tech-chip" data-tech="adxTrend">Belirgin Trend</div>
             <div class="chip tech-chip" data-tech="bbBounce">Bollinger Dibi</div>
             <div class="chip tech-chip" data-tech="stochReversal">Stokastik Dönüş</div>
             <div class="chip tech-chip" data-tech="maConfirm">Ortalama Onayı</div>
@@ -905,11 +905,11 @@ if('serviceWorker' in navigator){
             <div class="chip" data-preset="lowdebt">Az Borç</div>
             <div class="chip" data-preset="growth">Büyüme</div>
             <div class="chip" data-preset="value">Değer</div>
-            <div class="chip" data-preset="quality">Kaliteli</div>
+            <div class="chip" data-preset="quality">Kalite</div>
             <div class="chip" data-preset="momentum">Momentum</div>
             <div class="chip" data-preset="dividend">Temettü</div>
-            <div class="chip" data-preset="smallcap">Küçük Şirketler</div>
-            <div class="chip" data-preset="megacap">Dev Şirketler</div>
+            <div class="chip" data-preset="smallcap">Küçük Ölçek</div>
+            <div class="chip" data-preset="megacap">Büyük Ölçek</div>
           </div>
           <div class="goat-info" id="preset-info-adv"></div>
           <div class="filter-group-title" style="margin-top:10px;">📈 Hazır Teknik Analiz</div>
@@ -919,14 +919,14 @@ if('serviceWorker' in navigator){
             <div class="chip tech-chip" data-tech="nearHigh">52H Zirve</div>
             <div class="chip tech-chip" data-tech="pullback">Düzeltme</div>
             <div class="chip tech-chip" data-tech="strongDay">Günlük Hareket</div>
-            <div class="chip tech-chip" data-tech="highVolume">Akıllı Para</div>
-            <div class="chip tech-chip" data-tech="techBuy">Güçlü Sinyal</div>
+            <div class="chip tech-chip" data-tech="highVolume">Yüksek Hacim</div>
+            <div class="chip tech-chip" data-tech="techBuy">Teknik Alım</div>
             <div class="chip tech-chip" data-tech="momentum3m">3A Momentum</div>
             <div class="chip tech-chip" data-tech="trendFollow">Trend Takibi</div>
-            <div class="chip tech-chip" data-tech="rsiBounce">Toparlanıyor</div>
+            <div class="chip tech-chip" data-tech="rsiBounce">Dip Tepkisi</div>
             <div class="chip tech-chip" data-tech="goldenCross">Golden Cross</div>
             <div class="chip tech-chip" data-tech="macdReversal">MACD Dönüşü</div>
-            <div class="chip tech-chip" data-tech="adxTrend">Güçlü Trend</div>
+            <div class="chip tech-chip" data-tech="adxTrend">Belirgin Trend</div>
             <div class="chip tech-chip" data-tech="bbBounce">Bollinger Dibi</div>
             <div class="chip tech-chip" data-tech="stochReversal">Stokastik Dönüş</div>
             <div class="chip tech-chip" data-tech="maConfirm">Ortalama Onayı</div>
@@ -1474,37 +1474,37 @@ if('serviceWorker' in navigator){
           
           <div class="ib-items-grid">
 <div class="ib-item">
-            <div class="ib-name">Az Borçlu Şirketler</div>
+            <div class="ib-name">Düşük Borç Odaklı</div>
             <div class="ib-desc">Borcu çok az ya da hiç olmayan şirketler. Ekonomi kötüye gidince borçlu şirketler sıkışır, borçsuzlar ayakta kalır. Güvenli liman arıyorsan başlangıç noktası.</div>
             <div class="ib-crit">B/Ö &lt;%30 · Cari &gt;2</div>
           </div>
 
           <div class="ib-item">
-            <div class="ib-name">Büyüme Hisseleri</div>
+            <div class="ib-name">Büyüme Odaklı</div>
             <div class="ib-desc">Her yıl hem satışları hem karı hızla artan şirketler. Bugün küçük ama yarın çok daha büyük olabilir. Uzun vadeli yatırım için güçlü bir başlangıç noktası.</div>
             <div class="ib-crit">Kazanç büyümesi &gt;%20 · Gelir büyümesi &gt;%15 · ROE &gt;%15</div>
           </div>
 
           <div class="ib-item">
-            <div class="ib-name">Değer Hisseleri</div>
+            <div class="ib-name">Değer Odaklı</div>
             <div class="ib-desc">Piyasanın fark etmediği, gerçek değerinin altında fiyatlanmış şirketler. Ucuz hisse arıyorsan başlangıç noktası bu. Fiyat/Kazanç oranı düşük, temettü ödüyor olması istenir.</div>
             <div class="ib-crit">F/K &lt;15 · PD/DD &lt;2 · Temettü &gt;%2</div>
           </div>
 
           <div class="ib-item">
-            <div class="ib-name">Kaliteli Şirketler</div>
+            <div class="ib-name">Kalite Odaklı</div>
             <div class="ib-desc">Her açıdan sağlam şirketler. Karlılığı yüksek, borcu az, nakit durumu güçlü. Piyasa düşse bile ayakta kalan, uzun vadede değer biriktiren şirket profili.</div>
             <div class="ib-crit">ROE &gt;%20 · Net marj &gt;%15 · Brüt marj &gt;%35 · B/Ö &lt;80 · Cari &gt;1.5</div>
           </div>
 
           <div class="ib-item">
-            <div class="ib-name">Momentum Hisseleri</div>
+            <div class="ib-name">Momentum Odaklı</div>
             <div class="ib-desc">Hem satışları hem de karı aynı anda hızla artan şirketler. Bu ikisi birlikte artıyorsa şirket gerçekten ivme kazanıyor demektir. Piyasa bunu fark edince hisse de yükselir.</div>
             <div class="ib-crit">Gelir büyümesi &gt;%20 · Kazanç büyümesi &gt;%20</div>
           </div>
 
           <div class="ib-item">
-            <div class="ib-name">Temettü Hisseleri</div>
+            <div class="ib-name">Temettü Odaklı</div>
             <div class="ib-desc">Düzenli olarak hissedarlara nakit ödeyen şirketler. Hisse fiyatı oynamasa bile yılda %4+ kazanırsın. Borcu makul, parası ödemeye yeter durumda olan şirketler taranır.</div>
             <div class="ib-crit">Temettü &gt;%4 · B/Ö &lt;%80 · Cari &gt;1.2</div>
           </div>
@@ -1519,7 +1519,7 @@ if('serviceWorker' in navigator){
 
           <div class="ib-items-grid">
 <div class="ib-item">
-            <div class="ib-name">Güçlü Sinyal</div>
+            <div class="ib-name">Teknik Alım</div>
             <div class="ib-desc">26 farklı teknik analiz aracının büyük çoğunluğu bu hisse için 'al' diyor. Tek bir göstergeye güvenmek yerine hepsini birden değerlendiren en kapsamlı teknik filtre.</div>
             <div class="ib-crit">Teknik Skor &gt;0.5</div>
           </div>
@@ -1555,13 +1555,13 @@ if('serviceWorker' in navigator){
           </div>
 
           <div class="ib-item">
-            <div class="ib-name">Akıllı Para</div>
+            <div class="ib-name">Yüksek Hacim</div>
             <div class="ib-desc">Normalden çok daha fazla alım-satım olan ve fiyatı yükselen hisseler. Bu kadar hacim genellikle büyük kurumların pozisyon açtığının işareti. Akıllı para nereye gidiyor diye bakıyorsan bu filtre.</div>
             <div class="ib-crit">Hacim &gt;5M lot · Günlük değişim &gt;0</div>
           </div>
 
           <div class="ib-item">
-            <div class="ib-name">Toparlanıyor</div>
+            <div class="ib-name">Dip Tepkisi</div>
             <div class="ib-desc">Aşırı satılmış bölgeden çıkmış ama henüz pahalıya girmemiş hisseler. Dibi geride bırakmış ama fiyatı hâlâ makul. Toparlanmanın erken aşamasını yakalamak için iyi bir bölge.</div>
             <div class="ib-crit">RSI 30–50 · 52H düşüğünden &gt;%3</div>
           </div>
