@@ -4918,6 +4918,7 @@ function _doShowHomepage() {
   clearFilters();
   var _hb = document.getElementById('hamburger-btn'); if(_hb) _hb.style.display = 'none';
   if(window.location.pathname !== '/') history.pushState({page:'home'}, '', '/');
+  if (typeof loadRecentScans === 'function') loadRecentScans();
 }
 
 // ── DISCLAIMER POPUP ──
@@ -5002,6 +5003,53 @@ function showScanSummary(total, matches) {
     durVal.textContent = elapsed + 's';
     durItem.style.display = '';
   }
+  _recordRecentScan(filters, total);
+}
+
+// Site-geneli "Son Taramalar"a kaydet — yalnızca deep-linklenebilir (kind+key'li)
+// birincil filtresi olan BORSA taramaları (Pro hisse tarayıcı ile yeniden açılabilir)
+function _recordRecentScan(filters, total) {
+  try {
+    var asset = (_activeAsset === 'kripto') ? 'kripto' : (_activeAsset === 'fon') ? 'fon' : 'borsa';
+    if (asset !== 'borsa') return;                 // şimdilik yalnız hisse taramaları
+    if (!total || total < 1) return;
+    var primary = (filters || []).find(function(f) { return f.kind && f.key; });
+    if (!primary) return;                          // filtresiz/özel filtre → deep-link yok
+    var exMeta = (typeof EXCHANGE_META !== 'undefined' ? EXCHANGE_META[currentExchange] : null) || {};
+    fetch('/api/recent-scans', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        kind: primary.kind, k: primary.key, label: primary.label,
+        asset: asset, ex: currentExchange,
+        exLabel: exMeta.name || (currentExchange || '').toUpperCase(),
+        count: total
+      })
+    }).catch(function() {});
+  } catch (e) {}
+}
+
+// Homepage "Son Taramalar" — site-geneli son taramaları çek, Kolay-stili kart olarak göster
+function loadRecentScans() {
+  var sec = document.getElementById('hpx-recent');
+  var grid = document.getElementById('hpx-recent-grid');
+  if (!sec || !grid) return;
+  fetch('/api/recent-scans').then(function(r) { return r.json(); }).then(function(d) {
+    var scans = (d && d.scans) || [];
+    if (!scans.length) { sec.style.display = 'none'; return; }
+    grid.innerHTML = scans.map(function(s) {
+      var assetLabel = s.asset === 'kripto' ? 'Kripto' : s.asset === 'fon' ? 'Fon' : 'Borsa';
+      var url = '/?strateji=' + encodeURIComponent(s.k) + (s.ex ? '&ex=' + encodeURIComponent(s.ex) : '');
+      var cnt = (parseInt(s.count, 10) || 0).toLocaleString('tr-TR');
+      return '<a class="hpx-rcard" href="' + url + '">' +
+        '<div class="hrc-name">' + esc(s.label) + '</div>' +
+        '<div class="hrc-meta"><span>' + esc(assetLabel) + '</span><span class="hrc-dot">·</span>' +
+          '<span class="hrc-ex">' + esc(s.exLabel || '') + '</span><span class="hrc-dot">·</span>' +
+          '<span class="hrc-count">' + cnt + '</span><span>tarandı</span></div>' +
+        '</a>';
+    }).join('');
+    sec.style.display = '';
+  }).catch(function() { sec.style.display = 'none'; });
 }
 
 // "Neden eşleşti": dokunmatik cihazda aktif-filtre etiketine dokununca lens
@@ -5756,6 +5804,7 @@ document.addEventListener('DOMContentLoaded', function(){
   _startIndicesTicker();
   _initWorker();
   _initKeyboardNav();
+  if (typeof loadRecentScans === 'function') loadRecentScans();
   _initDensity();
   _updateFavBadge();
   _updateOnboarding(null); // Varsayılan: genel onboarding
@@ -5830,10 +5879,20 @@ document.addEventListener('DOMContentLoaded', function(){
       }, 300);
     }
   }
-  // Bilgi Bankası "stratejiyi dene" derin bağlantısı: ?strateji=KEY
+  // Bilgi Bankası "stratejiyi dene" + Son Taramalar derin bağlantısı: ?strateji=KEY (&ex=BORSA)
   var _strat = _sp.get('strateji');
   if (_strat) {
+    var _stratEx = (_sp.get('ex') || '').toLowerCase();
     setTimeout(function(){
+      // İstenen borsayı seç (varsa) — runScan tetiklemeden doğrudan, strateji uygulanınca taranır
+      if (_stratEx) {
+        var exb = document.querySelector('.exbtn[data-exchange="' + _stratEx + '"]');
+        if (exb && !exb.classList.contains('on')) {
+          document.querySelectorAll('.exbtn').forEach(function(b){ b.classList.remove('on'); });
+          exb.classList.add('on');
+          currentExchange = _stratEx;
+        }
+      }
       if (typeof GURUS !== 'undefined' && GURUS[_strat] && typeof applyStrategyAndGo === 'function') applyStrategyAndGo(_strat);
       else if (typeof PRESETS !== 'undefined' && PRESETS[_strat] && typeof applyPresetAndGo === 'function') applyPresetAndGo(_strat);
       else if (typeof TECH_PRESETS !== 'undefined' && TECH_PRESETS[_strat] && typeof applyTechAndGo === 'function') applyTechAndGo(_strat);

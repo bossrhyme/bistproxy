@@ -132,8 +132,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=warm33">
-<script src="/deepfin.js?v=179" defer></script>
+<link rel="stylesheet" href="/deepfin.css?v=warm34">
+<script src="/deepfin.js?v=180" defer></script>
 <script src="/auth-header.js?v=2" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -286,19 +286,19 @@ if('serviceWorker' in navigator){
       </div>
     </div>
 
+    <!-- SON TARAMALAR (site-geneli) -->
+    <div class="hpx-section hpx-section-left" id="hpx-recent" style="display:none">
+      <div class="hpx-eye">Son Taramalar</div>
+      <div class="hpx-recent-sub">Sitede yapılan son taramalar — birine tıkla, aynı taramayı Pro'da çalıştır</div>
+      <div class="hpx-recent-grid" id="hpx-recent-grid"></div>
+    </div>
+
     <!-- YASAL UYARI -->
     <div class="hpx-disc">
       <p>DeepFin'de sunulan tüm veriler, filtreler ve stratejiler yalnızca <strong>bilgilendirme amaçlıdır</strong>. Bu platform herhangi bir finansal araç için <strong>alım, satım veya elde tutma tavsiyesi vermez</strong>; yatırım danışmanlığı hizmeti sunmaz. <strong>Geçmiş performans gelecekteki sonuçların garantisi değildir.</strong> Yatırım kararlarınızı almadan önce <em>lisanslı bir finansal danışmana</em> başvurmanızı tavsiye ederiz. Tüm yatırım işlemleri kullanıcının kendi sorumluluğundadır.</p>
       <p>DeepFin'de yer alan yatırımcı ve fon stratejileri — <strong>Buffett, Graham, Lynch, Klarman, Greenblatt</strong> ve diğerleri — ilgili kişi ve kurumlarla herhangi bir <strong>iş birliği, lisans veya resmi bağlantı olmaksızın</strong> yalnızca kamuya açık yayın, kitap ve akademik kaynaklara dayanılarak hazırlanmıştır. Sunulan filtreler özgün yorumlara ve hesaplama farklılıklarına tabidir; <strong>tam bir yansıma değildir.</strong></p>
     </div>
 
-    <!-- ADS BANNER -->
-    <div style="width:100%;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--s1);display:flex;align-items:center;justify-content:center;padding:16px 0;flex-shrink:0;">
-      <div style="position:relative;width:728px;height:90px;max-width:calc(100vw - 32px);min-height:90px;background:var(--s2);border:1px dashed var(--border2);border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-sizing:border-box;">
-        <span style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--s1);padding:0 8px;font-size:9px;font-weight:600;color:var(--muted2);letter-spacing:1px;text-transform:uppercase;white-space:nowrap;">REKLAM</span>
-        <span style="font-size:10px;color:var(--muted);pointer-events:none;user-select:none;">728 × 90 · Leaderboard</span>
-      </div>
-    </div>
 
     <!-- FOOTER -->
     <footer class="hp-footer">

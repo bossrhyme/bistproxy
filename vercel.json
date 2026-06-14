@@ -117,6 +117,10 @@
       "destination": "/api/scan.js"
     },
     {
+      "source": "/api/recent-scans",
+      "destination": "/api/recent-scans.js"
+    },
+    {
       "source": "/api/quote",
       "destination": "/api/quote.js"
     },
