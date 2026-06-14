@@ -4103,7 +4103,7 @@ function showState(id){
     el.style.display = s===id ? (s==='twrap'?'block':'flex') : 'none';
   });
   const smEl = document.getElementById('scan-summary');
-  if (smEl) smEl.style.display = id === 'twrap' ? 'grid' : 'none';
+  if (smEl) smEl.style.display = id === 'twrap' ? 'flex' : 'none';
   const nsbEl = document.getElementById('new-scan-btn');
   if (nsbEl) nsbEl.style.display = id === 'twrap' ? 'inline-flex' : 'none';
   const afwEl = document.getElementById('add-filter-wrap');
