@@ -1595,16 +1595,20 @@ tbody tr td { height: 36px; }
 
 /* ── Dark Mode explicit toggle — same as :root terminal ──────── */
 [data-theme="dark"]{
-  --bg:#0A0E14;--s1:#0F1520;--s2:#141C2A;--s3:#1A2335;
-  --border:#1C2940;--border2:#263850;
-  --green:#00C853;--green2:#00A844;--green-bg:rgba(0,200,83,.1);
-  --red:#FF4444;--red-bg:rgba(255,68,68,.08);
-  --gold:#FFB300;--teal:#00BCD4;
-  --text:#D8E8F8;--text2:#7090B0;--muted:#2E4060;--muted2:#4A6480;
-  --accent:#1E90FF;--accent2:rgba(30,144,255,.12);--hover:rgba(30,144,255,.07);
-  --shadow:0 1px 4px rgba(0,0,0,.5),0 1px 2px rgba(0,0,0,.4);
-  --shadow-md:0 4px 18px rgba(0,0,0,.55),0 2px 6px rgba(0,0,0,.4);
-  --shadow-lg:0 12px 44px rgba(0,0,0,.65),0 4px 16px rgba(0,0,0,.5);
+  /* Analiz sayfasıyla aynı nötr (GitHub-dark) tema */
+  --bg:#0d1117;--s1:#161b22;--s2:#1c2128;--s3:#21262d;
+  --border:#30363d;--border2:#484f58;
+  --green:#3fb950;--green2:#2ea043;--green-bg:rgba(63,185,80,.12);
+  --red:#f85149;--red-bg:rgba(248,81,73,.12);
+  --gold:#f0b429;--teal:#2dd4bf;
+  --text:#e6edf3;--text2:#8b949e;--muted:#6e7681;--muted2:#8b949e;
+  /* Accent: koyu nötr yüzeylerde metin olarak da okunabilir açık slate-mavi
+     (deepfin.css'te ~97 yerde metin rengi olarak kullanılıyor) */
+  --blue:#6e86ac;--blue2:#56708f;
+  --accent:#6e86ac;--accent2:rgba(110,134,172,.18);--hover:rgba(255,255,255,.04);
+  --shadow:0 1px 3px rgba(0,0,0,.4),0 1px 2px rgba(0,0,0,.3);
+  --shadow-md:0 4px 12px rgba(0,0,0,.5),0 2px 4px rgba(0,0,0,.4);
+  --shadow-lg:0 12px 44px rgba(0,0,0,.6),0 4px 16px rgba(0,0,0,.45);
 }
 
 /* Theme toggle button */

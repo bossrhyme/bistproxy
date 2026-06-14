@@ -1079,3 +1079,16 @@ html,body{height:100%;overflow:hidden;}
 /* Grid ve trend kartlarının köşe yarıçapını eşitle */
 .prf-mgrid{border-radius:10px;}
 #prf-trend-cards > div{border-radius:10px !important;}
+
+/* ── Birleşik header (anasayfa ile aynı: nokta logo + ortalı nav) ── */
+.topbar{position:relative;}
+.tleft{flex:1;display:flex;align-items:center;gap:10px;min-width:0;}
+.tnav{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:2px;}
+.tright{flex:1;display:flex;align-items:center;justify-content:flex-end;gap:5px;margin-left:0;}
+.tlogo{color:var(--gold)!important;font-weight:700;}
+.tlogo-mark{width:8px;height:8px;background:var(--gold);border-radius:50%;box-shadow:0 0 0 2px rgba(217,119,6,.18);flex-shrink:0;}
+.auth-btn{font-size:12px;padding:6px 14px;border-radius:7px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:500;white-space:nowrap;transition:all .12s;}
+.auth-ghost{background:transparent;color:var(--text);border:1px solid var(--border2);}
+.auth-ghost:hover{background:var(--hover);}
+.auth-primary{background:var(--accent);color:#fff;border:1px solid transparent;}
+.auth-primary:hover{background:var(--blue2);}

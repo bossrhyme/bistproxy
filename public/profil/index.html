@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"></noscript>
 <script>(function(){try{var t=localStorage.getItem('df_theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})()</script>
-<link rel="stylesheet" href="/deepfin.css?v=warm6">
+<link rel="stylesheet" href="/deepfin.css?v=warm23">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;}
@@ -353,22 +353,27 @@ body{overflow-y:auto;}
 </head>
 <body>
 <div class="topbar" style="position:sticky;top:0;z-index:10;">
-  <div class="tlogo"><div class="tlogo-mark">D</div>DeepFin</div>
-  <span class="tlive">Canlı</span>
-  <a href="/" class="hp-nav-btn">Anasayfa</a>
-  <a href="/" class="hp-nav-btn">Tarayıcı</a>
-  <a href="/analiz/" class="hp-nav-btn">Analiz</a>
+  <div class="tleft">
+    <a href="/" class="tlogo" style="text-decoration:none;cursor:pointer"><span class="tlogo-mark"></span>DeepFin</a>
+    <span class="tlive">Canlı</span>
+  </div>
+  <nav class="tnav">
+    <a href="/" class="hp-nav-btn">Anasayfa</a>
+    <a href="/" class="hp-nav-btn">Tarayıcı</a>
+    <a href="/analiz/" class="hp-nav-btn">Analiz</a>
+    <a href="/bilgi/" class="hp-nav-btn">Bilgi Bankası</a>
+    <a href="/profil" class="hp-nav-btn active">Profil</a>
+  </nav>
   <div class="tright">
     <button class="topbarbtn theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir" aria-label="Karanlık/Açık mod geçiş">☾</button>
     <div class="pf-topbar-btn-wrap">
-      <span class="topbarbtn infobtn pf-topbar-profile-btn" onclick="toggleProfileMenu(event)">👤<span class="prf-btn-lbl">Profil</span> ▾</span>
+      <span class="topbarbtn infobtn pf-topbar-profile-btn" onclick="toggleProfileMenu(event)">👤 ▾</span>
       <div id="pf-profile-menu">
         <button class="pf-menu-item" onclick="showSettingsView()">⚙️ Hesap Ayarları</button>
         <div class="pf-menu-sep"></div>
         <a href="/api/auth/logout" class="pf-menu-item danger" onclick="return confirm('Çıkış yapılsın mı?')">↪ Çıkış Yap</a>
       </div>
     </div>
-    <a href="/" class="topbarbtn infobtn">Bilgi Bankası</a>
     <button class="topbarbtn supportbtn" onclick="window.location.href='/'">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
       Destek Ol

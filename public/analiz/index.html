@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
 <script>(function(){try{var t=localStorage.getItem('df_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
-<link rel="stylesheet" href="/analiz/analiz.css?v=arctic71">
+<link rel="stylesheet" href="/analiz/analiz.css?v=arctic72">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -72,20 +72,21 @@ window.addEventListener('DOMContentLoaded', function(){
 <body>
 
 <div class="topbar">
-  <a href="/" class="tlogo" style="cursor:pointer;text-decoration:none;color:inherit;">
-    <div class="tlogo-mark">D</div>DeepFin
-  </a>
-  <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--green);"><span style="display:inline-block;width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s ease infinite;"></span>Canlı</span>
-
-  <a href="/" class="hp-nav-btn">Anasayfa</a>
-  <a href="/" class="hp-nav-btn">Tarayıcı</a>
-  <span class="hp-nav-btn active">Analiz</span>
+  <div class="tleft">
+    <a href="/" class="tlogo" style="cursor:pointer;text-decoration:none;"><span class="tlogo-mark"></span>DeepFin</a>
+    <span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--green);"><span style="display:inline-block;width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s ease infinite;"></span>Canlı</span>
+  </div>
+  <nav class="tnav">
+    <a href="/" class="hp-nav-btn">Anasayfa</a>
+    <a href="/" class="hp-nav-btn">Tarayıcı</a>
+    <a href="/analiz/" class="hp-nav-btn active">Analiz</a>
+    <a href="/bilgi/" class="hp-nav-btn">Bilgi Bankası</a>
+    <a href="/profil" class="hp-nav-btn">Profil</a>
+  </nav>
   <div class="tright">
     <button class="topbarbtn theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir" aria-label="Karanlık/Açık mod geçiş">☾</button>
-    <a href="/profil" id="profile-btn" class="topbarbtn infobtn profile-topbtn" title="Profilim">
-      <span id="profile-btn-inner">👤</span><span class="prf-btn-lbl">Profil</span>
-    </a>
-    <button class="topbarbtn infobtn" onclick="openInfo()">Bilgi Bankası</button>
+    <button class="auth-btn auth-ghost" onclick="location.href='/profil'">Giriş Yap</button>
+    <button class="auth-btn auth-primary" onclick="location.href='/profil'">Kayıt Ol</button>
     <button class="topbarbtn supportbtn" onclick="openSupport()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
       Destek Ol
