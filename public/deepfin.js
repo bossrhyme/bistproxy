@@ -3606,15 +3606,32 @@ function renderKolayFilters() {
     _ktip.style.opacity = '1';
   }
   function _hide() { if (_ktip) { _ktip.style.opacity = '0'; _ktip.style.display = 'none'; } }
+  var _TIP_SEL = '.kfil[data-tip], .hpx-spill[data-tip]';
   document.addEventListener('mouseover', function(e) {
-    var el = e.target.closest && e.target.closest('.kfil[data-tip]');
+    var el = e.target.closest && e.target.closest(_TIP_SEL);
     if (el) _show(el);
   });
   document.addEventListener('mouseout', function(e) {
-    var el = e.target.closest && e.target.closest('.kfil[data-tip]');
+    var el = e.target.closest && e.target.closest(_TIP_SEL);
     if (el && !(e.relatedTarget && el.contains(e.relatedTarget))) _hide();
   });
 })();
+
+// Anasayfa strateji kartlarına bilgi balonu (data-tip) ekle — açıklamalar dict'lerden
+function _initHomeStratTips() {
+  document.querySelectorAll('#hpx-sg-goat .hpx-spill, #hpx-sg-fund .hpx-spill, #hpx-sg-tech .hpx-spill').forEach(function(el) {
+    if (el.hasAttribute('data-tip')) return;
+    var oc = el.getAttribute('onclick') || '';
+    var m = oc.match(/apply(Strategy|Preset|Tech)AndGo\('([^']+)'\)/);
+    if (!m) return;
+    var dict = m[1] === 'Strategy' ? (typeof GURUS !== 'undefined' && GURUS)
+             : m[1] === 'Preset'   ? (typeof PRESETS !== 'undefined' && PRESETS)
+             :                       (typeof TECH_PRESETS !== 'undefined' && TECH_PRESETS);
+    var d = dict && dict[m[2]];
+    if (d && d.desc) { el.setAttribute('data-tip', d.desc); el.setAttribute('data-tipname', d.label || ''); }
+  });
+}
+document.addEventListener('DOMContentLoaded', _initHomeStratTips);
 
 // Bir Kolay filtre anahtarı için chip + filtre inputlarını hazırlar.
 // Veriyi YENİDEN ÇEKMEZ — sadece state'i kurar ve özel (special) anahtarı döner.

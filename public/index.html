@@ -132,8 +132,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=warm18">
-<script src="/deepfin.js?v=166" defer></script>
+<link rel="stylesheet" href="/deepfin.css?v=warm20">
+<script src="/deepfin.js?v=167" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -168,27 +168,33 @@ if('serviceWorker' in navigator){
 <!-- ─── MAIN APP ─── -->
 <div id="app" class="on">
   <div class="topbar">
-    <div class="tlogo" onclick="showHomepage()" style="cursor:pointer"><div class="tlogo-mark">D</div>DeepFin</div>
-    <span class="tlive">Canlı</span>
+    <div class="tleft">
+      <div class="tlogo" onclick="showHomepage()" style="cursor:pointer"><div class="tlogo-mark">D</div>DeepFin</div>
+      <span class="tlive">Canlı</span>
+    </div>
 
-    <a href="/" class="hp-nav-btn active" id="nav-home" onclick="event.preventDefault(); showHomepage()">Anasayfa</a>
-    <a href="/" class="hp-nav-btn" id="nav-tarama" onclick="event.preventDefault(); showScreenerOrPrescan()">Tarayıcı</a>
-    <a href="/analiz/" class="hp-nav-btn" id="nav-analiz">Analiz</a>
+    <!-- Sayfalar — ortalanmış -->
+    <nav class="tnav">
+      <a href="/" class="hp-nav-btn active" id="nav-home" onclick="event.preventDefault(); showHomepage()">Anasayfa</a>
+      <a href="/" class="hp-nav-btn" id="nav-tarama" onclick="event.preventDefault(); showScreenerOrPrescan()">Tarayıcı</a>
+      <a href="/analiz/" class="hp-nav-btn" id="nav-analiz">Analiz</a>
+      <button class="hp-nav-btn" onclick="openInfo()">Bilgi Bankası</button>
+      <a href="/profil" id="profile-btn" class="hp-nav-btn profile-topbtn" title="Profilim"><span id="profile-btn-inner" class="prf-nav-av">👤</span>Profil<span id="fav-total-badge" style="display:none;background:var(--accent);color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 5px;margin-left:2px;line-height:1.4;align-items:center;"></span></a>
+    </nav>
+
     <button class="hamburger-btn" id="hamburger-btn" onclick="toggleMobileDrawer()" style="display:none;" aria-label="Filtreler">
       <span class="ham-line"></span><span class="ham-line"></span><span class="ham-line"></span>
     </button>
 
     <div class="tright">
-      <button class="topbarbtn kbd-help-btn" onclick="_toggleShortcutHelp()" title="Klavye kısayolları (?)" aria-label="Klavye kısayolları">?</button>
       <button class="topbarbtn theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir (T)" aria-label="Karanlık/Açık mod geçiş">☀</button>
-      <a href="/profil" id="profile-btn" class="topbarbtn infobtn profile-topbtn" title="Profilim">
-        <span id="profile-btn-inner">👤</span><span class="prf-btn-lbl">Profil</span><span id="fav-total-badge" style="display:none;background:var(--accent);color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 5px;margin-left:2px;line-height:1.4;align-items:center;"></span>
-      </a>
-      <button class="topbarbtn infobtn" onclick="openInfo()">Bilgi Bankası</button>
       <button class="topbarbtn supportbtn" onclick="openSupport()">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
   Destek Ol
 </button>
+      <!-- Giriş / Kayıt — sağda ayrı -->
+      <button class="auth-btn auth-ghost" onclick="showToast('Giriş özelliği yakında eklenecek')">Giriş Yap</button>
+      <button class="auth-btn auth-primary" onclick="showToast('Kayıt özelliği yakında eklenecek')">Kayıt Ol</button>
       <!-- Hidden: JS tarafından kullanılıyor -->
       <button id="scanbtn" onclick="runScan()" style="display:none"></button>
       <button id="stopbtn" onclick="abortScan()" style="display:none"></button>
