@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Bilgi Bankası — DeepFin</title>
+<meta name="description" content="DeepFin Bilgi Bankası — yatırım stratejisi rehberleri, terimler sözlüğü, filtre açıklamaları ve teknik analiz.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"></noscript>
+<script>(function(){try{var t=localStorage.getItem('df_theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})()</script>
+<link rel="stylesheet" href="/deepfin.css?v=warm21">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;}
+body{overflow-y:auto;}
+
+/* Sayfa başlığı */
+.bk-head{max-width:1180px;margin:0 auto;padding:36px 40px 20px;}
+.bk-title{font-size:30px;font-weight:600;letter-spacing:-.8px;color:var(--text);}
+.bk-sub{font-size:14px;color:var(--text2);margin-top:6px;}
+
+/* Layout */
+.bk-wrap{max-width:1180px;margin:0 auto;padding:0 40px 60px;display:flex;gap:32px;align-items:flex-start;}
+.bk-side{width:230px;flex-shrink:0;position:sticky;top:64px;}
+.bk-side-nav{display:flex;flex-direction:column;gap:2px;border-top:1px solid var(--border);padding-top:14px;}
+.bk-nav-btn{text-align:left;background:transparent;border:none;font-family:'Inter',sans-serif;font-size:14px;color:var(--text2);padding:11px 14px;border-radius:9px;cursor:pointer;transition:all .12s;font-weight:500;}
+.bk-nav-btn:hover{background:var(--s3);color:var(--text);}
+.bk-nav-btn.on{background:var(--accent);color:#fff;}
+.bk-content{flex:1;min-width:0;}
+
+/* Liste kartları */
+.bk-list{display:flex;flex-direction:column;}
+.bk-card{padding:22px 4px;border-bottom:1px solid var(--border);cursor:pointer;transition:opacity .12s;}
+.bk-card:hover .bk-card-title{color:var(--gold);}
+.bk-card-title{font-size:17px;font-weight:600;color:var(--text);letter-spacing:-.3px;transition:color .12s;}
+.bk-card-desc{font-size:13px;color:var(--text2);margin-top:6px;line-height:1.5;}
+.bk-card-meta{display:flex;align-items:center;gap:10px;margin-top:12px;}
+.bk-lvl{font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:5px;letter-spacing:.02em;}
+.bk-lvl-b{background:var(--green-bg,#F0FDF4);color:var(--green);}
+.bk-lvl-o{background:#FFFBEB;color:var(--gold);}
+.bk-lvl-i{background:#EFF2F7;color:var(--blue2);}
+[data-theme="dark"] .bk-lvl-b{background:rgba(22,163,74,.14);}
+[data-theme="dark"] .bk-lvl-o{background:rgba(217,119,6,.16);}
+[data-theme="dark"] .bk-lvl-i{background:rgba(51,65,85,.3);color:var(--text2);}
+.bk-time{font-size:12px;color:var(--muted);}
+
+/* Sözlük / filtre / teknik öğeleri */
+.bk-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}
+@media(max-width:760px){.bk-grid{grid-template-columns:1fr;}}
+.bk-item{background:var(--s1);border:1px solid var(--border);border-radius:11px;padding:16px 18px;}
+.bk-item-name{font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;}
+.bk-eng{font-size:11px;font-weight:400;color:var(--muted);}
+.bk-item-desc{font-size:12.5px;color:var(--text2);line-height:1.6;margin-top:7px;}
+.bk-item-crit{font-size:11.5px;color:var(--gold);margin-top:8px;font-weight:500;}
+.bk-sec-intro{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:20px;max-width:640px;}
+
+/* Makale okuyucu */
+.bk-article{max-width:680px;}
+.bk-back{background:transparent;border:none;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;padding:4px 0;margin-bottom:18px;display:inline-flex;align-items:center;gap:6px;}
+.bk-back:hover{color:var(--text);}
+.bk-art-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.bk-art-h1{font-size:26px;font-weight:600;letter-spacing:-.6px;color:var(--text);line-height:1.2;margin-bottom:20px;}
+.bk-article h2{font-size:17px;font-weight:600;color:var(--text);margin:26px 0 10px;letter-spacing:-.2px;}
+.bk-article p{font-size:14.5px;color:var(--text2);line-height:1.75;margin-bottom:14px;}
+.bk-article strong{color:var(--text);font-weight:600;}
+.bk-article ul{margin:0 0 14px;padding-left:4px;list-style:none;}
+.bk-article li{font-size:14px;color:var(--text2);line-height:1.7;padding-left:18px;position:relative;margin-bottom:6px;}
+.bk-article li::before{content:'';position:absolute;left:2px;top:10px;width:5px;height:5px;border-radius:50%;background:var(--gold);}
+.bk-callout{background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:9px;padding:14px 16px;margin:18px 0;}
+.bk-callout-h{font-size:12px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+.bk-callout p{font-size:13px;margin-bottom:0;}
+.bk-crit-box{background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:14px 16px;margin:16px 0;}
+.bk-crit-box .bk-crit-row{display:flex;justify-content:space-between;gap:12px;font-size:13px;padding:5px 0;border-bottom:1px dashed var(--border);}
+.bk-crit-box .bk-crit-row:last-child{border-bottom:none;}
+.bk-crit-row span:first-child{color:var(--text2);}
+.bk-crit-row span:last-child{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums;}
+.bk-try{display:inline-block;margin-top:8px;background:var(--gold);color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;text-decoration:none;}
+.bk-try:hover{background:#B45309;}
+
+.bk-disc{max-width:1180px;margin:0 auto;padding:8px 40px 40px;}
+.bk-disc p{font-size:11px;color:var(--muted);line-height:1.7;}
+
+@media(max-width:860px){
+  .bk-head,.bk-wrap,.bk-disc{padding-left:20px;padding-right:20px;}
+  .bk-wrap{flex-direction:column;}
+  .bk-side{width:100%;position:static;}
+  .bk-side-nav{flex-direction:row;flex-wrap:wrap;border-top:none;padding-top:0;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<div class="topbar" style="position:sticky;top:0;z-index:20;">
+  <div class="tleft">
+    <a href="/" class="tlogo" style="text-decoration:none;cursor:pointer"><span class="tlogo-mark"></span>DeepFin</a>
+  </div>
+  <nav class="tnav">
+    <a href="/" class="hp-nav-btn">Anasayfa</a>
+    <a href="/" class="hp-nav-btn">Tarayıcı</a>
+    <a href="/analiz/" class="hp-nav-btn">Analiz</a>
+    <a href="/bilgi/" class="hp-nav-btn active">Bilgi Bankası</a>
+    <a href="/profil" class="hp-nav-btn">Profil</a>
+  </nav>
+  <div class="tright">
+    <button class="topbarbtn theme-toggle-btn" id="theme-toggle" onclick="bkToggleTheme()" title="Tema değiştir" aria-label="Karanlık/Açık mod geçiş">☀</button>
+    <button class="auth-btn auth-ghost" onclick="alert('Giriş özelliği yakında eklenecek')">Giriş Yap</button>
+    <button class="auth-btn auth-primary" onclick="alert('Kayıt özelliği yakında eklenecek')">Kayıt Ol</button>
+  </div>
+</div>
+
+<div class="bk-head">
+  <div class="bk-title">Bilgi Bankası</div>
+  <div class="bk-sub">Rehberler, terimler sözlüğü ve filtre açıklamaları</div>
+</div>
+
+<div class="bk-wrap">
+  <aside class="bk-side">
+    <nav class="bk-side-nav" id="bk-nav"></nav>
+  </aside>
+  <main class="bk-content" id="bk-content"></main>
+</div>
+
+<div class="bk-disc">
+  <p>Bu içerikler yalnızca eğitim ve bilgilendirme amaçlıdır; yatırım tavsiyesi değildir. Sunulan strateji ve kriterler kamuya açık kaynaklara dayanır ve özgün yorumlar içerir. Geçmiş performans gelecekteki sonuçların garantisi değildir.</p>
+</div>
+
+<script src="/bilgi/bilgi.js?v=1"></script>
+<script>
+function bkToggleTheme(){
+  var dark = document.documentElement.getAttribute('data-theme') !== 'dark';
+  try{localStorage.setItem('df_theme', dark?'dark':'light');}catch(e){}
+  document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+  var b=document.getElementById('theme-toggle'); if(b) b.textContent = dark?'☾':'☀';
+}
+(function(){var b=document.getElementById('theme-toggle');if(b)b.textContent=document.documentElement.getAttribute('data-theme')==='dark'?'☾':'☀';})();
+</script>
+</body>
+</html>

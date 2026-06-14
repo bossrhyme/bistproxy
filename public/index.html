@@ -133,7 +133,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
 <link rel="stylesheet" href="/deepfin.css?v=warm21">
-<script src="/deepfin.js?v=167" defer></script>
+<script src="/deepfin.js?v=168" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -178,7 +178,7 @@ if('serviceWorker' in navigator){
       <a href="/" class="hp-nav-btn active" id="nav-home" onclick="event.preventDefault(); showHomepage()">Anasayfa</a>
       <a href="/" class="hp-nav-btn" id="nav-tarama" onclick="event.preventDefault(); showScreenerOrPrescan()">Tarayıcı</a>
       <a href="/analiz/" class="hp-nav-btn" id="nav-analiz">Analiz</a>
-      <button class="hp-nav-btn" onclick="openInfo()">Bilgi Bankası</button>
+      <a href="/bilgi/" class="hp-nav-btn">Bilgi Bankası</a>
       <a href="/profil" id="profile-btn" class="hp-nav-btn profile-topbtn" title="Profilim"><span id="profile-btn-inner" class="prf-nav-av">👤</span>Profil<span id="fav-total-badge" style="display:none;background:var(--accent);color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 5px;margin-left:2px;line-height:1.4;align-items:center;"></span></a>
     </nav>
 
@@ -216,7 +216,7 @@ if('serviceWorker' in navigator){
       <p class="hpx-sub">Hisse, fon ve kripto — 9 varlık sınıfı tek ekranda. 100+ filtre kriteri, dünyaca ünlü stratejiler ve 28+ borsada gerçek zamanlı veri.</p>
       <div class="hpx-ctas">
         <button class="hpx-cta-p" onclick="showScreenerOrPrescan()">Taramaya Başla</button>
-        <button class="hpx-cta-g" onclick="showScreener();openInfo()">Nasıl çalışır</button>
+        <button class="hpx-cta-g" onclick="location.href='/bilgi/'">Nasıl çalışır</button>
       </div>
       <div class="hpx-stats">
         <div><div class="hpx-stat-n">9+</div><div class="hpx-stat-l">varlık sınıfı</div></div>
@@ -312,11 +312,11 @@ if('serviceWorker' in navigator){
         <div class="footer-links-group">
           <div class="footer-col">
             <div class="footer-col-title">Platform</div>
-            <a class="footer-link" onclick="showScreener();openInfo()">Bilgi Bankası</a>
-            <a class="footer-link" onclick="showScreener();openInfo()">Yatırımcı Lensleri</a>
-            <a class="footer-link" onclick="showScreener();openInfo()">Terimler Sözlüğü</a>
-            <a class="footer-link" onclick="showScreener();openInfo()">Filtre Presetleri</a>
-            <a class="footer-link" onclick="showFooterModal('teknikanaliz')">Teknik Analiz Presetleri</a>
+            <a class="footer-link" href="/bilgi/">Bilgi Bankası</a>
+            <a class="footer-link" href="/bilgi/#guides">Strateji Rehberleri</a>
+            <a class="footer-link" href="/bilgi/#terms">Terimler Sözlüğü</a>
+            <a class="footer-link" href="/bilgi/#filters">Filtre Açıklamaları</a>
+            <a class="footer-link" href="/bilgi/#tech">Teknik Analiz</a>
           </div>
           <div class="footer-col">
             <div class="footer-col-title">Hakkımızda</div>

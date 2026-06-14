@@ -5703,6 +5703,15 @@ document.addEventListener('DOMContentLoaded', function(){
       }, 300);
     }
   }
+  // Bilgi Bankası "stratejiyi dene" derin bağlantısı: ?strateji=KEY
+  var _strat = _sp.get('strateji');
+  if (_strat) {
+    setTimeout(function(){
+      if (typeof GURUS !== 'undefined' && GURUS[_strat] && typeof applyStrategyAndGo === 'function') applyStrategyAndGo(_strat);
+      else if (typeof PRESETS !== 'undefined' && PRESETS[_strat] && typeof applyPresetAndGo === 'function') applyPresetAndGo(_strat);
+      else if (typeof TECH_PRESETS !== 'undefined' && TECH_PRESETS[_strat] && typeof applyTechAndGo === 'function') applyTechAndGo(_strat);
+    }, 200);
+  }
   var total = document.querySelectorAll('[data-goat],[data-preset],[data-tech]').length;
   var el = document.querySelector('[data-strat-count]');
   if(el) el.innerHTML = total + ' <span>strateji</span>';
