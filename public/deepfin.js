@@ -4893,13 +4893,14 @@ function showToast(msg) {
   if(!t) {
     t = document.createElement('div');
     t.id = 'df-toast';
-    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid #2a2a2a;color:#ededed;font-size:12px;padding:10px 20px;border-radius:8px;z-index:9999;opacity:0;transition:opacity .2s;white-space:nowrap;font-family:DM Sans,sans-serif;';
+    t.className = 'df-toast';
     document.body.appendChild(t);
   }
   t.textContent = msg;
-  t.style.opacity = '1';
+  void t.offsetWidth; // reflow → yeniden gösterimde geçiş tetiklensin
+  t.classList.add('show');
   clearTimeout(t._timer);
-  t._timer = setTimeout(function(){ t.style.opacity = '0'; }, 3000);
+  t._timer = setTimeout(function(){ t.classList.remove('show'); }, 3000);
 }
 function showHomepage() {
   _doShowHomepage();
