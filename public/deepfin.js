@@ -4978,7 +4978,7 @@ function showScanSummary(total, matches) {
     var xBtn = (f.kind && f.key)
       ? '<span class="ssm-tag-x" onclick="removeScanFilter(\'' + f.kind + '\',\'' + f.key + '\')" title="Bu filtreyi kaldır">×</span>'
       : '';
-    return '<span class="ssm-tag">' + esc(f.label) + xBtn +
+    return '<span class="ssm-tag"' + (f.desc ? ' data-haspopup="1"' : '') + '>' + esc(f.label) + xBtn +
       (f.desc ? '<span class="ssm-tag-popup">' + esc(f.desc) + '</span>' : '') +
       '</span>';
   }).join('');
@@ -5003,6 +5003,27 @@ function showScanSummary(total, matches) {
     durItem.style.display = '';
   }
 }
+
+// "Neden eşleşti": dokunmatik cihazda aktif-filtre etiketine dokununca lens
+// kriterleri popup'ını aç (hover yok). × (filtre kaldır) hariç tutulur.
+(function() {
+  document.addEventListener('click', function(e) {
+    if (!(window.matchMedia && window.matchMedia('(hover: none)').matches)) return;
+    if (e.target.closest('.ssm-tag-x')) return; // × kendi işini yapsın
+    var tag = e.target.closest('#scan-summary .ssm-tag[data-haspopup]');
+    // açık olan diğer ipuçlarını kapat
+    document.querySelectorAll('#scan-summary .ssm-tag.tip-open').forEach(function(t) {
+      if (t !== tag) t.classList.remove('tip-open');
+    });
+    if (!tag) return;
+    e.stopPropagation();
+    tag.classList.toggle('tip-open');
+    if (tag.classList.contains('tip-open')) {
+      clearTimeout(tag._tipTO);
+      tag._tipTO = setTimeout(function() { tag.classList.remove('tip-open'); }, 4500);
+    }
+  });
+})();
 
 // Özet barındaki × — filtreyi her iki paneldeki chip'lerden kaldırıp kalanlarla yeniden tarar
 function removeScanFilter(kind, key) {
