@@ -132,8 +132,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=warm24">
-<script src="/deepfin.js?v=168" defer></script>
+<link rel="stylesheet" href="/deepfin.css?v=warm25">
+<script src="/deepfin.js?v=169" defer></script>
 <script src="/auth-header.js?v=1" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -1030,47 +1030,11 @@ if('serviceWorker' in navigator){
         <span class="ad-slot-label">728 × 90 · Leaderboard · Carbon Ads / AdSense</span>
       </div>
 
+      <!-- ROW 1: Eylemler + Sırala + Araçlar -->
       <div class="toolbar" id="toolbar" style="display:none">
-        <div class="rcount">
-          <strong id="resn">0</strong><span> / <span id="scann">0</span> hisse</span>
-        </div>
-        <button id="tb-fav-btn" class="sb-fav-btn" onclick="toggleFavFilter(event)" title="Listelerim" style="display:none">☆ Listelerim</button>
-        <button id="tb-col-btn" class="col-btn" onclick="openColPicker()" title="Kolonları özelleştir" style="display:none">⚙ Kolonlar</button>
-        <button id="tb-export-btn" class="col-btn tb-export-btn" onclick="exportToCSV()" title="CSV olarak dışa aktar" style="display:none">↓ CSV</button>
-        <div class="saved-scans-wrap" id="saved-scans-wrap" style="display:none">
-          <button class="col-btn tb-save-btn" onclick="saveCurrentScan()" title="Mevcut taramayı kaydet">✦ Kaydet</button>
-          <button class="col-btn tb-templates-btn" onclick="openSavedScans()" title="Kaydedilen taramalar" id="tb-templates-btn">📋</button>
-        </div>
-        <div class="density-toggle" id="density-toggle" style="display:none">
-          <button class="density-btn active" data-density="compact" onclick="setDensity('compact')" title="Kompakt görünüm">▤</button>
-          <button class="density-btn" data-density="normal" onclick="setDensity('normal')" title="Normal görünüm">▥</button>
-          <button class="density-btn" data-density="comfortable" onclick="setDensity('comfortable')" title="Geniş görünüm">▦</button>
-        </div>
-        <button class="tbl-scroll-btn" id="scroll-left" onclick="tblScroll(-300)" title="Sola kaydır">&#8249;</button>
-        <button class="tbl-scroll-btn" id="scroll-right" onclick="tblScroll(300)" title="Sağa kaydır">&#8250;</button>
-        <div class="pbar"><div class="pbarfill" id="prog"></div></div>
-        <select class="ssel" id="sortf" onchange="onSortChange()">
-          <option value="marketCapitalization">Piyasa Değeri</option>
-          <option value="peNormalizedAnnual">F/K</option>
-          <option value="pbAnnual">PD/DD</option>
-          <option value="roeTTM">ROE</option>
-          <option value="roaTTM">ROA</option>
-          <option value="netProfitMarginTTM">Kar Marjı</option>
-          <option value="dividendYieldIndicatedAnnual">Temettü</option>
-          <option value="revenueGrowthTTMYoy">Gelir Büyümesi</option>
-          <option value="currentRatioAnnual">Cari Oran</option>
-        </select>
-        <select class="ssel" id="sortd" onchange="onSortChange()">
-          <option value="desc">↓ Azalan</option>
-          <option value="asc">↑ Artan</option>
-        </select>
-      </div>
-
-      <!-- STATS BAR -->
-      <div class="stats-bar" id="stats-bar">
-        <button id="new-scan-btn" class="new-scan-btn" onclick="openScanModeChoice()" title="Yeni tarama başlat">🔍 Yeni Tarama</button>
+        <button id="new-scan-btn" class="new-scan-btn" onclick="openScanModeChoice()" title="Yeni tarama başlat">Yeni Tarama</button>
         <div class="add-filter-wrap" id="add-filter-wrap" style="display:none">
-          <button id="add-filter-btn" class="new-scan-btn add-filter-btn" onclick="toggleFilterDropdown(event)" title="Mevcut taramaya filtre ekle">➕ Filtre Ekle</button>
+          <button id="add-filter-btn" class="new-scan-btn add-filter-btn" onclick="toggleFilterDropdown(event)" title="Mevcut taramaya filtre ekle">+ Filtre Ekle</button>
           <div id="filter-dropdown" class="filter-dropdown" style="display:none"></div>
         </div>
         <div class="sb-search">
@@ -1079,29 +1043,76 @@ if('serviceWorker' in navigator){
           <span class="sb-search-shortcut">/</span>
         </div>
         <button id="mobile-filter-btn" class="mobile-filter-btn" onclick="toggleMobileDrawer()" title="Filtreleri aç">☰ Filtreler</button>
-        <div class="sb-item"><span class="sb-label">TARAMA</span><span class="sb-val" id="sb-count">—</span></div>
-        <div class="sb-item"><span class="sb-label">YÜKSELİŞ</span><span class="sb-val up" id="sb-up">—</span></div>
-        <div class="sb-item"><span class="sb-label">DÜŞÜŞ</span><span class="sb-val dn" id="sb-dn">—</span></div>
-        <div class="sb-item"><span class="sb-label">BORSA</span><span class="sb-val" id="sb-ex">—</span></div>
-        <div class="sb-item"><span class="sb-label">GÜNCELLEME</span><span class="sb-val" id="sb-time">—</span></div>
-        <div class="sb-item" id="sb-result-item" style="display:none"><span class="sb-label">SONUÇ</span><span class="sb-val" id="sb-result">—</span></div>
+        <div class="pbar" id="tb-pbar"><div class="pbarfill" id="prog"></div></div>
+        <div class="tb-sort">
+          <span class="tb-sort-lbl">Sırala</span>
+          <select class="ssel" id="sortf" onchange="onSortChange()">
+            <option value="marketCapitalization">Piyasa Değeri</option>
+            <option value="peNormalizedAnnual">F/K</option>
+            <option value="pbAnnual">PD/DD</option>
+            <option value="roeTTM">ROE</option>
+            <option value="roaTTM">ROA</option>
+            <option value="netProfitMarginTTM">Kar Marjı</option>
+            <option value="dividendYieldIndicatedAnnual">Temettü</option>
+            <option value="revenueGrowthTTMYoy">Gelir Büyümesi</option>
+            <option value="currentRatioAnnual">Cari Oran</option>
+          </select>
+          <select class="ssel ssel-dir" id="sortd" onchange="onSortChange()">
+            <option value="desc">↓</option>
+            <option value="asc">↑</option>
+          </select>
+        </div>
+        <div class="tb-tools-wrap">
+          <button class="tb-tools-btn" id="tb-tools-toggle" onclick="toggleToolsMenu(event)" title="Araçlar">Araçlar ▾</button>
+          <div class="tb-tools-menu" id="tb-tools-menu" style="display:none">
+            <button id="tb-fav-btn" class="tb-menu-item sb-fav-btn" onclick="toggleFavFilter(event)" title="Listelerim" style="display:none">Listelerim</button>
+            <button id="tb-col-btn" class="tb-menu-item col-btn" onclick="openColPicker()" title="Kolonları özelleştir" style="display:none">Kolonlar</button>
+            <button id="tb-export-btn" class="tb-menu-item col-btn tb-export-btn" onclick="exportToCSV()" title="CSV olarak dışa aktar" style="display:none">CSV indir</button>
+            <div class="tb-menu-sep"></div>
+            <div class="saved-scans-wrap" id="saved-scans-wrap" style="display:none">
+              <button class="tb-menu-item col-btn tb-save-btn" onclick="saveCurrentScan()" title="Mevcut taramayı kaydet">Taramayı Kaydet</button>
+              <button class="tb-menu-item col-btn tb-templates-btn" onclick="openSavedScans()" id="tb-templates-btn" title="Kaydedilen taramalar">Kayıtlı Taramalar</button>
+            </div>
+            <div class="tb-menu-sep"></div>
+            <div class="tb-menu-label">Görünüm</div>
+            <div class="density-toggle" id="density-toggle" style="display:none">
+              <button class="density-btn active" data-density="compact" onclick="setDensity('compact')" title="Kompakt görünüm">Kompakt</button>
+              <button class="density-btn" data-density="normal" onclick="setDensity('normal')" title="Normal görünüm">Normal</button>
+              <button class="density-btn" data-density="comfortable" onclick="setDensity('comfortable')" title="Geniş görünüm">Geniş</button>
+            </div>
+          </div>
+        </div>
+        <span id="resn" style="display:none">0</span><span id="scann" style="display:none">0</span>
       </div>
 
-      <!-- Quick Scan Bar -->
+      <!-- META özet -->
+      <div class="stats-bar" id="stats-bar">
+        <div class="sb-item"><span class="sb-label">BORSA</span><span class="sb-val" id="sb-ex">—</span></div>
+        <div class="sb-item" id="sb-result-item" style="display:none"><span class="sb-val" id="sb-result">—</span></div>
+        <div class="sb-item"><span class="sb-val up" id="sb-up">—</span><span class="sb-val dn" id="sb-dn">—</span></div>
+        <div class="sb-item"><span class="sb-label">GÜNCELLEME</span><span class="sb-val" id="sb-time">—</span></div>
+        <span id="sb-count" style="display:none">—</span>
+      </div>
+
+      <!-- ROW 2: Hızlı filtreler (gruplu, sade) -->
       <div class="quick-scan-bar" id="quick-scan-bar">
-        <span class="qs-label">HIZLI TARA</span>
-        <button class="qs-btn" onclick="quickScan('momentum')" title="Satış ve kazanç büyümesi &gt;20%">⚡ Momentum</button>
-        <button class="qs-btn" onclick="quickScan('breakout')" title="52H zirvesine yakın, hacimli yükseliş">↗ Breakout</button>
-        <button class="qs-btn" onclick="quickScan('oversold')" title="RSI &lt;35, zirveden %20 uzak">↙ Aşırı Satış</button>
-        <button class="qs-btn" onclick="quickScan('nearHigh')" title="52H zirvesine %5 mesafe">▲ 52H Zirve</button>
-        <button class="qs-btn qs-val" onclick="quickScan('value')" title="F/K &lt;15, PD/DD &lt;2, temettü">◆ Değer</button>
-        <button class="qs-btn qs-grw" onclick="quickScan('growth')" title="Kazanç büyümesi %20, ROE %15"><Büyüme</button>
-        <button class="qs-btn qs-div" onclick="quickScan('dividend')" title="Temettü %4+, borç makul">★ Temettü</button>
-        <button class="qs-btn qs-qual" onclick="quickScan('quality')" title="ROE %20, net marj %15">✦ Kalite</button>
-        <div class="qs-sep"></div>
-        <button class="qs-btn qs-goat" onclick="quickGoat('buffett')" title="Warren Buffett kriterleri">W.Buffett</button>
-        <button class="qs-btn qs-goat" onclick="quickGoat('graham')" title="Benjamin Graham kriterleri">B.Graham</button>
-        <button class="qs-btn qs-goat" onclick="quickGoat('lynch')" title="Peter Lynch kriterleri">P.Lynch</button>
+        <span class="qs-label">Hızlı</span>
+        <span class="qs-grp">Temel</span>
+        <button class="qs-btn qs-val" onclick="quickScan('value')" title="F/K &lt;15, PD/DD &lt;2, temettü">Değer</button>
+        <button class="qs-btn qs-grw" onclick="quickScan('growth')" title="Kazanç büyümesi %20, ROE %15">Büyüme</button>
+        <button class="qs-btn qs-div" onclick="quickScan('dividend')" title="Temettü %4+, borç makul">Temettü</button>
+        <button class="qs-btn qs-qual" onclick="quickScan('quality')" title="ROE %20, net marj %15">Kalite</button>
+        <span class="qs-vsep"></span>
+        <span class="qs-grp">Teknik</span>
+        <button class="qs-btn" onclick="quickScan('momentum')" title="Satış ve kazanç büyümesi &gt;20%">Momentum</button>
+        <button class="qs-btn" onclick="quickScan('breakout')" title="52H zirvesine yakın, hacimli yükseliş">Breakout</button>
+        <button class="qs-btn" onclick="quickScan('oversold')" title="RSI &lt;35, zirveden %20 uzak">Aşırı Satış</button>
+        <button class="qs-btn" onclick="quickScan('nearHigh')" title="52H zirvesine %5 mesafe">52H Zirve</button>
+        <span class="qs-vsep"></span>
+        <span class="qs-grp">Lensler</span>
+        <button class="qs-btn qs-goat" onclick="quickGoat('buffett')" title="Warren Buffett kriterleri">Buffett</button>
+        <button class="qs-btn qs-goat" onclick="quickGoat('graham')" title="Benjamin Graham kriterleri">Graham</button>
+        <button class="qs-btn qs-goat" onclick="quickGoat('lynch')" title="Peter Lynch kriterleri">Lynch</button>
       </div>
 
       <div id="scan-summary" class="scan-summary" style="display:none"></div>

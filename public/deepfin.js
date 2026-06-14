@@ -5046,6 +5046,29 @@ function closeFilterDropdown() {
   document.removeEventListener('click', _fdOutsideClick);
 }
 
+// ── Araçlar menüsü (toolbar) ──
+function _toolsOutsideClick(e) {
+  if (e.target.closest && e.target.closest('.tb-tools-wrap')) return;
+  closeToolsMenu();
+}
+function closeToolsMenu() {
+  var m = document.getElementById('tb-tools-menu');
+  if (m) m.style.display = 'none';
+  var t = document.getElementById('tb-tools-toggle');
+  if (t) t.classList.remove('open');
+  document.removeEventListener('click', _toolsOutsideClick);
+}
+function toggleToolsMenu(e) {
+  if (e) e.stopPropagation();
+  var m = document.getElementById('tb-tools-menu');
+  var t = document.getElementById('tb-tools-toggle');
+  if (!m) return;
+  if (m.style.display === 'block') { closeToolsMenu(); return; }
+  m.style.display = 'block';
+  if (t) t.classList.add('open');
+  setTimeout(function(){ document.addEventListener('click', _toolsOutsideClick); }, 0);
+}
+
 function renderFilterDropdown() {
   var dd = document.getElementById('filter-dropdown');
   if (!dd) return;
