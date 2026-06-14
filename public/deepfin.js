@@ -3115,6 +3115,12 @@ function colSort(f){
   else { sortSt.field=f; sortSt.dir='desc'; }
   renderTable();
 }
+function toggleSortDir(){
+  var b = document.getElementById('sortd');
+  if (!b) return;
+  b.value = (b.value === 'desc') ? 'asc' : 'desc';
+  onSortChange();
+}
 function onSortChange(){
   sortSt.field = document.getElementById('sortf').value;
   sortSt.dir   = document.getElementById('sortd').value;
@@ -4965,14 +4971,20 @@ function showScanSummary(total, matches) {
       (tagsHtml
         ? '<span class="ssm-flabel">Aktif filtre:</span>' + tagsHtml
         : '<span class="ssm-no-filter">Filtresiz</span>') +
-    '</span>' +
-    '<span class="ssm-right ssm-dur">' + elapsed + 's</span>';
-  // Tarandı/eşleşti bilgisi stats-bar'da GÜNCELLEME yanında
+    '</span>';
+  // Tarandı/eşleşti bilgisi meta barında
   var resItem = document.getElementById('sb-result-item');
   var resVal  = document.getElementById('sb-result');
   if (resItem && resVal) {
     resVal.innerHTML = total + ' tarandı · <span class="up">' + matches + ' eşleşti</span>';
     resItem.style.display = '';
+  }
+  // Tarama süresi meta barının sonunda (… 16:34 · 3.0s)
+  var durItem = document.getElementById('sb-dur-item');
+  var durVal  = document.getElementById('sb-dur');
+  if (durItem && durVal && elapsed !== '—') {
+    durVal.textContent = elapsed + 's';
+    durItem.style.display = '';
   }
 }
 

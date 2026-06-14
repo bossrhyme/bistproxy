@@ -132,8 +132,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=warm26">
-<script src="/deepfin.js?v=171" defer></script>
+<link rel="stylesheet" href="/deepfin.css?v=warm27">
+<script src="/deepfin.js?v=172" defer></script>
 <script src="/auth-header.js?v=1" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -1045,7 +1045,7 @@ if('serviceWorker' in navigator){
         <button id="mobile-filter-btn" class="mobile-filter-btn" onclick="toggleMobileDrawer()" title="Filtreleri aç">☰ Filtreler</button>
         <div class="pbar" id="tb-pbar"><div class="pbarfill" id="prog"></div></div>
         <div class="tb-sort">
-          <span class="tb-sort-lbl">Sırala</span>
+          <span class="tb-sort-lbl">Sırala:</span>
           <select class="ssel" id="sortf" onchange="onSortChange()">
             <option value="marketCapitalization">Piyasa Değeri</option>
             <option value="peNormalizedAnnual">F/K</option>
@@ -1057,10 +1057,7 @@ if('serviceWorker' in navigator){
             <option value="revenueGrowthTTMYoy">Gelir Büyümesi</option>
             <option value="currentRatioAnnual">Cari Oran</option>
           </select>
-          <select class="ssel ssel-dir" id="sortd" onchange="onSortChange()">
-            <option value="desc">↓</option>
-            <option value="asc">↑</option>
-          </select>
+          <button type="button" class="ssel ssel-dir sort-dir-btn" id="sortd" value="desc" onclick="toggleSortDir()" title="Sıralama yönü (azalan / artan)"></button>
         </div>
         <div class="tb-tools-wrap">
           <button class="tb-tools-btn" id="tb-tools-toggle" onclick="toggleToolsMenu(event)" title="Araçlar">Araçlar ▾</button>
@@ -1091,6 +1088,7 @@ if('serviceWorker' in navigator){
         <div class="sb-item" id="sb-result-item" style="display:none"><span class="sb-val" id="sb-result">—</span></div>
         <div class="sb-item"><span class="sb-val up" id="sb-up">—</span><span class="sb-val dn" id="sb-dn">—</span></div>
         <div class="sb-item"><span class="sb-val sb-time-val" id="sb-time">—</span></div>
+        <div class="sb-item" id="sb-dur-item" style="display:none"><span class="sb-val sb-dur-val" id="sb-dur">—</span></div>
         <span id="sb-count" style="display:none">—</span>
       </div>
 
