@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <script>(function(){try{var t=localStorage.getItem('df_theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})()</script>
-<link rel="stylesheet" href="/analiz/prf.css?v=warm3">
+<link rel="stylesheet" href="/analiz/prf.css?v=warm3b">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap"></noscript>
 
@@ -191,12 +191,15 @@ window.addEventListener('DOMContentLoaded', function(){
           <div id="prf-investor-fit"></div>
           <div class="an-sec-head">Sektör Karşılaştırması</div>
           <div id="prf-sector-cmp" style="min-height:40px;"></div>
+          <!-- Gelir Tablosu / Bilanço / Nakit Akışı: detaylı tablo veri kaynağı yok — şimdilik gizli -->
+          <div id="prf-statements" style="display:none;">
           <div class="an-sec-head" style="display:flex;align-items:center;gap:6px;">Gelir Tablosu<span id="inc-annual" onclick="setPeriod('income','annual',this)" class="prf-period-active" style="margin-left:auto;">Yıllık</span><span id="inc-quarterly" onclick="setPeriod('income','quarterly',this)" class="prf-period-btn">Çeyreklik</span></div>
           <div id="prf-income-table" style="overflow-x:auto;"><div style="padding:16px;color:var(--muted2);font-size:12px;">Yükleniyor...</div></div>
           <div class="an-sec-head" style="display:flex;align-items:center;gap:6px;">Bilanço<span id="bal-annual" onclick="setPeriod('balance','annual',this)" class="prf-period-active" style="margin-left:auto;">Yıllık</span><span id="bal-quarterly" onclick="setPeriod('balance','quarterly',this)" class="prf-period-btn">Çeyreklik</span></div>
           <div id="prf-balance-table" style="overflow-x:auto;"><div style="padding:16px;color:var(--muted2);font-size:12px;">Yükleniyor...</div></div>
           <div class="an-sec-head" style="display:flex;align-items:center;gap:6px;">Nakit Akışı<span id="cf-annual" onclick="setPeriod('cashflow','annual',this)" class="prf-period-active" style="margin-left:auto;">Yıllık</span><span id="cf-quarterly" onclick="setPeriod('cashflow','quarterly',this)" class="prf-period-btn">Çeyreklik</span></div>
           <div id="prf-cashflow-table" style="overflow-x:auto;"><div style="padding:16px;color:var(--muted2);font-size:12px;">Yükleniyor...</div></div>
+          </div>
 
           <div class="an-group-head">Teknik Analiz</div>
           <div class="an-sec-head">Teknik Göstergeler</div>
@@ -255,6 +258,6 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js" defer></script>
-<script src="/analiz/prf.js?v=warm5"></script>
+<script src="/analiz/prf.js?v=warm6"></script>
 </body>
 </html>

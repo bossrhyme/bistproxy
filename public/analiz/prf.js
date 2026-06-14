@@ -2184,6 +2184,9 @@ function setPeriod(type, period, el) {
 
 // Veriyi render et
 function renderFundPanel(type, period) {
+  // Detaylı tablo veri kaynağı yok — bölüm gizliyse boşuna fetch etme
+  var _st = document.getElementById('prf-statements');
+  if (_st && _st.style.display === 'none') return;
   var cacheKey = type + '_' + period;
   var data = _fundCache[cacheKey];
   var containerId = type === 'balance' ? 'prf-balance-table' : type === 'cashflow' ? 'prf-cashflow-table' : 'prf-income-table';
