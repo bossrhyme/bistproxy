@@ -66,8 +66,10 @@ function checkOrigin(req) {
     if (origin) return isAllowedOrigin(origin);
     try { return isAllowedOrigin(new URL(referer).origin); } catch(e) { return false; }
   }
-  // POST/PUT/DELETE: strict origin check
-  if (!origin && !referer) return true; // server-to-server (no browser Origin)
+  // POST/PUT/DELETE: strict origin check (default-deny).
+  // Referrer-Policy: strict-origin-when-cross-origin → same-origin istekler tam Referer gönderir,
+  // dolayısıyla meşru tarayıcı istekleri origin VEYA referer taşır. İkisi de yoksa reddet.
+  if (!origin && !referer) return false;
   if (origin) return isAllowedOrigin(origin);
   try { return isAllowedOrigin(new URL(referer).origin); } catch(e) { return false; }
 }
@@ -237,6 +239,7 @@ async function handleMe(req, res) {
 
 async function handleDailyCheckin(req, res) {
   if (req.method !== 'POST') { jsonRes(res, 405, { error: 'Method not allowed' }); return; }
+  if (!checkOrigin(req)) { jsonRes(res, 403, { error: 'Geçersiz istek kaynağı' }); return; }
   const user = await getUser(req);
   if (!user) { jsonRes(res, 401, { error: 'Unauthorized' }); return; }
   const full = await kvGet('usr:' + user.id);

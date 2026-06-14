@@ -3374,8 +3374,8 @@ function _vsRowHtml(s, idx) {
   var _mcapTier = _mcap == null ? '' : _mcap >= 200000 ? ' mcap-mega' : _mcap >= 10000 ? ' mcap-large' : _mcap >= 2000 ? ' mcap-mid' : _mcap >= 300 ? ' mcap-small' : ' mcap-micro';
   return `<tr onclick="showDetail('${escJS(s.symbol)}')" tabindex="0" class="${selSym===s.symbol?'selrow':''}${_mcapTier}">
       <td class="nfav"><span class="fav-icon${isFav?' fav-on':''}" onclick="${favClick}" title="${esc(favTitle)}">★</span></td>
-      <td data-col="symbol" style="display:table-cell;"><span class="row-num">${idx+1}</span><span class="sym-wrap"><span class="row-arrow">›</span><span class="sym">${s.symbol}</span></span></td>
-      <td data-col="name" style="${cv('name')}font-size:11px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.name}">${s.name}</td>
+      <td data-col="symbol" style="display:table-cell;"><span class="row-num">${idx+1}</span><span class="sym-wrap"><span class="row-arrow">›</span><span class="sym">${esc(s.symbol)}</span></span></td>
+      <td data-col="name" style="${cv('name')}font-size:11px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(s.name)}">${esc(s.name)}</td>
       <td data-col="price" style="${cv('price')}">${s.currentPrice!=null?(s.currentPrice.toFixed(2)+' '+(EXCHANGE_META[currentExchange]||EXCHANGE_META.bist).currency):nil}</td>
       <td data-col="mcap" style="${cv('mcap')}">${fmc(s.marketCapitalization)}</td>
       <td data-col="pe" style="${cv('pe')}">${fv(s.peNormalizedAnnual,1)}</td>
@@ -3397,7 +3397,7 @@ function _vsRowHtml(s, idx) {
       <td data-col="chg1w" style="${cv('chg1w')}">${s.perfW!=null?fPerf(s.perfW):nil}</td>
       <td data-col="perf3m" style="${cv('perf3m')}">${s.perf3m!=null?fPerf(s.perf3m):nil}</td>
       <td data-col="float_pct" style="${cv('float_pct')}">${s.floatPct!=null?fv(s.floatPct,1,true):nil}</td>
-      <td data-col="sector" style="${cv('sector')}font-size:10px;color:var(--muted2)">${s.sector||'—'}</td>
+      <td data-col="sector" style="${cv('sector')}font-size:10px;color:var(--muted2)">${esc(s.sector)||'—'}</td>
     </tr>`;
 }function renderTable(){
   // Apply density class
@@ -3801,7 +3801,7 @@ function showDetail(sym){
       ['PD/DD <tag>FQ</tag>', s.pbAnnual, v=>v.toFixed(2), 'dval-pb'],
       ['F/S <tag>TTM</tag>', s.psTTM, v=>v.toFixed(2), 'dval-ps'],
       ['Piyasa Değeri', s.marketCapitalization, v=>fmcDual(v, s.exchangeId||currentExchange)],
-      ['Sektör', s.sector, v=>v],
+      ['Sektör', s.sector, v=>esc(v)],
       ['52H Yüksek', s['52WeekHigh'], v=>`${v.toFixed(2)} ₺`],
       ['52H Düşük', s['52WeekLow'], v=>`${v.toFixed(2)} ₺`],
     ]},
@@ -4296,7 +4296,7 @@ init();
       var inner = document.getElementById('profile-btn-inner');
       if (inner) {
         if (d.user.picture) {
-          inner.innerHTML = '<img class="pf-av" src="' + d.user.picture + '" alt="">';
+          inner.innerHTML = '<img class="pf-av" src="' + esc(safeUrl(d.user.picture)) + '" alt="">';
         } else {
           inner.textContent = (d.user.name || '?')[0].toUpperCase();
         }

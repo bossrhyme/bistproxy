@@ -11,8 +11,15 @@
       var initial = name ? name.charAt(0).toUpperCase() : '';
       var avs = document.querySelectorAll('.df-auth-av');
       for (var k = 0; k < avs.length; k++) {
-        if (user.picture) avs[k].innerHTML = '<img src="' + user.picture + '" alt="" style="width:18px;height:18px;border-radius:50%;object-fit:cover;display:block;">';
-        else avs[k].textContent = initial;
+        if (user.picture && /^https?:\/\//i.test(user.picture)) {
+          // src'yi property olarak ata — markup/attribute injection imkânsız
+          avs[k].textContent = '';
+          var img = document.createElement('img');
+          img.src = user.picture;
+          img.alt = '';
+          img.style.cssText = 'width:18px;height:18px;border-radius:50%;object-fit:cover;display:block;';
+          avs[k].appendChild(img);
+        } else avs[k].textContent = initial;
       }
     }
   }
