@@ -132,7 +132,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=warm27">
+<link rel="stylesheet" href="/deepfin.css?v=warm28">
 <script src="/deepfin.js?v=172" defer></script>
 <script src="/auth-header.js?v=1" defer></script>
 <link rel="manifest" href="/manifest.json">
@@ -1094,23 +1094,23 @@ if('serviceWorker' in navigator){
 
       <!-- ROW 2: Hızlı filtreler (gruplu, sade) -->
       <div class="quick-scan-bar" id="quick-scan-bar">
-        <span class="qs-label">Hızlı</span>
-        <span class="qs-grp">Temel</span>
-        <button class="qs-btn qs-val" onclick="quickScan('value')" title="F/K &lt;15, PD/DD &lt;2, temettü">Değer</button>
-        <button class="qs-btn qs-grw" onclick="quickScan('growth')" title="Kazanç büyümesi %20, ROE %15">Büyüme</button>
-        <button class="qs-btn qs-div" onclick="quickScan('dividend')" title="Temettü %4+, borç makul">Temettü</button>
-        <button class="qs-btn qs-qual" onclick="quickScan('quality')" title="ROE %20, net marj %15">Kalite</button>
+        <span class="qs-label">Hızlı Tarama</span>
+        <span class="qs-grp">Temel Analiz</span>
+        <button class="qs-btn" onclick="quickScan('value')" title="F/K &lt;15, PD/DD &lt;2, temettü">Değer</button>
+        <button class="qs-btn" onclick="quickScan('growth')" title="Kazanç büyümesi %20, ROE %15">Büyüme</button>
+        <button class="qs-btn" onclick="quickScan('dividend')" title="Temettü %4+, borç makul">Temettü</button>
+        <button class="qs-btn" onclick="quickScan('quality')" title="ROE %20, net marj %15">Kalite</button>
         <span class="qs-vsep"></span>
-        <span class="qs-grp">Teknik</span>
+        <span class="qs-grp">Teknik Analiz</span>
         <button class="qs-btn" onclick="quickScan('momentum')" title="Satış ve kazanç büyümesi &gt;20%">Momentum</button>
         <button class="qs-btn" onclick="quickScan('breakout')" title="52H zirvesine yakın, hacimli yükseliş">Breakout</button>
         <button class="qs-btn" onclick="quickScan('oversold')" title="RSI &lt;35, zirveden %20 uzak">Aşırı Satış</button>
         <button class="qs-btn" onclick="quickScan('nearHigh')" title="52H zirvesine %5 mesafe">52H Zirve</button>
         <span class="qs-vsep"></span>
-        <span class="qs-grp">Lensler</span>
-        <button class="qs-btn qs-goat" onclick="quickGoat('buffett')" title="Warren Buffett kriterleri">Buffett</button>
-        <button class="qs-btn qs-goat" onclick="quickGoat('graham')" title="Benjamin Graham kriterleri">Graham</button>
-        <button class="qs-btn qs-goat" onclick="quickGoat('lynch')" title="Peter Lynch kriterleri">Lynch</button>
+        <span class="qs-grp">Yatırımcı Lensleri</span>
+        <button class="qs-btn" onclick="quickGoat('buffett')" title="Warren Buffett kriterleri">Buffett</button>
+        <button class="qs-btn" onclick="quickGoat('graham')" title="Benjamin Graham kriterleri">Graham</button>
+        <button class="qs-btn" onclick="quickGoat('lynch')" title="Peter Lynch kriterleri">Lynch</button>
       </div>
 
       <div id="scan-summary" class="scan-summary" style="display:none"></div>
