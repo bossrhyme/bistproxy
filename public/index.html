@@ -133,7 +133,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
 <link rel="stylesheet" href="/deepfin.css?v=warm15">
-<script src="/deepfin.js?v=165" defer></script>
+<script src="/deepfin.js?v=166" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -170,24 +170,6 @@ if('serviceWorker' in navigator){
   <div class="topbar">
     <div class="tlogo" onclick="showHomepage()" style="cursor:pointer"><div class="tlogo-mark">D</div>DeepFin</div>
     <span class="tlive">Canlı</span>
-
-    <!-- Market Indices Ticker -->
-    <div class="tidx" id="topbar-indices">
-      <div class="tidx-item">
-        <span class="tidx-name">USD/TRY</span>
-        <span class="tidx-val" id="tidx-usdtry">—</span>
-      </div>
-      <div class="tidx-sep"></div>
-      <div class="tidx-item">
-        <span class="tidx-name">EUR/TRY</span>
-        <span class="tidx-val" id="tidx-eurtry">—</span>
-      </div>
-      <div class="tidx-sep"></div>
-      <div class="tidx-item">
-        <span class="tidx-name">GBP/TRY</span>
-        <span class="tidx-val" id="tidx-gbptry">—</span>
-      </div>
-    </div>
 
     <a href="/" class="hp-nav-btn active" id="nav-home" onclick="event.preventDefault(); showHomepage()">Anasayfa</a>
     <a href="/" class="hp-nav-btn" id="nav-tarama" onclick="event.preventDefault(); showScreenerOrPrescan()">Tarayıcı</a>

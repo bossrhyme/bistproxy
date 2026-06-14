@@ -35,27 +35,14 @@ function _initTheme() {
   _applyTheme(_isDark());
 }
 
-// ── Market Indices Ticker ─────────────────────────────────────
-// Raw /api/rates: TRY=USDTRY, EUR=EURUSD, GBP=GBPUSD
-function _updateIndicesTicker(r) {
-  if (!r || !r.TRY) return;
-  var usdtry = r.TRY;
-  // r.EUR ve r.GBP open.er-api'den "USD başına kaç EUR/GBP" şeklinde gelir (< 1).
-  // TRY/EUR = TRY/USD ÷ EUR/USD = r.TRY / r.EUR
-  var eurtry = r.EUR ? (r.TRY / r.EUR) : null;
-  var gbptry = r.GBP ? (r.TRY / r.GBP) : null;
-  var el1 = document.getElementById('tidx-usdtry');
-  var el2 = document.getElementById('tidx-eurtry');
-  var el3 = document.getElementById('tidx-gbptry');
-  if (el1) el1.textContent = usdtry.toFixed(2);
-  if (el2 && eurtry) el2.textContent = eurtry.toFixed(2);
-  if (el3 && gbptry) el3.textContent = gbptry.toFixed(2);
-}
+// ── Döviz kuru senkronizasyonu (görünmez) ─────────────────────
+// Header'da kur gösterilmiyor; kurlar yalnızca hesaplama için fxRates'te tutulur.
+// Bu fetch fxRates'i ana sayfada/taramadan önce de güncel tutar.
 function _startIndicesTicker() {
   function _fetch() {
     fetch('/api/rates', { headers: {'X-Requested-With':'XMLHttpRequest'} })
       .then(function(r){ return r.json(); })
-      .then(function(d){ _updateIndicesTicker(d); })
+      .then(function(d){ if (typeof _applyRatesToFx === 'function') _applyRatesToFx(d); })
       .catch(function(){});
   }
   _fetch();
@@ -917,6 +904,30 @@ let searchQ = '';
 let selSym = null;
 let sortSt = {field:'marketCapitalization', dir:'desc'};
 let fxRates = {TRY:44.1, EUR:1.163, GBP:1.333, JPY:0.00633, KRW:0.00074, RUB:89.0, NOK:0.090, CAD:0.73, TWD:32.0, BRL:5.70, HKD:7.78, CNY:7.25, SAR:3.75, CHF:1.12, AUD:0.633, ZAR:18.5, SEK:0.095, INR:0.012, AED:0.272};
+// /api/rates ham yanıtını hesaplama deposuna (fxRates) yazar.
+// Ham format: TRY=USDTRY, EUR/GBP/...=USD başına birim (open.er-api). Hesaplama için saklanır.
+function _applyRatesToFx(r) {
+  if (!r) return;
+  if (r.TRY) fxRates.TRY = r.TRY;
+  if (r.EUR) fxRates.EUR = 1 / r.EUR;
+  if (r.GBP) fxRates.GBP = 1 / r.GBP;
+  if (r.JPY) fxRates.JPY = 1 / r.JPY;
+  if (r.KRW) fxRates.KRW = 1 / r.KRW;
+  if (r.RUB) fxRates.RUB = r.RUB;
+  if (r.NOK) fxRates.NOK = 1 / r.NOK;
+  if (r.CAD) fxRates.CAD = 1 / r.CAD;
+  if (r.TWD) fxRates.TWD = r.TWD;
+  if (r.BRL) fxRates.BRL = r.BRL;
+  if (r.HKD) fxRates.HKD = r.HKD;
+  if (r.CNY) fxRates.CNY = r.CNY;
+  if (r.SAR) fxRates.SAR = r.SAR;
+  if (r.CHF) fxRates.CHF = 1 / r.CHF;
+  if (r.AUD) fxRates.AUD = 1 / r.AUD;
+  if (r.ZAR) fxRates.ZAR = r.ZAR;
+  if (r.SEK) fxRates.SEK = 1 / r.SEK;
+  if (r.INR) fxRates.INR = 1 / r.INR;
+  if (r.AED) fxRates.AED = 1 / r.AED;
+}
 let scanAborted = false;
 
 // ═══════════════════════════════════════════
@@ -1370,26 +1381,8 @@ async function runScan(){
     const rateRes = await fetch('/api/rates');
     if(rateRes.ok) {
       const r = await rateRes.json();
-      // /api/rates direkt {TRY, EUR, GBP, JPY} döner (USD bazlı)
-      if(r.TRY) fxRates.TRY = r.TRY;
-      if(r.EUR) fxRates.EUR = 1 / r.EUR;
-      if(r.GBP) fxRates.GBP = 1 / r.GBP;
-      if(r.JPY) fxRates.JPY = 1 / r.JPY;
-      if(r.KRW) fxRates.KRW = 1 / r.KRW;
-      if(r.RUB) fxRates.RUB = r.RUB;
-      if(r.NOK) fxRates.NOK = 1 / r.NOK;
-      if(r.CAD) fxRates.CAD = 1 / r.CAD;
-      if(r.TWD) fxRates.TWD = r.TWD;
-      if(r.BRL) fxRates.BRL = r.BRL;
-      if(r.HKD) fxRates.HKD = r.HKD;
-      if(r.CNY) fxRates.CNY = r.CNY;
-      if(r.SAR) fxRates.SAR = r.SAR;
-      if(r.CHF) fxRates.CHF = 1 / r.CHF;
-      if(r.AUD) fxRates.AUD = 1 / r.AUD;
-      if(r.ZAR) fxRates.ZAR = r.ZAR;
-      if(r.SEK) fxRates.SEK = 1 / r.SEK;
-      if(r.INR) fxRates.INR = 1 / r.INR;
-      if(r.AED) fxRates.AED = 1 / r.AED;
+      // /api/rates ham {TRY, EUR, GBP, ...} döner — hesaplama deposuna yaz
+      _applyRatesToFx(r);
     }
   } catch(e) { /* fallback kurlar kullanılır */ }
   // Collect all active filter tags for summary bar (deduplicated by key)
