@@ -96,47 +96,113 @@ var INV_META = {
   bal:    { emoji:'⚖️', risk:'Orta',         vade:'5+ yıl',    tags:['Çeşitlendirme','Sharpe oranı','Korelasyon','Risk/getiri dengesi'] },
 };
 
+// ── Yatırımcı profilin: zengin açıklama ──────────
+var INV_RICH = {
+  growth: {
+    buys: 'Geliri ve hisse başı kârı yıllar boyu %15–25+ büyüyen, pazar payını sürekli artıran şirketleri alır: teknoloji, e-ticaret, sağlık ve yükselen tüketici markaları. Büyüme hikâyesi bozulmadıkça pahalı görünen çarpanlara katlanır.',
+    why:  'Hisse fiyatını uzun vadede kâr büyümesi sürükler. Bugün makul bir prim ödeyip 5 yıl sonra kârını ikiye katlayacak şirkete ortak olmak, ucuz ama durağan şirkete ortak olmaktan daha çok kazandırır.',
+    similar: 'Peter Lynch'
+  },
+  div: {
+    buys: 'Düzenli ve artan temettü ödeyen, nakit akışı güçlü, borcu düşük köklü şirketleri alır: bankalar, telekom, kamu hizmetleri ve dayanıklı tüketim. Yüksek ama sürdürülebilir verim arar.',
+    why:  'Temettü, fiyat dalgalansa bile cebe giren gerçek nakittir. Yeniden yatırılan temettüler bileşik etkiyle uzun vadede toplam getirinin büyük kısmını oluşturur.',
+    similar: 'John Neff'
+  },
+  value: {
+    buys: 'Gerçek değerinin altında fiyatlanmış, düşük F/K ve PD/DD’li, sağlam bilançolu şirketleri alır. Piyasanın geçici olarak cezalandırdığı ama temeli bozulmamış işleri arar.',
+    why:  'Bir şeyi değerinin altında alırsan hem yükseliş potansiyeli hem de düşüşe karşı güvenlik marjı elde edersin. Piyasa er ya da geç gerçek değeri fiyatlar.',
+    similar: 'Warren Buffett'
+  },
+  mom: {
+    buys: 'Güçlü yükseliş trendinde, 52 hafta zirvesine yakın, göreceli gücü ve hacmi yüksek hisseleri alır. Kazananları tutar, kaybedenleri hızla keser.',
+    why:  'Yükselen güçlü kalmaya, düşen zayıf kalmaya meyleder. Trendle birlikte hareket etmek, dönüşü tahmin etmeye çalışmaktan daha yüksek olasılıklıdır.',
+    similar: 'William O’Neil'
+  },
+  def: {
+    buys: 'Düşük betalı, istikrarlı kâr eden, güçlü bilançolu savunmacı sektör şirketlerini alır: gıda, sağlık, kamu hizmetleri. Sürpriz sevmez, dayanıklılık arar.',
+    why:  'Kaybetmemek, kazanmanın ön koşuludur. Krizlerde az düşen bir portföy toparlanmada öne geçer; istikrar bileşik getiriyi korur.',
+    similar: 'Benjamin Graham'
+  },
+  small: {
+    buys: 'Kurumların ve analistlerin radarına girmemiş, küçük ölçekli ama kârlı ve ucuz şirketleri alır. Keşfedilmeden önce pozisyon almayı sever.',
+    why:  'Az takip edilen küçük şirketler verimsiz fiyatlanır; gerçek fırsatlar burada saklıdır. Şirket büyüyüp fark edildiğinde yeniden değerleme büyük kazanç getirir.',
+    similar: 'Walter Schloss'
+  },
+  spec: {
+    buys: 'Yüksek volatiliteli, katalizör bekleyen, hacim patlaması yaşayan agresif fırsatları alır. Kısa vadeli sert hareketleri hedefler.',
+    why:  'Yüksek risk, yüksek ödül potansiyeli taşır. Doğru zamanlanmış birkaç büyük kazanç, çok sayıda küçük kaybı sıkı risk yönetimiyle fazlasıyla telafi edebilir.',
+    similar: 'Jesse Livermore'
+  },
+  tech: {
+    buys: 'Yıkıcı inovasyon yapan, Ar-Ge’ye yatırım yapan, büyük pazarları hedefleyen teknoloji ve yazılım şirketlerini alır. Geleceğin kazananlarına erken ortak olur.',
+    why:  'Teknoloji, ekonomiyi yeniden şekillendiren en güçlü büyüme kaynağıdır. Bir sektörü dönüştüren şirketler kısa vadeli pahalılığı uzun vadede fazlasıyla haklı çıkarır.',
+    similar: 'Cathie Wood'
+  },
+  bal: {
+    buys: 'Farklı sektör ve varlıklara yayılmış, risk-getirisi dengeli bir sepet kurar. Tek bir hisseye veya temaya aşırı bağlanmaz.',
+    why:  'Çeşitlendirme, tek bir yanlışın portföyü batırmasını önler. Dengeli bir dağılım daha düşük dalgalanmayla istikrarlı bileşik getiri sağlar.',
+    similar: 'Ray Dalio'
+  },
+};
+
 function renderInvestorSidebar() {
   var sb = document.getElementById('pf-inv-sidebar');
   if (!sb) return;
   var current = _user && _user.investorType;
 
-  var html = '<div class="pf-inv-sb-title">Yatırımcı Profilleri</div>';
-
-  if (_user) {
+  // Kullanıcının kendi profili — zengin kart ("Yatırımcı Profilin")
+  if (current && INV_TYPES[current]) {
+    var inv  = INV_TYPES[current];
+    var meta = INV_META[current];
+    var rich = INV_RICH[current] || {};
+    var c = inv.color;
+    var html = '<div class="pf-inv-sb-title">Yatırımcı Profilin</div>';
+    html +=
+      '<div class="pf-inv-sb-item pf-inv-sb-me" style="border-color:' + c + ';background:' + c + '12;">' +
+        '<div class="pf-inv-sb-name" style="margin-bottom:5px;">' +
+          '<span style="color:' + c + '">' + inv.name + '</span>' +
+          '<span class="pf-inv-sb-me-badge" style="background:' + c + '">SEN</span>' +
+        '</div>' +
+        '<div class="pf-inv-sb-desc">' + inv.desc + '</div>' +
+        '<div class="pf-inv-sb-meta">' +
+          '<span class="pf-inv-sb-chip">' + meta.vade + '</span>' +
+          '<span class="pf-inv-sb-chip">' + meta.risk + ' risk</span>' +
+        '</div>' +
+        '<div class="pf-inv-sb-tags">' +
+          meta.tags.map(function(t){ return '<span class="pf-inv-sb-tag">' + t + '</span>'; }).join('') +
+        '</div>' +
+      '</div>';
+    if (rich.buys) html += '<div class="pf-inv-rich"><div class="pf-inv-rich-h">Hangi Hisseleri Alırsın?</div><div class="pf-inv-rich-b">' + rich.buys + '</div></div>';
+    if (rich.why)  html += '<div class="pf-inv-rich"><div class="pf-inv-rich-h">Neden?</div><div class="pf-inv-rich-b">' + rich.why + '</div></div>';
+    if (rich.similar) html += '<div class="pf-inv-rich"><div class="pf-inv-rich-h">Benzediğin Yatırımcı</div><div class="pf-inv-rich-sim" style="color:' + c + '">' + rich.similar + '</div></div>';
     html += '<button class="pf-inv-sb-change-btn" onclick="startQuizForExistingUser()">Kimliğini Güncelle</button>';
+    sb.innerHTML = html;
+    return;
   }
 
+  // Henüz tipi yok — tüm profilleri sade liste olarak göster
+  var html = '<div class="pf-inv-sb-title">Yatırımcı Profilleri</div>';
+  if (_user) {
+    html += '<button class="pf-inv-sb-change-btn" onclick="startQuizForExistingUser()">Kimliğini Belirle</button>';
+  }
   Object.keys(INV_TYPES).forEach(function(key) {
     var inv  = INV_TYPES[key];
     var meta = INV_META[key];
-    var isMe = current === key;
-    var borderStyle = isMe ? 'border-color:' + inv.color + ';' : '';
-    var bgStyle     = isMe ? 'background:' + inv.color + '12;' : '';
     html +=
-      '<div class="pf-inv-sb-item' + (isMe ? ' pf-inv-sb-me' : '') + '" style="' + borderStyle + bgStyle + '">' +
-        '<div class="pf-inv-sb-head">' +
-          '<span class="pf-inv-sb-emoji">' + meta.emoji + '</span>' +
-          '<div style="flex:1;min-width:0;">' +
-            '<div class="pf-inv-sb-name">' +
-              '<span style="color:' + inv.color + '">' + inv.name + '</span>' +
-              (isMe ? '<span class="pf-inv-sb-me-badge" style="background:' + inv.color + '">SEN</span>' : '') +
-            '</div>' +
-            '<div class="pf-inv-sb-desc">' + inv.desc + '</div>' +
-          '</div>' +
-        '</div>' +
+      '<div class="pf-inv-sb-item">' +
+        '<div class="pf-inv-sb-name"><span style="color:' + inv.color + '">' + inv.name + '</span></div>' +
+        '<div class="pf-inv-sb-desc">' + inv.desc + '</div>' +
         '<div class="pf-inv-sb-meta">' +
-          '<span class="pf-inv-sb-chip">⏱ ' + meta.vade + '</span>' +
-          '<span class="pf-inv-sb-chip">⚠ ' + meta.risk + '</span>' +
+          '<span class="pf-inv-sb-chip">' + meta.vade + '</span>' +
+          '<span class="pf-inv-sb-chip">' + meta.risk + ' risk</span>' +
         '</div>' +
         '<div class="pf-inv-sb-tags">' +
           meta.tags.map(function(t){ return '<span class="pf-inv-sb-tag">' + t + '</span>'; }).join('') +
         '</div>' +
       '</div>';
   });
-
   if (!current) {
-    html += '<div class="pf-inv-sb-scrollhint">Quiz yaparak tipini belirle 👆</div>';
+    html += '<div class="pf-inv-sb-scrollhint">Quiz yaparak tipini belirle</div>';
   }
   sb.innerHTML = html;
 }
@@ -371,7 +437,7 @@ async function init() {
             renderIdentity();
             var mb = dd.milestoneBonus || 0;
             var toastMsg = mb > 0
-              ? '+' + dd.pointsAdded + ' XP 🎉 ' + dd.streak + '. gün bonusu +' + mb + ' XP!'
+              ? '+' + dd.pointsAdded + ' XP · ' + dd.streak + '. gün bonusu +' + mb + ' XP!'
               : '+100 XP — ' + dd.streak + ' günlük giriş serisi!';
             toast(toastMsg);
           }
@@ -475,7 +541,7 @@ function renderIdentity() {
       identityCard.style.border     = '1px solid ' + iInv.color + '40';
       identityCard.style.borderLeft = '3px solid ' + iInv.color;
       identityCard.style.background = 'linear-gradient(130deg,' + iInv.color + '12 0%,var(--s1) 55%)';
-      if (identityDec) { identityDec.textContent = iMeta.emoji; }
+      if (identityDec) { identityDec.textContent = ''; }
     } else {
       identityCard.style.border     = '';
       identityCard.style.borderLeft = '';
@@ -1172,7 +1238,7 @@ window.submitAuth = async function(e) {
             renderIdentity();
             var mb = dd.milestoneBonus || 0;
             var toastMsg = mb > 0
-              ? '+' + dd.pointsAdded + ' XP 🎉 ' + dd.streak + '. gün bonusu +' + mb + ' XP!'
+              ? '+' + dd.pointsAdded + ' XP · ' + dd.streak + '. gün bonusu +' + mb + ' XP!'
               : '+100 XP — ' + dd.streak + ' günlük giriş serisi!';
             toast(toastMsg);
           }
