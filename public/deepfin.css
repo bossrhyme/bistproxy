@@ -7,7 +7,7 @@
   --red:#FF4444;--red-bg:rgba(255,68,68,.08);
   --blue:#1E90FF;--blue2:#1565C0;
   --gold:#FFB300;--teal:#00BCD4;
-  --text:#D8E8F8;--text2:#7090B0;--muted:#2E4060;--muted2:#4A6480;
+  --text:#D8E8F8;--text2:#7090B0;--muted:#2E4060;--muted2:#6B83A4;
   --accent:#1E90FF;--accent2:rgba(30,144,255,.12);--hover:rgba(30,144,255,.07);
   --ff:'Inter',sans-serif;
   --ff-mono:'Inter',sans-serif;
@@ -15,7 +15,7 @@
   --shadow-md:0 4px 18px rgba(0,0,0,.55),0 2px 6px rgba(0,0,0,.4);
   --shadow-lg:0 12px 44px rgba(0,0,0,.65),0 4px 16px rgba(0,0,0,.5);
   --r-sm:5px;--r-md:7px;--r-lg:8px;--r-xl:12px;--r-pill:9999px;
-  --sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-6:24px;--sp-8:32px;
+  --sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-5:20px;--sp-6:24px;--sp-7:28px;--sp-8:32px;
 }
 [data-theme="light"]{
   /* ── DeepFin Warm (mockup) — default ── */
@@ -25,7 +25,7 @@
   --red:#dc2626;--red-bg:rgba(220,38,38,.07);
   --blue:#1E293B;--blue2:#334155;
   --gold:#D97706;--teal:#0E7490;
-  --text:#111210;--text2:#6B6B68;--muted:#A3A39F;--muted2:#8B8B88;
+  --text:#111210;--text2:#6B6B68;--muted:#A3A39F;--muted2:#6E6E6B;
   --accent:#1E293B;--accent2:rgba(30,41,59,.08);--hover:rgba(0,0,0,.04);
   --shadow:0 1px 3px rgba(17,18,16,.05),0 1px 2px rgba(17,18,16,.04);
   --shadow-md:0 4px 16px rgba(17,18,16,.08),0 2px 6px rgba(17,18,16,.05);
