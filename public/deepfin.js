@@ -5157,6 +5157,28 @@ function fdToggleChip(kind, key, el) {
 }
 
 // ── MOBILE DRAWER ──
+// Drawer açıkken odağı içeride tut (a11y: focus-trap + Escape + odak geri yükleme)
+var _drawerPrevFocus = null;
+function _drawerFocusables(sidebar) {
+  var sel = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+  return Array.prototype.filter.call(sidebar.querySelectorAll(sel), function(el) {
+    // görünürlük: position:fixed drawer'da offsetParent güvenilmez → boyut/rect ile bak
+    return el.offsetWidth > 0 || el.offsetHeight > 0 || el.getClientRects().length > 0;
+  });
+}
+function _drawerKeydown(e) {
+  var sidebar = document.querySelector('.sidebar');
+  if (!sidebar || !sidebar.classList.contains('open')) return;
+  if (e.key === 'Escape') { e.preventDefault(); closeMobileDrawer(); return; }
+  if (e.key !== 'Tab') return;
+  var f = _drawerFocusables(sidebar);
+  if (!f.length) return;
+  var first = f[0], last = f[f.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  else if (!sidebar.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+}
+
 function toggleMobileDrawer() {
   var sidebar = document.querySelector('.sidebar');
   var overlay = document.getElementById('drawer-overlay');
@@ -5169,8 +5191,18 @@ function toggleMobileDrawer() {
   } else {
     sidebar.classList.add('open');
     if (overlay) overlay.classList.add('open');
-    if (btn) btn.classList.add('open');
+    if (btn) { btn.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); }
     document.body.style.overflow = 'hidden';
+    // a11y: modal dialog semantiği + focus-trap
+    sidebar.setAttribute('role', 'dialog');
+    sidebar.setAttribute('aria-modal', 'true');
+    _drawerPrevFocus = document.activeElement;
+    document.addEventListener('keydown', _drawerKeydown, true);
+    setTimeout(function() {
+      var f = _drawerFocusables(sidebar);
+      if (f.length) f[0].focus();
+      else { sidebar.setAttribute('tabindex', '-1'); sidebar.focus(); }
+    }, 60);
   }
 }
 
@@ -5180,8 +5212,18 @@ function closeMobileDrawer() {
   var btn     = document.getElementById('hamburger-btn');
   if (sidebar) sidebar.classList.remove('open');
   if (overlay) overlay.classList.remove('open');
-  if (btn)     btn.classList.remove('open');
+  if (btn) { btn.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
   document.body.style.overflow = '';
+  // a11y: dialog semantiğini geri al, focus-trap'i kaldır, odağı geri yükle
+  if (sidebar) {
+    sidebar.setAttribute('role', 'complementary');
+    sidebar.removeAttribute('aria-modal');
+  }
+  document.removeEventListener('keydown', _drawerKeydown, true);
+  if (_drawerPrevFocus && typeof _drawerPrevFocus.focus === 'function') {
+    _drawerPrevFocus.focus();
+    _drawerPrevFocus = null;
+  }
 }
 let disclaimerTimer = null;
 

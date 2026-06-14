@@ -133,7 +133,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
 <link rel="stylesheet" href="/deepfin.css?v=warm32">
-<script src="/deepfin.js?v=177" defer></script>
+<script src="/deepfin.js?v=178" defer></script>
 <script src="/auth-header.js?v=2" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -182,7 +182,7 @@ if('serviceWorker' in navigator){
       <a href="/bilgi/" class="hp-nav-btn">Bilgi Bankası</a>
     </nav>
 
-    <button class="hamburger-btn" id="hamburger-btn" onclick="toggleMobileDrawer()" style="display:none;" aria-label="Filtreler">
+    <button class="hamburger-btn" id="hamburger-btn" onclick="toggleMobileDrawer()" style="display:none;" aria-label="Filtreler" aria-controls="sidebar" aria-expanded="false">
       <span class="ham-line"></span><span class="ham-line"></span><span class="ham-line"></span>
     </button>
 
