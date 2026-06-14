@@ -4528,7 +4528,7 @@ function updateStatsBar() {
   document.getElementById('sb-up').textContent = '▲ ' + upCount;
   document.getElementById('sb-dn').textContent = '▼ ' + dnCount;
   document.getElementById('sb-ex').textContent = ex.name || currentExchange.toUpperCase();
-  document.getElementById('sb-time').textContent = hh + ':' + mm + ':' + ss;
+  document.getElementById('sb-time').textContent = hh + ':' + mm;
 }
 
 function updateTicker() {
@@ -4961,8 +4961,11 @@ function showScanSummary(total, matches) {
       '</span>';
   }).join('');
   el.innerHTML =
-    '<span class="ssm-left"></span>' +
-    '<span class="ssm-center ssm-tags-center">' + (tagsHtml || '<span class="ssm-no-filter">Filtresiz</span>') + '</span>' +
+    '<span class="ssm-left">' +
+      (tagsHtml
+        ? '<span class="ssm-flabel">Aktif filtre:</span>' + tagsHtml
+        : '<span class="ssm-no-filter">Filtresiz</span>') +
+    '</span>' +
     '<span class="ssm-right ssm-dur">' + elapsed + 's</span>';
   // Tarandı/eşleşti bilgisi stats-bar'da GÜNCELLEME yanında
   var resItem = document.getElementById('sb-result-item');
