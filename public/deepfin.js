@@ -1317,8 +1317,11 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 // TARAMA MOTORU — tek istekte tüm BIST
 // ═══════════════════════════════════════════
 var _scanRunning = false;
+var _scanQueued  = false;
 async function runScan(){
-  if (_scanRunning) return;
+  // Bir tarama sürerken gelen istekleri düşürme — kuyruğa al, bitince tekrar çalıştır.
+  // (Aksi halde ilk açılışta veya hızlı tıklamada tarama kaybolur.)
+  if (_scanRunning) { _scanQueued = true; return; }
   _scanRunning = true;
   closeMobileDrawer();
   // Disclaimer kontrolü
@@ -1858,6 +1861,14 @@ async function runScan(){
     _scanRunning = false;
     btn.disabled = false;
     document.getElementById('stopbtn').style.display = 'none';
+    // Tarama sürerken düşen bir istek olduysa, en güncel filtrelerle tekrar tara.
+    if (_scanQueued) {
+      _scanQueued = false;
+      stopScanEta();
+      hideQuickScanPill();
+      setTimeout(runScan, 0);
+      return;
+    }
     var _remaining = _isSuccess ? Math.max(0, _scanMinMs - (Date.now() - scanStartTime)) : 0;
     if (_remaining > 0) {
       setTimeout(function() {
@@ -3071,6 +3082,9 @@ function applyAndRender(special){
   if (_wrap) _wrap.scrollTop = 0;
   _vsInit();
   _vsRender();
+  // Kolay tablosu _vsData'dan beslenir — _vsData güncellendikten SONRA tekrar çiz.
+  // (showState('twrap') içindeki renderKolay henüz eski _vsData'yı görür → bir adım geride kalırdı.)
+  if (_scanMode === 'kolay' && typeof renderKolay === 'function') renderKolay();
   updateStatsBar();
   updateTicker();
   _saveScanHistory(filtered.length);
@@ -3545,31 +3559,48 @@ function renderKolayFilters() {
 }
 function kolayToggleMoreFilters() { _kolayFiltExpanded = !_kolayFiltExpanded; renderKolayFilters(); }
 
-// Bir Kolay filtreyi yüklü veriye uygula (kategoriyi otomatik bul)
-function _kolayApplyChip(key) {
-  var chip = null;
-  if (typeof GURUS !== 'undefined' && GURUS[key]) chip = document.querySelector('#goat-chips .goat-chip[data-goat="' + key + '"]');
-  else if (typeof TECH_PRESETS !== 'undefined' && TECH_PRESETS[key]) chip = document.querySelector('#tech-presets .chip[data-tech="' + key + '"]');
-  else if (typeof PRESETS !== 'undefined' && PRESETS[key]) chip = document.querySelector('#presets .chip[data-preset="' + key + '"]');
-  if (chip) chip.classList.add('on');
-  if (typeof _applyChips === 'function') _applyChips(BASIC_CHIP_CFG);
+// Bir Kolay filtre anahtarı için chip + filtre inputlarını hazırlar.
+// Veriyi YENİDEN ÇEKMEZ — sadece state'i kurar ve özel (special) anahtarı döner.
+// Böylece filtre tıklamaları mevcut veriye anında uygulanır, async yarış olmaz.
+function _kolaySetupFilter(key) {
+  // Önce tüm chip/inputları temizle (önceki seçim takılmasını önler)
+  document.querySelectorAll('#goat-chips .goat-chip.on, #presets .chip.on, #tech-presets .chip.on, #adv-goat-chips .goat-chip.on, #adv-presets .chip.on, #adv-tech-presets .chip.on').forEach(function(c){ c.classList.remove('on'); });
+  document.querySelectorAll('.finps input, #hisse-hidden-filters input').forEach(function(i){ i.value = ''; });
+  document.querySelectorAll('.qs-btn.active').forEach(function(b){ b.classList.remove('active'); });
+  var special = null;
+  if (key && key !== 'all') {
+    var chip = null, filters = null;
+    if (typeof GURUS !== 'undefined' && GURUS[key]) {
+      chip = document.querySelector('#goat-chips .goat-chip[data-goat="' + key + '"]');
+      filters = GURUS[key].filters; special = GURUS[key].special || null;
+    } else if (typeof TECH_PRESETS !== 'undefined' && TECH_PRESETS[key]) {
+      chip = document.querySelector('#tech-presets .chip[data-tech="' + key + '"]');
+      filters = TECH_PRESETS[key].filters;
+    } else if (typeof PRESETS !== 'undefined' && PRESETS[key]) {
+      chip = document.querySelector('#presets .chip[data-preset="' + key + '"]');
+      filters = PRESETS[key].filters;
+    }
+    if (chip) chip.classList.add('on');
+    if (filters) Object.keys(filters).forEach(function(k){ var el = document.getElementById(k); if (el) el.value = filters[k]; });
+  }
+  window._chipSpecial = special;
+  if (typeof updateClrBtn === 'function') updateClrBtn();
+  return special;
 }
 
 function kolayFilter(key, el) {
   _kolayFilterKey = key;
   renderKolayFilters(); // aktif durumu güncelle
-  // Önce tüm filtreleri temizle (seçim takılmasını önler)
-  document.querySelectorAll('#goat-chips .goat-chip.on, #presets .chip.on, #tech-presets .chip.on, #adv-goat-chips .goat-chip.on, #adv-presets .chip.on, #adv-tech-presets .chip.on').forEach(function(c){ c.classList.remove('on'); });
-  document.querySelectorAll('.finps input, #hisse-hidden-filters input').forEach(function(i){ i.value = ''; });
-  document.querySelectorAll('.qs-btn.active').forEach(function(b){ b.classList.remove('active'); });
-  if (typeof updateClrBtn === 'function') updateClrBtn();
+  var special = _kolaySetupFilter(key);
   var hasData = (typeof allData !== 'undefined' && allData && allData.length);
-  if (key === 'all') {
-    if (hasData) { if (typeof applyAndRender === 'function') applyAndRender(); } else { _runDefaultScan(); }
-    return;
+  if (hasData) {
+    // Veri zaten yüklü — anında, yarışsız yerel filtreleme
+    if (typeof applyAndRender === 'function') applyAndRender(special);
+  } else {
+    // Henüz veri yok — bir kez tara; tarama bittiğinde kurulan filtre uygulanır
+    if (_activeAsset !== 'hisse' && typeof selectAsset === 'function') selectAsset('hisse');
+    runScan();
   }
-  if (hasData) _kolayApplyChip(key);
-  else _runDefaultScan();
 }
 
 // Kolay sol panel: Varlık + Borsa listesi
@@ -3615,12 +3646,11 @@ function kolaySelectExchange(key) {
   allData = []; filtered = []; selSym = null;
   if (typeof closeDetail === 'function') closeDetail();
   renderKolaySide();
-  // Yeni borsada taze tara; veri gelince mevcut filtre uygulanır
-  _runDefaultScan();
-  if (_kolayFilterKey && _kolayFilterKey !== 'all') {
-    var k = _kolayFilterKey;
-    setTimeout(function(){ if (allData && allData.length) _kolayApplyChip(k); }, 1400);
-  }
+  // Yeni borsada taze tara; mevcut filtreyi kurup tek taramayla uygula
+  // (tarama bittiğinde kurulan filtre/özel anahtar otomatik uygulanır)
+  _kolaySetupFilter(_kolayFilterKey);
+  if (_activeAsset !== 'hisse' && typeof selectAsset === 'function') selectAsset('hisse');
+  runScan();
 }
 
 
