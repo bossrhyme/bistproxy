@@ -354,7 +354,7 @@ td:nth-child(2){font-family:var(--ff);}
 .goat-card-criteria{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;}
 .goat-criterion{font-size:10px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r-sm);padding:2px 7px;color:var(--muted2);}
 .goat-divider{border:none;border-top:1px solid var(--border);margin:20px 0;}
-.goat-fund-tag{display:inline-block;font-size:8px;font-weight:700;padding:1px 5px;border-radius:var(--r-sm);background:rgba(240,180,41,.12);color:#d97706;margin-left:6px;vertical-align:middle;}
+.goat-fund-tag{display:inline-block;font-size:8px;font-weight:700;padding:1px 5px;border-radius:var(--r-sm);background:rgba(240,180,41,.12);color:var(--gold);margin-left:6px;vertical-align:middle;}
 .picard{background:var(--s2);border:1px solid var(--border);padding:16px 18px;border-radius:8px;transition:border-color .15s;}
 .picard:hover{border-color:var(--accent);}
 .picard-name{font-size:14px;font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-.2px;}
@@ -476,7 +476,7 @@ td:nth-child(2){font-family:var(--ff);}
 .ssm-dur{font-family:var(--ff-mono);font-size:10px;color:var(--muted);}
 
 .dxloading{text-align:center;padding:20px;color:var(--muted2);font-size:11px;}
-.dxerror{text-align:center;padding:16px;color:#f6465d;font-size:10px;}
+.dxerror{text-align:center;padding:16px;color:var(--red);font-size:10px;}
 
 /* ══════════════════════════════════
    PRESCAN FULL-SCREEN VIEW
@@ -568,7 +568,7 @@ td:nth-child(2){font-family:var(--ff);}
 #prescan-view.psv-at-limit .psv-goat-card:not(.on),
 #prescan-view.psv-at-limit .psv-preset-card:not(.on),
 #prescan-view.psv-at-limit .psv-tech-card:not(.on){opacity:.35;pointer-events:none;}
-.psv-limit-hint{display:none;font-size:12px;font-weight:600;color:#b45309;background:rgba(240,180,41,.1);border:1px solid rgba(240,180,41,.35);border-radius:var(--r-md);padding:8px 16px;}
+.psv-limit-hint{display:none;font-size:12px;font-weight:600;color:var(--gold);background:rgba(240,180,41,.1);border:1px solid rgba(240,180,41,.35);border-radius:var(--r-md);padding:8px 16px;}
 .psv-close-btn{position:absolute;top:14px;right:18px;background:var(--s2);border:1px solid var(--border);color:var(--text2);font-size:12px;font-weight:600;padding:7px 14px;border-radius:var(--r-pill);cursor:pointer;z-index:5;transition:border-color .15s,color .15s;}
 .psv-close-btn:hover{border-color:var(--accent);color:var(--accent);}
 #prescan-view.psv-at-limit .psv-limit-hint{display:block;}
@@ -954,7 +954,6 @@ td:nth-child(2){font-family:var(--ff);}
   .iitem-name { font-size: 13px; }
   .preset-info-grid { grid-template-columns: 1fr; }
   .goat-bank-grid { grid-template-columns: 1fr; }
- { white-space: nowrap; } { white-space: nowrap; }
   .smodal { margin: 8px; max-width: calc(100vw - 16px); }
   .smodal-title { font-size: 20px; letter-spacing: 2px; }
   .smodal-body {  max-height: calc(100dvh - 160px); }
@@ -1552,10 +1551,6 @@ tbody tr td { height: 36px; }
 #result-area thead th.right{text-align:right;}
 
 #result-area tbody tr:hover{background:var(--s2);}
-#result-area 
-#result-area 
-#result-area 
-#result-area 
 #result-area .res-hdr{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--s2);border-bottom:1px solid var(--border);font-size:11px;position:sticky;top:0;z-index:6;}
 #result-area .res-hdr b{color:var(--text);}
 #result-area .res-cnt{color:var(--accent);font-weight:600;}
@@ -1573,7 +1568,7 @@ tbody tr td { height: 36px; }
     padding:5px 10px;background:var(--accent);color:#fff;
     border:none;border-radius:5px;font-size:11px;font-weight:700;
     cursor:pointer;white-space:nowrap;flex-shrink:0;
-    font-family:inherit;min-height:32px;line-height:1.4;
+    font-family:inherit;min-height:44px;line-height:1.4;
   }
 
   /* Sidebar — fixed drawer, ID selektör tüm class kurallarını ezer */
@@ -1902,3 +1897,28 @@ kbd{font-family:var(--ff-mono);font-size:10px;color:var(--text);background:var(-
 .kfil-tip{position:fixed;z-index:2000;width:260px;max-width:calc(100vw - 16px);background:var(--s1);border:1px solid var(--border2);border-radius:10px;padding:11px 13px;box-shadow:0 8px 28px rgba(15,23,42,.13);pointer-events:none;opacity:0;display:none;transition:opacity .14s;font-family:'Inter',sans-serif;}
 .kfil-tip-h{font-size:12px;font-weight:700;color:var(--text);margin-bottom:5px;letter-spacing:.2px;}
 .kfil-tip-d{font-size:11px;color:var(--text2);line-height:1.6;}
+
+/* ══════════════════════════════════════════════════════════
+   DOKUNMA GERİ BİLDİRİMİ (:active) — mobilde tap-highlight kaldırılmış,
+   yerine hafif bir bas-geri-bildirimi. GPU-dostu (yalnız transform).
+══════════════════════════════════════════════════════════ */
+.chip:active,.fd-chip:active,.qs-btn:active,.exbtn:active,.goat-chip:active,
+.new-scan-btn:active,.tb-tools-btn:active,.auth-btn:active,.sbtn:active,
+.psv-asset-btn:active,.psv-goat-card:active,.psv-preset-card:active,
+.sbp-scan-btn:active,.hpx-spill:active,.qs-btn:active{
+  transform:scale(.97);
+}
+tbody tr:active{background:var(--s3);}
+
+/* ══════════════════════════════════════════════════════════
+   prefers-reduced-motion — sonsuz/animasyonlu hareketleri nötrle.
+   Vestibüler güvenlik + erişilebilirlik (WCAG 2.3.3). Salt additive.
+══════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *,*::before,*::after{
+    animation-duration:.001ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;
+    scroll-behavior:auto !important;
+  }
+}

@@ -132,8 +132,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=warm28">
-<script src="/deepfin.js?v=174" defer></script>
+<link rel="stylesheet" href="/deepfin.css?v=warm29">
+<script src="/deepfin.js?v=175" defer></script>
 <script src="/auth-header.js?v=2" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -170,7 +170,7 @@ if('serviceWorker' in navigator){
 <div id="app" class="on">
   <div class="topbar">
     <div class="tleft">
-      <div class="tlogo" onclick="showHomepage()" style="cursor:pointer"><span class="tlogo-mark"></span>DeepFin</div>
+      <div class="tlogo" onclick="showHomepage()" style="cursor:pointer" role="button" tabindex="0" aria-label="Anasayfa"><span class="tlogo-mark"></span>DeepFin</div>
       <span class="tlive">Canlı</span>
     </div>
 
@@ -240,7 +240,7 @@ if('serviceWorker' in navigator){
     <div class="hpx-section hpx-section-left">
       <div class="hpx-eye">Varlıklar</div>
       <div class="hpx-spill-wrap">
-          <div class="hpx-spill" onclick="showScreenerOrPrescan()"><div class="hpx-spill-name">Borsa</div><div class="hpx-spill-tag">Hisse senetleri · 28+ borsa</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="showScreenerOrPrescan()"><div class="hpx-spill-name">Borsa</div><div class="hpx-spill-tag">Hisse senetleri · 28+ borsa</div></div>
           <div class="hpx-spill hpx-spill-soon"><div class="hpx-spill-name">Kripto <span class="hpx-soon">Yakında</span></div><div class="hpx-spill-tag">Kripto paralar</div></div>
           <div class="hpx-spill hpx-spill-soon"><div class="hpx-spill-name">Fon <span class="hpx-soon">Yakında</span></div><div class="hpx-spill-tag">Yatırım fonları</div></div>
           <div class="hpx-spill hpx-spill-soon"><div class="hpx-spill-name">ETF <span class="hpx-soon">Yakında</span></div><div class="hpx-spill-tag">Borsa yatırım fonları</div></div>
@@ -258,31 +258,31 @@ if('serviceWorker' in navigator){
         <button class="hpx-tab" onclick="hpStratTab(this,'tech')">Teknik Analiz</button>
       </div>
       <div class="hpx-spill-wrap" id="hpx-sg-goat">
-          <div class="hpx-spill" onclick="applyStrategyAndGo('buffett')"><div class="hpx-spill-name">Buffett</div><div class="hpx-spill-tag">Kalite & moat</div></div>
-          <div class="hpx-spill" onclick="applyStrategyAndGo('graham')"><div class="hpx-spill-name">Graham</div><div class="hpx-spill-tag">Güvenlik marjı</div></div>
-          <div class="hpx-spill" onclick="applyStrategyAndGo('fisher')"><div class="hpx-spill-name">Fisher</div><div class="hpx-spill-tag">Büyüme kalitesi</div></div>
-          <div class="hpx-spill" onclick="applyStrategyAndGo('munger')"><div class="hpx-spill-name">Munger</div><div class="hpx-spill-tag">Mükemmel şirket</div></div>
-          <div class="hpx-spill" onclick="applyStrategyAndGo('lynch')"><div class="hpx-spill-name">Lynch</div><div class="hpx-spill-tag">PEG · GARP</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyStrategyAndGo('buffett')"><div class="hpx-spill-name">Buffett</div><div class="hpx-spill-tag">Kalite & moat</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyStrategyAndGo('graham')"><div class="hpx-spill-name">Graham</div><div class="hpx-spill-tag">Güvenlik marjı</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyStrategyAndGo('fisher')"><div class="hpx-spill-name">Fisher</div><div class="hpx-spill-tag">Büyüme kalitesi</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyStrategyAndGo('munger')"><div class="hpx-spill-name">Munger</div><div class="hpx-spill-tag">Mükemmel şirket</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyStrategyAndGo('lynch')"><div class="hpx-spill-name">Lynch</div><div class="hpx-spill-tag">PEG · GARP</div></div>
       </div>
       <div class="hpx-spill-wrap" id="hpx-sg-fund" style="display:none">
-          <div class="hpx-spill" onclick="applyPresetAndGo('value')"><div class="hpx-spill-name">Değer</div><div class="hpx-spill-tag">Düşük F/K</div></div>
-          <div class="hpx-spill" onclick="applyPresetAndGo('growth')"><div class="hpx-spill-name">Büyüme</div><div class="hpx-spill-tag">Gelir ivmesi</div></div>
-          <div class="hpx-spill" onclick="applyPresetAndGo('dividend')"><div class="hpx-spill-name">Temettü</div><div class="hpx-spill-tag">Yüksek verim</div></div>
-          <div class="hpx-spill" onclick="applyPresetAndGo('quality')"><div class="hpx-spill-name">Kalite</div><div class="hpx-spill-tag">Güçlü ROE</div></div>
-          <div class="hpx-spill" onclick="applyPresetAndGo('lowdebt')"><div class="hpx-spill-name">Az Borç</div><div class="hpx-spill-tag">Temiz bilanço</div></div>
-          <div class="hpx-spill" onclick="applyPresetAndGo('momentum')"><div class="hpx-spill-name">Momentum</div><div class="hpx-spill-tag">Hızlanan kazanç</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyPresetAndGo('value')"><div class="hpx-spill-name">Değer</div><div class="hpx-spill-tag">Düşük F/K</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyPresetAndGo('growth')"><div class="hpx-spill-name">Büyüme</div><div class="hpx-spill-tag">Gelir ivmesi</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyPresetAndGo('dividend')"><div class="hpx-spill-name">Temettü</div><div class="hpx-spill-tag">Yüksek verim</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyPresetAndGo('quality')"><div class="hpx-spill-name">Kalite</div><div class="hpx-spill-tag">Güçlü ROE</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyPresetAndGo('lowdebt')"><div class="hpx-spill-name">Az Borç</div><div class="hpx-spill-tag">Temiz bilanço</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyPresetAndGo('momentum')"><div class="hpx-spill-name">Momentum</div><div class="hpx-spill-tag">Hızlanan kazanç</div></div>
       </div>
       <div class="hpx-spill-wrap" id="hpx-sg-tech" style="display:none">
-          <div class="hpx-spill" onclick="applyTechAndGo('breakout')"><div class="hpx-spill-name">Breakout</div><div class="hpx-spill-tag">Yeni zirve</div></div>
-          <div class="hpx-spill" onclick="applyTechAndGo('oversold')"><div class="hpx-spill-name">Aşırı Satış</div><div class="hpx-spill-tag">RSI < 35</div></div>
-          <div class="hpx-spill" onclick="applyTechAndGo('nearHigh')"><div class="hpx-spill-name">ATH Yakın</div><div class="hpx-spill-tag">52H zirve</div></div>
-          <div class="hpx-spill" onclick="applyTechAndGo('pullback')"><div class="hpx-spill-name">Düzeltme</div><div class="hpx-spill-tag">Sağlıklı geri çekilme</div></div>
-          <div class="hpx-spill" onclick="applyTechAndGo('strongDay')"><div class="hpx-spill-name">Günlük Hareket</div><div class="hpx-spill-tag">Günlük %2+</div></div>
-          <div class="hpx-spill" onclick="applyTechAndGo('highVolume')"><div class="hpx-spill-name">Yüksek Hacim</div><div class="hpx-spill-tag">Yüksek hacim</div></div>
-          <div class="hpx-spill" onclick="applyTechAndGo('techBuy')"><div class="hpx-spill-name">Teknik Alım</div><div class="hpx-spill-tag">Teknik skor</div></div>
-          <div class="hpx-spill" onclick="applyTechAndGo('momentum3m')"><div class="hpx-spill-name">3A Momentum</div><div class="hpx-spill-tag">Orta vadeli ivme</div></div>
-          <div class="hpx-spill" onclick="applyTechAndGo('trendFollow')"><div class="hpx-spill-name">Trend Takibi</div><div class="hpx-spill-tag">Güçlü trend</div></div>
-          <div class="hpx-spill" onclick="applyTechAndGo('rsiBounce')"><div class="hpx-spill-name">Dip Tepkisi</div><div class="hpx-spill-tag">RSI dönüşü</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyTechAndGo('breakout')"><div class="hpx-spill-name">Breakout</div><div class="hpx-spill-tag">Yeni zirve</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyTechAndGo('oversold')"><div class="hpx-spill-name">Aşırı Satış</div><div class="hpx-spill-tag">RSI < 35</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyTechAndGo('nearHigh')"><div class="hpx-spill-name">ATH Yakın</div><div class="hpx-spill-tag">52H zirve</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyTechAndGo('pullback')"><div class="hpx-spill-name">Düzeltme</div><div class="hpx-spill-tag">Sağlıklı geri çekilme</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyTechAndGo('strongDay')"><div class="hpx-spill-name">Günlük Hareket</div><div class="hpx-spill-tag">Günlük %2+</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyTechAndGo('highVolume')"><div class="hpx-spill-name">Yüksek Hacim</div><div class="hpx-spill-tag">Yüksek hacim</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyTechAndGo('techBuy')"><div class="hpx-spill-name">Teknik Alım</div><div class="hpx-spill-tag">Teknik skor</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyTechAndGo('momentum3m')"><div class="hpx-spill-name">3A Momentum</div><div class="hpx-spill-tag">Orta vadeli ivme</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyTechAndGo('trendFollow')"><div class="hpx-spill-name">Trend Takibi</div><div class="hpx-spill-tag">Güçlü trend</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyTechAndGo('rsiBounce')"><div class="hpx-spill-name">Dip Tepkisi</div><div class="hpx-spill-tag">RSI dönüşü</div></div>
       </div>
     </div>
 
@@ -345,7 +345,7 @@ if('serviceWorker' in navigator){
   <div class="drawer-panel" id="drawer-panel">
     <div class="drawer-header">
       <span class="drawer-title">⚡ Filtreler</span>
-      <button class="drawer-close" onclick="closeMobileDrawer()">×</button>
+      <button class="drawer-close" onclick="closeMobileDrawer()" aria-label="Kapat">×</button>
     </div>
     <div class="drawer-nav">
       <a class="drawer-nav-link" id="dnav-home" onclick="closeMobileDrawer(); showHomepage()">🏠 Anasayfa</a>
@@ -1038,7 +1038,7 @@ if('serviceWorker' in navigator){
         </div>
         <div class="sb-search">
           <span class="sb-search-ico">⌕</span>
-          <input type="text" id="sb-searchbox" class="sb-search-input" placeholder="Sembol ara..." oninput="onSearch()" />
+          <input type="text" id="sb-searchbox" class="sb-search-input" placeholder="Sembol ara..." aria-label="Sembol ara" oninput="onSearch()" />
           <span class="sb-search-shortcut">/</span>
         </div>
         <button id="mobile-filter-btn" class="mobile-filter-btn" onclick="toggleMobileDrawer()" title="Filtreleri aç">☰ Filtreler</button>

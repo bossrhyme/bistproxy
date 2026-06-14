@@ -418,7 +418,7 @@ function _fonRowHtml(f, i) {
     <td class="nfav" onclick="event.stopPropagation();toggleFonFav('${escJS(f.code)}')" title="${isFav?'Favorilerden çıkar':'Favorilere ekle'}"><span class="fav-icon${isFav?' fav-on':''}">★</span></td>
     <td style="padding:7px 6px;white-space:nowrap">
       <span class="row-num">${i+1}</span>
-      <span class="sym-wrap"><span class="row-arrow">›</span><span class="sym">${f.code}</span>${ver}${_fonCatBadge(f.category)}</span>
+      <span class="sym-wrap"><span class="row-arrow">›</span><span class="sym">${esc(f.code)}</span>${ver}${_fonCatBadge(f.category)}</span>
       <div class="tsub" title="${esc(f.name||'')}">${esc(name)}</div>
     </td>
     <td class="tn">₺${(f.price||0).toFixed(4)}</td>
@@ -554,13 +554,13 @@ function _kriptoTvBadge(r) {
 function _kriptoRowHtml(c, i, hasTvl) {
   var isFav = kriptoFavSet.has(c.symbol);
   var ver   = c.verified ? '<sup style="color:var(--green);font-size:8px">✓</sup>' : '';
-  var img   = c.image ? `<img src="${c.image}" width="14" height="14" style="border-radius:50%;vertical-align:middle;margin-right:3px" onerror="this.remove()">` : '';
+  var img   = c.image ? `<img src="${esc(safeUrl(c.image))}" width="14" height="14" style="border-radius:50%;vertical-align:middle;margin-right:3px" onerror="this.remove()">` : '';
   var name  = c.name && c.name.length > 30 ? c.name.slice(0, 30) + '…' : (c.name || '');
   return `<tr>
     <td class="nfav" onclick="event.stopPropagation();toggleKriptoFav('${escJS(c.symbol)}')" title="${isFav?'Favorilerden çıkar':'Favorilere ekle'}"><span class="fav-icon${isFav?' fav-on':''}">★</span></td>
     <td style="padding:7px 6px;white-space:nowrap">
       <span class="row-num">${c.rank||i+1}</span>
-      <span class="sym-wrap"><span class="row-arrow">›</span>${img}<span class="sym">${(c.symbol||'').toUpperCase()}</span>${ver}</span>
+      <span class="sym-wrap"><span class="row-arrow">›</span>${img}<span class="sym">${esc((c.symbol||'').toUpperCase())}</span>${ver}</span>
       <div class="tsub">${esc(name)}</div>
     </td>
     <td class="tn">${_kriptoPrice(c.price)}</td>
@@ -3488,7 +3488,7 @@ function renderKolay() {
   for (var i = 0; i < cap; i++) {
     var s = data[i];
     rows += '<tr onclick="showDetail(\'' + escJS(s.symbol) + '\')" tabindex="0">' +
-      '<td class="kt-hisse"><span class="kt-sym">' + s.symbol + '</span><span class="kt-name">' + (s.name || '') + '</span></td>' +
+      '<td class="kt-hisse"><span class="kt-sym">' + esc(s.symbol) + '</span><span class="kt-name">' + esc(s.name || '') + '</span></td>' +
       '<td class="r kt-price">' + (s.currentPrice != null ? s.currentPrice.toFixed(2) + ' ' + curr : '—') + '</td>' +
       '<td class="r">' + (s.changePercent != null ? fPerf(s.changePercent) : '—') + '</td>' +
       '<td class="r"><span style="' + peC(s.peNormalizedAnnual) + '">' + (s.peNormalizedAnnual != null && s.peNormalizedAnnual > 0 ? s.peNormalizedAnnual.toFixed(1) : '—') + '</span></td>' +
@@ -3620,6 +3620,16 @@ function renderKolayFilters() {
   document.addEventListener('mouseout', function(e) {
     var el = e.target.closest && e.target.closest(_TIP_SEL);
     if (el && !(e.relatedTarget && el.contains(e.relatedTarget))) _hide();
+  });
+  // Dokunmatik (hover yok): tap ile balonu kısa süre göster — mevcut aksiyonu engellemez
+  var _ktipTO = null;
+  document.addEventListener('click', function(e) {
+    if (!(window.matchMedia && window.matchMedia('(hover: none)').matches)) return;
+    var el = e.target.closest && e.target.closest(_TIP_SEL);
+    if (!el) return;
+    _show(el);
+    clearTimeout(_ktipTO);
+    _ktipTO = setTimeout(_hide, 2600);
   });
 })();
 
@@ -5339,6 +5349,16 @@ function applyTechAndGo(techKey) {
   document.addEventListener('mouseout',function(e){
     if(e.target.closest('th[data-tip]')&&el())el().style.display='none';
   });
+  // Dokunmatik (hover yok): başlığa tap → kolon açıklamasını kısa süre göster (sıralamayı engellemez)
+  var _thTO=null;
+  document.addEventListener('click',function(e){
+    if(!(window.matchMedia&&window.matchMedia('(hover: none)').matches))return;
+    var th=e.target.closest('th[data-tip]');if(!th)return;
+    var d=el();if(!d)return;
+    d.innerHTML=th.getAttribute('data-tip');d.style.display='block';
+    var r=th.getBoundingClientRect();pos(r.left+r.width/2,r.bottom);
+    clearTimeout(_thTO);_thTO=setTimeout(function(){if(el())el().style.display='none';},2600);
+  });
 })();
 
 // Start on homepage
@@ -5347,7 +5367,7 @@ function applyTechAndGo(techKey) {
 // ── Klavye Navigasyonu ────────────────────────────────────────
 function _initKeyboardNav() {
   // Tüm chip'lere tabindex + role ekle (keyboard focus desteği)
-  document.querySelectorAll('.chip,.goat-chip,.exbtn').forEach(function(el) {
+  document.querySelectorAll('.chip,.goat-chip,.exbtn,.hpx-spill,.tlogo').forEach(function(el) {
     if (!el.hasAttribute('tabindex')) {
       el.setAttribute('tabindex', '0');
       if (!el.getAttribute('role')) el.setAttribute('role', 'button');
@@ -5406,7 +5426,7 @@ function _initKeyboardNav() {
 
     // Enter/Space ile chip/button aktivasyonu
     if (e.key === 'Enter' || e.key === ' ') {
-      if (el.classList.contains('chip') || el.classList.contains('goat-chip') || el.classList.contains('exbtn')) {
+      if (el.classList.contains('chip') || el.classList.contains('goat-chip') || el.classList.contains('exbtn') || el.classList.contains('hpx-spill') || el.classList.contains('tlogo')) {
         e.preventDefault();
         el.click();
         return;
