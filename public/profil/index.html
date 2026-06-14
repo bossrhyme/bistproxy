@@ -371,12 +371,13 @@ body{overflow-y:auto;}
     <a href="/" class="hp-nav-btn">Tarayıcı</a>
     <a href="/analiz/" class="hp-nav-btn">Analiz</a>
     <a href="/bilgi/" class="hp-nav-btn">Bilgi Bankası</a>
-    <a href="/profil" class="hp-nav-btn active">Profil</a>
   </nav>
   <div class="tright">
     <button class="topbarbtn theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir" aria-label="Karanlık/Açık mod geçiş">☾</button>
-    <div class="pf-topbar-btn-wrap">
-      <span class="topbarbtn infobtn pf-topbar-profile-btn" onclick="toggleProfileMenu(event)">Hesabım ▾</span>
+    <button class="auth-btn auth-ghost df-auth-out" onclick="document.getElementById('pf-login')&&document.getElementById('pf-login').scrollIntoView({behavior:'smooth'})">Giriş Yap</button>
+    <button class="auth-btn auth-primary df-auth-out" onclick="document.getElementById('pf-login')&&document.getElementById('pf-login').scrollIntoView({behavior:'smooth'})">Kayıt Ol</button>
+    <div class="pf-topbar-btn-wrap df-auth-in" style="display:none">
+      <span class="topbarbtn infobtn pf-topbar-profile-btn" onclick="toggleProfileMenu(event)"><span class="df-auth-av"></span>Profil ▾</span>
       <div id="pf-profile-menu">
         <button class="pf-menu-item" onclick="showSettingsView()">Hesap Ayarları</button>
         <div class="pf-menu-sep"></div>
@@ -606,6 +607,7 @@ body{overflow-y:auto;}
 <div class="pf-toast" id="pf-toast"></div>
 
 <script src="/profil/profil.js?v=18"></script>
+<script src="/auth-header.js?v=1"></script>
 <script>
 function toggleTheme(){
   var dark = document.documentElement.getAttribute('data-theme') !== 'dark';

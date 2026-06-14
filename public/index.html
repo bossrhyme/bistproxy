@@ -134,6 +134,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 </style>
 <link rel="stylesheet" href="/deepfin.css?v=warm23">
 <script src="/deepfin.js?v=168" defer></script>
+<script src="/auth-header.js?v=1" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
@@ -179,7 +180,6 @@ if('serviceWorker' in navigator){
       <a href="/" class="hp-nav-btn" id="nav-tarama" onclick="event.preventDefault(); showScreenerOrPrescan()">Tarayıcı</a>
       <a href="/analiz/" class="hp-nav-btn" id="nav-analiz">Analiz</a>
       <a href="/bilgi/" class="hp-nav-btn">Bilgi Bankası</a>
-      <a href="/profil" id="profile-btn" class="hp-nav-btn profile-topbtn" title="Profilim"><span id="profile-btn-inner" class="prf-nav-av">👤</span>Profil<span id="fav-total-badge" style="display:none;background:var(--accent);color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 5px;margin-left:2px;line-height:1.4;align-items:center;"></span></a>
     </nav>
 
     <button class="hamburger-btn" id="hamburger-btn" onclick="toggleMobileDrawer()" style="display:none;" aria-label="Filtreler">
@@ -188,8 +188,9 @@ if('serviceWorker' in navigator){
 
     <div class="tright">
       <button class="topbarbtn theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir (T)" aria-label="Karanlık/Açık mod geçiş">☀</button>
-      <button class="auth-btn auth-ghost" onclick="showToast('Giriş özelliği yakında eklenecek')">Giriş Yap</button>
-      <button class="auth-btn auth-primary" onclick="showToast('Kayıt özelliği yakında eklenecek')">Kayıt Ol</button>
+      <button class="auth-btn auth-ghost df-auth-out" onclick="location.href='/profil'">Giriş Yap</button>
+      <button class="auth-btn auth-primary df-auth-out" onclick="location.href='/profil'">Kayıt Ol</button>
+      <a href="/profil" id="profile-btn" class="auth-btn auth-primary df-auth-in profile-topbtn" title="Profilim" style="display:none"><span id="profile-btn-inner" class="df-auth-av"></span>Profil<span id="fav-total-badge" style="display:none;background:#fff;color:var(--accent);font-size:9px;font-weight:700;border-radius:10px;padding:1px 5px;margin-left:5px;line-height:1.4;"></span></a>
       <button class="topbarbtn supportbtn" onclick="openSupport()">
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
   Destek Ol

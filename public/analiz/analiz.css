@@ -154,3 +154,6 @@ footer a:hover{color:var(--text2);}
 .auth-ghost:hover{background:var(--hover);}
 .auth-primary{background:var(--accent);color:#fff;border:1px solid transparent;}
 .auth-primary:hover{background:var(--blue2);}
+.df-auth-in{display:inline-flex;align-items:center;text-decoration:none;}
+.df-auth-av{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.22);font-size:10px;font-weight:700;margin-right:6px;overflow:hidden;}
+.df-auth-av:empty{display:none;}
