@@ -70,7 +70,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter', sans-serif;font
 /* ── TOPBAR ── */
 .topbar{display:flex;align-items:center;padding:0 16px;padding-left:calc(16px + env(safe-area-inset-left, 0px));padding-right:calc(16px + env(safe-area-inset-right, 0px));height:48px;border-bottom:1px solid var(--border);background:var(--s1);flex-shrink:0;gap:10px;z-index:10;box-shadow:0 1px 0 var(--border);}
 .tlogo{font-size:14px;font-weight:700;color:var(--gold);white-space:nowrap;letter-spacing:-.2px;display:flex;align-items:center;gap:6px;}
-.tlogo-mark{width:20px;height:20px;background:var(--gold);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;}
+.tlogo-mark{width:8px;height:8px;background:var(--gold);border-radius:50%;box-shadow:0 0 0 2px rgba(217,119,6,.18);flex-shrink:0;}
 /* Ortalanmış sayfa navigasyonu — sol/sağ eşit flex, nav tam ortada */
 .tleft{flex:1;display:flex;align-items:center;gap:10px;min-width:0;}
 .tnav{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:2px;}
@@ -611,9 +611,9 @@ td:nth-child(2){font-family:var(--ff);}
     height: calc(48px + env(safe-area-inset-top, 0px));
   }
   .tlive { display: none; }
-  /* "DeepFin" metnini font-size:0 ile gizle, sadece D mark kalsın */
-  .tlogo { font-size: 0; gap: 0; }
-  .tlogo-mark { width: 28px; height: 28px; font-size: 14px; }
+  /* Nokta logo + "DeepFin" metni mobilde de görünür kalsın */
+  .tlogo { font-size: 13px; gap: 6px; }
+  .tlogo-mark { width: 8px; height: 8px; }
   .supportbtn { display: none; }
   .infobtn:not(.profile-topbtn) { display: none !important; }
   /* Nav linkleri kompakt */
