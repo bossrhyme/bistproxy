@@ -133,7 +133,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
 <link rel="stylesheet" href="/deepfin.css?v=warm30">
-<script src="/deepfin.js?v=175" defer></script>
+<script src="/deepfin.js?v=176" defer></script>
 <script src="/auth-header.js?v=2" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -168,7 +168,7 @@ if('serviceWorker' in navigator){
 
 <!-- ─── MAIN APP ─── -->
 <div id="app" class="on">
-  <div class="topbar">
+  <div class="topbar" role="banner">
     <div class="tleft">
       <div class="tlogo" onclick="showHomepage()" style="cursor:pointer" role="button" tabindex="0" aria-label="Anasayfa"><span class="tlogo-mark"></span>DeepFin</div>
       <span class="tlive">Canlı</span>
@@ -374,7 +374,7 @@ if('serviceWorker' in navigator){
     </div>
 
     <!-- SIDEBAR -->
-    <div class="sidebar" id="sidebar">
+    <div class="sidebar" id="sidebar" role="complementary" aria-label="Filtreler">
 
       <!-- VARLIK NAV BAR -->
       <div class="asset-nav-bar">
@@ -1006,7 +1006,7 @@ if('serviceWorker' in navigator){
     </div><!-- /sidebar -->
 
     <!-- CONTENT -->
-    <div class="content">
+    <div class="content" role="main">
       <!-- TICKER TAPE -->
       <div class="ticker-wrap" id="ticker-wrap">
         <button id="sb-reopen" onclick="toggleSidebar()" title="Filtreleri aç" style="display:none">
@@ -1242,7 +1242,7 @@ if('serviceWorker' in navigator){
     <!-- DETAIL PANEL -->
     <div class="detail" id="detail">
       <div class="dhead">
-        <button class="dclose" onclick="closeDetail()">✕</button>
+        <button class="dclose" onclick="closeDetail()" aria-label="Kapat">✕</button>
         <div class="dsym" id="dsym">—</div>
         <div class="dname" id="dname">—</div>
         <div class="dhead-nav">
@@ -1307,7 +1307,7 @@ if('serviceWorker' in navigator){
   <div class="modal" onclick="event.stopPropagation()" style="max-width:560px;">
     <div class="modal-head">
       <div class="modal-title" id="footer-modal-title">BAŞLIK</div>
-      <button class="modal-close" onclick="closeFooterModal()">✕</button>
+      <button class="modal-close" onclick="closeFooterModal()" aria-label="Kapat">✕</button>
     </div>
     <div class="modal-body" id="footer-modal-body" style="padding:20px 24px;font-size:13px;line-height:1.8;color:var(--text2);"></div>
   </div>
@@ -1318,7 +1318,7 @@ if('serviceWorker' in navigator){
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-head">
       <div class="modal-title">BİLGİ <span>BANKASI</span></div>
-      <button class="modal-close" onclick="closeInfo()">✕</button>
+      <button class="modal-close" onclick="closeInfo()" aria-label="Kapat">✕</button>
     </div>
     <div class="modal-body">
 
@@ -1978,7 +1978,7 @@ if('serviceWorker' in navigator){
           <div class="smodal-subtitle">DeepFin'i ücretsiz ve reklamsız tutmak için</div>
         </div>
       </div>
-      <button class="smodal-close" onclick="closeSupport()">✕</button>
+      <button class="smodal-close" onclick="closeSupport()" aria-label="Kapat">✕</button>
     </div>
     <!-- Açıklama -->
     <div class="smodal-body">

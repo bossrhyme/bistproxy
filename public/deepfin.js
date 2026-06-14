@@ -3408,8 +3408,13 @@ function _vsRowHtml(s, idx) {
     var oc = th.getAttribute('onclick')||'';
     var match = oc.match(/colSort\('([^']+)'\)/);
     if(match){
-      th.classList.toggle('sorted', match[1]===sortSt.field);
-      th.classList.toggle('asc', match[1]===sortSt.field && sortSt.dir==='asc');
+      var on = match[1]===sortSt.field;
+      th.classList.toggle('sorted', on);
+      th.classList.toggle('asc', on && sortSt.dir==='asc');
+      // Erişilebilirlik: sıralanabilir başlık → klavye + aria-sort
+      th.setAttribute('role','columnheader');
+      if(!th.hasAttribute('tabindex')) th.setAttribute('tabindex','0');
+      th.setAttribute('aria-sort', on ? (sortSt.dir==='asc'?'ascending':'descending') : 'none');
     }
   });
 
@@ -5426,7 +5431,7 @@ function _initKeyboardNav() {
 
     // Enter/Space ile chip/button aktivasyonu
     if (e.key === 'Enter' || e.key === ' ') {
-      if (el.classList.contains('chip') || el.classList.contains('goat-chip') || el.classList.contains('exbtn') || el.classList.contains('hpx-spill') || el.classList.contains('tlogo')) {
+      if (el.classList.contains('chip') || el.classList.contains('goat-chip') || el.classList.contains('exbtn') || el.classList.contains('hpx-spill') || el.classList.contains('tlogo') || (el.tagName === 'TH' && el.hasAttribute('onclick'))) {
         e.preventDefault();
         el.click();
         return;
