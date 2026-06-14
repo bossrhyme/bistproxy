@@ -1065,3 +1065,17 @@ html,body{height:100%;overflow:hidden;}
 /* Detay sekmesi: ana grup başlıkları (Temel Analiz / Teknik Analiz) */
 .an-group-head{font-size:16px;font-weight:600;color:var(--text);letter-spacing:-.3px;margin:30px 0 4px;padding-bottom:9px;border-bottom:2px solid var(--accent);}
 .an-group-head:first-child{margin-top:0;}
+
+/* ═══ Detay sayfası renk/kart uyumu (warm) ═══ */
+/* Finansal özet ve fiyat bilgileri de beyaz kart olsun (grid/kartlarla eşleşsin) */
+#prf-fin-summary{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:4px 16px;}
+#prf-price-stats{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:6px 16px;}
+.fin-tbl td{border-bottom-color:var(--border);}
+.fin-tbl tbody tr:not(.fin-grp):hover{background:var(--s3);}
+.fin-dot-g{background:var(--green);}
+.fin-dot-m{background:var(--gold);}
+.fin-dot-b{background:var(--red);}
+.prf-qstat{border-bottom-color:var(--border);}
+/* Grid ve trend kartlarının köşe yarıçapını eşitle */
+.prf-mgrid{border-radius:10px;}
+#prf-trend-cards > div{border-radius:10px !important;}
