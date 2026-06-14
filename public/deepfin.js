@@ -3542,22 +3542,67 @@ var KOLAY_FILTERS = [
   { key: 'graham',   name: 'Graham' },
   { key: 'lynch',    name: 'Lynch' },
 ];
-var _KOLAY_FILT_VIS = 3; // ilk 3 görünür, gerisi "Daha Fazla"
+var _KOLAY_FILT_VIS = 3; // (eski) — artık tüm filtreler gösteriliyor
+
+// Bir Kolay filtre anahtarının açıklamasını (tooltip için) bulur.
+function _kolayFilterInfo(key) {
+  if (key === 'all') return { label: 'Tüm Hisseler', desc: 'Borsadaki tüm hisseleri filtresiz listeler.' };
+  var src = (typeof GURUS !== 'undefined' && GURUS[key])
+         || (typeof TECH_PRESETS !== 'undefined' && TECH_PRESETS[key])
+         || (typeof PRESETS !== 'undefined' && PRESETS[key]) || null;
+  return src ? { label: src.label, desc: src.desc || '' } : null;
+}
 
 function renderKolayFilters() {
   var c = document.getElementById('kolay-filters');
   if (!c) return;
-  var html = '<button class="kfil' + (_kolayFilterKey === 'all' ? ' on' : '') + '" onclick="kolayFilter(\'all\',this)">Tümü</button>';
-  KOLAY_FILTERS.forEach(function(f, i) {
-    var hide = (i >= _KOLAY_FILT_VIS && !_kolayFiltExpanded) ? ' style="display:none"' : '';
-    html += '<button class="kfil' + (_kolayFilterKey === f.key ? ' on' : '') + '"' + hide + ' onclick="kolayFilter(\'' + f.key + '\',this)">' + f.name + '</button>';
-  });
-  if (KOLAY_FILTERS.length > _KOLAY_FILT_VIS) {
-    html += '<button class="kfil-more" onclick="kolayToggleMoreFilters()">' + (_kolayFiltExpanded ? '− Daha Az' : '+ Daha Fazla') + '</button>';
+  function chip(key, name) {
+    var info = _kolayFilterInfo(key);
+    var tip = info ? ' data-tip="' + esc(info.desc) + '" data-tipname="' + esc(info.label) + '"' : '';
+    return '<button class="kfil' + (_kolayFilterKey === key ? ' on' : '') + '"' + tip +
+      ' onclick="kolayFilter(\'' + key + '\',this)">' + name + '</button>';
   }
+  var html = chip('all', 'Tümü');
+  KOLAY_FILTERS.forEach(function(f) { html += chip(f.key, f.name); });
   c.innerHTML = html;
 }
-function kolayToggleMoreFilters() { _kolayFiltExpanded = !_kolayFiltExpanded; renderKolayFilters(); }
+
+// Kolay filtre etiketleri için detaylı bilgi balonu (hover) — delegasyonla
+(function() {
+  var _ktip = null;
+  function _show(el) {
+    var name = el.getAttribute('data-tipname') || '';
+    var desc = el.getAttribute('data-tip') || '';
+    if (!desc) return;
+    if (!_ktip) {
+      _ktip = document.createElement('div');
+      _ktip.className = 'kfil-tip';
+      document.body.appendChild(_ktip);
+    }
+    _ktip.innerHTML = '<div class="kfil-tip-h">' + name + '</div><div class="kfil-tip-d">' + desc + '</div>';
+    var r = el.getBoundingClientRect();
+    _ktip.style.opacity = '0';
+    _ktip.style.display = 'block';
+    // ölç ve konumla — etiketin altında, ekran içinde
+    var tw = _ktip.offsetWidth, th = _ktip.offsetHeight;
+    var left = r.left + r.width / 2 - tw / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - tw - 8));
+    var top = r.bottom + 8;
+    if (top + th > window.innerHeight - 8) top = r.top - th - 8; // yer yoksa üste al
+    _ktip.style.left = left + 'px';
+    _ktip.style.top = top + 'px';
+    _ktip.style.opacity = '1';
+  }
+  function _hide() { if (_ktip) { _ktip.style.opacity = '0'; _ktip.style.display = 'none'; } }
+  document.addEventListener('mouseover', function(e) {
+    var el = e.target.closest && e.target.closest('.kfil[data-tip]');
+    if (el) _show(el);
+  });
+  document.addEventListener('mouseout', function(e) {
+    var el = e.target.closest && e.target.closest('.kfil[data-tip]');
+    if (el && !(e.relatedTarget && el.contains(e.relatedTarget))) _hide();
+  });
+})();
 
 // Bir Kolay filtre anahtarı için chip + filtre inputlarını hazırlar.
 // Veriyi YENİDEN ÇEKMEZ — sadece state'i kurar ve özel (special) anahtarı döner.

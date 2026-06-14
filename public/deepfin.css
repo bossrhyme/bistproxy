@@ -1840,3 +1840,9 @@ kbd{font-family:var(--ff-mono);font-size:10px;color:var(--text);background:var(-
 .kfil-more{background:none;border:none;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;padding:7px 10px;font-family:'Inter',sans-serif;}
 .kfil-more:hover{text-decoration:underline;}
 [data-scan-mode="kolay"] #add-filter-wrap{display:none !important;}
+/* Kolay modda pro tarama özet barı ("Filtresiz" vb.) gizli — kendi başlığımız var */
+[data-scan-mode="kolay"] #scan-summary{display:none !important;}
+/* Kolay filtre etiketi bilgi balonu */
+.kfil-tip{position:fixed;z-index:2000;width:260px;max-width:calc(100vw - 16px);background:var(--s1);border:1px solid var(--border2);border-radius:10px;padding:11px 13px;box-shadow:0 8px 28px rgba(15,23,42,.13);pointer-events:none;opacity:0;display:none;transition:opacity .14s;font-family:'Inter',sans-serif;}
+.kfil-tip-h{font-size:12px;font-weight:700;color:var(--text);margin-bottom:5px;letter-spacing:.2px;}
+.kfil-tip-d{font-size:11px;color:var(--text2);line-height:1.6;}
