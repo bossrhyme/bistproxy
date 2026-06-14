@@ -2305,7 +2305,7 @@ function initPrescanView() {
     var tagsHtml = tags.length ? '<div class="psv-goat-tags">'+tags.map(function(t){return '<span class="psv-goat-tag">'+t+'</span>';}).join('')+'</div>' : '';
     var descHtml = g.desc ? '<div class="psv-goat-desc">'+esc(g.desc)+'</div>' : '';
     return '<div class="psv-goat-card" data-goat="'+key+'" onclick="psvToggleGoat(\''+key+'\')">' +
-      '<div class="psv-goat-name">'+name+'</div>'+sub+tagsHtml+descHtml+'</div>';
+      '<div class="psv-goat-name">'+name+' Lensi</div>'+sub+tagsHtml+descHtml+'</div>';
   }
 
   function mkFilterCard(key, p, cls, toggleFn) {
@@ -2351,12 +2351,12 @@ function initPrescanView() {
     '<button class="psv-show-more" id="psv-ex-more" onclick="psvToggleMoreEx()">+ Diğer Borsalar</button>'+
     '</div>'+
 
-    // GOAT section
+    // Yatırımcı Lensleri section
     '<div class="psv-section">'+
-    '<div class="psv-section-hd">Yatırımcı Stratejisi <span class="psv-opt">isteğe bağlı</span></div>'+
+    '<div class="psv-section-hd">Yatırımcı Lensleri <span class="psv-opt">isteğe bağlı</span></div>'+
     '<div class="psv-goat-grid" id="psv-goat-main">'+PSV_MAIN_GOATS.map(mkGoatCard).join('')+'</div>'+
     '<div class="psv-goat-extra" id="psv-goat-extra" style="display:none">'+extraGoatKeys.map(mkGoatCard).join('')+'</div>'+
-    '<button class="psv-show-more" id="psv-goat-more" onclick="psvToggleMoreGoats()">+ Tüm Stratejiler</button>'+
+    '<button class="psv-show-more" id="psv-goat-more" onclick="psvToggleMoreGoats()">+ Tüm Lensler</button>'+
     '</div>'+
 
     // Temel — yatay satır, ortalı
@@ -2466,7 +2466,7 @@ function psvToggleMoreGoats() {
   if (!extra) return;
   var open = extra.style.display !== 'none';
   extra.style.display = open ? 'none' : 'flex';
-  if (btn) btn.textContent = open ? '+ Tüm Stratejiler' : '— Daha Az';
+  if (btn) btn.textContent = open ? '+ Tüm Lensler' : '— Daha Az';
 }
 
 function psvToggleMoreEx() {
@@ -4993,7 +4993,7 @@ function hideQuickScanPill() {
 
 // ── FİLTRE EKLE DROPDOWN — tablodan ayrılmadan chip seçimi ──
 var FD_GROUPS = [
-  { kind: 'goat',   title: 'Yatırımcı Stratejileri', containerId: 'goat-chips',   attr: 'data-goat' },
+  { kind: 'goat',   title: 'Yatırımcı Lensleri', containerId: 'goat-chips',   attr: 'data-goat' },
   { kind: 'preset', title: 'Temel Stratejiler',      containerId: 'presets',      attr: 'data-preset' },
   { kind: 'tech',   title: 'Teknik Stratejiler',     containerId: 'tech-presets', attr: 'data-tech' }
 ];
