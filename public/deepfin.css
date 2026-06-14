@@ -214,7 +214,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter', sans-serif;font
 
 /* ── CONTENT ── */
 .content{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-.toolbar{padding:9px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:var(--s1);flex-shrink:0;}
+.toolbar{padding:9px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:var(--s1);flex-shrink:0;flex-wrap:wrap;row-gap:6px;}
 .rcount strong{font-size:16px;font-weight:700;color:var(--text);font-family:var(--ff-mono);}
 .rcount span{font-size:10px;color:var(--muted2);margin-left:3px;}
 .pbar{height:2px;background:var(--border);flex:1;overflow:hidden;border-radius:1px;}
@@ -1701,7 +1701,23 @@ kbd{font-family:var(--ff-mono);font-size:10px;color:var(--text);background:var(-
 .stats-bar .sb-val.dn{color:var(--red);}
 .stats-bar .sb-time-val{color:var(--muted2);font-weight:500;}
 .stats-bar .sb-dur-val{color:var(--muted);font-weight:500;}
-@media(max-width:768px){.quick-scan-bar{gap:3px;padding:4px 8px;}.qs-btn{font-size:9px;padding:3px 6px;}}
+@media(max-width:768px){
+  /* Dikey alanı koru: çok satıra sarmak yerine tek satır yatay kaydırma (etiketler korunur) */
+  .quick-scan-bar{gap:5px;padding:6px 10px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+  .quick-scan-bar::-webkit-scrollbar{display:none;}
+  .qs-btn{font-size:10px;padding:4px 9px;flex-shrink:0;}
+  .qs-grp,.qs-label,.qs-vsep{flex-shrink:0;}
+}
+/* Tablet/küçük dizüstü ölü-bölge (769–1024px): sidebar+detay tabloyu eziyordu */
+@media (min-width:769px) and (max-width:1024px){
+  .sidebar{width:188px;min-width:188px;}
+  .detail.open{width:min(320px,42vw);min-width:0;}
+}
+/* Yatay (landscape) kısa ekran: chrome dikey alanı yutmasın */
+@media (max-height:480px){
+  .quick-scan-bar{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;}
+  .quick-scan-bar::-webkit-scrollbar{display:none;}
+}
 
 /* ── Row Density Toggle ──────────────────────────────────────── */
 .density-toggle{display:flex;align-items:center;gap:1px;border:1px solid var(--border2);border-radius:var(--r-sm);overflow:hidden;}
