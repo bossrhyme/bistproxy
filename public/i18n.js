@@ -69,6 +69,24 @@
     'disc.p2':         { tr: "DeepFin'de yer alan yatırımcı ve fon stratejileri — <strong>Buffett, Graham, Lynch, Klarman, Greenblatt</strong> ve diğerleri — ilgili kişi ve kurumlarla herhangi bir <strong>iş birliği, lisans veya resmi bağlantı olmaksızın</strong> yalnızca kamuya açık yayın, kitap ve akademik kaynaklara dayanılarak hazırlanmıştır. Sunulan filtreler özgün yorumlara ve hesaplama farklılıklarına tabidir; <strong>tam bir yansıma değildir.</strong>",
                          en: "The investor and fund strategies on DeepFin — <strong>Buffett, Graham, Lynch, Klarman, Greenblatt</strong> and others — were prepared <strong>without any partnership, license or official affiliation</strong> with the relevant people or institutions, based solely on publicly available publications, books and academic sources. The filters shown are subject to original interpretation and calculation differences; <strong>they are not an exact reflection.</strong>" },
 
+    // ── Tarayıcı (Pro) UI chrome ──
+    'tb.newScan':      { tr: 'Yeni Tarama',     en: 'New Scan' },
+    'tb.addFilter':    { tr: '+ Filtre Ekle',   en: '+ Add Filter' },
+    'tb.search':       { tr: 'Sembol ara...',   en: 'Search symbol...' },
+    'tb.sort':         { tr: 'Sırala:',         en: 'Sort:' },
+    'tb.tools':        { tr: 'Araçlar ▾',       en: 'Tools ▾' },
+    'tb.lists':        { tr: 'Listelerim',      en: 'My Lists' },
+    'tb.columns':      { tr: 'Kolonlar',        en: 'Columns' },
+    'tb.csv':          { tr: 'CSV indir',       en: 'Export CSV' },
+    'tb.saveScan':     { tr: 'Taramayı Kaydet', en: 'Save Scan' },
+    'tb.savedScans':   { tr: 'Kayıtlı Taramalar', en: 'Saved Scans' },
+    'tb.view':         { tr: 'Görünüm',         en: 'View' },
+    'tb.compact':      { tr: 'Kompakt',         en: 'Compact' },
+    'tb.normal':       { tr: 'Normal',          en: 'Normal' },
+    'tb.wide':         { tr: 'Geniş',           en: 'Wide' },
+    'sb.hideFilters':  { tr: 'Filtreleri Gizle', en: 'Hide Filters' },
+    'qs.quick':        { tr: 'Hızlı Tarama',    en: 'Quick Scan' },
+
     // ── Dil seçici ──
     'lang.label':      { tr: 'Dil',             en: 'Language' }
   };

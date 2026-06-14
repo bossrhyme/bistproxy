@@ -133,7 +133,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
 <link rel="stylesheet" href="/deepfin.css?v=warm35">
-<script src="/i18n.js?v=1" defer></script>
+<script src="/i18n.js?v=2" defer></script>
 <script src="/deepfin.js?v=183" defer></script>
 <script src="/auth-header.js?v=2" defer></script>
 <link rel="manifest" href="/manifest.json">
@@ -415,7 +415,7 @@ if('serviceWorker' in navigator){
       <div class="sbp" id="sbp-hisse">
         <div class="sbp-header-row">
           <button class="sbp-back" onclick="goBackToLanding()">← Varlık Listesi</button>
-          <button class="sbp-hide-btn" onclick="toggleSidebar()">Filtreleri Gizle</button>
+          <button class="sbp-hide-btn" onclick="toggleSidebar()" data-i18n="sb.hideFilters">Filtreleri Gizle</button>
         </div>
         <div class="sbp-scroll">
 
@@ -1032,20 +1032,20 @@ if('serviceWorker' in navigator){
 
       <!-- ROW 1: Eylemler + Sırala + Araçlar -->
       <div class="toolbar" id="toolbar" style="display:none">
-        <button id="new-scan-btn" class="new-scan-btn" onclick="openScanModeChoice()" title="Yeni tarama başlat">Yeni Tarama</button>
+        <button id="new-scan-btn" class="new-scan-btn" onclick="openScanModeChoice()" title="Yeni tarama başlat" data-i18n="tb.newScan">Yeni Tarama</button>
         <div class="add-filter-wrap" id="add-filter-wrap" style="display:none">
-          <button id="add-filter-btn" class="new-scan-btn add-filter-btn" onclick="toggleFilterDropdown(event)" title="Mevcut taramaya filtre ekle">+ Filtre Ekle</button>
+          <button id="add-filter-btn" class="new-scan-btn add-filter-btn" onclick="toggleFilterDropdown(event)" title="Mevcut taramaya filtre ekle" data-i18n="tb.addFilter">+ Filtre Ekle</button>
           <div id="filter-dropdown" class="filter-dropdown" style="display:none"></div>
         </div>
         <div class="sb-search">
           <span class="sb-search-ico">⌕</span>
-          <input type="text" id="sb-searchbox" class="sb-search-input" placeholder="Sembol ara..." aria-label="Sembol ara" oninput="onSearch()" />
+          <input type="text" id="sb-searchbox" class="sb-search-input" placeholder="Sembol ara..." data-i18n-ph="tb.search" aria-label="Sembol ara" oninput="onSearch()" />
           <span class="sb-search-shortcut">/</span>
         </div>
         <button id="mobile-filter-btn" class="mobile-filter-btn" onclick="toggleMobileDrawer()" title="Filtreleri aç">☰ Filtreler</button>
         <div class="pbar" id="tb-pbar"><div class="pbarfill" id="prog"></div></div>
         <div class="tb-sort">
-          <span class="tb-sort-lbl">Sırala:</span>
+          <span class="tb-sort-lbl" data-i18n="tb.sort">Sırala:</span>
           <select class="ssel" id="sortf" onchange="onSortChange()">
             <option value="marketCapitalization">Piyasa Değeri</option>
             <option value="peNormalizedAnnual">F/K</option>
@@ -1060,22 +1060,22 @@ if('serviceWorker' in navigator){
           <button type="button" class="ssel ssel-dir sort-dir-btn" id="sortd" value="desc" onclick="toggleSortDir()" title="Sıralama yönü (azalan / artan)"></button>
         </div>
         <div class="tb-tools-wrap">
-          <button class="tb-tools-btn" id="tb-tools-toggle" onclick="toggleToolsMenu(event)" title="Araçlar">Araçlar ▾</button>
+          <button class="tb-tools-btn" id="tb-tools-toggle" onclick="toggleToolsMenu(event)" title="Araçlar" data-i18n="tb.tools">Araçlar ▾</button>
           <div class="tb-tools-menu" id="tb-tools-menu" style="display:none">
-            <button id="tb-fav-btn" class="tb-menu-item sb-fav-btn" onclick="toggleFavFilter(event)" title="Listelerim" style="display:none">Listelerim</button>
-            <button id="tb-col-btn" class="tb-menu-item col-btn" onclick="openColPicker()" title="Kolonları özelleştir" style="display:none">Kolonlar</button>
-            <button id="tb-export-btn" class="tb-menu-item col-btn tb-export-btn" onclick="exportToCSV()" title="CSV olarak dışa aktar" style="display:none">CSV indir</button>
+            <button id="tb-fav-btn" class="tb-menu-item sb-fav-btn" onclick="toggleFavFilter(event)" title="Listelerim" style="display:none" data-i18n="tb.lists">Listelerim</button>
+            <button id="tb-col-btn" class="tb-menu-item col-btn" onclick="openColPicker()" title="Kolonları özelleştir" style="display:none" data-i18n="tb.columns">Kolonlar</button>
+            <button id="tb-export-btn" class="tb-menu-item col-btn tb-export-btn" onclick="exportToCSV()" title="CSV olarak dışa aktar" style="display:none" data-i18n="tb.csv">CSV indir</button>
             <div class="tb-menu-sep"></div>
             <div class="saved-scans-wrap" id="saved-scans-wrap" style="display:none">
-              <button class="tb-menu-item col-btn tb-save-btn" onclick="saveCurrentScan()" title="Mevcut taramayı kaydet">Taramayı Kaydet</button>
-              <button class="tb-menu-item col-btn tb-templates-btn" onclick="openSavedScans()" id="tb-templates-btn" title="Kaydedilen taramalar">Kayıtlı Taramalar</button>
+              <button class="tb-menu-item col-btn tb-save-btn" onclick="saveCurrentScan()" title="Mevcut taramayı kaydet" data-i18n="tb.saveScan">Taramayı Kaydet</button>
+              <button class="tb-menu-item col-btn tb-templates-btn" onclick="openSavedScans()" id="tb-templates-btn" title="Kaydedilen taramalar" data-i18n="tb.savedScans">Kayıtlı Taramalar</button>
             </div>
             <div class="tb-menu-sep"></div>
-            <div class="tb-menu-label">Görünüm</div>
+            <div class="tb-menu-label" data-i18n="tb.view">Görünüm</div>
             <div class="density-toggle" id="density-toggle" style="display:none">
-              <button class="density-btn active" data-density="compact" onclick="setDensity('compact')" title="Kompakt görünüm">Kompakt</button>
-              <button class="density-btn" data-density="normal" onclick="setDensity('normal')" title="Normal görünüm">Normal</button>
-              <button class="density-btn" data-density="comfortable" onclick="setDensity('comfortable')" title="Geniş görünüm">Geniş</button>
+              <button class="density-btn active" data-density="compact" onclick="setDensity('compact')" title="Kompakt görünüm" data-i18n="tb.compact">Kompakt</button>
+              <button class="density-btn" data-density="normal" onclick="setDensity('normal')" title="Normal görünüm" data-i18n="tb.normal">Normal</button>
+              <button class="density-btn" data-density="comfortable" onclick="setDensity('comfortable')" title="Geniş görünüm" data-i18n="tb.wide">Geniş</button>
             </div>
           </div>
         </div>
@@ -1094,20 +1094,20 @@ if('serviceWorker' in navigator){
 
       <!-- ROW 2: Hızlı filtreler (gruplu, sade) -->
       <div class="quick-scan-bar" id="quick-scan-bar">
-        <span class="qs-label">Hızlı Tarama</span>
-        <span class="qs-grp">Temel Analiz</span>
+        <span class="qs-label" data-i18n="qs.quick">Hızlı Tarama</span>
+        <span class="qs-grp" data-i18n="strat.fundamental">Temel Analiz</span>
         <button class="qs-btn" onclick="quickScan('value')" title="F/K &lt;15, PD/DD &lt;2, temettü">Değer</button>
         <button class="qs-btn" onclick="quickScan('growth')" title="Kazanç büyümesi %20, ROE %15">Büyüme</button>
         <button class="qs-btn" onclick="quickScan('dividend')" title="Temettü %4+, borç makul">Temettü</button>
         <button class="qs-btn" onclick="quickScan('quality')" title="ROE %20, net marj %15">Kalite</button>
         <span class="qs-vsep"></span>
-        <span class="qs-grp">Teknik Analiz</span>
+        <span class="qs-grp" data-i18n="strat.technical">Teknik Analiz</span>
         <button class="qs-btn" onclick="quickScan('momentum')" title="Satış ve kazanç büyümesi &gt;20%">Momentum</button>
         <button class="qs-btn" onclick="quickScan('breakout')" title="52H zirvesine yakın, hacimli yükseliş">Breakout</button>
         <button class="qs-btn" onclick="quickScan('oversold')" title="RSI &lt;35, zirveden %20 uzak">Aşırı Satış</button>
         <button class="qs-btn" onclick="quickScan('nearHigh')" title="52H zirvesine %5 mesafe">52H Zirve</button>
         <span class="qs-vsep"></span>
-        <span class="qs-grp">Yatırımcı Lensleri</span>
+        <span class="qs-grp" data-i18n="strat.lenses">Yatırımcı Lensleri</span>
         <button class="qs-btn" onclick="quickGoat('buffett')" title="Warren Buffett kriterleri">Buffett</button>
         <button class="qs-btn" onclick="quickGoat('graham')" title="Benjamin Graham kriterleri">Graham</button>
         <button class="qs-btn" onclick="quickGoat('lynch')" title="Peter Lynch kriterleri">Lynch</button>
