@@ -2407,10 +2407,16 @@ function _buildMetricsCard(m, type) {
       document.body.appendChild(_tip);
     }
     _tip.innerHTML = _tipContent();
-    var tipH = 300;
-    var left  = rect.left - 272 - 12;
-    var top   = rect.top + rect.height / 2 - tipH / 2;
-    if (left < 8) left = rect.right + 12;
+    var W = 272;
+    var tipH = _tip.offsetHeight || 300;
+    // Prefer to the left of the ring; if no room, go right; clamp into viewport.
+    var left = rect.left - W - 12;
+    if (left < 8) {
+      left = rect.right + 12;
+      if (left + W > window.innerWidth - 8) left = window.innerWidth - W - 8;
+    }
+    left = Math.max(8, left);
+    var top = rect.top + rect.height / 2 - tipH / 2;
     top = Math.max(8, Math.min(top, window.innerHeight - tipH - 8));
     _tip.style.left = left + 'px';
     _tip.style.top  = top  + 'px';
@@ -2419,11 +2425,23 @@ function _buildMetricsCard(m, type) {
 
   function _hide() { if (_tip) _tip.style.opacity = '0'; }
 
-  document.addEventListener('DOMContentLoaded', function() {
-    var wrap = document.querySelector('.df-sc-ring-wrap');
+  // Event delegation: .df-sc-ring-wrap is rendered dynamically into the
+  // Overview panel after load (and may be re-rendered), so binding directly
+  // on DOMContentLoaded misses it. Delegate from document instead.
+  document.addEventListener('mouseover', function(e) {
+    var wrap = e.target.closest && e.target.closest('.df-sc-ring-wrap');
     if (!wrap) return;
     wrap.style.cursor = 'help';
-    wrap.addEventListener('mouseenter', function() { _show(wrap.getBoundingClientRect()); });
-    wrap.addEventListener('mouseleave', _hide);
+    // Anchor to the ring circle (narrow) rather than the full-width wrap so the
+    // tooltip lands beside the gauge instead of off-screen.
+    var ring = wrap.querySelector('.df-sc-ring') || wrap;
+    _show(ring.getBoundingClientRect());
+  });
+  document.addEventListener('mouseout', function(e) {
+    var wrap = e.target.closest && e.target.closest('.df-sc-ring-wrap');
+    if (!wrap) return;
+    // Ignore moves that stay within the same wrap.
+    if (e.relatedTarget && wrap.contains(e.relatedTarget)) return;
+    _hide();
   });
 })();
