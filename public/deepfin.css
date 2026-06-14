@@ -1958,4 +1958,5 @@ tbody tr:active{background:var(--s3);}
 .hrc-dot{color:var(--border2);}
 .hrc-ex{font-family:var(--ff-mono);font-weight:600;color:var(--text2);}
 .hrc-count{color:var(--accent);font-weight:700;font-family:var(--ff-mono);}
+.hrc-found{color:var(--green);font-weight:700;font-family:var(--ff-mono);}
 @media(max-width:768px){.hpx-recent-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;}}

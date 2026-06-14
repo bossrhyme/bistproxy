@@ -5003,12 +5003,12 @@ function showScanSummary(total, matches) {
     durVal.textContent = elapsed + 's';
     durItem.style.display = '';
   }
-  _recordRecentScan(filters, total);
+  _recordRecentScan(filters, total, matches);
 }
 
 // Site-geneli "Son Taramalar"a kaydet — yalnızca deep-linklenebilir (kind+key'li)
 // birincil filtresi olan BORSA taramaları (Pro hisse tarayıcı ile yeniden açılabilir)
-function _recordRecentScan(filters, total) {
+function _recordRecentScan(filters, total, matches) {
   try {
     var asset = (_activeAsset === 'kripto') ? 'kripto' : (_activeAsset === 'fon') ? 'fon' : 'borsa';
     if (asset !== 'borsa') return;                 // şimdilik yalnız hisse taramaları
@@ -5023,7 +5023,7 @@ function _recordRecentScan(filters, total) {
         kind: primary.kind, k: primary.key, label: primary.label,
         asset: asset, ex: currentExchange,
         exLabel: exMeta.name || (currentExchange || '').toUpperCase(),
-        count: total
+        count: total, matched: (matches != null ? matches : 0)
       })
     }).catch(function() {});
   } catch (e) {}
@@ -5041,11 +5041,14 @@ function loadRecentScans() {
       var assetLabel = s.asset === 'kripto' ? 'Kripto' : s.asset === 'fon' ? 'Fon' : 'Borsa';
       var url = '/?strateji=' + encodeURIComponent(s.k) + (s.ex ? '&ex=' + encodeURIComponent(s.ex) : '');
       var cnt = (parseInt(s.count, 10) || 0).toLocaleString('tr-TR');
+      var foundHtml = (s.matched != null)
+        ? '<span class="hrc-dot">·</span><span class="hrc-found">' + (parseInt(s.matched, 10) || 0).toLocaleString('tr-TR') + '</span><span>bulundu</span>'
+        : '';
       return '<a class="hpx-rcard" href="' + url + '">' +
         '<div class="hrc-name">' + esc(s.label) + '</div>' +
         '<div class="hrc-meta"><span>' + esc(assetLabel) + '</span><span class="hrc-dot">·</span>' +
           '<span class="hrc-ex">' + esc(s.exLabel || '') + '</span><span class="hrc-dot">·</span>' +
-          '<span class="hrc-count">' + cnt + '</span><span>tarandı</span></div>' +
+          '<span class="hrc-count">' + cnt + '</span><span>tarandı</span>' + foundHtml + '</div>' +
         '</a>';
     }).join('');
     sec.style.display = '';

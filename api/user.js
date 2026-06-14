@@ -762,11 +762,12 @@ async function handleRecentScans(req, res) {
     const kind = clean(body.kind, 8), asset = clean(body.asset, 8), k = clean(body.k, 40);
     const label = clean(body.label, 48), ex = clean(body.ex, 16), exLabel = clean(body.exLabel, 24);
     const count = Math.max(0, Math.min(parseInt(body.count, 10) || 0, 1000000));
+    const matched = Math.max(0, Math.min(parseInt(body.matched, 10) || 0, 1000000));
     if (['goat', 'preset', 'tech'].indexOf(kind) < 0 || ['borsa', 'kripto', 'fon'].indexOf(asset) < 0
         || !k || !label || !/^[a-zA-Z0-9_-]+$/.test(k)) {
       jsonRes(res, 400, { ok: false }); return;
     }
-    const rec = JSON.stringify({ kind, asset, k, label, ex, exLabel, count, ts: Date.now() });
+    const rec = JSON.stringify({ kind, asset, k, label, ex, exLabel, count, matched, ts: Date.now() });
     try {
       await kvPipeline([['LPUSH', LIST_KEY, rec], ['LTRIM', LIST_KEY, '0', '19']]);
       jsonRes(res, 200, { ok: true });
