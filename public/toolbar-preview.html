@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tarayıcı Toolbar — Önizleme (öneri)</title>
+<script>(function(){try{var t=localStorage.getItem('df_theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})()</script>
+<link rel="stylesheet" href="/deepfin.css?v=warm24">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;padding:28px;}
+.note{max-width:1180px;margin:0 auto 18px;font-size:12px;color:var(--muted);}
+.note b{color:var(--gold);}
+.wrap{max-width:1180px;margin:0 auto;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--s1);box-shadow:var(--shadow-md);}
+
+/* ── SIRA 1: Eylemler ── */
+.mk-tb{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--s1);}
+.mk-btn{font-size:13px;font-weight:500;padding:7px 14px;border-radius:8px;cursor:pointer;font-family:inherit;white-space:nowrap;border:1px solid transparent;transition:all .12s;}
+.mk-primary{background:var(--accent);color:#fff;}
+.mk-primary:hover{background:var(--blue2);}
+.mk-ghost{background:transparent;color:var(--text);border-color:var(--border2);}
+.mk-ghost:hover{background:var(--hover);}
+.mk-search{display:flex;align-items:center;gap:7px;background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:0 10px;height:34px;min-width:220px;}
+.mk-search input{flex:1;background:transparent;border:none;outline:none;font-size:13px;color:var(--text);font-family:inherit;}
+.mk-search .ico{color:var(--muted);font-size:13px;}
+.mk-search .kbd{font-size:10px;color:var(--muted);border:1px solid var(--border2);border-radius:4px;padding:1px 5px;}
+.mk-spacer{flex:1;}
+.mk-sort{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);}
+.mk-sort select{font-size:12.5px;font-weight:500;color:var(--text);background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:7px 10px;font-family:inherit;cursor:pointer;}
+.mk-tools-wrap{position:relative;}
+.mk-tools{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:500;color:var(--text);background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:7px 12px;cursor:pointer;}
+.mk-tools:hover{border-color:var(--accent);}
+.mk-menu{position:absolute;top:calc(100% + 6px);right:0;width:230px;background:var(--s1);border:1px solid var(--border2);border-radius:10px;box-shadow:var(--shadow-lg);padding:6px;z-index:20;}
+.mk-mi{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 11px;border-radius:7px;font-size:13px;color:var(--text);cursor:pointer;}
+.mk-mi:hover{background:var(--s3);}
+.mk-mi .hint{font-size:10px;color:var(--muted);}
+.mk-msep{height:1px;background:var(--border);margin:5px 4px;}
+.mk-mlabel{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;padding:6px 11px 3px;}
+.mk-seg{display:flex;gap:4px;padding:2px 11px 8px;}
+.mk-seg button{flex:1;font-size:11px;padding:6px;border-radius:6px;border:1px solid var(--border2);background:var(--s2);color:var(--text2);cursor:pointer;font-family:inherit;}
+.mk-seg button.on{background:var(--accent);color:#fff;border-color:transparent;}
+
+/* ── meta özet ── */
+.mk-meta{padding:7px 14px;border-bottom:1px solid var(--border);font-size:11.5px;color:var(--muted);background:var(--s1);display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.mk-meta b{color:var(--text2);font-weight:600;}
+.mk-meta .up{color:var(--green);font-weight:600;}
+.mk-meta .dn{color:var(--red);font-weight:600;}
+.mk-meta .dot{color:var(--border2);}
+
+/* ── SIRA 2: Hızlı filtreler ── */
+.mk-quick{display:flex;align-items:center;gap:7px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--s1);flex-wrap:wrap;}
+.mk-ql{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-right:2px;}
+.mk-grp{font-size:11px;font-weight:600;color:var(--text2);}
+.mk-chip{font-size:12px;font-weight:500;padding:5px 12px;border-radius:7px;cursor:pointer;border:1px solid var(--border2);background:var(--s1);color:var(--text2);transition:all .12s;}
+.mk-chip:hover{border-color:var(--accent);color:var(--accent);}
+.mk-chip.on{background:var(--accent);color:#fff;border-color:transparent;}
+.mk-vsep{width:1px;height:18px;background:var(--border2);margin:0 4px;}
+
+/* ── SIRA 3: aktif filtre etiketleri ── */
+.mk-tags{display:flex;align-items:center;gap:7px;padding:9px 14px;background:var(--s2);font-size:11px;color:var(--muted);flex-wrap:wrap;}
+.mk-tag{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--text);background:var(--s1);border:1px solid var(--border2);border-radius:6px;padding:3px 9px;}
+.mk-tag .x{color:var(--muted);cursor:pointer;font-size:13px;}
+
+/* ── tablo örneği ── */
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead th{padding:9px 12px;text-align:right;font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--s2);}
+thead th:nth-child(-n+2){text-align:left;}
+tbody td{padding:11px 12px;text-align:right;border-bottom:1px solid var(--border);color:var(--text);font-variant-numeric:tabular-nums;}
+tbody td:nth-child(-n+2){text-align:left;}
+.sym{font-weight:700;color:var(--accent);}
+.up{color:var(--green);}.dn{color:var(--red);}
+.star{color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="note"><b>ÖNİZLEME</b> — Tarayıcı toolbar yeniden tasarımı (öneri). Henüz uygulanmadı; onayınızdan sonra gerçek sayfaya geçecek. Tema değiştirmek için: tarayıcıda <code>df_theme</code> = dark.</div>
+
+<div class="wrap">
+
+  <!-- SIRA 1: Eylemler -->
+  <div class="mk-tb">
+    <button class="mk-btn mk-primary">Yeni Tarama</button>
+    <button class="mk-btn mk-ghost">+ Filtre Ekle</button>
+    <div class="mk-search"><span class="ico">⌕</span><input placeholder="Sembol ara…"><span class="kbd">/</span></div>
+    <div class="mk-spacer"></div>
+    <div class="mk-sort">Sırala:
+      <select><option>Piyasa Değeri ↓</option><option>F/K ↓</option><option>ROE ↓</option></select>
+    </div>
+    <div class="mk-tools-wrap">
+      <div class="mk-tools">Araçlar ▾</div>
+      <!-- menü (örnek olarak açık gösterildi) -->
+      <div class="mk-menu">
+        <div class="mk-mi">Listelerim</div>
+        <div class="mk-mi">Kolonlar</div>
+        <div class="mk-mi">CSV indir</div>
+        <div class="mk-msep"></div>
+        <div class="mk-mi">Taramayı Kaydet</div>
+        <div class="mk-mi">Kayıtlı Taramalar <span class="hint">3</span></div>
+        <div class="mk-msep"></div>
+        <div class="mk-mlabel">Görünüm</div>
+        <div class="mk-seg"><button class="on">Kompakt</button><button>Normal</button><button>Geniş</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- meta özet -->
+  <div class="mk-meta"><b>BIST</b><span class="dot">·</span>607 tarandı<span class="dot">·</span><b>14 eşleşti</b><span class="dot">·</span><span class="up">▲ 9</span><span class="dn">▼ 5</span><span class="dot">·</span>16:34<span class="dot">·</span>3.0s</div>
+
+  <!-- SIRA 2: Hızlı filtreler (gruplu, emojisiz) -->
+  <div class="mk-quick">
+    <span class="mk-ql">Hızlı</span>
+    <span class="mk-grp">Temel</span>
+    <button class="mk-chip">Değer</button><button class="mk-chip">Büyüme</button><button class="mk-chip">Temettü</button><button class="mk-chip">Kalite</button>
+    <span class="mk-vsep"></span>
+    <span class="mk-grp">Teknik</span>
+    <button class="mk-chip">Momentum</button><button class="mk-chip">Breakout</button><button class="mk-chip">Aşırı Satış</button><button class="mk-chip">52H Zirve</button>
+    <span class="mk-vsep"></span>
+    <span class="mk-grp">Lensler</span>
+    <button class="mk-chip">Buffett</button><button class="mk-chip on">Graham</button><button class="mk-chip">Lynch</button>
+  </div>
+
+  <!-- SIRA 3: aktif filtre etiketleri (filtre seçiliyken) -->
+  <div class="mk-tags">Aktif filtre: <span class="mk-tag">Benjamin Graham <span class="x">×</span></span></div>
+
+  <!-- tablo örneği -->
+  <table>
+    <thead><tr><th></th><th>Sembol</th><th>Fiyat</th><th>P. Değeri ($)</th><th>Günlük%</th><th>PD/DD</th><th>F/K</th><th>ROE%</th><th>RSI</th></tr></thead>
+    <tbody>
+      <tr><td class="star">★</td><td><span class="sym">TRGYO</span></td><td>98.35 ₺</td><td>$2.1B</td><td class="up">+0.1%</td><td>0.68</td><td>11.9</td><td class="up">+6.5%</td><td>54</td></tr>
+      <tr><td class="star">★</td><td><span class="sym">ULKER</span></td><td>113.20 ₺</td><td>$903M</td><td class="up">+1.9%</td><td>0.85</td><td>11.4</td><td class="up">+8.5%</td><td>39</td></tr>
+      <tr><td class="star">★</td><td><span class="sym">SAHOL</span></td><td>92.10 ₺</td><td>$5.4B</td><td class="dn">-0.4%</td><td>0.74</td><td>9.2</td><td class="up">+12.1%</td><td>61</td></tr>
+    </tbody>
+  </table>
+
+</div>
+
+<div class="note" style="margin-top:18px;">
+  <b>Değişen:</b> 4 satır → 2 satır + ince özet · birincil eylemler (Yeni Tarama, Filtre Ekle, Arama) solda · sıralama tek kontrol · az kullanılan 6 araç "Araçlar ▾" menüsünde · hızlı filtreler Temel/Teknik/Lensler olarak gruplandı, emojiler kaldırıldı · tekrar eden sayaçlar tek özet satırına indi · yatay kaydırma okları kaldırıldı.
+</div>
+</body>
+</html>
