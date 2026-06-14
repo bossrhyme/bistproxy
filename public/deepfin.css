@@ -1093,6 +1093,11 @@ td:nth-child(2){font-family:var(--ff);}
 .hpx-spill-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px;}
 .hpx-spill-tag{font-size:11px;color:var(--text2);}
 .hpx-step-icon svg{width:22px;height:22px;}
+/* Varlıklar — yakında (henüz aktif olmayan) varlık sınıfları */
+.hpx-spill-soon{cursor:default;}
+.hpx-spill-soon:hover{border-color:var(--border);background:var(--s1);}
+.hpx-spill-soon .hpx-spill-name{color:var(--text2);}
+.hpx-soon{display:inline-block;margin-left:5px;font-size:9px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:var(--s3);border:1px solid var(--border);border-radius:4px;padding:1px 5px;vertical-align:middle;}
 .hpx-more{margin-top:14px;background:none;border:none;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;padding:4px 0;display:inline-flex;align-items:center;gap:4px;font-family:var(--ff);}
 .hpx-more:hover{text-decoration:underline;}
 
