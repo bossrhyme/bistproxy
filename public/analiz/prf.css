@@ -677,14 +677,6 @@ td:first-child,td:nth-child(2){text-align:left;}
 .analiz-ex-chip img { border-radius: 2px; }
 
 .analiz-breadcrumb { display:none !important; }
-.analiz-breadcrumb-UNUSED {
-  padding: 10px 20px; border-bottom: 1px solid var(--border); background: var(--s1);
-  display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted);
-  font-family: 'Inter',sans-serif;
-}
-.analiz-breadcrumb span { color: var(--text2); }
-.analiz-breadcrumb .sep { color: var(--border2); }
-.analiz-breadcrumb .crumb { color: var(--accent); }
 
 /* Detay paneli — Hemen Al + Detaylı Analiz butonları */
 .dpl-action-row {
@@ -945,7 +937,6 @@ html,body{height:100%;overflow:hidden;}
 .fin-tt{position:fixed;z-index:9999;background:var(--s1);color:var(--text2);font-size:11px;padding:6px 10px;border-radius:6px;border:1px solid var(--border2);pointer-events:none;display:none;max-width:220px;line-height:1.4;box-shadow:var(--shadow-md);}
 
 /* ── DeepFin Skoru ─────────────────────────────────────────── */
-#prf-score-sside{}
 .df-sc-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
 .df-sc-title{font-size:10px;font-weight:700;color:var(--text);letter-spacing:.6px;text-transform:uppercase;}
 .df-sc-wbtn{background:none;border:1px solid var(--border2);color:var(--text2);font-size:9px;padding:3px 8px;border-radius:4px;cursor:pointer;transition:all .2s;}
