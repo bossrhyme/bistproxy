@@ -135,6 +135,8 @@ body{overflow-y:auto;}
 .pf-lang-btn{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;padding:8px 18px;border-radius:8px;border:1px solid var(--border2);background:var(--s1);color:var(--text2);cursor:pointer;transition:all .12s;}
 .pf-lang-btn:hover{border-color:var(--accent);color:var(--accent);}
 .pf-lang-btn.on{background:var(--accent);color:#fff;border-color:transparent;}
+.pf-lang-login{margin-top:28px;display:flex;flex-direction:column;align-items:center;gap:9px;}
+.pf-lang-login-label{font-size:10px;font-weight:700;color:var(--muted2);letter-spacing:.6px;text-transform:uppercase;}
 
 /* Watchlists */
 .pf-list-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
@@ -444,6 +446,14 @@ body{overflow-y:auto;}
     <div class="pf-auth-switch">
       <span id="pf-switch-text">Hesabın yok mu?</span>
       <button type="button" onclick="toggleAuthMode()" id="pf-switch-btn">Kayıt Ol</button>
+    </div>
+    <!-- Dil seçimi — giriş yapmadan da erişilebilir -->
+    <div class="pf-lang-login">
+      <span class="pf-lang-login-label" data-i18n="lang.label">Dil</span>
+      <div class="pf-lang-btns">
+        <button type="button" class="pf-lang-btn" data-lang-btn="tr" onclick="dfSetLang('tr')">Türkçe</button>
+        <button type="button" class="pf-lang-btn" data-lang-btn="en" onclick="dfSetLang('en')">English</button>
+      </div>
     </div>
   </div>
 
