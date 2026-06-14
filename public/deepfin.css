@@ -1132,7 +1132,8 @@ td:nth-child(2){font-family:var(--ff);}
 .hpx-step{text-align:center;}
 .hpx-step .hpx-step-icon{margin-left:auto;margin-right:auto;}
 .hp-footer-top,.hp-footer-bottom{max-width:1160px;margin-left:auto;margin-right:auto;}
-/* Borsalar & Stratejiler: sola yaslı (ortalı kolon içinde) */
+/* Varlıklar & Stratejiler: sola yaslı (ortalı 1160 kolonu doldurur — başlıklar hizalı) */
+.hpx-section-left{width:100%;}
 .hpx-section-left .hpx-eye{text-align:left;}
 .hpx-section-left .hpx-tabs{justify-content:flex-start;}
 .hpx-section-left .hpx-more{margin-left:0;margin-right:auto;}
