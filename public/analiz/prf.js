@@ -1590,12 +1590,12 @@ function anTab(id, el) {
   var tabs = document.querySelectorAll('.an-tabs .atab');
   for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('on');
   if (el) el.classList.add('on');
-  ['ov','fu','te','de','go','fv','ne'].forEach(function(x){
+  ['ov','de','go','fv','ne'].forEach(function(x){
     var p = document.getElementById('anp-'+x);
     if (p) p.classList.toggle('on', x === id);
   });
   if (id === 'fv' && typeof _startFairValue === 'function') _startFairValue();
-  if (id === 'te') _buildTechMetrics();
+  if (id === 'de' && typeof _buildTechMetrics === 'function') _buildTechMetrics();
   var sc = document.querySelector('.an-scroll'); if (sc) sc.scrollTop = 0;
 }
 

@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <script>(function(){try{var t=localStorage.getItem('df_theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})()</script>
-<link rel="stylesheet" href="/analiz/prf.css?v=warm2">
+<link rel="stylesheet" href="/analiz/prf.css?v=warm3">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap"></noscript>
 
@@ -117,9 +117,7 @@ window.addEventListener('DOMContentLoaded', function(){
         </div>
         <div class="an-tabs">
           <div class="atab on" onclick="anTab('ov',this)">Genel Bakış</div>
-          <div class="atab" onclick="anTab('fu',this)">Temel</div>
-          <div class="atab" onclick="anTab('te',this)">Teknik</div>
-          <div class="atab" onclick="anTab('de',this)">Detaylı</div>
+          <div class="atab" onclick="anTab('de',this)">Detay</div>
           <div class="atab" onclick="anTab('go',this)">GOAT</div>
           <div class="atab" onclick="anTab('fv',this)">Adil Fiyat</div>
           <div class="atab" onclick="anTab('ne',this)">Haberler</div>
@@ -159,29 +157,14 @@ window.addEventListener('DOMContentLoaded', function(){
         </div>
 
         <!-- TEMEL -->
-        <div class="an-panel" id="anp-fu">
+        <!-- DETAY: Temel Analiz + Teknik Analiz -->
+        <div class="an-panel" id="anp-de">
+          <div class="an-group-head">Temel Analiz</div>
           <div class="an-sec-head">Temel Oranlar</div>
           <div class="prf-mgrid" id="prf-metrics"><div style="padding:20px;color:var(--muted);font-size:12px;grid-column:span 4">Veriler yükleniyor...</div></div>
           <div id="prf-fin-gauges" style="display:none;"></div>
           <div id="prf-fin-debt" style="display:none;"></div>
-          <div class="an-sec-head">Temel Finansal Göstergeler</div>
-          <div id="prf-fin-summary" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;"></div>
-          <div class="an-sec-head">Hangi Yatırımcı Neden Alabilir?</div>
-          <div id="prf-investor-fit"></div>
-        </div>
-
-        <!-- TEKNİK -->
-        <div class="an-panel" id="anp-te">
-          <div class="an-sec-head">Teknik Göstergeler</div>
-          <div class="mgrid" id="prf-tech-metrics"><div style="padding:20px;color:var(--muted);font-size:12px;">Veriler yükleniyor...</div></div>
-          <div class="an-badges" id="prf-tech-badges" style="margin-top:14px;"></div>
-          <div class="an-sec-head">Fiyat Bilgileri</div>
-          <div id="prf-price-stats"></div>
-        </div>
-
-        <!-- DETAYLI -->
-        <div class="an-panel" id="anp-de">
-          <div class="an-sec-head">Gelir & Kâr Trendi</div>
+          <div class="an-sec-head">Gelir &amp; Kâr Trendi</div>
           <div style="display:flex;gap:10px;margin-bottom:6px;" id="prf-trend-cards">
             <div style="flex:1;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:14px;">
               <div style="font-size:9px;color:var(--text2);margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase;">Gelir Büyümesi</div>
@@ -200,8 +183,12 @@ window.addEventListener('DOMContentLoaded', function(){
               <div id="prf-perf-bars" style="display:flex;flex-direction:column;gap:5px;margin-top:4px;"></div>
             </div>
           </div>
+          <div class="an-sec-head">Temel Finansal Göstergeler</div>
+          <div id="prf-fin-summary" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;"></div>
           <div class="an-sec-head">Şirket Hakkında</div>
           <p id="prf-desc" style="font-size:12px;color:var(--text2);line-height:1.7;">Yükleniyor...</p>
+          <div class="an-sec-head">Hangi Yatırımcı Neden Alabilir?</div>
+          <div id="prf-investor-fit"></div>
           <div class="an-sec-head">Sektör Karşılaştırması</div>
           <div id="prf-sector-cmp" style="min-height:40px;"></div>
           <div class="an-sec-head" style="display:flex;align-items:center;gap:6px;">Gelir Tablosu<span id="inc-annual" onclick="setPeriod('income','annual',this)" class="prf-period-active" style="margin-left:auto;">Yıllık</span><span id="inc-quarterly" onclick="setPeriod('income','quarterly',this)" class="prf-period-btn">Çeyreklik</span></div>
@@ -210,6 +197,14 @@ window.addEventListener('DOMContentLoaded', function(){
           <div id="prf-balance-table" style="overflow-x:auto;"><div style="padding:16px;color:var(--muted2);font-size:12px;">Yükleniyor...</div></div>
           <div class="an-sec-head" style="display:flex;align-items:center;gap:6px;">Nakit Akışı<span id="cf-annual" onclick="setPeriod('cashflow','annual',this)" class="prf-period-active" style="margin-left:auto;">Yıllık</span><span id="cf-quarterly" onclick="setPeriod('cashflow','quarterly',this)" class="prf-period-btn">Çeyreklik</span></div>
           <div id="prf-cashflow-table" style="overflow-x:auto;"><div style="padding:16px;color:var(--muted2);font-size:12px;">Yükleniyor...</div></div>
+
+          <div class="an-group-head">Teknik Analiz</div>
+          <div class="an-sec-head">Teknik Göstergeler</div>
+          <div class="mgrid" id="prf-tech-metrics"><div style="padding:20px;color:var(--muted);font-size:12px;">Veriler yükleniyor...</div></div>
+          <div class="an-badges" id="prf-tech-badges" style="margin-top:14px;"></div>
+          <div class="an-sec-head">Fiyat Bilgileri</div>
+          <div id="prf-price-stats"></div>
+
           <div class="an-sec-head">Benzer Hisseler</div>
           <div id="prf-similar"><div style="font-size:11px;color:var(--muted)">Önce tarama yapın</div></div>
         </div>
@@ -260,6 +255,6 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js" defer></script>
-<script src="/analiz/prf.js?v=warm4"></script>
+<script src="/analiz/prf.js?v=warm5"></script>
 </body>
 </html>
