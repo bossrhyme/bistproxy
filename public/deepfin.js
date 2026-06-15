@@ -2369,10 +2369,10 @@ function initPrescanView() {
   function mkFilterCard(key, p, cls, toggleFn) {
     if (!p) return '';
     var tags = _psvGetTags(p.filters||{}, 3);
-    var tagsHtml = tags.length ? '<div class="psv-preset-tags-row">'+tags.map(function(t){return '<span class="psv-preset-tag-sm">'+t+'</span>';}).join('')+'</div>' : '';
+    var tagsHtml = tags.length ? '<div class="psv-preset-tags-row">'+tags.map(function(t){return '<span class="psv-preset-tag-sm">'+esc(t)+'</span>';}).join('')+'</div>' : '';
     return '<div class="'+cls+'" data-key="'+key+'" onclick="'+toggleFn+'(\''+key+'\')">' +
-      '<div class="psv-preset-name">'+p.label+'</div>'+tagsHtml+
-      '<div class="psv-preset-desc">'+p.desc+'</div></div>';
+      '<div class="psv-preset-name">'+esc(p.label)+'</div>'+tagsHtml+
+      '<div class="psv-preset-desc">'+esc(p.desc)+'</div></div>';
   }
 
   var allExKeys      = Object.keys(EXCHANGE_META).filter(function(k){ return PSV_MAIN_EX.indexOf(k)===-1; });
@@ -2806,7 +2806,7 @@ function _applyChips(cfg) {
   var byGroup = {};
   allInfos.forEach(function(info) {
     if (!byGroup[info.infoId]) byGroup[info.infoId] = [];
-    byGroup[info.infoId].push('<strong>' + info.label + ':</strong> ' + info.desc);
+    byGroup[info.infoId].push('<strong>' + esc(info.label) + ':</strong> ' + esc(info.desc));
   });
   Object.keys(byGroup).forEach(function(id) {
     var el = document.getElementById(id);
