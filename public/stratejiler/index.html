@@ -27,8 +27,9 @@
 <link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
 <link rel="apple-touch-icon" href="/icons/icon-180.png">
 <script>(function(){try{var t=localStorage.getItem('df_theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})()</script>
-<script src="/i18n.js?v=3" defer></script>
+<script src="/i18n.js?v=4" defer></script>
 <script src="/auth-header.js?v=2" defer></script>
+<link rel="stylesheet" href="/deepfin.css?v=warm36">
 <style>
 /* ── Tokens (light default, dark override) ── */
 :root{
@@ -52,19 +53,7 @@ html{background:var(--bg);}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;display:flex;flex-direction:column;}
 
 /* ── Topbar ── */
-.topbar{height:var(--topbar-h);background:var(--s1);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;padding:0 18px;position:sticky;top:0;z-index:100;}
-.tlogo{display:flex;align-items:center;gap:6px;font-size:15px;font-weight:700;letter-spacing:-.3px;text-decoration:none;color:var(--text);cursor:pointer;}
-.tlogo-mark{width:22px;height:22px;background:var(--accent);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;}
-.tlive{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--green);}
-.tlive::before{content:'';width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s ease infinite;}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
-.hp-nav-btn{font-size:13px;font-weight:500;color:var(--muted2);text-decoration:none;padding:6px 12px;border-radius:var(--r);transition:color .15s,background .15s;white-space:nowrap;}
-.hp-nav-btn:hover{color:var(--text);}
-.hp-nav-btn.active{color:var(--accent);}
-.tright{margin-left:auto;display:flex;align-items:center;gap:6px;}
-.topbarbtn{background:none;border:1px solid var(--border);border-radius:var(--r);padding:5px 11px;font-size:11.5px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .15s;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:5px;}
-.topbarbtn:hover{border-color:var(--accent);color:var(--accent);}
-.supportbtn{gap:5px;}
+/* header stilleri deepfin.css'ten geliyor */
 
 /* ── Hero ── */
 .hero{text-align:center;padding:48px 20px 28px;}
@@ -100,8 +89,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 .ps-ex-btn.on{border-color:var(--accent);background:color-mix(in srgb, var(--accent) 10%, transparent);box-shadow:0 0 0 1px var(--accent) inset;}
 .ps-ex-flag-img{width:36px;height:auto;border-radius:3px;display:block;box-shadow:0 0 0 1px rgba(0,0,0,.10);}
 .ps-ex-flag-emoji{font-size:28px;line-height:1;}
-.ps-ex-name{font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;}
+.ps-ex-name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;}
+.ps-ex-country{font-size:10px;font-weight:500;color:var(--muted2);white-space:nowrap;}
 .ps-ex-btn.on .ps-ex-name{color:var(--accent);}
+.ps-ex-btn{gap:3px;padding:13px 18px;}
 .ps-show-more{margin-top:12px;background:none;border:none;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;padding:4px 0;display:inline-flex;align-items:center;gap:4px;}
 .ps-show-more:hover{text-decoration:underline;}
 
@@ -216,31 +207,37 @@ footer a:hover{color:var(--text2);}
 <body>
 
 <!-- ── TOPBAR ── -->
-<div class="topbar">
-  <a href="/" class="tlogo"><div class="tlogo-mark">D</div>DeepFin</a>
-  <span class="tlive">Canlı</span>
-  <a href="/" class="hp-nav-btn" data-i18n="nav.home">Anasayfa</a>
-  <a href="/" class="hp-nav-btn" data-i18n="nav.scanner">Tarayıcı</a>
-  <a href="/analiz/" class="hp-nav-btn" data-i18n="nav.analysis">Analiz</a>
-  <span class="hp-nav-btn active" data-i18n="nav.strategies">Stratejiler</span>
-  <a href="/bilgi/" class="hp-nav-btn" data-i18n="nav.learn">Bilgi Bankası</a>
+<div class="topbar" role="banner">
+  <div class="tleft">
+    <a href="/" class="tlogo" style="text-decoration:none;color:inherit"><span class="tlogo-mark"></span>DeepFin</a>
+    <span class="tlive">Canlı</span>
+  </div>
+  <nav class="tnav">
+    <a href="/" class="hp-nav-btn" data-i18n="nav.home">Anasayfa</a>
+    <a href="/" class="hp-nav-btn" data-i18n="nav.scanner">Tarayıcı</a>
+    <a href="/analiz/" class="hp-nav-btn" data-i18n="nav.analysis">Analiz</a>
+    <a href="/stratejiler/" class="hp-nav-btn active" data-i18n="nav.strategies">Stratejiler</a>
+    <a href="/bilgi/" class="hp-nav-btn" data-i18n="nav.learn">Bilgi Bankası</a>
+  </nav>
   <div class="tright">
     <div class="lang-toggle" role="group" aria-label="Dil / Language">
       <button class="lang-toggle-btn" data-lang-btn="tr" onclick="dfSetLang('tr')">TR</button>
       <button class="lang-toggle-btn" data-lang-btn="en" onclick="dfSetLang('en')">EN</button>
     </div>
-    <button class="topbarbtn theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir">☾</button>
-    <a href="/profil" class="topbarbtn" title="Profilim">👤 <span class="btn-lbl">Profil</span></a>
+    <button class="topbarbtn theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir" aria-label="Karanlık/Açık mod geçiş">☾</button>
+    <button class="auth-btn auth-ghost df-auth-out" onclick="location.href='/profil'" data-i18n="auth.login">Giriş Yap</button>
+    <button class="auth-btn auth-primary df-auth-out" onclick="location.href='/profil'" data-i18n="auth.register">Kayıt Ol</button>
+    <a href="/profil" id="profile-btn" class="auth-btn auth-primary df-auth-in" title="Profilim" style="display:none"><span id="profile-btn-inner" class="df-auth-av"></span><span data-i18n="auth.profile">Profil</span></a>
     <button class="topbarbtn supportbtn" onclick="window.open('https://buymeacoffee.com/deepfin','_blank')">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-      <span class="btn-lbl">Destek Ol</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+      <span data-i18n="auth.support">Destek Ol</span>
     </button>
   </div>
 </div>
 
 <!-- ── HERO ── -->
 <div class="hero">
-  <div class="hero-badge" data-i18n="sp.badge">📊 STRATEJİ KARŞILAŞTIRMA</div>
+  <div class="hero-badge" data-i18n="sp.badge">STRATEJİ KARŞILAŞTIRMA</div>
   <h1 data-i18n-html="sp.h1">Hangi Strateji <span>Ne Kadar Kazandırdı?</span></h1>
   <p class="hero-sub" data-i18n="sp.sub">Büyüme, değer, temettü ve 50+ stratejinin filtre kriterlerinden geçen hisselerin son 1–6 ay ortalama getirisini gerçek piyasa verisiyle karşılaştır.</p>
 </div>
@@ -248,22 +245,22 @@ footer a:hover{color:var(--text2);}
 <!-- ── VARLIK + BORSA SEÇİMİ (prescan stili) ── -->
 <div class="ps-select">
   <div class="ps-section">
-    <div class="ps-section-hd">🏦 Varlık</div>
+    <div class="ps-section-hd" data-i18n="assets.title">Varlık</div>
     <div class="ps-asset-wrap">
       <button class="ps-asset-arrow" onclick="scrollAssets(-1)" aria-label="Sola kaydır">‹</button>
       <div class="ps-asset-row" id="ps-asset-row">
-        <button class="ps-asset-btn on"><span class="ps-asset-icon">📈</span><span class="ps-asset-name">Borsa</span></button>
-        <div class="ps-asset-soon"><span class="ps-asset-icon">₿</span><span class="ps-asset-name">Kripto</span><span class="ps-asset-badge">yakında</span></div>
-        <div class="ps-asset-soon"><span class="ps-asset-icon">💼</span><span class="ps-asset-name">Fon</span><span class="ps-asset-badge">yakında</span></div>
-        <div class="ps-asset-soon"><span class="ps-asset-icon">📦</span><span class="ps-asset-name">ETF</span><span class="ps-asset-badge">yakında</span></div>
-        <div class="ps-asset-soon"><span class="ps-asset-icon">💵</span><span class="ps-asset-name">Eurobond</span><span class="ps-asset-badge">yakında</span></div>
-        <div class="ps-asset-soon"><span class="ps-asset-icon">🏛️</span><span class="ps-asset-name">Bono/Tahvil</span><span class="ps-asset-badge">yakında</span></div>
+        <button class="ps-asset-btn on"><span class="ps-asset-name" data-i18n="assets.stocks">Borsa</span></button>
+        <div class="ps-asset-soon"><span class="ps-asset-name" data-i18n="assets.crypto">Kripto</span><span class="ps-asset-badge" data-i18n="soon">yakında</span></div>
+        <div class="ps-asset-soon"><span class="ps-asset-name" data-i18n="assets.fund">Fon</span><span class="ps-asset-badge" data-i18n="soon">yakında</span></div>
+        <div class="ps-asset-soon"><span class="ps-asset-name" data-i18n="assets.etf">ETF</span><span class="ps-asset-badge" data-i18n="soon">yakında</span></div>
+        <div class="ps-asset-soon"><span class="ps-asset-name" data-i18n="assets.eurobond">Eurobond</span><span class="ps-asset-badge" data-i18n="soon">yakında</span></div>
+        <div class="ps-asset-soon"><span class="ps-asset-name" data-i18n="assets.bond">Bono/Tahvil</span><span class="ps-asset-badge" data-i18n="soon">yakında</span></div>
       </div>
       <button class="ps-asset-arrow" onclick="scrollAssets(1)" aria-label="Sağa kaydır">›</button>
     </div>
   </div>
   <div class="ps-section">
-    <div class="ps-section-hd">🌍 Borsa</div>
+    <div class="ps-section-hd" data-i18n="sp.exchange">Borsa</div>
     <div class="ps-ex-grid" id="ex-main"></div>
     <div class="ps-ex-grid ps-ex-extra" id="ex-extra" hidden></div>
     <button class="ps-show-more" id="ex-more-btn" onclick="toggleMoreEx()">+ Diğer Borsalar</button>

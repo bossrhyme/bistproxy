@@ -36,6 +36,14 @@ var EX_META = {
 };
 var MAIN_EX = ['bist','nasdaq','nyse','sp500','dax','lse'];
 var EX_KEYS = Object.keys(EX_META);
+var EX_COUNTRY = {
+  bist:'Türkiye', nasdaq:'ABD', nyse:'ABD', sp500:'ABD', dax:'Almanya', lse:'İngiltere',
+  nikkei:'Japonya', krx:'Güney Kore', moex:'Rusya', france:'Fransa', amsterdam:'Hollanda',
+  brussels:'Belçika', lisbon:'Portekiz', dublin:'İrlanda', oslo:'Norveç', milan:'İtalya',
+  tsx:'Kanada', twse:'Tayvan', b3:'Brezilya', hkex:'Hong Kong', china:'Çin', saudi:'Suudi Arabistan',
+  switzerland:'İsviçre', australia:'Avustralya', southafrica:'Güney Afrika', sweden:'İsveç',
+  india:'Hindistan', uae:'BAE'
+};
 
 // Emoji bayrağı ISO koduna çevir → flagcdn görseli (tarayıcı ile aynı)
 function isoFromFlag(emoji) {
@@ -666,19 +674,19 @@ function renderAll() {
 
   if (showAllGroups) {
     var goatItems = Object.keys(GURUS).map(function(k) {
-      var g = GURUS[k]; return { icon:'🐐', label:g.label, st:stats(g.filters, g.special||null), filters:g.filters, special:g.special||null };
+      var g = GURUS[k]; return { icon:'', label:g.label, st:stats(g.filters, g.special||null), filters:g.filters, special:g.special||null };
     });
-    html += sectionHtml('🏆 GOAT Stratejileri', goatItems);
+    html += sectionHtml('Yatırımcı Lensleri', goatItems);
 
     var presetItems = Object.keys(PRESETS).map(function(k) {
-      var p = PRESETS[k]; return { icon:'📊', label:p.label, st:stats(p.filters, null), filters:p.filters, special:null };
+      var p = PRESETS[k]; return { icon:'', label:p.label, st:stats(p.filters, null), filters:p.filters, special:null };
     });
-    html += sectionHtml('📐 Temel Filtreler', presetItems);
+    html += sectionHtml('Temel Analiz', presetItems);
 
     var techItems = Object.keys(TECH_PRESETS).map(function(k) {
-      var p = TECH_PRESETS[k]; return { icon:'📈', label:p.label, st:stats(p.filters, null), filters:p.filters, special:null };
+      var p = TECH_PRESETS[k]; return { icon:'', label:p.label, st:stats(p.filters, null), filters:p.filters, special:null };
     });
-    html += sectionHtml('⚙️ Teknik Filtreler', techItems);
+    html += sectionHtml('Teknik Analiz', techItems);
 
     html += '<button class="sr-toggle" onclick="toggleAll()">▲ Sadece Yatırımcı Stratejileri</button>';
   } else {
@@ -693,8 +701,9 @@ function renderAll() {
 function exTabHtml(key) {
   var m = EX_META[key]; if (!m) return '';
   return '<button class="ps-ex-btn' + (key === currentEx ? ' on' : '') + '" data-ex="' + key + '"' +
-    ' onclick="setEx(\'' + key + '\')">' + flagImg(m.flag) +
-    '<span class="ps-ex-name">' + m.name + '</span></button>';
+    ' onclick="setEx(\'' + key + '\')">' +
+    '<span class="ps-ex-name">' + m.name + '</span>' +
+    '<span class="ps-ex-country">' + (EX_COUNTRY[key] || '') + '</span></button>';
 }
 function renderExchangeTabs() {
   var mainEl  = document.getElementById('ex-main');
