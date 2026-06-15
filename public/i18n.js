@@ -67,9 +67,9 @@
     'strat.technical': { tr: 'Teknik Analiz',   en: 'Technical' },
 
     // ── Son Taramalar ──
-    'recent.title':    { tr: 'Son Taramalar',   en: 'Recent Scans' },
-    'recent.sub':      { tr: "Sitede yapılan son taramalar — birine tıkla, aynı taramayı Pro'da çalıştır",
-                         en: 'Recent scans across the site — click one to run the same scan in Pro' },
+    'recent.title':    { tr: 'Sitede yapılan son taramalar', en: 'Recent scans across the site' },
+    'recent.sub':      { tr: "Birine tıkla, aynı taramayı Pro'da çalıştır",
+                         en: 'Click one to run the same scan in Pro' },
 
     // ── Yasal uyarı + footer (kısaltılmış anahtarlar) ──
     'disc.p1':         { tr: "DeepFin'de sunulan tüm veriler, filtreler ve stratejiler yalnızca <strong>bilgilendirme amaçlıdır</strong>. Bu platform herhangi bir finansal araç için <strong>alım, satım veya elde tutma tavsiyesi vermez</strong>; yatırım danışmanlığı hizmeti sunmaz. <strong>Geçmiş performans gelecekteki sonuçların garantisi değildir.</strong> Yatırım kararlarınızı almadan önce <em>lisanslı bir finansal danışmana</em> başvurmanızı tavsiye ederiz. Tüm yatırım işlemleri kullanıcının kendi sorumluluğundadır.",
