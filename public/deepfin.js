@@ -1261,16 +1261,25 @@ function exportToCSV() {
     { key: 'currentRatioAnnual',        label: 'Cari Oran' },
     { key: 'sector',                    label: 'Sektör' },
   ];
-  var rows = [cols.map(function(c){ return '"' + c.label + '"'; }).join(',')];
+  // Türkçe/Avrupa Excel için: ayraç ';' (virgül ondalık sanılır → tek sütun olurdu),
+  // ondalık ',' (nokta binlik sanılır), sep= direktifi + BOM ile her yerel ayarda doğru açılır.
+  var SEP = ';';
+  var rows = ['sep=' + SEP];
+  rows.push(cols.map(function(c){ return '"' + c.label + '"'; }).join(SEP));
   filtered.forEach(function(s) {
     rows.push(cols.map(function(c) {
       var v = s[c.key];
       if (v === null || v === undefined) return '';
       if (typeof v === 'string') return '"' + v.replace(/"/g, '""') + '"';
-      return v;
-    }).join(','));
+      if (typeof v === 'number') {
+        // 2 ondalığa yuvarla (uzun kuyrukları temizle), sonra Türkçe ondalık (,)
+        var n = Math.round(v * 100) / 100;
+        return String(n).replace('.', ',');
+      }
+      return String(v);
+    }).join(SEP));
   });
-  var csv = '﻿' + rows.join('\n'); // BOM for Excel Turkish support
+  var csv = '﻿' + rows.join('\r\n'); // BOM (Türkçe karakter) + CRLF (Excel)
   var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   var url = URL.createObjectURL(blob);
   var a = document.createElement('a');
