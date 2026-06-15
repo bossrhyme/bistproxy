@@ -5191,7 +5191,11 @@ function toggleFilterDropdown(e) {
   dd.style.display = 'block';
   var btn = document.getElementById('add-filter-btn');
   if (btn) btn.classList.add('open');
-  setTimeout(function() { document.addEventListener('click', _fdOutsideClick); }, 0);
+  // Capture fazında dinle: akordeon/chip tıklaması renderFilterDropdown ile
+  // innerHTML'i yeniden kurup tıklanan elemanı koparıyor; bubble fazında çalışan
+  // dışarı-tıklama kontrolü kopmuş elemanı "dışarıda" sanıp paneli kapatırdı.
+  // Capture rebuild'den ÖNCE çalışır → eleman hâlâ panelde → kapatmaz.
+  setTimeout(function() { document.addEventListener('click', _fdOutsideClick, true); }, 0);
 }
 
 function _fdOutsideClick(e) {
@@ -5204,7 +5208,7 @@ function closeFilterDropdown() {
   if (dd) dd.style.display = 'none';
   var btn = document.getElementById('add-filter-btn');
   if (btn) btn.classList.remove('open');
-  document.removeEventListener('click', _fdOutsideClick);
+  document.removeEventListener('click', _fdOutsideClick, true);
 }
 
 // ── Araçlar menüsü (toolbar) ──
