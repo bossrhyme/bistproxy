@@ -5186,6 +5186,7 @@ function toggleFilterDropdown(e) {
   var dd = document.getElementById('filter-dropdown');
   if (!dd) return;
   if (dd.style.display !== 'none') { closeFilterDropdown(); return; }
+  _fdOpenGroup = null; // her açılışta 3 başlık kapalı görünsün
   renderFilterDropdown();
   dd.style.display = 'block';
   var btn = document.getElementById('add-filter-btn');
@@ -5229,6 +5230,14 @@ function toggleToolsMenu(e) {
   setTimeout(function(){ document.addEventListener('click', _toolsOutsideClick); }, 0);
 }
 
+// Akordeon: aynı anda yalnızca bir kategori açık. null = hepsi kapalı.
+var _fdOpenGroup = null;
+
+function fdToggleGroup(kind) {
+  _fdOpenGroup = (_fdOpenGroup === kind) ? null : kind;
+  renderFilterDropdown();
+}
+
 function renderFilterDropdown() {
   var dd = document.getElementById('filter-dropdown');
   if (!dd) return;
@@ -5238,21 +5247,31 @@ function renderFilterDropdown() {
     var dict = g.kind === 'goat' ? GURUS : g.kind === 'preset' ? PRESETS : TECH_PRESETS;
     var chips = document.querySelectorAll('#' + g.containerId + ' [' + g.attr + ']');
     if (!chips.length) return;
-    html += '<div class="fd-group-title">' + g.title + '</div><div class="fd-chips">';
-    var items = [];
+    var items = [], selCount = 0;
     chips.forEach(function(c) {
       var key = c.getAttribute(g.attr);
       var def = dict[key];
       // Goat chip'ler mini-card'a dönüştürülmüş olabilir — sadece isim span'ini al
       var nameEl = c.querySelector('.gcchip-name');
+      var on = c.classList.contains('on');
+      if (on) selCount++;
       items.push({
         key: key,
         label: (nameEl ? nameEl.textContent : c.textContent).trim(),
         desc: def && def.desc ? def.desc : '',
-        on: c.classList.contains('on')
+        on: on
       });
     });
     items.sort(function(a, b) { return a.label.localeCompare(b.label, 'tr'); });
+    var isOpen = _fdOpenGroup === g.kind;
+    html += '<button type="button" class="fd-acc' + (isOpen ? ' open' : '') + '" onclick="fdToggleGroup(\'' + g.kind + '\')">' +
+      '<span class="fd-acc-title">' + g.title + '</span>' +
+      '<span class="fd-acc-meta">' +
+        (selCount ? '<span class="fd-acc-sel">' + selCount + '</span>' : '') +
+        '<span class="fd-acc-n">' + items.length + '</span>' +
+        '<span class="fd-acc-arr">▾</span>' +
+      '</span></button>';
+    html += '<div class="fd-chips"' + (isOpen ? '' : ' style="display:none"') + '>';
     items.forEach(function(it) {
       var tip = it.desc ? ' title="' + esc(it.desc) + '"' : '';
       html += '<span class="fd-chip' + (it.on ? ' on' : '') + '"' + tip +
@@ -5283,6 +5302,7 @@ function fdToggleChip(kind, key, el) {
   window._quickRescan = true;
   window._quickRescanLabel = (wasOn ? '− ' : '+ ') + el.textContent.trim();
   _applyChips(BASIC_CHIP_CFG);
+  renderFilterDropdown(); // akordeon başlık sayaçlarını (seçili/toplam) tazele, açık kategori korunur
 }
 
 // ── MOBILE DRAWER ──

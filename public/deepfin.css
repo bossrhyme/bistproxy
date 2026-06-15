@@ -591,7 +591,18 @@ td:nth-child(2){font-family:var(--ff);}
 .fd-count{font-size:11px;font-weight:600;color:var(--muted2);font-family:'Inter',sans-serif;}
 .fd-group-title{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--text2);margin:12px 0 7px;}
 .fd-group-title::before{content:'';width:3px;height:12px;background:var(--accent);border-radius:2px;flex-shrink:0;}
-.fd-chips{display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;}
+/* Akordeon başlık (kategori aç/kapa) */
+.fd-acc{display:flex;align-items:center;justify-content:space-between;width:100%;gap:8px;font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--text2);background:transparent;border:none;border-radius:var(--r-md);padding:10px 4px;margin-top:4px;cursor:pointer;text-align:left;font-family:inherit;transition:color .12s;}
+.fd-acc:hover{color:var(--accent);}
+.fd-acc.open{color:var(--text);}
+.fd-acc-title{display:flex;align-items:center;gap:7px;}
+.fd-acc-title::before{content:'';width:3px;height:12px;background:var(--accent);border-radius:2px;flex-shrink:0;}
+.fd-acc-meta{display:inline-flex;align-items:center;gap:7px;}
+.fd-acc-sel{font-size:9.5px;font-weight:700;font-family:'Inter',sans-serif;letter-spacing:0;color:#fff;background:var(--accent);border-radius:9px;min-width:16px;text-align:center;padding:0 5px;line-height:16px;}
+.fd-acc-n{font-size:9.5px;font-weight:700;font-family:'Inter',sans-serif;letter-spacing:0;color:var(--muted2);background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:0 6px;line-height:15px;}
+.fd-acc-arr{font-size:9px;color:var(--muted2);transition:transform .18s,color .12s;}
+.fd-acc.open .fd-acc-arr{transform:rotate(180deg);color:var(--accent);}
+.fd-chips{display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;padding:0 2px 6px;}
 .fd-chip{font-size:10.5px;font-weight:500;line-height:1.4;padding:3px 9px;border:1px solid var(--border2);border-radius:var(--r-md);background:var(--s2);color:var(--text2);cursor:pointer;transition:border-color .10s,background .10s,color .10s;white-space:nowrap;user-select:none;flex-shrink:0;}
 .fd-chip:hover{border-color:var(--accent);color:var(--accent);background:var(--hover);}
 .fd-chip.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600;}
