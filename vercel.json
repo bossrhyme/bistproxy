@@ -68,20 +68,32 @@
     {
       "source": "/manifest.json",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=86400" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400"
+        }
       ]
     },
     {
       "source": "/robots.txt",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=86400" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400"
+        }
       ]
     },
     {
       "source": "/sitemap.xml",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=86400" },
-        { "key": "Content-Type",  "value": "application/xml; charset=utf-8" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400"
+        },
+        {
+          "key": "Content-Type",
+          "value": "application/xml; charset=utf-8"
+        }
       ]
     },
     {
@@ -129,6 +141,14 @@
       "destination": "/api/rates.js"
     },
     {
+      "source": "/stratejiler",
+      "destination": "/stratejiler/index.html"
+    },
+    {
+      "source": "/stratejiler/",
+      "destination": "/stratejiler/index.html"
+    },
+    {
       "source": "/analiz",
       "destination": "/analiz/index.html"
     },
@@ -172,29 +192,98 @@
       "source": "/api/bist-quote",
       "destination": "/api/bist-quote.js"
     },
-    { "source": "/api/symbol-list",   "destination": "/api/symbols.js" },
-    { "source": "/api/symbol-search", "destination": "/api/symbols.js" },
-    { "source": "/api/auth/register",           "destination": "/api/user.js" },
-    { "source": "/api/auth/login",              "destination": "/api/user.js" },
-    { "source": "/api/auth/me",                 "destination": "/api/user.js" },
-    { "source": "/api/auth/logout",             "destination": "/api/user.js" },
-    { "source": "/api/auth/change-password",    "destination": "/api/user.js" },
-    { "source": "/api/auth/update-profile",     "destination": "/api/user.js" },
-    { "source": "/api/auth/daily-checkin",      "destination": "/api/user.js" },
-    { "source": "/api/auth/set-investor-type",  "destination": "/api/user.js" },
-    { "source": "/api/portfolio/item",        "destination": "/api/user.js" },
-    { "source": "/api/portfolio",             "destination": "/api/user.js" },
-    { "source": "/api/watchlists/:path*",  "destination": "/api/user.js" },
-    { "source": "/api/watchlists",         "destination": "/api/user.js" },
-    { "source": "/api/track",              "destination": "/api/user.js" },
-    { "source": "/api/report",             "destination": "/api/user.js" },
-    { "source": "/api/admin/users",        "destination": "/api/user.js" },
-    { "source": "/api/admin/bans",         "destination": "/api/user.js" },
-    { "source": "/api/admin/user-detail",  "destination": "/api/user.js" },
-    { "source": "/profil",            "destination": "/profil/index.html" },
-    { "source": "/profil/",           "destination": "/profil/index.html" },
-    { "source": "/admin",             "destination": "/admin/index.html" },
-    { "source": "/admin/",            "destination": "/admin/index.html" }
+    {
+      "source": "/api/symbol-list",
+      "destination": "/api/symbols.js"
+    },
+    {
+      "source": "/api/symbol-search",
+      "destination": "/api/symbols.js"
+    },
+    {
+      "source": "/api/auth/register",
+      "destination": "/api/user.js"
+    },
+    {
+      "source": "/api/auth/login",
+      "destination": "/api/user.js"
+    },
+    {
+      "source": "/api/auth/me",
+      "destination": "/api/user.js"
+    },
+    {
+      "source": "/api/auth/logout",
+      "destination": "/api/user.js"
+    },
+    {
+      "source": "/api/auth/change-password",
+      "destination": "/api/user.js"
+    },
+    {
+      "source": "/api/auth/update-profile",
+      "destination": "/api/user.js"
+    },
+    {
+      "source": "/api/auth/daily-checkin",
+      "destination": "/api/user.js"
+    },
+    {
+      "source": "/api/auth/set-investor-type",
+      "destination": "/api/user.js"
+    },
+    {
+      "source": "/api/portfolio/item",
+      "destination": "/api/user.js"
+    },
+    {
+      "source": "/api/portfolio",
+      "destination": "/api/user.js"
+    },
+    {
+      "source": "/api/watchlists/:path*",
+      "destination": "/api/user.js"
+    },
+    {
+      "source": "/api/watchlists",
+      "destination": "/api/user.js"
+    },
+    {
+      "source": "/api/track",
+      "destination": "/api/user.js"
+    },
+    {
+      "source": "/api/report",
+      "destination": "/api/user.js"
+    },
+    {
+      "source": "/api/admin/users",
+      "destination": "/api/user.js"
+    },
+    {
+      "source": "/api/admin/bans",
+      "destination": "/api/user.js"
+    },
+    {
+      "source": "/api/admin/user-detail",
+      "destination": "/api/user.js"
+    },
+    {
+      "source": "/profil",
+      "destination": "/profil/index.html"
+    },
+    {
+      "source": "/profil/",
+      "destination": "/profil/index.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/admin/index.html"
+    },
+    {
+      "source": "/admin/",
+      "destination": "/admin/index.html"
+    }
   ],
   "crons": [
     {
@@ -224,7 +313,11 @@
     "api/bist-quote.js": {
       "maxDuration": 10
     },
-    "api/symbols.js": { "maxDuration": 15 },
-    "api/user.js": { "maxDuration": 10 }
+    "api/symbols.js": {
+      "maxDuration": 15
+    },
+    "api/user.js": {
+      "maxDuration": 10
+    }
   }
 }

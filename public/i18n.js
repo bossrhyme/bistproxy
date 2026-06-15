@@ -8,6 +8,13 @@
     'nav.scanner':     { tr: 'Tarayıcı',       en: 'Screener' },
     'nav.analysis':    { tr: 'Analiz',         en: 'Analysis' },
     'nav.learn':       { tr: 'Bilgi Bankası',  en: 'Learn' },
+    'nav.strategies':  { tr: 'Stratejiler',    en: 'Strategies' },
+
+    // ── Strateji Karşılaştırma sayfası ──
+    'sp.badge':        { tr: '📊 STRATEJİ KARŞILAŞTIRMA', en: '📊 STRATEGY COMPARISON' },
+    'sp.h1':           { tr: 'Hangi Strateji <span>Ne Kadar Kazandırdı?</span>', en: 'Which Strategy <span>Returned How Much?</span>' },
+    'sp.sub':          { tr: 'Büyüme, değer, temettü ve 50+ stratejinin filtre kriterlerinden geçen hisselerin son 1–6 ay ortalama getirisini gerçek piyasa verisiyle karşılaştır.',
+                         en: 'Compare the last 1–6 month average returns of stocks passing the filter criteria of 50+ growth, value, dividend and other strategies — with real market data.' },
     'auth.login':      { tr: 'Giriş Yap',      en: 'Log in' },
     'auth.register':   { tr: 'Kayıt Ol',       en: 'Sign up' },
     'auth.support':    { tr: 'Destek Ol',      en: 'Support' },
