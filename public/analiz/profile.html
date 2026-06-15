@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <script>(function(){try{var t=localStorage.getItem('df_theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})()</script>
-<link rel="stylesheet" href="/analiz/prf.css?v=warm6">
+<link rel="stylesheet" href="/analiz/prf.css?v=warm7">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&display=swap"></noscript>
 
@@ -72,6 +72,7 @@ window.addEventListener('DOMContentLoaded', function(){
   if(btn) btn.textContent = dark?'☀':'☾';
 });
 </script>
+<script src="/i18n.js?v=4" defer></script>
 </head>
 <body>
 <div id="app">
@@ -82,16 +83,22 @@ window.addEventListener('DOMContentLoaded', function(){
       <span id="prf-live-dot" style="display:none;font-size:10px;color:var(--green);align-items:center;gap:4px;"><span style="display:inline-block;width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s ease infinite;"></span>Canlı</span>
     </div>
     <nav class="tnav">
-      <a href="/" class="hp-nav-btn" onclick="event.preventDefault(); goHome()">Anasayfa</a>
-      <a href="/" class="hp-nav-btn" onclick="event.preventDefault(); goScreener()">Tarayıcı</a>
-      <a href="/analiz/" class="hp-nav-btn active" onclick="event.preventDefault(); goAnaliz()">Analiz</a>
-      <a href="/bilgi/" class="hp-nav-btn">Bilgi Bankası</a>
+      <a href="/" class="hp-nav-btn" onclick="event.preventDefault(); goHome()" data-i18n="nav.home">Anasayfa</a>
+      <a href="/" class="hp-nav-btn" onclick="event.preventDefault(); goScreener()" data-i18n="nav.scanner">Tarayıcı</a>
+      <a href="/analiz/" class="hp-nav-btn active" onclick="event.preventDefault(); goAnaliz()" data-i18n="nav.analysis">Analiz</a>
+      <a href="/stratejiler/" class="hp-nav-btn" data-i18n="nav.strategies">Stratejiler</a>
+      <a href="/bilgi/" class="hp-nav-btn" data-i18n="nav.learn">Bilgi Bankası</a>
     </nav>
     <div class="tright">
-      <button class="topbarbtn theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir" aria-label="Karanlık/Açık mod geçiş">☾</button>
-      <button class="auth-btn auth-ghost df-auth-out" onclick="location.href='/profil'">Giriş Yap</button>
-      <button class="auth-btn auth-primary df-auth-out" onclick="location.href='/profil'">Kayıt Ol</button>
-      <a href="/profil" class="auth-btn auth-primary df-auth-in" style="display:none"><span class="df-auth-av"></span>Profil</a>
+      
+    <div class="lang-toggle" role="group" aria-label="Dil / Language">
+      <button class="lang-toggle-btn" data-lang-btn="tr" onclick="dfSetLang && dfSetLang(\'tr\')">TR</button>
+      <button class="lang-toggle-btn" data-lang-btn="en" onclick="dfSetLang && dfSetLang(\'en\')">EN</button>
+    </div>
+<button class="topbarbtn theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir" aria-label="Karanlık/Açık mod geçiş">☾</button>
+      <button class="auth-btn auth-ghost df-auth-out" onclick="location.href='/profil'" data-i18n="auth.login">Giriş Yap</button>
+      <button class="auth-btn auth-primary df-auth-out" onclick="location.href='/profil'" data-i18n="auth.register">Kayıt Ol</button>
+      <a href="/profil" class="auth-btn auth-primary df-auth-in" style="display:none"><span class="df-auth-av"></span><span data-i18n="auth.profile">Profil</span></a>
       <button class="topbarbtn supportbtn" onclick="location.href='/'">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
         Destek Ol
