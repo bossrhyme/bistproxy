@@ -15,8 +15,8 @@
 
     // ── Anasayfa hero ──
     'hero.eyebrow':    { tr: '30.000+ enstrüman canlı taranıyor', en: '30,000+ instruments scanned live' },
-    'hero.h1a':        { tr: 'Tarama bizden.',  en: 'Screen smarter.' },
-    'hero.h1b':        { tr: 'Karar sizden.',   en: 'Decide with confidence.' },
+    'hero.h1a':        { tr: 'Akıllıca tara,',  en: 'Screen smarter.' },
+    'hero.h1b':        { tr: 'güvenle karar ver.', en: 'Decide with confidence.' },
     'hero.sub':        { tr: 'Hisse, fon ve kripto — hepsi tek ekranda. Dünyaca ünlü yatırımcı stratejileri ve 100+ filtreyle binlerce şirketi saniyeler içinde tara, kararını güvenle ver.',
                          en: 'Stocks, funds and crypto — all on one screen. Screen thousands of companies in seconds with world-renowned investor strategies and 100+ filters, and decide with confidence.' },
     'hero.cta1':       { tr: 'Taramaya Başla',  en: 'Start Screening' },
