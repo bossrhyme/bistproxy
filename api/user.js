@@ -66,8 +66,10 @@ function checkOrigin(req) {
     if (origin) return isAllowedOrigin(origin);
     try { return isAllowedOrigin(new URL(referer).origin); } catch(e) { return false; }
   }
-  // POST/PUT/DELETE: strict origin check
-  if (!origin && !referer) return true; // server-to-server (no browser Origin)
+  // POST/PUT/DELETE: strict origin check (default-deny).
+  // Referrer-Policy: strict-origin-when-cross-origin → same-origin istekler tam Referer gönderir,
+  // dolayısıyla meşru tarayıcı istekleri origin VEYA referer taşır. İkisi de yoksa reddet.
+  if (!origin && !referer) return false;
   if (origin) return isAllowedOrigin(origin);
   try { return isAllowedOrigin(new URL(referer).origin); } catch(e) { return false; }
 }
@@ -237,6 +239,7 @@ async function handleMe(req, res) {
 
 async function handleDailyCheckin(req, res) {
   if (req.method !== 'POST') { jsonRes(res, 405, { error: 'Method not allowed' }); return; }
+  if (!checkOrigin(req)) { jsonRes(res, 403, { error: 'Geçersiz istek kaynağı' }); return; }
   const user = await getUser(req);
   if (!user) { jsonRes(res, 401, { error: 'Unauthorized' }); return; }
   const full = await kvGet('usr:' + user.id);
@@ -739,12 +742,48 @@ async function handleStats(req, res) {
   }
 }
 
+// ── Son Taramalar (site-geneli) — GET son 10 / POST ekle (KV LPUSH+LTRIM) ──
+async function handleRecentScans(req, res) {
+  const LIST_KEY = 'df_recent_scans_v2'; // v2: eski hatalı (filtresiz/607) kayıtları bırak, taze başla
+  res.setHeader('Cache-Control', 'no-store');
+  if (req.method === 'GET') {
+    try {
+      const out = await kvPipeline([['LRANGE', LIST_KEY, '0', '9']]);
+      const raw = (out[0] && out[0].result) || [];
+      const scans = raw.map(function (s) { try { return JSON.parse(s); } catch (e) { return null; } }).filter(Boolean);
+      jsonRes(res, 200, { scans: scans });
+    } catch (e) { jsonRes(res, 200, { scans: [] }); }
+    return;
+  }
+  if (req.method === 'POST') {
+    if (!checkOrigin(req)) { jsonRes(res, 403, { ok: false }); return; }
+    const body = await readBody(req) || {};
+    const clean = function (s, max) { return String(s == null ? '' : s).replace(/[\x00-\x1F<>]/g, '').slice(0, max).trim(); };
+    const kind = clean(body.kind, 8), asset = clean(body.asset, 8), k = clean(body.k, 40);
+    const label = clean(body.label, 48), ex = clean(body.ex, 16), exLabel = clean(body.exLabel, 24);
+    const count = Math.max(0, Math.min(parseInt(body.count, 10) || 0, 1000000));
+    const matched = Math.max(0, Math.min(parseInt(body.matched, 10) || 0, 1000000));
+    if (['goat', 'preset', 'tech'].indexOf(kind) < 0 || ['borsa', 'kripto', 'fon'].indexOf(asset) < 0
+        || !k || !label || !/^[a-zA-Z0-9_-]+$/.test(k)) {
+      jsonRes(res, 400, { ok: false }); return;
+    }
+    const rec = JSON.stringify({ kind, asset, k, label, ex, exLabel, count, matched, ts: Date.now() });
+    try {
+      await kvPipeline([['LPUSH', LIST_KEY, rec], ['LTRIM', LIST_KEY, '0', '19']]);
+      jsonRes(res, 200, { ok: true });
+    } catch (e) { jsonRes(res, 200, { ok: false }); }
+    return;
+  }
+  jsonRes(res, 405, { ok: false });
+}
+
 // ── main router ───────────────────────────────
 module.exports = async function handler(req, res) {
   const path = (req.url || '').split('?')[0];
 
   try {
     if (path === '/api/stats')               return await handleStats(req, res);
+    if (path === '/api/recent-scans')        return await handleRecentScans(req, res);
     if (path === '/api/track')               return await handleTrack(req, res);
     if (path === '/api/report')              return await handleReport(req, res);
     if (path === '/api/admin/users')         return await handleAdminUsers(req, res);

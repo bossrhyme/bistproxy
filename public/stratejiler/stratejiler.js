@@ -5,37 +5,51 @@
 
 // ── Borsa tanımları (tarayıcı ile aynı) ───────────────────────
 var EX_META = {
-  bist:        { name:'BIST',               flag:'🇹🇷', range:[0,800]  },
-  nasdaq:      { name:'NASDAQ',             flag:'🇺🇸', range:[0,4500] },
-  nyse:        { name:'NYSE',               flag:'🇺🇸', range:[0,3000] },
-  sp500:       { name:'S&P 500',            flag:'🇺🇸', range:[0,503]  },
-  dax:         { name:'DAX',                flag:'🇩🇪', range:[0,500]  },
-  lse:         { name:'LSE',                flag:'🇬🇧', range:[0,2000] },
-  nikkei:      { name:'Nikkei',             flag:'🇯🇵', range:[0,4000] },
-  krx:         { name:'KRX',                flag:'🇰🇷', range:[0,3000] },
-  moex:        { name:'MOEX',               flag:'🇷🇺', range:[0,500]  },
-  france:      { name:'Euronext Paris',     flag:'🇫🇷', range:[0,3000] },
-  amsterdam:   { name:'Euronext Amsterdam', flag:'🇳🇱', range:[0,3000] },
-  brussels:    { name:'Euronext Brussels',  flag:'🇧🇪', range:[0,3000] },
-  lisbon:      { name:'Euronext Lisbon',    flag:'🇵🇹', range:[0,3000] },
-  dublin:      { name:'Euronext Dublin',    flag:'🇮🇪', range:[0,3000] },
-  oslo:        { name:'Oslo Bors',          flag:'🇳🇴', range:[0,3000] },
-  milan:       { name:'Borsa Italiana',     flag:'🇮🇹', range:[0,3000] },
-  tsx:         { name:'TSX',                flag:'🇨🇦', range:[0,3000] },
-  twse:        { name:'TWSE',               flag:'🇹🇼', range:[0,3000] },
-  b3:          { name:'B3',                 flag:'🇧🇷', range:[0,3000] },
-  hkex:        { name:'HKEX',               flag:'🇭🇰', range:[0,3000] },
-  china:       { name:'SSE/SZSE',           flag:'🇨🇳', range:[0,3000] },
-  saudi:       { name:'Tadawul',            flag:'🇸🇦', range:[0,3000] },
-  switzerland: { name:'SIX',                flag:'🇨🇭', range:[0,3000] },
-  australia:   { name:'ASX',                flag:'🇦🇺', range:[0,3000] },
-  southafrica: { name:'JSE',                flag:'🇿🇦', range:[0,3000] },
-  sweden:      { name:'Nasdaq Stockholm',   flag:'🇸🇪', range:[0,3000] },
-  india:       { name:'NSE',                flag:'🇮🇳', range:[0,3000] },
-  uae:         { name:'DFM',                flag:'🇦🇪', range:[0,3000] },
+  bist:        { name:'BIST',               flag:'', range:[0,800]  },
+  nasdaq:      { name:'NASDAQ',             flag:'', range:[0,4500] },
+  nyse:        { name:'NYSE',               flag:'', range:[0,3000] },
+  sp500:       { name:'S&P 500',            flag:'', range:[0,503]  },
+  dax:         { name:'DAX',                flag:'', range:[0,500]  },
+  lse:         { name:'LSE',                flag:'', range:[0,2000] },
+  nikkei:      { name:'Nikkei',             flag:'', range:[0,4000] },
+  krx:         { name:'KRX',                flag:'', range:[0,3000] },
+  moex:        { name:'MOEX',               flag:'', range:[0,500]  },
+  france:      { name:'Euronext Paris',     flag:'', range:[0,3000] },
+  amsterdam:   { name:'Euronext Amsterdam', flag:'', range:[0,3000] },
+  brussels:    { name:'Euronext Brussels',  flag:'', range:[0,3000] },
+  lisbon:      { name:'Euronext Lisbon',    flag:'', range:[0,3000] },
+  dublin:      { name:'Euronext Dublin',    flag:'', range:[0,3000] },
+  oslo:        { name:'Oslo Bors',          flag:'', range:[0,3000] },
+  milan:       { name:'Borsa Italiana',     flag:'', range:[0,3000] },
+  tsx:         { name:'TSX',                flag:'', range:[0,3000] },
+  twse:        { name:'TWSE',               flag:'', range:[0,3000] },
+  b3:          { name:'B3',                 flag:'', range:[0,3000] },
+  hkex:        { name:'HKEX',               flag:'', range:[0,3000] },
+  china:       { name:'SSE/SZSE',           flag:'', range:[0,3000] },
+  saudi:       { name:'Tadawul',            flag:'', range:[0,3000] },
+  switzerland: { name:'SIX',                flag:'', range:[0,3000] },
+  australia:   { name:'ASX',                flag:'', range:[0,3000] },
+  southafrica: { name:'JSE',                flag:'', range:[0,3000] },
+  sweden:      { name:'Nasdaq Stockholm',   flag:'', range:[0,3000] },
+  india:       { name:'NSE',                flag:'', range:[0,3000] },
+  uae:         { name:'DFM',                flag:'', range:[0,3000] },
 };
 var MAIN_EX = ['bist','nasdaq','nyse','sp500','dax','lse'];
 var EX_KEYS = Object.keys(EX_META);
+var EX_COUNTRY = {
+  bist:'Türkiye', nasdaq:'ABD', nyse:'ABD', sp500:'ABD', dax:'Almanya', lse:'İngiltere',
+  nikkei:'Japonya', krx:'Güney Kore', moex:'Rusya', france:'Fransa', amsterdam:'Hollanda',
+  brussels:'Belçika', lisbon:'Portekiz', dublin:'İrlanda', oslo:'Norveç', milan:'İtalya',
+  tsx:'Kanada', twse:'Tayvan', b3:'Brezilya', hkex:'Hong Kong', china:'Çin', saudi:'Suudi Arabistan',
+  switzerland:'İsviçre', australia:'Avustralya', southafrica:'Güney Afrika', sweden:'İsveç',
+  india:'Hindistan', uae:'BAE'
+};
+var EX_ISO = {
+  bist:'tr', nasdaq:'us', nyse:'us', sp500:'us', dax:'de', lse:'gb', nikkei:'jp', krx:'kr',
+  moex:'ru', france:'fr', amsterdam:'nl', brussels:'be', lisbon:'pt', dublin:'ie', oslo:'no',
+  milan:'it', tsx:'ca', twse:'tw', b3:'br', hkex:'hk', china:'cn', saudi:'sa', switzerland:'ch',
+  australia:'au', southafrica:'za', sweden:'se', india:'in', uae:'ae'
+};
 
 // Emoji bayrağı ISO koduna çevir → flagcdn görseli (tarayıcı ile aynı)
 function isoFromFlag(emoji) {
@@ -194,8 +208,15 @@ var TECH_PRESETS = {
   stochReversal:{ label:'Stokastik Dönüş', filters:{stoch_k_max:25, stoch_kd_min:0} },
   maConfirm:    { label:'Ortalama Onayı',  filters:{ma_rating_min:0.5} },
   oscConfirm:   { label:'Osilatör Onayı',  filters:{osc_rating_min:0.1} },
-  lowBeta:      { label:'Defansif',        filters:{beta_max:0.8, div_min:1} },
-  ytdLeader:    { label:'1A Momentum',     filters:{perf1m_min:10, perf3m_min:10} },
+  lowBeta:         { label:'Defansif',             filters:{beta_max:0.8, div_min:1} },
+  ytdLeader:       { label:'1A Momentum',          filters:{perf1m_min:10, perf3m_min:10} },
+  sma200Test:      { label:'SMA200 Testi',         filters:{above_sma200_min:0, above_sma200_max:3, rsi_min:40, chg_min:0.3} },
+  multiMomentum:   { label:'Çok Dönemli Momentum', filters:{perf1m_min:3, perf3m_min:10, perf6m_min:20} },
+  oscAlignment:    { label:'Üçlü Osilatör',        filters:{rsi_min:50, macd_hist_min:0, stoch_k_min:50} },
+  volumeTrend:     { label:'Hacimli Trend',        filters:{perf6m_min:20, rel_vol_min:1.5, from_high_min:-15} },
+  adxMomentum:     { label:'ADX Momentum',         filters:{adx_min:25, adx_di_diff_min:0, perf3m_min:10} },
+  growthBreakout:  { label:'Büyüme Kırılımı',      filters:{earng_min:15, tech_rating_min:0.3, from_high_min:-10} },
+  deathCrossBounce:{ label:'Kontrarian Dönüş',     filters:{sma_trend_max:0, above_sma200_max:0, rsi_min:35, rsi_max:55, from_low_min:8} },
 };
 var GURUS = {
   ackman:   { label:'Bill Ackman',             filters:{roe_min:15, margin_min:10, de_max:80, cr_min:1.2, pe_max:20} },
@@ -224,15 +245,15 @@ var GURUS = {
   carlisle: { label:"Tobias Carlisle",         filters:{pe_max:10, cr_min:1} },
 };
 var INVESTOR_PROFILES = [
-  { key:'growth', label:'Büyüme Avcısı',       icon:'🚀', goat:[],        preset:['growth','momentum'],        tech:['breakout'] },
-  { key:'div',    label:'Temettü Koleksiyoneri',icon:'💰', goat:[],        preset:['dividend','lowdebt'],       tech:[] },
-  { key:'value',  label:'Değer Dedektifi',      icon:'🔍', goat:['buffett'],preset:['value','lowdebt'],         tech:[] },
-  { key:'mom',    label:'Momentum Sörfçüsü',   icon:'🏄', goat:[],        preset:['momentum'],                 tech:['momentum3m','breakout'] },
-  { key:'def',    label:'Savunma Kalesi',       icon:'🛡️', goat:[],        preset:['quality','lowdebt'],        tech:[] },
-  { key:'small',  label:'Küçük Değer Keşifçisi',icon:'🔭', goat:[],        preset:['value','growth'],           tech:[] },
-  { key:'spec',   label:'Spekülatif Akıncı',    icon:'⚡', goat:[],        preset:[],                           tech:['breakout','techBuy','highVolume'] },
-  { key:'tech',   label:'Teknoloji Vizyoneri',  icon:'🤖', goat:[],        preset:[],                           tech:['breakout','techBuy','trendFollow'] },
-  { key:'bal',    label:'Çevik Dengeleyici',    icon:'⚖️', goat:[],        preset:['quality','dividend'],       tech:[] },
+  { key:'growth', label:'Büyüme Avcısı',       icon:'', goat:[],        preset:['growth','momentum'],        tech:['breakout'] },
+  { key:'div',    label:'Temettü Koleksiyoneri',icon:'', goat:[],        preset:['dividend','lowdebt'],       tech:[] },
+  { key:'value',  label:'Değer Dedektifi',      icon:'', goat:['buffett'],preset:['value','lowdebt'],         tech:[] },
+  { key:'mom',    label:'Momentum Sörfçüsü',   icon:'', goat:[],        preset:['momentum'],                 tech:['momentum3m','breakout'] },
+  { key:'def',    label:'Savunma Kalesi',       icon:'', goat:[],        preset:['quality','lowdebt'],        tech:[] },
+  { key:'small',  label:'Küçük Değer Keşifçisi',icon:'', goat:[],        preset:['value','growth'],           tech:[] },
+  { key:'spec',   label:'Spekülatif Akıncı',    icon:'', goat:[],        preset:[],                           tech:['breakout','techBuy','highVolume'] },
+  { key:'tech',   label:'Teknoloji Vizyoneri',  icon:'', goat:[],        preset:[],                           tech:['breakout','techBuy','trendFollow'] },
+  { key:'bal',    label:'Çevik Dengeleyici',    icon:'', goat:[],        preset:['quality','dividend'],       tech:[] },
 ];
 
 // ── Durum ─────────────────────────────────────────────────────
@@ -276,8 +297,8 @@ function buildPayload(ex) {
   return { columns: cols, range: range, sort:{ sortBy:'market_cap_basic', sortOrder:'desc' }, ignore_unknown_fields:true };
 }
 
-function parseRows(tvRows, ex) {
-  var cols_arr = colsFor(ex);
+function parseRows(tvRows, ex, respCols) {
+  var cols_arr = (respCols && respCols.length) ? respCols : colsFor(ex);
   var results = [];
   for (var i = 0; i < tvRows.length; i++) {
     var row = tvRows[i];
@@ -399,16 +420,18 @@ function loadData(ex) {
     progBar.style.width = '75%';
     return res.json();
   }).then(function(json) {
+    if (json && json.error) throw new Error(json.error); // sunucu hatasını (rate-limit/ban vb.) göster
     var rows = (json && json.data) ? json.data : (Array.isArray(json) ? json : []);
     if (!rows.length) throw new Error('Veri boş döndü');
-    allData = parseRows(rows, ex);
+    // Kolonları yanıttaki sıraya göre oku (sunucu whitelist/sıra değiştirse bile hizalı kalır)
+    allData = parseRows(rows, ex, (json && json.columns) || null);
     progBar.style.width = '100%';
     setTimeout(function() {
       stateEl.style.display = 'none';
       renderAll();
     }, 300);
   }).catch(function(e) {
-    stateEl.innerHTML = '<div class="pg-err">⚠ Veri yüklenemedi: ' + e.message + '</div>' +
+    stateEl.innerHTML = '<div class="pg-err">Veri yüklenemedi: ' + e.message + '</div>' +
       '<button class="pg-retry" onclick="loadData(currentEx)">Tekrar Dene</button>';
   });
 }
@@ -582,7 +605,7 @@ function rowHtml(it) {
 
 function detailHtml(it) {
   var crit = fmtCriteria(it.filters, it.special);
-  var critHtml = '<div class="sr-crit-hd">🔎 Bu strateji neye göre tarıyor?</div>' +
+  var critHtml = '<div class="sr-crit-hd">Bu strateji neye göre tarıyor?</div>' +
     '<div class="sr-crit-chips">' +
       crit.map(function(c){ return '<span class="sr-crit-chip">' + c + '</span>'; }).join('') +
     '</div>';
@@ -596,7 +619,7 @@ function detailHtml(it) {
   } else {
     var capped = list.slice(0, 60);
     var hint = list.length > 60 ? (' · en iyi 60 (3A getiriye göre)') : '';
-    stockHtml = '<div class="sr-stk-hd">📋 Listedeki hisseler — ' + list.length + ' adet' + hint + '</div>' +
+    stockHtml = '<div class="sr-stk-hd">Listedeki hisseler — ' + list.length + ' adet' + hint + '</div>' +
       '<div class="sr-stk-grid">' +
         '<div class="sr-stk-head"><span>Sembol</span><span>1A</span><span>3A</span><span>6A</span></div>' +
         capped.map(function(s){
@@ -631,14 +654,14 @@ function renderAll() {
   _rows = {}; _rowSeq = 0;
 
   var html = '<div class="sr-note">' +
-    exm.flag + ' <b>' + exm.name + '</b> · ' + allData.length + ' hisse tarandı. ' +
+    '<b>' + exm.name + '</b> · ' + allData.length + ' hisse tarandı. ' +
     'Her stratejinin <b>bugünkü</b> filtre kriterlerinden geçen hisselerin son 1&nbsp;/&nbsp;3&nbsp;/&nbsp;6 aydaki ' +
     '<b>eşit ağırlıklı (aritmetik) ortalama</b> getirisi gösterilir. ' +
     'Bir stratejinin üstüne tıklayarak tarama kriterlerini ve listedeki hisseleri görebilirsin.' +
   '</div>';
 
   html += '<div class="sr-warn">' +
-    '<div class="sr-warn-hd"><span class="sr-warn-ico">⚠️</span> Bu getiriler bir geçmiş performans testi (backtest) DEĞİLDİR</div>' +
+    '<div class="sr-warn-hd">Bu getiriler bir geçmiş performans testi (backtest) DEĞİLDİR</div>' +
     '<ul class="sr-warn-list">' +
       '<li>Filtre <b>bugünün</b> verisine uygulanır, ama getiriler <b>geçmiş</b> döneme aittir. Yani burası ' +
         '“bu kritere <b>bugün</b> uyan hisseler son dönemde ne yapmış?” sorusunu yanıtlar — ' +
@@ -656,29 +679,24 @@ function renderAll() {
     var pf = profileFilters(p);
     return { icon:p.icon, label:p.label, st:stats(pf.f, pf.sp), filters:pf.f, special:pf.sp };
   });
-  html += sectionHtml('🧬 Yatırımcı Stratejileri', profItems);
+  html += sectionHtml('Yatırımcı Stratejileri', profItems);
 
-  // Reklam (orta): yatırımcı stratejileri ile "tümünü göster" arası
-  html += '<div class="ad-slot" id="ad-mid">' +
-    '<span class="ad-label">Reklam</span>' +
-    '<div class="ad-placeholder"></div>' +
-  '</div>';
 
   if (showAllGroups) {
     var goatItems = Object.keys(GURUS).map(function(k) {
-      var g = GURUS[k]; return { icon:'🐐', label:g.label, st:stats(g.filters, g.special||null), filters:g.filters, special:g.special||null };
+      var g = GURUS[k]; return { icon:'', label:g.label, st:stats(g.filters, g.special||null), filters:g.filters, special:g.special||null };
     });
-    html += sectionHtml('🏆 GOAT Stratejileri', goatItems);
+    html += sectionHtml('Yatırımcı Lensleri', goatItems);
 
     var presetItems = Object.keys(PRESETS).map(function(k) {
-      var p = PRESETS[k]; return { icon:'📊', label:p.label, st:stats(p.filters, null), filters:p.filters, special:null };
+      var p = PRESETS[k]; return { icon:'', label:p.label, st:stats(p.filters, null), filters:p.filters, special:null };
     });
-    html += sectionHtml('📐 Temel Filtreler', presetItems);
+    html += sectionHtml('Temel Analiz', presetItems);
 
     var techItems = Object.keys(TECH_PRESETS).map(function(k) {
-      var p = TECH_PRESETS[k]; return { icon:'📈', label:p.label, st:stats(p.filters, null), filters:p.filters, special:null };
+      var p = TECH_PRESETS[k]; return { icon:'', label:p.label, st:stats(p.filters, null), filters:p.filters, special:null };
     });
-    html += sectionHtml('⚙️ Teknik Filtreler', techItems);
+    html += sectionHtml('Teknik Analiz', techItems);
 
     html += '<button class="sr-toggle" onclick="toggleAll()">▲ Sadece Yatırımcı Stratejileri</button>';
   } else {
@@ -692,9 +710,12 @@ function renderAll() {
 // ── Borsa sekmeleri (ilk 6 + Diğer Borsalar) ──────────────────
 function exTabHtml(key) {
   var m = EX_META[key]; if (!m) return '';
+  var iso = EX_ISO[key] || '';
+  var flag = iso ? '<img class="ps-ex-flag-img" src="https://flagcdn.com/w40/' + iso + '.png" alt="" loading="lazy">' : '';
   return '<button class="ps-ex-btn' + (key === currentEx ? ' on' : '') + '" data-ex="' + key + '"' +
-    ' onclick="setEx(\'' + key + '\')">' + flagImg(m.flag) +
-    '<span class="ps-ex-name">' + m.name + '</span></button>';
+    ' onclick="setEx(\'' + key + '\')">' + flag +
+    '<span class="ps-ex-name">' + m.name + '</span>' +
+    '<span class="ps-ex-country">' + (EX_COUNTRY[key] || '') + '</span></button>';
 }
 function renderExchangeTabs() {
   var mainEl  = document.getElementById('ex-main');

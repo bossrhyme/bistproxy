@@ -16,12 +16,13 @@ function safeUrl(u) { var s = String(u||''); return /^https?:\/\//i.test(s) ? s 
 
 // ── Tema ──────────────────────────────────────────────────────
 function _isDark() {
+  // Default: light (DeepFin warm mode)
   try { return localStorage.getItem('df_theme') === 'dark'; } catch(e) { return false; }
 }
 function _applyTheme(dark) {
   document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
   var meta = document.getElementById('meta-theme-color');
-  if (meta) meta.content = dark ? '#09101e' : '#f8fafc';
+  if (meta) meta.content = dark ? '#0A0E14' : '#FAFAF7';
   var btn = document.getElementById('theme-toggle');
   if (btn) btn.textContent = dark ? '☀' : '☾';
 }
@@ -32,6 +33,20 @@ function toggleTheme() {
 }
 function _initTheme() {
   _applyTheme(_isDark());
+}
+
+// ── Döviz kuru senkronizasyonu (görünmez) ─────────────────────
+// Header'da kur gösterilmiyor; kurlar yalnızca hesaplama için fxRates'te tutulur.
+// Bu fetch fxRates'i ana sayfada/taramadan önce de güncel tutar.
+function _startIndicesTicker() {
+  function _fetch() {
+    fetch('/api/rates', { headers: {'X-Requested-With':'XMLHttpRequest'} })
+      .then(function(r){ return r.json(); })
+      .then(function(d){ if (typeof _applyRatesToFx === 'function') _applyRatesToFx(d); })
+      .catch(function(){});
+  }
+  _fetch();
+  setInterval(_fetch, 60000);
 }
 
 // Auto-attach X-Requested-With to all /api/ fetches (CSRF protection)
@@ -125,7 +140,8 @@ function _updateOnboarding(type) {
       + '</div>'
       + (i < data.steps.length - 1 ? '<div class="onb-arrow">→</div>' : '');
   }).join('');
-  cont.innerHTML = '<div class="onb-title">Nasıl Kullanılır?</div><div class="onb-steps">' + stepsHtml + '</div>';
+  var histHtml = _renderScanHistory();
+  cont.innerHTML = (histHtml || '') + '<div class="onb-title">Nasıl Kullanılır?</div><div class="onb-steps">' + stepsHtml + '</div>';
 }
 
 function selectAsset(type) {
@@ -402,7 +418,7 @@ function _fonRowHtml(f, i) {
     <td class="nfav" onclick="event.stopPropagation();toggleFonFav('${escJS(f.code)}')" title="${isFav?'Favorilerden çıkar':'Favorilere ekle'}"><span class="fav-icon${isFav?' fav-on':''}">★</span></td>
     <td style="padding:7px 6px;white-space:nowrap">
       <span class="row-num">${i+1}</span>
-      <span class="sym-wrap"><span class="row-arrow">›</span><span class="sym">${f.code}</span>${ver}${_fonCatBadge(f.category)}</span>
+      <span class="sym-wrap"><span class="row-arrow">›</span><span class="sym">${esc(f.code)}</span>${ver}${_fonCatBadge(f.category)}</span>
       <div class="tsub" title="${esc(f.name||'')}">${esc(name)}</div>
     </td>
     <td class="tn">₺${(f.price||0).toFixed(4)}</td>
@@ -538,13 +554,13 @@ function _kriptoTvBadge(r) {
 function _kriptoRowHtml(c, i, hasTvl) {
   var isFav = kriptoFavSet.has(c.symbol);
   var ver   = c.verified ? '<sup style="color:var(--green);font-size:8px">✓</sup>' : '';
-  var img   = c.image ? `<img src="${c.image}" width="14" height="14" style="border-radius:50%;vertical-align:middle;margin-right:3px" onerror="this.remove()">` : '';
+  var img   = c.image ? `<img src="${esc(safeUrl(c.image))}" width="14" height="14" style="border-radius:50%;vertical-align:middle;margin-right:3px" onerror="this.remove()">` : '';
   var name  = c.name && c.name.length > 30 ? c.name.slice(0, 30) + '…' : (c.name || '');
   return `<tr>
     <td class="nfav" onclick="event.stopPropagation();toggleKriptoFav('${escJS(c.symbol)}')" title="${isFav?'Favorilerden çıkar':'Favorilere ekle'}"><span class="fav-icon${isFav?' fav-on':''}">★</span></td>
     <td style="padding:7px 6px;white-space:nowrap">
       <span class="row-num">${c.rank||i+1}</span>
-      <span class="sym-wrap"><span class="row-arrow">›</span>${img}<span class="sym">${(c.symbol||'').toUpperCase()}</span>${ver}</span>
+      <span class="sym-wrap"><span class="row-arrow">›</span>${img}<span class="sym">${esc((c.symbol||'').toUpperCase())}</span>${ver}</span>
       <div class="tsub">${esc(name)}</div>
     </td>
     <td class="tn">${_kriptoPrice(c.price)}</td>
@@ -839,6 +855,17 @@ const EXCHANGE_META = {
   uae:         { name: 'DFM',             currency: 'د.إ',  currencyCode: 'AED', flag: '🇦🇪', symSuffix: '.DU', exCode: 'DFM',        filters: [] },
 };
 
+// Borsa → ülke (etiketlerde tutarlı ülke bazlı isimlendirme için tek kaynak)
+const EXCHANGE_COUNTRY = {
+  bist:'Türkiye', nasdaq:'ABD', sp500:'ABD', dax:'Almanya', lse:'İngiltere',
+  nikkei:'Japonya', nyse:'ABD', krx:'Güney Kore', moex:'Rusya', france:'Fransa',
+  amsterdam:'Hollanda', brussels:'Belçika', lisbon:'Portekiz', dublin:'İrlanda',
+  oslo:'Norveç', milan:'İtalya', tsx:'Kanada', twse:'Tayvan', b3:'Brezilya',
+  hkex:'Hong Kong', china:'Çin', saudi:'Suudi Arabistan', switzerland:'İsviçre',
+  australia:'Avustralya', southafrica:'Güney Afrika', sweden:'İsveç',
+  india:'Hindistan', uae:'BAE'
+};
+
 // Borsa açıklamaları — chip hover tooltipleri
 const EXCHANGE_TIPS = {
   bist:        'Borsa İstanbul, Türkiye',
@@ -877,6 +904,30 @@ let searchQ = '';
 let selSym = null;
 let sortSt = {field:'marketCapitalization', dir:'desc'};
 let fxRates = {TRY:44.1, EUR:1.163, GBP:1.333, JPY:0.00633, KRW:0.00074, RUB:89.0, NOK:0.090, CAD:0.73, TWD:32.0, BRL:5.70, HKD:7.78, CNY:7.25, SAR:3.75, CHF:1.12, AUD:0.633, ZAR:18.5, SEK:0.095, INR:0.012, AED:0.272};
+// /api/rates ham yanıtını hesaplama deposuna (fxRates) yazar.
+// Ham format: TRY=USDTRY, EUR/GBP/...=USD başına birim (open.er-api). Hesaplama için saklanır.
+function _applyRatesToFx(r) {
+  if (!r) return;
+  if (r.TRY) fxRates.TRY = r.TRY;
+  if (r.EUR) fxRates.EUR = 1 / r.EUR;
+  if (r.GBP) fxRates.GBP = 1 / r.GBP;
+  if (r.JPY) fxRates.JPY = 1 / r.JPY;
+  if (r.KRW) fxRates.KRW = 1 / r.KRW;
+  if (r.RUB) fxRates.RUB = r.RUB;
+  if (r.NOK) fxRates.NOK = 1 / r.NOK;
+  if (r.CAD) fxRates.CAD = 1 / r.CAD;
+  if (r.TWD) fxRates.TWD = r.TWD;
+  if (r.BRL) fxRates.BRL = r.BRL;
+  if (r.HKD) fxRates.HKD = r.HKD;
+  if (r.CNY) fxRates.CNY = r.CNY;
+  if (r.SAR) fxRates.SAR = r.SAR;
+  if (r.CHF) fxRates.CHF = 1 / r.CHF;
+  if (r.AUD) fxRates.AUD = 1 / r.AUD;
+  if (r.ZAR) fxRates.ZAR = r.ZAR;
+  if (r.SEK) fxRates.SEK = 1 / r.SEK;
+  if (r.INR) fxRates.INR = 1 / r.INR;
+  if (r.AED) fxRates.AED = 1 / r.AED;
+}
 let scanAborted = false;
 
 // ═══════════════════════════════════════════
@@ -1075,27 +1126,27 @@ function _doShowListFilterPicker(rect) {
 // KOLON SEÇİCİ
 // ═══════════════════════════════════════════
 const COL_DEFS = [
-  {key:'name', label:'ŞİRKET ADI', def:false},
   {key:'price', label:'FİYAT', def:true},
   {key:'mcap', label:'P.Değeri', def:true},
-  {key:'pe', label:'F/K', def:true},
+  {key:'chg1d', label:'Günlük%', def:true},
   {key:'pb', label:'PD/DD', def:true},
-  {key:'ps', label:'F/S', def:true},
-  {key:'roe', label:'ROE%', def:true},
-  {key:'roa', label:'ROA%', def:true},
-  {key:'margin', label:'MARJ%', def:true},
+  {key:'pe', label:'F/K', def:true},
   {key:'revg', label:'GELİR↑%', def:true},
-  {key:'epsg', label:'K.BÜY%', def:true},
-  {key:'fscore', label:'F-Score', def:false},
+  {key:'roe', label:'ROE%', def:true},
+  {key:'margin', label:'MARJ%', def:true},
   {key:'de', label:'B/Ö', def:true},
-  {key:'cr', label:'CARİ', def:true},
+  {key:'rsi', label:'RSI', def:true},
+  {key:'name', label:'ŞİRKET ADI', def:false},
+  {key:'ps', label:'F/S', def:false},
+  {key:'roa', label:'ROA%', def:false},
+  {key:'epsg', label:'K.BÜY%', def:false},
+  {key:'fscore', label:'F-Score', def:false},
+  {key:'cr', label:'CARİ', def:false},
   {key:'div', label:'TEMETTÜ%', def:false},
   {key:'peg', label:'PEG', def:false},
   {key:'tech_rating', label:'Teknik Skor', def:false},
-  {key:'rsi', label:'RSI', def:true},
-  {key:'chg1d', label:'Günlük%', def:true},
-  {key:'chg1w', label:'1H Geti%', def:true},
-  {key:'perf3m', label:'3A Geti%', def:true},
+  {key:'chg1w', label:'1H Geti%', def:false},
+  {key:'perf3m', label:'3A Geti%', def:false},
   {key:'float_pct', label:'H.Açık%', def:false},
   {key:'sector', label:'SEKTÖR', def:false},
 ];
@@ -1104,7 +1155,7 @@ var _colVisible = null;
 function loadColPrefs() {
   if (_colVisible) return;
   try {
-    var saved = localStorage.getItem('df_cols_v6');
+    var saved = localStorage.getItem('df_cols_v7');
     if (saved) { _colVisible = {}; JSON.parse(saved).forEach(function(k){ _colVisible[k]=true; }); return; }
   } catch(e) {}
   // Varsayılan: def:false olan sütunlar gizli
@@ -1113,7 +1164,7 @@ function loadColPrefs() {
 }
 
 function saveColPrefs() {
-  localStorage.setItem('df_cols_v6', JSON.stringify(Object.keys(_colVisible).filter(function(k){ return _colVisible[k]; })));
+  localStorage.setItem('df_cols_v7', JSON.stringify(Object.keys(_colVisible).filter(function(k){ return _colVisible[k]; })));
 }
 
 function isColVisible(key) { loadColPrefs(); return !!_colVisible[key]; }
@@ -1124,6 +1175,51 @@ function applyColVisibility() {
     var vis = isColVisible(d.key);
     document.querySelectorAll('[data-col="'+d.key+'"]').forEach(function(el){ el.style.display = vis ? '' : 'none'; });
   });
+  _initColDrag();
+  applyColOrder();
+}
+
+// ── Kolon sırası (sürükle-bırak) ──
+var _colOrder = null;
+function _loadColOrder() {
+  if (_colOrder) return;
+  try { var s = localStorage.getItem('df_col_order_v2'); if (s) { var arr = JSON.parse(s); if (Array.isArray(arr) && arr.length) { _colOrder = arr.filter(function(k){ return COL_DEFS.some(function(d){return d.key===k;}); }); COL_DEFS.forEach(function(d){ if(_colOrder.indexOf(d.key)===-1) _colOrder.push(d.key); }); return; } } } catch(e) {}
+  _colOrder = COL_DEFS.map(function(d){ return d.key; });
+}
+function _reorderRowCells(row) {
+  var cells = row.children, map = {}, i;
+  for (i = 0; i < cells.length; i++) { var k = cells[i].getAttribute && cells[i].getAttribute('data-col'); if (k) map[k] = cells[i]; }
+  for (i = 0; i < _colOrder.length; i++) { var el = map[_colOrder[i]]; if (el) row.appendChild(el); }
+}
+function applyColOrder() {
+  _loadColOrder();
+  var head = document.querySelector('#hisse-table thead tr');
+  if (head) _reorderRowCells(head);
+  var rows = document.querySelectorAll('#hisse-table tbody tr');
+  for (var i = 0; i < rows.length; i++) _reorderRowCells(rows[i]);
+}
+var _dragCol = null;
+function _initColDrag() {
+  var ths = document.querySelectorAll('#hisse-table thead th[data-col]');
+  ths.forEach(function(th) {
+    if (th._cdInit) return; th._cdInit = true;
+    th.setAttribute('draggable', 'true');
+    th.addEventListener('dragstart', function(e) { _dragCol = th.getAttribute('data-col'); try { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', _dragCol); } catch(_) {} th.classList.add('col-dragging'); });
+    th.addEventListener('dragend', function() { th.classList.remove('col-dragging'); document.querySelectorAll('.col-drop-l,.col-drop-r').forEach(function(x){ x.classList.remove('col-drop-l','col-drop-r'); }); _dragCol = null; });
+    th.addEventListener('dragover', function(e) { if (!_dragCol || _dragCol === th.getAttribute('data-col')) return; e.preventDefault(); try { e.dataTransfer.dropEffect = 'move'; } catch(_) {} var r = th.getBoundingClientRect(); var after = (e.clientX - r.left) > r.width / 2; th.classList.toggle('col-drop-r', after); th.classList.toggle('col-drop-l', !after); });
+    th.addEventListener('dragleave', function() { th.classList.remove('col-drop-l','col-drop-r'); });
+    th.addEventListener('drop', function(e) { e.preventDefault(); var target = th.getAttribute('data-col'); var r = th.getBoundingClientRect(); var after = (e.clientX - r.left) > r.width / 2; th.classList.remove('col-drop-l','col-drop-r'); _moveCol(_dragCol, target, after); });
+  });
+}
+function _moveCol(from, to, after) {
+  if (!from || from === to) return;
+  _loadColOrder();
+  var fi = _colOrder.indexOf(from); if (fi < 0) return;
+  _colOrder.splice(fi, 1);
+  var ti = _colOrder.indexOf(to); if (ti < 0) { _colOrder.splice(fi, 0, from); return; }
+  _colOrder.splice(after ? ti + 1 : ti, 0, from);
+  try { localStorage.setItem('df_col_order_v2', JSON.stringify(_colOrder)); } catch(e) {}
+  applyColOrder();
 }
 
 function openColPicker() {
@@ -1140,6 +1236,76 @@ function openColPicker() {
 function toggleCol(key, vis) { loadColPrefs(); _colVisible[key]=vis; saveColPrefs(); applyColVisibility(); }
 function closeColPicker() { var m=document.getElementById('col-picker-modal'); if(m) m.classList.remove('open'); }
 function resetColPrefs() { _colVisible=null; loadColPrefs(); saveColPrefs(); openColPicker(); applyColVisibility(); renderTable(); }
+
+// ── CSV Export ────────────────────────────────────────────────
+function exportToCSV() {
+  if (!filtered || !filtered.length) return;
+  var ex = EXCHANGE_META[currentExchange] || EXCHANGE_META.bist;
+  var cur = ex.currency || '₺';
+  var cols = [
+    { key: 'symbol',                    label: 'Sembol' },
+    { key: 'name',                      label: 'Şirket Adı' },
+    { key: 'currentPrice',              label: 'Fiyat (' + cur + ')' },
+    { key: 'changePercent',             label: 'Değişim %' },
+    { key: 'marketCapitalization',      label: 'Piyasa Değeri (M$)' },
+    { key: 'peNormalizedAnnual',        label: 'F/K' },
+    { key: 'pbAnnual',                  label: 'PD/DD' },
+    { key: 'psTTM',                     label: 'F/S' },
+    { key: 'roeTTM',                    label: 'ROE %' },
+    { key: 'roaTTM',                    label: 'ROA %' },
+    { key: 'netProfitMarginTTM',        label: 'Net Marj %' },
+    { key: 'grossMarginTTM',            label: 'Brüt Marj %' },
+    { key: 'revenueGrowthTTMYoy',       label: 'Gelir Büy %' },
+    { key: 'epsGrowthTTMYoy',           label: 'EPS Büy %' },
+    { key: 'dividendYieldIndicatedAnnual', label: 'Temettü %' },
+    { key: 'currentRatioAnnual',        label: 'Cari Oran' },
+    { key: 'sector',                    label: 'Sektör' },
+  ];
+  // Türkçe/Avrupa Excel için: ayraç ';' (virgül ondalık sanılır → tek sütun olurdu),
+  // ondalık ',' (nokta binlik sanılır), sep= direktifi + BOM ile her yerel ayarda doğru açılır.
+  var SEP = ';';
+  var rows = ['sep=' + SEP];
+  rows.push(cols.map(function(c){ return '"' + c.label + '"'; }).join(SEP));
+  filtered.forEach(function(s) {
+    rows.push(cols.map(function(c) {
+      var v = s[c.key];
+      if (v === null || v === undefined) return '';
+      if (typeof v === 'string') return '"' + v.replace(/"/g, '""') + '"';
+      if (typeof v === 'number') {
+        // 2 ondalığa yuvarla (uzun kuyrukları temizle), sonra Türkçe ondalık (,)
+        var n = Math.round(v * 100) / 100;
+        return String(n).replace('.', ',');
+      }
+      return String(v);
+    }).join(SEP));
+  });
+  var csv = '﻿' + rows.join('\r\n'); // BOM (Türkçe karakter) + CRLF (Excel)
+  var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  var stamp = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = 'deepfin-' + (currentExchange || 'bist') + '-' + stamp + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ── Row Density Toggle ──
+var _rowDensity = (function(){ try { return localStorage.getItem('df_density') || 'compact'; } catch(e){ return 'compact'; } })();
+function setDensity(d) {
+  _rowDensity = d;
+  try { localStorage.setItem('df_density', d); } catch(e){}
+  var tbl = document.getElementById('hisse-table');
+  if (tbl) { tbl.classList.remove('density-compact','density-normal','density-comfortable'); tbl.classList.add('density-'+d); }
+  document.querySelectorAll('.density-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.density === d); });
+}
+function _initDensity() {
+  setDensity(_rowDensity);
+  // Update buttons if already rendered
+  document.querySelectorAll('.density-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.density === _rowDensity); });
+}
 
 // ═══════════════════════════════════════════
 // HABERLER
@@ -1182,8 +1348,11 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 // TARAMA MOTORU — tek istekte tüm BIST
 // ═══════════════════════════════════════════
 var _scanRunning = false;
+var _scanQueued  = false;
 async function runScan(){
-  if (_scanRunning) return;
+  // Bir tarama sürerken gelen istekleri düşürme — kuyruğa al, bitince tekrar çalıştır.
+  // (Aksi halde ilk açılışta veya hızlı tıklamada tarama kaybolur.)
+  if (_scanRunning) { _scanQueued = true; return; }
   _scanRunning = true;
   closeMobileDrawer();
   // Disclaimer kontrolü
@@ -1221,26 +1390,8 @@ async function runScan(){
     const rateRes = await fetch('/api/rates');
     if(rateRes.ok) {
       const r = await rateRes.json();
-      // /api/rates direkt {TRY, EUR, GBP, JPY} döner (USD bazlı)
-      if(r.TRY) fxRates.TRY = r.TRY;
-      if(r.EUR) fxRates.EUR = 1 / r.EUR;
-      if(r.GBP) fxRates.GBP = 1 / r.GBP;
-      if(r.JPY) fxRates.JPY = 1 / r.JPY;
-      if(r.KRW) fxRates.KRW = 1 / r.KRW;
-      if(r.RUB) fxRates.RUB = r.RUB;
-      if(r.NOK) fxRates.NOK = 1 / r.NOK;
-      if(r.CAD) fxRates.CAD = 1 / r.CAD;
-      if(r.TWD) fxRates.TWD = r.TWD;
-      if(r.BRL) fxRates.BRL = r.BRL;
-      if(r.HKD) fxRates.HKD = r.HKD;
-      if(r.CNY) fxRates.CNY = r.CNY;
-      if(r.SAR) fxRates.SAR = r.SAR;
-      if(r.CHF) fxRates.CHF = 1 / r.CHF;
-      if(r.AUD) fxRates.AUD = 1 / r.AUD;
-      if(r.ZAR) fxRates.ZAR = r.ZAR;
-      if(r.SEK) fxRates.SEK = 1 / r.SEK;
-      if(r.INR) fxRates.INR = 1 / r.INR;
-      if(r.AED) fxRates.AED = 1 / r.AED;
+      // /api/rates ham {TRY, EUR, GBP, ...} döner — hesaplama deposuna yaz
+      _applyRatesToFx(r);
     }
   } catch(e) { /* fallback kurlar kullanılır */ }
   // Collect all active filter tags for summary bar (deduplicated by key)
@@ -1723,6 +1874,14 @@ async function runScan(){
     _scanRunning = false;
     btn.disabled = false;
     document.getElementById('stopbtn').style.display = 'none';
+    // Tarama sürerken düşen bir istek olduysa, en güncel filtrelerle tekrar tara.
+    if (_scanQueued) {
+      _scanQueued = false;
+      stopScanEta();
+      hideQuickScanPill();
+      setTimeout(runScan, 0);
+      return;
+    }
     var _remaining = _isSuccess ? Math.max(0, _scanMinMs - (Date.now() - scanStartTime)) : 0;
     if (_remaining > 0) {
       setTimeout(function() {
@@ -1743,21 +1902,21 @@ async function runScan(){
 // ═══════════════════════════════════════════
 const PRESETS = {
   // Klasik değer yatırımı: F/K<15, PD/DD<2, temettü ödeyen
-  value:    { label: 'Değer Hisseleri',    desc: 'Kazancına göre ucuz, defter değerine yakın fiyatlı ve temettü ödeyen şirketleri bulur. F/K 15 altı, PD/DD 2 altı, temettü %2 üzeri.', filters: {pe_max:15, pb_max:2, div_min:2} },
+  value:    { label: 'Değer Odaklı',    desc: 'Kazancına göre ucuz, defter değerine yakın fiyatlı ve temettü ödeyen şirketleri bulur. F/K 15 altı, PD/DD 2 altı, temettü %2 üzeri.', filters: {pe_max:15, pb_max:2, div_min:2} },
   // Büyüme: kazanç+gelir ivmesi, güçlü özkaynak getirisi
-  growth:   { label: 'Büyüme Hisseleri',   desc: 'Satışları ve karları hızla büyüyen, özkaynağını verimli kullanan şirketleri bulur. Kazanç büyümesi %20, gelir büyümesi %15, ROE %15 üzeri.', filters: {earng_min:20, revg_min:15, roe_min:15} },
+  growth:   { label: 'Büyüme Odaklı',   desc: 'Satışları ve karları hızla büyüyen, özkaynağını verimli kullanan şirketleri bulur. Kazanç büyümesi %20, gelir büyümesi %15, ROE %15 üzeri.', filters: {earng_min:20, revg_min:15, roe_min:15} },
   // Temettü: yüksek verim, sürdürülebilir ödeme kapasitesi
-  dividend: { label: 'Temettü Hisseleri',  desc: 'Yüksek ve sürdürülebilir temettü ödeyen, borcu makul şirketleri bulur. Temettü %4 üzeri, borç/özkaynak %80 altı, cari oran 1.2 üzeri.', filters: {div_min:4, de_max:80, cr_min:1.2} },
+  dividend: { label: 'Temettü Odaklı',  desc: 'Yüksek ve sürdürülebilir temettü ödeyen, borcu makul şirketleri bulur. Temettü %4 üzeri, borç/özkaynak %80 altı, cari oran 1.2 üzeri.', filters: {div_min:4, de_max:80, cr_min:1.2} },
   // Kalite: Buffett/Munger "wonderful company at fair price"
-  quality:  { label: 'Kaliteli Şirketler', desc: 'Yüksek karlılık ve düşük borçla her koşulda ayakta kalan şirketleri bulur. ROE %20, net marj %15, brüt marj %35 üzeri.', filters: {roe_min:20, margin_min:15, gross_min:35, de_max:80, cr_min:1.5} },
+  quality:  { label: 'Kalite Odaklı', desc: 'Yüksek karlılık ve düşük borçla her koşulda ayakta kalan şirketleri bulur. ROE %20, net marj %15, brüt marj %35 üzeri.', filters: {roe_min:20, margin_min:15, gross_min:35, de_max:80, cr_min:1.5} },
   // Az borçlu: Buffett "borçsuz şirket" prensibi
-  lowdebt:  { label: 'Az Borçlu Şirketler', desc: 'Borcu çok düşük, nakdi güçlü, krize dayanıklı şirketleri bulur. Borç/özkaynak %30 altı, cari oran 2 üzeri.', filters: {de_max:30, cr_min:2} },
+  lowdebt:  { label: 'Düşük Borç Odaklı', desc: 'Borcu çok düşük, nakdi güçlü, krize dayanıklı şirketleri bulur. Borç/özkaynak %30 altı, cari oran 2 üzeri.', filters: {de_max:30, cr_min:2} },
   // Momentum: güçlü ivme, hem büyüme hem fiyat güç
-  momentum: { label: 'Momentum Hisseleri', desc: 'Satış ve kar büyümesi aynı anda ivmelenen şirketleri bulur. Her ikisi de %20 üzeri.', filters: {revg_min:20, earng_min:20} },
+  momentum: { label: 'Momentum Odaklı', desc: 'Satış ve kar büyümesi aynı anda ivmelenen şirketleri bulur. Her ikisi de %20 üzeri.', filters: {revg_min:20, earng_min:20} },
   // Boyut: kurumların radarına girmemiş küçük ama karlı şirketler
-  smallcap: { label: 'Küçük Şirketler',   desc: 'Kurumların radarına girmemiş küçük ama karlı şirketleri bulur. Piyasa değeri 500M dolar altı, ROE %15 ve kazanç büyümesi %15 üzeri.', filters: {mc_max:500, roe_min:15, earng_min:15} },
+  smallcap: { label: 'Küçük Ölçek',   desc: 'Kurumların radarına girmemiş küçük ama karlı şirketleri bulur. Piyasa değeri 500M dolar altı, ROE %15 ve kazanç büyümesi %15 üzeri.', filters: {mc_max:500, roe_min:15, earng_min:15} },
   // Boyut: oturmuş, güvenilir devler
-  megacap:  { label: 'Dev Şirketler',     desc: 'Oturmuş, güvenilir büyük şirketleri bulur. Piyasa değeri 10 milyar dolar üzeri, ROE %12 üzeri ve temettü ödeyen.', filters: {mc_min:10000, roe_min:12, div_min:1} }
+  megacap:  { label: 'Büyük Ölçek',     desc: 'Oturmuş, güvenilir büyük şirketleri bulur. Piyasa değeri 10 milyar dolar üzeri, ROE %12 üzeri ve temettü ödeyen.', filters: {mc_min:10000, roe_min:12, div_min:1} }
 };
 
 // Teknik Analiz Presetleri
@@ -1798,13 +1957,13 @@ const TECH_PRESETS = {
   },
 
   highVolume: {
-    label: 'Akıllı Para',
+    label: 'Yüksek Hacim',
     desc: 'Normalinin en az 2 katı hacimle yükselen hisseleri bulur. Göreli hacim artışı kurumsal ilginin en güvenilir işaretidir.',
     filters: { rel_vol_min: 2, chg_min: 0 }
   },
 
   techBuy: {
-    label: 'Güçlü Sinyal',
+    label: 'Teknik Alım',
     desc: '26 teknik göstergenin çoğunluğunun alım sinyali verdiği hisseleri bulur. Teknik skor 0.5 üzeri.',
     filters: { tech_rating_min: 0.5 }
   },
@@ -1822,7 +1981,7 @@ const TECH_PRESETS = {
   },
 
   rsiBounce: {
-    label: 'Toparlanıyor',
+    label: 'Dip Tepkisi',
     desc: 'Aşırı satıştan çıkıp toparlanmanın erken aşamasında olan hisseleri bulur. RSI 30-50 arası, dipten %3 üzeri.',
     filters: { rsi_min: 30, rsi_max: 50, from_low_min: 3 }
   },
@@ -1842,7 +2001,7 @@ const TECH_PRESETS = {
   },
 
   adxTrend: {
-    label: 'Güçlü Trend',
+    label: 'Belirgin Trend',
     desc: 'Gücü ölçülebilir, alıcı yönü baskın trendleri bulur. ADX 25 üzeri, +DI eksi DI üzerinde.',
     filters: { adx_min: 25, adx_di_diff_min: 0 }
   },
@@ -1881,6 +2040,50 @@ const TECH_PRESETS = {
     label: '1A Momentum',
     desc: 'Son bir ayda güçlü ivme kazanan hisseleri bulur. 1 aylık getiri %10, 3 aylık getiri %10 üzeri.',
     filters: { perf1m_min: 10, perf3m_min: 10 }
+  },
+
+  // ── KOMBİNASYON SİNYALLER ──────────────────────────────────────────────
+
+  sma200Test: {
+    label: 'SMA200 Testi',
+    desc: '200 günlük ortalamasını destek olarak test edip dönen hisseleri bulur. Fiyat SMA200\'ün %3 yakınında, RSI 40 üzeri, günlük hafif artış. Trend devam sinyali.',
+    filters: { above_sma200_min: 0, above_sma200_max: 3, rsi_min: 40, chg_min: 0.3 }
+  },
+
+  multiMomentum: {
+    label: 'Çok Dönemli Momentum',
+    desc: '1, 3 ve 6 aylık periyodların hepsinde piyasayı geçen hisseleri bulur. Kısa vadeli ivme orta-uzun vadede de güçlüdür — üç dönem uyumu en güvenilir momentum sinyalidir.',
+    filters: { perf1m_min: 3, perf3m_min: 10, perf6m_min: 20 }
+  },
+
+  oscAlignment: {
+    label: 'Üçlü Osilatör',
+    desc: 'RSI, MACD histogramı ve Stokastik %K — üç bağımsız osilatör aynı anda alım bölgesinde olan hisseleri bulur. Tek gösterge sinyali yerine üçlü teyit, yanlış alarm riskini önemli ölçüde düşürür.',
+    filters: { rsi_min: 50, macd_hist_min: 0, stoch_k_min: 50 }
+  },
+
+  volumeTrend: {
+    label: 'Hacimli Trend',
+    desc: '6 aylık güçlü getiri, normalin 1.5 katı hacim ve zirveye %15 mesafe — üçünü birden karşılayan hisseleri bulur. Kurumsal alımın en belirgin izleri: yüksek hacim ve kısa zirve mesafesi.',
+    filters: { perf6m_min: 20, rel_vol_min: 1.5, from_high_min: -15 }
+  },
+
+  adxMomentum: {
+    label: 'ADX Momentum',
+    desc: 'Hem gücü (ADX>25) hem yönü (+DI>-DI) teyit edilmiş, 3 aylık getirisi %10 üzeri trendleri bulur. ADX trend varlığını ölçer; +DI yönünü; 3 aylık getiri momentum kalıcılığını doğrular.',
+    filters: { adx_min: 25, adx_di_diff_min: 0, perf3m_min: 10 }
+  },
+
+  growthBreakout: {
+    label: 'Büyüme Kırılımı',
+    desc: 'EPS büyümesi %15 üzeri olan, teknik alım sinyali veren ve zirvesine yakın hisseleri bulur. Temel büyüme + teknik kırılım kombinasyonu büyüme yatırımcısının aranan durumudur.',
+    filters: { earng_min: 15, tech_rating_min: 0.3, from_high_min: -10 }
+  },
+
+  deathCrossBounce: {
+    label: 'Kontrarian Dönüş',
+    desc: 'Ölüm haçı bölgesinde (SMA50<SMA200, fiyat<SMA200) ancak dibinden %8 yükselmiş ve RSI toparlanma bölgesinde (35-55) olan hisseleri bulur. Düşüş trendindeki erken dönüş fırsatı — yüksek risk/getiri.',
+    filters: { sma_trend_max: 0, above_sma200_max: 0, rsi_min: 35, rsi_max: 55, from_low_min: 8 }
   },
 
 };
@@ -2146,8 +2349,9 @@ function initPrescanView() {
       ? '<img class="psv-ex-flag-img" src="https://flagcdn.com/w40/'+iso+'.png" alt="'+iso+'" loading="lazy">'
       : '<span class="psv-ex-flag">'+m.flag+'</span>';
     var tip = EXCHANGE_TIPS[key] || '';
+    var country = EXCHANGE_COUNTRY[key] ? '<span class="psv-ex-country">'+EXCHANGE_COUNTRY[key]+'</span>' : '';
     return '<button class="psv-ex-btn" data-exchange="'+key+'"'+(tip ? ' data-tip="'+tip+'"' : '')+' onclick="psvSetExchange(\''+key+'\')">' +
-      flagHtml + '<span class="psv-ex-name">'+m.name+'</span></button>';
+      flagHtml + '<span class="psv-ex-name">'+m.name+'</span>'+country+'</button>';
   }
 
   function mkGoatCard(key) {
@@ -2159,16 +2363,16 @@ function initPrescanView() {
     var tagsHtml = tags.length ? '<div class="psv-goat-tags">'+tags.map(function(t){return '<span class="psv-goat-tag">'+t+'</span>';}).join('')+'</div>' : '';
     var descHtml = g.desc ? '<div class="psv-goat-desc">'+esc(g.desc)+'</div>' : '';
     return '<div class="psv-goat-card" data-goat="'+key+'" onclick="psvToggleGoat(\''+key+'\')">' +
-      '<div class="psv-goat-name">'+name+'</div>'+sub+tagsHtml+descHtml+'</div>';
+      '<div class="psv-goat-name">'+name+' Lensi</div>'+sub+tagsHtml+descHtml+'</div>';
   }
 
   function mkFilterCard(key, p, cls, toggleFn) {
     if (!p) return '';
     var tags = _psvGetTags(p.filters||{}, 3);
-    var tagsHtml = tags.length ? '<div class="psv-preset-tags-row">'+tags.map(function(t){return '<span class="psv-preset-tag-sm">'+t+'</span>';}).join('')+'</div>' : '';
+    var tagsHtml = tags.length ? '<div class="psv-preset-tags-row">'+tags.map(function(t){return '<span class="psv-preset-tag-sm">'+esc(t)+'</span>';}).join('')+'</div>' : '';
     return '<div class="'+cls+'" data-key="'+key+'" onclick="'+toggleFn+'(\''+key+'\')">' +
-      '<div class="psv-preset-name">'+p.label+'</div>'+tagsHtml+
-      '<div class="psv-preset-desc">'+p.desc+'</div></div>';
+      '<div class="psv-preset-name">'+esc(p.label)+'</div>'+tagsHtml+
+      '<div class="psv-preset-desc">'+esc(p.desc)+'</div></div>';
   }
 
   var allExKeys      = Object.keys(EXCHANGE_META).filter(function(k){ return PSV_MAIN_EX.indexOf(k)===-1; });
@@ -2179,18 +2383,18 @@ function initPrescanView() {
   el.innerHTML =
     '<button class="psv-close-btn" id="psv-close-btn" onclick="closePrescanView()" style="display:none">✕ Sonuçlara dön</button>'+
     '<div class="psv-inner">'+
-    '<div class="psv-brand"><div class="psv-logo"><div class="tlogo-mark">D</div>DeepFin</div><div class="psv-tagline">Varlık seç · Borsa seç · Tara</div></div>'+
+    '<div class="psv-brand"><div class="psv-logo"><div class="tlogo-mark" style="width:24px;height:24px;font-size:12px;">D</div>DeepFin</div><div class="psv-tagline">VARLIK · BORSA · STRATEJİ · TARA</div></div>'+
 
     // Asset type section — yatay kaydırmalı
     '<div class="psv-section">'+
-    '<div class="psv-section-hd">🏦 Varlık</div>'+
+    '<div class="psv-section-hd">Varlık</div>'+
     '<div class="psv-asset-wrap">'+
       '<button class="psv-asset-arrow" onclick="psvScrollAssets(-1)" aria-label="Sola kaydır">‹</button>'+
       '<div class="psv-asset-row" id="psv-asset-row">'+
         PSV_ASSETS.map(function(a){
           return a.active
-            ? '<button class="psv-asset-btn on" data-asset="'+a.key+'" onclick="psvSetAsset(\''+a.key+'\')"><span class="psv-asset-icon">'+a.icon+'</span><span class="psv-asset-name">'+a.label+'</span></button>'
-            : '<div class="psv-asset-soon"><span class="psv-asset-icon">'+a.icon+'</span><span class="psv-asset-name">'+a.label+'</span><span class="psv-asset-badge">yakında</span></div>';
+            ? '<button class="psv-asset-btn on" data-asset="'+a.key+'" onclick="psvSetAsset(\''+a.key+'\')"><span class="psv-asset-name">'+a.label+'</span></button>'
+            : '<div class="psv-asset-soon"><span class="psv-asset-name">'+a.label+'</span><span class="psv-asset-badge">yakında</span></div>';
         }).join('')+
       '</div>'+
       '<button class="psv-asset-arrow" onclick="psvScrollAssets(1)" aria-label="Sağa kaydır">›</button>'+
@@ -2199,23 +2403,23 @@ function initPrescanView() {
 
     // Exchange section
     '<div class="psv-section">'+
-    '<div class="psv-section-hd">🌍 Borsa</div>'+
+    '<div class="psv-section-hd">Borsa</div>'+
     '<div class="psv-ex-grid" id="psv-ex-grid">'+PSV_MAIN_EX.map(mkExBtn).join('')+'</div>'+
     '<div class="psv-ex-extra" id="psv-ex-extra" style="display:none">'+allExKeys.map(mkExBtn).join('')+'</div>'+
     '<button class="psv-show-more" id="psv-ex-more" onclick="psvToggleMoreEx()">+ Diğer Borsalar</button>'+
     '</div>'+
 
-    // GOAT section
+    // Yatırımcı Lensleri section
     '<div class="psv-section">'+
-    '<div class="psv-section-hd">🐐 Yatırımcı Stratejisi <span class="psv-opt">isteğe bağlı</span></div>'+
+    '<div class="psv-section-hd">Yatırımcı Lensleri <span class="psv-opt">isteğe bağlı</span></div>'+
     '<div class="psv-goat-grid" id="psv-goat-main">'+PSV_MAIN_GOATS.map(mkGoatCard).join('')+'</div>'+
     '<div class="psv-goat-extra" id="psv-goat-extra" style="display:none">'+extraGoatKeys.map(mkGoatCard).join('')+'</div>'+
-    '<button class="psv-show-more" id="psv-goat-more" onclick="psvToggleMoreGoats()">+ Tüm Stratejiler</button>'+
+    '<button class="psv-show-more" id="psv-goat-more" onclick="psvToggleMoreGoats()">+ Tüm Lensler</button>'+
     '</div>'+
 
     // Temel — yatay satır, ortalı
     '<div class="psv-section">'+
-    '<div class="psv-section-hd">📊 Temel <span class="psv-opt">isteğe bağlı</span></div>'+
+    '<div class="psv-section-hd">Temel <span class="psv-opt">isteğe bağlı</span></div>'+
     '<div class="psv-chip-grid" id="psv-preset-main">'+PSV_MAIN_PRESETS.map(function(k){ return mkFilterCard(k, PRESETS[k], 'psv-preset-card', 'psvTogglePreset'); }).join('')+'</div>'+
     '<div class="psv-chip-extra" id="psv-preset-extra" style="display:none">'+extraPresetKeys.map(function(k){ return mkFilterCard(k, PRESETS[k], 'psv-preset-card', 'psvTogglePreset'); }).join('')+'</div>'+
     (extraPresetKeys.length ? '<button class="psv-show-more" id="psv-preset-more" onclick="psvToggleMorePresets()">+ Daha Fazla ('+extraPresetKeys.length+')</button>' : '')+
@@ -2223,7 +2427,7 @@ function initPrescanView() {
 
     // Teknik — yatay satır, ortalı
     '<div class="psv-section">'+
-    '<div class="psv-section-hd">📈 Teknik <span class="psv-opt">isteğe bağlı</span></div>'+
+    '<div class="psv-section-hd">Teknik <span class="psv-opt">isteğe bağlı</span></div>'+
     '<div class="psv-chip-grid" id="psv-tech-main">'+PSV_MAIN_TECH.map(function(k){ return mkFilterCard(k, TECH_PRESETS[k], 'psv-tech-card', 'psvToggleTech'); }).join('')+'</div>'+
     '<div class="psv-chip-extra" id="psv-tech-extra" style="display:none">'+extraTechKeys.map(function(k){ return mkFilterCard(k, TECH_PRESETS[k], 'psv-tech-card', 'psvToggleTech'); }).join('')+'</div>'+
     '<button class="psv-show-more" id="psv-tech-more" onclick="psvToggleMoreTech()">+ Daha Fazla ('+extraTechKeys.length+')</button>'+
@@ -2231,8 +2435,8 @@ function initPrescanView() {
 
     // Scan button
     '<div class="psv-scan-wrap">'+
-    '<div class="psv-limit-hint" id="psv-limit-hint">⚠ En fazla 4 filtre seçilebilir — yenisini eklemek için mevcut bir seçimi kaldır.</div>'+
-    '<button class="psv-scan-btn" id="psv-scan-btn" onclick="psvScan()">▶ Hisse Tara</button></div>'+
+    '<div class="psv-limit-hint" id="psv-limit-hint">En fazla 4 filtre seçilebilir — yenisini eklemek için mevcut bir seçimi kaldır.</div>'+
+    '<button class="psv-scan-btn" id="psv-scan-btn" onclick="psvScan()">Hisse Tara</button></div>'+
 
     '</div>';
 
@@ -2290,7 +2494,7 @@ function _psvUpdateSelState() {
   var pv = document.getElementById('prescan-view');
   if (pv) pv.classList.toggle('psv-at-limit', atLimit);
   var btn = document.getElementById('psv-scan-btn');
-  if (btn) btn.textContent = total > 0 ? '▶ ' + total + ' Filtre ile Tara' : '▶ Hisse Tara';
+  if (btn) btn.textContent = total > 0 ? total + ' Filtre ile Tara' : 'Hisse Tara';
 }
 
 function psvToggleGoat(key) {
@@ -2320,7 +2524,7 @@ function psvToggleMoreGoats() {
   if (!extra) return;
   var open = extra.style.display !== 'none';
   extra.style.display = open ? 'none' : 'flex';
-  if (btn) btn.textContent = open ? '+ Tüm Stratejiler' : '— Daha Az';
+  if (btn) btn.textContent = open ? '+ Tüm Lensler' : '— Daha Az';
 }
 
 function psvToggleMoreEx() {
@@ -2602,7 +2806,7 @@ function _applyChips(cfg) {
   var byGroup = {};
   allInfos.forEach(function(info) {
     if (!byGroup[info.infoId]) byGroup[info.infoId] = [];
-    byGroup[info.infoId].push('<strong>' + info.label + ':</strong> ' + info.desc);
+    byGroup[info.infoId].push('<strong>' + esc(info.label) + ':</strong> ' + esc(info.desc));
   });
   Object.keys(byGroup).forEach(function(id) {
     var el = document.getElementById(id);
@@ -2617,6 +2821,49 @@ function _applyChips(cfg) {
 
 function applyAllChips()    { _applyChips(BASIC_CHIP_CFG); }
 function applyAllChipsAdv() { _applyChips(ADV_CHIP_CFG); }
+
+// ── Quick Scan Bar ────────────────────────────────────────────
+function quickScan(presetKey) {
+  // Ensure we're in screener view
+  var hp = document.getElementById('homepage');
+  if (hp && hp.style.display !== 'none') showScreener();
+  // Close prescan if open
+  var pv = document.getElementById('prescan-view');
+  if (pv && pv.style.display !== 'none') { pv.style.display = 'none'; }
+  // Clear all chips
+  document.querySelectorAll('#goat-chips .goat-chip.on, #presets .chip.on, #tech-presets .chip.on').forEach(function(c){ c.classList.remove('on'); });
+  // Activate the requested chip
+  var techChip = document.querySelector('#tech-presets .chip[data-tech="' + presetKey + '"]');
+  var presetChip = document.querySelector('#presets .chip[data-preset="' + presetKey + '"]');
+  if (techChip) { techChip.classList.add('on'); }
+  else if (presetChip) { presetChip.classList.add('on'); }
+  // Clear inputs and apply
+  document.querySelectorAll('.finps input, #hisse-hidden-filters input').forEach(function(i){ i.value = ''; });
+  var preset = TECH_PRESETS[presetKey] || PRESETS[presetKey];
+  if (preset && preset.filters) {
+    Object.keys(preset.filters).forEach(function(k){ var el = document.getElementById(k); if (el) el.value = preset.filters[k]; });
+  }
+  // Mark active quick-scan button
+  document.querySelectorAll('.qs-btn').forEach(function(b){ b.classList.remove('active'); });
+  var btn = document.querySelector('.qs-btn[onclick*="quickScan(\'' + presetKey + '\')"]');
+  if (btn) btn.classList.add('active');
+  updateClrBtn();
+  runScan();
+}
+
+function quickGoat(goatKey) {
+  var hp = document.getElementById('homepage');
+  if (hp && hp.style.display !== 'none') showScreener();
+  var pv = document.getElementById('prescan-view');
+  if (pv && pv.style.display !== 'none') { pv.style.display = 'none'; }
+  document.querySelectorAll('#goat-chips .goat-chip.on, #presets .chip.on, #tech-presets .chip.on').forEach(function(c){ c.classList.remove('on'); });
+  var chip = document.querySelector('#goat-chips .goat-chip[data-goat="' + goatKey + '"]');
+  if (chip) chip.classList.add('on');
+  document.querySelectorAll('.qs-btn').forEach(function(b){ b.classList.remove('active'); });
+  var btn = document.querySelector('.qs-btn[onclick*="quickGoat(\'' + goatKey + '\')"]');
+  if (btn) btn.classList.add('active');
+  _applyChips(BASIC_CHIP_CFG);
+}
 
 function _countChips(cfg) {
   return document.querySelectorAll(
@@ -2709,6 +2956,7 @@ function clearFilters(resetChips=true){
   const sf = document.getElementById('sector_filter'); if(sf) sf.value = '';
   const sfAdv = document.getElementById('sector_filter_adv'); if(sfAdv) sfAdv.value = '';
   if(resetChips) { document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on')); ['goat-info','preset-info','tech-preset-info','goat-info-adv','preset-info-adv','tech-preset-info-adv'].forEach(id=>{const el=document.getElementById(id);if(el){el.style.display='none';el.innerHTML='';}});}
+  document.querySelectorAll('.qs-btn.active').forEach(function(b){ b.classList.remove('active'); });
   updateClrBtn();
   if(allData.length) applyAndRender();
 }
@@ -2897,8 +3145,12 @@ function applyAndRender(special){
   if (_wrap) _wrap.scrollTop = 0;
   _vsInit();
   _vsRender();
+  // Kolay tablosu _vsData'dan beslenir — _vsData güncellendikten SONRA tekrar çiz.
+  // (showState('twrap') içindeki renderKolay henüz eski _vsData'yı görür → bir adım geride kalırdı.)
+  if (_scanMode === 'kolay' && typeof renderKolay === 'function') renderKolay();
   updateStatsBar();
   updateTicker();
+  _saveScanHistory(filtered.length);
   setTimeout(applyColVisibility, 0);
   // Mobil: tablo görünür alana scroll et
   if (window.innerWidth <= 768) {
@@ -2920,6 +3172,12 @@ function colSort(f){
   if(sortSt.field===f) sortSt.dir = sortSt.dir==='desc'?'asc':'desc';
   else { sortSt.field=f; sortSt.dir='desc'; }
   renderTable();
+}
+function toggleSortDir(){
+  var b = document.getElementById('sortd');
+  if (!b) return;
+  b.value = (b.value === 'desc') ? 'asc' : 'desc';
+  onSortChange();
 }
 function onSortChange(){
   sortSt.field = document.getElementById('sortf').value;
@@ -3097,6 +3355,7 @@ function _vsRender() {
     rows += '<tr class="vs-pad vs-sentinel" style="height:' + botPad + 'px"><td colspan="22"></td></tr>';
   }
   tbody.innerHTML = rows;
+  if (typeof applyColOrder === 'function') applyColOrder();
 
   // Sentinel observer: botPad row görünürce daha fazla yükle
   _vsBindSentinel();
@@ -3169,10 +3428,12 @@ function _vsRowHtml(s, idx) {
     favClick  = "event.stopPropagation();toggleFav('" + escJS(s.symbol) + "')";
     favTitle  = isFav ? 'Favorilerden çıkar' : 'Favorilere ekle';
   }
-  return `<tr onclick="showDetail('${escJS(s.symbol)}')" tabindex="0" class="${selSym===s.symbol?'selrow':''}">
+  var _mcap = s.marketCapitalization;
+  var _mcapTier = _mcap == null ? '' : _mcap >= 200000 ? ' mcap-mega' : _mcap >= 10000 ? ' mcap-large' : _mcap >= 2000 ? ' mcap-mid' : _mcap >= 300 ? ' mcap-small' : ' mcap-micro';
+  return `<tr onclick="showDetail('${escJS(s.symbol)}')" tabindex="0" class="${selSym===s.symbol?'selrow':''}${_mcapTier}">
       <td class="nfav"><span class="fav-icon${isFav?' fav-on':''}" onclick="${favClick}" title="${esc(favTitle)}">★</span></td>
-      <td data-col="symbol" style="display:table-cell;"><span class="row-num">${idx+1}</span><span class="sym-wrap"><span class="row-arrow">›</span><span class="sym">${s.symbol}</span></span></td>
-      <td data-col="name" style="${cv('name')}font-size:11px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${s.name}">${s.name}</td>
+      <td data-col="symbol" style="display:table-cell;"><span class="row-num">${idx+1}</span><span class="sym-wrap"><span class="row-arrow">›</span><span class="sym">${esc(s.symbol)}</span></span></td>
+      <td data-col="name" style="${cv('name')}font-size:11px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(s.name)}">${esc(s.name)}</td>
       <td data-col="price" style="${cv('price')}">${s.currentPrice!=null?(s.currentPrice.toFixed(2)+' '+(EXCHANGE_META[currentExchange]||EXCHANGE_META.bist).currency):nil}</td>
       <td data-col="mcap" style="${cv('mcap')}">${fmc(s.marketCapitalization)}</td>
       <td data-col="pe" style="${cv('pe')}">${fv(s.peNormalizedAnnual,1)}</td>
@@ -3194,16 +3455,24 @@ function _vsRowHtml(s, idx) {
       <td data-col="chg1w" style="${cv('chg1w')}">${s.perfW!=null?fPerf(s.perfW):nil}</td>
       <td data-col="perf3m" style="${cv('perf3m')}">${s.perf3m!=null?fPerf(s.perf3m):nil}</td>
       <td data-col="float_pct" style="${cv('float_pct')}">${s.floatPct!=null?fv(s.floatPct,1,true):nil}</td>
-      <td data-col="sector" style="${cv('sector')}font-size:10px;color:var(--muted2)">${s.sector||'—'}</td>
+      <td data-col="sector" style="${cv('sector')}font-size:10px;color:var(--muted2)">${esc(s.sector)||'—'}</td>
     </tr>`;
 }function renderTable(){
+  // Apply density class
+  var _tbl = document.getElementById('hisse-table');
+  if (_tbl) { _tbl.classList.remove('density-compact','density-normal','density-comfortable'); _tbl.classList.add('density-'+(_rowDensity||'compact')); }
   // Sort header güncelle
   document.querySelectorAll('thead th').forEach(function(th){
     var oc = th.getAttribute('onclick')||'';
     var match = oc.match(/colSort\('([^']+)'\)/);
     if(match){
-      th.classList.toggle('sorted', match[1]===sortSt.field);
-      th.classList.toggle('asc', match[1]===sortSt.field && sortSt.dir==='asc');
+      var on = match[1]===sortSt.field;
+      th.classList.toggle('sorted', on);
+      th.classList.toggle('asc', on && sortSt.dir==='asc');
+      // Erişilebilirlik: sıralanabilir başlık → klavye + aria-sort
+      th.setAttribute('role','columnheader');
+      if(!th.hasAttribute('tabindex')) th.setAttribute('tabindex','0');
+      th.setAttribute('aria-sort', on ? (sortSt.dir==='asc'?'ascending':'descending') : 'none');
     }
   });
 
@@ -3222,6 +3491,320 @@ function _vsRowHtml(s, idx) {
   _vsRender();
   updateStatsBar();
   setTimeout(applyColVisibility, 0);
+  if (_scanMode === 'kolay') renderKolay();
+}
+
+// ═══════════════════════════════════════════
+// KOLAY MOD — sade tarayıcı görünümü
+// ═══════════════════════════════════════════
+var _scanMode = 'kolay';
+try { var _sm0 = localStorage.getItem('df_scan_mode'); if (_sm0 === 'pro' || _sm0 === 'kolay') _scanMode = _sm0; } catch(e) {}
+
+function setScanMode(mode) {
+  _scanMode = (mode === 'pro') ? 'pro' : 'kolay';
+  try { localStorage.setItem('df_scan_mode', _scanMode); } catch(e) {}
+  _applyScanMode();
+  if (typeof _vsData !== 'undefined' && _vsData && _vsData.length) {
+    if (_scanMode === 'kolay') renderKolay();
+    else { try { renderTable(); } catch(e) {} }
+  }
+}
+
+function _applyScanMode() {
+  document.documentElement.setAttribute('data-scan-mode', _scanMode);
+  var btns = document.querySelectorAll('.smt-btn');
+  for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('on', btns[i].getAttribute('data-mode') === _scanMode);
+  var tw = document.getElementById('twrap');
+  var kw = document.getElementById('kolay-wrap');
+  var resultsVisible = tw && tw.style.display && tw.style.display !== 'none';
+  if (kw) kw.style.display = (_scanMode === 'kolay' && resultsVisible) ? 'block' : 'none';
+  if (_scanMode === 'kolay' && typeof renderKolaySide === 'function') renderKolaySide();
+  if (_scanMode === 'kolay' && typeof renderKolayFilters === 'function') renderKolayFilters();
+}
+
+function renderKolay() {
+  var tb = document.getElementById('kolay-tbody');
+  if (!tb) return;
+  var data = (typeof _vsData !== 'undefined' && _vsData) ? _vsData : [];
+  var ex = currentExchange;
+  var exMeta = EXCHANGE_META[ex] || EXCHANGE_META.bist;
+  var curr = exMeta.currency || '';
+  var sub = document.getElementById('kolay-sub');
+  if (sub) sub.textContent = (exMeta.name || ex.toUpperCase()) + ' · ' + data.length + ' hisse';
+  // Başlık: seçili filtre adı (Tümü ise "Tüm Hisseler")
+  var titleEl = document.getElementById('kolay-title');
+  if (titleEl) {
+    var _kf = (_kolayFilterKey && _kolayFilterKey !== 'all')
+      ? KOLAY_FILTERS.find(function(f){ return f.key === _kolayFilterKey; }) : null;
+    titleEl.textContent = _kf ? _kf.name : 'Tüm Hisseler';
+  }
+  var f = (typeof _usdToLocalFactor === 'function') ? _usdToLocalFactor(ex) : null;
+  function mcapStr(v) {
+    if (!v) return '—';
+    if (f && isFinite(f)) { var loc = v * f; return curr + (loc >= 1e6 ? (loc/1e6).toFixed(1)+'T' : loc >= 1e3 ? (loc/1e3).toFixed(0)+'B' : loc.toFixed(0)+'M'); }
+    return fmc(v);
+  }
+  function peC(v) { if (v == null || v <= 0) return ''; return 'font-weight:600;color:' + (v < 15 ? 'var(--green)' : v < 25 ? 'var(--gold)' : 'var(--red)'); }
+  function roeC(v) { if (v == null) return ''; return 'font-weight:600;color:' + (v > 15 ? 'var(--green)' : v > 8 ? 'var(--gold)' : 'var(--red)'); }
+  var cap = data.length > 500 ? 500 : data.length;
+  var rows = '';
+  for (var i = 0; i < cap; i++) {
+    var s = data[i];
+    rows += '<tr onclick="showDetail(\'' + escJS(s.symbol) + '\')" tabindex="0">' +
+      '<td class="kt-hisse"><span class="kt-sym">' + esc(s.symbol) + '</span><span class="kt-name">' + esc(s.name || '') + '</span></td>' +
+      '<td class="r kt-price">' + (s.currentPrice != null ? s.currentPrice.toFixed(2) + ' ' + curr : '—') + '</td>' +
+      '<td class="r">' + (s.changePercent != null ? fPerf(s.changePercent) : '—') + '</td>' +
+      '<td class="r"><span style="' + peC(s.peNormalizedAnnual) + '">' + (s.peNormalizedAnnual != null && s.peNormalizedAnnual > 0 ? s.peNormalizedAnnual.toFixed(1) : '—') + '</span></td>' +
+      '<td class="r"><span style="' + roeC(s.roeTTM) + '">' + (s.roeTTM != null ? s.roeTTM.toFixed(1) + '%' : '—') + '</span></td>' +
+      '<td class="r">' + (s.rsi14 != null ? fRsi(s.rsi14) : '—') + '</td>' +
+      '<td class="r kt-mcap">' + mcapStr(s.marketCapitalization) + '</td>' +
+    '</tr>';
+  }
+  if (data.length > cap) rows += '<tr class="kt-more"><td colspan="7">+ ' + (data.length - cap) + ' hisse daha — tümünü görmek için Pro moda geç</td></tr>';
+  tb.innerHTML = rows || '<tr><td colspan="7" style="padding:24px;text-align:center;color:var(--muted)">Sonuç yok</td></tr>';
+  _applyScanMode();
+}
+try { _applyScanMode(); } catch(e) {}
+
+// ── Tarayıcıya girişte Kolay/Pro seçim ekranı ──
+function openScanModeChoice() {
+  var pv = document.getElementById('prescan-view'); if (pv) pv.style.display = 'none';
+  ['empty','loading','errstate','twrap'].forEach(function(id){ var e = document.getElementById(id); if (e) e.style.display = 'none'; });
+  var kw = document.getElementById('kolay-wrap'); if (kw) kw.style.display = 'none';
+  var sb = document.getElementById('stats-bar'); if (sb) sb.classList.remove('visible');
+  var ch = document.getElementById('scan-mode-choice'); if (ch) ch.style.display = 'flex';
+}
+
+function chooseScanMode(mode) {
+  var ch = document.getElementById('scan-mode-choice'); if (ch) ch.style.display = 'none';
+  setScanMode(mode);
+  // Profesyonel → tarama yapılandırma ekranı (prescan: varlık/borsa/strateji/tara)
+  if (mode === 'pro') { openPrescanView(); return; }
+  // Kolay → varsayılan: BIST borsası + Tümü filtresi
+  currentExchange = 'bist';
+  _kolayFilterKey = 'all';
+  document.querySelectorAll('.kfil').forEach(function(c){ c.classList.remove('on'); });
+  var _tumu = document.querySelector('.kfil'); if (_tumu) _tumu.classList.add('on');
+  document.querySelectorAll('.exbtn').forEach(function(b){ b.classList.toggle('on', b.dataset.exchange === 'bist'); });
+  if (typeof renderKolaySide === 'function') renderKolaySide();
+  _runDefaultScan();
+}
+
+// Temiz varsayılan tarama (tüm hisseler, filtresiz)
+function _runDefaultScan() {
+  // Tüm chip/inputları temizle
+  document.querySelectorAll('#goat-chips .goat-chip.on, #presets .chip.on, #tech-presets .chip.on, #adv-goat-chips .goat-chip.on, #adv-presets .chip.on, #adv-tech-presets .chip.on').forEach(function(c){ c.classList.remove('on'); });
+  document.querySelectorAll('.finps input, #hisse-hidden-filters input').forEach(function(i){ i.value = ''; });
+  document.querySelectorAll('.qs-btn.active').forEach(function(b){ b.classList.remove('active'); });
+  window._chipSpecial = null;
+  if (typeof updateClrBtn === 'function') updateClrBtn();
+  // _applyChips kanıtlanmış yol: selectAsset('hisse') yapar, özel filtreyi sıfırlar, temiz tarar
+  if (typeof _applyChips === 'function') _applyChips(BASIC_CHIP_CFG);
+  else { if (_activeAsset !== 'hisse' && typeof selectAsset === 'function') selectAsset('hisse'); runScan(); }
+}
+
+// Kolay moddaki 4 basit filtre (temel + teknik) + Tümü
+var _kolayFilterKey = 'all';
+var _kolayExpanded = false;        // borsa listesi genişletme
+var _kolayFiltExpanded = false;    // filtre listesi genişletme
+var _kolayAssetExpanded = false;   // varlık listesi genişletme
+
+// Kolay filtreler (temel + teknik + goat) — basit isimlerle
+var KOLAY_FILTERS = [
+  { key: 'value',    name: 'Değer Odaklı' },
+  { key: 'quality',  name: 'Kalite Odaklı' },
+  { key: 'breakout', name: 'Yükseliş Eğilimi' },
+  { key: 'oversold', name: 'Geri Çekilmiş' },
+  { key: 'growth',   name: 'Büyüme Odaklı' },
+  { key: 'dividend', name: 'Temettü Odaklı' },
+  { key: 'momentum', name: 'Momentum Odaklı' },
+  { key: 'nearHigh', name: 'Zirveye Yakın' },
+  { key: 'buffett',  name: 'Buffett Lensi' },
+  { key: 'graham',   name: 'Graham Lensi' },
+  { key: 'lynch',    name: 'Lynch Lensi' },
+];
+var _KOLAY_FILT_VIS = 3; // (eski) — artık tüm filtreler gösteriliyor
+
+// Bir Kolay filtre anahtarının açıklamasını (tooltip için) bulur.
+function _kolayFilterInfo(key) {
+  if (key === 'all') return { label: 'Tüm Hisseler', desc: 'Borsadaki tüm hisseleri filtresiz listeler.' };
+  var src = (typeof GURUS !== 'undefined' && GURUS[key])
+         || (typeof TECH_PRESETS !== 'undefined' && TECH_PRESETS[key])
+         || (typeof PRESETS !== 'undefined' && PRESETS[key]) || null;
+  return src ? { label: src.label, desc: src.desc || '' } : null;
+}
+
+function renderKolayFilters() {
+  var c = document.getElementById('kolay-filters');
+  if (!c) return;
+  function chip(key, name) {
+    var info = _kolayFilterInfo(key);
+    var tip = info ? ' data-tip="' + esc(info.desc) + '" data-tipname="' + esc(info.label) + '"' : '';
+    return '<button class="kfil' + (_kolayFilterKey === key ? ' on' : '') + '"' + tip +
+      ' onclick="kolayFilter(\'' + key + '\',this)">' + name + '</button>';
+  }
+  var html = chip('all', 'Tümü');
+  KOLAY_FILTERS.forEach(function(f) { html += chip(f.key, f.name); });
+  c.innerHTML = html;
+}
+
+// Kolay filtre etiketleri için detaylı bilgi balonu (hover) — delegasyonla
+(function() {
+  var _ktip = null;
+  function _show(el) {
+    var name = el.getAttribute('data-tipname') || '';
+    var desc = el.getAttribute('data-tip') || '';
+    if (!desc) return;
+    if (!_ktip) {
+      _ktip = document.createElement('div');
+      _ktip.className = 'kfil-tip';
+      document.body.appendChild(_ktip);
+    }
+    _ktip.innerHTML = '<div class="kfil-tip-h">' + name + '</div><div class="kfil-tip-d">' + desc + '</div>';
+    var r = el.getBoundingClientRect();
+    _ktip.style.opacity = '0';
+    _ktip.style.display = 'block';
+    // ölç ve konumla — etiketin altında, ekran içinde
+    var tw = _ktip.offsetWidth, th = _ktip.offsetHeight;
+    var left = r.left + r.width / 2 - tw / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - tw - 8));
+    var top = r.bottom + 8;
+    if (top + th > window.innerHeight - 8) top = r.top - th - 8; // yer yoksa üste al
+    _ktip.style.left = left + 'px';
+    _ktip.style.top = top + 'px';
+    _ktip.style.opacity = '1';
+  }
+  function _hide() { if (_ktip) { _ktip.style.opacity = '0'; _ktip.style.display = 'none'; } }
+  var _TIP_SEL = '.kfil[data-tip], .hpx-spill[data-tip]';
+  document.addEventListener('mouseover', function(e) {
+    var el = e.target.closest && e.target.closest(_TIP_SEL);
+    if (el) _show(el);
+  });
+  document.addEventListener('mouseout', function(e) {
+    var el = e.target.closest && e.target.closest(_TIP_SEL);
+    if (el && !(e.relatedTarget && el.contains(e.relatedTarget))) _hide();
+  });
+  // Dokunmatik (hover yok): tap ile balonu kısa süre göster — mevcut aksiyonu engellemez
+  var _ktipTO = null;
+  document.addEventListener('click', function(e) {
+    if (!(window.matchMedia && window.matchMedia('(hover: none)').matches)) return;
+    var el = e.target.closest && e.target.closest(_TIP_SEL);
+    if (!el) return;
+    _show(el);
+    clearTimeout(_ktipTO);
+    _ktipTO = setTimeout(_hide, 2600);
+  });
+})();
+
+// Anasayfa strateji kartlarına bilgi balonu (data-tip) ekle — açıklamalar dict'lerden
+function _initHomeStratTips() {
+  document.querySelectorAll('#hpx-sg-goat .hpx-spill, #hpx-sg-fund .hpx-spill, #hpx-sg-tech .hpx-spill').forEach(function(el) {
+    if (el.hasAttribute('data-tip')) return;
+    var oc = el.getAttribute('onclick') || '';
+    var m = oc.match(/apply(Strategy|Preset|Tech)AndGo\('([^']+)'\)/);
+    if (!m) return;
+    var dict = m[1] === 'Strategy' ? (typeof GURUS !== 'undefined' && GURUS)
+             : m[1] === 'Preset'   ? (typeof PRESETS !== 'undefined' && PRESETS)
+             :                       (typeof TECH_PRESETS !== 'undefined' && TECH_PRESETS);
+    var d = dict && dict[m[2]];
+    if (d && d.desc) { el.setAttribute('data-tip', d.desc); el.setAttribute('data-tipname', d.label || ''); }
+  });
+}
+document.addEventListener('DOMContentLoaded', _initHomeStratTips);
+
+// Bir Kolay filtre anahtarı için chip + filtre inputlarını hazırlar.
+// Veriyi YENİDEN ÇEKMEZ — sadece state'i kurar ve özel (special) anahtarı döner.
+// Böylece filtre tıklamaları mevcut veriye anında uygulanır, async yarış olmaz.
+function _kolaySetupFilter(key) {
+  // Önce tüm chip/inputları temizle (önceki seçim takılmasını önler)
+  document.querySelectorAll('#goat-chips .goat-chip.on, #presets .chip.on, #tech-presets .chip.on, #adv-goat-chips .goat-chip.on, #adv-presets .chip.on, #adv-tech-presets .chip.on').forEach(function(c){ c.classList.remove('on'); });
+  document.querySelectorAll('.finps input, #hisse-hidden-filters input').forEach(function(i){ i.value = ''; });
+  document.querySelectorAll('.qs-btn.active').forEach(function(b){ b.classList.remove('active'); });
+  var special = null;
+  if (key && key !== 'all') {
+    var chip = null, filters = null;
+    if (typeof GURUS !== 'undefined' && GURUS[key]) {
+      chip = document.querySelector('#goat-chips .goat-chip[data-goat="' + key + '"]');
+      filters = GURUS[key].filters; special = GURUS[key].special || null;
+    } else if (typeof TECH_PRESETS !== 'undefined' && TECH_PRESETS[key]) {
+      chip = document.querySelector('#tech-presets .chip[data-tech="' + key + '"]');
+      filters = TECH_PRESETS[key].filters;
+    } else if (typeof PRESETS !== 'undefined' && PRESETS[key]) {
+      chip = document.querySelector('#presets .chip[data-preset="' + key + '"]');
+      filters = PRESETS[key].filters;
+    }
+    if (chip) chip.classList.add('on');
+    if (filters) Object.keys(filters).forEach(function(k){ var el = document.getElementById(k); if (el) el.value = filters[k]; });
+  }
+  window._chipSpecial = special;
+  if (typeof updateClrBtn === 'function') updateClrBtn();
+  return special;
+}
+
+function kolayFilter(key, el) {
+  _kolayFilterKey = key;
+  renderKolayFilters(); // aktif durumu güncelle
+  var special = _kolaySetupFilter(key);
+  var hasData = (typeof allData !== 'undefined' && allData && allData.length);
+  if (hasData) {
+    // Veri zaten yüklü — anında, yarışsız yerel filtreleme
+    if (typeof applyAndRender === 'function') applyAndRender(special);
+  } else {
+    // Henüz veri yok — bir kez tara; tarama bittiğinde kurulan filtre uygulanır
+    if (_activeAsset !== 'hisse' && typeof selectAsset === 'function') selectAsset('hisse');
+    runScan();
+  }
+}
+
+// Kolay sol panel: Varlık + Borsa listesi
+function renderKolaySide() {
+  // ── Varlık listesi (ilk 3 + daha fazla) ──
+  var aList = document.getElementById('kolay-asset-list');
+  if (aList && typeof PSV_ASSETS !== 'undefined') {
+    aList.innerHTML = PSV_ASSETS.map(function(a, i) {
+      var hide = (i >= 3 && !_kolayAssetExpanded) ? ' style="display:none"' : '';
+      if (a.active) return '<button class="ks-asset on"' + hide + '>' + a.label + '</button>';
+      return '<div class="ks-soon"' + hide + '>' + a.label + ' <span>yakında</span></div>';
+    }).join('');
+    var aMore = document.getElementById('kolay-asset-more');
+    if (aMore) { aMore.style.display = PSV_ASSETS.length > 3 ? '' : 'none'; aMore.textContent = _kolayAssetExpanded ? '− Daha Az' : '+ Daha Fazla'; }
+  }
+  // ── Borsa listesi (ana 6 + diğer borsalar) ──
+  var list = document.getElementById('kolay-ex-list');
+  if (!list || typeof EXCHANGE_META === 'undefined') return;
+  var main = (typeof PSV_MAIN_EX !== 'undefined') ? PSV_MAIN_EX : ['bist','nasdaq','nyse','sp500','dax','lse'];
+  var extra = Object.keys(EXCHANGE_META).filter(function(k){ return main.indexOf(k) === -1; });
+  function exItem(key) {
+    var m = EXCHANGE_META[key]; if (!m) return '';
+    var iso = (typeof _isoFromFlag === 'function') ? _isoFromFlag(m.flag) : '';
+    var flag = iso ? '<img class="ks-flag" src="https://flagcdn.com/w20/' + iso + '.png" alt="" loading="lazy">' : '<span class="ks-flag-e">' + m.flag + '</span>';
+    var country = EXCHANGE_COUNTRY[key] ? '<span class="ks-ex-country">' + EXCHANGE_COUNTRY[key] + '</span>' : '';
+    return '<button class="ks-ex' + (currentExchange === key ? ' on' : '') + '" onclick="kolaySelectExchange(\'' + key + '\')">' + flag + '<span class="ks-ex-name">' + m.name + '</span>' + country + '</button>';
+  }
+  list.innerHTML = main.map(exItem).join('') +
+    '<div class="ks-ex-extra" id="kolay-ex-extra"' + (_kolayExpanded ? '' : ' style="display:none"') + '>' + extra.map(exItem).join('') + '</div>';
+}
+
+function kolayToggleMoreEx() {
+  _kolayExpanded = !_kolayExpanded;
+  var ex = document.getElementById('kolay-ex-extra'); if (ex) ex.style.display = _kolayExpanded ? 'block' : 'none';
+  var btn = document.getElementById('kolay-ex-more'); if (btn) btn.textContent = _kolayExpanded ? '− Daha Az' : '+ Diğer Borsalar';
+}
+function kolayToggleMoreAssets() { _kolayAssetExpanded = !_kolayAssetExpanded; renderKolaySide(); }
+
+function kolaySelectExchange(key) {
+  if (typeof EXCHANGE_META === 'undefined' || !EXCHANGE_META[key]) return;
+  currentExchange = key;
+  document.querySelectorAll('.exbtn').forEach(function(b){ b.classList.toggle('on', b.dataset.exchange === key); });
+  document.querySelectorAll('#adv-ex-grid .exbtn').forEach(function(b){ b.classList.toggle('on', b.dataset.exchange === key); });
+  allData = []; filtered = []; selSym = null;
+  if (typeof closeDetail === 'function') closeDetail();
+  renderKolaySide();
+  // Yeni borsada taze tara; mevcut filtreyi kurup tek taramayla uygula
+  // (tarama bittiğinde kurulan filtre/özel anahtar otomatik uygulanır)
+  _kolaySetupFilter(_kolayFilterKey);
+  if (_activeAsset !== 'hisse' && typeof selectAsset === 'function') selectAsset('hisse');
+  runScan();
 }
 
 
@@ -3291,7 +3874,7 @@ function showDetail(sym){
       ['PD/DD <tag>FQ</tag>', s.pbAnnual, v=>v.toFixed(2), 'dval-pb'],
       ['F/S <tag>TTM</tag>', s.psTTM, v=>v.toFixed(2), 'dval-ps'],
       ['Piyasa Değeri', s.marketCapitalization, v=>fmcDual(v, s.exchangeId||currentExchange)],
-      ['Sektör', s.sector, v=>v],
+      ['Sektör', s.sector, v=>esc(v)],
       ['52H Yüksek', s['52WeekHigh'], v=>`${v.toFixed(2)} ₺`],
       ['52H Düşük', s['52WeekLow'], v=>`${v.toFixed(2)} ₺`],
     ]},
@@ -3323,6 +3906,7 @@ function showDetail(sym){
     </div>`).join('');
 
   document.getElementById('detail').classList.add('open');
+  _updateDetailNavPos();
   // Panel transition bitmesini bekle (200ms)
   setTimeout(function(){ updateChart(sym); }, 260);
 
@@ -3531,9 +4115,24 @@ function updateChart(sym) {
 function closeDetail(){
   document.getElementById('detail').classList.remove('open');
   selSym = null;
-  // Chart'ı sıfırla ki bir sonraki hisse doğru yüklensin
-  // chart temizleme updateChart'ta yapılıyor
   if(allData.length) renderTable();
+}
+
+function detailNav(dir) {
+  if (!selSym || !filtered || !filtered.length) return;
+  var sorted_data = sorted(filtered);
+  var idx = sorted_data.findIndex(function(s){ return s.symbol === selSym; });
+  if (idx === -1) return;
+  var next = sorted_data[idx + dir];
+  if (next) showDetail(next.symbol);
+}
+
+function _updateDetailNavPos() {
+  var posEl = document.getElementById('dhead-pos');
+  if (!posEl || !selSym || !filtered || !filtered.length) return;
+  var sorted_data = sorted(filtered);
+  var idx = sorted_data.findIndex(function(s){ return s.symbol === selSym; });
+  posEl.textContent = (idx + 1) + ' / ' + sorted_data.length;
 }
 
 // ═══════════════════════════════════════════
@@ -3583,12 +4182,15 @@ function showState(id){
     el.style.display = s===id ? (s==='twrap'?'block':'flex') : 'none';
   });
   const smEl = document.getElementById('scan-summary');
-  if (smEl) smEl.style.display = id === 'twrap' ? 'grid' : 'none';
+  if (smEl) smEl.style.display = id === 'twrap' ? 'flex' : 'none';
   const nsbEl = document.getElementById('new-scan-btn');
   if (nsbEl) nsbEl.style.display = id === 'twrap' ? 'inline-flex' : 'none';
   const afwEl = document.getElementById('add-filter-wrap');
   if (afwEl) afwEl.style.display = id === 'twrap' ? 'inline-flex' : 'none';
   if (id !== 'twrap') closeFilterDropdown();
+  // Kolay görünümü twrap durumunu yansıtır
+  if (typeof _applyScanMode === 'function') _applyScanMode();
+  if (id === 'twrap' && _scanMode === 'kolay' && typeof renderKolay === 'function') renderKolay();
   // Loading/hata/boş durumda stats-bar da gizli — üst bar tek blok halinde değişir,
   // bayat değerler (önceki taramanın sayıları) loading sırasında görünmez
   if (id !== 'twrap') {
@@ -3767,7 +4369,7 @@ init();
       var inner = document.getElementById('profile-btn-inner');
       if (inner) {
         if (d.user.picture) {
-          inner.innerHTML = '<img class="pf-av" src="' + d.user.picture + '" alt="">';
+          inner.innerHTML = '<img class="pf-av" src="' + esc(safeUrl(d.user.picture)) + '" alt="">';
         } else {
           inner.textContent = (d.user.name || '?')[0].toUpperCase();
         }
@@ -3986,8 +4588,14 @@ function updateStatsBar() {
   // Toolbar'daki hisse-only butonları göster
   var tbFav = document.getElementById('tb-fav-btn');
   var tbCol = document.getElementById('tb-col-btn');
+  var tbDens = document.getElementById('density-toggle');
+  var tbExp = document.getElementById('tb-export-btn');
+  var tbSaved = document.getElementById('saved-scans-wrap');
   if (tbFav) tbFav.style.display = '';
   if (tbCol) tbCol.style.display = '';
+  if (tbDens) tbDens.style.display = 'flex';
+  if (tbExp) tbExp.style.display = '';
+  if (tbSaved) tbSaved.style.display = 'flex';
   var upCount = filtered.filter(function(s){ return s.changePercent > 0; }).length;
   var dnCount = filtered.filter(function(s){ return s.changePercent < 0; }).length;
   var ex = (typeof EXCHANGE_META !== 'undefined' ? EXCHANGE_META[currentExchange] : null) || {};
@@ -3999,7 +4607,7 @@ function updateStatsBar() {
   document.getElementById('sb-up').textContent = '▲ ' + upCount;
   document.getElementById('sb-dn').textContent = '▼ ' + dnCount;
   document.getElementById('sb-ex').textContent = ex.name || currentExchange.toUpperCase();
-  document.getElementById('sb-time').textContent = hh + ':' + mm + ':' + ss;
+  document.getElementById('sb-time').textContent = hh + ':' + mm;
 }
 
 function updateTicker() {
@@ -4140,7 +4748,7 @@ function showFooterModal(type) {
   </div>
 
   <div class="fbk-card">
-    <div class="fbk-card-header"><span class="fbk-chip">Güçlü Trendde</span><span class="fbk-tag">Minervini Template</span></div>
+    <div class="fbk-card-header"><span class="fbk-chip">Belirgin Trend</span><span class="fbk-tag">Minervini Template</span></div>
     <p>52 hafta düşüğünden %25+ yukarıda, 6 aylık getiri pozitif. Minervini'nin "Trend Template" kriterinin basitleştirilmiş versiyonu — sadece yapısal olarak güçlü hisseler taranır.</p>
     <div class="fbk-filters">52H düşüğünden %25+ · 6 ay getiri &gt; %10</div>
   </div>
@@ -4343,13 +4951,14 @@ function showToast(msg) {
   if(!t) {
     t = document.createElement('div');
     t.id = 'df-toast';
-    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid #2a2a2a;color:#ededed;font-size:12px;padding:10px 20px;border-radius:8px;z-index:9999;opacity:0;transition:opacity .2s;white-space:nowrap;font-family:DM Sans,sans-serif;';
+    t.className = 'df-toast';
     document.body.appendChild(t);
   }
   t.textContent = msg;
-  t.style.opacity = '1';
+  void t.offsetWidth; // reflow → yeniden gösterimde geçiş tetiklensin
+  t.classList.add('show');
   clearTimeout(t._timer);
-  t._timer = setTimeout(function(){ t.style.opacity = '0'; }, 3000);
+  t._timer = setTimeout(function(){ t.classList.remove('show'); }, 3000);
 }
 function showHomepage() {
   _doShowHomepage();
@@ -4367,6 +4976,7 @@ function _doShowHomepage() {
   clearFilters();
   var _hb = document.getElementById('hamburger-btn'); if(_hb) _hb.style.display = 'none';
   if(window.location.pathname !== '/') history.pushState({page:'home'}, '', '/');
+  if (typeof loadRecentScans === 'function') loadRecentScans();
 }
 
 // ── DISCLAIMER POPUP ──
@@ -4427,22 +5037,106 @@ function showScanSummary(total, matches) {
     var xBtn = (f.kind && f.key)
       ? '<span class="ssm-tag-x" onclick="removeScanFilter(\'' + f.kind + '\',\'' + f.key + '\')" title="Bu filtreyi kaldır">×</span>'
       : '';
-    return '<span class="ssm-tag">' + esc(f.label) + xBtn +
+    return '<span class="ssm-tag"' + (f.desc ? ' data-haspopup="1"' : '') + '>' + esc(f.label) + xBtn +
       (f.desc ? '<span class="ssm-tag-popup">' + esc(f.desc) + '</span>' : '') +
       '</span>';
   }).join('');
   el.innerHTML =
-    '<span class="ssm-left"></span>' +
-    '<span class="ssm-center ssm-tags-center">' + (tagsHtml || '<span class="ssm-no-filter">Filtresiz</span>') + '</span>' +
-    '<span class="ssm-right ssm-dur">' + elapsed + 's</span>';
-  // Tarandı/eşleşti bilgisi stats-bar'da GÜNCELLEME yanında
+    '<span class="ssm-left">' +
+      (tagsHtml
+        ? '<span class="ssm-flabel">Aktif filtre:</span>' + tagsHtml
+        : '<span class="ssm-no-filter">Filtresiz</span>') +
+    '</span>';
+  // Tarandı/eşleşti bilgisi meta barında
   var resItem = document.getElementById('sb-result-item');
   var resVal  = document.getElementById('sb-result');
   if (resItem && resVal) {
     resVal.innerHTML = total + ' tarandı · <span class="up">' + matches + ' eşleşti</span>';
     resItem.style.display = '';
   }
+  // Tarama süresi meta barının sonunda (… 16:34 · 3.0s)
+  var durItem = document.getElementById('sb-dur-item');
+  var durVal  = document.getElementById('sb-dur');
+  if (durItem && durVal && elapsed !== '—') {
+    durVal.textContent = elapsed + 's';
+    durItem.style.display = '';
+  }
+  _recordRecentScan(filters, total, matches);
 }
+
+// Site-geneli "Son Taramalar"a kaydet — yalnızca deep-linklenebilir (kind+key'li)
+// birincil filtresi olan BORSA taramaları (Pro hisse tarayıcı ile yeniden açılabilir)
+function _recordRecentScan(filters, total, matches) {
+  try {
+    var asset = (_activeAsset === 'kripto') ? 'kripto' : (_activeAsset === 'fon') ? 'fon' : 'borsa';
+    if (asset !== 'borsa') return;                 // şimdilik yalnız hisse taramaları
+    if (!total || total < 1) return;
+    // Yalnızca ANLAMLI filtreli tarama kaydet: eşleşen 1..total-1 arası olmalı.
+    // matches>=total → filtre etkisiz (tüm hisseler eşleşmiş); matches<1 → boş/loading.
+    var m = (matches != null ? matches : 0);
+    if (m < 1 || m >= total) return;
+    var primary = (filters || []).find(function(f) { return f.kind && f.key; });
+    if (!primary) return;                          // filtresiz/özel filtre → deep-link yok
+    var exMeta = (typeof EXCHANGE_META !== 'undefined' ? EXCHANGE_META[currentExchange] : null) || {};
+    fetch('/api/recent-scans', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        kind: primary.kind, k: primary.key, label: primary.label,
+        asset: asset, ex: currentExchange,
+        exLabel: exMeta.name || (currentExchange || '').toUpperCase(),
+        count: total, matched: (matches != null ? matches : 0)
+      })
+    }).catch(function() {});
+  } catch (e) {}
+}
+
+// Homepage "Son Taramalar" — site-geneli son taramaları çek, Kolay-stili kart olarak göster
+function loadRecentScans() {
+  var sec = document.getElementById('hpx-recent');
+  var grid = document.getElementById('hpx-recent-grid');
+  if (!sec || !grid) return;
+  fetch('/api/recent-scans').then(function(r) { return r.json(); }).then(function(d) {
+    var scans = (d && d.scans) || [];
+    if (!scans.length) { sec.style.display = 'none'; return; }
+    grid.innerHTML = scans.map(function(s) {
+      var assetLabel = s.asset === 'kripto' ? 'Kripto' : s.asset === 'fon' ? 'Fon' : 'Borsa';
+      var url = '/?strateji=' + encodeURIComponent(s.k) + (s.ex ? '&ex=' + encodeURIComponent(s.ex) : '');
+      var cnt = (parseInt(s.count, 10) || 0).toLocaleString('tr-TR');
+      var foundHtml = (s.matched != null)
+        ? '<span class="hrc-dot">·</span><span class="hrc-found">' + (parseInt(s.matched, 10) || 0).toLocaleString('tr-TR') + '</span><span>bulundu</span>'
+        : '';
+      return '<a class="hpx-rcard" href="' + url + '">' +
+        '<div class="hrc-name">' + esc(s.label) + '</div>' +
+        '<div class="hrc-meta"><span>' + esc(assetLabel) + '</span><span class="hrc-dot">·</span>' +
+          '<span class="hrc-ex">' + esc(s.exLabel || '') + '</span><span class="hrc-dot">·</span>' +
+          '<span class="hrc-count">' + cnt + '</span><span>tarandı</span>' + foundHtml + '</div>' +
+        '</a>';
+    }).join('');
+    sec.style.display = '';
+  }).catch(function() { sec.style.display = 'none'; });
+}
+
+// "Neden eşleşti": dokunmatik cihazda aktif-filtre etiketine dokununca lens
+// kriterleri popup'ını aç (hover yok). × (filtre kaldır) hariç tutulur.
+(function() {
+  document.addEventListener('click', function(e) {
+    if (!(window.matchMedia && window.matchMedia('(hover: none)').matches)) return;
+    if (e.target.closest('.ssm-tag-x')) return; // × kendi işini yapsın
+    var tag = e.target.closest('#scan-summary .ssm-tag[data-haspopup]');
+    // açık olan diğer ipuçlarını kapat
+    document.querySelectorAll('#scan-summary .ssm-tag.tip-open').forEach(function(t) {
+      if (t !== tag) t.classList.remove('tip-open');
+    });
+    if (!tag) return;
+    e.stopPropagation();
+    tag.classList.toggle('tip-open');
+    if (tag.classList.contains('tip-open')) {
+      clearTimeout(tag._tipTO);
+      tag._tipTO = setTimeout(function() { tag.classList.remove('tip-open'); }, 4500);
+    }
+  });
+})();
 
 // Özet barındaki × — filtreyi her iki paneldeki chip'lerden kaldırıp kalanlarla yeniden tarar
 function removeScanFilter(kind, key) {
@@ -4487,7 +5181,7 @@ function hideQuickScanPill() {
 
 // ── FİLTRE EKLE DROPDOWN — tablodan ayrılmadan chip seçimi ──
 var FD_GROUPS = [
-  { kind: 'goat',   title: 'Yatırımcı Stratejileri', containerId: 'goat-chips',   attr: 'data-goat' },
+  { kind: 'goat',   title: 'Yatırımcı Lensleri', containerId: 'goat-chips',   attr: 'data-goat' },
   { kind: 'preset', title: 'Temel Stratejiler',      containerId: 'presets',      attr: 'data-preset' },
   { kind: 'tech',   title: 'Teknik Stratejiler',     containerId: 'tech-presets', attr: 'data-tech' }
 ];
@@ -4497,11 +5191,16 @@ function toggleFilterDropdown(e) {
   var dd = document.getElementById('filter-dropdown');
   if (!dd) return;
   if (dd.style.display !== 'none') { closeFilterDropdown(); return; }
+  _fdOpenGroup = null; // her açılışta 3 başlık kapalı görünsün
   renderFilterDropdown();
   dd.style.display = 'block';
   var btn = document.getElementById('add-filter-btn');
   if (btn) btn.classList.add('open');
-  setTimeout(function() { document.addEventListener('click', _fdOutsideClick); }, 0);
+  // Capture fazında dinle: akordeon/chip tıklaması renderFilterDropdown ile
+  // innerHTML'i yeniden kurup tıklanan elemanı koparıyor; bubble fazında çalışan
+  // dışarı-tıklama kontrolü kopmuş elemanı "dışarıda" sanıp paneli kapatırdı.
+  // Capture rebuild'den ÖNCE çalışır → eleman hâlâ panelde → kapatmaz.
+  setTimeout(function() { document.addEventListener('click', _fdOutsideClick, true); }, 0);
 }
 
 function _fdOutsideClick(e) {
@@ -4514,7 +5213,38 @@ function closeFilterDropdown() {
   if (dd) dd.style.display = 'none';
   var btn = document.getElementById('add-filter-btn');
   if (btn) btn.classList.remove('open');
-  document.removeEventListener('click', _fdOutsideClick);
+  document.removeEventListener('click', _fdOutsideClick, true);
+}
+
+// ── Araçlar menüsü (toolbar) ──
+function _toolsOutsideClick(e) {
+  if (e.target.closest && e.target.closest('.tb-tools-wrap')) return;
+  closeToolsMenu();
+}
+function closeToolsMenu() {
+  var m = document.getElementById('tb-tools-menu');
+  if (m) m.style.display = 'none';
+  var t = document.getElementById('tb-tools-toggle');
+  if (t) t.classList.remove('open');
+  document.removeEventListener('click', _toolsOutsideClick);
+}
+function toggleToolsMenu(e) {
+  if (e) e.stopPropagation();
+  var m = document.getElementById('tb-tools-menu');
+  var t = document.getElementById('tb-tools-toggle');
+  if (!m) return;
+  if (m.style.display === 'block') { closeToolsMenu(); return; }
+  m.style.display = 'block';
+  if (t) t.classList.add('open');
+  setTimeout(function(){ document.addEventListener('click', _toolsOutsideClick); }, 0);
+}
+
+// Akordeon: aynı anda yalnızca bir kategori açık. null = hepsi kapalı.
+var _fdOpenGroup = null;
+
+function fdToggleGroup(kind) {
+  _fdOpenGroup = (_fdOpenGroup === kind) ? null : kind;
+  renderFilterDropdown();
 }
 
 function renderFilterDropdown() {
@@ -4526,21 +5256,31 @@ function renderFilterDropdown() {
     var dict = g.kind === 'goat' ? GURUS : g.kind === 'preset' ? PRESETS : TECH_PRESETS;
     var chips = document.querySelectorAll('#' + g.containerId + ' [' + g.attr + ']');
     if (!chips.length) return;
-    html += '<div class="fd-group-title">' + g.title + '</div><div class="fd-chips">';
-    var items = [];
+    var items = [], selCount = 0;
     chips.forEach(function(c) {
       var key = c.getAttribute(g.attr);
       var def = dict[key];
       // Goat chip'ler mini-card'a dönüştürülmüş olabilir — sadece isim span'ini al
       var nameEl = c.querySelector('.gcchip-name');
+      var on = c.classList.contains('on');
+      if (on) selCount++;
       items.push({
         key: key,
         label: (nameEl ? nameEl.textContent : c.textContent).trim(),
         desc: def && def.desc ? def.desc : '',
-        on: c.classList.contains('on')
+        on: on
       });
     });
     items.sort(function(a, b) { return a.label.localeCompare(b.label, 'tr'); });
+    var isOpen = _fdOpenGroup === g.kind;
+    html += '<button type="button" class="fd-acc' + (isOpen ? ' open' : '') + '" onclick="fdToggleGroup(\'' + g.kind + '\')">' +
+      '<span class="fd-acc-title">' + g.title + '</span>' +
+      '<span class="fd-acc-meta">' +
+        (selCount ? '<span class="fd-acc-sel">' + selCount + '</span>' : '') +
+        '<span class="fd-acc-n">' + items.length + '</span>' +
+        '<span class="fd-acc-arr">▾</span>' +
+      '</span></button>';
+    html += '<div class="fd-chips"' + (isOpen ? '' : ' style="display:none"') + '>';
     items.forEach(function(it) {
       var tip = it.desc ? ' title="' + esc(it.desc) + '"' : '';
       html += '<span class="fd-chip' + (it.on ? ' on' : '') + '"' + tip +
@@ -4571,9 +5311,32 @@ function fdToggleChip(kind, key, el) {
   window._quickRescan = true;
   window._quickRescanLabel = (wasOn ? '− ' : '+ ') + el.textContent.trim();
   _applyChips(BASIC_CHIP_CFG);
+  renderFilterDropdown(); // akordeon başlık sayaçlarını (seçili/toplam) tazele, açık kategori korunur
 }
 
 // ── MOBILE DRAWER ──
+// Drawer açıkken odağı içeride tut (a11y: focus-trap + Escape + odak geri yükleme)
+var _drawerPrevFocus = null;
+function _drawerFocusables(sidebar) {
+  var sel = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+  return Array.prototype.filter.call(sidebar.querySelectorAll(sel), function(el) {
+    // görünürlük: position:fixed drawer'da offsetParent güvenilmez → boyut/rect ile bak
+    return el.offsetWidth > 0 || el.offsetHeight > 0 || el.getClientRects().length > 0;
+  });
+}
+function _drawerKeydown(e) {
+  var sidebar = document.querySelector('.sidebar');
+  if (!sidebar || !sidebar.classList.contains('open')) return;
+  if (e.key === 'Escape') { e.preventDefault(); closeMobileDrawer(); return; }
+  if (e.key !== 'Tab') return;
+  var f = _drawerFocusables(sidebar);
+  if (!f.length) return;
+  var first = f[0], last = f[f.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  else if (!sidebar.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+}
+
 function toggleMobileDrawer() {
   var sidebar = document.querySelector('.sidebar');
   var overlay = document.getElementById('drawer-overlay');
@@ -4586,8 +5349,18 @@ function toggleMobileDrawer() {
   } else {
     sidebar.classList.add('open');
     if (overlay) overlay.classList.add('open');
-    if (btn) btn.classList.add('open');
+    if (btn) { btn.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); }
     document.body.style.overflow = 'hidden';
+    // a11y: modal dialog semantiği + focus-trap
+    sidebar.setAttribute('role', 'dialog');
+    sidebar.setAttribute('aria-modal', 'true');
+    _drawerPrevFocus = document.activeElement;
+    document.addEventListener('keydown', _drawerKeydown, true);
+    setTimeout(function() {
+      var f = _drawerFocusables(sidebar);
+      if (f.length) f[0].focus();
+      else { sidebar.setAttribute('tabindex', '-1'); sidebar.focus(); }
+    }, 60);
   }
 }
 
@@ -4597,8 +5370,18 @@ function closeMobileDrawer() {
   var btn     = document.getElementById('hamburger-btn');
   if (sidebar) sidebar.classList.remove('open');
   if (overlay) overlay.classList.remove('open');
-  if (btn)     btn.classList.remove('open');
+  if (btn) { btn.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
   document.body.style.overflow = '';
+  // a11y: dialog semantiğini geri al, focus-trap'i kaldır, odağı geri yükle
+  if (sidebar) {
+    sidebar.setAttribute('role', 'complementary');
+    sidebar.removeAttribute('aria-modal');
+  }
+  document.removeEventListener('keydown', _drawerKeydown, true);
+  if (_drawerPrevFocus && typeof _drawerPrevFocus.focus === 'function') {
+    _drawerPrevFocus.focus();
+    _drawerPrevFocus = null;
+  }
 }
 let disclaimerTimer = null;
 
@@ -4613,9 +5396,9 @@ function showDisclaimerModal() {
   const cdEl = document.getElementById('disclaimerCountdown');
   btn.disabled = true;
   btn.style.cursor = 'not-allowed';
-  btn.style.background = '#1a1a1a';
-  btn.style.color = '#555';
-  btn.style.borderColor = '#333';
+  btn.style.background = 'var(--s3)';
+  btn.style.color = 'var(--muted)';
+  btn.style.borderColor = 'var(--border)';
 
   disclaimerTimer = setInterval(function() {
     secs--;
@@ -4626,9 +5409,9 @@ function showDisclaimerModal() {
       cdEl.textContent = '';
       btn.disabled = false;
       btn.style.cursor = 'pointer';
-      btn.style.background = '#ededed';
-      btn.style.color = '#000';
-      btn.style.borderColor = '#ededed';
+      btn.style.background = 'var(--accent)';
+      btn.style.color = '#fff';
+      btn.style.borderColor = 'var(--accent)';
     }
   }, 1000);
 }
@@ -4647,7 +5430,7 @@ function showScreener() {
 function showScreenerOrPrescan() {
   // Prescan üstte açılacak; alttaki sidebar durumuna dokunma (geri dönüşte kayma olmasın)
   _doShowScreener(true);
-  openPrescanView();
+  openScanModeChoice();
 }
 function _doShowScreener(keepSidebar) {
   hideAnalizPage();
@@ -4684,42 +5467,46 @@ function selectExchangeAndGo(exKey) {
   if(btn) selectExchange(btn);
 }
 
+// Homepage "Borsalar" — ilk 5 + diğerleri aç/kapa
+function hpToggleEx() {
+  var ex = document.getElementById('hpx-ex-extra');
+  var btn = document.getElementById('hpx-ex-more');
+  if (!ex || !btn) return;
+  var hidden = getComputedStyle(ex).display === 'none';
+  ex.style.display = hidden ? 'grid' : 'none';
+  btn.textContent = hidden ? '− Daha Az' : '+ Diğer Borsalar';
+}
+
+// Homepage "Popüler Stratejiler" tab switch
+function hpStratTab(el, id) {
+  var tabs = el.parentElement.querySelectorAll('.hpx-tab');
+  for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('on');
+  el.classList.add('on');
+  ['goat', 'fund', 'tech'].forEach(function(x) {
+    var g = document.getElementById('hpx-sg-' + x);
+    if (g) g.style.display = (x === id) ? 'grid' : 'none';
+  });
+}
+
 function _track(type, key) {
   fetch('/api/track', { method:'POST', headers:{'Content-Type':'application/json'},
     body: JSON.stringify({type: type, key: key}) }).catch(function(){});
 }
 
-function applyStrategyAndGo(goatKey) {
-  _track('goat', goatKey);
-  clearFilters();
-  showScreener();
-  setTimeout(function(){
-    var chip = document.querySelector('#goat-chips .goat-chip[data-goat="' + goatKey + '"]');
-    if (chip) { chip.classList.add('on'); applyAllChips(); }
-    else runScan();
-  }, 150);
-}
+function applyStrategyAndGo(goatKey) { _track('goat', goatKey); _homeStrategy('goat', goatKey); }
+function applyPresetAndGo(presetKey) { _track('preset', presetKey); _homeStrategy('preset', presetKey); }
+function applyTechAndGo(techKey)     { _track('tech', techKey);    _homeStrategy('tech', techKey); }
 
-function applyPresetAndGo(presetKey) {
-  _track('preset', presetKey);
-  clearFilters();
+// Anasayfa hazır filtreleri — tarayıcıyı aç, sonra KANITLANMIŞ quickGoat/quickScan
+// ile filtreyi DOĞRUDAN veri sözlüğünden uygula. Önceki sürüm chip render/timing
+// yarışına ve yanlış selektöre (.tech-chip) takılıp bazen filtresiz tarıyordu
+// (→ "607 bulundu" gibi tutarsız sonuçlar). Artık tek, filtreli tarama.
+function _homeStrategy(kind, key) {
   showScreener();
-  setTimeout(function(){
-    var chip = document.querySelector('#presets .chip[data-preset="' + presetKey + '"]');
-    if (chip) { chip.classList.add('on'); applyAllChips(); }
-    else runScan();
-  }, 150);
-}
-
-function applyTechAndGo(techKey) {
-  _track('tech', techKey);
-  clearFilters();
-  showScreener();
-  setTimeout(function(){
-    var chip = document.querySelector('#tech-presets .tech-chip[data-tech="' + techKey + '"]');
-    if (chip) { chip.classList.add('on'); applyAllChips(); }
-    else runScan();
-  }, 150);
+  setTimeout(function() {
+    if (kind === 'goat') quickGoat(key);
+    else quickScan(key); // quickScan hem preset hem tech anahtarını işler
+  }, 80);
 }
 
 
@@ -4751,6 +5538,16 @@ function applyTechAndGo(techKey) {
   document.addEventListener('mouseout',function(e){
     if(e.target.closest('th[data-tip]')&&el())el().style.display='none';
   });
+  // Dokunmatik (hover yok): başlığa tap → kolon açıklamasını kısa süre göster (sıralamayı engellemez)
+  var _thTO=null;
+  document.addEventListener('click',function(e){
+    if(!(window.matchMedia&&window.matchMedia('(hover: none)').matches))return;
+    var th=e.target.closest('th[data-tip]');if(!th)return;
+    var d=el();if(!d)return;
+    d.innerHTML=th.getAttribute('data-tip');d.style.display='block';
+    var r=th.getBoundingClientRect();pos(r.left+r.width/2,r.bottom);
+    clearTimeout(_thTO);_thTO=setTimeout(function(){if(el())el().style.display='none';},2600);
+  });
 })();
 
 // Start on homepage
@@ -4759,25 +5556,73 @@ function applyTechAndGo(techKey) {
 // ── Klavye Navigasyonu ────────────────────────────────────────
 function _initKeyboardNav() {
   // Tüm chip'lere tabindex + role ekle (keyboard focus desteği)
-  document.querySelectorAll('.chip,.goat-chip,.exbtn').forEach(function(el) {
+  document.querySelectorAll('.chip,.goat-chip,.exbtn,.hpx-spill,.tlogo').forEach(function(el) {
     if (!el.hasAttribute('tabindex')) {
       el.setAttribute('tabindex', '0');
       if (!el.getAttribute('role')) el.setAttribute('role', 'button');
     }
   });
 
-  // Enter/Space ile chip/button aktivasyonu
   document.addEventListener('keydown', function(e) {
     var el = e.target;
+    var tag = el.tagName;
+    var inInput = tag === 'INPUT' || tag === 'TEXTAREA' || el.isContentEditable;
+
+    // Bloomberg shortcut: '/' focuses symbol search
+    if (e.key === '/' && !inInput && !e.ctrlKey && !e.metaKey) {
+      var si = document.getElementById('sb-searchbox');
+      if (si) { e.preventDefault(); si.focus(); si.select(); }
+      return;
+    }
+
+    // '?' — keyboard shortcut help overlay
+    if ((e.key === '?' || (e.key === '/' && e.shiftKey)) && !inInput) {
+      e.preventDefault();
+      _toggleShortcutHelp();
+      return;
+    }
+
+    // Single-key nav shortcuts (only when not in input)
+    if (!inInput && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      // S → Screener/Tarayıcı
+      if (e.key === 's' || e.key === 'S') {
+        var sl = document.getElementById('screener-layout');
+        var hp = document.getElementById('homepage');
+        if (hp && hp.style.display !== 'none') { e.preventDefault(); showScreenerOrPrescan(); return; }
+      }
+      // H → Homepage/Anasayfa
+      if (e.key === 'h' || e.key === 'H') {
+        var hp2 = document.getElementById('homepage');
+        if (hp2 && hp2.style.display === 'none') { e.preventDefault(); showHomepage(); return; }
+      }
+      // T → Toggle theme
+      if (e.key === 't' || e.key === 'T') {
+        e.preventDefault();
+        toggleTheme();
+        return;
+      }
+      // D → Close detail panel
+      if (e.key === 'd' || e.key === 'D') {
+        var det = document.getElementById('detail');
+        if (det && det.classList.contains('open')) { e.preventDefault(); closeDetail(); return; }
+      }
+      // F → Focus on favori tab
+      if (e.key === 'f' || e.key === 'F') {
+        var favBtn = document.querySelector('.exbtn[data-exchange="fav"]');
+        if (favBtn) { e.preventDefault(); favBtn.click(); return; }
+      }
+    }
+
+    // Enter/Space ile chip/button aktivasyonu
     if (e.key === 'Enter' || e.key === ' ') {
-      if (el.classList.contains('chip') || el.classList.contains('goat-chip') || el.classList.contains('exbtn')) {
+      if (el.classList.contains('chip') || el.classList.contains('goat-chip') || el.classList.contains('exbtn') || el.classList.contains('hpx-spill') || el.classList.contains('tlogo') || (el.tagName === 'TH' && el.hasAttribute('onclick'))) {
         e.preventDefault();
         el.click();
         return;
       }
     }
     // Tablo satırları: ok tuşlarıyla navigasyon
-    if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && el.tagName === 'TR') {
+    if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && tag === 'TR') {
       e.preventDefault();
       var tbody = el.closest('tbody');
       if (!tbody) return;
@@ -4787,10 +5632,224 @@ function _initKeyboardNav() {
       if (next) { next.setAttribute('tabindex', '-1'); next.focus(); }
     }
     // Enter ile satır açma
-    if (e.key === 'Enter' && el.tagName === 'TR') {
+    if (e.key === 'Enter' && tag === 'TR') {
       el.click();
     }
+    // Escape: search temizle, detail kapat veya shortcut help kapat
+    if (e.key === 'Escape') {
+      var shm = document.getElementById('shortcut-help-modal');
+      if (shm && shm.classList.contains('open')) { shm.classList.remove('open'); return; }
+      var si = document.getElementById('sb-searchbox');
+      if (si && si === document.activeElement) { si.value = ''; si.dispatchEvent(new Event('input')); si.blur(); return; }
+      var det2 = document.getElementById('detail');
+      if (det2 && det2.classList.contains('open')) { closeDetail(); return; }
+    }
+    // ← → detail panel navigation
+    if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && !inInput && !e.ctrlKey && !e.metaKey) {
+      var det3 = document.getElementById('detail');
+      if (det3 && det3.classList.contains('open')) {
+        e.preventDefault();
+        detailNav(e.key === 'ArrowRight' ? 1 : -1);
+        return;
+      }
+    }
   });
+}
+
+// ── Saved Scan Templates ─────────────────────────────────────
+function _getSavedScans() {
+  try { return JSON.parse(localStorage.getItem('df_saved_scans') || '[]'); } catch(e){ return []; }
+}
+function _putSavedScans(arr) {
+  try { localStorage.setItem('df_saved_scans', JSON.stringify(arr)); } catch(e){}
+}
+function saveCurrentScan() {
+  // Collect current state
+  var goats = [], presets = [], techs = [], inputs = {};
+  document.querySelectorAll('#goat-chips .goat-chip.on').forEach(function(c){ if(c.dataset.goat) goats.push(c.dataset.goat); });
+  document.querySelectorAll('#presets .chip.on').forEach(function(c){ if(c.dataset.preset) presets.push(c.dataset.preset); });
+  document.querySelectorAll('#tech-presets .chip.on').forEach(function(c){ if(c.dataset.tech) techs.push(c.dataset.tech); });
+  document.querySelectorAll('.finps input, #hisse-hidden-filters input').forEach(function(i){ if(i.value) inputs[i.id] = i.value; });
+  var sf = document.getElementById('sector_filter'); if(sf && sf.value) inputs.sector_filter = sf.value;
+  if (!goats.length && !presets.length && !techs.length && !Object.keys(inputs).length) {
+    alert('Kaydedilecek filtre yok. Önce bir tarama çalıştır.'); return;
+  }
+  var name = prompt('Bu taramaya bir isim ver:', (_scanMeta && _scanMeta.strategy) || 'Özel Tarama');
+  if (!name) return;
+  var scans = _getSavedScans();
+  scans.unshift({ id: Date.now(), name: name, exchange: currentExchange, goats: goats, presets: presets, techs: techs, inputs: inputs, ts: Date.now() });
+  scans = scans.slice(0, 20);
+  _putSavedScans(scans);
+  // Visual feedback
+  var btn = document.querySelector('.tb-save-btn');
+  if (btn) { var orig = btn.textContent; btn.textContent = '✓ Kaydedildi'; setTimeout(function(){ btn.textContent = orig; }, 1500); }
+}
+function openSavedScans() {
+  var modal = document.getElementById('saved-scans-modal');
+  var list = document.getElementById('ssm-list');
+  var empty = document.getElementById('ssm-empty');
+  if (!modal) return;
+  var scans = _getSavedScans();
+  if (!scans.length) { list.innerHTML = ''; empty.style.display = ''; }
+  else {
+    empty.style.display = 'none';
+    var ex_names = { bist:'BIST', nasdaq:'NASDAQ', nyse:'NYSE', sp500:'S&P500', dax:'DAX', lse:'LSE', nikkei:'NIKKEI', kucuk:'Küçük BIST' };
+    list.innerHTML = scans.map(function(sc) {
+      var tags = [].concat(
+        sc.goats.map(function(k){ return '<span class="ssm-tag ssm-goat">'+(GURUS[k]?GURUS[k].label.split(' — ')[0].split(' (')[0]:k)+'</span>'; }),
+        sc.presets.map(function(k){ return '<span class="ssm-tag ssm-preset">'+(PRESETS[k]?PRESETS[k].label:k)+'</span>'; }),
+        sc.techs.map(function(k){ return '<span class="ssm-tag ssm-tech">'+(TECH_PRESETS[k]?TECH_PRESETS[k].label:k)+'</span>'; })
+      ).join('');
+      var date = new Date(sc.ts).toLocaleDateString('tr-TR', {day:'2-digit',month:'short'});
+      return '<div class="ssm-item">'+
+        '<div class="ssm-item-head">'+
+          '<span class="ssm-item-name">'+esc(sc.name)+'</span>'+
+          '<span class="ssm-item-ex">'+(ex_names[sc.exchange]||sc.exchange.toUpperCase())+'</span>'+
+          '<span class="ssm-item-date">'+date+'</span>'+
+          '<button class="ssm-del-btn" onclick="deleteSavedScan('+sc.id+',event)" title="Sil">✕</button>'+
+        '</div>'+
+        '<div class="ssm-item-tags">'+tags+'</div>'+
+        '<button class="ssm-run-btn" onclick="runSavedScan('+sc.id+')">▶ Çalıştır</button>'+
+        '</div>';
+    }).join('');
+  }
+  modal.style.display = 'flex';
+}
+function closeSavedScans() {
+  var m = document.getElementById('saved-scans-modal');
+  if (m) m.style.display = 'none';
+}
+function deleteSavedScan(id, e) {
+  if (e) e.stopPropagation();
+  var scans = _getSavedScans().filter(function(sc){ return sc.id !== id; });
+  _putSavedScans(scans);
+  openSavedScans();
+}
+function runSavedScan(id) {
+  var sc = _getSavedScans().find(function(s){ return s.id === id; });
+  if (!sc) return;
+  closeSavedScans();
+  // Set exchange
+  if (sc.exchange && sc.exchange !== currentExchange) {
+    currentExchange = sc.exchange;
+    document.querySelectorAll('.exbtn').forEach(function(b){ b.classList.toggle('on', b.dataset.exchange === sc.exchange); });
+  }
+  // Clear and restore chips
+  document.querySelectorAll('#goat-chips .goat-chip.on, #presets .chip.on, #tech-presets .chip.on').forEach(function(c){ c.classList.remove('on'); });
+  sc.goats.forEach(function(k){ var c=document.querySelector('#goat-chips .goat-chip[data-goat="'+k+'"]'); if(c) c.classList.add('on'); });
+  sc.presets.forEach(function(k){ var c=document.querySelector('#presets .chip[data-preset="'+k+'"]'); if(c) c.classList.add('on'); });
+  sc.techs.forEach(function(k){ var c=document.querySelector('#tech-presets .chip[data-tech="'+k+'"]'); if(c) c.classList.add('on'); });
+  // Restore inputs
+  document.querySelectorAll('.finps input, #hisse-hidden-filters input').forEach(function(i){ i.value = sc.inputs[i.id] || ''; });
+  var sf = document.getElementById('sector_filter'); if(sf) sf.value = sc.inputs.sector_filter || '';
+  _applyChips(BASIC_CHIP_CFG);
+}
+
+// ── Scan History ─────────────────────────────────────────────
+function _saveScanHistory(resultCount) {
+  if (!_scanMeta || !_scanMeta.exchange) return;
+  var strategy = _scanMeta.strategy;
+  if (!strategy && resultCount === 0) return;
+  var entry = {
+    ts: Date.now(),
+    exchange: _scanMeta.exchange,
+    strategy: strategy || 'Özel Filtre',
+    count: resultCount,
+    filters: (_scanMeta.filters || []).map(function(f){ return { kind: f.kind, key: f.key, label: f.label }; })
+  };
+  var hist = _getScanHistory();
+  // Remove duplicate same strategy+exchange
+  hist = hist.filter(function(h){ return !(h.exchange === entry.exchange && h.strategy === entry.strategy); });
+  hist.unshift(entry);
+  hist = hist.slice(0, 5);
+  try { localStorage.setItem('df_scan_hist', JSON.stringify(hist)); } catch(e){}
+}
+function _getScanHistory() {
+  try { return JSON.parse(localStorage.getItem('df_scan_hist') || '[]'); } catch(e){ return []; }
+}
+function _renderScanHistory() {
+  var hist = _getScanHistory();
+  if (!hist.length) return '';
+  var ex_names = { bist:'BIST', nasdaq:'NASDAQ', nyse:'NYSE', sp500:'S&P500', dax:'DAX', lse:'LSE', nikkei:'NIKKEI', kucuk:'Küçük BIST' };
+  var rows = hist.map(function(h, i) {
+    var ago = Math.round((Date.now() - h.ts) / 60000);
+    var agoTxt = ago < 60 ? ago + ' dk önce' : Math.round(ago/60) + ' sa önce';
+    var filterHtml = h.filters && h.filters.length
+      ? h.filters.map(function(f){ return '<span class="sh-tag sh-tag-'+f.kind+'">'+esc(f.label)+'</span>'; }).join('')
+      : '<span class="sh-tag">Özel</span>';
+    var canRerun = h.filters && h.filters.length;
+    return '<div class="sh-item' + (canRerun ? ' sh-clickable' : '') + '" data-hidx="'+i+'" onclick="_shItemClick(this)">'
+      +'<div class="sh-meta"><span class="sh-ex">'+(ex_names[h.exchange]||h.exchange.toUpperCase())+'</span><span class="sh-count">'+h.count+' sonuç</span><span class="sh-ago">'+agoTxt+'</span></div>'
+      +'<div class="sh-tags">'+filterHtml+'</div>'
+      +'</div>';
+  }).join('');
+  return '<div class="scan-history"><div class="sh-title">SON TARAMALAR</div>'+rows+'</div>';
+}
+function _shItemClick(el) {
+  var idx = parseInt(el.dataset.hidx, 10);
+  var hist = _getScanHistory();
+  var h = hist[idx];
+  if (!h || !h.filters || !h.filters.length) return;
+  rerunScan(h);
+}
+function rerunScan(entry) {
+  // Navigate to screener
+  var hp = document.getElementById('homepage');
+  if (hp && hp.style.display !== 'none') showScreener();
+  var pv = document.getElementById('prescan-view');
+  if (pv) pv.style.display = 'none';
+  // Clear all chips
+  document.querySelectorAll('#goat-chips .goat-chip.on, #presets .chip.on, #tech-presets .chip.on').forEach(function(c){ c.classList.remove('on'); });
+  document.querySelectorAll('.finps input, #hisse-hidden-filters input').forEach(function(i){ i.value = ''; });
+  // Re-apply filters
+  (entry.filters || []).forEach(function(f) {
+    if (f.kind === 'goat') {
+      var chip = document.querySelector('#goat-chips .goat-chip[data-goat="'+f.key+'"]');
+      if (chip) chip.classList.add('on');
+    } else if (f.kind === 'preset') {
+      var chip = document.querySelector('#presets .chip[data-preset="'+f.key+'"]');
+      if (chip) chip.classList.add('on');
+    } else if (f.kind === 'tech') {
+      var chip = document.querySelector('#tech-presets .chip[data-tech="'+f.key+'"]');
+      if (chip) chip.classList.add('on');
+    }
+  });
+  _applyChips(BASIC_CHIP_CFG);
+}
+
+// ── Keyboard Shortcut Help Overlay ──
+function _toggleShortcutHelp() {
+  var m = document.getElementById('shortcut-help-modal');
+  if (!m) {
+    m = document.createElement('div');
+    m.id = 'shortcut-help-modal';
+    m.className = 'shortcut-help-modal';
+    m.innerHTML =
+      '<div class="shm-inner">'+
+      '<div class="shm-head"><span class="shm-title">Klavye Kısayolları</span><button class="shm-close" onclick="document.getElementById(\'shortcut-help-modal\').classList.remove(\'open\')">✕</button></div>'+
+      '<div class="shm-grid">'+
+      '<div class="shm-section"><div class="shm-section-title">Navigasyon</div>'+
+      '<div class="shm-row"><kbd>/</kbd><span>Sembol ara</span></div>'+
+      '<div class="shm-row"><kbd>S</kbd><span>Tarayıcı\'ya git</span></div>'+
+      '<div class="shm-row"><kbd>H</kbd><span>Anasayfaya git</span></div>'+
+      '<div class="shm-row"><kbd>T</kbd><span>Tema değiştir</span></div>'+
+      '</div>'+
+      '<div class="shm-section"><div class="shm-section-title">Tablo & Detay</div>'+
+      '<div class="shm-row"><kbd>↑</kbd><kbd>↓</kbd><span>Satır seç</span></div>'+
+      '<div class="shm-row"><kbd>Enter</kbd><span>Detay aç</span></div>'+
+      '<div class="shm-row"><kbd>←</kbd><kbd>→</kbd><span>Önceki / Sonraki</span></div>'+
+      '<div class="shm-row"><kbd>D</kbd><span>Detay kapat</span></div>'+
+      '<div class="shm-row"><kbd>F</kbd><span>Favoriler</span></div>'+
+      '</div>'+
+      '<div class="shm-section"><div class="shm-section-title">Genel</div>'+
+      '<div class="shm-row"><kbd>Esc</kbd><span>Kapat / Temizle</span></div>'+
+      '<div class="shm-row"><kbd>?</kbd><span>Bu yardım</span></div>'+
+      '</div>'+
+      '</div></div>';
+    m.addEventListener('click', function(e){ if (e.target === m) m.classList.remove('open'); });
+    document.body.appendChild(m);
+  }
+  m.classList.toggle('open');
 }
 
 // ── Favori Toplam Sayısı (Item 12 — birleştirme yardımcısı) ──
@@ -4814,8 +5873,11 @@ window.addEventListener('popstate', function(e) {
 // ─────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function(){
   _initTheme();
+  _startIndicesTicker();
   _initWorker();
   _initKeyboardNav();
+  if (typeof loadRecentScans === 'function') loadRecentScans();
+  _initDensity();
   _updateFavBadge();
   _updateOnboarding(null); // Varsayılan: genel onboarding
   // Sidebar borsa chiplerine hover açıklaması
@@ -4859,7 +5921,7 @@ document.addEventListener('DOMContentLoaded', function(){
   var _investor = _sp.get('investor');
   if (_p === 'profile' || _p === 'screener' || _p === 'analiz' || _path === '/screener' || _hasWl) {
     showScreener();
-    if (!_investor && allData.length === 0 && !_hasWl) openPrescanView();
+    if (!_investor && allData.length === 0 && !_hasWl) openScanModeChoice();
   } else {
     showHomepage();
   }
@@ -4889,9 +5951,29 @@ document.addEventListener('DOMContentLoaded', function(){
       }, 300);
     }
   }
-  var total = document.querySelectorAll('[data-goat],[data-preset],[data-tech]').length;
+  // Bilgi Bankası "stratejiyi dene" + Son Taramalar derin bağlantısı: ?strateji=KEY (&ex=BORSA)
+  var _strat = _sp.get('strateji');
+  if (_strat) {
+    var _stratEx = (_sp.get('ex') || '').toLowerCase();
+    setTimeout(function(){
+      // İstenen borsayı seç (varsa) — runScan tetiklemeden doğrudan, strateji uygulanınca taranır
+      if (_stratEx) {
+        var exb = document.querySelector('.exbtn[data-exchange="' + _stratEx + '"]');
+        if (exb && !exb.classList.contains('on')) {
+          document.querySelectorAll('.exbtn').forEach(function(b){ b.classList.remove('on'); });
+          exb.classList.add('on');
+          currentExchange = _stratEx;
+        }
+      }
+      if (typeof GURUS !== 'undefined' && GURUS[_strat] && typeof applyStrategyAndGo === 'function') applyStrategyAndGo(_strat);
+      else if (typeof PRESETS !== 'undefined' && PRESETS[_strat] && typeof applyPresetAndGo === 'function') applyPresetAndGo(_strat);
+      else if (typeof TECH_PRESETS !== 'undefined' && TECH_PRESETS[_strat] && typeof applyTechAndGo === 'function') applyTechAndGo(_strat);
+    }, 200);
+  }
+  // Filtre & Strateji toplamı = tüm strateji/lens chip'leri + 34 filtre kriteri
+  var total = document.querySelectorAll('[data-goat],[data-preset],[data-tech]').length + 34;
   var el = document.querySelector('[data-strat-count]');
-  if(el) el.innerHTML = total + ' <span>strateji</span>';
+  if(el) el.textContent = total + '+';
   upgradeGoatChips();
 });
 
@@ -4912,12 +5994,14 @@ function toggleSidebar() {
 
 function initSidebarState() {
   if (window.innerWidth <= 768) { closeMobileDrawer(); return; }
+  // Varsayılan: sol filtre paneli GİZLİ (collapsed) — sonuçlara tam alan.
+  // #sb-reopen sekmesiyle istendiğinde açılır (borsa/sektör/lens erişimi korunur).
   var sb         = document.getElementById('sidebar');
   var reopen     = document.getElementById('sb-reopen');
   var tickerWrap = document.getElementById('ticker-wrap');
-  if (sb)         sb.classList.remove('collapsed');
-  if (reopen)     reopen.style.display = 'none';
-  if (tickerWrap) tickerWrap.classList.remove('sb-open');
+  if (sb)         sb.classList.add('collapsed');
+  if (reopen)     reopen.style.display = 'flex';
+  if (tickerWrap) tickerWrap.classList.add('sb-open');
 }
 function collapseSidebar(instant) {
   if (window.innerWidth <= 768) return;

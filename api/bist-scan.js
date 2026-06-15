@@ -312,7 +312,6 @@ module.exports = async function handler(req, res) {
     console.error('[bist-scan] Error:', err.message);
     return res.status(500).json({
       error:    'İş Yatırım veri çekme hatası',
-      detail:   err.message,
       fallback: true
     });
   }

@@ -26,40 +26,37 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
 <link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
 <link rel="apple-touch-icon" href="/icons/icon-180.png">
-<script>(function(){try{var t=localStorage.getItem('df_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})()</script>
+<script>(function(){try{var t=localStorage.getItem('df_theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})()</script>
+<script src="/i18n.js?v=6" defer></script>
+<script src="/auth-header.js?v=2" defer></script>
+<link rel="stylesheet" href="/deepfin.css?v=warm39">
 <style>
 /* ── Tokens (light default, dark override) ── */
 :root{
-  --bg:#f4f7fc;--s1:#fff;--s2:#f0f4fb;--s3:#e8eef8;--border:#dde5f0;--border2:#c8d5eb;
-  --text:#0f172a;--text2:#334155;--muted:#94a3b8;--muted2:#64748b;
-  --accent:#3b82f6;--green:#16a34a;--red:#dc2626;--yellow:#d97706;
-  --r:8px;--r2:12px;--r-pill:20px;
-  --topbar-h:52px;
+  --bg:#FAFAF7;--s1:#FFFFFF;--s2:#FFFFFF;--s3:#F5F5F2;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.13);
+  --text:#111210;--text2:#6B6B68;--muted:#A3A39F;--muted2:#6E6E6B;
+  --accent:#1E293B;--accent2:rgba(30,41,59,.08);--green:#16a34a;--red:#dc2626;--yellow:#D97706;--gold:#D97706;
+  --r:9px;--r2:12px;--r-pill:9999px;--topbar-h:52px;
 }
 [data-theme="dark"]{
-  --bg:#0A0E14;--s1:#0f1520;--s2:#141d2b;--s3:#1a2435;--border:#1e2d42;--border2:#253548;
-  --text:#e8edf5;--text2:#c5cfe0;--muted:#6b7fa0;--muted2:#8a9bbf;
-  --accent:#3b82f6;--green:#22c55e;--red:#ef4444;--yellow:#f59e0b;
+  --bg:#0d1117;--s1:#161b22;--s2:#1c2128;--s3:#21262d;--border:#30363d;--border2:#484f58;
+  --text:#e6edf3;--text2:#8b949e;--muted:#6e7681;--muted2:#8b949e;
+  --accent:#6e86ac;--accent2:rgba(110,134,172,.18);--green:#3fb950;--red:#f85149;--yellow:#f0b429;--gold:#f0b429;
 }
+.lang-toggle{display:inline-flex;border:1px solid var(--border2);border-radius:7px;overflow:hidden;flex-shrink:0;}
+.lang-toggle-btn{font-family:'Inter',sans-serif;font-size:11px;font-weight:700;padding:5px 9px;background:transparent;color:var(--text2);border:none;cursor:pointer;transition:all .12s;}
+.lang-toggle-btn:hover{color:var(--accent);}
+.lang-toggle-btn.on{background:var(--accent);color:#fff;}
 
 *{box-sizing:border-box;margin:0;padding:0;}
 html{background:var(--bg);}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;display:flex;flex-direction:column;}
+/* deepfin.css SPA kabuğu html,body'ye overflow:hidden+height:100% koyuyor — bu
+   normal kaydırmalı doküman olduğu için ez (yoksa sayfa aşağı kaymıyor) */
+html,body{height:auto !important;overflow-y:auto !important;overflow-x:hidden !important;}
 
 /* ── Topbar ── */
-.topbar{height:var(--topbar-h);background:var(--s1);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;padding:0 18px;position:sticky;top:0;z-index:100;}
-.tlogo{display:flex;align-items:center;gap:6px;font-size:15px;font-weight:700;letter-spacing:-.3px;text-decoration:none;color:var(--text);cursor:pointer;}
-.tlogo-mark{width:22px;height:22px;background:var(--accent);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;}
-.tlive{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--green);}
-.tlive::before{content:'';width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s ease infinite;}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
-.hp-nav-btn{font-size:13px;font-weight:500;color:var(--muted2);text-decoration:none;padding:6px 12px;border-radius:var(--r);transition:color .15s,background .15s;white-space:nowrap;}
-.hp-nav-btn:hover{color:var(--text);}
-.hp-nav-btn.active{color:var(--accent);}
-.tright{margin-left:auto;display:flex;align-items:center;gap:6px;}
-.topbarbtn{background:none;border:1px solid var(--border);border-radius:var(--r);padding:5px 11px;font-size:11.5px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .15s;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:5px;}
-.topbarbtn:hover{border-color:var(--accent);color:var(--accent);}
-.supportbtn{gap:5px;}
+/* header stilleri deepfin.css'ten geliyor */
 
 /* ── Hero ── */
 .hero{text-align:center;padding:48px 20px 28px;}
@@ -87,7 +84,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 .ps-asset-name{font-size:12px;font-weight:700;color:var(--text2);white-space:nowrap;}
 .ps-asset-badge{font-size:9px;font-weight:700;color:#fff;background:var(--muted);padding:2px 6px;border-radius:10px;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0;}
 /* Borsa kart grid */
-.ps-ex-grid{display:flex;flex-wrap:wrap;gap:10px;}
+
+.ps-ex-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
+.ps-section-hd{justify-content:center;}
+.ps-asset-wrap{justify-content:center;}
+.ps-asset-row{justify-content:center;}
+.ps-ex-section-center{text-align:center;}
 .ps-ex-extra{margin-top:10px;}
 .ps-ex-extra[hidden]{display:none;}
 .ps-ex-btn{display:flex;flex-direction:column;align-items:center;gap:7px;padding:14px 20px;background:var(--s1);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .15s;min-width:84px;font-family:inherit;}
@@ -95,8 +97,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 .ps-ex-btn.on{border-color:var(--accent);background:color-mix(in srgb, var(--accent) 10%, transparent);box-shadow:0 0 0 1px var(--accent) inset;}
 .ps-ex-flag-img{width:36px;height:auto;border-radius:3px;display:block;box-shadow:0 0 0 1px rgba(0,0,0,.10);}
 .ps-ex-flag-emoji{font-size:28px;line-height:1;}
-.ps-ex-name{font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;}
+.ps-ex-name{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;}
+.ps-ex-country{font-size:10px;font-weight:500;color:var(--muted2);white-space:nowrap;}
 .ps-ex-btn.on .ps-ex-name{color:var(--accent);}
+.ps-ex-btn{gap:6px;padding:12px 18px;}
 .ps-show-more{margin-top:12px;background:none;border:none;color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;padding:4px 0;display:inline-flex;align-items:center;gap:4px;}
 .ps-show-more:hover{text-decoration:underline;}
 
@@ -211,60 +215,63 @@ footer a:hover{color:var(--text2);}
 <body>
 
 <!-- ── TOPBAR ── -->
-<div class="topbar">
-  <a href="/" class="tlogo"><div class="tlogo-mark">D</div>DeepFin</a>
-  <span class="tlive">Canlı</span>
-  <a href="/" class="hp-nav-btn">Anasayfa</a>
-  <a href="/" class="hp-nav-btn">Tarayıcı</a>
-  <a href="/analiz/" class="hp-nav-btn">Analiz</a>
-  <span class="hp-nav-btn active">Stratejiler</span>
+<div class="topbar" role="banner">
+  <div class="tleft">
+    <a href="/" class="tlogo" style="text-decoration:none;color:inherit"><span class="tlogo-mark"></span>DeepFin</a>
+    <span class="tlive">Canlı</span>
+  </div>
+  <nav class="tnav">
+    <a href="/" class="hp-nav-btn" data-i18n="nav.home">Anasayfa</a>
+    <a href="/screener" class="hp-nav-btn" data-i18n="nav.scanner">Tarayıcı</a>
+    <a href="/analiz/" class="hp-nav-btn" data-i18n="nav.analysis">Analiz</a>
+    <a href="/stratejiler/" class="hp-nav-btn active" data-i18n="nav.strategies">Stratejiler</a>
+    <a href="/bilgi/" class="hp-nav-btn" data-i18n="nav.learn">Bilgi Bankası</a>
+  </nav>
   <div class="tright">
-    <button class="topbarbtn theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir">☾</button>
-    <a href="/profil" class="topbarbtn" title="Profilim">👤 <span class="btn-lbl">Profil</span></a>
+    <div class="lang-toggle" role="group" aria-label="Dil / Language">
+      <button class="lang-toggle-btn" data-lang-btn="tr" onclick="dfSetLang('tr')">TR</button>
+      <button class="lang-toggle-btn" data-lang-btn="en" onclick="dfSetLang('en')">EN</button>
+    </div>
+    <button class="topbarbtn theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir" aria-label="Karanlık/Açık mod geçiş">☾</button>
+    <button class="auth-btn auth-ghost df-auth-out" onclick="location.href='/profil'" data-i18n="auth.login">Giriş Yap</button>
+    <button class="auth-btn auth-primary df-auth-out" onclick="location.href='/profil'" data-i18n="auth.register">Kayıt Ol</button>
+    <a href="/profil" id="profile-btn" class="auth-btn auth-primary df-auth-in" title="Profilim" style="display:none"><span id="profile-btn-inner" class="df-auth-av"></span><span data-i18n="auth.profile">Profil</span></a>
     <button class="topbarbtn supportbtn" onclick="window.open('https://buymeacoffee.com/deepfin','_blank')">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-      <span class="btn-lbl">Destek Ol</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+      <span data-i18n="auth.support">Destek Ol</span>
     </button>
   </div>
 </div>
 
 <!-- ── HERO ── -->
 <div class="hero">
-  <div class="hero-badge">📊 STRATEJİ KARŞILAŞTIRMA</div>
-  <h1>Hangi Strateji <span>Ne Kadar Kazandırdı?</span></h1>
-  <p class="hero-sub">Büyüme, değer, temettü ve 50+ stratejinin filtre kriterlerinden geçen hisselerin son 1–6 ay ortalama getirisini gerçek piyasa verisiyle karşılaştır.</p>
+  <div class="hero-badge" data-i18n="sp.badge">STRATEJİ KARŞILAŞTIRMA</div>
+  <h1 data-i18n-html="sp.h1">Hangi Strateji <span>Ne Kadar Kazandırdı?</span></h1>
+  <p class="hero-sub" data-i18n="sp.sub">Büyüme, değer, temettü ve 50+ stratejinin filtre kriterlerinden geçen hisselerin son 1–6 ay ortalama getirisini gerçek piyasa verisiyle karşılaştır.</p>
 </div>
 
 <!-- ── VARLIK + BORSA SEÇİMİ (prescan stili) ── -->
 <div class="ps-select">
   <div class="ps-section">
-    <div class="ps-section-hd">🏦 Varlık</div>
+    <div class="ps-section-hd" data-i18n="assets.title">Varlık</div>
     <div class="ps-asset-wrap">
       <button class="ps-asset-arrow" onclick="scrollAssets(-1)" aria-label="Sola kaydır">‹</button>
       <div class="ps-asset-row" id="ps-asset-row">
-        <button class="ps-asset-btn on"><span class="ps-asset-icon">📈</span><span class="ps-asset-name">Borsa</span></button>
-        <div class="ps-asset-soon"><span class="ps-asset-icon">₿</span><span class="ps-asset-name">Kripto</span><span class="ps-asset-badge">yakında</span></div>
-        <div class="ps-asset-soon"><span class="ps-asset-icon">💼</span><span class="ps-asset-name">Fon</span><span class="ps-asset-badge">yakında</span></div>
-        <div class="ps-asset-soon"><span class="ps-asset-icon">📦</span><span class="ps-asset-name">ETF</span><span class="ps-asset-badge">yakında</span></div>
-        <div class="ps-asset-soon"><span class="ps-asset-icon">💵</span><span class="ps-asset-name">Eurobond</span><span class="ps-asset-badge">yakında</span></div>
-        <div class="ps-asset-soon"><span class="ps-asset-icon">🏛️</span><span class="ps-asset-name">Bono/Tahvil</span><span class="ps-asset-badge">yakında</span></div>
+        <button class="ps-asset-btn on"><span class="ps-asset-name" data-i18n="assets.stocks">Borsa</span></button>
+        <div class="ps-asset-soon"><span class="ps-asset-name" data-i18n="assets.crypto">Kripto</span><span class="ps-asset-badge" data-i18n="soon">yakında</span></div>
+        <div class="ps-asset-soon"><span class="ps-asset-name" data-i18n="assets.fund">Fon</span><span class="ps-asset-badge" data-i18n="soon">yakında</span></div>
+        <div class="ps-asset-soon"><span class="ps-asset-name" data-i18n="assets.etf">ETF</span><span class="ps-asset-badge" data-i18n="soon">yakında</span></div>
+        <div class="ps-asset-soon"><span class="ps-asset-name" data-i18n="assets.eurobond">Eurobond</span><span class="ps-asset-badge" data-i18n="soon">yakında</span></div>
+        <div class="ps-asset-soon"><span class="ps-asset-name" data-i18n="assets.bond">Bono/Tahvil</span><span class="ps-asset-badge" data-i18n="soon">yakında</span></div>
       </div>
       <button class="ps-asset-arrow" onclick="scrollAssets(1)" aria-label="Sağa kaydır">›</button>
     </div>
   </div>
   <div class="ps-section">
-    <div class="ps-section-hd">🌍 Borsa</div>
+    <div class="ps-section-hd" data-i18n="sp.exchange">Borsa</div>
     <div class="ps-ex-grid" id="ex-main"></div>
     <div class="ps-ex-grid ps-ex-extra" id="ex-extra" hidden></div>
     <button class="ps-show-more" id="ex-more-btn" onclick="toggleMoreEx()">+ Diğer Borsalar</button>
-  </div>
-</div>
-
-<!-- ── ÜSTTE REKLAM BANNER ── -->
-<div class="ad-top-wrap">
-  <div class="ad-slot" id="ad-top">
-    <span class="ad-label">Reklam</span>
-    <div class="ad-placeholder"></div>
   </div>
 </div>
 
@@ -283,11 +290,38 @@ footer a:hover{color:var(--text2);}
 </div>
 
 <!-- ── FOOTER ── -->
-<footer>
-  © 2026 DeepFin &nbsp;·&nbsp;
-  <a href="/">Tarayıcı</a> &nbsp;·&nbsp;
-  <a href="/analiz/">Analiz</a> &nbsp;·&nbsp;
-  Yatırım tavsiyesi değildir
+<footer class="hp-footer">
+  <div class="hp-footer-top">
+    <div class="footer-brand">
+      <div class="footer-logo"><span class="tlogo-mark"></span>DeepFin</div>
+      <p class="footer-tagline">Akıllıca tara, güvenle karar ver.</p>
+      <p class="footer-desc">Dünya borsaları için gerçek zamanlı veri.</p>
+    </div>
+    <div class="footer-links-group">
+      <div class="footer-col">
+        <div class="footer-col-title">Platform</div>
+        <a class="footer-link" href="/" data-i18n="nav.scanner">Tarayıcı</a>
+        <a class="footer-link" href="/stratejiler/" data-i18n="nav.strategies">Stratejiler</a>
+        <a class="footer-link" href="/analiz/" data-i18n="nav.analysis">Analiz</a>
+        <a class="footer-link" href="/bilgi/" data-i18n="nav.learn">Bilgi Bankası</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Kaynaklar</div>
+        <a class="footer-link" href="/bilgi/#guides">Strateji Rehberleri</a>
+        <a class="footer-link" href="/bilgi/#terms">Terimler Sözlüğü</a>
+        <a class="footer-link" href="/bilgi/#filters">Filtre Açıklamaları</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Destek</div>
+        <a class="footer-link" href="https://buymeacoffee.com/deepfin" target="_blank" rel="noopener" data-i18n="auth.support">Destek Ol</a>
+        <a class="footer-link" href="/profil" data-i18n="auth.profile">Profil</a>
+      </div>
+    </div>
+  </div>
+  <div class="hp-footer-bottom">
+    <span>© 2026 DeepFin. Tüm hakları saklıdır.</span>
+    <span class="footer-disclaimer-short">Bu platform yatırım tavsiyesi vermez. Tüm veriler bilgi amaçlıdır.</span>
+  </div>
 </footer>
 
 <script>
@@ -304,7 +338,7 @@ window.addEventListener('DOMContentLoaded',function(){
   if(btn) btn.textContent = dark?'☀':'☾';
 });
 </script>
-<script src="/stratejiler/stratejiler.js?v=6" defer></script>
+<script src="/stratejiler/stratejiler.js?v=7" defer></script>
 
 </body>
 </html>

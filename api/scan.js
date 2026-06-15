@@ -1,4 +1,5 @@
 const https = require('https');
+const crypto = require('crypto');
 const { protect, trackViolation } = require('./_protect');
 
 // ─────────────────────────────────────────────
@@ -447,9 +448,17 @@ module.exports = async function(req, res) {
       merged.filter = [...baseFilters, ...clientFilters];
     }
 
-    // Cache key: borsa + kolon listesi (sıralanmış — client farklı sıra gönderse de aynı cache'e düşer)
-    const colHash  = Buffer.from([...(merged.columns || [])].sort().join(',')).toString('base64').slice(0, 20);
-    const cacheKey = 'df_v4_' + exchange + '_' + colHash; // v4: country-specific paths for india/sweden/uae
+    // Cache key: borsa + YANITI ETKİLEYEN TÜM girdiler (kolon + filtre + sıralama + aralık).
+    // Önceden yalnız kolonlar anahtardaydı; client filter/sort/range yanıtı değiştirdiği için
+    // farklı filtreli istekler aynı cache'e düşüp birbirinin verisini görebiliyordu (cache zehirlenmesi).
+    const keyMaterial = JSON.stringify({
+      c: [...(merged.columns || [])].sort(),
+      f: merged.filter || [],
+      s: merged.sort || {},
+      r: merged.range || [],
+    });
+    const colHash  = crypto.createHash('sha1').update(keyMaterial).digest('base64').replace(/[^A-Za-z0-9]/g, '').slice(0, 24);
+    const cacheKey = 'df_v5_' + exchange + '_' + colHash; // v5: filter/sort/range de anahtarda
     const ttl      = getCacheTTL(exchange);
 
     // Her tarama isteğinde sayacı artır (cache hit/miss fark etmez)
@@ -529,7 +538,8 @@ module.exports = async function(req, res) {
             res.setHeader('X-Cache', 'STALE');
             res.status(200).end(JSON.stringify(stale));
           } else {
-            res.status(statusCode).end(data);
+            // Ham upstream gövdesini (Cloudflare/ban HTML'i) istemciye yansıtma — genel hata döndür
+            res.status(502).json({ error: 'Veri kaynağı geçici olarak yanıt vermiyor' });
           }
         }
         resolve();
@@ -647,6 +657,7 @@ module.exports = async function(req, res) {
   if (action === 'insider') {
     const symbol = (url.searchParams.get('symbol') || '').toUpperCase();
     if (!symbol) return res.status(400).json({ error: 'symbol required' });
+    if (!/^[A-Z0-9.\-]{1,12}$/.test(symbol)) return res.status(400).json({ error: 'invalid symbol' });
 
     return new Promise(async (resolve) => {
       try {
@@ -727,6 +738,7 @@ module.exports = async function(req, res) {
   if (action === 'short') {
     const symbol = (url.searchParams.get('symbol') || '').toUpperCase();
     if (!symbol) return res.status(400).json({ error: 'symbol required' });
+    if (!/^[A-Z0-9.\-]{1,12}$/.test(symbol)) return res.status(400).json({ error: 'invalid symbol' });
 
     return new Promise(async (resolve) => {
       try {
