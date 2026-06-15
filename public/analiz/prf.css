@@ -71,8 +71,8 @@ body{background:var(--bg);color:var(--text);font-family:Inter, sans-serif;}
 .profile-topbtn.logged-in{border-color:var(--accent);color:var(--accent);}
 .profile-topbtn .pf-av{width:20px;height:20px;border-radius:50%;object-fit:cover;}
 .prf-btn-lbl{font-size:12px;font-weight:500;}
-.supportbtn{background:rgba(246,70,93,.08);border:1px solid rgba(246,70,93,.25);color:#f6465d;}
-.supportbtn:hover{background:rgba(246,70,93,.15);border-color:#f6465d;color:#f6465d;}
+.supportbtn{background:transparent;border:1px solid var(--border2);color:var(--text2);}
+.supportbtn:hover{border-color:var(--accent);color:var(--accent);}
 #scantime{font-size:11px;color:var(--muted2);}
 #active-exchange-badge{display:none;align-items:center;gap:5px;padding:4px 10px;background:var(--s2);border:1px solid var(--border);border-radius:6px;font-size:11px;font-weight:600;color:var(--text);flex-shrink:0;}
 
@@ -1081,8 +1081,8 @@ html,body{height:100%;overflow:hidden;}
 .auth-btn{font-size:12px;padding:6px 14px;border-radius:7px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:500;white-space:nowrap;transition:all .12s;}
 .auth-ghost{background:transparent;color:var(--text);border:1px solid var(--border2);}
 .auth-ghost:hover{background:var(--hover);}
-.auth-primary{background:var(--accent);color:#fff;border:1px solid transparent;}
-.auth-primary:hover{background:var(--blue2);}
+.auth-primary{background:transparent;color:var(--text);border:1px solid var(--border2);}
+.auth-primary:hover{background:var(--hover);}
 .df-auth-in{display:inline-flex;align-items:center;text-decoration:none;}
 .df-auth-av{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.22);font-size:10px;font-weight:700;margin-right:6px;overflow:hidden;}
 .df-auth-av:empty{display:none;}
