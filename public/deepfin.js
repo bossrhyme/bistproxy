@@ -2042,6 +2042,50 @@ const TECH_PRESETS = {
     filters: { perf1m_min: 10, perf3m_min: 10 }
   },
 
+  // ── KOMBİNASYON SİNYALLER ──────────────────────────────────────────────
+
+  sma200Test: {
+    label: 'SMA200 Testi',
+    desc: '200 günlük ortalamasını destek olarak test edip dönen hisseleri bulur. Fiyat SMA200\'ün %3 yakınında, RSI 40 üzeri, günlük hafif artış. Trend devam sinyali.',
+    filters: { above_sma200_min: 0, above_sma200_max: 3, rsi_min: 40, chg_min: 0.3 }
+  },
+
+  multiMomentum: {
+    label: 'Çok Dönemli Momentum',
+    desc: '1, 3 ve 6 aylık periyodların hepsinde piyasayı geçen hisseleri bulur. Kısa vadeli ivme orta-uzun vadede de güçlüdür — üç dönem uyumu en güvenilir momentum sinyalidir.',
+    filters: { perf1m_min: 3, perf3m_min: 10, perf6m_min: 20 }
+  },
+
+  oscAlignment: {
+    label: 'Üçlü Osilatör',
+    desc: 'RSI, MACD histogramı ve Stokastik %K — üç bağımsız osilatör aynı anda alım bölgesinde olan hisseleri bulur. Tek gösterge sinyali yerine üçlü teyit, yanlış alarm riskini önemli ölçüde düşürür.',
+    filters: { rsi_min: 50, macd_hist_min: 0, stoch_k_min: 50 }
+  },
+
+  volumeTrend: {
+    label: 'Hacimli Trend',
+    desc: '6 aylık güçlü getiri, normalin 1.5 katı hacim ve zirveye %15 mesafe — üçünü birden karşılayan hisseleri bulur. Kurumsal alımın en belirgin izleri: yüksek hacim ve kısa zirve mesafesi.',
+    filters: { perf6m_min: 20, rel_vol_min: 1.5, from_high_min: -15 }
+  },
+
+  adxMomentum: {
+    label: 'ADX Momentum',
+    desc: 'Hem gücü (ADX>25) hem yönü (+DI>-DI) teyit edilmiş, 3 aylık getirisi %10 üzeri trendleri bulur. ADX trend varlığını ölçer; +DI yönünü; 3 aylık getiri momentum kalıcılığını doğrular.',
+    filters: { adx_min: 25, adx_di_diff_min: 0, perf3m_min: 10 }
+  },
+
+  growthBreakout: {
+    label: 'Büyüme Kırılımı',
+    desc: 'EPS büyümesi %15 üzeri olan, teknik alım sinyali veren ve zirvesine yakın hisseleri bulur. Temel büyüme + teknik kırılım kombinasyonu büyüme yatırımcısının aranan durumudur.',
+    filters: { earng_min: 15, tech_rating_min: 0.3, from_high_min: -10 }
+  },
+
+  deathCrossBounce: {
+    label: 'Kontrarian Dönüş',
+    desc: 'Ölüm haçı bölgesinde (SMA50<SMA200, fiyat<SMA200) ancak dibinden %8 yükselmiş ve RSI toparlanma bölgesinde (35-55) olan hisseleri bulur. Düşüş trendindeki erken dönüş fırsatı — yüksek risk/getiri.',
+    filters: { sma_trend_max: 0, above_sma200_max: 0, rsi_min: 35, rsi_max: 55, from_low_min: 8 }
+  },
+
 };
 
 // Guru stratejileri

@@ -208,8 +208,15 @@ var TECH_PRESETS = {
   stochReversal:{ label:'Stokastik Dönüş', filters:{stoch_k_max:25, stoch_kd_min:0} },
   maConfirm:    { label:'Ortalama Onayı',  filters:{ma_rating_min:0.5} },
   oscConfirm:   { label:'Osilatör Onayı',  filters:{osc_rating_min:0.1} },
-  lowBeta:      { label:'Defansif',        filters:{beta_max:0.8, div_min:1} },
-  ytdLeader:    { label:'1A Momentum',     filters:{perf1m_min:10, perf3m_min:10} },
+  lowBeta:         { label:'Defansif',             filters:{beta_max:0.8, div_min:1} },
+  ytdLeader:       { label:'1A Momentum',          filters:{perf1m_min:10, perf3m_min:10} },
+  sma200Test:      { label:'SMA200 Testi',         filters:{above_sma200_min:0, above_sma200_max:3, rsi_min:40, chg_min:0.3} },
+  multiMomentum:   { label:'Çok Dönemli Momentum', filters:{perf1m_min:3, perf3m_min:10, perf6m_min:20} },
+  oscAlignment:    { label:'Üçlü Osilatör',        filters:{rsi_min:50, macd_hist_min:0, stoch_k_min:50} },
+  volumeTrend:     { label:'Hacimli Trend',        filters:{perf6m_min:20, rel_vol_min:1.5, from_high_min:-15} },
+  adxMomentum:     { label:'ADX Momentum',         filters:{adx_min:25, adx_di_diff_min:0, perf3m_min:10} },
+  growthBreakout:  { label:'Büyüme Kırılımı',      filters:{earng_min:15, tech_rating_min:0.3, from_high_min:-10} },
+  deathCrossBounce:{ label:'Kontrarian Dönüş',     filters:{sma_trend_max:0, above_sma200_max:0, rsi_min:35, rsi_max:55, from_low_min:8} },
 };
 var GURUS = {
   ackman:   { label:'Bill Ackman',             filters:{roe_min:15, margin_min:10, de_max:80, cr_min:1.2, pe_max:20} },
