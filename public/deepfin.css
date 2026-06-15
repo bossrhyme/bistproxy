@@ -1108,7 +1108,7 @@ td:nth-child(2){font-family:var(--ff);}
 
 .hpx-tabs{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap;}
 .hpx-tab{font-size:12px;padding:6px 14px;border-radius:7px;cursor:pointer;border:1px solid var(--border);color:var(--text2);background:transparent;font-family:var(--ff);font-weight:500;transition:all .12s;}
-.hpx-tab.on{background:var(--accent2);color:var(--accent);border-color:var(--accent);font-weight:600;}
+.hpx-tab.on{color:var(--accent);font-weight:600;}
 .hpx-tab:hover:not(.on){border-color:var(--border2);color:var(--text);}
 .hpx-spill-wrap{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;}
 .hpx-spill{padding:13px 15px;border:1px solid var(--border);border-radius:9px;cursor:pointer;background:var(--s1);transition:border-color .12s,background .12s;text-align:left;}
