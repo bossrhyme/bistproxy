@@ -158,11 +158,11 @@
     },
     {
       "source": "/analiz/profil",
-      "destination": "/analiz/profil.html"
+      "destination": "/analiz/profile.html"
     },
     {
       "source": "/analiz/profil/",
-      "destination": "/analiz/profil.html"
+      "destination": "/analiz/profile.html"
     },
     {
       "source": "/api/verify",
