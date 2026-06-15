@@ -5,34 +5,34 @@
 
 // ── Borsa tanımları (tarayıcı ile aynı) ───────────────────────
 var EX_META = {
-  bist:        { name:'BIST',               flag:'🇹🇷', range:[0,800]  },
-  nasdaq:      { name:'NASDAQ',             flag:'🇺🇸', range:[0,4500] },
-  nyse:        { name:'NYSE',               flag:'🇺🇸', range:[0,3000] },
-  sp500:       { name:'S&P 500',            flag:'🇺🇸', range:[0,503]  },
-  dax:         { name:'DAX',                flag:'🇩🇪', range:[0,500]  },
-  lse:         { name:'LSE',                flag:'🇬🇧', range:[0,2000] },
-  nikkei:      { name:'Nikkei',             flag:'🇯🇵', range:[0,4000] },
-  krx:         { name:'KRX',                flag:'🇰🇷', range:[0,3000] },
-  moex:        { name:'MOEX',               flag:'🇷🇺', range:[0,500]  },
-  france:      { name:'Euronext Paris',     flag:'🇫🇷', range:[0,3000] },
-  amsterdam:   { name:'Euronext Amsterdam', flag:'🇳🇱', range:[0,3000] },
-  brussels:    { name:'Euronext Brussels',  flag:'🇧🇪', range:[0,3000] },
-  lisbon:      { name:'Euronext Lisbon',    flag:'🇵🇹', range:[0,3000] },
-  dublin:      { name:'Euronext Dublin',    flag:'🇮🇪', range:[0,3000] },
-  oslo:        { name:'Oslo Bors',          flag:'🇳🇴', range:[0,3000] },
-  milan:       { name:'Borsa Italiana',     flag:'🇮🇹', range:[0,3000] },
-  tsx:         { name:'TSX',                flag:'🇨🇦', range:[0,3000] },
-  twse:        { name:'TWSE',               flag:'🇹🇼', range:[0,3000] },
-  b3:          { name:'B3',                 flag:'🇧🇷', range:[0,3000] },
-  hkex:        { name:'HKEX',               flag:'🇭🇰', range:[0,3000] },
-  china:       { name:'SSE/SZSE',           flag:'🇨🇳', range:[0,3000] },
-  saudi:       { name:'Tadawul',            flag:'🇸🇦', range:[0,3000] },
-  switzerland: { name:'SIX',                flag:'🇨🇭', range:[0,3000] },
-  australia:   { name:'ASX',                flag:'🇦🇺', range:[0,3000] },
-  southafrica: { name:'JSE',                flag:'🇿🇦', range:[0,3000] },
-  sweden:      { name:'Nasdaq Stockholm',   flag:'🇸🇪', range:[0,3000] },
-  india:       { name:'NSE',                flag:'🇮🇳', range:[0,3000] },
-  uae:         { name:'DFM',                flag:'🇦🇪', range:[0,3000] },
+  bist:        { name:'BIST',               flag:'', range:[0,800]  },
+  nasdaq:      { name:'NASDAQ',             flag:'', range:[0,4500] },
+  nyse:        { name:'NYSE',               flag:'', range:[0,3000] },
+  sp500:       { name:'S&P 500',            flag:'', range:[0,503]  },
+  dax:         { name:'DAX',                flag:'', range:[0,500]  },
+  lse:         { name:'LSE',                flag:'', range:[0,2000] },
+  nikkei:      { name:'Nikkei',             flag:'', range:[0,4000] },
+  krx:         { name:'KRX',                flag:'', range:[0,3000] },
+  moex:        { name:'MOEX',               flag:'', range:[0,500]  },
+  france:      { name:'Euronext Paris',     flag:'', range:[0,3000] },
+  amsterdam:   { name:'Euronext Amsterdam', flag:'', range:[0,3000] },
+  brussels:    { name:'Euronext Brussels',  flag:'', range:[0,3000] },
+  lisbon:      { name:'Euronext Lisbon',    flag:'', range:[0,3000] },
+  dublin:      { name:'Euronext Dublin',    flag:'', range:[0,3000] },
+  oslo:        { name:'Oslo Bors',          flag:'', range:[0,3000] },
+  milan:       { name:'Borsa Italiana',     flag:'', range:[0,3000] },
+  tsx:         { name:'TSX',                flag:'', range:[0,3000] },
+  twse:        { name:'TWSE',               flag:'', range:[0,3000] },
+  b3:          { name:'B3',                 flag:'', range:[0,3000] },
+  hkex:        { name:'HKEX',               flag:'', range:[0,3000] },
+  china:       { name:'SSE/SZSE',           flag:'', range:[0,3000] },
+  saudi:       { name:'Tadawul',            flag:'', range:[0,3000] },
+  switzerland: { name:'SIX',                flag:'', range:[0,3000] },
+  australia:   { name:'ASX',                flag:'', range:[0,3000] },
+  southafrica: { name:'JSE',                flag:'', range:[0,3000] },
+  sweden:      { name:'Nasdaq Stockholm',   flag:'', range:[0,3000] },
+  india:       { name:'NSE',                flag:'', range:[0,3000] },
+  uae:         { name:'DFM',                flag:'', range:[0,3000] },
 };
 var MAIN_EX = ['bist','nasdaq','nyse','sp500','dax','lse'];
 var EX_KEYS = Object.keys(EX_META);
@@ -232,15 +232,15 @@ var GURUS = {
   carlisle: { label:"Tobias Carlisle",         filters:{pe_max:10, cr_min:1} },
 };
 var INVESTOR_PROFILES = [
-  { key:'growth', label:'Büyüme Avcısı',       icon:'🚀', goat:[],        preset:['growth','momentum'],        tech:['breakout'] },
-  { key:'div',    label:'Temettü Koleksiyoneri',icon:'💰', goat:[],        preset:['dividend','lowdebt'],       tech:[] },
-  { key:'value',  label:'Değer Dedektifi',      icon:'🔍', goat:['buffett'],preset:['value','lowdebt'],         tech:[] },
-  { key:'mom',    label:'Momentum Sörfçüsü',   icon:'🏄', goat:[],        preset:['momentum'],                 tech:['momentum3m','breakout'] },
-  { key:'def',    label:'Savunma Kalesi',       icon:'🛡️', goat:[],        preset:['quality','lowdebt'],        tech:[] },
-  { key:'small',  label:'Küçük Değer Keşifçisi',icon:'🔭', goat:[],        preset:['value','growth'],           tech:[] },
-  { key:'spec',   label:'Spekülatif Akıncı',    icon:'⚡', goat:[],        preset:[],                           tech:['breakout','techBuy','highVolume'] },
-  { key:'tech',   label:'Teknoloji Vizyoneri',  icon:'🤖', goat:[],        preset:[],                           tech:['breakout','techBuy','trendFollow'] },
-  { key:'bal',    label:'Çevik Dengeleyici',    icon:'⚖️', goat:[],        preset:['quality','dividend'],       tech:[] },
+  { key:'growth', label:'Büyüme Avcısı',       icon:'', goat:[],        preset:['growth','momentum'],        tech:['breakout'] },
+  { key:'div',    label:'Temettü Koleksiyoneri',icon:'', goat:[],        preset:['dividend','lowdebt'],       tech:[] },
+  { key:'value',  label:'Değer Dedektifi',      icon:'', goat:['buffett'],preset:['value','lowdebt'],         tech:[] },
+  { key:'mom',    label:'Momentum Sörfçüsü',   icon:'', goat:[],        preset:['momentum'],                 tech:['momentum3m','breakout'] },
+  { key:'def',    label:'Savunma Kalesi',       icon:'', goat:[],        preset:['quality','lowdebt'],        tech:[] },
+  { key:'small',  label:'Küçük Değer Keşifçisi',icon:'', goat:[],        preset:['value','growth'],           tech:[] },
+  { key:'spec',   label:'Spekülatif Akıncı',    icon:'', goat:[],        preset:[],                           tech:['breakout','techBuy','highVolume'] },
+  { key:'tech',   label:'Teknoloji Vizyoneri',  icon:'', goat:[],        preset:[],                           tech:['breakout','techBuy','trendFollow'] },
+  { key:'bal',    label:'Çevik Dengeleyici',    icon:'', goat:[],        preset:['quality','dividend'],       tech:[] },
 ];
 
 // ── Durum ─────────────────────────────────────────────────────
@@ -284,8 +284,8 @@ function buildPayload(ex) {
   return { columns: cols, range: range, sort:{ sortBy:'market_cap_basic', sortOrder:'desc' }, ignore_unknown_fields:true };
 }
 
-function parseRows(tvRows, ex) {
-  var cols_arr = colsFor(ex);
+function parseRows(tvRows, ex, respCols) {
+  var cols_arr = (respCols && respCols.length) ? respCols : colsFor(ex);
   var results = [];
   for (var i = 0; i < tvRows.length; i++) {
     var row = tvRows[i];
@@ -407,16 +407,18 @@ function loadData(ex) {
     progBar.style.width = '75%';
     return res.json();
   }).then(function(json) {
+    if (json && json.error) throw new Error(json.error); // sunucu hatasını (rate-limit/ban vb.) göster
     var rows = (json && json.data) ? json.data : (Array.isArray(json) ? json : []);
     if (!rows.length) throw new Error('Veri boş döndü');
-    allData = parseRows(rows, ex);
+    // Kolonları yanıttaki sıraya göre oku (sunucu whitelist/sıra değiştirse bile hizalı kalır)
+    allData = parseRows(rows, ex, (json && json.columns) || null);
     progBar.style.width = '100%';
     setTimeout(function() {
       stateEl.style.display = 'none';
       renderAll();
     }, 300);
   }).catch(function(e) {
-    stateEl.innerHTML = '<div class="pg-err">⚠ Veri yüklenemedi: ' + e.message + '</div>' +
+    stateEl.innerHTML = '<div class="pg-err">Veri yüklenemedi: ' + e.message + '</div>' +
       '<button class="pg-retry" onclick="loadData(currentEx)">Tekrar Dene</button>';
   });
 }
@@ -590,7 +592,7 @@ function rowHtml(it) {
 
 function detailHtml(it) {
   var crit = fmtCriteria(it.filters, it.special);
-  var critHtml = '<div class="sr-crit-hd">🔎 Bu strateji neye göre tarıyor?</div>' +
+  var critHtml = '<div class="sr-crit-hd">Bu strateji neye göre tarıyor?</div>' +
     '<div class="sr-crit-chips">' +
       crit.map(function(c){ return '<span class="sr-crit-chip">' + c + '</span>'; }).join('') +
     '</div>';
@@ -604,7 +606,7 @@ function detailHtml(it) {
   } else {
     var capped = list.slice(0, 60);
     var hint = list.length > 60 ? (' · en iyi 60 (3A getiriye göre)') : '';
-    stockHtml = '<div class="sr-stk-hd">📋 Listedeki hisseler — ' + list.length + ' adet' + hint + '</div>' +
+    stockHtml = '<div class="sr-stk-hd">Listedeki hisseler — ' + list.length + ' adet' + hint + '</div>' +
       '<div class="sr-stk-grid">' +
         '<div class="sr-stk-head"><span>Sembol</span><span>1A</span><span>3A</span><span>6A</span></div>' +
         capped.map(function(s){
@@ -639,14 +641,14 @@ function renderAll() {
   _rows = {}; _rowSeq = 0;
 
   var html = '<div class="sr-note">' +
-    exm.flag + ' <b>' + exm.name + '</b> · ' + allData.length + ' hisse tarandı. ' +
+    '<b>' + exm.name + '</b> · ' + allData.length + ' hisse tarandı. ' +
     'Her stratejinin <b>bugünkü</b> filtre kriterlerinden geçen hisselerin son 1&nbsp;/&nbsp;3&nbsp;/&nbsp;6 aydaki ' +
     '<b>eşit ağırlıklı (aritmetik) ortalama</b> getirisi gösterilir. ' +
     'Bir stratejinin üstüne tıklayarak tarama kriterlerini ve listedeki hisseleri görebilirsin.' +
   '</div>';
 
   html += '<div class="sr-warn">' +
-    '<div class="sr-warn-hd"><span class="sr-warn-ico">⚠️</span> Bu getiriler bir geçmiş performans testi (backtest) DEĞİLDİR</div>' +
+    '<div class="sr-warn-hd">Bu getiriler bir geçmiş performans testi (backtest) DEĞİLDİR</div>' +
     '<ul class="sr-warn-list">' +
       '<li>Filtre <b>bugünün</b> verisine uygulanır, ama getiriler <b>geçmiş</b> döneme aittir. Yani burası ' +
         '“bu kritere <b>bugün</b> uyan hisseler son dönemde ne yapmış?” sorusunu yanıtlar — ' +
@@ -664,13 +666,8 @@ function renderAll() {
     var pf = profileFilters(p);
     return { icon:p.icon, label:p.label, st:stats(pf.f, pf.sp), filters:pf.f, special:pf.sp };
   });
-  html += sectionHtml('🧬 Yatırımcı Stratejileri', profItems);
+  html += sectionHtml('Yatırımcı Stratejileri', profItems);
 
-  // Reklam (orta): yatırımcı stratejileri ile "tümünü göster" arası
-  html += '<div class="ad-slot" id="ad-mid">' +
-    '<span class="ad-label">Reklam</span>' +
-    '<div class="ad-placeholder"></div>' +
-  '</div>';
 
   if (showAllGroups) {
     var goatItems = Object.keys(GURUS).map(function(k) {

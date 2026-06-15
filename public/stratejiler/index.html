@@ -81,7 +81,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-
 .ps-asset-name{font-size:12px;font-weight:700;color:var(--text2);white-space:nowrap;}
 .ps-asset-badge{font-size:9px;font-weight:700;color:#fff;background:var(--muted);padding:2px 6px;border-radius:10px;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0;}
 /* Borsa kart grid */
-.ps-ex-grid{display:flex;flex-wrap:wrap;gap:10px;}
+
+.ps-ex-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
+.ps-section-hd{justify-content:center;}
+.ps-asset-wrap{justify-content:center;}
+.ps-asset-row{justify-content:center;}
+.ps-ex-section-center{text-align:center;}
 .ps-ex-extra{margin-top:10px;}
 .ps-ex-extra[hidden]{display:none;}
 .ps-ex-btn{display:flex;flex-direction:column;align-items:center;gap:7px;padding:14px 20px;background:var(--s1);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .15s;min-width:84px;font-family:inherit;}
@@ -264,14 +269,6 @@ footer a:hover{color:var(--text2);}
     <div class="ps-ex-grid" id="ex-main"></div>
     <div class="ps-ex-grid ps-ex-extra" id="ex-extra" hidden></div>
     <button class="ps-show-more" id="ex-more-btn" onclick="toggleMoreEx()">+ Diğer Borsalar</button>
-  </div>
-</div>
-
-<!-- ── ÜSTTE REKLAM BANNER ── -->
-<div class="ad-top-wrap">
-  <div class="ad-slot" id="ad-top">
-    <span class="ad-label">Reklam</span>
-    <div class="ad-placeholder"></div>
   </div>
 </div>
 
