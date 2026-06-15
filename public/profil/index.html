@@ -379,6 +379,10 @@ body{overflow-y:auto;}
     <a href="/bilgi/" class="hp-nav-btn" data-i18n="nav.learn">Bilgi Bankası</a>
   </nav>
   <div class="tright">
+    <div class="lang-toggle" role="group" aria-label="Dil / Language">
+      <button class="lang-toggle-btn" data-lang-btn="tr" onclick="dfSetLang('tr')">TR</button>
+      <button class="lang-toggle-btn" data-lang-btn="en" onclick="dfSetLang('en')">EN</button>
+    </div>
     <button class="topbarbtn theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir" aria-label="Karanlık/Açık mod geçiş">☾</button>
     <button class="auth-btn auth-ghost df-auth-out" onclick="document.getElementById('pf-login')&&document.getElementById('pf-login').scrollIntoView({behavior:'smooth'})" data-i18n="auth.login">Giriş Yap</button>
     <button class="auth-btn auth-primary df-auth-out" onclick="document.getElementById('pf-login')&&document.getElementById('pf-login').scrollIntoView({behavior:'smooth'})" data-i18n="auth.register">Kayıt Ol</button>

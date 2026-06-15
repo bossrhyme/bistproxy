@@ -1960,3 +1960,10 @@ tbody tr:active{background:var(--s3);}
 .hrc-count{color:var(--accent);font-weight:700;font-family:var(--ff-mono);}
 .hrc-found{color:var(--green);font-weight:700;font-family:var(--ff-mono);}
 @media(max-width:768px){.hpx-recent-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;}}
+
+/* Header dil düğmesi (TR/EN) — paylaşılan */
+.lang-toggle{display:inline-flex;border:1px solid var(--border2);border-radius:7px;overflow:hidden;flex-shrink:0;}
+.lang-toggle-btn{font-family:var(--ff);font-size:11px;font-weight:700;padding:5px 9px;background:transparent;color:var(--text2);border:none;cursor:pointer;transition:background .12s,color .12s;letter-spacing:.02em;}
+.lang-toggle-btn:hover{color:var(--accent);}
+.lang-toggle-btn.on{background:var(--accent);color:#fff;}
+@media(max-width:768px){.lang-toggle-btn{padding:5px 7px;font-size:10px;}}

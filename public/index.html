@@ -132,7 +132,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=warm35">
+<link rel="stylesheet" href="/deepfin.css?v=warm36">
 <script src="/i18n.js?v=2" defer></script>
 <script src="/deepfin.js?v=183" defer></script>
 <script src="/auth-header.js?v=2" defer></script>
@@ -188,6 +188,10 @@ if('serviceWorker' in navigator){
     </button>
 
     <div class="tright">
+      <div class="lang-toggle" role="group" aria-label="Dil / Language">
+        <button class="lang-toggle-btn" data-lang-btn="tr" onclick="dfSetLang('tr')">TR</button>
+        <button class="lang-toggle-btn" data-lang-btn="en" onclick="dfSetLang('en')">EN</button>
+      </div>
       <button class="topbarbtn theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir (T)" aria-label="Karanlık/Açık mod geçiş">☀</button>
       <button class="auth-btn auth-ghost df-auth-out" onclick="location.href='/profil'" data-i18n="auth.login">Giriş Yap</button>
       <button class="auth-btn auth-primary df-auth-out" onclick="location.href='/profil'" data-i18n="auth.register">Kayıt Ol</button>
