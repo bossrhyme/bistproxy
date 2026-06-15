@@ -44,6 +44,12 @@ var EX_COUNTRY = {
   switzerland:'İsviçre', australia:'Avustralya', southafrica:'Güney Afrika', sweden:'İsveç',
   india:'Hindistan', uae:'BAE'
 };
+var EX_ISO = {
+  bist:'tr', nasdaq:'us', nyse:'us', sp500:'us', dax:'de', lse:'gb', nikkei:'jp', krx:'kr',
+  moex:'ru', france:'fr', amsterdam:'nl', brussels:'be', lisbon:'pt', dublin:'ie', oslo:'no',
+  milan:'it', tsx:'ca', twse:'tw', b3:'br', hkex:'hk', china:'cn', saudi:'sa', switzerland:'ch',
+  australia:'au', southafrica:'za', sweden:'se', india:'in', uae:'ae'
+};
 
 // Emoji bayrağı ISO koduna çevir → flagcdn görseli (tarayıcı ile aynı)
 function isoFromFlag(emoji) {
@@ -697,8 +703,10 @@ function renderAll() {
 // ── Borsa sekmeleri (ilk 6 + Diğer Borsalar) ──────────────────
 function exTabHtml(key) {
   var m = EX_META[key]; if (!m) return '';
+  var iso = EX_ISO[key] || '';
+  var flag = iso ? '<img class="ps-ex-flag-img" src="https://flagcdn.com/w40/' + iso + '.png" alt="" loading="lazy">' : '';
   return '<button class="ps-ex-btn' + (key === currentEx ? ' on' : '') + '" data-ex="' + key + '"' +
-    ' onclick="setEx(\'' + key + '\')">' +
+    ' onclick="setEx(\'' + key + '\')">' + flag +
     '<span class="ps-ex-name">' + m.name + '</span>' +
     '<span class="ps-ex-country">' + (EX_COUNTRY[key] || '') + '</span></button>';
 }
