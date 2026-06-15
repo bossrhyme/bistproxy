@@ -51,6 +51,9 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 html{background:var(--bg);}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;display:flex;flex-direction:column;}
+/* deepfin.css SPA kabuğu html,body'ye overflow:hidden+height:100% koyuyor — bu
+   normal kaydırmalı doküman olduğu için ez (yoksa sayfa aşağı kaymıyor) */
+html,body{height:auto !important;overflow-y:auto !important;overflow-x:hidden !important;}
 
 /* ── Topbar ── */
 /* header stilleri deepfin.css'ten geliyor */
@@ -287,11 +290,38 @@ footer a:hover{color:var(--text2);}
 </div>
 
 <!-- ── FOOTER ── -->
-<footer>
-  © 2026 DeepFin &nbsp;·&nbsp;
-  <a href="/">Tarayıcı</a> &nbsp;·&nbsp;
-  <a href="/analiz/">Analiz</a> &nbsp;·&nbsp;
-  Yatırım tavsiyesi değildir
+<footer class="hp-footer">
+  <div class="hp-footer-top">
+    <div class="footer-brand">
+      <div class="footer-logo"><span class="tlogo-mark"></span>DeepFin</div>
+      <p class="footer-tagline">Akıllıca tara, güvenle karar ver.</p>
+      <p class="footer-desc">Dünya borsaları için gerçek zamanlı veri.</p>
+    </div>
+    <div class="footer-links-group">
+      <div class="footer-col">
+        <div class="footer-col-title">Platform</div>
+        <a class="footer-link" href="/" data-i18n="nav.scanner">Tarayıcı</a>
+        <a class="footer-link" href="/stratejiler/" data-i18n="nav.strategies">Stratejiler</a>
+        <a class="footer-link" href="/analiz/" data-i18n="nav.analysis">Analiz</a>
+        <a class="footer-link" href="/bilgi/" data-i18n="nav.learn">Bilgi Bankası</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Kaynaklar</div>
+        <a class="footer-link" href="/bilgi/#guides">Strateji Rehberleri</a>
+        <a class="footer-link" href="/bilgi/#terms">Terimler Sözlüğü</a>
+        <a class="footer-link" href="/bilgi/#filters">Filtre Açıklamaları</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Destek</div>
+        <a class="footer-link" href="https://buymeacoffee.com/deepfin" target="_blank" rel="noopener" data-i18n="auth.support">Destek Ol</a>
+        <a class="footer-link" href="/profil" data-i18n="auth.profile">Profil</a>
+      </div>
+    </div>
+  </div>
+  <div class="hp-footer-bottom">
+    <span>© 2026 DeepFin. Tüm hakları saklıdır.</span>
+    <span class="footer-disclaimer-short">Bu platform yatırım tavsiyesi vermez. Tüm veriler bilgi amaçlıdır.</span>
+  </div>
 </footer>
 
 <script>
