@@ -549,7 +549,8 @@ td:nth-child(2){font-family:var(--ff);}
 .psv-goat-extra{margin-top:8px;}
 
 /* Faz 3 — Uyum Puanı sütunu */
-.match-score{font-size:11px;font-weight:800;font-family:var(--ff-mono);padding:2px 7px;border-radius:4px;display:inline-block;min-width:28px;text-align:center;}
+.match-score{font-size:11px;font-weight:800;font-family:var(--ff-mono);padding:3px 8px 3px;border-radius:5px;display:inline-flex;flex-direction:column;align-items:center;min-width:36px;text-align:center;line-height:1.2;gap:1px;}
+.ms-lbl{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;opacity:.8;line-height:1;font-family:var(--ff);}
 .ms-high{color:#00c076;background:rgba(0,192,118,.13);}
 .ms-watch{color:#f0b429;background:rgba(240,180,41,.10);}
 .ms-ok{color:var(--text2);background:var(--s2);font-weight:600;}
@@ -2239,6 +2240,56 @@ tbody tr:active{background:var(--s3);}
   .ssm-metric{min-width:90px;padding:8px 12px;}
   .ssm-metric-val{font-size:15px;}
   .trust-strip{font-size:10px;padding:5px 12px;}
+}
+
+/* ── KALAN FAZLAR: PSV Numaralı Aileler ── */
+.psv-family{border-left:3px solid transparent;padding-left:12px;margin-left:-12px;}
+.psv-family-gold{border-left-color:var(--gold);}
+.psv-family-purple{border-left-color:#7c3aed;}
+.psv-family-teal{border-left-color:var(--teal);}
+.psv-fnum{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;font-size:10px;font-weight:800;font-family:var(--ff-mono);background:var(--gold);color:#1a1000;flex-shrink:0;margin-right:4px;vertical-align:middle;}
+.psv-fnum-purple{background:#7c3aed;color:#fff;}
+.psv-fnum-teal{background:var(--teal);color:#0a0e14;}
+
+/* ── KALAN FAZLAR: PSV Kriterleri Önizlemesi (4.J) ── */
+.psv-criteria-preview{background:var(--s2);border:1px solid var(--border2);border-radius:var(--r-lg);padding:12px 14px;margin:12px 0;display:flex;flex-direction:column;gap:8px;}
+.pcb-title{font-size:9px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px;}
+.pcb-item{display:flex;align-items:flex-start;gap:6px;flex-wrap:wrap;}
+.pcb-name{font-size:11px;font-weight:700;color:var(--text);white-space:nowrap;flex-shrink:0;}
+.pcb-sep{font-size:11px;color:var(--muted2);flex-shrink:0;}
+.pcb-tags{font-size:11px;color:var(--gold);font-family:var(--ff-mono);font-weight:600;line-height:1.4;}
+
+/* ── KALAN FAZLAR: Drawer - Kriter satırı iyileştirmesi ── */
+.mdr-row{display:grid;grid-template-columns:20px 1fr auto auto auto 80px 60px;align-items:center;gap:6px;padding:7px 10px;border-radius:5px;margin-bottom:3px;}
+.mdr-pass{background:rgba(0,192,118,.07);}
+.mdr-near{background:rgba(240,180,41,.07);}
+.mdr-fail{background:rgba(255,68,68,.06);}
+.mdr-miss{background:var(--s2);}
+.mdr-icon{font-size:12px;font-weight:800;text-align:center;}
+.mdr-pass .mdr-icon{color:#00c076;}
+.mdr-near .mdr-icon{color:#f0b429;}
+.mdr-fail .mdr-icon{color:var(--red);}
+.mdr-miss .mdr-icon{color:var(--muted2);}
+.mdr-st-lbl{font-size:9px;font-weight:700;text-align:right;text-transform:uppercase;letter-spacing:.04em;}
+.mdr-pass .mdr-st-lbl{color:#00c076;}
+.mdr-near .mdr-st-lbl{color:#f0b429;}
+.mdr-fail .mdr-st-lbl{color:var(--red);}
+.mdr-miss .mdr-st-lbl{color:var(--muted2);}
+
+/* ── KALAN FAZLAR: Mobil Sonuç Kartları ── */
+.kolay-cards{display:none;}
+@media(max-width:600px){
+  #twrap .kzy-table,
+  #twrap .vs-table,
+  #kolay-wrap .kolay-table{display:none;}
+  #twrap .kolay-cards,
+  #kolay-wrap .kolay-cards{display:flex !important;flex-direction:column;gap:8px;padding:10px 12px;}
+  .kolay-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;gap:4px 10px;box-shadow:var(--shadow);}
+  .kolay-card-sym{font-size:14px;font-weight:800;color:var(--text);font-family:var(--ff-mono);}
+  .kolay-card-name{font-size:11px;color:var(--muted2);grid-column:1;}
+  .kolay-card-price{font-size:15px;font-weight:700;font-family:var(--ff-mono);color:var(--text);text-align:right;grid-row:1;}
+  .kolay-card-chg{font-size:12px;font-weight:600;text-align:right;font-family:var(--ff-mono);grid-row:2;}
+  .kolay-card-match{grid-column:1/-1;margin-top:6px;padding-top:6px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;}
 }
 
 /* Header dil düğmesi (TR/EN) — paylaşılan */

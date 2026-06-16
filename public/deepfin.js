@@ -2160,24 +2160,24 @@ function initPrescanView() {
     // ── Panel 3: Strateji + Tara ──
     '<div id="psv-panel-3" class="psv-panel" style="display:none">'+
 
-    // Yatırımcı Lensleri — hisse
-    '<div class="psv-section" id="psv-sec-goat">'+
-    '<div class="psv-section-hd">Yatırımcı Lensleri <span class="psv-opt">isteğe bağlı</span>'+
+    // 01 Yatırımcı Lensleri — hisse
+    '<div class="psv-section psv-family psv-family-gold" id="psv-sec-goat">'+
+    '<div class="psv-section-hd"><span class="psv-fnum">01</span> Yatırımcı Lensleri <span class="psv-opt">isteğe bağlı</span>'+
     '<input class="psv-lens-search" id="psv-lens-search" type="text" placeholder="Lens ara…" oninput="psvGoatSearch(this.value)"></div>'+
     '<div id="psv-goat-groups">'+PSV_GURU_GROUPS.map(mkGoatGroup).join('')+'</div>'+
     '</div>'+
 
-    // Temel — hisse
-    '<div class="psv-section" id="psv-sec-temel">'+
-    '<div class="psv-section-hd">Temel <span class="psv-opt">isteğe bağlı</span></div>'+
+    // 02 Temel — hisse
+    '<div class="psv-section psv-family psv-family-purple" id="psv-sec-temel">'+
+    '<div class="psv-section-hd"><span class="psv-fnum psv-fnum-purple">02</span> Temel <span class="psv-opt">isteğe bağlı</span></div>'+
     '<div class="psv-chip-grid" id="psv-preset-main">'+PSV_MAIN_PRESETS.map(function(k){ return mkFilterCard(k, PRESETS[k], 'psv-preset-card', 'psvTogglePreset'); }).join('')+'</div>'+
     '<div class="psv-chip-extra" id="psv-preset-extra" style="display:none">'+extraPresetKeys.map(function(k){ return mkFilterCard(k, PRESETS[k], 'psv-preset-card', 'psvTogglePreset'); }).join('')+'</div>'+
     (extraPresetKeys.length ? '<button class="psv-show-more" id="psv-preset-more" onclick="psvToggleMorePresets()">+ Daha Fazla ('+extraPresetKeys.length+')</button>' : '')+
     '</div>'+
 
-    // Teknik — hisse
-    '<div class="psv-section" id="psv-sec-teknik">'+
-    '<div class="psv-section-hd">Teknik <span class="psv-opt">isteğe bağlı</span></div>'+
+    // 03 Teknik — hisse
+    '<div class="psv-section psv-family psv-family-teal" id="psv-sec-teknik">'+
+    '<div class="psv-section-hd"><span class="psv-fnum psv-fnum-teal">03</span> Teknik <span class="psv-opt">isteğe bağlı</span></div>'+
     '<div id="psv-tech-groups">'+PSV_TECH_GROUPS.map(mkTechGroup).join('')+'</div>'+
     '</div>'+
 
@@ -2217,7 +2217,8 @@ function initPrescanView() {
     }).join('')+
     '</div></div>'+
 
-    '<div class="psv-insight" id="psv-insight-3">💡 Filtre seçmeden tüm evren listelenir. En az bir strateji ekleyerek <b>Uyum Puanı</b> hesaplatın.</div>'+
+    '<div class="psv-criteria-preview" id="psv-criteria-preview" style="display:none"></div>'+
+    '<div class="psv-insight" id="psv-insight-3">💡 Filtre seçmeden tüm evren listelenir. En az bir strateji ekleyerek <b>Eşleşme Düzeyi</b> hesaplatın.</div>'+
     '<div class="psv-limit-hint" id="psv-limit-hint">En fazla 4 filtre seçilebilir — yenisini eklemek için mevcut bir seçimi kaldır.</div>'+
     '<div class="psv-nav-row psv-nav-scan">'+
       '<button class="psv-nav-back" onclick="psvPrevStep()">← Geri</button>'+
@@ -2363,6 +2364,41 @@ function _psvUpdateSelState() {
   var btn = document.getElementById('psv-scan-btn');
   if (btn) btn.textContent = total > 0 ? total + ' Filtre ile Tara' : (_psvCurAsset === 'kripto' ? 'Kripto Tara' : 'Hisse Tara');
   _psvUpdateInsight(3);
+  _psvUpdateCriteriaPreview();
+}
+
+function _psvUpdateCriteriaPreview() {
+  var box = document.getElementById('psv-criteria-preview');
+  if (!box) return;
+  var items = [];
+  var renderItem = function(name, filters, desc) {
+    var tags = _psvGetTags(filters || {}, 8);
+    var tagsStr = tags.length ? tags.join(' · ') : (desc || '');
+    if (!tagsStr) return;
+    items.push('<div class="pcb-item"><span class="pcb-name">' + esc(name) + '</span><span class="pcb-sep">→</span><span class="pcb-tags">' + esc(tagsStr) + '</span></div>');
+  };
+  if (typeof _psvActiveGoats !== 'undefined') {
+    _psvActiveGoats.forEach(function(key) {
+      var g = (typeof GURUS !== 'undefined') ? GURUS[key] : null;
+      if (!g) return;
+      renderItem(g.label.split(' — ')[0].split(' (')[0], g.filters);
+    });
+  }
+  if (typeof _psvActivePresets !== 'undefined') {
+    _psvActivePresets.forEach(function(key) {
+      var p = (typeof PRESETS !== 'undefined') ? PRESETS[key] : null;
+      if (p) renderItem(p.label, p.filters, p.desc);
+    });
+  }
+  if (typeof _psvActiveTech !== 'undefined') {
+    _psvActiveTech.forEach(function(key) {
+      var t = (typeof TECH_PRESETS !== 'undefined') ? TECH_PRESETS[key] : null;
+      if (t) renderItem(t.label, t.filters, t.desc);
+    });
+  }
+  if (!items.length) { box.style.display = 'none'; return; }
+  box.style.display = '';
+  box.innerHTML = '<div class="pcb-title">Aktif Filtre Kriterleri</div>' + items.join('');
 }
 
 // ── Faz 6: PSV Wizard ──────────────────────────────────────────────
@@ -3203,13 +3239,17 @@ function sorted(arr){
   });
 }
 
+var _BAND_LBLS = { high: 'Güçlü', watch: 'Yakın', ok: 'Orta', low: 'Zayıf' };
+
 function _fMatch(m, sym) {
   if (!m) return nil;
   var cls = 'ms-' + m.status;
+  var lbl = _BAND_LBLS[m.status] || '';
+  var inner = m.score + '<span class="ms-lbl">' + lbl + '</span>';
   if (sym) {
-    return '<span class="match-score ' + cls + ' ms-clickable" onclick="event.stopPropagation();showMatchDrawer(\'' + escJS(sym) + '\')" title="Kriter detayını gör">' + m.score + '</span>';
+    return '<span class="match-score ' + cls + ' ms-clickable" onclick="event.stopPropagation();showMatchDrawer(\'' + escJS(sym) + '\')" title="Kriter detayını gör">' + inner + '</span>';
   }
-  return '<span class="match-score ' + cls + '">' + m.score + '</span>';
+  return '<span class="match-score ' + cls + '">' + inner + '</span>';
 }
 
 // ── FAZ 4: "Neden Eşleşti?" Drawer ──────────────────────────────
@@ -3257,9 +3297,9 @@ function showMatchDrawer(sym) {
   var m = stock._match;
 
   var STATUS_MAP = {
-    pass: { icon: '✓', lbl: 'Geçer', cls: 'mdr-pass' },
-    near: { icon: '⚡', lbl: 'Yakın', cls: 'mdr-near' },
-    fail: { icon: '✗', lbl: 'Başarısız', cls: 'mdr-fail' },
+    pass: { icon: '✓', lbl: 'Karşılandı', cls: 'mdr-pass' },
+    near: { icon: '◎', lbl: 'Yakın', cls: 'mdr-near' },
+    fail: { icon: '✕', lbl: 'Karşılanmadı', cls: 'mdr-fail' },
     miss: { icon: '—', lbl: 'Veri Yok', cls: 'mdr-miss' }
   };
 
@@ -3281,7 +3321,7 @@ function showMatchDrawer(sym) {
       '</div>';
   }).join('');
 
-  var scoreLbls = { high: 'Yüksek Uyum', watch: 'İzle', ok: 'Orta Uyum', low: 'Düşük' };
+  var scoreLbls = { high: 'Güçlü Eşleşme', watch: 'Yakın Eşleşme', ok: 'Orta Eşleşme', low: 'Zayıf Eşleşme' };
   var scoreCls = 'ms-' + m.status;
   var scoreLbl = scoreLbls[m.status] || '';
 
@@ -3312,7 +3352,7 @@ function showMatchDrawer(sym) {
         (stock.name ? '<span class="mdr-name">' + esc(stock.name) + '</span>' : '') +
       '</div>' +
       '<div class="mdr-hd-right">' +
-        '<span class="match-score ' + scoreCls + ' mdr-score-badge">' + m.score + '</span>' +
+        '<span class="match-score ' + scoreCls + ' mdr-score-badge">' + m.score + '<span class="ms-lbl">' + _BAND_LBLS[m.status] + '</span></span>' +
         '<span class="mdr-score-lbl">' + scoreLbl + '</span>' +
       '</div>' +
       '<button class="mdr-close" onclick="closeMatchDrawer()" title="Kapat">×</button>' +
@@ -3684,22 +3724,37 @@ function renderKolay() {
   var hasMatch = typeof computeMatch === 'function' && typeof _scoreFilters !== 'undefined' && Object.keys(_scoreFilters).length > 0;
   var cap = data.length > 500 ? 500 : data.length;
   var rows = '';
+  var cards = '';
   for (var i = 0; i < cap; i++) {
     var s = data[i];
     var matchCell = hasMatch && s._match ? _fMatch(s._match, s.symbol) : '<span class="nil">—</span>';
+    var price = s.currentPrice != null ? s.currentPrice.toFixed(2) + ' ' + curr : '—';
+    var chg = s.changePercent != null ? fPerf(s.changePercent) : '—';
     rows += '<tr onclick="showDetail(\'' + escJS(s.symbol) + '\')" tabindex="0">' +
       '<td class="kt-hisse"><span class="kt-sym">' + esc(s.symbol) + '</span><span class="kt-name">' + esc(s.name || '') + '</span></td>' +
-      '<td class="r kt-price">' + (s.currentPrice != null ? s.currentPrice.toFixed(2) + ' ' + curr : '—') + '</td>' +
-      '<td class="r">' + (s.changePercent != null ? fPerf(s.changePercent) : '—') + '</td>' +
+      '<td class="r kt-price">' + price + '</td>' +
+      '<td class="r">' + chg + '</td>' +
       '<td class="r"><span style="' + peC(s.peNormalizedAnnual) + '">' + (s.peNormalizedAnnual != null && s.peNormalizedAnnual > 0 ? s.peNormalizedAnnual.toFixed(1) : '—') + '</span></td>' +
       '<td class="r"><span style="' + roeC(s.roeTTM) + '">' + (s.roeTTM != null ? s.roeTTM.toFixed(1) + '%' : '—') + '</span></td>' +
       '<td class="r">' + (s.rsi14 != null ? fRsi(s.rsi14) : '—') + '</td>' +
       '<td class="r kt-mcap">' + mcapStr(s.marketCapitalization) + '</td>' +
       '<td class="r kt-uyum">' + matchCell + '</td>' +
     '</tr>';
+    cards += '<div class="kolay-card" onclick="showDetail(\'' + escJS(s.symbol) + '\')" tabindex="0">' +
+      '<span class="kolay-card-sym">' + esc(s.symbol) + '</span>' +
+      '<span class="kolay-card-price">' + price + '</span>' +
+      '<span class="kolay-card-name">' + esc(s.name || '') + '</span>' +
+      '<span class="kolay-card-chg">' + chg + '</span>' +
+      (hasMatch && s._match ? '<div class="kolay-card-match">' + matchCell + '</div>' : '') +
+    '</div>';
   }
-  if (data.length > cap) rows += '<tr class="kt-more"><td colspan="8">+ ' + (data.length - cap) + ' hisse daha — tümünü görmek için Pro moda geç</td></tr>';
+  if (data.length > cap) {
+    rows += '<tr class="kt-more"><td colspan="8">+ ' + (data.length - cap) + ' hisse daha — tümünü görmek için Pro moda geç</td></tr>';
+    cards += '<div class="kolay-card kt-more" style="justify-content:center;color:var(--muted2);font-size:12px;grid-template-columns:1fr">+ ' + (data.length - cap) + ' hisse daha</div>';
+  }
   tb.innerHTML = rows || '<tr><td colspan="8" style="padding:24px;text-align:center;color:var(--muted)">Sonuç yok</td></tr>';
+  var cardsEl = document.getElementById('kolay-cards');
+  if (cardsEl) cardsEl.innerHTML = cards || '<div style="padding:24px;text-align:center;color:var(--muted)">Sonuç yok</div>';
   _applyScanMode();
 }
 try { _applyScanMode(); } catch(e) {}
