@@ -83,7 +83,7 @@ function _scoreOne(val, field, op, target) {
 
 // Bir hissenin tüm aktif filtrelere karşı Uyum Puanı'nı hesapla
 // filters: { pe_max:15, roe_min:20, ... }  (_scoreFilters'den gelir)
-// Döner: { score:0-100, status:'high'|'watch'|'ok'|'low', n:kriter_sayısı } | null
+// Döner: { score:0-100, status:'high'|'watch'|'ok'|'low', n:kriter_sayısı, details:[...] } | null
 function computeMatch(stock, filters) {
   _ensureSfMap();
   if (!filters || !stock) return null;
@@ -91,6 +91,7 @@ function computeMatch(stock, filters) {
   if (!keys.length) return null;
 
   var total = 0, count = 0;
+  var details = [];
   keys.forEach(function(key) {
     var field = _sfMap[key];
     if (!field) return;
@@ -98,7 +99,10 @@ function computeMatch(stock, filters) {
     if (target == null) return;
     var op = key.endsWith('_min') ? 'min' : key.endsWith('_max') ? 'max' : null;
     if (!op) return;
-    var s = _scoreOne(stock[field], field, op, target);
+    var val = stock[field];
+    var s = _scoreOne(val, field, op, target);
+    var crit_status = s === null ? 'miss' : s >= SCORE_CFG.PASS ? 'pass' : s > 0 ? 'near' : 'fail';
+    details.push({ key: key, field: field, op: op, target: target, val: val, s: s, status: crit_status });
     if (s !== null) { total += s; count++; }
   });
 
@@ -106,5 +110,5 @@ function computeMatch(stock, filters) {
   var pct = Math.round((total / count) * 100);
   var b = SCORE_CFG.bands;
   var status = pct >= b.high ? 'high' : pct >= b.watch ? 'watch' : pct >= b.ok ? 'ok' : 'low';
-  return { score: pct, status: status, n: count };
+  return { score: pct, status: status, n: count, details: details };
 }

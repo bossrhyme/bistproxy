@@ -3062,10 +3062,140 @@ function sorted(arr){
   });
 }
 
-function _fMatch(m) {
+function _fMatch(m, sym) {
   if (!m) return nil;
   var cls = 'ms-' + m.status;
+  if (sym) {
+    return '<span class="match-score ' + cls + ' ms-clickable" onclick="event.stopPropagation();showMatchDrawer(\'' + escJS(sym) + '\')" title="Kriter detayını gör">' + m.score + '</span>';
+  }
   return '<span class="match-score ' + cls + '">' + m.score + '</span>';
+}
+
+// ── FAZ 4: "Neden Eşleşti?" Drawer ──────────────────────────────
+var _MATCH_KEY_LABELS = {
+  pe_min:'F/K', pe_max:'F/K', pb_min:'PD/DD', pb_max:'PD/DD',
+  ps_min:'F/S', ps_max:'F/S', roe_min:'ROE%', roe_max:'ROE%',
+  roa_min:'ROA%', roa_max:'ROA%', margin_min:'Net Marj%', margin_max:'Net Marj%',
+  gross_min:'Brüt Marj%', gross_max:'Brüt Marj%', revg_min:'Gelir Büy%', revg_max:'Gelir Büy%',
+  earng_min:'K.Büyüme%', earng_max:'K.Büyüme%', div_min:'Temettü%', div_max:'Temettü%',
+  de_min:'B/Ö', de_max:'B/Ö', cr_min:'Cari Oran', cr_max:'Cari Oran',
+  piotroski_min:'F-Score', piotroski_max:'F-Score', peg_min:'PEG', peg_max:'PEG',
+  mc_min:'Piy.Değ', mc_max:'Piy.Değ', chg_min:'Günlük%', chg_max:'Günlük%',
+  rsi_min:'RSI', rsi_max:'RSI', beta_min:'Beta', beta_max:'Beta',
+  adx_min:'ADX', adx_max:'ADX', adx_di_diff_min:'ADX DI+',
+  tech_rating_min:'Teknik', tech_rating_max:'Teknik',
+  ma_rating_min:'Hrt.Ort.', ma_rating_max:'Hrt.Ort.',
+  osc_rating_min:'Osilatör', osc_rating_max:'Osilatör',
+  perf1m_min:'1A%', perf1m_max:'1A%', perf3m_min:'3A%', perf3m_max:'3A%',
+  perf6m_min:'6A%', perf6m_max:'6A%', perfy_min:'1Y%', perfy_max:'1Y%',
+  from_high_min:'52H Yük.%', from_high_max:'52H Yük.%', from_low_min:'52H Düş.%',
+  rel_vol_min:'Röl.Hacim', rel_vol_max:'Röl.Hacim',
+  price_min:'Fiyat', price_max:'Fiyat',
+  stoch_k_min:'Stoch K', stoch_k_max:'Stoch K', stoch_kd_min:'Stoch KD',
+  macd_min:'MACD', macd_max:'MACD', macd_hist_min:'MACD Hist', macd_hist_max:'MACD Hist',
+  bb_dist_min:'BB Mesafe', bb_dist_max:'BB Mesafe',
+  above_sma200_min:'SMA200 Üst%', above_sma200_max:'SMA200 Üst%',
+  sma_trend_min:'SMA Trend', sma_trend_max:'SMA Trend'
+};
+
+function _mdrFmtVal(v, key) {
+  if (v == null || !isFinite(v)) return '—';
+  if (/roe|roa|margin|gross|revg|earng|div|chg|perf|from|above/.test(key)) return v.toFixed(1) + '%';
+  if (/piotroski/.test(key)) return Math.round(v) + '/9';
+  if (/mc_/.test(key)) {
+    if (v >= 1e6) return '$' + (v / 1e6).toFixed(1) + 'T';
+    if (v >= 1000) return '$' + (v / 1000).toFixed(0) + 'B';
+    return '$' + v.toFixed(0) + 'M';
+  }
+  return v.toFixed(2);
+}
+
+function showMatchDrawer(sym) {
+  var stock = (_vsData || []).find(function(s) { return s.symbol === sym; });
+  if (!stock || !stock._match) return;
+  var m = stock._match;
+
+  var STATUS_MAP = {
+    pass: { icon: '✓', lbl: 'Geçer', cls: 'mdr-pass' },
+    near: { icon: '⚡', lbl: 'Yakın', cls: 'mdr-near' },
+    fail: { icon: '✗', lbl: 'Başarısız', cls: 'mdr-fail' },
+    miss: { icon: '—', lbl: 'Veri Yok', cls: 'mdr-miss' }
+  };
+
+  var rows = m.details.map(function(d) {
+    var st = STATUS_MAP[d.status] || STATUS_MAP.miss;
+    var lbl = _MATCH_KEY_LABELS[d.key] || d.key;
+    var opSym = d.op === 'min' ? '≥' : '≤';
+    var valStr = _mdrFmtVal(d.val, d.key);
+    var tgtStr = _mdrFmtVal(d.target, d.key);
+    var barPct = d.s != null ? Math.round(d.s * 100) : 0;
+    return '<div class="mdr-row ' + st.cls + '">' +
+      '<span class="mdr-icon">' + st.icon + '</span>' +
+      '<span class="mdr-lbl">' + esc(lbl) + '</span>' +
+      '<span class="mdr-val">' + esc(valStr) + '</span>' +
+      '<span class="mdr-op">' + opSym + '</span>' +
+      '<span class="mdr-tgt">' + esc(tgtStr) + '</span>' +
+      '<div class="mdr-bar-wrap"><div class="mdr-bar" style="width:' + barPct + '%"></div></div>' +
+      '<span class="mdr-st-lbl">' + st.lbl + '</span>' +
+      '</div>';
+  }).join('');
+
+  var scoreLbls = { high: 'Yüksek Uyum', watch: 'İzle', ok: 'Orta Uyum', low: 'Düşük' };
+  var scoreCls = 'ms-' + m.status;
+  var scoreLbl = scoreLbls[m.status] || '';
+
+  var filters = (_scanMeta && _scanMeta.filters) || [];
+  var lensHtml = '';
+  if (filters.length) {
+    var lensItems = filters.map(function(f) {
+      var kc = f.kind === 'goat' ? 'ssm-goat' : f.kind === 'tech' ? 'ssm-tech' : 'ssm-preset';
+      return '<span class="ssm-tag ' + kc + '">' + esc(f.label) + '</span>';
+    }).join('');
+    lensHtml = '<div class="mdr-lenses"><span class="mdr-lenses-lbl">Aktif Lensler</span>' + lensItems + '</div>';
+  }
+
+  var passCnt = m.details.filter(function(d) { return d.status === 'pass'; }).length;
+  var nearCnt = m.details.filter(function(d) { return d.status === 'near'; }).length;
+  var failCnt = m.details.filter(function(d) { return d.status === 'fail' || d.status === 'miss'; }).length;
+
+  var summaryHtml = '<div class="mdr-summary">' +
+    '<span class="mdr-sum-item mdr-pass"><span class="mdr-sum-n">' + passCnt + '</span> Geçer</span>' +
+    '<span class="mdr-sum-item mdr-near"><span class="mdr-sum-n">' + nearCnt + '</span> Yakın</span>' +
+    '<span class="mdr-sum-item mdr-fail"><span class="mdr-sum-n">' + failCnt + '</span> Başarısız</span>' +
+    '</div>';
+
+  var html =
+    '<div class="mdr-hd">' +
+      '<div class="mdr-hd-left">' +
+        '<span class="mdr-sym">' + esc(sym) + '</span>' +
+        (stock.name ? '<span class="mdr-name">' + esc(stock.name) + '</span>' : '') +
+      '</div>' +
+      '<div class="mdr-hd-right">' +
+        '<span class="match-score ' + scoreCls + ' mdr-score-badge">' + m.score + '</span>' +
+        '<span class="mdr-score-lbl">' + scoreLbl + '</span>' +
+      '</div>' +
+      '<button class="mdr-close" onclick="closeMatchDrawer()" title="Kapat">×</button>' +
+    '</div>' +
+    '<div class="mdr-body">' +
+      summaryHtml +
+      '<div class="mdr-section-lbl">Kriter Analizi <span class="mdr-n">(' + m.n + ' kriter)</span></div>' +
+      '<div class="mdr-rows">' + rows + '</div>' +
+      lensHtml +
+    '</div>';
+
+  var drawer = document.getElementById('match-drawer');
+  if (!drawer) return;
+  drawer.innerHTML = html;
+  drawer.classList.add('open');
+  var overlay = document.getElementById('match-drawer-overlay');
+  if (overlay) overlay.classList.add('open');
+}
+
+function closeMatchDrawer() {
+  var drawer = document.getElementById('match-drawer');
+  if (drawer) drawer.classList.remove('open');
+  var overlay = document.getElementById('match-drawer-overlay');
+  if (overlay) overlay.classList.remove('open');
 }
 
 // ═══════════════════════════════════════════
@@ -3319,7 +3449,7 @@ function _vsRowHtml(s, idx) {
       <td data-col="perf3m" style="${cv('perf3m')}">${s.perf3m!=null?fPerf(s.perf3m):nil}</td>
       <td data-col="float_pct" style="${cv('float_pct')}">${s.floatPct!=null?fv(s.floatPct,1,true):nil}</td>
       <td data-col="sector" style="${cv('sector')}font-size:10px;color:var(--muted2)">${esc(s.sector)||'—'}</td>
-      <td data-col="match" style="${cv('match')}">${_fMatch(s._match)}</td>
+      <td data-col="match" style="${cv('match')}">${_fMatch(s._match, s.symbol)}</td>
     </tr>`;
 }function renderTable(){
   // Apply density class
@@ -5520,6 +5650,8 @@ function _initKeyboardNav() {
     if (e.key === 'Escape') {
       var shm = document.getElementById('shortcut-help-modal');
       if (shm && shm.classList.contains('open')) { shm.classList.remove('open'); return; }
+      var mdr = document.getElementById('match-drawer');
+      if (mdr && mdr.classList.contains('open')) { closeMatchDrawer(); return; }
       var si = document.getElementById('sb-searchbox');
       if (si && si === document.activeElement) { si.value = ''; si.dispatchEvent(new Event('input')); si.blur(); return; }
       var det2 = document.getElementById('detail');

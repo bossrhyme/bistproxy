@@ -543,6 +543,58 @@ td:nth-child(2){font-family:var(--ff);}
 .ms-watch{color:#f0b429;background:rgba(240,180,41,.10);}
 .ms-ok{color:var(--text2);background:var(--s2);font-weight:600;}
 .ms-low{color:var(--muted2);}
+.ms-clickable{cursor:pointer;transition:opacity .15s;}
+.ms-clickable:hover{opacity:.75;}
+
+/* Faz 4 — "Neden Eşleşti?" Drawer */
+#match-drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1099;display:none;opacity:0;transition:opacity .2s;}
+#match-drawer-overlay.open{display:block;opacity:1;}
+#match-drawer{position:fixed;top:0;right:0;bottom:0;width:400px;max-width:96vw;background:var(--s1);border-left:1px solid var(--border2);z-index:1100;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .22s cubic-bezier(.25,.46,.45,.94);overflow:hidden;}
+#match-drawer.open{transform:translateX(0);}
+.mdr-hd{display:flex;align-items:flex-start;gap:10px;padding:16px 14px 14px;border-bottom:1px solid var(--border2);background:var(--s2);flex-shrink:0;}
+.mdr-hd-left{flex:1;min-width:0;}
+.mdr-sym{font-size:17px;font-weight:800;color:var(--text);font-family:var(--ff-mono);display:block;}
+.mdr-name{font-size:11px;color:var(--muted2);display:block;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.mdr-hd-right{display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0;}
+.mdr-score-badge{font-size:20px !important;padding:5px 12px !important;min-width:48px !important;}
+.mdr-score-lbl{font-size:10px;color:var(--muted2);text-align:center;}
+.mdr-close{background:none;border:none;color:var(--muted2);font-size:20px;cursor:pointer;padding:0 4px;line-height:1;flex-shrink:0;transition:color .15s;}
+.mdr-close:hover{color:var(--text);}
+.mdr-body{flex:1;overflow-y:auto;padding:14px;}
+.mdr-summary{display:flex;gap:10px;margin-bottom:14px;}
+.mdr-sum-item{display:flex;flex-direction:column;align-items:center;flex:1;padding:8px 4px;border-radius:var(--r-sm);background:var(--s2);font-size:10px;color:var(--muted2);}
+.mdr-sum-n{font-size:22px;font-weight:800;font-family:var(--ff-mono);line-height:1.1;}
+.mdr-sum-item.mdr-pass .mdr-sum-n{color:#00c076;}
+.mdr-sum-item.mdr-near .mdr-sum-n{color:#f0b429;}
+.mdr-sum-item.mdr-fail .mdr-sum-n{color:#f6465d;}
+.mdr-section-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted2);margin-bottom:8px;}
+.mdr-n{font-weight:400;text-transform:none;letter-spacing:0;}
+.mdr-rows{display:flex;flex-direction:column;gap:4px;margin-bottom:16px;}
+.mdr-row{display:grid;grid-template-columns:18px 1fr auto auto auto 52px 48px;align-items:center;gap:6px;padding:6px 8px;border-radius:var(--r-sm);background:var(--s2);font-size:11px;}
+.mdr-row.mdr-pass{border-left:3px solid #00c076;}
+.mdr-row.mdr-near{border-left:3px solid #f0b429;}
+.mdr-row.mdr-fail,.mdr-row.mdr-miss{border-left:3px solid #f6465d;}
+.mdr-miss{opacity:.6;}
+.mdr-icon{font-size:12px;text-align:center;}
+.mdr-row.mdr-pass .mdr-icon{color:#00c076;}
+.mdr-row.mdr-near .mdr-icon{color:#f0b429;}
+.mdr-row.mdr-fail .mdr-icon,.mdr-row.mdr-miss .mdr-icon{color:#f6465d;}
+.mdr-lbl{font-weight:700;color:var(--text2);}
+.mdr-val{font-family:var(--ff-mono);color:var(--text);text-align:right;}
+.mdr-op{color:var(--muted2);font-size:10px;}
+.mdr-tgt{font-family:var(--ff-mono);color:var(--muted2);text-align:left;}
+.mdr-bar-wrap{height:4px;background:var(--s3,rgba(255,255,255,.06));border-radius:2px;overflow:hidden;}
+.mdr-bar{height:100%;border-radius:2px;background:var(--accent);transition:width .3s;}
+.mdr-row.mdr-pass .mdr-bar{background:#00c076;}
+.mdr-row.mdr-near .mdr-bar{background:#f0b429;}
+.mdr-row.mdr-fail .mdr-bar,.mdr-row.mdr-miss .mdr-bar{background:#f6465d;}
+.mdr-st-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;text-align:right;color:var(--muted2);}
+.mdr-row.mdr-pass .mdr-st-lbl{color:#00c076;}
+.mdr-row.mdr-near .mdr-st-lbl{color:#f0b429;}
+.mdr-row.mdr-fail .mdr-st-lbl,.mdr-row.mdr-miss .mdr-st-lbl{color:#f6465d;}
+.mdr-lenses{margin-top:4px;}
+.mdr-lenses-lbl{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted2);margin-bottom:6px;}
+@media(max-width:480px){#match-drawer{width:100vw;border-left:none;}}
 
 /* Faz 2 — Lens groups (guru + teknik grupları) */
 .psv-section-hd{justify-content:flex-start;}
