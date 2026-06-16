@@ -1952,6 +1952,21 @@ var PSV_MAIN_TECH    = ['breakout','oversold','nearHigh','pullback','highVolume'
 var PSV_MAIN_EX    = ['bist','nasdaq','nyse','sp500','dax','lse'];
 var PSV_MAIN_GOATS = ['buffett','graham','lynch','fisher','munger'];
 
+var PSV_GURU_GROUPS = [
+  { id:'deger',    label:'Değer',            vitrin:['graham','schloss','klarman'],     extra:['dreman','carlisle','graham_ncav'] },
+  { id:'kalite',   label:'Kalite',           vitrin:['buffett','munger','tsmith'],      extra:['greenblatt','piotroski'] },
+  { id:'buyume',   label:'Büyüme / GARP',    vitrin:['lynch','oneil','minervini'],      extra:['ark','oshaughnessy','fisher'] },
+  { id:'aktivist', label:'Aktivist',         vitrin:['ackman','icahn','einhorn'],       extra:[] },
+  { id:'momentum', label:'Momentum / Makro', vitrin:['soros','zweig','neff'],           extra:['templeton','kfisher'] }
+];
+
+var PSV_TECH_GROUPS = [
+  { id:'t-trend',    label:'Trend',      vitrin:['breakout','nearHigh','goldenCross'],    extra:['pullback','trendFollow','adxTrend','volumeTrend','growthBreakout'] },
+  { id:'t-momt',     label:'Momentum',   vitrin:['highVolume','strongDay','ytdLeader'],   extra:['multiMomentum','adxMomentum'] },
+  { id:'t-osilator', label:'Osilatör',   vitrin:['oversold','rsiBounce','macdReversal'],  extra:['bbBounce','stochReversal','deathCrossBounce'] },
+  { id:'t-onay',     label:'Onay / Mix', vitrin:['techBuy','maConfirm','oscAlignment'],   extra:['oscConfirm','lowBeta'] }
+];
+
 var _PSV_FMTS = [
   ['pe_max',          function(v){ return 'F/K<'+v; }],
   ['pb_max',          function(v){ return 'F/DD<'+v; }],
@@ -2050,10 +2065,38 @@ function initPrescanView() {
       '<div class="psv-preset-desc">'+esc(p.desc)+'</div></div>';
   }
 
-  var allExKeys      = Object.keys(EXCHANGE_META).filter(function(k){ return PSV_MAIN_EX.indexOf(k)===-1; });
-  var extraGoatKeys  = Object.keys(GURUS).filter(function(k){ return PSV_MAIN_GOATS.indexOf(k)===-1; });
+  var allExKeys       = Object.keys(EXCHANGE_META).filter(function(k){ return PSV_MAIN_EX.indexOf(k)===-1; });
   var extraPresetKeys = Object.keys(PRESETS).filter(function(k){ return PSV_MAIN_PRESETS.indexOf(k)===-1; });
-  var extraTechKeys   = Object.keys(TECH_PRESETS).filter(function(k){ return PSV_MAIN_TECH.indexOf(k)===-1; });
+
+  function mkGoatGroup(grp) {
+    var vitrinHtml = grp.vitrin.map(mkGoatCard).join('');
+    var extraHtml  = grp.extra.length
+      ? '<div class="psv-goat-grid psv-lg-extra" id="psv-lge-'+grp.id+'" style="display:none">'+grp.extra.map(mkGoatCard).join('')+'</div>'
+      : '';
+    var moreBtn = grp.extra.length
+      ? '<button class="psv-lg-more" data-gid="'+grp.id+'" data-count="'+grp.extra.length+'" onclick="psvToggleLgMore(this)">+ '+grp.extra.length+' daha</button>'
+      : '';
+    return '<div class="psv-lens-group" id="psv-lg-'+grp.id+'">' +
+      '<div class="psv-lg-hd"><span class="psv-lg-name">'+esc(grp.label)+'</span><span class="psv-lg-count">'+(grp.vitrin.length+grp.extra.length)+'</span></div>' +
+      '<div class="psv-goat-grid psv-lg-vitrin">'+vitrinHtml+'</div>' +
+      extraHtml + moreBtn +
+      '</div>';
+  }
+
+  function mkTechGroup(grp) {
+    var vitrinHtml = grp.vitrin.map(function(k){ return mkFilterCard(k, TECH_PRESETS[k], 'psv-tech-card', 'psvToggleTech'); }).join('');
+    var extraHtml  = grp.extra.length
+      ? '<div class="psv-chip-grid psv-lg-extra" id="psv-lge-'+grp.id+'" style="display:none">'+grp.extra.map(function(k){ return mkFilterCard(k, TECH_PRESETS[k], 'psv-tech-card', 'psvToggleTech'); }).join('')+'</div>'
+      : '';
+    var moreBtn = grp.extra.length
+      ? '<button class="psv-lg-more" data-gid="'+grp.id+'" data-count="'+grp.extra.length+'" onclick="psvToggleLgMore(this)">+ '+grp.extra.length+' daha</button>'
+      : '';
+    return '<div class="psv-lens-group" id="psv-lg-'+grp.id+'">' +
+      '<div class="psv-lg-hd"><span class="psv-lg-name">'+esc(grp.label)+'</span><span class="psv-lg-count">'+(grp.vitrin.length+grp.extra.length)+'</span></div>' +
+      '<div class="psv-chip-grid psv-lg-vitrin">'+vitrinHtml+'</div>' +
+      extraHtml + moreBtn +
+      '</div>';
+  }
 
   el.innerHTML =
     '<button class="psv-close-btn" id="psv-close-btn" onclick="closePrescanView()" style="display:none">✕ Sonuçlara dön</button>'+
@@ -2084,12 +2127,11 @@ function initPrescanView() {
     '<button class="psv-show-more" id="psv-ex-more" onclick="psvToggleMoreEx()">+ Diğer Borsalar</button>'+
     '</div>'+
 
-    // Yatırımcı Lensleri — sadece hisse
+    // Yatırımcı Lensleri — sadece hisse (Faz 2: gruplu layout + arama)
     '<div class="psv-section" id="psv-sec-goat">'+
-    '<div class="psv-section-hd">Yatırımcı Lensleri <span class="psv-opt">isteğe bağlı</span></div>'+
-    '<div class="psv-goat-grid" id="psv-goat-main">'+PSV_MAIN_GOATS.map(mkGoatCard).join('')+'</div>'+
-    '<div class="psv-goat-extra" id="psv-goat-extra" style="display:none">'+extraGoatKeys.map(mkGoatCard).join('')+'</div>'+
-    '<button class="psv-show-more" id="psv-goat-more" onclick="psvToggleMoreGoats()">+ Tüm Lensler</button>'+
+    '<div class="psv-section-hd">Yatırımcı Lensleri <span class="psv-opt">isteğe bağlı</span>'+
+    '<input class="psv-lens-search" id="psv-lens-search" type="text" placeholder="Lens ara…" oninput="psvGoatSearch(this.value)"></div>'+
+    '<div id="psv-goat-groups">'+PSV_GURU_GROUPS.map(mkGoatGroup).join('')+'</div>'+
     '</div>'+
 
     // Temel — sadece hisse
@@ -2100,12 +2142,10 @@ function initPrescanView() {
     (extraPresetKeys.length ? '<button class="psv-show-more" id="psv-preset-more" onclick="psvToggleMorePresets()">+ Daha Fazla ('+extraPresetKeys.length+')</button>' : '')+
     '</div>'+
 
-    // Teknik — sadece hisse
+    // Teknik — sadece hisse (Faz 2: gruplu layout)
     '<div class="psv-section" id="psv-sec-teknik">'+
     '<div class="psv-section-hd">Teknik <span class="psv-opt">isteğe bağlı</span></div>'+
-    '<div class="psv-chip-grid" id="psv-tech-main">'+PSV_MAIN_TECH.map(function(k){ return mkFilterCard(k, TECH_PRESETS[k], 'psv-tech-card', 'psvToggleTech'); }).join('')+'</div>'+
-    '<div class="psv-chip-extra" id="psv-tech-extra" style="display:none">'+extraTechKeys.map(function(k){ return mkFilterCard(k, TECH_PRESETS[k], 'psv-tech-card', 'psvToggleTech'); }).join('')+'</div>'+
-    '<button class="psv-show-more" id="psv-tech-more" onclick="psvToggleMoreTech()">+ Daha Fazla ('+extraTechKeys.length+')</button>'+
+    '<div id="psv-tech-groups">'+PSV_TECH_GROUPS.map(mkTechGroup).join('')+'</div>'+
     '</div>'+
 
     // ── KRİPTO bölümleri (başlangıçta gizli) ──
@@ -2301,13 +2341,32 @@ function psvToggleTech(key) {
   _psvUpdateSelState();
 }
 
-function psvToggleMoreGoats() {
-  var extra = document.getElementById('psv-goat-extra');
-  var btn   = document.getElementById('psv-goat-more');
+function psvToggleLgMore(btn) {
+  var gid   = btn.dataset.gid;
+  var count = btn.dataset.count;
+  var extra = document.getElementById('psv-lge-'+gid);
   if (!extra) return;
   var open = extra.style.display !== 'none';
-  extra.style.display = open ? 'none' : 'flex';
-  if (btn) btn.textContent = open ? '+ Tüm Lensler' : '— Daha Az';
+  extra.style.display = open ? 'none' : '';
+  btn.textContent = open ? '+ '+count+' daha' : '− Daha az';
+}
+
+function psvGoatSearch(val) {
+  var q = val.toLowerCase().trim();
+  document.querySelectorAll('#psv-sec-goat .psv-goat-card').forEach(function(c) {
+    var key = c.dataset.goat || '';
+    var g = (typeof GURUS !== 'undefined' && GURUS[key]) || {};
+    var text = ((g.label || '') + ' ' + (g.desc || '')).toLowerCase();
+    c.style.display = (!q || text.indexOf(q) !== -1) ? '' : 'none';
+  });
+  document.querySelectorAll('#psv-sec-goat .psv-lens-group').forEach(function(grpEl) {
+    if (q) {
+      var extra = grpEl.querySelector('.psv-lg-extra');
+      if (extra) extra.style.display = '';
+    }
+    var anyVisible = Array.from(grpEl.querySelectorAll('.psv-goat-card')).some(function(c){ return c.style.display !== 'none'; });
+    grpEl.style.display = anyVisible ? '' : 'none';
+  });
 }
 
 function psvToggleMoreEx() {
@@ -2329,15 +2388,7 @@ function psvToggleMorePresets() {
   if (btn) btn.textContent = open ? '+ Daha Fazla (' + extraCount + ')' : '— Daha Az';
 }
 
-function psvToggleMoreTech() {
-  var extra = document.getElementById('psv-tech-extra');
-  var btn   = document.getElementById('psv-tech-more');
-  if (!extra) return;
-  var open = extra.style.display !== 'none';
-  var extraCount = Object.keys(TECH_PRESETS).filter(function(k){ return PSV_MAIN_TECH.indexOf(k)===-1; }).length;
-  extra.style.display = open ? 'none' : 'flex';
-  if (btn) btn.textContent = open ? '+ Daha Fazla (' + extraCount + ')' : '— Daha Az';
-}
+// psvToggleMoreGoats / psvToggleMoreTech kaldırıldı → psvToggleLgMore (Faz 2)
 
 function openPrescanView() {
   _psvActiveGoats   = new Set();

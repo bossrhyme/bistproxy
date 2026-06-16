@@ -536,6 +536,21 @@ td:nth-child(2){font-family:var(--ff);}
 /* GOAT cards */
 .psv-goat-grid,.psv-goat-extra{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
 .psv-goat-extra{margin-top:8px;}
+
+/* Faz 2 — Lens groups (guru + teknik grupları) */
+.psv-section-hd{justify-content:flex-start;}
+.psv-lens-search{margin-left:auto;padding:4px 10px;background:var(--s2);border:1px solid var(--border2);border-radius:var(--r-sm);font-size:11px;color:var(--text);font-family:var(--ff);outline:none;width:130px;transition:border-color .15s;}
+.psv-lens-search:focus{border-color:var(--accent);width:180px;}
+.psv-lens-search::placeholder{color:var(--muted2);}
+#psv-goat-groups,#psv-tech-groups{display:flex;flex-direction:column;gap:14px;}
+.psv-lens-group{display:flex;flex-direction:column;gap:6px;}
+.psv-lg-hd{display:flex;align-items:center;gap:7px;margin-bottom:2px;}
+.psv-lg-name{font-size:10px;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;}
+.psv-lg-count{font-size:9px;font-weight:700;color:var(--muted2);background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:1px 6px;font-family:var(--ff-mono);}
+.psv-lg-vitrin{justify-content:flex-start;}
+.psv-lg-extra{margin-top:6px;justify-content:flex-start;}
+.psv-lg-more{margin-top:4px;align-self:flex-start;background:none;border:none;color:var(--accent);font-size:11px;font-weight:600;cursor:pointer;padding:2px 0;font-family:var(--ff);}
+.psv-lg-more:hover{text-decoration:underline;}
 .psv-goat-card{position:relative;display:flex;flex-direction:column;gap:4px;padding:10px 12px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r-lg);cursor:pointer;transition:all .15s;min-width:96px;max-width:160px;}
 .psv-goat-card:hover{border-color:var(--accent);background:var(--hover);}
 .psv-goat-card.on{border-color:var(--accent);background:var(--accent2);}
