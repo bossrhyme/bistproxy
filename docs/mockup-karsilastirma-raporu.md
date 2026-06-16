@@ -309,4 +309,91 @@ Uyum puanı algoritması gerektirmeyen, mevcut motora dokunmayan cilalar:
 **En yüksek getirili tek hamle:** Faz 1'i (anlatım cilaları) hemen yapmak — düşük risk, hissedilir fark. **En stratejik hamle:** Faz 2'de gerçek bir **Uyum Puanı** motoru kurmak — mockup'un tüm vaadinin kilidi bu.
 
 ---
+
+# EK — Entegrasyon Planı (2026-06-16)
+
+> Bu ek, iki soruya yanıt verir: **(1)** Bizim çok sayıda filtreyi mockup'un sade yapısına nasıl sokarız; **(2)** Mockup'ta olup bizde olmayanları motora nasıl bağlarız. Onaylanan ürün kararı: **filtreleme felsefesi = "İkisi de" (Katı/Esnek anahtarı).**
+
+## E.0 — Temel Tez
+
+> **Bizim filtre derinliğimiz, mockup'un "Uyum Puanı"nı *gerçek* yapan yakıttır.**
+
+Mockup skorları elle yazılmış (hardcoded) çünkü arkasında gerçek eşik yok. Bizde her `GURUS`/`PRESET`/`TECH_PRESET` zaten `.filters` objesinde `_min`/`_max` eşikleri taşıyor. Yani 25 mercek + 28 teknik + 8 temel preset, bir skorlama motoruna **hazır yapılandırılmış girdi**. İki soru aynı çözümün iki yüzü: çok-filtre bir yük değil, motorun benzini.
+
+## E.1 — Çok Filtreyi Sade Yapıya Sokmak (Kademeli Açığa Çıkarma)
+
+Mockup'un "3 karar ailesi" çerçevesi yapımıza birebir oturuyor (GURUS→Yatırımcı, PRESETS→Temel, TECH→Teknik). Sorun yapı değil, **adet**. Üç katman:
+
+**1. Katman — Vitrin (Kolay/varsayılan):** Ailede 4–5 öne çıkan kart. Zaten var: `PSV_MAIN_GOATS=5`, `PSV_MAIN_PRESETS=4`, `PSV_MAIN_TECH=5`. Mockup'un temiz görünümü = bu katman.
+
+**2. Katman — Gruplama + Arama:** 25 yatırımcı merceğini stile göre grupla (25 düz → 5 grup × ~5):
+- **Değer:** Graham, Schloss, Klarman, Dreman, Carlisle, Net-Net (NCAV)
+- **Kalite:** Buffett, Munger, Terry Smith, Greenblatt
+- **Büyüme / GARP:** Lynch, O'Neil, Minervini, Cathie Wood, O'Shaughnessy
+- **Aktivist / Özel Durum:** Ackman, Icahn, Einhorn
+- **Momentum / Makro:** Soros, Zweig, Neff, Templeton, K. Fisher
+- (+ "Mercek ara…" kutusu — mockup'un step-2 market-arama deseni genişletilir)
+
+Bu hem gezilebilirlik hem **eğiticilik** sağlar (kullanıcı "Buffett neden Kalite" öğrenir). Aynı yöntem 28 teknik preset için de uygulanır (Trend / Momentum / Aşırılık / Hacim / Volatilite grupları).
+
+**3. Katman — Manuel Eşikler (Pro):** ~56 ham `_min/_max` metriği "Gelişmiş / Manuel" bölümünde kalır — vitrini kirletmeden. Bu zaten Kolay/Pro ayrımımız.
+
+> **Sonuç:** Mockup sadeliği = 1. katman varsayılanı; bizim derinliğimiz = 2–3. katman, açığa çıkarma ardında.
+
+## E.2 — Skorlama Motoru (Omurga)
+
+Tüm eksik mockup özellikleri buna bağlı; gerisi bedava düşer.
+
+**Girdi:** aktif filtre seti → her mercek/preset kendi eşik kurallarına açılır
+(örn. `Buffett = {roe_min:15, de_max:0.5, pe_min:8, pe_max:25}`).
+
+**Hesap:** her hisse × her aktif eşik için **0–1 normalize alt-skor** (eşiğin ne kadar üstünde/altında). Aile içinde ortala → 3 aile skoru → **ağırlıklı topla** → **0–100 Uyum Puanı**.
+
+**Onaylanan mod kararı — Katı/Esnek anahtarı (ikisi de):**
+- **Katı (varsayılan, mevcut davranış):** eşiği geçemeyen **elenir**; Uyum Puanı yalnızca geçenler arasında sıralama + açıklama için kullanılır. Öngörülebilir, düşük risk, mevcut kullanıcıyı bozmaz.
+- **Esnek (opt-in):** sıkı eleme gevşer; eşiğe **yakın** olana kısmi puan verilir, liste genişler. "Yüksek Uyum / Yakın İzle / Uygun" rozetleri (mockup pill mantığı) bu modda anlam kazanır.
+- UI: sonuç toolbar'ında küçük bir **Katı ⇄ Esnek** anahtarı; varsayılan Katı. Geçiş anında yeniden render (yeni tarama gerekmez — skor istemci tarafında).
+
+**Normalize taslağı (örnek, `_min` kuralı için):**
+`alt_skor = clamp((deger − taban) / (tavan − taban), 0, 1)`
+— `taban = eşik × (1 − tolerans)`, `tavan = eşik × (1 + bant)`.
+Katı modda `deger < eşik` → elenir; Esnek modda `taban..eşik` arası kısmi puan. (`_max` kuralları simetrik.) Tolerans/bant ve aile ağırlıkları **tek bir config'te** tutulur ki kalibrasyon merkezî olsun.
+
+**Çıktı:** her hisse için bir `_matchBreakdown` objesi (hangi kritere ne kadar uydu) saklanır → aşağıdaki özellikleri besler.
+
+## E.3 — Eksik Özelliklerin Motora Bağlanması
+
+| Mockup özelliği | Motordan nasıl beslenir |
+|---|---|
+| **Uyum Puanı kolonu (4.A)** | Doğrudan motor çıktısı; yeni "Uyum" kolonu + sıralama seçeneği |
+| **Neden Eşleşti? drawer (4.B)** | `_matchBreakdown` → aile çubukları + "ROE %18 ≥ %15 ✓" satırları (gerçek değer) |
+| **Sonuç metrik kartları (4.F)** | En yüksek uyum / filtre dışı (`allData − filtered`) / aktif aile — bedava |
+| **Yüksek-Uyum/Yakın-İzle rozetleri** | Esnek modda puan bandından türetilir |
+
+**Motor gerektirmeyen, hemen yapılabilenler (Faz 1):**
+- **"Neden bu sonuçlar?" düz cümle (4.C)** — aktif filtre adlarından `recipeSentence` benzeri
+- **Güven şeridi (4.G)** — statik `.trust-strip` ("Eşleşme ≠ öneri")
+- **Feedback toast (4.H)** — mockup `showFeedback` birebir
+- **Filtre eşik şeffaflığı (4.J)** — seçili eşikleri "Filtre Mantığı" kutusunda göster (veri zaten var)
+
+## E.4 — Önkoşul Tech-Debt (Faz 0)
+
+1. **Tek kaynak:** `deepfin.js` ve `stratejiler.js` strateji verisinin **senkron olmayan iki kopyasını** taşıyor (`tsmith`/`templeton`/`graham_ncav` vs `smith`/`netnet`). Skor iki sayfada da kullanılacağı için önce ortak bir `strategies.js` modülüne indirgenmeli — yoksa aynı hisse iki yerde farklı puan alır.
+2. **Ölü kod:** `.smt-btn` Kolay/Pro toggle'ı CSS/JS'te referanslı ama HTML'de üretilmiyor — wizard çalışmasında temizlenir.
+3. **4-filtre limiti:** Skor "1 mercek + birkaç kriter" ile daha anlamlı; `_PSV_MAX_SEL` yeniden değerlendirilmeli.
+
+## E.5 — Faz Sıralaması (entegrasyon odaklı)
+
+| Faz | İçerik | Motor? |
+|---|---|---|
+| **0** | Strateji verisini tek kaynağa indir + ölü kod temizliği | Hayır (önkoşul) |
+| **1** | "Neden bu sonuçlar?" cümlesi, güven şeridi, feedback toast, eşik şeffaflığı | Hayır |
+| **2** | Yatırımcı mercek **gruplama + arama** (25→5 grup), vitrin/derinlik katmanları | Hayır |
+| **3** | **Uyum Puanı motoru** + **Katı/Esnek anahtarı** + tablo kolonu + sonuç metrik kartları | **Evet (çekirdek)** |
+| **4** | "Neden Eşleşti?" drawer, 3-adım kurulum wizard'ı | Evet (3'e bağlı) |
+| **5** | Hero canlı önizleme, marka tazeleme, mobil sonuç kartları | Hayır |
+
+İki "kazanç düğümü": **Faz 1** (sıfır riskle hissedilir anlatım farkı) ve **Faz 3** (mockup'un tüm vaadinin kilidi).
+
+---
 *Bu doküman yalnızca araştırma/analiz amaçlıdır; kodda değişiklik içermez.*
