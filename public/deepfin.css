@@ -454,6 +454,17 @@ td:nth-child(2){font-family:var(--ff);}
 .sstep-item.done .sstep-label{color:var(--text);}
 .sstep-item.active .sstep-sub,.sstep-item.done .sstep-sub{display:block;}
 
+/* Faz 5 — Makro Bant */
+.macro-band{display:flex;align-items:center;gap:0;flex-wrap:wrap;border-bottom:1px solid var(--border);background:var(--s2);padding:5px 14px;flex-shrink:0;overflow:hidden;}
+.mb-item{display:flex;align-items:baseline;gap:5px;padding:3px 10px;border-right:1px solid var(--border);}
+.mb-item:last-of-type{border-right:none;}
+.mb-lbl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted2);white-space:nowrap;}
+.mb-val{font-size:11px;font-weight:700;font-family:var(--ff-mono);color:var(--text2);white-space:nowrap;}
+.mb-warn .mb-val{color:#f6465d;}
+.mb-caution .mb-val{color:#f0b429;}
+.mb-stale{font-size:10px;color:var(--muted2);margin-left:auto;padding-left:8px;cursor:help;}
+@media(max-width:640px){.mb-item:nth-child(n+4){display:none;}}
+
 /* ── SCAN SUMMARY CARD ── */
 .scan-summary{padding:8px 14px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:6px;font-size:11px;color:var(--muted2);background:var(--s2);flex-shrink:0;position:relative;overflow:visible;min-height:30px;animation:dfFadeIn .18s ease;}
 .ssm-why{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;}
@@ -1183,7 +1194,36 @@ td:nth-child(2){font-family:var(--ff);}
 .hpx-h1{font-size:clamp(38px,5.5vw,64px);font-weight:600;letter-spacing:-1.8px;line-height:1.08;color:var(--text);margin-bottom:20px;max-width:680px;}
 .hpx-h1 em{font-style:normal;color:var(--accent);}
 .hpx-sub{font-size:17px;color:var(--text2);line-height:1.65;margin-bottom:40px;max-width:520px;font-weight:400;}
-.hpx-ctas{display:flex;gap:10px;margin-bottom:56px;flex-wrap:wrap;}
+.hpx-ctas{display:flex;gap:10px;margin-bottom:32px;flex-wrap:wrap;}
+
+/* Faz 5 — Hero Canlı Önizleme */
+.hpx-preview{width:100%;max-width:560px;margin:0 auto 40px;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--s1);box-shadow:0 4px 24px rgba(0,0,0,.07);text-align:left;}
+.hpx-pv-bar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:10px 14px;background:var(--s2);border-bottom:1px solid var(--border);}
+.hpx-pv-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted2);margin-right:2px;}
+.hpx-pv-chip{font-size:11px;font-weight:600;padding:3px 9px;border-radius:6px;cursor:default;}
+.hpx-pv-goat{background:rgba(245,158,11,.14);color:#B45309;}
+[data-theme="dark"] .hpx-pv-goat{background:rgba(245,158,11,.18);color:#fbbf24;}
+.hpx-pv-preset{background:rgba(99,102,241,.12);color:#4f46e5;}
+[data-theme="dark"] .hpx-pv-preset{background:rgba(99,102,241,.18);color:#818cf8;}
+.hpx-pv-filter{background:var(--s3);color:var(--text2);border:1px solid var(--border2);}
+.hpx-pv-result{margin-left:auto;font-size:11px;color:var(--text2);}
+.hpx-pv-result b{color:var(--green);font-weight:700;}
+.hpx-pv-table{padding:4px 0;}
+.hpx-pv-row{display:grid;grid-template-columns:1fr 44px 52px 52px 44px;gap:4px 10px;align-items:center;padding:8px 14px;transition:background .1s;cursor:pointer;}
+.hpx-pv-row:hover:not(.hpx-pv-hd){background:var(--s3);}
+.hpx-pv-hd{padding:4px 14px 6px;cursor:default;}
+.hpx-pv-hd:hover{background:transparent;}
+.hpx-pv-hd span{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted2);}
+.hpx-pv-sym{min-width:0;}
+.hpx-pv-ticker{display:block;font-size:12px;font-weight:700;color:var(--text);font-family:var(--ff-mono);}
+.hpx-pv-name{display:block;font-size:10px;color:var(--muted2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hpx-pv-num{font-size:12px;font-family:var(--ff-mono);text-align:right;color:var(--text2);}
+.hpx-pv-match{text-align:right;}
+.hpx-g{color:#00c076 !important;}
+.hpx-r{color:#f6465d !important;}
+.hpx-pv-cta{text-align:center;padding:10px 14px;border-top:1px solid var(--border);font-size:12px;font-weight:600;color:var(--accent);cursor:pointer;transition:background .1s;}
+.hpx-pv-cta:hover{background:var(--s3);}
+@media(max-width:520px){.hpx-preview{max-width:100%;}}
 .hpx-cta-p{font-size:14px;padding:11px 24px;border-radius:9px;background:var(--gold);color:#fff;border:none;cursor:pointer;font-weight:500;font-family:var(--ff);box-shadow:0 1px 3px rgba(217,119,6,.25);transition:all .15s;}
 .hpx-cta-p:hover{background:#B45309;box-shadow:0 4px 12px rgba(217,119,6,.3);transform:translateY(-1px);}
 .hpx-cta-g{font-size:14px;padding:11px 16px;border-radius:8px;background:transparent;color:var(--text2);border:1px solid var(--border2);cursor:pointer;font-family:var(--ff);transition:all .15s;}
@@ -1961,11 +2001,43 @@ kbd{font-family:var(--ff-mono);font-size:10px;color:var(--text);background:var(-
 .kt-mcap{color:var(--text2);}
 .kt-more td{text-align:center;color:var(--accent);font-size:12px;font-weight:600;padding:14px;cursor:default;}
 .kt-more:hover{background:transparent !important;}
+.kt-uyum{text-align:right;}
+.kt-uyum-th{white-space:nowrap;}
 @media(max-width:760px){
   .kolay-presets{grid-template-columns:1fr 1fr;}
   #kolay-wrap{padding:16px 4% 40px;}
   .kolay-table thead th:nth-child(4),.kolay-table td:nth-child(4),
   .kolay-table thead th:nth-child(7),.kolay-table td:nth-child(7){display:none;}
+}
+/* Faz 5 — Mobil Sonuç Kartları (Kolay Mod) */
+@media(max-width:600px){
+  .kolay-tablewrap{border:none;border-radius:0;background:transparent;}
+  .kolay-table{display:block;}
+  .kolay-table thead{display:none;}
+  .kolay-table tbody{display:flex;flex-direction:column;gap:8px;}
+  .kolay-table tbody tr{
+    display:grid;
+    grid-template-columns:1fr auto auto;
+    grid-template-rows:auto auto;
+    border:1px solid var(--border) !important;
+    border-bottom:1px solid var(--border) !important;
+    border-radius:10px;
+    padding:11px 13px;
+    background:var(--s1);
+    gap:2px 10px;
+  }
+  .kolay-table tbody tr:last-child{border-bottom:1px solid var(--border) !important;}
+  .kolay-table td{padding:0;font-size:13px;}
+  .kt-hisse{grid-column:1;grid-row:1/3;align-self:center;}
+  .kt-sym{font-size:13px;}
+  .kt-price{grid-column:2;grid-row:1;text-align:right;font-size:13px;}
+  .kolay-table td:nth-child(3){grid-column:2;grid-row:2;text-align:right;font-size:12px;}
+  .kt-uyum{grid-column:3;grid-row:1/3;align-self:center;text-align:right;}
+  .kolay-table td:nth-child(4),
+  .kolay-table td:nth-child(5),
+  .kolay-table td:nth-child(6),
+  .kolay-table td:nth-child(7){display:none;}
+  .kt-more td{border-radius:10px;border:1px solid var(--border);display:block;}
 }
 
 /* ═══ Kolay/Pro Seçim Ekranı ═══ */

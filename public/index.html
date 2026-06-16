@@ -132,11 +132,11 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=warm48">
+<link rel="stylesheet" href="/deepfin.css?v=warm50">
 <script src="/i18n.js?v=6" defer></script>
 <script src="/strategies.js?v=1" defer></script>
 <script src="/scoring.js?v=1" defer></script>
-<script src="/deepfin.js?v=202" defer></script>
+<script src="/deepfin.js?v=204" defer></script>
 <script src="/auth-header.js?v=2" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -225,6 +225,48 @@ if('serviceWorker' in navigator){
       <div class="hpx-ctas">
         <button class="hpx-cta-p" onclick="showScreenerOrPrescan()" data-i18n="hero.cta1">Taramaya Başla</button>
         <button class="hpx-cta-g" onclick="showHomepage(); var s=document.getElementById('how-section'); if(s) s.scrollIntoView({behavior:'smooth',block:'start'});" data-i18n="hero.cta2">Nasıl çalışır</button>
+      </div>
+      <!-- Faz 5: Hero Canlı Önizleme -->
+      <div class="hpx-preview" aria-hidden="true">
+        <div class="hpx-pv-bar">
+          <span class="hpx-pv-label">Örnek tarama:</span>
+          <span class="hpx-pv-chip hpx-pv-goat">Buffett</span>
+          <span class="hpx-pv-chip hpx-pv-preset">Değer</span>
+          <span class="hpx-pv-chip hpx-pv-filter">ROE ≥ 15%</span>
+          <span class="hpx-pv-chip hpx-pv-filter">F/K ≤ 20</span>
+          <span class="hpx-pv-result">→ <b>8</b> eşleşme</span>
+        </div>
+        <div class="hpx-pv-table">
+          <div class="hpx-pv-row hpx-pv-hd">
+            <span class="hpx-pv-sym">Hisse</span>
+            <span class="hpx-pv-num">F/K</span>
+            <span class="hpx-pv-num">ROE%</span>
+            <span class="hpx-pv-num">Değ%</span>
+            <span class="hpx-pv-match">UYUM</span>
+          </div>
+          <div class="hpx-pv-row" onclick="showScreenerOrPrescan()">
+            <span class="hpx-pv-sym"><span class="hpx-pv-ticker">THYAO</span><span class="hpx-pv-name">Türk Hava Yolları</span></span>
+            <span class="hpx-pv-num">9.2</span>
+            <span class="hpx-pv-num hpx-g">22.4%</span>
+            <span class="hpx-pv-num hpx-g">+3.1%</span>
+            <span class="hpx-pv-match"><span class="match-score ms-high">87</span></span>
+          </div>
+          <div class="hpx-pv-row" onclick="showScreenerOrPrescan()">
+            <span class="hpx-pv-sym"><span class="hpx-pv-ticker">SISE</span><span class="hpx-pv-name">Şişe Cam</span></span>
+            <span class="hpx-pv-num">14.8</span>
+            <span class="hpx-pv-num hpx-g">17.9%</span>
+            <span class="hpx-pv-num hpx-r">−1.2%</span>
+            <span class="hpx-pv-match"><span class="match-score ms-watch">71</span></span>
+          </div>
+          <div class="hpx-pv-row" onclick="showScreenerOrPrescan()">
+            <span class="hpx-pv-sym"><span class="hpx-pv-ticker">BIMAS</span><span class="hpx-pv-name">BİM Mağazaları</span></span>
+            <span class="hpx-pv-num">18.3</span>
+            <span class="hpx-pv-num hpx-g">19.5%</span>
+            <span class="hpx-pv-num hpx-g">+0.8%</span>
+            <span class="hpx-pv-match"><span class="match-score ms-watch">68</span></span>
+          </div>
+          <div class="hpx-pv-cta" onclick="showScreenerOrPrescan()">Tümünü tara →</div>
+        </div>
       </div>
       <div class="hpx-stats">
         <div><div class="hpx-stat-n">9+</div><div class="hpx-stat-l" data-i18n="stat.assets">varlık sınıfı</div></div>
@@ -1137,6 +1179,9 @@ if('serviceWorker' in navigator){
         <button class="qs-btn" onclick="quickGoat('lynch')" title="Peter Lynch kriterleri">Lynch</button>
       </div>
 
+      <!-- Faz 5: Makro Bant -->
+      <div id="macro-band" class="macro-band" style="display:none"></div>
+
       <div id="scan-summary" class="scan-summary" style="display:none"></div>
 
       <div class="cstate" id="empty">
@@ -1234,6 +1279,7 @@ if('serviceWorker' in navigator){
                 <th class="r" title="Özsermaye Kârlılığı — %15 üzeri iyi kabul edilir">ROE</th>
                 <th class="r" title="RSI (14) — 30 altı aşırı satım, 70 üstü aşırı alım">RSI</th>
                 <th class="r">Piyasa Değeri</th>
+                <th class="r kt-uyum-th" title="Uyum Puanı — aktif filtrelerle örtüşme yüzdesi">UYUM</th>
               </tr>
             </thead>
             <tbody id="kolay-tbody"></tbody>

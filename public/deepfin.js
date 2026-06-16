@@ -3540,10 +3540,12 @@ function renderKolay() {
   }
   function peC(v) { if (v == null || v <= 0) return ''; return 'font-weight:600;color:' + (v < 15 ? 'var(--green)' : v < 25 ? 'var(--gold)' : 'var(--red)'); }
   function roeC(v) { if (v == null) return ''; return 'font-weight:600;color:' + (v > 15 ? 'var(--green)' : v > 8 ? 'var(--gold)' : 'var(--red)'); }
+  var hasMatch = typeof computeMatch === 'function' && typeof _scoreFilters !== 'undefined' && Object.keys(_scoreFilters).length > 0;
   var cap = data.length > 500 ? 500 : data.length;
   var rows = '';
   for (var i = 0; i < cap; i++) {
     var s = data[i];
+    var matchCell = hasMatch && s._match ? _fMatch(s._match, s.symbol) : '<span class="nil">—</span>';
     rows += '<tr onclick="showDetail(\'' + escJS(s.symbol) + '\')" tabindex="0">' +
       '<td class="kt-hisse"><span class="kt-sym">' + esc(s.symbol) + '</span><span class="kt-name">' + esc(s.name || '') + '</span></td>' +
       '<td class="r kt-price">' + (s.currentPrice != null ? s.currentPrice.toFixed(2) + ' ' + curr : '—') + '</td>' +
@@ -3552,10 +3554,11 @@ function renderKolay() {
       '<td class="r"><span style="' + roeC(s.roeTTM) + '">' + (s.roeTTM != null ? s.roeTTM.toFixed(1) + '%' : '—') + '</span></td>' +
       '<td class="r">' + (s.rsi14 != null ? fRsi(s.rsi14) : '—') + '</td>' +
       '<td class="r kt-mcap">' + mcapStr(s.marketCapitalization) + '</td>' +
+      '<td class="r kt-uyum">' + matchCell + '</td>' +
     '</tr>';
   }
-  if (data.length > cap) rows += '<tr class="kt-more"><td colspan="7">+ ' + (data.length - cap) + ' hisse daha — tümünü görmek için Pro moda geç</td></tr>';
-  tb.innerHTML = rows || '<tr><td colspan="7" style="padding:24px;text-align:center;color:var(--muted)">Sonuç yok</td></tr>';
+  if (data.length > cap) rows += '<tr class="kt-more"><td colspan="8">+ ' + (data.length - cap) + ' hisse daha — tümünü görmek için Pro moda geç</td></tr>';
+  tb.innerHTML = rows || '<tr><td colspan="8" style="padding:24px;text-align:center;color:var(--muted)">Sonuç yok</td></tr>';
   _applyScanMode();
 }
 try { _applyScanMode(); } catch(e) {}
@@ -5877,6 +5880,35 @@ function _updateFavBadge() {
   badge.style.display = n > 0 ? 'inline-flex' : 'none';
 }
 
+// ── FAZ 5: Makro Bant ──────────────────────────────────────────
+var _macroData = null;
+function _fmtPct(v, dec) { return v != null ? v.toFixed(dec != null ? dec : 1) + '%' : '—'; }
+function _macroItem(lbl, val, cls) {
+  return '<span class="mb-item' + (cls ? ' ' + cls : '') + '"><span class="mb-lbl">' + lbl + '</span><span class="mb-val">' + val + '</span></span>';
+}
+function renderMacroBand(d) {
+  var el = document.getElementById('macro-band');
+  if (!el) return;
+  if (!d) { el.style.display = 'none'; return; }
+  var html =
+    _macroItem('Fed Faiz', _fmtPct(d.us_rate)) +
+    _macroItem('ABD TÜFE', _fmtPct(d.us_cpi)) +
+    _macroItem('VIX', d.vix != null ? d.vix.toFixed(1) : '—', d.vix > 25 ? 'mb-warn' : d.vix > 20 ? 'mb-caution' : '') +
+    _macroItem('TCMB Faiz', _fmtPct(d.tr_rate)) +
+    _macroItem('TR TÜFE', _fmtPct(d.tr_cpi)) +
+    (d.source === 'fallback' || d._static ? '<span class="mb-stale" title="Statik veri · yakında güncellenir">~</span>' : '');
+  el.innerHTML = html;
+  el.style.display = 'flex';
+}
+function fetchMacroBand() {
+  var el = document.getElementById('macro-band');
+  if (!el) return;
+  fetch('/api/macro').then(function(r) { return r.json(); }).then(function(d) {
+    _macroData = d;
+    renderMacroBand(d);
+  }).catch(function() { /* sessiz hata — makro bant isteğe bağlı */ });
+}
+
 // ── URL ROUTING (History API) ─────────────────────────
 window.addEventListener('popstate', function(e) {
   var path = window.location.pathname;
@@ -5927,6 +5959,7 @@ document.addEventListener('DOMContentLoaded', function(){
   }
   fetchLiveStats();
   setInterval(fetchLiveStats, 60000);
+  fetchMacroBand();
   var _sp   = new URLSearchParams(window.location.search);
   var _p    = _sp.get('from');
   var _path = window.location.pathname;
