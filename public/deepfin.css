@@ -455,7 +455,11 @@ td:nth-child(2){font-family:var(--ff);}
 .sstep-item.active .sstep-sub,.sstep-item.done .sstep-sub{display:block;}
 
 /* ── SCAN SUMMARY CARD ── */
-.scan-summary{padding:8px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:flex-start;gap:8px;font-size:11px;color:var(--muted2);background:var(--s2);flex-shrink:0;position:relative;overflow:visible;min-height:30px;animation:dfFadeIn .18s ease;}
+.scan-summary{padding:8px 14px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:6px;font-size:11px;color:var(--muted2);background:var(--s2);flex-shrink:0;position:relative;overflow:visible;min-height:30px;animation:dfFadeIn .18s ease;}
+.ssm-why{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;}
+.ssm-why-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.06em;font-weight:800;color:var(--accent);white-space:nowrap;}
+.ssm-why-txt{font-size:11.5px;color:var(--text2);line-height:1.45;}
+.ssm-why-txt b{color:var(--text);font-weight:700;}
 .ssm-left{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-width:0;}
 .ssm-flabel{color:var(--muted);font-size:11px;white-space:nowrap;}
 .ssm-center{text-align:center;white-space:nowrap;color:var(--muted2);}

@@ -4813,6 +4813,19 @@ function stopScanEta() {
   items.forEach(function(item) { item.classList.remove('active'); item.classList.add('done'); });
 }
 
+// "Neden bu sonuçlar?" — aktif reçeteyi düz cümleye çevirir (Faz 1: açıklanabilirlik)
+function _recipeSentence(filters, total, matches) {
+  var exMeta = (typeof EXCHANGE_META !== 'undefined') ? EXCHANGE_META[currentExchange] : null;
+  var exName = (exMeta && exMeta.name) || (currentExchange || '').toUpperCase();
+  var assetWord = (_activeAsset === 'kripto') ? 'kripto' : (_activeAsset === 'fon') ? 'fon' : 'hisse';
+  if (!filters || !filters.length) {
+    return 'Tüm <b>' + esc(exName) + '</b> ' + assetWord + 'leri listeleniyor — henüz filtre uygulanmadı.';
+  }
+  var crit = filters.map(function(f) { return f.label; }).filter(Boolean).map(esc).join(' + ');
+  var n = (matches != null) ? matches.toLocaleString('tr-TR') : '—';
+  return '<b>' + esc(exName) + '</b> evreninde <b>' + crit + '</b> kriterleriyle eşleşen <b>' + n + '</b> aday.';
+}
+
 function showScanSummary(total, matches) {
   const el = document.getElementById('scan-summary');
   if (!el) return;
@@ -4827,6 +4840,8 @@ function showScanSummary(total, matches) {
       '</span>';
   }).join('');
   el.innerHTML =
+    '<div class="ssm-why"><span class="ssm-why-lbl">Neden bu sonuçlar?</span>' +
+      '<span class="ssm-why-txt">' + _recipeSentence(filters, total, matches) + '</span></div>' +
     '<span class="ssm-left">' +
       (tagsHtml
         ? '<span class="ssm-flabel">Aktif filtre:</span>' + tagsHtml
