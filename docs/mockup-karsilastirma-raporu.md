@@ -674,4 +674,103 @@ Tüm "his/kalibrasyon" buradan ayarlanır; mantık değişmez. Simply Wall St a�
 5. **Kripto/fon kural setleri** ayrı tanımlanmalı (farklı metrikler); aile çerçevesi (Yatırımcı/Temel/Teknik) hisseye özgü, kripto'da "Kategori/Strateji/On-chain" aileleri olur.
 
 ---
+
+# E.9 — Skorlama Rafine: Ağırlıklar & Sınır Yakınlığı (veri-tahrikli)
+
+> **İncelenen yeni mockup:** `7771ab0b-yenimarkastratejitaramaduzeltilmis.html` (1957 satır; eskisinin +789 satır rafine hâli). Önemli eklemeler: drawer'da **3-durumlu kriter kontrol listesi** (matched / near / miss), setup'ta **`criteria-preview`** (eşikleri önden gösterir → Faz 1 şeffaflık somutlaşır), filtre panelinde **özet/düzenleme modu**, "Uyum Puanı" → **"Eşleşme düzeyi"**, bantlar **Güçlü / Yakın / Orta Eşleşme**, premium görsel rafinaj. Bu bölüm, kullanıcının iki sorusunu yanıtlar: **filtre ağırlıkları** ve **sınır yakınlığı** (%10 mu %20 mi?), *tüm veriyi verimli kullanarak*.
+
+## E.9.0 — Yeni Mockup Ne Öğretti (kanıt)
+
+Mockup'un gerçek kodu her kritere **elle ayrı "near" eşiği** yazıyor:
+```
+ROE:     pass>15,  near>13     (~%13)
+D/E:     pass<0.5, near<0.65   (~%30)
+PD/DD:   pass<2,   near<2.4    (~%20)
+Hacim:   pass>1.2, near>1.05   (~%12)
+52H:     pass<10,  near<15     (~%50)
+Drawdown:pass<22,  near<30     (~%36)
+Payout:  pass<70,  near<78     (~%11)
+status = pass ? 'matched' : near ? 'near' : 'miss'   // ağırlık YOK, hepsi eşit
+```
+**İki ders:** (1) **Sabit % yanlış** — mockup bile metrik başına %11–%50 arası *değişen* tolerans seçmiş, çünkü her metriğin doğal yayılımı farklı. (2) Ama bunları **elle yazmak** bizim ölçeğimizde (56 metrik × 25+ strateji) sürdürülemez ve keyfî. Ayrıca mockup'ta **hiç ağırlık yok**. İkisini de daha iyi yapacağız — *zaten çektiğimiz veriyle*.
+
+## E.9.1 — Sınır Yakınlığı: %10/%20 DEĞİL, Evrenin Dağılımına Göre
+
+**Temel fikir:** Her tarama `allData`'yı (~3000 satır) belleğe alıyor; şu an sadece ikili filtreleme için. Bu **kesitsel dağılım** bedava elimizde. "Yakınlık", metriğin **kendi doğal yayılımı** cinsinden ölçülmeli — sabit yüzde değil.
+
+**Sağlam yayılım (robust σ):** Std sapma DEĞİL (finansal veride aşırı uçlar var; tek bir F/K=900 onu patlatır). Bunun yerine **IQR** tabanlı:
+```
+robustσ_m = IQR_m / 1.349        // IQR = Q3 − Q1, evren genelinde, metrik m için
+```
+(veya MAD×1.4826). Tarama başına bir kez, O(n) ≈ ihmal edilebilir.
+
+**Band (bir `_min` kuralı, eşik T):**
+```
+tol_abs  = k_near  · robustσ_m     // T altı "near" toleransı
+band_abs = k_excel · robustσ_m     // T üstü "mükemmel" erişimi (1.0'a)
+F = T − tol_abs    (near tabanı)    C = T + band_abs   (mükemmel tavan)
+value ≥ T  → matched   ·   F ≤ value < T → near   ·   value < F → miss
+```
+`_max` kuralları simetrik. Bu, E.8.3'teki **sabit %'leri (band=0.5·T, tol=0.25·T) σ-tabanlı band'la değiştirir** — gerisi (PASS=0.6 çıpası, normalize eğrisi) aynı kalır.
+
+**"%10 mu %20 mi" sorusunun cevabı:** **Hiçbiri sabit değil.** Efektif yüzde = `k_near · robustσ_m / T` → her metrik için kendiliğinden farklı çıkar (birinde %8, diğerinde %35) — mockup'un elle seçtiği değişkenliği **otomatik ve savunulabilir** biçimde üretir. Tek ayar düğmesi `k_near` (≈0.5): "yarım robust-σ kadar altı hâlâ yakın".
+
+**Alternatif (saf yüzdelik-sıra):** "near" = eşiğin oturduğu yüzdelik dilimin hemen altındaki ~8 puanlık kohort. Daha da robust ve açıklaması kolay ("geçen kümeye komşu"), ama eşiğin mutlak anlamını gölgeler. **Birincil öneri: IQR-tabanlı band** (mutlak eşik anlamını korur); yüzdelik-sıra ikincil/deneysel.
+
+## E.9.2 — Küçük Örneklem & Özel Durumlar
+
+- **n < 30 (tek sektör, az coin):** IQR kararsız → o metrik için **sabit %15** geçici toleransa düş (güvenli varsayılan).
+- **Boolean kriterler** ("nakit akışı pozitif"): band yok, sadece matched/miss (near yok).
+- **Sınırlı metrikler** (RSI 0–100): band mutlak puan cinsinden (σ yine evrenden).
+- **Özel mercekler** (peg, piotroski): E.8.5'teki özel skorlayıcı; band uygulanmaz.
+
+## E.9.3 — Filtre Ağırlıkları: 4 Kademe (açıklanabilirlik öncelikli)
+
+Ağırlık iki düzeyde: **aile-içi** (bir merceğin hangi kriteri daha önemli) ve **aileler-arası** (Yatırımcı/Temel/Teknik/Duygu).
+
+| Kademe | Ne | Varsayılan mı? | Neden |
+|---|---|---|---|
+| **1. Eşit** | Tüm kriter/aile eşit, duygu 0.7; aktif+kapsanan aileler üzerinden renormalize | ✅ **Varsayılan** | En açıklanabilir; "Neden Eşleşti" şeffaflığını bozmaz |
+| **2. Strateji vurgusu** | Mercek, kritik kritere `weight` tanımlar (varsayılan 1); örn. Magic Formula = ROIC + kazanç verimi baskın | Opt-in | Düşük yazım maliyeti, sadece gereken yerde |
+| **3. Kullanıcı slider** | Aileler-arası ağırlığı kullanıcı ayarlar (Yatırımcı/Temel/Teknik/Duygu) | Opt-in | Güç kullanıcı; şeffaf & kontrollü |
+| **4. Ayrımsal (data-driven)** | Kriteri **bilgi içeriğine** göre ağırlıkla: evreni ayrıştıran kriter (yüksek dağılım / ~%50 geçme oranı) daha ağır | ⚠️ **Deneysel** | "Tüm veriyi verimli kullan"ın en uç hâli ama riskli (bkz. aşağı) |
+
+**Ayrımsal ağırlık (Kademe 4) — neden varsayılan DEĞİL:** Herkesin geçtiği bir kriter (geçme oranı ~%100) sinyal taşımaz; evreni ikiye bölen kriter taşır → `w ∝ (1 − |2·geçmeOranı − 1|)` veya kesitsel dağılım. **Ama:** (a) nadir-geçen bir kriter skoru ele geçirebilir, (b) aynı hisse farklı evrende farklı puan alır (kafa karıştırır), (c) drawer'da açıklaması zor. Bu yüzden **şeffaflık-öncelikli üründe varsayılan eşit kalır; ayrımsal mod opsiyonel/etiketli** sunulur ("bu ağırlık, kriterin mevcut evreni ne kadar ayrıştırdığını yansıtır").
+
+**Güven/kapsam ağırlığı (her kademede):** Bir aile 3 kriterden yalnız 1'inde veri bulabiliyorsa, skoru daha az güvenilir → aile ağırlığını **kapsamla** çarp (`coverage = değerlenen/aktif`). Hem "veriyi verimli kullanır" hem açıklanabilir: *"3 kriterden 1'i değerlendi — düşük güven."*
+
+## E.9.4 — "Tüm Veriyi Verimli Kullan" — Birleşik İlke
+
+`allData` (zaten bellekte) tek taramadan şunları **bedava** üretir:
+1. **Sınır yakınlık band'ı** → robustσ_m (IQR) ile metrik-uyarlı (E.9.1) — *birincil veri kazanımı*.
+2. **Eşik-üstü prim** → yüzdelik-sıra: en üst-desil ROE, eşiği kıl payı geçenden yüksek skor alır (E.8.3 band'ına ek).
+3. **(Opsiyonel) Ayrımsal ağırlık** → geçme oranı/dağılım (E.9.3 Kademe 4).
+4. **3-durum (matched/near/miss)** → drawer kontrol listesini besler (yeni mockup).
+Hepsi O(n)/O(n log n) tek geçiş; sanal kaydırma etkilenmez.
+
+## E.9.5 — Kalibrasyon Önerisi
+
+```js
+SCORE_CFG.proximity = {
+  method:'iqr',          // 'iqr' | 'percentile' | 'fixed'
+  kNear: 0.5,            // T altı kaç robust-σ hâlâ "near"
+  kExcel: 1.5,          // T üstü kaç robust-σ ile "mükemmel"
+  smallNFallback: 0.15, // n<30 ise sabit %15
+  minN: 30
+};
+SCORE_CFG.weights = {
+  mode:'equal',                 // 'equal' | 'strategy' | 'user' | 'discriminative'
+  familyWeights:{ yatirimci:1, temel:1, teknik:1, duygu:0.7 },
+  useCoverageConfidence:true
+};
+```
+`kNear`'ı, tipik near-band ~%10–25'e denk gelecek şekilde kalibre et (mockup'un elle aralığını taklit eder ama metrik-uyarlı). Simply Wall St açık-kaynak modeli referans; küçük bir backtest/göz kontrolüyle doğrula.
+
+## E.9.6 — Yol Haritasına Etki (Faz 3/4 güncellemesi)
+
+- **Faz 3 (motor):** Normalize band'ı **σ-tabanlı (E.9.1)** kur; ağırlık varsayılanı **eşit + kapsam-güveni**; ayrımsal mod *deneysel bayrak* arkasında. `allData` dağılım istatistiklerini (Q1/Q3 per metrik) skorlamadan önce bir kez hesapla.
+- **Faz 4 (açıklanabilirlik):** Drawer'da yeni mockup'un **3-durumlu kriter kontrol listesi** (matched/near/miss) — her satır: kriter, gerçek değer, durum rozeti. Near durumu doğrudan E.9.1 band'ından gelir → "%13.2 ROE, %15 eşiğine **yakın**".
+- **Faz 1 (şeffaflık):** Setup'taki **`criteria-preview`** (eşikleri önden gösterme) yeni mockup'tan birebir alınabilir.
+
+---
 *Bu doküman yalnızca araştırma/analiz amaçlıdır; kodda değişiklik içermez.*
