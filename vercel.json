@@ -141,6 +141,10 @@
       "destination": "/api/rates.js"
     },
     {
+      "source": "/api/macro",
+      "destination": "/api/rates.js"
+    },
+    {
       "source": "/stratejiler",
       "destination": "/stratejiler/index.html"
     },

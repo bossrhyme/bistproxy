@@ -1,8 +1,77 @@
-// api/rates.js — Döviz kuru proxy
-// Primary: open.er-api.com (ToS uyumlu, 1500 req/ay)
-// Fallback: KV backup → sabit değerler
+// api/rates.js — Döviz kuru proxy + /api/macro (makro göstergeler)
+// Rates: open.er-api.com primary, KV backup, sabit fallback
+// Macro: FRED API (FRED_API_KEY env) + TCMB statik fallback
 const https = require('https');
 const { protect } = require('./_protect');
+
+// ── MACRO (FRED + TCMB) ──────────────────────────────────────────
+const MACRO_CACHE_MS = 12 * 60 * 60 * 1000;
+let _macroCache = null;
+let _macroCacheAt = 0;
+const TR_FALLBACK = { tr_rate: 47.5, tr_cpi: 38.1, _static: true };
+
+function fredFetch(seriesId, apiKey) {
+  return new Promise((resolve, reject) => {
+    const path = '/fred/series/observations?series_id=' + seriesId +
+      '&api_key=' + encodeURIComponent(apiKey) +
+      '&sort_order=desc&limit=3&file_type=json';
+    const req = https.request(
+      { hostname: 'api.stlouisfed.org', path, method: 'GET',
+        headers: { 'User-Agent': 'DeepFin/1.0', Accept: 'application/json' } },
+      (res) => {
+        let data = '';
+        res.on('data', c => data += c);
+        res.on('end', () => {
+          try {
+            const j = JSON.parse(data);
+            const obs = (j.observations || []).filter(o => o.value !== '.');
+            if (!obs.length) return reject(new Error('no data: ' + seriesId));
+            resolve(parseFloat(obs[0].value));
+          } catch (e) { reject(e); }
+        });
+      }
+    );
+    req.setTimeout(8000, () => { req.destroy(); reject(new Error('timeout')); });
+    req.on('error', reject);
+    req.end();
+  });
+}
+
+async function fetchFred(apiKey) {
+  const [fedFunds, , vix] = await Promise.all([
+    fredFetch('DFF', apiKey),
+    fredFetch('CPIAUCSL', apiKey),
+    fredFetch('VIXCLS', apiKey),
+  ]);
+  let cpiYoy = null;
+  try { cpiYoy = await fredFetch('CPIAUCSL_PC1', apiKey); } catch {}
+  return { us_rate: fedFunds, us_cpi: cpiYoy, vix, source: 'fred' };
+}
+
+async function handleMacro(req, res, allowedOrigin) {
+  res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Vary', 'Origin');
+  if (req.method === 'OPTIONS') return res.status(200).end();
+
+  if (_macroCache && (Date.now() - _macroCacheAt) < MACRO_CACHE_MS) {
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    return res.status(200).json(_macroCache);
+  }
+
+  const apiKey = process.env.FRED_API_KEY;
+  let result = { us_rate: 4.33, us_cpi: 2.7, vix: 16.4, ...TR_FALLBACK, ts: Date.now(), source: 'fallback' };
+  if (apiKey) {
+    try {
+      const fredData = await fetchFred(apiKey);
+      result = { ...result, ...fredData, ts: Date.now() };
+    } catch (e) { console.error('[macro] FRED failed:', e.message); }
+  }
+  _macroCache = result;
+  _macroCacheAt = Date.now();
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  return res.status(200).json(result);
+}
 
 async function kvGet(key) {
   try {
@@ -91,6 +160,11 @@ async function fetchOpenEr() {
 module.exports = async function(req, res) {
   const origin = req.headers.origin || '';
   const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+
+  // /api/macro route — no auth required
+  const urlPath = (req.url || '').split('?')[0];
+  if (urlPath.includes('macro')) return handleMacro(req, res, allowedOrigin);
+
   res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Vary', 'Origin');
