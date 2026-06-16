@@ -547,6 +547,9 @@ td:nth-child(2){font-family:var(--ff);}
 /* Chip grid — sola hizalı yatay satır (Temel + Teknik) */
 .psv-chip-grid,.psv-chip-extra{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-start;}
 .psv-chip-extra{margin-top:8px;}
+.psv-kcat-btn{padding:7px 14px;background:var(--s1);border:1.5px solid var(--border);border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;color:var(--text2);transition:all .15s;font-family:var(--ff-sans,inherit);}
+.psv-kcat-btn:hover{border-color:var(--accent);background:var(--hover);}
+.psv-kcat-btn.on{border-color:var(--accent);background:var(--accent2);color:var(--accent);}
 
 /* Preset + Tech cards */
 .psv-preset-card,.psv-tech-card{position:relative;display:flex;flex-direction:column;gap:4px;padding:10px 12px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r-lg);cursor:pointer;transition:border-color .15s,background .15s;min-width:96px;max-width:176px;}

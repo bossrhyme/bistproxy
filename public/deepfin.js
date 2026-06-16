@@ -2419,37 +2419,74 @@ function initPrescanView() {
     '</div>'+
     '</div>'+
 
-    // Exchange section
-    '<div class="psv-section">'+
+    // Exchange section — sadece hisse
+    '<div class="psv-section" id="psv-sec-exchange">'+
     '<div class="psv-section-hd">Borsa</div>'+
     '<div class="psv-ex-grid" id="psv-ex-grid">'+PSV_MAIN_EX.map(mkExBtn).join('')+'</div>'+
     '<div class="psv-ex-extra" id="psv-ex-extra" style="display:none">'+allExKeys.map(mkExBtn).join('')+'</div>'+
     '<button class="psv-show-more" id="psv-ex-more" onclick="psvToggleMoreEx()">+ Diğer Borsalar</button>'+
     '</div>'+
 
-    // Yatırımcı Lensleri section
-    '<div class="psv-section">'+
+    // Yatırımcı Lensleri — sadece hisse
+    '<div class="psv-section" id="psv-sec-goat">'+
     '<div class="psv-section-hd">Yatırımcı Lensleri <span class="psv-opt">isteğe bağlı</span></div>'+
     '<div class="psv-goat-grid" id="psv-goat-main">'+PSV_MAIN_GOATS.map(mkGoatCard).join('')+'</div>'+
     '<div class="psv-goat-extra" id="psv-goat-extra" style="display:none">'+extraGoatKeys.map(mkGoatCard).join('')+'</div>'+
     '<button class="psv-show-more" id="psv-goat-more" onclick="psvToggleMoreGoats()">+ Tüm Lensler</button>'+
     '</div>'+
 
-    // Temel — yatay satır, ortalı
-    '<div class="psv-section">'+
+    // Temel — sadece hisse
+    '<div class="psv-section" id="psv-sec-temel">'+
     '<div class="psv-section-hd">Temel <span class="psv-opt">isteğe bağlı</span></div>'+
     '<div class="psv-chip-grid" id="psv-preset-main">'+PSV_MAIN_PRESETS.map(function(k){ return mkFilterCard(k, PRESETS[k], 'psv-preset-card', 'psvTogglePreset'); }).join('')+'</div>'+
     '<div class="psv-chip-extra" id="psv-preset-extra" style="display:none">'+extraPresetKeys.map(function(k){ return mkFilterCard(k, PRESETS[k], 'psv-preset-card', 'psvTogglePreset'); }).join('')+'</div>'+
     (extraPresetKeys.length ? '<button class="psv-show-more" id="psv-preset-more" onclick="psvToggleMorePresets()">+ Daha Fazla ('+extraPresetKeys.length+')</button>' : '')+
     '</div>'+
 
-    // Teknik — yatay satır, ortalı
-    '<div class="psv-section">'+
+    // Teknik — sadece hisse
+    '<div class="psv-section" id="psv-sec-teknik">'+
     '<div class="psv-section-hd">Teknik <span class="psv-opt">isteğe bağlı</span></div>'+
     '<div class="psv-chip-grid" id="psv-tech-main">'+PSV_MAIN_TECH.map(function(k){ return mkFilterCard(k, TECH_PRESETS[k], 'psv-tech-card', 'psvToggleTech'); }).join('')+'</div>'+
     '<div class="psv-chip-extra" id="psv-tech-extra" style="display:none">'+extraTechKeys.map(function(k){ return mkFilterCard(k, TECH_PRESETS[k], 'psv-tech-card', 'psvToggleTech'); }).join('')+'</div>'+
     '<button class="psv-show-more" id="psv-tech-more" onclick="psvToggleMoreTech()">+ Daha Fazla ('+extraTechKeys.length+')</button>'+
     '</div>'+
+
+    // ── KRİPTO bölümleri (başlangıçta gizli) ──
+    // Kripto Kategori
+    '<div class="psv-section" id="psv-sec-kripto-cat" style="display:none">'+
+    '<div class="psv-section-hd">Kategori</div>'+
+    '<div class="psv-chip-grid">'+
+    [
+      {cat:'',label:'Tümü'},{cat:'layer-1',label:'Layer 1'},{cat:'layer-2',label:'Layer 2'},
+      {cat:'decentralized-finance-defi',label:'DeFi'},{cat:'meme-token',label:'Meme'},
+      {cat:'artificial-intelligence',label:'AI'},{cat:'gaming',label:'Gaming'},
+      {cat:'real-world-assets-rwa',label:'RWA'},{cat:'liquid-staking-tokens',label:'Liquid Stake'},
+      {cat:'decentralized-exchange',label:'DEX'},{cat:'yield-aggregator',label:'Yield'}
+    ].map(function(c){
+      return '<button class="psv-kcat-btn'+(c.cat===''?' on':'')+'" data-cat="'+esc(c.cat)+'" onclick="psvKriptoCat(this)">'+esc(c.label)+'</button>';
+    }).join('')+
+    '</div></div>'+
+
+    // Kripto Strateji
+    '<div class="psv-section" id="psv-sec-kripto-strat" style="display:none">'+
+    '<div class="psv-section-hd">Strateji <span class="psv-opt">isteğe bağlı</span></div>'+
+    '<div class="psv-chip-grid">'+
+    [
+      {preset:'hacim_patlamasi',label:'Hacim Patlaması',desc:'Hacim artışı + günlük yükseliş'},
+      {preset:'rsi_dip',label:'RSI Dip',desc:'RSI < 35, aşırı satım bölgesi'},
+      {preset:'ath_yakini',label:'ATH Yakını',desc:"ATH'dan %10 uzakta"},
+      {preset:'buyuk_kap',label:'Büyük Kapı',desc:'Piyasa değeri $10B+'},
+      {preset:'kucuk_cap_gem',label:'Küçük Kapı Gem',desc:'$100M altı, hacimli'},
+      {preset:'momentum',label:'Momentum',desc:'7g +%10, 30g +%20'},
+      {preset:'dusuk_arz',label:'Düşük Arz',desc:'Dolaşım/toplam arz < %50'},
+      {preset:'defi_deger',label:'DeFi Değer',desc:'MC/TVL < 3, TVL $100M+'},
+      {preset:'yeni_ath',label:'ATH Kırıcı',desc:"7g +%20, ATH'a %5 kaldı"}
+    ].map(function(p){
+      return '<div class="psv-preset-card" data-preset="'+esc(p.preset)+'" onclick="psvKriptoPreset(this)">'+
+        '<div class="psv-preset-name">'+esc(p.label)+'</div>'+
+        '<div class="psv-preset-desc">'+esc(p.desc)+'</div></div>';
+    }).join('')+
+    '</div></div>'+
 
     // Scan button
     '<div class="psv-scan-wrap">'+
@@ -2493,13 +2530,65 @@ const PSV_ASSETS = [
 
 function psvSetAsset(key) {
   document.querySelectorAll('.psv-asset-btn').forEach(function(b){ b.classList.toggle('on', b.dataset.asset === key); });
-  // Kripto: PSV'yi kapat, kripto moduna geç (kendi filtre paneli var)
-  if (key === 'kripto') {
-    closePrescanView();
-    selectAsset('kripto');
-    return;
+  var isKripto = key === 'kripto';
+  ['psv-sec-exchange','psv-sec-goat','psv-sec-temel','psv-sec-teknik'].forEach(function(id){
+    var s = document.getElementById(id); if (s) s.style.display = isKripto ? 'none' : '';
+  });
+  ['psv-sec-kripto-cat','psv-sec-kripto-strat'].forEach(function(id){
+    var s = document.getElementById(id); if (s) s.style.display = isKripto ? '' : 'none';
+  });
+  var hint = document.getElementById('psv-limit-hint');
+  if (hint) hint.style.display = isKripto ? 'none' : '';
+  var btn = document.getElementById('psv-scan-btn');
+  if (btn) {
+    if (isKripto) {
+      btn.textContent = 'Kripto Tara';
+      btn.onclick = psvScanKripto;
+    } else {
+      btn.onclick = psvScan;
+      _psvUpdateSelState();
+    }
   }
-  // Diğer aktif varlıklar için preset bölümünü güncelle (ileride)
+}
+
+function psvKriptoCat(el) {
+  document.querySelectorAll('.psv-kcat-btn').forEach(function(b){ b.classList.remove('on'); });
+  el.classList.add('on');
+}
+
+function psvKriptoPreset(el) {
+  var was = el.classList.contains('on');
+  document.querySelectorAll('#psv-sec-kripto-strat .psv-preset-card').forEach(function(c){ c.classList.remove('on'); });
+  if (!was) el.classList.add('on');
+}
+
+function psvScanKripto() {
+  var catBtn = document.querySelector('.psv-kcat-btn.on');
+  var cat = catBtn ? catBtn.dataset.cat : '';
+  var presetCard = document.querySelector('#psv-sec-kripto-strat .psv-preset-card.on');
+  var preset = presetCard ? presetCard.dataset.preset : null;
+  var pv = document.getElementById('prescan-view');
+  if (pv) { pv.style.transition = ''; pv.classList.add('psv-closing'); }
+  collapseSidebar(true);
+  setTimeout(function() {
+    if (pv) {
+      pv.style.display = 'none';
+      pv.classList.remove('psv-closing');
+      pv.style.opacity = '';
+      pv.style.transition = '';
+    }
+    // Sidebar kategori chip'ini seç
+    document.querySelectorAll('#sbp-kripto .chip[data-cat]').forEach(function(c){
+      c.classList.toggle('on', c.dataset.cat === cat);
+    });
+    // Opsiyonel preset chip'ini seç (tek seçim)
+    if (preset) {
+      document.querySelectorAll('#sbp-kripto .chip[data-preset]').forEach(function(c){
+        c.classList.toggle('on', c.dataset.preset === preset);
+      });
+    }
+    selectAsset('kripto');
+  }, 280);
 }
 
 function psvScrollAssets(dir) {
