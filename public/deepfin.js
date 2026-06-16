@@ -2101,14 +2101,28 @@ function initPrescanView() {
       '</div>';
   }
 
+  // Reset wizard state each open
+  _psvStep = 1;
+  _psvCurAsset = 'hisse';
+
   el.innerHTML =
     '<button class="psv-close-btn" id="psv-close-btn" onclick="closePrescanView()" style="display:none">✕ Sonuçlara dön</button>'+
     '<div class="psv-inner">'+
     '<div class="psv-brand"><div class="psv-logo"><div class="tlogo-mark" style="width:24px;height:24px;font-size:12px;">D</div>DeepFin</div><div class="psv-tagline">VARLIK · BORSA · STRATEJİ · TARA</div></div>'+
 
-    // Asset type section — yatay kaydırmalı
+    // ── Wizard Rail ──
+    '<div class="psv-wizard-rail">'+
+      '<div class="psv-rail-step active" data-step="1"><div class="psv-rs-dot">01</div><div class="psv-rs-label">Varlık</div></div>'+
+      '<div class="psv-rail-line"></div>'+
+      '<div class="psv-rail-step" data-step="2"><div class="psv-rs-dot">02</div><div class="psv-rs-label">Borsa</div></div>'+
+      '<div class="psv-rail-line"></div>'+
+      '<div class="psv-rail-step" data-step="3"><div class="psv-rs-dot">03</div><div class="psv-rs-label">Strateji</div></div>'+
+    '</div>'+
+
+    // ── Panel 1: Varlık ──
+    '<div id="psv-panel-1" class="psv-panel">'+
     '<div class="psv-section">'+
-    '<div class="psv-section-hd">Varlık</div>'+
+    '<div class="psv-section-hd">Varlık Türü</div>'+
     '<div class="psv-asset-wrap">'+
       '<button class="psv-asset-arrow" onclick="psvScrollAssets(-1)" aria-label="Sola kaydır">‹</button>'+
       '<div class="psv-asset-row" id="psv-asset-row">'+
@@ -2121,23 +2135,39 @@ function initPrescanView() {
       '<button class="psv-asset-arrow" onclick="psvScrollAssets(1)" aria-label="Sağa kaydır">›</button>'+
     '</div>'+
     '</div>'+
+    '<div class="psv-insight" id="psv-insight-1">💡 <b>Borsa Hissesi</b> seçildi — 28 farklı global borsa, gerçek zamanlı finansal veriler.</div>'+
+    '<div class="psv-nav-row">'+
+      '<div></div>'+
+      '<button class="psv-nav-next" id="psv-panel1-next" onclick="psvNextStep()">Borsa Seç →</button>'+
+    '</div>'+
+    '</div>'+
 
-    // Exchange section — sadece hisse
-    '<div class="psv-section" id="psv-sec-exchange">'+
-    '<div class="psv-section-hd">Borsa</div>'+
+    // ── Panel 2: Borsa ──
+    '<div id="psv-panel-2" class="psv-panel" style="display:none">'+
+    '<div class="psv-section">'+
+    '<div class="psv-section-hd">Borsa / Evren</div>'+
     '<div class="psv-ex-grid" id="psv-ex-grid">'+PSV_MAIN_EX.map(mkExBtn).join('')+'</div>'+
     '<div class="psv-ex-extra" id="psv-ex-extra" style="display:none">'+allExKeys.map(mkExBtn).join('')+'</div>'+
     '<button class="psv-show-more" id="psv-ex-more" onclick="psvToggleMoreEx()">+ Diğer Borsalar</button>'+
     '</div>'+
+    '<div class="psv-insight" id="psv-insight-2">💡 Borsa seçin.</div>'+
+    '<div class="psv-nav-row">'+
+      '<button class="psv-nav-back" onclick="psvPrevStep()">← Geri</button>'+
+      '<button class="psv-nav-next" onclick="psvNextStep()">Strateji Seç →</button>'+
+    '</div>'+
+    '</div>'+
 
-    // Yatırımcı Lensleri — sadece hisse (Faz 2: gruplu layout + arama)
+    // ── Panel 3: Strateji + Tara ──
+    '<div id="psv-panel-3" class="psv-panel" style="display:none">'+
+
+    // Yatırımcı Lensleri — hisse
     '<div class="psv-section" id="psv-sec-goat">'+
     '<div class="psv-section-hd">Yatırımcı Lensleri <span class="psv-opt">isteğe bağlı</span>'+
     '<input class="psv-lens-search" id="psv-lens-search" type="text" placeholder="Lens ara…" oninput="psvGoatSearch(this.value)"></div>'+
     '<div id="psv-goat-groups">'+PSV_GURU_GROUPS.map(mkGoatGroup).join('')+'</div>'+
     '</div>'+
 
-    // Temel — sadece hisse
+    // Temel — hisse
     '<div class="psv-section" id="psv-sec-temel">'+
     '<div class="psv-section-hd">Temel <span class="psv-opt">isteğe bağlı</span></div>'+
     '<div class="psv-chip-grid" id="psv-preset-main">'+PSV_MAIN_PRESETS.map(function(k){ return mkFilterCard(k, PRESETS[k], 'psv-preset-card', 'psvTogglePreset'); }).join('')+'</div>'+
@@ -2145,14 +2175,13 @@ function initPrescanView() {
     (extraPresetKeys.length ? '<button class="psv-show-more" id="psv-preset-more" onclick="psvToggleMorePresets()">+ Daha Fazla ('+extraPresetKeys.length+')</button>' : '')+
     '</div>'+
 
-    // Teknik — sadece hisse (Faz 2: gruplu layout)
+    // Teknik — hisse
     '<div class="psv-section" id="psv-sec-teknik">'+
     '<div class="psv-section-hd">Teknik <span class="psv-opt">isteğe bağlı</span></div>'+
     '<div id="psv-tech-groups">'+PSV_TECH_GROUPS.map(mkTechGroup).join('')+'</div>'+
     '</div>'+
 
-    // ── KRİPTO bölümleri (başlangıçta gizli) ──
-    // Kripto Kategori
+    // Kripto Kategori (gizli)
     '<div class="psv-section" id="psv-sec-kripto-cat" style="display:none">'+
     '<div class="psv-section-hd">Kategori</div>'+
     '<div class="psv-chip-grid">'+
@@ -2167,7 +2196,7 @@ function initPrescanView() {
     }).join('')+
     '</div></div>'+
 
-    // Kripto Strateji
+    // Kripto Strateji (gizli)
     '<div class="psv-section" id="psv-sec-kripto-strat" style="display:none">'+
     '<div class="psv-section-hd">Strateji <span class="psv-opt">isteğe bağlı</span></div>'+
     '<div class="psv-chip-grid">'+
@@ -2188,14 +2217,18 @@ function initPrescanView() {
     }).join('')+
     '</div></div>'+
 
-    // Scan button
-    '<div class="psv-scan-wrap">'+
+    '<div class="psv-insight" id="psv-insight-3">💡 Filtre seçmeden tüm evren listelenir. En az bir strateji ekleyerek <b>Uyum Puanı</b> hesaplatın.</div>'+
     '<div class="psv-limit-hint" id="psv-limit-hint">En fazla 4 filtre seçilebilir — yenisini eklemek için mevcut bir seçimi kaldır.</div>'+
-    '<button class="psv-scan-btn" id="psv-scan-btn" onclick="psvScan()">Hisse Tara</button></div>'+
+    '<div class="psv-nav-row psv-nav-scan">'+
+      '<button class="psv-nav-back" onclick="psvPrevStep()">← Geri</button>'+
+      '<button class="psv-scan-btn" id="psv-scan-btn" onclick="psvScan()">Hisse Tara</button>'+
+    '</div>'+
 
-    '</div>';
+    '</div>'+ // end psv-panel-3
+    '</div>'; // end psv-inner
 
   psvSetExchange(currentExchange);
+  psvGoStep(1);
 }
 
 function psvSetExchange(key) {
@@ -2213,6 +2246,7 @@ function psvSetExchange(key) {
       if (tlTab) tlTab.style.display = '';
     }
   }
+  _psvUpdateInsight(2);
 }
 
 // Varlık sınıfları — prescan yatay kaydırmalı satır
@@ -2229,9 +2263,11 @@ const PSV_ASSETS = [
 ];
 
 function psvSetAsset(key) {
+  _psvCurAsset = key;
   document.querySelectorAll('.psv-asset-btn').forEach(function(b){ b.classList.toggle('on', b.dataset.asset === key); });
   var isKripto = key === 'kripto';
-  ['psv-sec-exchange','psv-sec-goat','psv-sec-temel','psv-sec-teknik'].forEach(function(id){
+  // Panel 3: toggle hisse vs kripto sections
+  ['psv-sec-goat','psv-sec-temel','psv-sec-teknik'].forEach(function(id){
     var s = document.getElementById(id); if (s) s.style.display = isKripto ? 'none' : '';
   });
   ['psv-sec-kripto-cat','psv-sec-kripto-strat'].forEach(function(id){
@@ -2249,6 +2285,11 @@ function psvSetAsset(key) {
       _psvUpdateSelState();
     }
   }
+  // Update panel 1 nav label and insight, then advance to step 2 (or 3 for kripto)
+  var navBtn = document.getElementById('psv-panel1-next');
+  if (navBtn) navBtn.textContent = isKripto ? 'Strateji Seç →' : 'Borsa Seç →';
+  _psvUpdateInsight(1);
+  if (_psvStep === 1) psvNextStep();
 }
 
 function _psvUpdateKriptoBtn() {
@@ -2320,28 +2361,117 @@ function _psvUpdateSelState() {
   var pv = document.getElementById('prescan-view');
   if (pv) pv.classList.toggle('psv-at-limit', atLimit);
   var btn = document.getElementById('psv-scan-btn');
-  if (btn) btn.textContent = total > 0 ? total + ' Filtre ile Tara' : 'Hisse Tara';
+  if (btn) btn.textContent = total > 0 ? total + ' Filtre ile Tara' : (_psvCurAsset === 'kripto' ? 'Kripto Tara' : 'Hisse Tara');
+  _psvUpdateInsight(3);
+}
+
+// ── Faz 6: PSV Wizard ──────────────────────────────────────────────
+var _psvStep = 1;
+var _psvCurAsset = 'hisse';
+var _psvFeedbackTimer = null;
+var _matchMode = 'kati'; // 'kati' | 'esnek'
+
+function setMatchMode(mode) {
+  _matchMode = mode;
+  document.querySelectorAll('.mmt-btn').forEach(function(b) {
+    b.classList.toggle('on', b.dataset.mode === mode);
+  });
+  if (typeof allData !== 'undefined' && allData.length) applyAndRender();
+}
+
+function psvFeedback(msg) {
+  var el = document.getElementById('psv-feedback-toast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'psv-feedback-toast';
+    el.className = 'psv-feedback-toast';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(_psvFeedbackTimer);
+  _psvFeedbackTimer = setTimeout(function() { el.classList.remove('show'); }, 2000);
+}
+
+function _psvUpdateInsight(step) {
+  var box = document.getElementById('psv-insight-' + step);
+  if (!box) return;
+  var msg = '';
+  if (step === 1) {
+    if (_psvCurAsset === 'kripto') msg = '<b>Kripto</b> seçildi — CoinGecko ile 2000+ kripto para taranabilir.';
+    else msg = '<b>Borsa Hissesi</b> seçildi — 28 farklı global borsa, gerçek zamanlı finansal veriler.';
+  } else if (step === 2) {
+    var exMeta = (typeof EXCHANGE_META !== 'undefined') ? EXCHANGE_META[currentExchange] : null;
+    var exName = exMeta ? exMeta.name : (currentExchange || 'BIST').toUpperCase();
+    var etaSec = (typeof EXCHANGE_ETA !== 'undefined' && EXCHANGE_ETA[currentExchange]) ? EXCHANGE_ETA[currentExchange] : 5;
+    msg = '<b>' + esc(exName) + '</b> seçildi — tarama süresi yaklaşık <b>' + etaSec + ' saniye</b>.';
+  } else if (step === 3) {
+    var total = _psvTotalSel();
+    if (total === 0) {
+      msg = 'Filtre seçmeden tüm evren listelenir. En az bir strateji ekleyerek <b>Uyum Puanı</b> hesaplatın.';
+    } else {
+      msg = '<b>' + total + '</b> filtre aktif — tarama tamamlandığında her hisse için Uyum Puanı hesaplanacak.';
+    }
+  }
+  box.innerHTML = '💡 ' + msg;
+}
+
+function psvGoStep(n) {
+  _psvStep = Math.max(1, Math.min(3, n));
+  [1, 2, 3].forEach(function(i) {
+    var panel = document.getElementById('psv-panel-' + i);
+    if (panel) panel.style.display = i === _psvStep ? '' : 'none';
+    var railStep = document.querySelector('.psv-rail-step[data-step="' + i + '"]');
+    if (railStep) {
+      railStep.classList.remove('active', 'done');
+      if (i < _psvStep) railStep.classList.add('done');
+      else if (i === _psvStep) railStep.classList.add('active');
+    }
+  });
+  _psvUpdateInsight(_psvStep);
+  // Scroll to top of prescan-view
+  var el = document.getElementById('prescan-view');
+  if (el) el.scrollTop = 0;
+}
+
+function psvNextStep() {
+  if (_psvCurAsset === 'kripto' && _psvStep === 1) { psvGoStep(3); return; }
+  if (_psvStep < 3) psvGoStep(_psvStep + 1);
+}
+
+function psvPrevStep() {
+  if (_psvCurAsset === 'kripto' && _psvStep === 3) { psvGoStep(1); return; }
+  if (_psvStep > 1) psvGoStep(_psvStep - 1);
 }
 
 function psvToggleGoat(key) {
   if (!_psvActiveGoats.has(key) && _psvTotalSel() >= _PSV_MAX_SEL) return;
+  var adding = !_psvActiveGoats.has(key);
   _psvActiveGoats.has(key) ? _psvActiveGoats.delete(key) : _psvActiveGoats.add(key);
   document.querySelectorAll('.psv-goat-card[data-goat="'+key+'"]').forEach(function(c){ c.classList.toggle('on', _psvActiveGoats.has(key)); });
   _psvUpdateSelState();
+  var g = (typeof GURUS !== 'undefined') ? GURUS[key] : null;
+  if (adding && g) psvFeedback('✓ ' + g.label.split(' — ')[0].split(' (')[0] + ' lensi eklendi');
 }
 
 function psvTogglePreset(key) {
   if (!_psvActivePresets.has(key) && _psvTotalSel() >= _PSV_MAX_SEL) return;
+  var adding = !_psvActivePresets.has(key);
   _psvActivePresets.has(key) ? _psvActivePresets.delete(key) : _psvActivePresets.add(key);
   document.querySelectorAll('.psv-preset-card[data-key="'+key+'"]').forEach(function(c){ c.classList.toggle('on', _psvActivePresets.has(key)); });
   _psvUpdateSelState();
+  var p = (typeof PRESETS !== 'undefined') ? PRESETS[key] : null;
+  if (adding && p) psvFeedback('✓ ' + p.label + ' filtresi eklendi');
 }
 
 function psvToggleTech(key) {
   if (!_psvActiveTech.has(key) && _psvTotalSel() >= _PSV_MAX_SEL) return;
+  var adding = !_psvActiveTech.has(key);
   _psvActiveTech.has(key) ? _psvActiveTech.delete(key) : _psvActiveTech.add(key);
   document.querySelectorAll('.psv-tech-card[data-key="'+key+'"]').forEach(function(c){ c.classList.toggle('on', _psvActiveTech.has(key)); });
   _psvUpdateSelState();
+  var t = (typeof TECH_PRESETS !== 'undefined') ? TECH_PRESETS[key] : null;
+  if (adding && t) psvFeedback('✓ ' + t.label + ' teknik sinyali eklendi');
 }
 
 function psvToggleLgMore(btn) {
@@ -2920,10 +3050,21 @@ function applyAndRender(special){
       if (mx !== null && rule[2]) _scoreFilters[rule[2]] = mx;
     });
     var _hasFilters = Object.keys(_scoreFilters).length > 0;
-    filtered.forEach(function(s) {
-      s._match = _hasFilters ? computeMatch(s, _scoreFilters) : null;
-    });
+    // Esnek mod: tüm evren gösterilir, puansız olanlar listede kalır
+    if (_hasFilters && _matchMode === 'esnek' && !special) {
+      allData.forEach(function(s) { s._match = computeMatch(s, _scoreFilters); });
+      filtered = allData.filter(function(s) { return !searchQ || (s.symbol.includes(searchQ.toUpperCase()) || s.name.toUpperCase().includes(searchQ.toUpperCase())); });
+    } else {
+      filtered.forEach(function(s) {
+        s._match = _hasFilters ? computeMatch(s, _scoreFilters) : null;
+      });
+    }
   }
+  // Show/hide Katı⇄Esnek toggle in toolbar
+  var _mmToggle = document.getElementById('match-mode-toggle');
+  if (_mmToggle) _mmToggle.style.display = Object.keys(_scoreFilters).length > 0 ? '' : 'none';
+  // Sync toggle button states
+  document.querySelectorAll('.mmt-btn').forEach(function(b) { b.classList.toggle('on', b.dataset.mode === _matchMode); });
 
   document.getElementById('toolbar').style.display = 'flex';
   document.getElementById('resn').textContent = filtered.length;
@@ -5053,6 +5194,22 @@ function showScanSummary(total, matches) {
       (f.desc ? '<span class="ssm-tag-popup">' + esc(f.desc) + '</span>' : '') +
       '</span>';
   }).join('');
+
+  // Faz 7: Sonuç metrikleri
+  var metricsHtml = '';
+  if (filters.length > 0 && matches > 0 && typeof filtered !== 'undefined') {
+    var bestMatch = null;
+    filtered.forEach(function(s) {
+      if (s._match && (!bestMatch || s._match.score > bestMatch.score)) bestMatch = { sym: s.symbol, score: s._match.score, status: s._match.status };
+    });
+    var filteredOut = (total || 0) - (matches || 0);
+    var metriks = [];
+    if (bestMatch) metriks.push('<div class="ssm-metric"><span class="ssm-metric-lbl">En Yüksek Uyum</span><span class="ssm-metric-val match-score ms-'+bestMatch.status+'">'+bestMatch.score+'</span><span class="ssm-metric-sym">'+esc(bestMatch.sym)+'</span></div>');
+    if (filteredOut > 0) metriks.push('<div class="ssm-metric"><span class="ssm-metric-lbl">Elenen</span><span class="ssm-metric-val ssm-metric-out">'+filteredOut.toLocaleString('tr-TR')+'</span></div>');
+    metriks.push('<div class="ssm-metric"><span class="ssm-metric-lbl">Filtre Ailesi</span><span class="ssm-metric-val">'+filters.length+'</span></div>');
+    if (metriks.length) metricsHtml = '<div class="ssm-metrics-row">'+metriks.join('')+'</div>';
+  }
+
   el.innerHTML =
     '<div class="ssm-why"><span class="ssm-why-lbl">Neden bu sonuçlar?</span>' +
       '<span class="ssm-why-txt">' + _recipeSentence(filters, total, matches) + '</span></div>' +
@@ -5061,6 +5218,7 @@ function showScanSummary(total, matches) {
         ? '<span class="ssm-flabel">Aktif filtre:</span>' + tagsHtml
         : '<span class="ssm-no-filter">Filtresiz</span>') +
     '</span>' +
+    metricsHtml +
     '<div class="ssm-trust">Eşleşme ≠ yatırım önerisi · gecikmeli/temsilî veri · sonuçlar yalnızca seçilen filtre kriterlerini yansıtır.</div>';
   // Taranan / Eşleşen — ayrı etiketli elemanlar
   var totItem = document.getElementById('sb-total-item');

@@ -2146,6 +2146,68 @@ tbody tr:active{background:var(--s3);}
 .hrc-found{color:var(--green);font-weight:700;font-family:var(--ff-mono);}
 @media(max-width:768px){.hpx-recent-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;}}
 
+/* ── FAZ 6: PSV 3-ADIM SİHİRBAZI ── */
+
+/* Wizard Rail */
+.psv-wizard-rail{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:28px;padding:0 8px;}
+.psv-rail-step{display:flex;flex-direction:column;align-items:center;gap:5px;min-width:64px;}
+.psv-rs-dot{width:32px;height:32px;border-radius:50%;border:2px solid var(--border2);background:var(--s1);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--muted2);font-family:var(--ff-mono);transition:all .2s;}
+.psv-rs-label{font-size:10px;font-weight:600;color:var(--muted2);letter-spacing:.04em;text-transform:uppercase;transition:color .2s;}
+.psv-rail-step.active .psv-rs-dot{border-color:var(--accent);background:var(--accent);color:#fff;box-shadow:0 2px 10px rgba(30,41,59,.3);}
+.psv-rail-step.active .psv-rs-label{color:var(--accent);}
+.psv-rail-step.done .psv-rs-dot{border-color:var(--green);background:var(--green);color:#fff;}
+.psv-rail-step.done .psv-rs-label{color:var(--green);}
+.psv-rail-line{flex:1;height:2px;background:var(--border);margin:0 4px;margin-bottom:17px;transition:background .2s;}
+
+/* Panels */
+.psv-panel{width:100%;}
+
+/* Insight box */
+.psv-insight{font-size:12px;line-height:1.6;color:var(--text2);background:rgba(30,41,59,.04);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--r-md);padding:10px 14px;margin:18px 0 12px;}
+
+/* Nav row */
+.psv-nav-row{display:flex;align-items:center;justify-content:space-between;padding:16px 0 8px;}
+.psv-nav-back{background:none;border:1px solid var(--border2);color:var(--text2);font-size:12px;font-weight:600;padding:9px 18px;border-radius:var(--r-md);cursor:pointer;font-family:var(--ff);transition:all .15s;}
+.psv-nav-back:hover{border-color:var(--accent);color:var(--accent);}
+.psv-nav-next{background:var(--accent);color:#fff;border:none;font-size:13px;font-weight:700;padding:10px 24px;border-radius:var(--r-md);cursor:pointer;font-family:var(--ff-mono);letter-spacing:.3px;transition:opacity .15s,transform .1s;}
+.psv-nav-next:hover{opacity:.88;transform:translateY(-1px);}
+.psv-nav-scan .psv-scan-btn{margin:0;}
+
+/* Feedback toast */
+.psv-feedback-toast{position:fixed;bottom:28px;left:50%;transform:translate(-50%,8px);background:var(--text);color:var(--bg);font-size:12px;font-weight:600;padding:9px 20px;border-radius:var(--r-lg);z-index:9999;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.28);}
+.psv-feedback-toast.show{opacity:1;transform:translate(-50%,0);}
+
+/* ── FAZ 6: KATI/ESNEK TOGGLE ── */
+.match-mode-toggle{display:inline-flex;border:1px solid var(--border2);border-radius:6px;overflow:hidden;flex-shrink:0;margin-right:2px;}
+.mmt-btn{font-family:var(--ff);font-size:11px;font-weight:700;padding:5px 10px;background:var(--s1);color:var(--muted2);border:none;cursor:pointer;transition:background .12s,color .12s;letter-spacing:.02em;white-space:nowrap;}
+.mmt-btn:hover{color:var(--accent);}
+.mmt-btn.on{background:var(--accent);color:#fff;}
+
+/* ── FAZ 7: SONUÇ METRİK KARTLARI ── */
+.ssm-metrics-row{display:flex;flex-wrap:wrap;gap:8px;padding:8px 0 4px;}
+.ssm-metric{display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r-md);}
+.ssm-metric-lbl{font-size:10px;color:var(--muted2);font-weight:500;white-space:nowrap;}
+.ssm-metric-val{font-size:12px;font-weight:700;color:var(--text);font-family:var(--ff-mono);}
+.ssm-metric-sym{font-size:10px;color:var(--muted2);font-weight:600;font-family:var(--ff-mono);}
+.ssm-metric-out{color:var(--red);}
+
+/* ── FAZ 7: MARKA TAZELEMESİ — navy/gold vurgu ── */
+:root{--navy:#1a2744;--cream:#f8f5ef;}
+[data-theme="dark"]{--navy:#1e3a5f;}
+.psv-wizard-rail .psv-rail-step.active .psv-rs-dot,
+.psv-nav-next,
+.psv-scan-btn{background:var(--accent);}
+.psv-brand .psv-logo .tlogo-mark{background:var(--gold);}
+.psv-insight{border-left-color:var(--gold);}
+@media(max-width:640px){
+  .psv-wizard-rail{margin-bottom:20px;gap:0;}
+  .psv-rs-dot{width:26px;height:26px;font-size:10px;}
+  .psv-rs-label{font-size:9px;}
+  .psv-nav-row{flex-wrap:wrap;gap:8px;}
+  .psv-nav-next,.psv-scan-btn{flex:1;text-align:center;}
+  .match-mode-toggle{margin-right:0;}
+}
+
 /* Header dil düğmesi (TR/EN) — paylaşılan */
 .lang-toggle{display:inline-flex;border:1px solid var(--border2);border-radius:7px;overflow:hidden;flex-shrink:0;}
 .lang-toggle-btn{font-family:var(--ff);font-size:11px;font-weight:700;padding:5px 9px;background:transparent;color:var(--text2);border:none;cursor:pointer;transition:background .12s,color .12s;letter-spacing:.02em;}
