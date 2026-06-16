@@ -576,7 +576,7 @@ function _kriptoRowHtml(c, i, hasTvl) {
   var name  = c.name && c.name.length > 30 ? c.name.slice(0, 30) + '…' : (c.name || '');
   return `<tr>
     <td class="nfav" onclick="event.stopPropagation();toggleKriptoFav('${escJS(c.symbol)}')" title="${isFav?'Favorilerden çıkar':'Favorilere ekle'}"><span class="fav-icon${isFav?' fav-on':''}">★</span></td>
-    <td style="padding:7px 6px;white-space:nowrap">
+    <td>
       <span class="row-num">${c.rank||i+1}</span>
       <span class="sym-wrap"><span class="row-arrow">›</span>${img}<span class="sym">${esc((c.symbol||'').toUpperCase())}</span>${ver}</span>
       <div class="tsub">${esc(name)}</div>
@@ -602,31 +602,25 @@ function _renderKripto(coins, meta, forceAll) {
     return;
   }
   var KRIPTO_INIT = 100;
-  var note=(meta.sources&&meta.sources.note)||'';
   var hasTvl = coins.some(function(c){ return c.tvl != null; });
   var visibleCoins = (_kriptoShowAll || coins.length <= KRIPTO_INIT) ? coins : coins.slice(0, KRIPTO_INIT);
   var rows = visibleCoins.map(function(c, i){ return _kriptoRowHtml(c, i, hasTvl); }).join('');
-  var srcLabel = hasTvl ? 'Çoklu kaynak · Canlı' : 'Canlı veri';
-  var hdr='<div class="res-hdr"><b>₿ Kripto</b><span class="res-cnt">'+coins.length+' coin</span>'+(note?'<span class="res-ok">'+note+'</span>':'')+'<span class="res-src">'+srcLabel+'</span></div>';
   var kCols=[
-    {k:'price',l:'Fiyat'},{k:'change24h',l:'24s%'},{k:'change7d',l:'7G%'},{k:'change30d',l:'30G%'},
-    {k:'mcap',l:'Piy.Değ.'},{k:'volume24h',l:'Hacim'},{k:'rsi14',l:'RSI'},{k:'athChange',l:'ATH%'}
+    {k:'price',l:'FİYAT'},{k:'change24h',l:'24S%'},{k:'change7d',l:'7G%'},{k:'change30d',l:'30G%'},
+    {k:'mcap',l:'PİY.DEĞ.'},{k:'volume24h',l:'HACİM'},{k:'rsi14',l:'RSI'},{k:'athChange',l:'ATH%'}
   ];
   if(hasTvl) kCols.push({k:'tvl',l:'TVL'});
   var kThSort=kCols.map(function(c){
     var active=sortSt.field===c.k;
-    var arrow=active?(sortSt.dir==='desc'?' ↓':' ↑'):'';
-    return '<th class="right'+(active?' sorted':'')+'" style="cursor:pointer" onclick="_kriptoSort(\''+c.k+'\')">'
-      +c.l+arrow+'</th>';
+    var cls='right'+(active?' sorted'+(sortSt.dir==='asc'?' asc':''):'');
+    return '<th class="'+cls+'" onclick="_kriptoSort(\''+c.k+'\')">' + c.l + '</th>';
   }).join('');
   var kMoreBar = (!_kriptoShowAll && coins.length > KRIPTO_INIT)
-    ? '<div style="text-align:center;padding:10px 0 4px">'
-      +'<button onclick="_renderKripto(_kriptoData,_kriptoMeta,true)" style="background:var(--s2);border:1px solid var(--border2);color:var(--text2);border-radius:6px;padding:7px 16px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">'
-      +'Tümünü göster — '+(coins.length - KRIPTO_INIT)+' coin daha'
-      +'</button></div>'
+    ? '<div class="kripto-more-bar"><button onclick="_renderKripto(_kriptoData,_kriptoMeta,true)" class="kripto-more-btn">Tümünü göster — '+(coins.length-KRIPTO_INIT)+' coin daha</button></div>'
     : '';
-  var tbl='<table><thead><tr><th style="width:28px"></th><th>Coin</th>'+kThSort+'<th class="right">Sinyal</th></tr></thead><tbody>'+rows+'</tbody></table>'+kMoreBar;
-  _showResultArea(hdr, tbl, coins.length);
+  var density = typeof _rowDensity !== 'undefined' ? (_rowDensity || 'compact') : 'compact';
+  var tbl='<table class="kripto-table density-'+density+'"><thead><tr><th style="width:28px"></th><th>COİN</th>'+kThSort+'<th class="right">SİNYAL</th></tr></thead><tbody>'+rows+'</tbody></table>'+kMoreBar;
+  _showResultArea('', tbl, coins.length);
 }
 
 
