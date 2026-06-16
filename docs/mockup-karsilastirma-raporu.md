@@ -382,18 +382,83 @@ Katı modda `deger < eşik` → elenir; Esnek modda `taban..eşik` arası kısmi
 2. **Ölü kod:** `.smt-btn` Kolay/Pro toggle'ı CSS/JS'te referanslı ama HTML'de üretilmiyor — wizard çalışmasında temizlenir.
 3. **4-filtre limiti:** Skor "1 mercek + birkaç kriter" ile daha anlamlı; `_PSV_MAX_SEL` yeniden değerlendirilmeli.
 
-## E.5 — Faz Sıralaması (entegrasyon odaklı)
+## E.5 — Birleşik Yol Haritası (UI + Veri Kaynakları Karışık, Adım Adım)
 
-| Faz | İçerik | Motor? |
-|---|---|---|
-| **0** | Strateji verisini tek kaynağa indir + ölü kod temizliği | Hayır (önkoşul) |
-| **1** | "Neden bu sonuçlar?" cümlesi, güven şeridi, feedback toast, eşik şeffaflığı | Hayır |
-| **2** | Yatırımcı mercek **gruplama + arama** (25→5 grup), vitrin/derinlik katmanları | Hayır |
-| **3** | **Uyum Puanı motoru** + **Katı/Esnek anahtarı** + tablo kolonu + sonuç metrik kartları | **Evet (çekirdek)** |
-| **4** | "Neden Eşleşti?" drawer, 3-adım kurulum wizard'ı | Evet (3'e bağlı) |
-| **5** | Hero canlı önizleme, marka tazeleme, mobil sonuç kartları | Hayır |
+> Veri kaynakları (bkz. `docs/veri-kaynaklari-arastirmasi.md`) fazlara **karıştırıldı**. Her faz: *ne yapılır* + *nereden ne çekilir* + *hangi `api/` dosyası* + *hangi özelliği besler*. Kaynaklar **ücretsiz/anahtarsız önce** sıralı; motor gerektirmeyenler erken.
 
-İki "kazanç düğümü": **Faz 1** (sıfır riskle hissedilir anlatım farkı) ve **Faz 3** (mockup'un tüm vaadinin kilidi).
+### Faz 0 — Temel & Veri Mimarisi (önkoşul, motor yok)
+1. Strateji verisini (`GURUS`/`PRESETS`/`TECH_PRESETS`) tek `public/strategies.js`'e indir → `deepfin.js` + `stratejiler.js` ikisi de import etsin (skor iki yerde tutarlı olsun).
+2. Ölü `.smt-btn` kodunu temizle; `_PSV_MAX_SEL=4` limitini gözden geçir.
+3. **Veri mimarisi kararı:** doğrudan-API mi yoksa **OpenBB self-host** toplayıcı katman mı? (uzun vade OpenBB; kısa vade doğrudan). Sunucu-önbellek desenini yeni kaynaklar için standardize et (günde 1–2 toplu çekim, kullanıcı başına değil).
+- **VERİ:** yok (sadece mimari).
+
+### Faz 1 — Anlatım Cilaları + Hızlı Veri Kazanımı (motor yok)
+1. UI: "Neden bu sonuçlar?" düz cümle (`showScanSummary`), güven şeridi (`.trust-strip`), feedback toast (`showFeedback`), filtre eşik şeffaflığı kutusu.
+2. **VERİ — DeFiLlama** (⭐ anahtarsız, rate-limit yok) → `api/kripto-scan.js`'e karıştır:
+   - `GET https://api.llama.fi/protocols` → protokol başına `tvl`, `mcap`, `change_1d/7d`, `category`
+   - `GET https://api.llama.fi/v2/historicalChainTvl` → TVL trendi
+   - Coin'e **TVL, MC/TVL, fee geliri** alanları ekle → mevcut "DeFi Değer / Yield" kripto filtreleri sahte değil **gerçek** olur. Düşük efor, sıfır key.
+- **Sonuç:** anlatım farkı + kripto derinliği, motor/risk yok.
+
+### Faz 2 — Derinlik + Yeni Veri-Destekli Mercekler (motor yok, veri hazırlığı)
+1. UI: 25 yatırımcı merceğini gruplama+arama (Değer/Kalite/Büyüme/Aktivist/Momentum), vitrin→derinlik katmanları. Aynısı 28 teknik için.
+2. **VERİ — FMP free** → `api/fundamentals.js` genişlet (alanlar kolon/rozet olarak gösterilir, henüz skora girmez):
+   - `GET /stable/price-target-consensus?symbol=` → **analist hedef fiyatı / yükseliş %**
+   - `GET /stable/insider-trading/search?symbol=` → **içeriden alım/satım** trendi
+   - `GET /stable/institutional-ownership/...` (13F) → **kurumsal sahiplik** değişimi → CAN SLIM/O'Neil & aktivist (Ackman/Icahn) mercekleri *gerçekten* çalışır
+3. **VERİ — Marketaux / Alpha Vantage** → yeni `api/sentiment.js`:
+   - Marketaux: `GET https://api.marketaux.com/v1/news/all?symbols=THYAO.IS&filter_entities=true` → varlık başına **−1..+1 haber duygu skoru**
+   - Yeni **"Duygu/Haber" sinyali** (4. karar ailesi tohumu) → tabloda rozet.
+- **Sonuç:** yeni veri kolonları + eksik mercekler tamamlanır; Faz 3 için zemin.
+
+### Faz 3 — Uyum Puanı Motoru (çekirdek) + Tüm Veriyi Skora Bağla
+1. Motor: normalize alt-skor → **4 aile** (Yatırımcı / Temel / Teknik / **Duygu**) → ağırlıklı 0–100, **Katı/Esnek anahtarı**.
+2. **Mix:** Faz 1–2'de çekilen veriler artık **skor girdisi**:
+   - DeFiLlama TVL/fee → kripto Uyum Puanı bileşeni
+   - FMP analist hedef / insider / 13F → temel & "akıllı para" alt-skorları
+   - Marketaux duygu → Duygu ailesi alt-skoru
+3. Tabloya **Uyum** kolonu + sıralama + **sonuç metrik kartları** (En yüksek uyum / filtre dışı / aktif aile).
+4. **Referans:** Simply Wall St açık-kaynak analiz modeli (`SimplyWallSt/Company-Analysis-Model`) — normalize/ağırlık kalibrasyonu için incele (implementasyon değil, referans).
+
+### Faz 4 — Açıklanabilirlik Derinliği + (opsiyonel) LLM
+1. **Neden Eşleşti? drawer** — aile kırılımı + gerçek-değer satırları: *"ROE %18 ≥ %15 ✓", "Analist hedefi %22 yukarı ✓", "Son 10 haber duygu +0.4 ✓", "Kurumsal alım artıyor ✓"* → Faz 2 verisi burada parlar.
+2. **AI (opsiyonel) — Claude** (Claude for Financial Services konsepti): drawer açıklama metnini şablon yerine **LLM ile üret** (önbellekli, maliyet kontrollü). DeepFin zaten Claude üzerinde.
+3. 3-adımlı kurulum wizard'ı (PSV evrimi).
+
+### Faz 5 — Makro Bağlam + Marka + Altyapı Olgunluğu
+1. **VERİ — FRED + TCMB EVDS** → yeni `api/macro.js`:
+   - FRED: `GET https://api.stlouisfed.org/fred/series/observations?series_id=...` → faiz/enflasyon
+   - TCMB EVDS → TR enflasyon, politika faizi, kur → ana sayfa/stats-bar **makro bandı** + **"reel getiri"** opsiyonu (Türk yatırımcıya özel farklılaştırma)
+2. UI: hero canlı önizleme, marka tazeleme, mobil sonuç kartları.
+3. **Altyapı (uzun vade):** OpenBB toplayıcı katmana geçiş + EODHD BIST resmî yedeği → TradingView scraping tek-nokta-arıza olmaktan çıkar.
+
+## E.6 — Veri Kaynağı × Faz Matrisi
+
+| Kaynak | Faz | Ne çekilir | api/ dosyası | Besler |
+|---|---|---|---|---|
+| **DeFiLlama** | 1 | TVL, fee, DEX hacmi, kategori | `kripto-scan.js` | Kripto DeFi/Yield filtreleri + (F3) skor |
+| **FMP** | 2 | Analist hedef, insider, 13F kurumsal | `fundamentals.js` | CAN SLIM/aktivist mercek + (F3) skor + (F4) drawer |
+| **Marketaux / Alpha Vantage** | 2 | Haber duygu (−1..+1) | `sentiment.js` (yeni) | Duygu ailesi + (F3) skor + (F4) drawer |
+| **Finnhub** | 2 | Kazanç takvimi/sürpriz | `fundamentals.js` | "Kazanç yakın" uyarısı |
+| **Simply Wall St modeli** | 3 | (kod değil) skor metodoloji referansı | — | Uyum Puanı kalibrasyonu |
+| **Claude (LLM)** | 4 | Açıklama metni üretimi | mevcut Claude | "Neden Eşleşti" anlatımı |
+| **FRED / TCMB EVDS** | 5 | Enflasyon, faiz, kur | `macro.js` (yeni) | Makro bandı + reel getiri |
+| **OpenBB / EODHD** | 5 | Toplayıcı katman / BIST yedeği | veri katmanı | Risk azaltma, global kapsam |
+
+## E.7 — "Nereden Ne Çekersin" Hızlı Referans (endpoint'ler doğrulanmalı)
+
+- **DeFiLlama** (key yok): `api.llama.fi/protocols`, `/v2/historicalChainTvl`, `/summary/fees/{protocol}`
+- **FMP** (free key): `/stable/price-target-consensus`, `/stable/insider-trading/search`, `/stable/institutional-ownership/*`, temel tablolar
+- **Marketaux** (free key): `/v1/news/all?symbols=&filter_entities=true` (entity başına `sentiment_score`)
+- **Alpha Vantage** (free key): `function=NEWS_SENTIMENT&tickers=` (haber + duygu, tek API'de temel de var)
+- **Finnhub** (free key): `/calendar/earnings`, `/stock/price-target`, `/stock/recommendation`
+- **FRED** (free key): `/fred/series/observations?series_id=`
+- **TCMB EVDS** (kayıt/anahtar gerekir — doğrulanmalı): enflasyon/faiz/kur serileri
+- **OpenBB** (self-host, kendi key'lerin): tek REST arayüzünden yukarıdakilerin çoğu
+
+> Tüm free tier'lar çağrı-limitli → **sunucu önbelleği** (var) ile günlük toplu çekim; ToS/atıf gereksinimleri entegrasyondan önce kontrol edilmeli.
+
+İki "kazanç düğümü" değişmedi: **Faz 1** (anlatım + DeFiLlama, sıfır risk/key) ve **Faz 3** (Uyum Puanı motoru, tüm veriyi birleştiren kilit).
 
 ---
 *Bu doküman yalnızca araştırma/analiz amaçlıdır; kodda değişiklik içermez.*
