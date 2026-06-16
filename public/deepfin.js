@@ -2465,7 +2465,6 @@ function initPrescanView() {
     '<div class="psv-section" id="psv-sec-kripto-strat" style="display:none">'+
     '<div class="psv-section-hd">Strateji <span class="psv-opt">isteğe bağlı</span></div>'+
     '<div class="psv-chip-grid">'+
-    '<button class="psv-kcat-btn on" id="psv-kstrat-all" data-preset="" onclick="psvKriptoPreset(this)">Tümü</button>'+
     [
       {preset:'hacim_patlamasi',label:'Hacim Patlaması',desc:'Hacim artışı + günlük yükseliş'},
       {preset:'rsi_dip',label:'RSI Dip',desc:'RSI < 35, aşırı satım bölgesi'},
@@ -2563,25 +2562,9 @@ function psvKriptoCat(el) {
 }
 
 function psvKriptoPreset(el) {
-  var preset = el.dataset.preset;
-  if (preset === '') {
-    // Tümü butonuna tıklandı — tüm preset card seçimlerini kaldır
-    document.querySelectorAll('#psv-sec-kripto-strat .psv-preset-card').forEach(function(c){ c.classList.remove('on'); });
-    document.querySelectorAll('#psv-sec-kripto-strat .psv-kcat-btn').forEach(function(b){ b.classList.remove('on'); });
-    var allBtn = document.getElementById('psv-kstrat-all');
-    if (allBtn) allBtn.classList.add('on');
-  } else {
-    // Strateji kartı
-    var was = el.classList.contains('on');
-    document.querySelectorAll('#psv-sec-kripto-strat .psv-preset-card').forEach(function(c){ c.classList.remove('on'); });
-    var allBtn = document.getElementById('psv-kstrat-all');
-    if (allBtn) allBtn.classList.remove('on');
-    if (!was) {
-      el.classList.add('on');
-    } else {
-      if (allBtn) allBtn.classList.add('on');
-    }
-  }
+  var was = el.classList.contains('on');
+  document.querySelectorAll('#psv-sec-kripto-strat .psv-preset-card').forEach(function(c){ c.classList.remove('on'); });
+  if (!was) el.classList.add('on');
   _psvUpdateKriptoBtn();
 }
 
