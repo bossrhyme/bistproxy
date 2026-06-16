@@ -5218,8 +5218,7 @@ function showScanSummary(total, matches) {
         ? '<span class="ssm-flabel">Aktif filtre:</span>' + tagsHtml
         : '<span class="ssm-no-filter">Filtresiz</span>') +
     '</span>' +
-    metricsHtml +
-    '<div class="ssm-trust">Eşleşme ≠ yatırım önerisi · gecikmeli/temsilî veri · sonuçlar yalnızca seçilen filtre kriterlerini yansıtır.</div>';
+    metricsHtml;
   // Taranan / Eşleşen — ayrı etiketli elemanlar
   var totItem = document.getElementById('sb-total-item');
   var totVal  = document.getElementById('sb-total');
@@ -5234,6 +5233,8 @@ function showScanSummary(total, matches) {
     resItem.style.display = '';
   }
   _recordRecentScan(filters, total, matches);
+  var trustStrip = document.getElementById('trust-strip');
+  if (trustStrip) trustStrip.style.display = '';
 }
 
 // Site-geneli "Son Taramalar"a kaydet — yalnızca deep-linklenebilir (kind+key'li)

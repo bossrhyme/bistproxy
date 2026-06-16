@@ -2184,21 +2184,51 @@ tbody tr:active{background:var(--s3);}
 .mmt-btn.on{background:var(--accent);color:#fff;}
 
 /* ── FAZ 7: SONUÇ METRİK KARTLARI ── */
-.ssm-metrics-row{display:flex;flex-wrap:wrap;gap:8px;padding:8px 0 4px;}
-.ssm-metric{display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r-md);}
-.ssm-metric-lbl{font-size:10px;color:var(--muted2);font-weight:500;white-space:nowrap;}
-.ssm-metric-val{font-size:12px;font-weight:700;color:var(--text);font-family:var(--ff-mono);}
-.ssm-metric-sym{font-size:10px;color:var(--muted2);font-weight:600;font-family:var(--ff-mono);}
+.ssm-metrics-row{display:flex;flex-wrap:wrap;gap:8px;padding:10px 0 4px;}
+.ssm-metric{display:flex;flex-direction:column;gap:3px;padding:10px 16px;background:var(--s1);border:1px solid var(--border2);border-radius:var(--r-lg);min-width:110px;}
+.ssm-metric-lbl{font-size:9px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;}
+.ssm-metric-val{font-size:18px;font-weight:800;color:var(--text);font-family:var(--ff-mono);line-height:1.1;}
+.ssm-metric-sym{font-size:10px;color:var(--muted2);font-weight:600;font-family:var(--ff-mono);margin-top:1px;}
 .ssm-metric-out{color:var(--red);}
+.ssm-metric:first-child{border-color:var(--gold);background:rgba(217,119,6,.05);}
+.ssm-metric:first-child .ssm-metric-val{color:var(--gold);}
 
-/* ── FAZ 7: MARKA TAZELEMESİ — navy/gold vurgu ── */
-:root{--navy:#1a2744;--cream:#f8f5ef;}
-[data-theme="dark"]{--navy:#1e3a5f;}
-.psv-wizard-rail .psv-rail-step.active .psv-rs-dot,
-.psv-nav-next,
-.psv-scan-btn{background:var(--accent);}
-.psv-brand .psv-logo .tlogo-mark{background:var(--gold);}
-.psv-insight{border-left-color:var(--gold);}
+/* ── FAZ 7: MARKA TAZELEMESİ ── */
+:root{--navy:#1a2744;--cream:#f8f5ef;--gold-glow:rgba(217,119,6,.18);}
+[data-theme="dark"]{--navy:#1e3a5f;--gold-glow:rgba(255,179,0,.15);}
+
+/* PSV: Gold scan & nav buttons (CTA hiyerarşisi) */
+.psv-scan-btn{background:linear-gradient(135deg,var(--gold),#e8a000)!important;color:#1a1000!important;box-shadow:0 4px 20px var(--gold-glow)!important;}
+.psv-scan-btn:hover{opacity:.92!important;box-shadow:0 6px 28px var(--gold-glow)!important;}
+.psv-nav-next{background:linear-gradient(135deg,var(--gold),#e8a000)!important;color:#1a1000!important;box-shadow:0 2px 12px var(--gold-glow);}
+.psv-nav-next:hover{box-shadow:0 4px 18px var(--gold-glow);}
+
+/* PSV: Rail active step → gold */
+.psv-rail-step.active .psv-rs-dot{border-color:var(--gold)!important;background:var(--gold)!important;color:#1a1000!important;box-shadow:0 2px 10px var(--gold-glow)!important;}
+.psv-rail-step.active .psv-rs-label{color:var(--gold)!important;}
+.psv-rail-line{transition:background .3s;}
+
+/* PSV insight: gold left border */
+.psv-insight{border-left-color:var(--gold)!important;background:rgba(217,119,6,.04)!important;}
+
+/* PSV inner: subtle navy tint header */
+.psv-brand{background:linear-gradient(160deg,rgba(26,39,68,.06) 0%,transparent 60%);border-radius:var(--r-xl);padding:20px;margin-bottom:8px;}
+
+/* Brand mark in PSV: gold gradient */
+.psv-brand .psv-logo .tlogo-mark{background:linear-gradient(135deg,var(--gold),#e8a000)!important;width:30px!important;height:30px!important;font-size:14px!important;border-radius:7px!important;color:#1a1000!important;box-shadow:0 2px 10px var(--gold-glow);}
+
+/* Topbar logo mark: gold gradient dot → premium badge */
+.tlogo-mark{background:linear-gradient(135deg,var(--gold),#c87800)!important;width:20px!important;height:20px!important;border-radius:5px!important;box-shadow:0 1px 6px var(--gold-glow)!important;}
+
+/* Katı/Esnek toggle — gold active */
+.mmt-btn.on{background:linear-gradient(135deg,var(--gold),#e8a000)!important;color:#1a1000!important;}
+.mmt-btn:hover{color:var(--gold)!important;}
+
+/* ── FAZ 7: GÜVEN ŞERİDİ (Trust Strip 4.G) ── */
+.trust-strip{display:flex;align-items:center;gap:8px;padding:6px 16px;background:rgba(217,119,6,.06);border-bottom:1px solid rgba(217,119,6,.18);font-size:11px;color:var(--muted2);font-family:var(--ff);flex-shrink:0;}
+.trust-strip .ts-icon{color:var(--gold);font-size:13px;flex-shrink:0;}
+[data-theme="dark"] .trust-strip{background:rgba(255,179,0,.05);border-bottom-color:rgba(255,179,0,.12);}
+
 @media(max-width:640px){
   .psv-wizard-rail{margin-bottom:20px;gap:0;}
   .psv-rs-dot{width:26px;height:26px;font-size:10px;}
@@ -2206,6 +2236,9 @@ tbody tr:active{background:var(--s3);}
   .psv-nav-row{flex-wrap:wrap;gap:8px;}
   .psv-nav-next,.psv-scan-btn{flex:1;text-align:center;}
   .match-mode-toggle{margin-right:0;}
+  .ssm-metric{min-width:90px;padding:8px 12px;}
+  .ssm-metric-val{font-size:15px;}
+  .trust-strip{font-size:10px;padding:5px 12px;}
 }
 
 /* Header dil düğmesi (TR/EN) — paylaşılan */
