@@ -132,9 +132,9 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=warm40">
+<link rel="stylesheet" href="/deepfin.css?v=warm41">
 <script src="/i18n.js?v=6" defer></script>
-<script src="/deepfin.js?v=188" defer></script>
+<script src="/deepfin.js?v=189" defer></script>
 <script src="/auth-header.js?v=2" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -1105,8 +1105,10 @@ if('serviceWorker' in navigator){
 
       <!-- META özet -->
       <div class="stats-bar" id="stats-bar">
-        <div class="sb-item"><span class="sb-val" id="sb-ex">—</span></div>
-        <div class="sb-item" id="sb-result-item" style="display:none"><span class="sb-val" id="sb-result">—</span></div>
+        <div class="sb-item"><span class="sb-lbl">Varlık Sınıfı</span><span class="sb-val" id="sb-asset">Hisse</span></div>
+        <div class="sb-item"><span class="sb-lbl">Borsa</span><span class="sb-val" id="sb-ex">—</span></div>
+        <div class="sb-item" id="sb-total-item" style="display:none"><span class="sb-lbl">Taranan</span><span class="sb-val" id="sb-total">—</span></div>
+        <div class="sb-item" id="sb-result-item" style="display:none"><span class="sb-lbl">Eşleşen</span><span class="sb-val up" id="sb-result">—</span></div>
         <div class="sb-item"><span class="sb-val up" id="sb-up">—</span><span class="sb-val dn" id="sb-dn">—</span></div>
         <div class="sb-item"><span class="sb-val sb-time-val" id="sb-time">—</span></div>
         <div class="sb-item" id="sb-dur-item" style="display:none"><span class="sb-val sb-dur-val" id="sb-dur">—</span></div>

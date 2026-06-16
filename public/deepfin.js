@@ -4608,6 +4608,8 @@ function updateStatsBar() {
   document.getElementById('sb-dn').textContent = '▼ ' + dnCount;
   document.getElementById('sb-ex').textContent = ex.name || currentExchange.toUpperCase();
   document.getElementById('sb-time').textContent = hh + ':' + mm;
+  var assetEl = document.getElementById('sb-asset');
+  if (assetEl) assetEl.textContent = (_activeAsset === 'kripto') ? 'Kripto' : (_activeAsset === 'fon') ? 'Fon' : 'Hisse';
 }
 
 function updateTicker() {
@@ -5047,11 +5049,17 @@ function showScanSummary(total, matches) {
         ? '<span class="ssm-flabel">Aktif filtre:</span>' + tagsHtml
         : '<span class="ssm-no-filter">Filtresiz</span>') +
     '</span>';
-  // Tarandı/eşleşti bilgisi meta barında
+  // Taranan / Eşleşen — ayrı etiketli elemanlar
+  var totItem = document.getElementById('sb-total-item');
+  var totVal  = document.getElementById('sb-total');
+  if (totItem && totVal) {
+    totVal.textContent = (total || 0).toLocaleString('tr-TR');
+    totItem.style.display = '';
+  }
   var resItem = document.getElementById('sb-result-item');
   var resVal  = document.getElementById('sb-result');
   if (resItem && resVal) {
-    resVal.innerHTML = total + ' tarandı · <span class="up">' + matches + ' eşleşti</span>';
+    resVal.textContent = (matches || 0).toLocaleString('tr-TR');
     resItem.style.display = '';
   }
   // Tarama süresi meta barının sonunda (… 16:34 · 3.0s)

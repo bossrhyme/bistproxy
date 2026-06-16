@@ -1084,6 +1084,7 @@ td:nth-child(2){font-family:var(--ff);}
 .sb-item:first-child{padding-left:0;}
 .sb-item:last-child{border-right:none;}
 .sb-label{color:var(--muted2);font-size:9px;letter-spacing:.6px;text-transform:uppercase;}
+.sb-lbl{font-size:9.5px;color:var(--muted2);font-weight:500;letter-spacing:.02em;margin-right:4px;font-family:var(--ff-sans,inherit);}
 .sb-val{font-weight:700;color:var(--text);font-size:11px;}
 .sb-val.up{color:var(--green);}
 .sb-val.dn{color:var(--red);}
