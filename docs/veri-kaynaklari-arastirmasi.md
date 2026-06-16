@@ -93,16 +93,41 @@ Bizde **yok**. Türk kullanıcı için **TRY enflasyonu / faiz** bağlamı kriti
 
 ---
 
-### F. Temel Veri Yedeği / Global Kapsam — ORTA (risk azaltma)
+### F. Temel Veri Yedeği / Global Kapsam / Toplayıcı Katman — ORTA (risk azaltma)
 
 TradingView/Yahoo scraping'ine **resmî yedek**; ban/kırılma riskini düşürür, BIST dışı kapsamı artırır.
 
 | Kaynak | Veri | Ücretsiz | Not |
 |---|---|---|---|
+| **OpenBB Platform** ⭐ | **~100 sağlayıcıyı tek şemada toplar** (hisse, opsiyon, kripto, forex, makro, tahvil, alt-veri); REST API + self-host + MCP | ✅✅ **Açık kaynak, ücretsiz** (sadece kendi provider key'lerin) | **Stratejik:** tek bir "rosetta stone" katmanı; TradingView scraping bağımlılığını kırar, sağlayıcı değiştirmeyi tek-satır yapar. Aşağıdaki A–E kaynaklarının çoğuna *zaten* OpenBB üzerinden erişilir |
 | **FMP** | Fiyat, finansal tablolar, oranlar (30 yıl geçmiş) | ✅ Free plan | Çok-amaçlı; A/B/C/E maddelerini de tek sağlayıcıda toplar |
+| **Fiscal.ai** (eski FinChat) | Kurumsal kalite: temiz temel, KPI, oran, segment, filing (S&P Market Intelligence kaynaklı) | ⚠️ Ücretli ($24 ürün; API 70+ platform) | Premium temel/KPI; 1000 şirket için segment verisi |
+| **Lambda Finance** | API: gerçek-zamanlı kote, kazanç transkripti, tablolar, haber, tarama | ⚠️ Ücretli ağırlıklı | Geliştirici-odaklı; konuşma-tabanlı erişim de var |
 | **EODHD** | Global borsa kapsamı (İstanbul dahil), uzun geçmiş | ✅ Sınırlı free, uygun ücretli | **BIST kapsıyor** — İş Yatırım'a resmî yedek |
 | **Alpha Vantage** | Fiyat, temel, 50+ teknik indikatör, forex, kripto, makro, haber duygu | ✅ Free key | Tek API'de en geniş; MCP sunucusu LLM/agent dostu |
 | **Polygon** | Borsa-lisanslı gerçek zamanlı + geniş geçmiş | ⚠️ Ücretli ağırlıklı | İleri seviye |
+
+> **OpenBB notu:** Bu bir *kaynak* değil, *toplayıcı katman*. Eğer veri çeşitliliğini ciddi büyütmek istersek, tek tek 6 API'ye entegrasyon yerine OpenBB Platform'u (kendi sunucumuzda) çalıştırıp tek REST arayüzünden Yahoo/FMP/Polygon/CoinGecko vb. çekmek en sürdürülebilir mimari olabilir. Değerlendirilmeli.
+
+---
+
+### G. Ürün & UX İlhamı — ⚠️ VERİ API'Sİ DEĞİL (rakip/konsept)
+
+Bu platformlardan **veri çekemeyiz** (kapalı/kurumsal ürünler veya chatbot'lar). Ama tasarım/özellik yönümüz için değerliler — özellikle **Simply Wall St**, doğrudan bizim Uyum Puanı / açıklanabilirlik vizyonumuzun olgun bir örneği.
+
+| Platform | Ne | Bizim için dersi |
+|---|---|---|
+| **Simply Wall St** ⭐⭐ | "Snowflake" — 5 eksenli görsel skor: Değerleme, Gelecek Büyüme, Geçmiş Performans, Finansal Sağlık, Temettü | **Birebir ilham:** Bizim "Uyum Puanı + 3 karar ailesi"nin görselleştirilmiş hali. Analiz modeli GitHub'da **açık kaynak** (`SimplyWallSt/Company-Analysis-Model`) — skorlama metodolojimiz için referans. Resmî API yok (gayrıresmî client var) |
+| **Stock Rover** | Güçlü tarayıcı; "screener snapshot" (sonucu zaman içinde izleme), CSV export | Tarama-geçmişi / "kaydedilmiş tarama zaman serisi" özelliği fikri. Public API yok |
+| **YCharts** | Veri görselleştirme/grafik; artık Fiscal.ai verisi kullanıyor | Grafik/karşılaştırma UX'i. Veri için Fiscal.ai'ye bak |
+| **Fintool** | SEC filing/earnings call üzerine genAI (Perplexity API ile) | Belge-üzerine-soru özelliği fikri (bizde haber sekmesi var, genişletilebilir) |
+| **Rogo / Brightwave / AlphaSense** | Kurumsal AI araştırma/chatbot (banka/fon için) | Kurumsal; bizim retail odağımıza uzak. Konsept: "ajan üretir rapor" |
+| **Incite AI / Kairos AI** | Trading chatbot ($17 / $167) | Retail AI-asistan trendi; bizim "Neden Eşleşti" anlatımı bunun hafif versiyonu |
+| **Claude for Financial Services** | Anthropic'in finans LLM'i (piyasa + muhasebe analizi) | **Doğrudan ilgili:** DeepFin zaten Claude üzerinde. Açıklanabilirlik metinlerini ("bu hisse neden eşleşti") **LLM ile üretmek** mümkün — şablonlu metnin ötesine geçer |
+| **PitchBook** | Özel piyasa (PE/VC) verisi — kurumsal, pahalı | Bizim kapsamımız dışı |
+| **Groww** | Hindistan retail aracı kurum | İlgisiz (coğrafya) |
+
+> **Net ayrım:** A–F = *veri çekeriz*. G = *fikir alırız, veri çekemeyiz*. Simply Wall St'in Snowflake'i ve açık-kaynak analiz modeli, Faz 3 (Uyum Puanı) için en somut dış referans.
 
 ---
 
@@ -128,6 +153,9 @@ Bu kaynaklar, önceki **entegrasyon planındaki** konseptleri besler:
 | **4** | **Finnhub** (kazanç takvimi/hedef) | Zaten kullanıyoruz, genişlet | Düşük | $0 free tier |
 | **5** | **FRED + TCMB EVDS** (makro/TRY) | Yerli farklılaştırma | Orta | $0 |
 | **6** | **EODHD** (BIST resmî yedek) | İş Yatırım/TV scraping'e yedek | Orta | Sınırlı free |
+| **7** | **OpenBB Platform** (toplayıcı katman) | Tek tek API yerine ~100 sağlayıcıyı tek arayüze indirir; uzun vadeli mimari | Yüksek (mimari) | $0 (açık kaynak) |
+
+> **Ürün ilhamı (veri değil):** **Simply Wall St Snowflake** + açık-kaynak analiz modeli, Faz 3 Uyum Puanı tasarımı için incelenmeli — implementasyon değil, referans.
 
 ---
 
@@ -155,5 +183,14 @@ Bu kaynaklar, önceki **entegrasyon planındaki** konseptleri besler:
 - [Economics Data APIs — FMP](https://site.financialmodelingprep.com/datasets/economics)
 - [FRED — St. Louis Fed](https://fred.stlouisfed.org/)
 - [Trading Economics API](https://tradingeconomics.com/api/indicators.aspx)
+- [OpenBB — GitHub (open source platform)](https://github.com/OpenBB-finance/OpenBB)
+- [OpenBB Docs](https://docs.openbb.co/)
+- [Fiscal.ai API Reference](https://docs.fiscal.ai/docs/api-reference)
+- [Lambda Finance — Financial Data APIs 2026](https://www.lambdafin.com/articles/financial-data-api-2026)
+- [Simply Wall St — How the Snowflake works](https://support.simplywall.st/hc/en-us/articles/360001740916-How-does-the-Snowflake-work)
+- [Simply Wall St — open-source Company Analysis Model](https://github.com/SimplyWallSt/Company-Analysis-Model/blob/master/MODEL.markdown)
+- [Stock Rover — Screener](https://www.stockrover.com/stock-screening/)
+- [Rogo AI](https://rogo.ai/)
+- [Fintool — Perplexity case study](https://www.perplexity.ai/api-platform/case-studies/fintool)
 
 *Yalnızca araştırma dokümanıdır; kodda değişiklik içermez.*
