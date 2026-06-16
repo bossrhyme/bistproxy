@@ -2405,7 +2405,7 @@ function initPrescanView() {
       '<div class="psv-asset-row" id="psv-asset-row">'+
         PSV_ASSETS.map(function(a){
           return a.active
-            ? '<button class="psv-asset-btn on" data-asset="'+a.key+'" onclick="psvSetAsset(\''+a.key+'\')"><span class="psv-asset-name">'+a.label+'</span></button>'
+            ? '<button class="psv-asset-btn'+(a.key==='hisse'?' on':'')+'" data-asset="'+a.key+'" onclick="psvSetAsset(\''+a.key+'\')"><span class="psv-asset-name">'+a.label+'</span></button>'
             : '<div class="psv-asset-soon"><span class="psv-asset-name">'+a.label+'</span><span class="psv-asset-badge">yakında</span></div>';
         }).join('')+
       '</div>'+
@@ -2465,6 +2465,7 @@ function initPrescanView() {
     '<div class="psv-section" id="psv-sec-kripto-strat" style="display:none">'+
     '<div class="psv-section-hd">Strateji <span class="psv-opt">isteğe bağlı</span></div>'+
     '<div class="psv-chip-grid">'+
+    '<button class="psv-kcat-btn on" id="psv-kstrat-all" data-preset="" onclick="psvKriptoPreset(this)">Tümü</button>'+
     [
       {preset:'hacim_patlamasi',label:'Hacim Patlaması',desc:'Hacim artışı + günlük yükseliş'},
       {preset:'rsi_dip',label:'RSI Dip',desc:'RSI < 35, aşırı satım bölgesi'},
@@ -2536,8 +2537,8 @@ function psvSetAsset(key) {
   var btn = document.getElementById('psv-scan-btn');
   if (btn) {
     if (isKripto) {
-      btn.textContent = 'Kripto Tara';
       btn.onclick = psvScanKripto;
+      _psvUpdateKriptoBtn();
     } else {
       btn.onclick = psvScan;
       _psvUpdateSelState();
@@ -2545,19 +2546,47 @@ function psvSetAsset(key) {
   }
 }
 
+function _psvUpdateKriptoBtn() {
+  var catBtn = document.querySelector('#psv-sec-kripto-cat .psv-kcat-btn.on');
+  var presetEl = document.querySelector('#psv-sec-kripto-strat .psv-preset-card.on');
+  var count = 0;
+  if (catBtn && catBtn.dataset.cat !== '') count++;
+  if (presetEl) count++;
+  var btn = document.getElementById('psv-scan-btn');
+  if (btn) btn.textContent = count > 0 ? count + ' Filtre ile Kripto Tara' : 'Kripto Tara';
+}
+
 function psvKriptoCat(el) {
-  document.querySelectorAll('.psv-kcat-btn').forEach(function(b){ b.classList.remove('on'); });
+  document.querySelectorAll('#psv-sec-kripto-cat .psv-kcat-btn').forEach(function(b){ b.classList.remove('on'); });
   el.classList.add('on');
+  _psvUpdateKriptoBtn();
 }
 
 function psvKriptoPreset(el) {
-  var was = el.classList.contains('on');
-  document.querySelectorAll('#psv-sec-kripto-strat .psv-preset-card').forEach(function(c){ c.classList.remove('on'); });
-  if (!was) el.classList.add('on');
+  var preset = el.dataset.preset;
+  if (preset === '') {
+    // Tümü butonuna tıklandı — tüm preset card seçimlerini kaldır
+    document.querySelectorAll('#psv-sec-kripto-strat .psv-preset-card').forEach(function(c){ c.classList.remove('on'); });
+    document.querySelectorAll('#psv-sec-kripto-strat .psv-kcat-btn').forEach(function(b){ b.classList.remove('on'); });
+    var allBtn = document.getElementById('psv-kstrat-all');
+    if (allBtn) allBtn.classList.add('on');
+  } else {
+    // Strateji kartı
+    var was = el.classList.contains('on');
+    document.querySelectorAll('#psv-sec-kripto-strat .psv-preset-card').forEach(function(c){ c.classList.remove('on'); });
+    var allBtn = document.getElementById('psv-kstrat-all');
+    if (allBtn) allBtn.classList.remove('on');
+    if (!was) {
+      el.classList.add('on');
+    } else {
+      if (allBtn) allBtn.classList.add('on');
+    }
+  }
+  _psvUpdateKriptoBtn();
 }
 
 function psvScanKripto() {
-  var catBtn = document.querySelector('.psv-kcat-btn.on');
+  var catBtn = document.querySelector('#psv-sec-kripto-cat .psv-kcat-btn.on');
   var cat = catBtn ? catBtn.dataset.cat : '';
   var presetCard = document.querySelector('#psv-sec-kripto-strat .psv-preset-card.on');
   var preset = presetCard ? presetCard.dataset.preset : null;
