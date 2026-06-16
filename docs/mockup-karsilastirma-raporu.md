@@ -461,4 +461,217 @@ Katı modda `deger < eşik` → elenir; Esnek modda `taban..eşik` arası kısmi
 İki "kazanç düğümü" değişmedi: **Faz 1** (anlatım + DeFiLlama, sıfır risk/key) ve **Faz 3** (Uyum Puanı motoru, tüm veriyi birleştiren kilit).
 
 ---
+
+# E.8 — Faz 3: Uyum Puanı Motoru — Detaylı Entegre Şeması
+
+> Mevcut mimariye (`deepfin.js`) gömülü, somut tasarım. Karar: **Katı/Esnek anahtarı (ikisi de)**. Bu yalnızca tasarımdır; kod değişikliği yok.
+
+## E.8.1 — Mimari Akış
+
+```
+                ┌─────────────── runScan() → allData (ham, ~3000 satır) ───────────────┐
+                │                                                                       │
+ Aktif çipler   │   ┌──────────────┐   filtre (Katı)    ┌──────────────┐                │
+ (GURUS/PRESETS │──▶│ _applyChips  │──▶ merged inputs ─▶│ applyAndRender│─▶ filtered    │
+  /TECH +       │   │ (provenance  │                    │  (mevcut)     │   (geçenler)   │
+  Duygu sinyali)│   │  KORUNUR)    │                    └──────┬───────┘                │
+                │   └──────┬───────┘                           │                        │
+                │          │ aktif kural seti (aile etiketli)  │                        │
+                │          ▼                                   ▼                        │
+                │   ┌───────────────────────  scoreResults(rows, ctx, mode) ─────────┐  │
+                │   │  her satır:  computeMatch(stock)                                │  │
+                │   │   ├─ normalizeRule(value, rule, mode) → 0..1 alt-skor           │  │
+                │   │   ├─ aile içi ortala (Yatırımcı/Temel/Teknik/Duygu)            │  │
+                │   │   └─ ağırlıklı topla → 0..100  + breakdown objesi              │  │
+                │   └───────────────────────────────┬───────────────────────────────┘  │
+                │                                    ▼                                   │
+                │   s._match = { score, band, families{...}, passedHard }               │
+                └────────────────────────────────────┬──────────────────────────────────┘
+                                                      ▼
+        ┌──────────────┬───────────────────┬──────────────────────┬─────────────────────┐
+   Uyum kolonu     sıralama            sonuç metrik           "Neden Eşleşti?"      Katı/Esnek
+  (_vsRowHtml)   (sorted: 'match')    kartları (E/4.F)        drawer (Faz 4)        toggle → re-score
+```
+
+**Kilit fikir:** Filtreleme (eleme) ile **skorlama** ayrılır. Eleme mevcut `applyAndRender` merged-input mantığını kullanır; skorlama ise **aktif çipleri provenance'ıyla** (hangi aile, hangi kural) tüketir — çünkü aile kırılımı için "bu kuralı hangi mercek getirdi" bilgisi gerekir. (Mevcut `mergeOne` bunu kaybediyor; motor merge'den ÖNCEKİ çip listesini okur.)
+
+## E.8.2 — Veri Modeli
+
+**Kural (rule)** — bir çipin `.filters` objesindeki her eşik tek bir kurala açılır:
+```js
+{ metric:'roeTTM', op:'min', target:15, family:'yatirimci', source:'buffett', weight:1 }
+{ metric:'peNormalizedAnnual', op:'range', lo:8, hi:25, family:'yatirimci', source:'buffett' }
+{ metric:'_sentiment', op:'min', target:0.2, family:'duygu', source:'news' }   // Faz 2 verisi
+```
+
+**Çıktı (her hisseye iliştirilir):**
+```js
+s._match = {
+  score: 81,                 // 0..100
+  band: 'high',              // high | watch | ok | (Katı'da elenen yok)
+  passedHard: true,          // Katı modda sert kuralları geçti mi
+  families: {
+    yatirimci: { label:'Buffett', score:0.84, coverage:'3/3',
+      rules:[ {metric:'ROE', val:18, target:'≥15', sub:0.80, status:'pass'},
+              {metric:'D/E', val:0.35, target:'≤0.5', sub:0.82, status:'pass'},
+              {metric:'F/K', val:12, target:'8–25', sub:0.90, status:'pass'} ] },
+    temel:    { label:'Değer', score:0.86, coverage:'3/3', rules:[…] },
+    teknik:   { label:'Yüksek Hacim', score:0.78, coverage:'2/2', rules:[…] },
+    duygu:    { label:'Haber', score:0.75, coverage:'1/1', rules:[…] }
+  }
+};
+```
+Bu tek obje; tablo kolonu, sıralama, metrik kartları, drawer ve rozetin **ortak kaynağı**.
+
+## E.8.3 — Normalize Fonksiyonu (matematik)
+
+Eşik = **geçiş çizgisi**; tam eşikte "sağlam geçer" = `PASS=0.6`, mükemmelde `1.0`, yakın-ıskada kısmi.
+
+**`_min` kuralı** (yüksek iyi, hedef T):
+- `C = T·(1+band)` (mükemmel tavan), `F = T·(1−tol)` (tolerans tabanı)
+- `value ≥ T` → `sub = PASS + (1−PASS)·clamp((value−T)/(C−T),0,1)`
+- `value < T` → **Esnek:** `sub = PASS·clamp((value−F)/(T−F),0,1)` · **Katı:** kural başarısız → hisse elenir
+
+**`_max` kuralı** (düşük iyi, hedef T) — simetrik: `C = T·(1−band)`, `F = T·(1+tol)`; `value ≤ T` geçer.
+
+**`range` [lo,hi]:** `min(_min@lo, _max@hi)` — iki uca da uyum.
+
+Varsayılan: `PASS=0.6, band=0.5, tol=0.25` (merkezî config'te, kalibre edilebilir).
+
+## E.8.4 — Aile Birleştirme + Ağırlık
+
+1. Kural alt-skorlarını **aile** bazında ortala (yalnızca verisi olan kurallar; bkz. E.8.5).
+2. Aktif aileleri **ağırlıklı** birleştir; ağırlıkları yalnızca aktif aileler üzerinden **renormalize** et:
+   `score = 100 · Σ(w_f · familyScore_f) / Σ(w_f)`
+3. Varsayılan ağırlıklar: `{ yatirimci:1, temel:1, teknik:1, duygu:0.7 }` (duygu daha hafif).
+
+## E.8.5 — Eksik Veri & Özel Durumlar
+
+- **`null`/eksik metrik:** O kural aile ortalamasından **çıkarılır** (ne 0 ceza, ne kredi); `coverage` "2/3" gösterir. Aile tamamen boşsa aile düşer.
+- **Özel mercekler:** `peg` (0–1.5 ideal → `sub=clamp((1.5−peg)/1.5,0,1)`), `piotroski` (0–9 → `/9`) kendi skorlayıcılarını alır (mevcut `special` bayrağı korunur).
+- **Yön/işaret:** her metrik için "yüksek mi iyi" yönü kural `op`'undan gelir; ters metrikler (`_max`) simetrik formülle.
+- **Bölme/aşırı uç:** `T=0` ise oransal yerine mutlak band; `clamp` ile taşma engellenir.
+
+## E.8.6 — Katı/Esnek Anahtarı (davranış)
+
+| | **Katı (varsayılan)** | **Esnek (opt-in)** |
+|---|---|---|
+| Eleme | Sert kuralları geçemeyen **elenir** (mevcut davranış) | Eşik elemesi yok; herkes skorlanır |
+| Alt-skor aralığı | Geçen kurallar [0.6–1.0] | Iska olanlar [0–0.6] kısmi |
+| Liste | Dar, "saf" | Geniş; `esnekFloor=40` altı kesilir (3000 satır olmasın) |
+| Rozet | Tümü ≥ geçer | Yüksek/Yakın/Uygun ayrışır |
+
+**Geçiş:** toolbar'da `setMatchMode('kati'|'esnek')` → **istemci tarafında** yeniden skorla + yeniden sırala + render. **Yeni ağ taraması YOK** (`allData` zaten elde). Mevcut "sıkı filtreleme" felsefesi silinmez, varsayılan kalır.
+
+## E.8.7 — Çıktının Tüketicileri
+
+| Tüketici | `s._match` alanı | Dosya/fonksiyon |
+|---|---|---|
+| Uyum kolonu + çubuk | `.score` | `_vsRowHtml` (3538) |
+| Sıralama "Uyum puanı" | `.score` | `sorted` (3320), sort opsiyonu |
+| Rozet (Yüksek/Yakın/Uygun) | `.band` | `_vsRowHtml` |
+| Sonuç metrik kartları | en yüksek `.score`, elenen sayısı | `showScanSummary` (5153) |
+| "Neden Eşleşti?" drawer | `.families` | Faz 4 |
+| LLM açıklama (ops.) | `.families` → prompt | Faz 4 |
+
+## E.8.8 — Entegrasyon Noktaları (gerçek kod)
+
+1. **Yeni modül `public/scoring.js`:** `computeMatch(stock, ctx)`, `normalizeRule(value, rule, mode)`, `aggregateFamilies(subs, weights)`, `SCORE_CFG`.
+2. **`_applyChips`** (2879): merge'den önce **aktif çip→kural** listesini (aile etiketli) `ctx.activeRules`'a yaz.
+3. **`applyAndRender`** (3143): `filtered` oluştuktan sonra (Katı) **veya** `allData` üstünde (Esnek) `scoreResults(rows, ctx, _matchMode)` çağır; her satıra `s._match` iliştir.
+4. **`sorted`** (3320): `sortSt.field==='match'` → `s._match.score`'a göre sırala (varsayılan sıralama puana çekilebilir).
+5. **`_vsRowHtml`** (3538): yeni "Uyum" `<td>` (mini çubuk + sayı + rozet).
+6. **`showScanSummary`** (5153): metrik kartları.
+7. **Toolbar:** `setMatchMode` anahtarı.
+8. **Kripto/Fon:** aynı motor `_renderKripto`/`_renderFon` için de çağrılır (kural kaynakları farklı: kripto'da DeFiLlama/CoinGecko alanları).
+
+## E.8.9 — Çekirdek Pseudocode
+
+```js
+function normalizeRule(v, r, mode){
+  if (v == null) return null;                 // veri yok → ortalamadan çıkar
+  const {PASS,band,tol} = SCORE_CFG;
+  if (r.op==='range'){
+    return Math.min(normalizeRule(v,{op:'min',target:r.lo},mode),
+                    normalizeRule(v,{op:'max',target:r.hi},mode));
+  }
+  const T=r.target;
+  if (r.op==='min'){
+    const C=T*(1+band), F=T*(1-tol);
+    if (v>=T) return PASS+(1-PASS)*clamp((v-T)/(C-T||1),0,1);
+    if (mode==='kati') return null;           // elenmiş sayılır (filtre zaten attı)
+    return PASS*clamp((v-F)/(T-F||1),0,1);
+  } else { // max
+    const C=T*(1-band), F=T*(1+tol);
+    if (v<=T) return PASS+(1-PASS)*clamp((T-v)/(T-C||1),0,1);
+    if (mode==='kati') return null;
+    return PASS*clamp((F-v)/(F-T||1),0,1);
+  }
+}
+
+function computeMatch(s, ctx){
+  const fam={};                                // aile → [alt-skorlar]
+  for (const r of ctx.activeRules){
+    const sub = normalizeRule(s[r.metric], r, ctx.mode);
+    if (sub==null) continue;
+    (fam[r.family] ??= {subs:[],rules:[]});
+    fam[r.family].subs.push(sub);
+    fam[r.family].rules.push({metric:r.label, val:s[r.metric], target:r.targetTxt, sub, status:sub>=0.6?'pass':'near'});
+  }
+  let wsum=0, acc=0, families={};
+  for (const [f,o] of Object.entries(fam)){
+    const fs = o.subs.reduce((a,b)=>a+b,0)/o.subs.length;
+    const w = SCORE_CFG.familyWeights[f] ?? 1;
+    wsum+=w; acc+=w*fs;
+    families[f]={score:fs, coverage:`${o.subs.length}/${ctx.familyRuleCount[f]}`, rules:o.rules};
+  }
+  const score = wsum ? Math.round(100*acc/wsum) : null;
+  const band = score>=SCORE_CFG.bands.high?'high':score>=SCORE_CFG.bands.watch?'watch':score>=SCORE_CFG.bands.ok?'ok':'low';
+  return {score, band, families, passedHard:true};
+}
+```
+
+## E.8.10 — İşlenmiş Örnek (THYAO; Buffett + Değer + Yüksek Hacim + Haber)
+
+| Aile | Kural | Değer | Hedef | Alt-skor |
+|---|---|---|---|---|
+| Yatırımcı (Buffett) | ROE | 18 | ≥15 | 0.80 |
+| | D/E | 0.35 | ≤0.5 | 0.82 |
+| | F/K | 12 | 8–25 | 0.90 |
+| → aile | | | | **0.84** |
+| Temel (Değer) | … | | | **0.86** |
+| Teknik (Y.Hacim) | … | | | **0.78** |
+| Duygu (Haber) | sentiment | +0.5 | ≥0.2 | **0.75** |
+
+Ağırlıklar `[1,1,1,0.7]`, Σw=3.7 →
+`score = 100·(0.84+0.86+0.78+0.7·0.75)/3.7 = 100·3.005/3.7 ≈ 81` → **band = Yüksek Uyum**.
+(Not: bantlar `SCORE_CFG.bands` ile kalibre edilir; mockup'taki 86 gibi sabitler temsilîydi.)
+
+## E.8.11 — Config / Kalibrasyon (tek yer)
+
+```js
+const SCORE_CFG = {
+  PASS:0.6, band:0.5, tol:0.25,
+  familyWeights:{ yatirimci:1, temel:1, teknik:1, duygu:0.7 },
+  bands:{ high:80, watch:65, ok:50 },
+  esnekFloor:40
+};
+```
+Tüm "his/kalibrasyon" buradan ayarlanır; mantık değişmez. Simply Wall St açık-kaynak modeli bu eşikler için referans.
+
+## E.8.12 — Performans
+
+- Karmaşıklık: `O(n · kural)`; n≤3000, kural≤~12 → ~36K işlem, **<5 ms**. Sanal kaydırma etkilenmez (skor önceden hesaplanıp `s._match`'e yazılır, render sadece okur).
+- Yeniden hesap **yalnızca** filtre değişiminde veya Katı/Esnek geçişinde; ağ taraması gerekmez.
+- Kripto/fon için de aynı; veri alanları kaynağa göre değişir.
+
+## E.8.13 — Riskler / Açık Sorular
+
+1. **Provenance:** mevcut `mergeOne` çip→input birleştirmesi aileyi kaybediyor; motor merge ÖNCESİ çip listesini okumalı (E.8.8/2). Refactor gerek.
+2. **Kalibrasyon güveni:** yanlış band/ağırlık "%86 uyum"u yanıltıcı yapar → şeffaf formül + "tavsiye değildir" şart.
+3. **Esnek modda liste boyutu:** `esnekFloor` ve sıralama ile sınırlanmalı (performans + anlam).
+4. **Tek kaynak önkoşulu:** Faz 0 (`strategies.js`) tamamlanmadan skor iki sayfada tutarsız olur.
+5. **Kripto/fon kural setleri** ayrı tanımlanmalı (farklı metrikler); aile çerçevesi (Yatırımcı/Temel/Teknik) hisseye özgü, kripto'da "Kategori/Strateji/On-chain" aileleri olur.
+
+---
 *Bu doküman yalnızca araştırma/analiz amaçlıdır; kodda değişiklik içermez.*
