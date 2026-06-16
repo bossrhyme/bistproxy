@@ -9,6 +9,7 @@ function chipRadio(el) {
   el.classList.add('on');
 }
 function chipToggle(el) { el.classList.toggle('on'); }
+function kriptoChipRadio(el) { chipRadio(el); if (_activeAsset === 'kripto') runKriptoScan(); }
 
 function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 function escJS(s) { return String(s == null ? '' : s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/</g,'\\x3C').replace(/>/g,'\\x3E'); }
@@ -173,6 +174,8 @@ function selectAsset(type) {
     if (ht) ht.style.display = 'none';
     if (ra) { ra.style.display = 'none'; ra.innerHTML = ''; }
   }
+  // Kripto seçilince otomatik ilk 500 coini yükle
+  if (type === 'kripto') setTimeout(runKriptoScan, 80);
 }
 
 // ── Asset'e göre sort seçeneklerini güncelle ───────────────
@@ -278,11 +281,11 @@ function _showResultArea(headerHtml, tableHtml, count) {
   ra.innerHTML = headerHtml + tableHtml;
   var emptyEl = document.getElementById('empty');
   if (emptyEl) emptyEl.style.display = 'none';
-  // Toolbar'ı göster, sayacı güncelle, stats-bar'ı gizle (fon/kripto için)
+  // Toolbar'ı göster, sayacı güncelle, stats-bar'ı gizle (fon için; kripto için ayrı yönetilir)
   var toolbar = document.getElementById('toolbar');
   if (toolbar) toolbar.style.display = '';
   var statsBar = document.getElementById('stats-bar');
-  if (statsBar) statsBar.style.display = 'none';
+  if (statsBar && _activeAsset !== 'kripto') statsBar.style.display = 'none';
   // Hisse-only toolbar butonlarını gizle (fon/kripto modunda)
   var tbFav = document.getElementById('tb-fav-btn');
   var tbCol = document.getElementById('tb-col-btn');
@@ -484,7 +487,7 @@ function runKriptoScan() {
   if(btn){btn.textContent='⏳ Taranıyor...';btn.disabled=true;}
   _showLoading('⏳ Kripto piyasa verisi yükleniyor...');
 
-  var params=new URLSearchParams({limit:'200',sort:'market_cap_desc'});
+  var params=new URLSearchParams({limit:'500',sort:'market_cap_desc'});
   var cat=document.querySelector('#sbp-kripto .chip.on[data-cat]');
   if(cat&&cat.dataset.cat) params.set('category',cat.dataset.cat);
   var pre=document.querySelector('#sbp-kripto .chip.on[data-preset]');
@@ -513,6 +516,21 @@ function runKriptoScan() {
       _kriptoTicker = coins.slice(0, 20);
       _renderKripto(coins, d);
       updateTicker();
+      // Stats-bar: Kripto bilgilerini göster
+      var _sb = document.getElementById('stats-bar');
+      if (_sb) { _sb.style.display = ''; _sb.classList.add('visible'); }
+      var _ae = document.getElementById('sb-asset'); if (_ae) _ae.textContent = 'Kripto';
+      var _ee = document.getElementById('sb-ex');    if (_ee) _ee.textContent = 'CoinGecko';
+      var _now = new Date();
+      var _te = document.getElementById('sb-time');
+      if (_te) _te.textContent = String(_now.getHours()).padStart(2,'0') + ':' + String(_now.getMinutes()).padStart(2,'0');
+      var _ti = document.getElementById('sb-total-item'), _tv = document.getElementById('sb-total');
+      if (_ti && _tv) { _tv.textContent = '500'; _ti.style.display = ''; }
+      var _ri = document.getElementById('sb-result-item'), _rv = document.getElementById('sb-result');
+      if (_ri && _rv) { _rv.textContent = coins.length.toLocaleString('tr-TR'); _ri.style.display = ''; }
+      // ▲▼ sayaçlarını gizle (kripto için anlamsız)
+      var _up = document.getElementById('sb-up'); if (_up) _up.textContent = '';
+      var _dn = document.getElementById('sb-dn'); if (_dn) _dn.textContent = '';
     })
     .catch(function(e){
       console.error('[kripto-scan]', e.message);
