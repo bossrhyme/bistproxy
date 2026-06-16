@@ -134,7 +134,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 </style>
 <link rel="stylesheet" href="/deepfin.css?v=warm41">
 <script src="/i18n.js?v=6" defer></script>
-<script src="/deepfin.js?v=191" defer></script>
+<script src="/deepfin.js?v=192" defer></script>
 <script src="/auth-header.js?v=2" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -247,7 +247,7 @@ if('serviceWorker' in navigator){
       <div class="hpx-eye" data-i18n="assets.title">Varlıklar</div>
       <div class="hpx-spill-wrap">
           <div class="hpx-spill" role="button" tabindex="0" onclick="showScreenerOrPrescan()"><div class="hpx-spill-name" data-i18n="assets.stocks">Borsa</div><div class="hpx-spill-tag" data-i18n="assets.stocksTag">Hisse senetleri · 28+ borsa</div></div>
-          <div class="hpx-spill hpx-spill-soon"><div class="hpx-spill-name"><span data-i18n="assets.crypto">Kripto</span> <span class="hpx-soon" data-i18n="soon">Yakında</span></div><div class="hpx-spill-tag" data-i18n="assets.cryptoTag">Kripto paralar</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="selectAsset('kripto')"><div class="hpx-spill-name" data-i18n="assets.crypto">Kripto</div><div class="hpx-spill-tag" data-i18n="assets.cryptoTag">Kripto paralar</div></div>
           <div class="hpx-spill hpx-spill-soon"><div class="hpx-spill-name"><span data-i18n="assets.fund">Fon</span> <span class="hpx-soon" data-i18n="soon">Yakında</span></div><div class="hpx-spill-tag" data-i18n="assets.fundTag">Yatırım fonları</div></div>
           <div class="hpx-spill hpx-spill-soon"><div class="hpx-spill-name"><span data-i18n="assets.etf">ETF</span> <span class="hpx-soon" data-i18n="soon">Yakında</span></div><div class="hpx-spill-tag" data-i18n="assets.etfTag">Borsa yatırım fonları</div></div>
           <div class="hpx-spill hpx-spill-soon"><div class="hpx-spill-name"><span data-i18n="assets.eurobond">Eurobond</span> <span class="hpx-soon" data-i18n="soon">Yakında</span></div><div class="hpx-spill-tag" data-i18n="assets.eurobondTag">Döviz tahvilleri</div></div>
@@ -404,7 +404,7 @@ if('serviceWorker' in navigator){
           </div>
           <div class="landing-list">
             <button class="li-btn" onclick="selectAsset('hisse')"><span class="li-icon">📈</span><span class="li-name">Hisse</span><svg class="li-arrow" width="7" height="8" viewBox="0 0 7 8" fill="none"><polygon points="0,0 7,4 0,8" fill="#3b82f6"/></svg></button>
-            <div class="li-soon"><span class="li-icon">₿</span><span class="li-name">Kripto</span><span class="li-badge">yakında</span></div>
+            <div class="li-soon" style="cursor:pointer" onclick="selectAsset('kripto')"><span class="li-icon">₿</span><span class="li-name">Kripto</span></div>
             <div class="li-soon"><span class="li-icon">💼</span><span class="li-name">Fon</span><span class="li-badge">yakında</span></div>
             <div class="li-soon"><span class="li-icon">📦</span><span class="li-name">ETF</span><span class="li-badge">yakında</span></div>
             <div class="li-soon"><span class="li-icon">🌍</span><span class="li-name">Eurobond</span><span class="li-badge">yakında</span></div>

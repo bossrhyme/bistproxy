@@ -2481,7 +2481,7 @@ function psvSetExchange(key) {
 // Varlık sınıfları — prescan yatay kaydırmalı satır
 const PSV_ASSETS = [
   { key: 'hisse',    label: 'Borsa',       icon: '📈', active: true },
-  { key: 'kripto',   label: 'Kripto',      icon: '₿' },
+  { key: 'kripto',   label: 'Kripto',      icon: '₿',  active: true },
   { key: 'fon',      label: 'Fon',         icon: '💼' },
   { key: 'etf',      label: 'ETF',         icon: '📦' },
   { key: 'eurobond', label: 'Eurobond',    icon: '💵' },
@@ -2493,6 +2493,13 @@ const PSV_ASSETS = [
 
 function psvSetAsset(key) {
   document.querySelectorAll('.psv-asset-btn').forEach(function(b){ b.classList.toggle('on', b.dataset.asset === key); });
+  // Kripto: PSV'yi kapat, kripto moduna geç (kendi filtre paneli var)
+  if (key === 'kripto') {
+    closePrescanView();
+    selectAsset('kripto');
+    return;
+  }
+  // Diğer aktif varlıklar için preset bölümünü güncelle (ileride)
 }
 
 function psvScrollAssets(dir) {
