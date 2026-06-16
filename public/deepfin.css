@@ -537,6 +537,13 @@ td:nth-child(2){font-family:var(--ff);}
 .psv-goat-grid,.psv-goat-extra{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
 .psv-goat-extra{margin-top:8px;}
 
+/* Faz 3 — Uyum Puanı sütunu */
+.match-score{font-size:11px;font-weight:800;font-family:var(--ff-mono);padding:2px 7px;border-radius:4px;display:inline-block;min-width:28px;text-align:center;}
+.ms-high{color:#00c076;background:rgba(0,192,118,.13);}
+.ms-watch{color:#f0b429;background:rgba(240,180,41,.10);}
+.ms-ok{color:var(--text2);background:var(--s2);font-weight:600;}
+.ms-low{color:var(--muted2);}
+
 /* Faz 2 — Lens groups (guru + teknik grupları) */
 .psv-section-hd{justify-content:flex-start;}
 .psv-lens-search{margin-left:auto;padding:4px 10px;background:var(--s2);border:1px solid var(--border2);border-radius:var(--r-sm);font-size:11px;color:var(--text);font-family:var(--ff);outline:none;width:130px;transition:border-color .15s;}

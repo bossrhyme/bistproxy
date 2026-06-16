@@ -911,6 +911,7 @@ const EXCHANGE_TIPS = {
 };
 
 let allData = [];
+var _scoreFilters = {};  // Faz 3: applyAndRender'da yakalanan aktif filtreler
 let filtered = [];
 let searchQ = '';
 let selSym = null;
@@ -1138,6 +1139,7 @@ function _doShowListFilterPicker(rect) {
 // KOLON SEÇİCİ
 // ═══════════════════════════════════════════
 const COL_DEFS = [
+  {key:'match', label:'UYUM', def:true},
   {key:'price', label:'FİYAT', def:true},
   {key:'mcap', label:'P.Değeri', def:true},
   {key:'chg1d', label:'Günlük%', def:true},
@@ -1857,6 +1859,7 @@ async function runScan(){
       // Sadece fiyatı olan hisseler — finansal veri yoksa sütunlar tire gösterir
       return s.currentPrice && s.currentPrice > 0;
     });
+    if (typeof buildIqrCache === 'function') buildIqrCache(allData);
     const _exm = EXCHANGE_META[currentExchange]||EXCHANGE_META.bist;
 
     updateExchangeBadge();
@@ -2908,6 +2911,20 @@ function applyAndRender(special){
     filtered.sort(function(a, b) { return (b.piotroski || 0) - (a.piotroski || 0); });
   }
 
+  // Faz 3: Uyum Puanı — aktif filtreler varsa her hisse için hesapla
+  _scoreFilters = {};
+  if (typeof computeMatch === 'function' && typeof FILTER_RULES !== 'undefined') {
+    FILTER_RULES.forEach(function(rule) {
+      var mn = getN(rule[1]), mx = rule[2] ? getN(rule[2]) : null;
+      if (mn !== null && rule[1]) _scoreFilters[rule[1]] = mn;
+      if (mx !== null && rule[2]) _scoreFilters[rule[2]] = mx;
+    });
+    var _hasFilters = Object.keys(_scoreFilters).length > 0;
+    filtered.forEach(function(s) {
+      s._match = _hasFilters ? computeMatch(s, _scoreFilters) : null;
+    });
+  }
+
   document.getElementById('toolbar').style.display = 'flex';
   document.getElementById('resn').textContent = filtered.length;
   document.getElementById('scann').textContent = allData.length;
@@ -3033,10 +3050,22 @@ function _sortAsset(arr, field, dir) {
 }
 function sorted(arr){
   return [...arr].sort((a,b)=>{
-    const av = a[sortSt.field] ?? (sortSt.dir==='desc'?-Infinity:Infinity);
-    const bv = b[sortSt.field] ?? (sortSt.dir==='desc'?-Infinity:Infinity);
+    var av, bv;
+    if (sortSt.field === '_match') {
+      av = a._match ? a._match.score : (sortSt.dir==='desc' ? -Infinity : Infinity);
+      bv = b._match ? b._match.score : (sortSt.dir==='desc' ? -Infinity : Infinity);
+    } else {
+      av = a[sortSt.field] ?? (sortSt.dir==='desc'?-Infinity:Infinity);
+      bv = b[sortSt.field] ?? (sortSt.dir==='desc'?-Infinity:Infinity);
+    }
     return sortSt.dir==='desc' ? bv-av : av-bv;
   });
+}
+
+function _fMatch(m) {
+  if (!m) return nil;
+  var cls = 'ms-' + m.status;
+  return '<span class="match-score ' + cls + '">' + m.score + '</span>';
 }
 
 // ═══════════════════════════════════════════
@@ -3290,6 +3319,7 @@ function _vsRowHtml(s, idx) {
       <td data-col="perf3m" style="${cv('perf3m')}">${s.perf3m!=null?fPerf(s.perf3m):nil}</td>
       <td data-col="float_pct" style="${cv('float_pct')}">${s.floatPct!=null?fv(s.floatPct,1,true):nil}</td>
       <td data-col="sector" style="${cv('sector')}font-size:10px;color:var(--muted2)">${esc(s.sector)||'—'}</td>
+      <td data-col="match" style="${cv('match')}">${_fMatch(s._match)}</td>
     </tr>`;
 }function renderTable(){
   // Apply density class

@@ -132,10 +132,11 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-<link rel="stylesheet" href="/deepfin.css?v=warm46">
+<link rel="stylesheet" href="/deepfin.css?v=warm47">
 <script src="/i18n.js?v=6" defer></script>
 <script src="/strategies.js?v=1" defer></script>
-<script src="/deepfin.js?v=200" defer></script>
+<script src="/scoring.js?v=1" defer></script>
+<script src="/deepfin.js?v=201" defer></script>
 <script src="/auth-header.js?v=2" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -1076,6 +1077,7 @@ if('serviceWorker' in navigator){
             <option value="dividendYieldIndicatedAnnual">Temettü</option>
             <option value="revenueGrowthTTMYoy">Gelir Büyümesi</option>
             <option value="currentRatioAnnual">Cari Oran</option>
+            <option value="_match">Uyum Puanı</option>
           </select>
           <button type="button" class="ssel ssel-dir sort-dir-btn" id="sortd" value="desc" onclick="toggleSortDir()" title="Sıralama yönü (azalan / artan)"></button>
         </div>
@@ -1205,6 +1207,7 @@ if('serviceWorker' in navigator){
               <th onclick="colSort('perf3m')" data-col="perf3m" data-tip="3 Aylık Getiri: Hissenin son 3 ayda yüzdesel değişimi. Jegadeesh-Titman momentum faktörü.">3A Geti%</th>
               <th onclick="colSort('floatPct')" data-col="float_pct" data-tip="Halka Açıklık Oranı: Dolaşımdaki hisselerin toplam hisse sayısına oranı. Düşük oran kurumsal kontrolün yüksek olduğunu gösterir.">H.Açık%</th>
               <th onclick="colSort('sector')" data-col="sector" data-tip="Şirketin faaliyet gösterdiği sektör. Sektöre göre filtrelemek için sol paneli kullanın.">SEKTÖR</th>
+              <th onclick="colSort('_match')" data-col="match" data-tip="Uyum Puanı: Seçili filtrelerle hissenin ne kadar örtüştüğü. 80+ yüksek uyum, 65-79 izle, 50-64 orta, &lt;50 düşük. Filtre yoksa gösterilmez.">UYUM</th>
             </tr>
           </thead>         <tbody id="tbody"></tbody>
         </table>
