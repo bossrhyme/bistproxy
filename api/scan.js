@@ -457,7 +457,7 @@ module.exports = async function(req, res) {
       s: merged.sort || {},
       r: merged.range || [],
     });
-    const colHash  = crypto.createHash('sha1').update(keyMaterial).digest('base64').replace(/[^A-Za-z0-9]/g, '').slice(0, 24);
+    const colHash  = crypto.createHash('sha256').update(keyMaterial).digest('base64').replace(/[^A-Za-z0-9]/g, '').slice(0, 24);
     const cacheKey = 'df_v5_' + exchange + '_' + colHash; // v5: filter/sort/range de anahtarda
     const ttl      = getCacheTTL(exchange);
 

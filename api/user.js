@@ -598,8 +598,8 @@ function checkAdminKey(req) {
   if (!hKey) return false;
   // HMAC karşılaştırması: anahtar uzunluğunu ele vermez, timing-safe
   try {
-    const h1 = crypto.createHmac('sha256', 'df').update(hKey).digest();
-    const h2 = crypto.createHmac('sha256', 'df').update(adminKey).digest();
+    const h1 = crypto.createHmac('sha256', adminKey).update('df-admin-v1').digest();
+    const h2 = crypto.createHmac('sha256', hKey).update('df-admin-v1').digest();
     return crypto.timingSafeEqual(h1, h2);
   } catch(e) { return false; }
 }

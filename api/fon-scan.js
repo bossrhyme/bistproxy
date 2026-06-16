@@ -116,7 +116,7 @@ async function tefasFetch(fonTur, daysBack, windowDays, attempt = 0) {
       // Rate limit veya geçici hata — 1 kez daha dene
       if (attempt === 0) {
         console.warn(`TEFAS rate limit (daysBack=${daysBack}), 2s sonra tekrar...`);
-        await sleep(2000);
+        await sleep(2000 + Math.random() * 1000);
         return tefasFetch(fonTur, daysBack, windowDays, 1);
       }
       console.error('TEFAS non-JSON (2. deneme):', r.body.slice(0, 80));
@@ -203,7 +203,8 @@ module.exports = async function handler(req, res) {
   const rlCount = await kvIncr('rl:fon-scan:' + ip, 60);
   if (rlCount > 10) {
     trackViolation(ip).catch(() => {});
-    return res.status(200).end(JSON.stringify({ funds: [], total: 0, source: 'fon', error: 'Çok fazla istek, lütfen bekleyin.' }));
+    res.setHeader('Retry-After', '60');
+    return res.status(429).json({ error: 'Çok fazla istek, lütfen bekleyin.' });
   }
 
   // Her tarama isteğinde sayacı artır

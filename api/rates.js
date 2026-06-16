@@ -115,7 +115,7 @@ module.exports = async function(req, res) {
       rates = { ...kvBackup, source: 'kv_backup' };
     } else {
       // 3. Sabit fallback
-      rates = { TRY: 44.6, EUR: 0.920, GBP: 0.790, JPY: 150.0, KRW: 1350.0, RUB: 89.0, NOK: 10.7, CAD: 1.37, TWD: 32.0, BRL: 5.70, HKD: 7.78, CNY: 7.25, SAR: 3.75, CHF: 0.895, AUD: 1.58, ZAR: 18.5, SEK: 10.5, INR: 84.0, AED: 3.67, source: 'fallback' };
+      rates = { TRY: 38.5, EUR: 0.920, GBP: 0.790, JPY: 150.0, KRW: 1350.0, RUB: 89.0, NOK: 10.7, CAD: 1.37, TWD: 32.0, BRL: 5.70, HKD: 7.78, CNY: 7.25, SAR: 3.75, CHF: 0.895, AUD: 1.58, ZAR: 18.5, SEK: 10.5, INR: 84.0, AED: 3.67, source: 'fallback', _stale: true };
     }
   }
 
