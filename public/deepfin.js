@@ -5062,13 +5062,6 @@ function showScanSummary(total, matches) {
     resVal.textContent = (matches || 0).toLocaleString('tr-TR');
     resItem.style.display = '';
   }
-  // Tarama süresi meta barının sonunda (… 16:34 · 3.0s)
-  var durItem = document.getElementById('sb-dur-item');
-  var durVal  = document.getElementById('sb-dur');
-  if (durItem && durVal && elapsed !== '—') {
-    durVal.textContent = elapsed + 's';
-    durItem.style.display = '';
-  }
   _recordRecentScan(filters, total, matches);
 }
 
