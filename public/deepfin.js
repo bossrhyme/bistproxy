@@ -4846,7 +4846,8 @@ function showScanSummary(total, matches) {
       (tagsHtml
         ? '<span class="ssm-flabel">Aktif filtre:</span>' + tagsHtml
         : '<span class="ssm-no-filter">Filtresiz</span>') +
-    '</span>';
+    '</span>' +
+    '<div class="ssm-trust">Eşleşme ≠ yatırım önerisi · gecikmeli/temsilî veri · sonuçlar yalnızca seçilen filtre kriterlerini yansıtır.</div>';
   // Taranan / Eşleşen — ayrı etiketli elemanlar
   var totItem = document.getElementById('sb-total-item');
   var totVal  = document.getElementById('sb-total');
