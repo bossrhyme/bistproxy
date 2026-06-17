@@ -2968,3 +2968,130 @@ body{padding-top:60px}
 [data-theme="light"] .df-cta{background:#E8D5A8;color:#16131F}
 [data-theme="light"] .lang-toggle-btn{color:rgba(238,228,208,.5)}
 [data-theme="light"] .lang-toggle-btn.on,[data-theme="light"] .lang-toggle-btn[aria-pressed="true"]{color:#16131F;background:#E8D5A8}
+
+/* ═══ SCAN PAGE — LIGHT CREAM DESIGN (replaces dark canvas for onboarding) ═══ */
+
+/* Page background — cream paper, no dark gradient */
+#page-scan .scan-page{
+  background:var(--paper);
+  padding-top:44px;
+  overflow-x:clip;
+}
+#page-scan .scan-page::before{display:none}
+
+/* Header above the shell */
+#page-scan .scan-head.setup-head{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  gap:36px;margin-bottom:28px;
+}
+#page-scan .scan-label{color:rgba(16,26,44,.42)}
+#page-scan .scan-label::before{display:none}
+#page-scan .scan-head-copy h1{
+  font-size:clamp(30px,3.2vw,48px);
+  line-height:1.06;letter-spacing:-1.8px;
+  color:var(--navy);text-shadow:none;
+}
+#page-scan .scan-head-side{
+  font-size:14px;line-height:1.68;color:#73716B;
+  max-width:480px;flex-shrink:0;
+}
+
+/* Shell — light ivory card floating on paper */
+#page-scan .setup-shell{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:18px;
+  box-shadow:0 12px 42px rgba(16,26,44,.07),0 1px 0 rgba(255,255,255,.85) inset;
+  min-height:480px;
+}
+
+/* Left rail — light beige */
+#page-scan .setup-rail{
+  background:#F5F2EA;
+  border-right:1px solid var(--line);
+  color:var(--navy);
+}
+#page-scan .setup-eyebrow{color:rgba(16,26,44,.44)}
+#page-scan .setup-rail h2{color:var(--navy)}
+#page-scan .setup-rail>p{color:#77736A}
+
+/* Step nav — light version */
+#page-scan .setup-step-nav{color:#77736A;background:transparent;align-items:center}
+#page-scan .setup-step-nav:hover{background:rgba(16,26,44,.05);color:var(--navy)}
+#page-scan .setup-step-nav b{
+  background:var(--line);border:0;color:#77736A;border-radius:50%;
+  width:28px;height:28px;font-size:11px;
+}
+#page-scan .setup-step-nav.on{
+  background:#fff;color:var(--navy);
+  box-shadow:0 2px 8px rgba(16,26,44,.08);
+}
+#page-scan .setup-step-nav.on b{background:var(--navy);color:#fff}
+#page-scan .setup-step-nav>span em{display:none}
+
+/* Summary */
+#page-scan .setup-summary{border-top-color:var(--line)}
+#page-scan .setup-summary>span{color:#9A9184}
+#page-scan .setup-summary strong{color:var(--navy)}
+
+/* Builder + bottom */
+#page-scan .setup-builder{background:#fff}
+#page-scan .setup-bottom{background:#FAFAF6;border-top-color:var(--line)}
+
+/* Panel head: purple eyebrow tag */
+#page-scan .setup-panel-head>span{
+  background:var(--purple-s);
+  border-color:#C9BAE8;
+  color:var(--purple);
+}
+#page-scan .setup-panel-head h3{color:var(--navy)}
+#page-scan .setup-panel-head p{color:#77736A}
+
+/* Asset cards: purple accent when active */
+#page-scan .setup-asset-card.on{
+  border-color:#C9BAE8;
+  background:var(--purple-s);
+  box-shadow:inset 3px 0 0 var(--purple);
+}
+#page-scan .setup-asset-card small{color:var(--purple);opacity:1}
+#page-scan .setup-asset-card.roadmap small{color:#9A9184}
+
+/* Exchange chips: purple accent */
+#page-scan .psv-ex-btn.on{border-color:#C9BAE8;background:var(--purple-s)}
+#page-scan .psv-ex-btn.on .psv-ex-name{color:var(--purple)}
+
+/* Insight box: purple label */
+#page-scan .setup-insight{
+  background:linear-gradient(135deg,#FFFEFA,#F8F3EA);
+  border-color:#E8DFD0;
+  box-shadow:none;
+}
+#page-scan .setup-insight>span{color:var(--purple)}
+#page-scan .setup-insight strong{color:var(--navy)}
+#page-scan .setup-insight p{color:#756F65}
+
+/* Bottom buttons */
+.setup-bottom-reset{
+  border:1px solid var(--line);border-radius:10px;
+  padding:11px 16px;background:#fff;color:#77736A;
+  font-size:13px;font-weight:600;cursor:pointer;transition:.14s;
+}
+.setup-bottom-reset:hover{border-color:#BEB4A3;color:var(--navy)}
+#page-scan .setup-bottom-next{background:var(--navy);color:var(--cream)}
+#page-scan .setup-bottom-next:hover{background:var(--ink2)}
+#page-scan .psv-scan-btn.setup-bottom-scan{background:var(--navy);color:var(--cream)}
+#page-scan .psv-scan-btn.setup-bottom-scan:hover{background:var(--ink2)}
+
+/* Filter col active state: gold inset → purple */
+#page-scan .setup-filter-opt.on{
+  background:#F5F1FC;
+  border-color:#D4C7F0;
+  box-shadow:inset 3px 0 0 var(--purple);
+}
+
+@media(max-width:820px){
+  #page-scan .scan-page{padding-top:24px;padding-left:16px;padding-right:16px}
+  #page-scan .scan-head.setup-head{display:block}
+  #page-scan .scan-head-side{margin-top:12px;max-width:none}
+  #page-scan .setup-shell{border-radius:14px}
+}

@@ -2250,6 +2250,7 @@ function initPrescanView() {
 
     // ── Bottom Nav ──
     '<div class="setup-bottom">'+
+      '<button class="setup-bottom-reset" onclick="openPrescanView()">Varsayılana Dön</button>'+
       '<button class="setup-bottom-back" id="psv-back-btn" onclick="psvPrevStep()" style="display:none">← Geri</button>'+
       '<button class="setup-bottom-next" id="psv-next-btn" onclick="psvNextStep()">Devam Et →</button>'+
       '<button class="psv-scan-btn setup-bottom-scan" id="psv-scan-btn" onclick="psvScan()" style="display:none">Hisse Tara</button>'+
@@ -2499,7 +2500,7 @@ function _psvUpdateInsight(step) {
 function _psvUpdateSummary() {
   var el = document.getElementById('psv-summary');
   if (!el) return;
-  var assetLabel = _psvCurAsset === 'kripto' ? 'Kripto' : 'Hisse';
+  var assetLabel = _psvCurAsset === 'kripto' ? 'Kripto' : 'Hisse Senedi';
   var exMeta = (typeof EXCHANGE_META !== 'undefined') ? EXCHANGE_META[currentExchange] : null;
   var exName = _psvCurAsset === 'kripto'
     ? 'Tüm Kripto'
