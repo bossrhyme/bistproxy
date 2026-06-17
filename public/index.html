@@ -322,7 +322,7 @@ if('serviceWorker' in navigator){
     <button class="df-navbtn" id="nav-tarama" data-page="page-scan" onclick="showScreenerOrPrescan()">Tarama</button>
     <button class="df-navbtn" data-page="page-strategies" onclick="showPage('page-strategies')">Tarama Reçeteleri</button>
     <button class="df-navbtn" data-page="page-pricing" onclick="showPage('page-pricing')">Fiyatlandırma</button>
-    <a href="/analiz/" class="df-navbtn" id="nav-analiz">Analiz</a>
+    <a href="/analiz/" class="df-navbtn" id="nav-analiz" style="display:none">Analiz</a>
   </div>
   <div class="df-navright">
     <div class="lang-toggle" role="group" aria-label="Dil / Language">
@@ -397,7 +397,7 @@ if('serviceWorker' in navigator){
   </div>
 
   <!-- POPÜLER STRATEJİLER -->
-  <div class="strat-sec">
+  <div class="strat-sec" style="display:none">
     <div class="strat-inner">
       <div class="strat-hd">
         <div><span class="lbl-sm">Popüler Stratejiler</span><h2>Bir lensten piyasaya bakın.</h2></div>
