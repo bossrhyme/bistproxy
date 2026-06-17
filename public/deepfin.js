@@ -2496,7 +2496,11 @@ function psvGoStep(n) {
   _psvStep = Math.max(1, Math.min(3, n));
   [1, 2, 3].forEach(function(i) {
     var panel = document.getElementById('psv-panel-' + i);
-    if (panel) panel.style.display = i === _psvStep ? '' : 'none';
+    if (panel) {
+      // .setup-panel default is display:none, so active panel needs explicit flex
+      panel.style.display = i === _psvStep ? 'flex' : 'none';
+      panel.classList.toggle('setup-panel-on', i === _psvStep);
+    }
     var railStep = document.querySelector('.psv-rail-step[data-step="' + i + '"]');
     if (railStep) {
       railStep.classList.remove('active', 'done');
