@@ -132,157 +132,11 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 </style>
-
-/* ── PAGE ROUTING SYSTEM ── */
-.page{display:none}
-.page.active{display:block}
-@keyframes pageIn{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}
-.page.active{animation:pageIn .22s ease both}
-/* ── TOP NAV ── */
-.topnav{position:fixed;top:0;z-index:200;width:100%;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:rgba(15,13,24,.96);backdrop-filter:blur(20px);border-bottom:1px solid rgba(238,228,208,.07);gap:8px;}
-[data-theme="light"] .topnav{background:rgba(250,250,247,.97);border-bottom:1px solid rgba(0,0,0,.08);}
-.df-logo{font-size:15px;font-weight:700;color:rgba(238,228,208,.92);letter-spacing:-.4px;cursor:pointer;flex-shrink:0;}
-[data-theme="light"] .df-logo{color:var(--text);}
-.df-logo em{font-style:normal;color:#E8D5A8;font-weight:300}
-[data-theme="light"] .df-logo em{color:#D97706;}
-.df-navlinks{display:flex;gap:2px;flex-shrink:0;}
-.df-navbtn{border:0;background:transparent;color:rgba(238,228,208,.42);font-size:12px;padding:6px 10px;border-radius:7px;transition:.12s;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;}
-[data-theme="light"] .df-navbtn{color:var(--text2);}
-.df-navbtn:hover,.df-navbtn.on{color:rgba(238,228,208,.9);background:rgba(238,228,208,.08)}
-[data-theme="light"] .df-navbtn:hover,[data-theme="light"] .df-navbtn.on{color:var(--text);background:rgba(0,0,0,.05);}
-.df-navright{display:flex;gap:6px;align-items:center;flex-shrink:0;}
-.df-ghost{border:1px solid rgba(238,228,208,.18);background:transparent;color:rgba(238,228,208,.6);font-size:11px;padding:6px 12px;cursor:pointer;border-radius:7px;font-family:'Inter',sans-serif;transition:.12s;white-space:nowrap;}
-[data-theme="light"] .df-ghost{border-color:var(--border2);color:var(--text2);}
-.df-ghost:hover{border-color:rgba(238,228,208,.4);color:rgba(238,228,208,.9);}
-.df-cta{border:0;border-radius:7px;padding:7px 14px;background:#E8D5A8;color:#16131F;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:.12s;white-space:nowrap;}
-[data-theme="light"] .df-cta{background:var(--accent);color:#fff;}
-.df-cta:hover{background:#f0debc;}
-[data-theme="light"] .df-cta:hover{background:var(--blue2);}
-body{padding-top:60px}
-html,body{height:100%;touch-action:pan-y;overflow-x:hidden;}
-/* Override critical CSS overflow:hidden on body for home page */
-body.page-home-active{overflow:auto;}
-#page-home{overflow-y:auto;height:calc(100dvh - 60px);}
-#page-scan{height:calc(100dvh - 60px);display:none;flex-direction:column;overflow:hidden;}
-#page-scan.active{display:flex;}
-#page-strategies,#page-pricing{overflow-y:auto;height:calc(100dvh - 60px);}
-/* ── SCAN PAGE: preserve exact existing layout ── */
-#page-scan .layout{flex:1;display:flex;overflow:hidden;position:relative;}
-#page-scan .content{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-/* ── HERO & HOME ── */
-.hero-home{padding:60px 32px 0;background:var(--bg);max-width:100%;border-bottom:1px solid var(--border);}
-.hero-grid{display:grid;grid-template-columns:1fr 420px;gap:48px;max-width:1100px;margin:0 auto;align-items:center;padding-bottom:48px;}
-@media(max-width:900px){.hero-grid{grid-template-columns:1fr;gap:32px;}}
-.hero-copy .kicker{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted2);margin-bottom:18px;display:block;}
-.hero-copy .h1{font-size:clamp(26px,3.2vw,44px);font-weight:700;line-height:1.18;letter-spacing:-.8px;margin-bottom:18px;color:var(--text);}
-.hero-copy .h1 .dim{display:block;color:var(--text2);}
-.hero-copy .h1 em{font-style:normal;color:#D97706;}
-[data-theme="dark"] .hero-copy .h1 em{color:#E8D5A8;}
-.hero-copy .sub{font-size:14px;line-height:1.75;color:var(--text2);margin-bottom:28px;max-width:460px;}
-.hero-actions{display:flex;gap:10px;flex-wrap:wrap;}
-.btn{border:0;border-radius:8px;padding:11px 22px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:.15s;}
-.btn-gold{background:#E8D5A8;color:#16131F;}
-[data-theme="light"] .btn-gold{background:var(--accent);color:#fff;}
-.btn-gold:hover{background:#f0debc;}
-[data-theme="light"] .btn-gold:hover{background:var(--blue2);}
-.btn-outline-soft{background:transparent;border:1px solid var(--border2);color:var(--text2);font-family:'Inter',sans-serif;}
-.btn-outline-soft:hover{border-color:var(--accent);color:var(--accent);}
-/* mini app */
-.mini-app{background:var(--s1);border:1px solid var(--border2);border-radius:12px;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,.12);}
-.mini-topbar{background:var(--s2);border-bottom:1px solid var(--border);padding:9px 12px;display:flex;align-items:center;gap:8px;}
-.mini-dots{display:flex;gap:4px;}
-.mini-dot{width:7px;height:7px;border-radius:50%;background:var(--border2);}
-.mini-bar-info{font-size:9px;color:var(--muted2);}
-.mini-body{display:grid;grid-template-columns:130px 1fr;gap:0;}
-.mini-fp{padding:10px;border-right:1px solid var(--border);}
-.mfp-lbl{font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:6px;}
-.mfp-row{font-size:9px;padding:4px 6px;border-radius:4px;margin-bottom:2px;display:flex;justify-content:space-between;color:var(--text2);}
-.mfp-row.on{background:var(--accent2);color:var(--accent);}
-.mfp-val{font-weight:600;}
-.mini-results{padding:8px;}
-.mini-th,.mini-row-r{display:grid;grid-template-columns:1fr 40px 40px 8px 52px;gap:3px;align-items:center;font-size:8px;padding:3px 0;}
-.mini-th{color:var(--muted2);border-bottom:1px solid var(--border);margin-bottom:3px;}
-.right{text-align:right;}
-.m-ticker{font-size:10px;font-weight:700;color:var(--text);}
-.m-name{font-size:8px;color:var(--muted2);}
-.m-up{color:var(--green);}
-.m-dn{color:var(--red);}
-.m-score{display:flex;align-items:center;gap:3px;}
-.m-track{flex:1;height:3px;background:var(--border);border-radius:2px;}
-.m-fill{height:100%;background:var(--green);border-radius:2px;}
-.m-sv{font-size:8px;font-weight:700;color:var(--green);min-width:16px;text-align:right;}
-.mini-score-note{font-size:7px;color:var(--muted);margin-top:6px;line-height:1.5;}
-.mini-summary{font-size:8px;color:var(--muted2);margin-top:5px;display:flex;justify-content:space-between;align-items:center;}
-.mini-summary strong{font-size:11px;font-weight:700;color:var(--green);}
-.hero-stats{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:28px;flex-wrap:wrap;padding:20px 0 24px;}
-.hero-stat strong{font-size:20px;font-weight:700;color:var(--text);}
-.hero-stat strong b{font-weight:400;font-size:14px;color:var(--muted2);}
-.hero-stat span{display:block;font-size:10px;color:var(--muted2);margin-top:1px;}
-.live-badge{display:flex;align-items:center;gap:6px;margin-left:auto;}
-.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;flex-shrink:0;}
-.live-badge span{font-size:11px;color:var(--text2);}
-.live-badge span strong{color:var(--text);font-weight:600;display:block;}
-/* ── STATEMENT ── */
-.statement-sec{padding:40px 32px;text-align:center;background:var(--s1);border-bottom:1px solid var(--border);}
-.statement-sec p{font-size:clamp(14px,1.8vw,20px);color:var(--text2);line-height:1.65;max-width:640px;margin:0 auto;}
-.statement-sec em{font-style:normal;color:var(--text);font-weight:600;}
-/* ── SERVICE ── */
-.service-sec{padding:56px 32px;background:var(--bg);}
-.service-inner{max-width:1100px;margin:0 auto;}
-.service-hd{display:flex;gap:36px;align-items:flex-start;margin-bottom:40px;flex-wrap:wrap;}
-.service-hd .lbl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--muted2);display:block;}
-.service-hd h2{font-size:clamp(18px,2.2vw,28px);font-weight:700;color:var(--text);margin-top:6px;letter-spacing:-.3px;}
-.service-hd p{font-size:13px;color:var(--text2);line-height:1.7;max-width:340px;margin-top:6px;}
-.service-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;}
-.service-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:24px;}
-.service-card code{font-size:9px;font-weight:600;letter-spacing:1px;color:var(--muted2);font-family:'Geist Mono',monospace;display:block;margin-bottom:10px;}
-.service-card h3{font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;}
-.service-card p{font-size:12px;color:var(--text2);line-height:1.6;}
-/* ── CTA ── */
-.cta-sec{background:var(--s1);padding:56px 32px;text-align:center;border-top:1px solid var(--border);}
-.cta-sec h2{font-size:clamp(18px,2.5vw,32px);font-weight:700;color:var(--text);letter-spacing:-.4px;margin-bottom:14px;}
-.cta-sec em{font-style:normal;color:#D97706;}
-[data-theme="dark"] .cta-sec em{color:#E8D5A8;}
-.cta-sec p{font-size:13px;color:var(--text2);max-width:460px;margin:0 auto 24px;line-height:1.7;}
-.btn-dark{background:var(--accent);color:#fff;}
-.btn-dark:hover{background:var(--blue2);}
-/* ── HOME FOOTER ── */
-.home-footer{background:var(--bg);border-top:1px solid var(--border);padding:20px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:11px;color:var(--text2);}
-.home-footer strong{color:var(--text);font-weight:700;}
-.home-footer a{color:var(--text2);text-decoration:none;}
-.home-footer a:hover{text-decoration:underline;}
-/* ── STRATEGIES PAGE ── */
-.light-page{padding:60px 32px;max-width:1100px;margin:0 auto;}
-.page-title{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:40px;flex-wrap:wrap;gap:16px;}
-.page-title .lbl-sm{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--muted2);display:block;}
-.page-title h1{font-size:clamp(20px,2.5vw,32px);font-weight:700;color:var(--text);margin-top:6px;letter-spacing:-.3px;}
-.page-title p{font-size:13px;color:var(--text2);line-height:1.7;max-width:340px;margin-top:6px;}
-.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;}
-.card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:24px;}
-.card code{font-size:10px;font-weight:700;color:var(--muted2);font-family:'Geist Mono',monospace;background:var(--s2);padding:3px 9px;border-radius:5px;display:inline-block;margin-bottom:12px;}
-.card h3{font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px;}
-.card p{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:14px;}
-.recipe-cta{border:0;background:var(--accent);color:#fff;font-size:11px;font-weight:600;padding:7px 14px;border-radius:6px;cursor:pointer;font-family:'Inter',sans-serif;}
-/* ── PRICING PAGE ── */
-.price-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;}
-.price-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:24px;}
-.price-card.featured{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);}
-.tier{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--muted2);margin-bottom:6px;}
-.amount{font-size:26px;font-weight:700;color:var(--text);margin-bottom:10px;}
-.price-card p{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:14px;}
-.features{display:flex;flex-direction:column;gap:5px;margin-bottom:18px;}
-.features span{font-size:11px;color:var(--text2);padding-left:13px;position:relative;}
-.features span::before{content:'✓';position:absolute;left:0;color:var(--green);font-size:10px;}
-.btn-outline{border:1px solid var(--border2);background:transparent;color:var(--text2);padding:9px 18px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;}
-.waitlist-form{display:flex;gap:7px;margin-top:7px;}
-.waitlist-input{flex:1;background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:8px 11px;font-size:11px;border-radius:5px;outline:none;font-family:'Inter',sans-serif;}
-.waitlist-btn{background:var(--accent);color:#fff;border:0;padding:8px 13px;font-size:11px;font-weight:600;border-radius:5px;cursor:pointer;font-family:'Inter',sans-serif;}
-</style>
-<link rel="stylesheet" href="/deepfin.css?v=warm72">
+<link rel="stylesheet" href="/deepfin.css?v=warm71">
 <script src="/i18n.js?v=6" defer></script>
 <script src="/strategies.js?v=1" defer></script>
 <script src="/scoring.js?v=1" defer></script>
-<script src="/deepfin.js?v=213" defer></script>
+<script src="/deepfin.js?v=212" defer></script>
 <script src="/auth-header.js?v=2" defer></script>
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -315,125 +169,226 @@ if('serviceWorker' in navigator){
 </head>
 <body>
 
-<!-- TOP NAV -->
-<nav class="topnav" role="banner">
-  <div class="df-logo" onclick="showPage('page-home')" role="button" tabindex="0">Deep<em>Fin</em></div>
-  <div class="df-navlinks" id="df-navlinks">
-    <button class="df-navbtn on" data-page="page-home" onclick="showPage('page-home')">Ürün</button>
-    <button class="df-navbtn" id="nav-tarama" data-page="page-scan" onclick="showScreenerOrPrescan()">Tarayıcı</button>
-    <button class="df-navbtn" data-page="page-strategies" onclick="showPage('page-strategies')">Stratejiler</button>
-    <button class="df-navbtn" data-page="page-pricing" onclick="showPage('page-pricing')">Fiyatlandırma</button>
-    <a href="/analiz/" class="df-navbtn" id="nav-analiz">Analiz</a>
-  </div>
-  <div class="df-navright">
-    <div class="lang-toggle" role="group" aria-label="Dil / Language">
-      <button class="lang-toggle-btn" data-lang-btn="tr" onclick="dfSetLang('tr')">TR</button>
-      <button class="lang-toggle-btn" data-lang-btn="en" onclick="dfSetLang('en')">EN</button>
+<!-- ─── MAIN APP ─── -->
+<div id="app" class="on">
+  <div class="topbar" role="banner">
+    <div class="tleft">
+      <div class="tlogo" onclick="showHomepage()" style="cursor:pointer" role="button" tabindex="0" aria-label="Anasayfa"><span class="tlogo-mark"></span>DeepFin</div>
+      <span class="tlive">Canlı</span>
     </div>
-    <button class="topbarbtn theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir (T)" aria-label="Karanlık/Açık mod geçiş">☀</button>
-    <button class="df-ghost df-auth-out" onclick="location.href='/profil'">Giriş Yap</button>
-    <button class="df-cta df-auth-out" onclick="location.href='/profil'">Kayıt Ol</button>
-    <a href="/profil" id="profile-btn" class="df-cta df-auth-in" title="Profilim" style="display:none"><span id="profile-btn-inner" class="df-auth-av"></span><span>Profil</span><span id="fav-total-badge" style="display:none;background:#fff;color:var(--accent);font-size:9px;font-weight:700;border-radius:10px;padding:1px 5px;margin-left:5px;line-height:1.4;"></span></a>
-    <button class="topbarbtn supportbtn" onclick="openSupport()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg><span>Destek Ol</span></button>
-    <!-- Hidden scan controls used by deepfin.js -->
-    <button id="scanbtn" onclick="runScan()" style="display:none"></button>
-    <button id="stopbtn" onclick="abortScan()" style="display:none"></button>
-  </div>
-  <button class="hamburger-btn" id="hamburger-btn" onclick="toggleMobileDrawer()" style="display:none;" aria-label="Filtreler" aria-controls="sidebar" aria-expanded="false">
-    <span class="ham-line"></span><span class="ham-line"></span><span class="ham-line"></span>
-  </button>
-</nav>
 
-<!-- PAGE: HOME -->
-<div class="page active" id="page-home">
-  <div class="hero-home">
-    <div class="hero-grid">
-      <div class="hero-copy">
-        <span class="kicker">Akıllı tarama platformu</span>
-        <h1 class="h1">
-          <span class="dim">Piyasayı değil,</span>
-          <em>stratejinize uyan</em> adayları tarayın.
-        </h1>
-        <p class="sub">Hisse senedi ve kripto evrenlerini; <strong>yatırımcı stratejileri, temel kriterler ve teknik sinyallerle</strong> açıklanabilir aday listelerine dönüştürün.</p>
-        <div class="hero-actions">
-          <button class="btn btn-gold" onclick="showScreenerOrPrescan()">Taramaya Başla</button>
-          <button class="btn btn-outline-soft" onclick="document.getElementById('how-sec').scrollIntoView({behavior:'smooth'})">Nasıl çalışır →</button>
+    <!-- Sayfalar — ortalanmış -->
+    <nav class="tnav">
+      <a href="/" class="hp-nav-btn active" id="nav-home" onclick="event.preventDefault(); showHomepage()" data-i18n="nav.home">Anasayfa</a>
+      <a href="/" class="hp-nav-btn" id="nav-tarama" onclick="event.preventDefault(); showScreenerOrPrescan()" data-i18n="nav.scanner">Tarayıcı</a>
+      <a href="/analiz/" class="hp-nav-btn" id="nav-analiz" data-i18n="nav.analysis">Analiz</a>
+      <a href="/stratejiler/" class="hp-nav-btn" data-i18n="nav.strategies">Stratejiler</a>
+      <a href="/bilgi/" class="hp-nav-btn" data-i18n="nav.learn">Bilgi Bankası</a>
+    </nav>
+
+    <button class="hamburger-btn" id="hamburger-btn" onclick="toggleMobileDrawer()" style="display:none;" aria-label="Filtreler" aria-controls="sidebar" aria-expanded="false">
+      <span class="ham-line"></span><span class="ham-line"></span><span class="ham-line"></span>
+    </button>
+
+    <div class="tright">
+      <div class="lang-toggle" role="group" aria-label="Dil / Language">
+        <button class="lang-toggle-btn" data-lang-btn="tr" onclick="dfSetLang('tr')">TR</button>
+        <button class="lang-toggle-btn" data-lang-btn="en" onclick="dfSetLang('en')">EN</button>
+      </div>
+      <button class="topbarbtn theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Tema değiştir (T)" aria-label="Karanlık/Açık mod geçiş">☀</button>
+      <button class="auth-btn auth-ghost df-auth-out" onclick="location.href='/profil'" data-i18n="auth.login">Giriş Yap</button>
+      <button class="auth-btn auth-primary df-auth-out" onclick="location.href='/profil'" data-i18n="auth.register">Kayıt Ol</button>
+      <a href="/profil" id="profile-btn" class="auth-btn auth-primary df-auth-in" title="Profilim" style="display:none"><span id="profile-btn-inner" class="df-auth-av"></span><span data-i18n="auth.profile">Profil</span><span id="fav-total-badge" style="display:none;background:#fff;color:var(--accent);font-size:9px;font-weight:700;border-radius:10px;padding:1px 5px;margin-left:5px;line-height:1.4;"></span></a>
+      <button class="topbarbtn supportbtn" onclick="openSupport()">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+  <span data-i18n="auth.support">Destek Ol</span>
+</button>
+      <!-- Hidden: JS tarafından kullanılıyor -->
+      <button id="scanbtn" onclick="runScan()" style="display:none"></button>
+      <button id="stopbtn" onclick="abortScan()" style="display:none"></button>
+    </div>
+  </div>
+
+
+
+
+
+  <!-- ─── ANALİZ SAYFASI ─── -->
+
+  <!-- ─── HOMEPAGE ─── -->
+  <div id="homepage" style="display:none;">
+    <!-- HERO -->
+    <div class="hpx-hero">
+      <div class="hpx-eyebrow"><span class="hpx-live-dot"></span><span data-i18n="hero.eyebrow">30.000+ enstrüman canlı taranıyor</span></div>
+      <h1 class="hpx-h1"><span data-i18n="hero.h1a">Akıllıca tara,</span><br><em data-i18n="hero.h1b">güvenle karar ver.</em></h1>
+      <p class="hpx-sub" data-i18n="hero.sub">150 filtreyle binlerce varlığı saniyeler içinde tara, kararını güvenle ver.</p>
+      <div class="hpx-ctas">
+        <button class="hpx-cta-p" onclick="showScreenerOrPrescan()" data-i18n="hero.cta1">Taramaya Başla</button>
+        <button class="hpx-cta-g" onclick="showHomepage(); var s=document.getElementById('how-section'); if(s) s.scrollIntoView({behavior:'smooth',block:'start'});" data-i18n="hero.cta2">Nasıl çalışır</button>
+      </div>
+      <!-- Faz 5: Hero Canlı Önizleme -->
+      <div class="hpx-preview" aria-hidden="true">
+        <div class="hpx-pv-bar">
+          <span class="hpx-pv-label">Örnek tarama:</span>
+          <span class="hpx-pv-chip hpx-pv-goat">Buffett</span>
+          <span class="hpx-pv-chip hpx-pv-preset">Değer</span>
+          <span class="hpx-pv-chip hpx-pv-filter">ROE ≥ 15%</span>
+          <span class="hpx-pv-chip hpx-pv-filter">F/K ≤ 20</span>
+          <span class="hpx-pv-result">→ <b>8</b> eşleşme</span>
+        </div>
+        <div class="hpx-pv-table">
+          <div class="hpx-pv-row hpx-pv-hd">
+            <span class="hpx-pv-sym">Hisse</span>
+            <span class="hpx-pv-num">F/K</span>
+            <span class="hpx-pv-num">ROE%</span>
+            <span class="hpx-pv-num">Değ%</span>
+            <span class="hpx-pv-match">UYUM</span>
+          </div>
+          <div class="hpx-pv-row" onclick="showScreenerOrPrescan()">
+            <span class="hpx-pv-sym"><span class="hpx-pv-ticker">THYAO</span><span class="hpx-pv-name">Türk Hava Yolları</span></span>
+            <span class="hpx-pv-num">9.2</span>
+            <span class="hpx-pv-num hpx-g">22.4%</span>
+            <span class="hpx-pv-num hpx-g">+3.1%</span>
+            <span class="hpx-pv-match"><span class="match-score ms-high">87</span></span>
+          </div>
+          <div class="hpx-pv-row" onclick="showScreenerOrPrescan()">
+            <span class="hpx-pv-sym"><span class="hpx-pv-ticker">SISE</span><span class="hpx-pv-name">Şişe Cam</span></span>
+            <span class="hpx-pv-num">14.8</span>
+            <span class="hpx-pv-num hpx-g">17.9%</span>
+            <span class="hpx-pv-num hpx-r">−1.2%</span>
+            <span class="hpx-pv-match"><span class="match-score ms-watch">71</span></span>
+          </div>
+          <div class="hpx-pv-row" onclick="showScreenerOrPrescan()">
+            <span class="hpx-pv-sym"><span class="hpx-pv-ticker">BIMAS</span><span class="hpx-pv-name">BİM Mağazaları</span></span>
+            <span class="hpx-pv-num">18.3</span>
+            <span class="hpx-pv-num hpx-g">19.5%</span>
+            <span class="hpx-pv-num hpx-g">+0.8%</span>
+            <span class="hpx-pv-match"><span class="match-score ms-watch">68</span></span>
+          </div>
+          <div class="hpx-pv-cta" onclick="showScreenerOrPrescan()">Tümünü tara →</div>
         </div>
       </div>
-      <div>
-        <div class="mini-app" aria-hidden="true">
-          <div class="mini-topbar">
-            <div class="mini-dots"><div class="mini-dot"></div><div class="mini-dot"></div><div class="mini-dot"></div></div>
-            <span class="mini-bar-info">Tarama · BIST · Buffett + Değer · 7 eşleşme</span>
+      <div class="hpx-stats">
+        <div><div class="hpx-stat-n">9+</div><div class="hpx-stat-l" data-i18n="stat.assets">varlık sınıfı</div></div>
+        <div><div class="hpx-stat-n">30K+</div><div class="hpx-stat-l" data-i18n="stat.instruments">enstrüman</div></div>
+        <div><div class="hpx-stat-n" data-strat-count>155+</div><div class="hpx-stat-l" data-i18n="stat.filters">Filtre &amp; Strateji</div></div>
+      </div>
+    </div>
+
+    <!-- NASIL ÇALIŞIR -->
+    <div class="hpx-section" id="how-section">
+      <div class="hpx-eye" data-i18n="how.title">Nasıl Çalışır</div>
+      <div class="hpx-steps">
+        <div class="hpx-step"><div class="hpx-step-num">01</div><div class="hpx-step-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M4 21V10M20 21V10M4 10l8-5 8 5M9 21v-6M15 21v-6"/></svg></div><div class="hpx-step-title" data-i18n="how.s1t">Varlık Seç</div><div class="hpx-step-hint" data-i18n="how.s1h">Hisse, fon, ETF veya kripto seç</div></div>
+        <div class="hpx-step"><div class="hpx-step-num">02</div><div class="hpx-step-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h18l-7 8.5V19l-4 2v-8.5z"/></svg></div><div class="hpx-step-title" data-i18n="how.s2t">Filtrele</div><div class="hpx-step-hint" data-i18n="how.s2h">Hazır strateji seç ya da kendi filtreni kur</div></div>
+        <div class="hpx-step"><div class="hpx-step-num">03</div><div class="hpx-step-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div><div class="hpx-step-title" data-i18n="how.s3t">Tara</div><div class="hpx-step-hint" data-i18n="how.s3h">Tüm piyasa saniyeler içinde taranır</div></div>
+        <div class="hpx-step"><div class="hpx-step-num">04</div><div class="hpx-step-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l3-4 3 3 4-6"/></svg></div><div class="hpx-step-title" data-i18n="how.s4t">İncele</div><div class="hpx-step-hint" data-i18n="how.s4h">Sonuçlara tıkla, tüm metrikler ve analiz</div></div>
+      </div>
+    </div>
+
+    <!-- VARLIKLAR -->
+    <div class="hpx-section hpx-section-left">
+      <div class="hpx-eye" data-i18n="assets.title">Varlıklar</div>
+      <div class="hpx-spill-wrap">
+          <div class="hpx-spill" role="button" tabindex="0" onclick="showScreenerOrPrescan()"><div class="hpx-spill-name" data-i18n="assets.stocks">Borsa</div><div class="hpx-spill-tag" data-i18n="assets.stocksTag">Hisse senetleri · 28+ borsa</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="selectAsset('kripto')"><div class="hpx-spill-name" data-i18n="assets.crypto">Kripto</div><div class="hpx-spill-tag" data-i18n="assets.cryptoTag">Kripto paralar</div></div>
+          <div class="hpx-spill hpx-spill-soon"><div class="hpx-spill-name"><span data-i18n="assets.fund">Fon</span> <span class="hpx-soon" data-i18n="soon">Yakında</span></div><div class="hpx-spill-tag" data-i18n="assets.fundTag">Yatırım fonları</div></div>
+          <div class="hpx-spill hpx-spill-soon"><div class="hpx-spill-name"><span data-i18n="assets.etf">ETF</span> <span class="hpx-soon" data-i18n="soon">Yakında</span></div><div class="hpx-spill-tag" data-i18n="assets.etfTag">Borsa yatırım fonları</div></div>
+          <div class="hpx-spill hpx-spill-soon"><div class="hpx-spill-name"><span data-i18n="assets.eurobond">Eurobond</span> <span class="hpx-soon" data-i18n="soon">Yakında</span></div><div class="hpx-spill-tag" data-i18n="assets.eurobondTag">Döviz tahvilleri</div></div>
+          <div class="hpx-spill hpx-spill-soon"><div class="hpx-spill-name"><span data-i18n="assets.bond">Bono/Tahvil</span> <span class="hpx-soon" data-i18n="soon">Yakında</span></div><div class="hpx-spill-tag" data-i18n="assets.bondTag">Sabit getirili</div></div>
+      </div>
+    </div>
+
+    <!-- POPÜLER STRATEJİLER -->
+    <div class="hpx-section hpx-section-left">
+      <div class="hpx-eye" data-i18n="strat.title">Popüler Stratejiler</div>
+      <div class="hpx-tabs">
+        <button class="hpx-tab on" onclick="hpStratTab(this,'goat')" data-i18n="strat.lenses">Yatırımcı Lensleri</button>
+        <button class="hpx-tab" onclick="hpStratTab(this,'fund')" data-i18n="strat.fundamental">Temel Analiz</button>
+        <button class="hpx-tab" onclick="hpStratTab(this,'tech')" data-i18n="strat.technical">Teknik Analiz</button>
+      </div>
+      <div class="hpx-spill-wrap" id="hpx-sg-goat">
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyStrategyAndGo('buffett')"><div class="hpx-spill-name">Buffett</div><div class="hpx-spill-tag">Kalite & moat</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyStrategyAndGo('graham')"><div class="hpx-spill-name">Graham</div><div class="hpx-spill-tag">Güvenlik marjı</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyStrategyAndGo('fisher')"><div class="hpx-spill-name">Fisher</div><div class="hpx-spill-tag">Büyüme kalitesi</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyStrategyAndGo('munger')"><div class="hpx-spill-name">Munger</div><div class="hpx-spill-tag">Mükemmel şirket</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyStrategyAndGo('lynch')"><div class="hpx-spill-name">Lynch</div><div class="hpx-spill-tag">PEG · GARP</div></div>
+      </div>
+      <div class="hpx-spill-wrap" id="hpx-sg-fund" style="display:none">
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyPresetAndGo('value')"><div class="hpx-spill-name">Değer</div><div class="hpx-spill-tag">Düşük F/K</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyPresetAndGo('growth')"><div class="hpx-spill-name">Büyüme</div><div class="hpx-spill-tag">Gelir ivmesi</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyPresetAndGo('dividend')"><div class="hpx-spill-name">Temettü</div><div class="hpx-spill-tag">Yüksek verim</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyPresetAndGo('quality')"><div class="hpx-spill-name">Kalite</div><div class="hpx-spill-tag">Güçlü ROE</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyPresetAndGo('lowdebt')"><div class="hpx-spill-name">Az Borç</div><div class="hpx-spill-tag">Temiz bilanço</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyPresetAndGo('momentum')"><div class="hpx-spill-name">Momentum</div><div class="hpx-spill-tag">Hızlanan kazanç</div></div>
+      </div>
+      <div class="hpx-spill-wrap" id="hpx-sg-tech" style="display:none">
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyTechAndGo('breakout')"><div class="hpx-spill-name">Breakout</div><div class="hpx-spill-tag">Yeni zirve</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyTechAndGo('oversold')"><div class="hpx-spill-name">Aşırı Satış</div><div class="hpx-spill-tag">RSI < 35</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyTechAndGo('nearHigh')"><div class="hpx-spill-name">ATH Yakın</div><div class="hpx-spill-tag">52H zirve</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyTechAndGo('pullback')"><div class="hpx-spill-name">Düzeltme</div><div class="hpx-spill-tag">Sağlıklı geri çekilme</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyTechAndGo('strongDay')"><div class="hpx-spill-name">Günlük Hareket</div><div class="hpx-spill-tag">Günlük %2+</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyTechAndGo('highVolume')"><div class="hpx-spill-name">Yüksek Hacim</div><div class="hpx-spill-tag">Yüksek hacim</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyTechAndGo('techBuy')"><div class="hpx-spill-name">Teknik Alım</div><div class="hpx-spill-tag">Teknik skor</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyTechAndGo('momentum3m')"><div class="hpx-spill-name">3A Momentum</div><div class="hpx-spill-tag">Orta vadeli ivme</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyTechAndGo('trendFollow')"><div class="hpx-spill-name">Trend Takibi</div><div class="hpx-spill-tag">Güçlü trend</div></div>
+          <div class="hpx-spill" role="button" tabindex="0" onclick="applyTechAndGo('rsiBounce')"><div class="hpx-spill-name">Dip Tepkisi</div><div class="hpx-spill-tag">RSI dönüşü</div></div>
+      </div>
+    </div>
+
+    <!-- SON TARAMALAR (site-geneli) -->
+    <div class="hpx-section hpx-section-left" id="hpx-recent" style="display:none">
+      <div class="hpx-eye" data-i18n="recent.title">Sitede yapılan son taramalar</div>
+      <div class="hpx-recent-sub" data-i18n="recent.sub">Birine tıkla, aynı taramayı Pro'da çalıştır</div>
+      <div class="hpx-recent-grid" id="hpx-recent-grid"></div>
+    </div>
+
+    <!-- YASAL UYARI -->
+    <div class="hpx-disc">
+      <p data-i18n-html="disc.p1">DeepFin'de sunulan tüm veriler, filtreler ve stratejiler yalnızca <strong>bilgilendirme amaçlıdır</strong>. Bu platform herhangi bir finansal araç için <strong>alım, satım veya elde tutma tavsiyesi vermez</strong>; yatırım danışmanlığı hizmeti sunmaz. <strong>Geçmiş performans gelecekteki sonuçların garantisi değildir.</strong> Yatırım kararlarınızı almadan önce <em>lisanslı bir finansal danışmana</em> başvurmanızı tavsiye ederiz. Tüm yatırım işlemleri kullanıcının kendi sorumluluğundadır.</p>
+      <p data-i18n-html="disc.p2">DeepFin'de yer alan yatırımcı ve fon stratejileri — <strong>Buffett, Graham, Lynch, Klarman, Greenblatt</strong> ve diğerleri — ilgili kişi ve kurumlarla herhangi bir <strong>iş birliği, lisans veya resmi bağlantı olmaksızın</strong> yalnızca kamuya açık yayın, kitap ve akademik kaynaklara dayanılarak hazırlanmıştır. Sunulan filtreler özgün yorumlara ve hesaplama farklılıklarına tabidir; <strong>tam bir yansıma değildir.</strong></p>
+    </div>
+
+
+    <!-- FOOTER -->
+    <footer class="hp-footer">
+      <div class="hp-footer-top">
+        <div class="footer-brand">
+          <div class="footer-logo"><span class="tlogo-mark"></span>DeepFin</div>
+          <p class="footer-tagline">Tarama bizden, karar sizden.</p>
+          <p class="footer-desc">Dünya borsaları için gerçek zamanlı veri.</p>
+        </div>
+        <div class="footer-links-group">
+          <div class="footer-col">
+            <div class="footer-col-title">Platform</div>
+            <a class="footer-link" href="/screener" data-i18n="nav.scanner">Tarayıcı</a>
+            <a class="footer-link" href="/stratejiler/" data-i18n="nav.strategies">Stratejiler</a>
+            <a class="footer-link" href="/analiz/" data-i18n="nav.analysis">Analiz</a>
+            <a class="footer-link" href="/bilgi/" data-i18n="nav.learn">Bilgi Bankası</a>
           </div>
-          <div class="mini-body">
-            <div class="mini-fp">
-              <div class="mfp-lbl">Aktif Filtreler</div>
-              <div class="mfp-row on"><span>Yatırımcı</span><span class="mfp-val">Buffett</span></div>
-              <div class="mfp-row on"><span>Temel</span><span class="mfp-val">Değer</span></div>
-              <div class="mfp-row on"><span>Teknik</span><span class="mfp-val">Yük. Hacim</span></div>
-            </div>
-            <div class="mini-results">
-              <div class="mini-th"><span>Varlık</span><span class="right">Fiyat</span><span class="right">Değ.</span><span></span><span class="right">Uyum</span></div>
-              <div class="mini-row-r"><div><div class="m-ticker">THYAO</div><div class="m-name">Havacılık</div></div><span class="right">₺312</span><span class="right m-up">+2.1%</span><span></span><div class="m-score"><div class="m-track"><div class="m-fill" style="width:86%"></div></div><span class="m-sv">86</span></div></div>
-              <div class="mini-row-r"><div><div class="m-ticker">SISE</div><div class="m-name">Cam</div></div><span class="right">₺42</span><span class="right m-up">+1.4%</span><span></span><div class="m-score"><div class="m-track"><div class="m-fill" style="width:81%"></div></div><span class="m-sv">81</span></div></div>
-              <div class="mini-row-r"><div><div class="m-ticker">FROTO</div><div class="m-name">Otomotiv</div></div><span class="right">₺962</span><span class="right m-dn">−0.4%</span><span></span><div class="m-score"><div class="m-track"><div class="m-fill" style="width:77%"></div></div><span class="m-sv">77</span></div></div>
-              <div class="mini-score-note">Eşleşme düzeyi seçilen kriterleri yansıtır; öneri değildir.</div>
-              <div class="mini-summary"><span>7 adaydan ilk 3</span><strong>86</strong></div>
-            </div>
+          <div class="footer-col">
+            <div class="footer-col-title">Kaynaklar</div>
+            <a class="footer-link" href="/bilgi/#guides">Strateji Rehberleri</a>
+            <a class="footer-link" href="/bilgi/#terms">Terimler Sözlüğü</a>
+            <a class="footer-link" href="/bilgi/#filters">Filtre Açıklamaları</a>
+          </div>
+          <div class="footer-col">
+            <div class="footer-col-title">Yasal &amp; Destek</div>
+            <a class="footer-link" onclick="openSupport()">Destek Ol</a>
+            <a class="footer-link" onclick="showFooterModal('disclaimer')">Yasal Uyarı</a>
+            <a class="footer-link" onclick="showFooterModal('privacy')">Gizlilik Politikası</a>
+            <a class="footer-link" onclick="showFooterModal('terms')">Kullanım Koşulları</a>
           </div>
         </div>
       </div>
-    </div>
-    <div class="hero-stats">
-      <div class="hero-stat"><strong>28<b>+</b></strong><span>Borsa</span></div>
-      <div class="hero-stat"><strong>30K<b>+</b></strong><span>Enstrüman</span></div>
-      <div class="hero-stat"><strong>150<b>+</b></strong><span>Tarama kriteri</span></div>
-      <div class="live-badge"><span class="live-dot"></span><span><strong>Canlı tarama</strong>Buffett · BIST · Temel + Teknik</span></div>
-    </div>
-  </div>
-
-  <div class="statement-sec">
-    <p>Buffett tarzı kalite yaklaşımı. Graham tarzı güvenlik marjı. Teknik momentum.<br><em>Aynı ekranda, açıklanabilir tarama mantığında.</em></p>
-  </div>
-
-  <div class="service-sec" id="how-sec">
-    <div class="service-inner">
-      <div class="service-hd">
-        <div><span class="lbl-sm">Platform</span><h2>Stratejini, açıklanabilir aday listesine dönüştürür.</h2></div>
-        <p>Piyasadaki 30.000+ varlığı, stratejinize uyan açıklanabilir adaylara indirger.</p>
+      <div class="hp-footer-bottom">
+        <span>© 2026 DeepFin. Tüm hakları saklıdır.</span>
+        <span class="footer-disclaimer-short">Bu platform yatırım tavsiyesi vermez. Tüm veriler bilgi amaçlıdır.</span>
       </div>
-      <div class="service-cards">
-        <div class="service-card"><code>01</code><h3>Akıllı Tarama</h3><p>Hisse ve kripto evrenlerini varlık türü, piyasa ve strateji filtresine göre sade bir akışta daraltır.</p></div>
-        <div class="service-card"><code>02</code><h3>Strateji Filtreleri</h3><p>Buffett, Graham, Lynch tarzı yaklaşımlar somut ve düzenlenebilir tarama kriterlerine dönüşür.</p></div>
-        <div class="service-card"><code>03</code><h3>Eşleşme Detayı</h3><p>Her sonucun neden listelendiğini ve hangi filtrelerden geçtiğini açıklar.</p></div>
-        <div class="service-card"><code>04</code><h3>Kaydedilmiş Akışlar</h3><p>Tekrarlanan taramalar, kayıtlı reçeteler ve aday notları için ölçeklenebilir yapı sunar.</p></div>
-      </div>
-    </div>
+    </footer>
   </div>
 
-  <div class="cta-sec">
-    <h2>Taramaya <em>başlayın.</em></h2>
-    <p>Kredi kartı gerekmez. İlk taramanız, yalnızca seçtiğiniz kriterlere göre açıklanabilir eşleşmeler üretir.</p>
-    <button class="btn btn-dark" onclick="showScreenerOrPrescan()">Taramaya Başla</button>
-    <p style="font-size:11px;margin-top:12px;margin-bottom:0;color:var(--muted2)">Platform yatırım tavsiyesi sunmaz; yalnızca seçilen kriterlere göre eşleşme listesi üretir.</p>
-  </div>
-
-  <footer class="home-footer">
-    <strong>DeepFin</strong>
-    <span>© 2026 · Platform yatırım tavsiyesi sunmaz. Sonuçlar seçilen filtre kriterlerine göre eşleşme listesidir.</span>
-    <span>
-      <a href="#" onclick="showFooterModal('privacy');return false">Gizlilik</a> ·
-      <a href="#" onclick="showFooterModal('terms');return false">Koşullar</a> ·
-      <a href="#" onclick="openSupport();return false">Destek Ol</a>
-    </span>
-  </footer>
-</div>
-
-<!-- PAGE: SCAN -->
-<div class="page" id="page-scan">
-
-  <!-- MOBILE DRAWER (preserved) -->
+  <!-- MOBILE DRAWER OVERLAY -->
   <div class="drawer-overlay" id="drawer-overlay" onclick="closeMobileDrawer()"></div>
   <div class="drawer-panel" id="drawer-panel">
     <div class="drawer-header">
@@ -441,16 +396,18 @@ if('serviceWorker' in navigator){
       <button class="drawer-close" onclick="closeMobileDrawer()" aria-label="Kapat">×</button>
     </div>
     <div class="drawer-nav">
-      <a class="drawer-nav-link" id="dnav-home" onclick="closeMobileDrawer(); showPage('page-home')">🏠 Anasayfa</a>
+      <a class="drawer-nav-link" id="dnav-home" onclick="closeMobileDrawer(); showHomepage()">🏠 Anasayfa</a>
       <a class="drawer-nav-link" id="dnav-tarama" onclick="closeMobileDrawer(); showScreenerOrPrescan()">🔍 Tarayıcı</a>
       <a class="drawer-nav-link" href="/analiz/">📊 Analiz</a>
       <a class="drawer-nav-link" href="/stratejiler/">🎯 Stratejiler</a>
       <a class="drawer-nav-link" href="/bilgi/">📚 Bilgi Bankası</a>
     </div>
-    <div id="drawer-content"></div>
+    <div id="drawer-content">
+      <!-- Sidebar içeriği JS ile buraya kopyalanır -->
+    </div>
   </div>
 
-  <div class="layout" id="screener-layout">
+  <div class="layout" id="screener-layout" style="display:none;">
 
     <!-- KOLAY MOD: Varlık + Borsa seçimi -->
     <div id="kolay-side">
@@ -466,6 +423,7 @@ if('serviceWorker' in navigator){
       </div>
     </div>
 
+    <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar" role="complementary" aria-label="Filtreler">
 
       <!-- VARLIK NAV BAR -->
@@ -1110,6 +1068,8 @@ if('serviceWorker' in navigator){
       </div><!-- /sbp-kripto -->
 
     </div><!-- /sidebar -->
+
+    <!-- CONTENT -->
     <div class="content" role="main">
       <!-- TICKER TAPE -->
       <div class="ticker-wrap" id="ticker-wrap">
@@ -1427,130 +1387,6 @@ if('serviceWorker' in navigator){
     </div>
   </div>
 </div>
-
-  </div><!-- /screener-layout -->
-
-</div><!-- /#page-scan -->
-
-<!-- PAGE: STRATEGIES -->
-<div class="page" id="page-strategies">
-  <div class="light-page"><div class="wrap">
-    <div class="page-title">
-      <div><span class="lbl-sm">Tarama Reçeteleri</span><h1>Hazır reçetelerle aday evrenini daraltın.</h1></div>
-      <p>Her reçete, açıklanabilir kriter setlerinden oluşur.</p>
-    </div>
-    <div class="card-grid">
-      <div class="card"><code>WB</code><h3>Buffett Tarzı Kalite</h3><p>Yüksek özsermaye kârlılığı, düşük borçluluk ve makul değerleme.</p><button class="recipe-cta" onclick="showScreenerOrPrescan()">Taramaya Başla</button></div>
-      <div class="card"><code>BG</code><h3>Graham Güvenlik Marjı</h3><p>Düşük çarpan ve sağlam bilanço odağıyla güvenlik marjı taraması.</p><button class="recipe-cta" onclick="showScreenerOrPrescan()">Taramaya Başla</button></div>
-      <div class="card"><code>PL</code><h3>Lynch Tarzı Büyüme</h3><p>Büyüme oranı ve PEG yaklaşımıyla büyüme adayları taraması.</p><button class="recipe-cta" onclick="showScreenerOrPrescan()">Taramaya Başla</button></div>
-      <div class="card"><code>TM</code><h3>Teknik Momentum</h3><p>Hacim, trend ve fiyat davranışına göre teknik sinyal örtüşmesi.</p><button class="recipe-cta" onclick="showScreenerOrPrescan()">Taramaya Başla</button></div>
-      <div class="card"><code>DV</code><h3>Temettü Kalitesi</h3><p>Düzenli temettü, ödeme oranı ve nakit akışı kriterleri.</p><button class="recipe-cta" onclick="showScreenerOrPrescan()">Taramaya Başla</button></div>
-      <div class="card"><code>QM</code><h3>Quality Compounder</h3><p>Uzun vadeli kaliteli büyüme adayları için çok katmanlı filtre seti.</p><button class="recipe-cta" onclick="showScreenerOrPrescan()">Taramaya Başla</button></div>
-    </div>
-  </div></div>
-</div>
-
-<!-- PAGE: PRICING -->
-<div class="page" id="page-pricing">
-  <div class="light-page"><div class="wrap">
-    <div class="page-title">
-      <div><span class="lbl-sm">Fiyatlandırma</span><h1>İhtiyaca göre sade paketler.</h1></div>
-      <p>Deneme, aktif tarama ve ekip kullanımı arasında sade bir karşılaştırma.</p>
-    </div>
-    <div class="price-grid">
-      <div class="price-card">
-        <div class="tier">Başlangıç</div>
-        <div class="amount">₺0</div>
-        <p>Platformu denemek ve sınırlı tarama yapmak için.</p>
-        <div class="features"><span>BIST temel kriter taraması</span><span>5 hazır strateji</span><span>Gecikmeli veri görünümü</span></div>
-        <button class="btn-outline" onclick="showScreenerOrPrescan()">Taramaya Başla</button>
-      </div>
-      <div class="price-card featured">
-        <div class="tier">Profesyonel</div>
-        <div class="amount">Yakında</div>
-        <p>Aktif araştırma yapan kullanıcılar için.</p>
-        <div class="features"><span>150+ tarama kriteri</span><span>Global piyasa seti</span><span>Filtre eşleşme detayları</span><span>Kaydedilmiş taramalar</span></div>
-        <p style="font-size:11px;color:var(--muted2);margin-bottom:6px">Erken erişim:</p>
-        <div class="waitlist-form">
-          <input class="waitlist-input" type="email" placeholder="e-posta@domain.com" id="waitlistEmail">
-          <button class="waitlist-btn" onclick="joinWaitlist()">Bildir</button>
-        </div>
-      </div>
-      <div class="price-card">
-        <div class="tier">Kurumsal</div>
-        <div class="amount">Özel</div>
-        <p>Ekip kullanımı ve özel veri entegrasyonu için.</p>
-        <div class="features"><span>Çoklu kullanıcı</span><span>API / veri entegrasyonu</span><span>Özel destek</span></div>
-        <button class="btn-outline">Görüşelim</button>
-      </div>
-    </div>
-  </div></div>
-</div>
-
-<!-- PAGE ROUTING SCRIPT -->
-<script>
-function showPage(pageId) {
-  // Hide all pages
-  document.querySelectorAll('.page').forEach(function(p) {
-    p.classList.remove('active');
-    // Fix overflow for scan page
-    if (p.id === 'page-scan') {
-      p.style.display = 'none';
-    }
-  });
-  // Remove 'on' from all nav buttons
-  document.querySelectorAll('.df-navbtn[data-page]').forEach(function(b) {
-    b.classList.remove('on');
-  });
-  // Show requested page
-  var page = document.getElementById(pageId);
-  if (page) {
-    page.classList.add('active');
-    if (pageId === 'page-scan') {
-      page.style.display = 'flex';
-    }
-  }
-  // Mark active nav button
-  var btn = document.querySelector('.df-navbtn[data-page="' + pageId + '"]');
-  if (btn) btn.classList.add('on');
-  // Body overflow
-  if (pageId === 'page-home') {
-    document.body.style.overflow = '';
-  } else {
-    document.body.style.overflow = 'hidden';
-  }
-}
-function showHomepage() {
-  showPage('page-home');
-}
-// Override showScreenerOrPrescan to show scan page first
-var _origShowScreener = typeof showScreenerOrPrescan !== 'undefined' ? showScreenerOrPrescan : null;
-document.addEventListener('DOMContentLoaded', function() {
-  // Patch showScreenerOrPrescan to also show the scan page
-  var origFn = window.showScreenerOrPrescan;
-  if (origFn) {
-    window.showScreenerOrPrescan = function() {
-      showPage('page-scan');
-      origFn.call(this);
-    };
-  }
-  // Patch showHomepage
-  window.showHomepage = function() {
-    showPage('page-home');
-  };
-  // Patch nav-home link
-  var navHome = document.getElementById('nav-home');
-  if (navHome) navHome.onclick = function(e) { e.preventDefault(); showPage('page-home'); };
-  // Waitlist join
-  window.joinWaitlist = function() {
-    var email = document.getElementById('waitlistEmail');
-    if (email && email.value) {
-      alert('Bekleme listesine eklendiniz: ' + email.value);
-      email.value = '';
-    }
-  };
-});
-</script>
 
 <!-- ─── FOOTER MODAL ─── -->
 <div class="modal-overlay" id="footerModal" onclick="closeFooterModal()">
@@ -2426,6 +2262,5 @@ function toggleExMore(){
   if(row)row.style.display=shown?'flex':'none';
 }
 </script>
-
 </body>
 </html>
