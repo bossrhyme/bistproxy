@@ -2,6 +2,27 @@
 // DeepFin — Varlık Navigasyon Sistemi
 // ═══════════════════════════════════════════════════════════════
 
+// ── Sayfa Yönlendirme (Faz 8-9) ──────────────────────────────
+var _currentDfPage = 'page-home';
+function showPage(id) {
+  _currentDfPage = id;
+  document.querySelectorAll('.page').forEach(function(p) {
+    p.classList.toggle('active', p.id === id);
+  });
+  document.querySelectorAll('.df-navbtn[data-page]').forEach(function(b) {
+    b.classList.toggle('on', b.dataset.page === id);
+  });
+  var navHome = document.getElementById('nav-home');
+  var navTarama = document.getElementById('nav-tarama');
+  if (navHome) navHome.classList.toggle('active', id === 'page-home');
+  if (navTarama) navTarama.classList.toggle('active', id === 'page-scan');
+}
+function joinWaitlist() {
+  var inp = document.getElementById('waitlistEmail');
+  if (inp && inp.value) { showToast('Bekleme listesine eklendi: ' + inp.value); inp.value = ''; }
+  else showToast('Lütfen e-posta adresinizi girin');
+}
+
 // ── Chip seçim fonksiyonları ──────────────────────────────────
 function chipRadio(el) {
   var c = el.closest('.chips') || el.parentElement;
@@ -2043,7 +2064,7 @@ function initPrescanView() {
       : '<span class="psv-ex-flag">'+m.flag+'</span>';
     var tip = EXCHANGE_TIPS[key] || '';
     var country = EXCHANGE_COUNTRY[key] ? '<span class="psv-ex-country">'+EXCHANGE_COUNTRY[key]+'</span>' : '';
-    return '<button class="psv-ex-btn" data-exchange="'+key+'"'+(tip ? ' data-tip="'+tip+'"' : '')+' onclick="psvSetExchange(\''+key+'\')">' +
+    return '<button class="psv-ex-btn setup-market" data-exchange="'+key+'"'+(tip ? ' data-tip="'+tip+'"' : '')+' onclick="psvSetExchange(\''+key+'\')">' +
       flagHtml + '<span class="psv-ex-name">'+m.name+'</span>'+country+'</button>';
   }
 
@@ -2106,84 +2127,94 @@ function initPrescanView() {
   _psvCurAsset = 'hisse';
 
   el.innerHTML =
-    '<button class="psv-close-btn" id="psv-close-btn" onclick="closePrescanView()" style="display:none">✕ Sonuçlara dön</button>'+
-    '<div class="psv-inner">'+
-    '<div class="psv-brand"><div class="psv-logo"><div class="tlogo-mark" style="width:24px;height:24px;font-size:12px;">D</div>DeepFin</div><div class="psv-tagline">VARLIK · BORSA · STRATEJİ · TARA</div></div>'+
-
-    // ── Wizard Rail ──
-    '<div class="psv-wizard-rail">'+
-      '<div class="psv-rail-step active" data-step="1"><div class="psv-rs-dot">01</div><div class="psv-rs-label">Varlık</div></div>'+
-      '<div class="psv-rail-line"></div>'+
-      '<div class="psv-rail-step" data-step="2"><div class="psv-rs-dot">02</div><div class="psv-rs-label">Borsa</div></div>'+
-      '<div class="psv-rail-line"></div>'+
-      '<div class="psv-rail-step" data-step="3"><div class="psv-rs-dot">03</div><div class="psv-rs-label">Strateji</div></div>'+
-    '</div>'+
-
-    // ── Panel 1: Varlık ──
-    '<div id="psv-panel-1" class="psv-panel">'+
-    '<div class="psv-section">'+
-    '<div class="psv-section-hd">Varlık Türü</div>'+
-    '<div class="psv-asset-wrap">'+
-      '<button class="psv-asset-arrow" onclick="psvScrollAssets(-1)" aria-label="Sola kaydır">‹</button>'+
-      '<div class="psv-asset-row" id="psv-asset-row">'+
-        PSV_ASSETS.map(function(a){
-          return a.active
-            ? '<button class="psv-asset-btn'+(a.key==='hisse'?' on':'')+'" data-asset="'+a.key+'" onclick="psvSetAsset(\''+a.key+'\')"><span class="psv-asset-name">'+a.label+'</span></button>'
-            : '<div class="psv-asset-soon"><span class="psv-asset-name">'+a.label+'</span><span class="psv-asset-badge">yakında</span></div>';
-        }).join('')+
+    '<div class="setup-shell">'+
+    // ── Left Rail ──
+    '<nav class="setup-rail">'+
+      '<div class="setup-eyebrow"><span class="tlogo-mark" style="width:20px;height:20px;font-size:11px;display:inline-flex;align-items:center;justify-content:center;border-radius:4px;background:var(--accent,#E8D5A8);color:#16131F;font-weight:700;margin-right:6px;">D</span>DeepFin</div>'+
+      '<div class="setup-progress">'+
+        '<button class="setup-step-nav on" data-step="1">01 Varlık</button>'+
+        '<button class="setup-step-nav" data-step="2">02 Borsa</button>'+
+        '<button class="setup-step-nav" data-step="3">03 Strateji</button>'+
       '</div>'+
-      '<button class="psv-asset-arrow" onclick="psvScrollAssets(1)" aria-label="Sağa kaydır">›</button>'+
+      // Legacy rail for backward-compat JS
+      '<div class="psv-wizard-rail" style="display:none">'+
+        '<div class="psv-rail-step active" data-step="1"><div class="psv-rs-dot">01</div><div class="psv-rs-label">Varlık</div></div>'+
+        '<div class="psv-rail-line"></div>'+
+        '<div class="psv-rail-step" data-step="2"><div class="psv-rs-dot">02</div><div class="psv-rs-label">Borsa</div></div>'+
+        '<div class="psv-rail-line"></div>'+
+        '<div class="psv-rail-step" data-step="3"><div class="psv-rs-dot">03</div><div class="psv-rs-label">Strateji</div></div>'+
+      '</div>'+
+    '</nav>'+
+
+    // ── Main Builder ──
+    '<div class="setup-builder">'+
+
+    // Panel 1: Varlık
+    '<div id="psv-panel-1" class="setup-panel">'+
+    '<div class="setup-filter-layout">'+
+    '<div class="setup-filter-col">'+
+    '<div class="setup-filter-title">Varlık Türü</div>'+
+    '<div class="setup-asset-grid">'+
+      PSV_ASSETS.map(function(a){
+        return a.active
+          ? '<button class="psv-asset-btn setup-asset-card'+(a.key==='hisse'?' on':'')+'" data-asset="'+a.key+'" onclick="psvSetAsset(\''+a.key+'\')">'+
+              '<span class="setup-asset-icon">'+a.icon+'</span>'+
+              '<span class="setup-asset-label">'+a.label+'</span>'+
+            '</button>'
+          : '<div class="setup-asset-card setup-asset-soon">'+
+              '<span class="setup-asset-icon">'+a.icon+'</span>'+
+              '<span class="setup-asset-label">'+a.label+'</span>'+
+              '<span class="psv-asset-badge">yakında</span>'+
+            '</div>';
+      }).join('')+
     '</div>'+
     '</div>'+
-    '<div class="psv-insight" id="psv-insight-1">💡 <b>Borsa Hissesi</b> seçildi — 28 farklı global borsa, gerçek zamanlı finansal veriler.</div>'+
-    '<div class="psv-nav-row">'+
-      '<div></div>'+
-      '<button class="psv-nav-next" id="psv-panel1-next" onclick="psvNextStep()">Borsa Seç →</button>'+
+    '<div class="setup-insight" id="psv-insight-1">💡 <b>Borsa Hissesi</b> seçildi — 28 farklı global borsa, gerçek zamanlı finansal veriler.</div>'+
     '</div>'+
     '</div>'+
 
-    // ── Panel 2: Borsa ──
-    '<div id="psv-panel-2" class="psv-panel" style="display:none">'+
-    '<div class="psv-section">'+
-    '<div class="psv-section-hd">Borsa / Evren</div>'+
-    '<div class="psv-ex-grid" id="psv-ex-grid">'+PSV_MAIN_EX.map(mkExBtn).join('')+'</div>'+
+    // Panel 2: Borsa
+    '<div id="psv-panel-2" class="setup-panel" style="display:none">'+
+    '<div class="setup-filter-layout">'+
+    '<div class="setup-filter-col">'+
+    '<div class="setup-filter-title">Borsa / Evren</div>'+
+    '<div class="setup-market-list psv-ex-grid" id="psv-ex-grid">'+PSV_MAIN_EX.map(mkExBtn).join('')+'</div>'+
     '<div class="psv-ex-extra" id="psv-ex-extra" style="display:none">'+allExKeys.map(mkExBtn).join('')+'</div>'+
     '<button class="psv-show-more" id="psv-ex-more" onclick="psvToggleMoreEx()">+ Diğer Borsalar</button>'+
     '</div>'+
-    '<div class="psv-insight" id="psv-insight-2">💡 Borsa seçin.</div>'+
-    '<div class="psv-nav-row">'+
-      '<button class="psv-nav-back" onclick="psvPrevStep()">← Geri</button>'+
-      '<button class="psv-nav-next" onclick="psvNextStep()">Strateji Seç →</button>'+
+    '<div class="setup-insight" id="psv-insight-2">💡 Borsa seçin.</div>'+
     '</div>'+
     '</div>'+
 
-    // ── Panel 3: Strateji + Tara ──
-    '<div id="psv-panel-3" class="psv-panel" style="display:none">'+
+    // Panel 3: Strateji
+    '<div id="psv-panel-3" class="setup-panel" style="display:none">'+
+    '<div class="setup-filter-layout">'+
+    '<div class="setup-filter-col">'+
 
-    // 01 Yatırımcı Lensleri — hisse
-    '<div class="psv-section psv-family psv-family-gold" id="psv-sec-goat">'+
-    '<div class="psv-section-hd"><span class="psv-fnum">01</span> Yatırımcı Lensleri <span class="psv-opt">isteğe bağlı</span>'+
+    // 01 Yatırımcı Lensleri
+    '<div class="setup-filter-title" id="psv-sec-goat-hd">01 Yatırımcı Lensleri <span class="psv-opt">isteğe bağlı</span>'+
     '<input class="psv-lens-search" id="psv-lens-search" type="text" placeholder="Lens ara…" oninput="psvGoatSearch(this.value)"></div>'+
+    '<div class="psv-section psv-family psv-family-gold" id="psv-sec-goat">'+
     '<div id="psv-goat-groups">'+PSV_GURU_GROUPS.map(mkGoatGroup).join('')+'</div>'+
     '</div>'+
 
-    // 02 Temel — hisse
+    // 02 Temel
+    '<div class="setup-filter-title" id="psv-sec-temel-hd">02 Temel <span class="psv-opt">isteğe bağlı</span></div>'+
     '<div class="psv-section psv-family psv-family-purple" id="psv-sec-temel">'+
-    '<div class="psv-section-hd"><span class="psv-fnum psv-fnum-purple">02</span> Temel <span class="psv-opt">isteğe bağlı</span></div>'+
     '<div class="psv-chip-grid" id="psv-preset-main">'+PSV_MAIN_PRESETS.map(function(k){ return mkFilterCard(k, PRESETS[k], 'psv-preset-card', 'psvTogglePreset'); }).join('')+'</div>'+
     '<div class="psv-chip-extra" id="psv-preset-extra" style="display:none">'+extraPresetKeys.map(function(k){ return mkFilterCard(k, PRESETS[k], 'psv-preset-card', 'psvTogglePreset'); }).join('')+'</div>'+
     (extraPresetKeys.length ? '<button class="psv-show-more" id="psv-preset-more" onclick="psvToggleMorePresets()">+ Daha Fazla ('+extraPresetKeys.length+')</button>' : '')+
     '</div>'+
 
-    // 03 Teknik — hisse
+    // 03 Teknik
+    '<div class="setup-filter-title" id="psv-sec-teknik-hd">03 Teknik <span class="psv-opt">isteğe bağlı</span></div>'+
     '<div class="psv-section psv-family psv-family-teal" id="psv-sec-teknik">'+
-    '<div class="psv-section-hd"><span class="psv-fnum psv-fnum-teal">03</span> Teknik <span class="psv-opt">isteğe bağlı</span></div>'+
     '<div id="psv-tech-groups">'+PSV_TECH_GROUPS.map(mkTechGroup).join('')+'</div>'+
     '</div>'+
 
-    // Kripto Kategori (gizli)
+    // Kripto Kategori (hidden)
     '<div class="psv-section" id="psv-sec-kripto-cat" style="display:none">'+
-    '<div class="psv-section-hd">Kategori</div>'+
+    '<div class="setup-filter-title">Kategori</div>'+
     '<div class="psv-chip-grid">'+
     [
       {cat:'',label:'Tümü'},{cat:'layer-1',label:'Layer 1'},{cat:'layer-2',label:'Layer 2'},
@@ -2196,9 +2227,9 @@ function initPrescanView() {
     }).join('')+
     '</div></div>'+
 
-    // Kripto Strateji (gizli)
+    // Kripto Strateji (hidden)
     '<div class="psv-section" id="psv-sec-kripto-strat" style="display:none">'+
-    '<div class="psv-section-hd">Strateji <span class="psv-opt">isteğe bağlı</span></div>'+
+    '<div class="setup-filter-title">Strateji <span class="psv-opt">isteğe bağlı</span></div>'+
     '<div class="psv-chip-grid">'+
     [
       {preset:'hacim_patlamasi',label:'Hacim Patlaması',desc:'Hacim artışı + günlük yükseliş'},
@@ -2218,15 +2249,22 @@ function initPrescanView() {
     '</div></div>'+
 
     '<div class="psv-criteria-preview" id="psv-criteria-preview" style="display:none"></div>'+
-    '<div class="psv-insight" id="psv-insight-3">💡 Filtre seçmeden tüm evren listelenir. En az bir strateji ekleyerek <b>Eşleşme Düzeyi</b> hesaplatın.</div>'+
+    '<div class="setup-insight" id="psv-insight-3">💡 Filtre seçmeden tüm evren listelenir. En az bir strateji ekleyerek <b>Eşleşme Düzeyi</b> hesaplatın.</div>'+
     '<div class="psv-limit-hint" id="psv-limit-hint">En fazla 4 filtre seçilebilir — yenisini eklemek için mevcut bir seçimi kaldır.</div>'+
-    '<div class="psv-nav-row psv-nav-scan">'+
-      '<button class="psv-nav-back" onclick="psvPrevStep()">← Geri</button>'+
-      '<button class="psv-scan-btn" id="psv-scan-btn" onclick="psvScan()">Hisse Tara</button>'+
+    '</div>'+ // setup-filter-col
+    '</div>'+ // setup-filter-layout
+    '</div>'+ // psv-panel-3
+
+    '</div>'+ // setup-builder
+
+    // ── Bottom Nav ──
+    '<div class="setup-bottom">'+
+      '<button class="setup-bottom-back" id="psv-back-btn" onclick="psvPrevStep()" style="display:none">← Geri</button>'+
+      '<button class="setup-bottom-next" id="psv-next-btn" onclick="psvNextStep()">Devam →</button>'+
+      '<button class="psv-scan-btn setup-bottom-scan" id="psv-scan-btn" onclick="psvScan()" style="display:none">Hisse Tara</button>'+
     '</div>'+
 
-    '</div>'+ // end psv-panel-3
-    '</div>'; // end psv-inner
+    '</div>'; // setup-shell
 
   psvSetExchange(currentExchange);
   psvGoStep(1);
@@ -2236,6 +2274,7 @@ function psvSetExchange(key) {
   currentExchange = key;
   document.querySelectorAll('.exbtn').forEach(function(b){ b.classList.toggle('on', b.dataset.exchange === key); });
   document.querySelectorAll('.psv-ex-btn').forEach(function(b){ b.classList.toggle('on', b.dataset.exchange === key); });
+  document.querySelectorAll('.setup-market').forEach(function(b){ b.classList.toggle('on', b.dataset.exchange === key); });
   var meta = EXCHANGE_META[key];
   if (meta) {
     var tlTab = document.querySelector('.ctab-cur[data-currency="TL"]');
@@ -2266,6 +2305,7 @@ const PSV_ASSETS = [
 function psvSetAsset(key) {
   _psvCurAsset = key;
   document.querySelectorAll('.psv-asset-btn').forEach(function(b){ b.classList.toggle('on', b.dataset.asset === key); });
+  document.querySelectorAll('.setup-asset-card').forEach(function(b){ b.classList.toggle('on', b.dataset.asset === key); });
   var isKripto = key === 'kripto';
   // Panel 3: toggle hisse vs kripto sections
   ['psv-sec-goat','psv-sec-temel','psv-sec-teknik'].forEach(function(id){
@@ -2463,7 +2503,19 @@ function psvGoStep(n) {
       if (i < _psvStep) railStep.classList.add('done');
       else if (i === _psvStep) railStep.classList.add('active');
     }
+    // New mockup: setup-step-nav on class
+    var stepNav = document.querySelector('.setup-step-nav[data-step="' + i + '"]');
+    if (stepNav) {
+      stepNav.classList.toggle('on', i <= _psvStep);
+    }
   });
+  // Setup-bottom back/next/scan buttons
+  var backBtn = document.getElementById('psv-back-btn');
+  var nextBtn = document.getElementById('psv-next-btn');
+  var scanBtn = document.getElementById('psv-scan-btn');
+  if (backBtn) backBtn.style.display = _psvStep > 1 ? '' : 'none';
+  if (nextBtn) nextBtn.style.display = _psvStep < 3 ? '' : 'none';
+  if (scanBtn) scanBtn.style.display = _psvStep === 3 ? '' : 'none';
   _psvUpdateInsight(_psvStep);
   // Scroll to top of prescan-view
   var el = document.getElementById('prescan-view');
@@ -2566,12 +2618,18 @@ function openPrescanView() {
   initPrescanView();
   var el = document.getElementById('prescan-view');
   if (!el) return;
-  // Mevcut sonuç varsa geri dönüş butonu göster
-  var cb = document.getElementById('psv-close-btn');
-  if (cb) cb.style.display = (typeof allData !== 'undefined' && allData.length > 0) ? '' : 'none';
-  el.style.transition = 'none';
-  el.style.opacity = '1';
-  el.style.display = 'flex';
+  // New page system: navigate to scan page first
+  if (document.getElementById('page-scan')) {
+    showPage('page-scan');
+    showState('prescan-view');
+  } else {
+    // Legacy fallback
+    var cb = document.getElementById('psv-close-btn');
+    if (cb) cb.style.display = (typeof allData !== 'undefined' && allData.length > 0) ? '' : 'none';
+    el.style.transition = 'none';
+    el.style.opacity = '1';
+    el.style.display = 'flex';
+  }
 }
 
 function closePrescanView() {
@@ -4370,10 +4428,22 @@ function copyWallet(btn, addr){
 // UTILS
 // ═══════════════════════════════════════════
 function showState(id){
-  ['empty','loading','errstate','twrap'].forEach(s=>{
-    const el = document.getElementById(s);
-    el.style.display = s===id ? (s==='twrap'?'block':'flex') : 'none';
+  ['empty','loading','errstate','twrap','prescan-view'].forEach(function(s){
+    var el = document.getElementById(s);
+    if (!el) return;
+    var show = s === id;
+    el.style.display = show ? (s==='twrap'?'block': s==='prescan-view'?'':'flex') : 'none';
   });
+  var scanHead = document.getElementById('df-scan-head');
+  if (scanHead) scanHead.style.display = (id === 'prescan-view') ? '' : 'none';
+  // Hide screener-layout when showing prescan (prescan-view floats on scan-page canvas)
+  var screenerLayout = document.getElementById('screener-layout');
+  if (screenerLayout) {
+    screenerLayout.style.display = (id === 'prescan-view') ? 'none' : '';
+  }
+  // Toggle scan-page scroll mode for prescan (canvas needs to be scrollable)
+  var scanPage = document.querySelector('.scan-page');
+  if (scanPage) scanPage.classList.toggle('psv-active', id === 'prescan-view');
   const smEl = document.getElementById('scan-summary');
   if (smEl) smEl.style.display = id === 'twrap' ? 'flex' : 'none';
   const nsbEl = document.getElementById('new-scan-btn');
@@ -5161,10 +5231,19 @@ function showHomepage() {
 function _doShowHomepage() {
   hideAnalizPage();
   var _pp=document.getElementById('profile-page'); if(_pp){_pp.style.display='none';_pp.classList.remove('on');}
-  document.getElementById('homepage').style.display = 'flex';
-  document.getElementById('screener-layout').style.display = 'none';
-  document.getElementById('nav-home').classList.add('active');
-  document.getElementById('nav-tarama').classList.remove('active');
+  // New page system
+  if (document.getElementById('page-home')) {
+    showPage('page-home');
+    clearFilters();
+    if(window.location.pathname !== '/') history.pushState({page:'home'}, '', '/');
+    if (typeof loadRecentScans === 'function') loadRecentScans();
+    return;
+  }
+  // Legacy fallback
+  var hp = document.getElementById('homepage'); if (hp) hp.style.display = 'flex';
+  var sl = document.getElementById('screener-layout'); if (sl) sl.style.display = 'none';
+  var nh = document.getElementById('nav-home'); if (nh) nh.classList.add('active');
+  var nt = document.getElementById('nav-tarama'); if (nt) nt.classList.remove('active');
   var na = document.getElementById('nav-analiz'); if(na) na.classList.remove('active');
   var dnh = document.getElementById('dnav-home'); if(dnh) dnh.classList.add('active');
   var dnt = document.getElementById('dnav-tarama'); if(dnt) dnt.classList.remove('active');
@@ -5656,7 +5735,12 @@ function showScreener() {
   _doShowScreener();
 }
 function showScreenerOrPrescan() {
-  // Prescan üstte açılacak; alttaki sidebar durumuna dokunma (geri dönüşte kayma olmasın)
+  if (document.getElementById('page-scan')) {
+    showPage('page-scan');
+    openPrescanView();
+    return;
+  }
+  // Legacy fallback
   _doShowScreener(true);
   openScanModeChoice();
 }
@@ -5665,23 +5749,30 @@ function _doShowScreener(keepSidebar) {
   if (!keepSidebar) setTimeout(initSidebarState, 0);
   var _pp=document.getElementById('profile-page'); if(_pp){_pp.style.display='none';_pp.classList.remove('on');}
   var na = document.getElementById('nav-analiz'); if(na) na.classList.remove('active');
-  // Disclaimer kontrolü
+  // New page system
+  if (document.getElementById('page-scan')) {
+    showPage('page-scan');
+    if (!_activeAsset) _updateOnboarding('hisse');
+    if(window.location.pathname !== '/screener') history.pushState({page:'screener'}, '', '/screener');
+    return;
+  }
+  // Legacy: Disclaimer kontrolü
   if (!disclaimerAccepted && !localStorage.getItem('df_disclaimer_v2')) {
     showDisclaimerModal();
-    document.getElementById('homepage').style.display = 'none';
-    document.getElementById('screener-layout').style.display = 'flex';
-    document.getElementById('nav-home').classList.remove('active');
-    document.getElementById('nav-tarama').classList.add('active');
+    var hp0 = document.getElementById('homepage'); if(hp0) hp0.style.display = 'none';
+    var sl0 = document.getElementById('screener-layout'); if(sl0) sl0.style.display = 'flex';
+    var nh0 = document.getElementById('nav-home'); if(nh0) nh0.classList.remove('active');
+    var nt0 = document.getElementById('nav-tarama'); if(nt0) nt0.classList.add('active');
     var dnh2=document.getElementById('dnav-home');if(dnh2)dnh2.classList.remove('active');
     var dnt2=document.getElementById('dnav-tarama');if(dnt2)dnt2.classList.add('active');
     var ts = document.querySelector('.tsearch');
     if(ts) ts.style.display = '';
     return;
   }
-  document.getElementById('homepage').style.display = 'none';
-  document.getElementById('screener-layout').style.display = 'flex';
-  document.getElementById('nav-home').classList.remove('active');
-  document.getElementById('nav-tarama').classList.add('active');
+  var hp = document.getElementById('homepage'); if(hp) hp.style.display = 'none';
+  var sl = document.getElementById('screener-layout'); if(sl) sl.style.display = 'flex';
+  var nh = document.getElementById('nav-home'); if(nh) nh.classList.remove('active');
+  var nt = document.getElementById('nav-tarama'); if(nt) nt.classList.add('active');
   var dnh3=document.getElementById('dnav-home');if(dnh3)dnh3.classList.remove('active');
   var dnt3=document.getElementById('dnav-tarama');if(dnt3)dnt3.classList.add('active');
   if (!_activeAsset) _updateOnboarding('hisse');
