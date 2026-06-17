@@ -2130,12 +2130,15 @@ function initPrescanView() {
     '<div class="setup-shell">'+
     // ── Left Rail ──
     '<nav class="setup-rail">'+
-      '<div class="setup-eyebrow"><span class="tlogo-mark" style="width:20px;height:20px;font-size:11px;display:inline-flex;align-items:center;justify-content:center;border-radius:4px;background:var(--accent,#E8D5A8);color:#16131F;font-weight:700;margin-right:6px;">D</span>DeepFin</div>'+
+      '<div class="setup-eyebrow">Tarama Kurulumu</div>'+
+      '<h2>3 adımda stratejine uygun evreni kur.</h2>'+
+      '<p>Varlık türü, evren ve filtre aileleri birbirinden ayrılır. Seçim tamamlanınca yalnızca bu bağlama uyan adaylar listelenir.</p>'+
       '<div class="setup-progress">'+
-        '<button class="setup-step-nav on" data-step="1">01 Varlık</button>'+
-        '<button class="setup-step-nav" data-step="2">02 Borsa</button>'+
-        '<button class="setup-step-nav" data-step="3">03 Strateji</button>'+
+        '<button class="setup-step-nav on" data-step="1" onclick="psvGoStep(1)"><b>1</b><span><small>Varlık Türü</small><em>Hisse, kripto evreni</em></span></button>'+
+        '<button class="setup-step-nav" data-step="2" onclick="psvGoStep(2)"><b>2</b><span><small>Ülke / Borsa / Evren</small><em>Piyasa kapsamı</em></span></button>'+
+        '<button class="setup-step-nav" data-step="3" onclick="psvGoStep(3)"><b>3</b><span><small>Filtreler</small><em>Strateji ve kriterler</em></span></button>'+
       '</div>'+
+      '<div class="setup-summary"><span>Aktif Seçim</span><strong id="psv-summary">Hisse · BIST</strong></div>'+
       // Legacy rail for backward-compat JS
       '<div class="psv-wizard-rail" style="display:none">'+
         '<div class="psv-rail-step active" data-step="1"><div class="psv-rs-dot">01</div><div class="psv-rs-label">Varlık</div></div>'+
@@ -2151,43 +2154,31 @@ function initPrescanView() {
 
     // Panel 1: Varlık
     '<div id="psv-panel-1" class="setup-panel">'+
-    '<div class="setup-filter-layout">'+
-    '<div class="setup-filter-col">'+
-    '<div class="setup-filter-title">Varlık Türü</div>'+
+    '<div class="setup-panel-head"><span>Kapsam</span><div><h3>Varlık türünü seç</h3><p>İlk karar, devamındaki ülke/borsa veya kripto evreni seçeneklerini belirler.</p></div></div>'+
     '<div class="setup-asset-grid">'+
-      PSV_ASSETS.map(function(a){
-        return a.active
-          ? '<button class="psv-asset-btn setup-asset-card'+(a.key==='hisse'?' on':'')+'" data-asset="'+a.key+'" onclick="psvSetAsset(\''+a.key+'\')">'+
-              '<span class="setup-asset-icon">'+a.icon+'</span>'+
-              '<span class="setup-asset-label">'+a.label+'</span>'+
-            '</button>'
-          : '<div class="setup-asset-card setup-asset-soon">'+
-              '<span class="setup-asset-icon">'+a.icon+'</span>'+
-              '<span class="setup-asset-label">'+a.label+'</span>'+
-              '<span class="psv-asset-badge">yakında</span>'+
-            '</div>';
-      }).join('')+
+      '<button class="psv-asset-btn setup-asset-card on" data-asset="hisse" onclick="psvSetAsset(\'hisse\')">'+
+        '<strong>Hisse Senedi</strong><span>Ülke ve borsa bazlı şirket evreni</span><small>Aktif</small>'+
+      '</button>'+
+      '<button class="psv-asset-btn setup-asset-card" data-asset="kripto" onclick="psvSetAsset(\'kripto\')">'+
+        '<strong>Kripto</strong><span>Coin, token ve kategori evreni</span><small>Aktif</small>'+
+      '</button>'+
+      '<div class="setup-asset-card roadmap"><strong>Yol haritası</strong><span>Fon, ETF ve emtia evrenleri sonraki fazda.</span><small>Yakında</small></div>'+
     '</div>'+
-    '</div>'+
-    '<div class="setup-insight" id="psv-insight-1">💡 <b>Borsa Hissesi</b> seçildi — 28 farklı global borsa, gerçek zamanlı finansal veriler.</div>'+
-    '</div>'+
+    '<div class="setup-insight" id="psv-insight-1"></div>'+
     '</div>'+
 
     // Panel 2: Borsa
     '<div id="psv-panel-2" class="setup-panel" style="display:none">'+
-    '<div class="setup-filter-layout">'+
-    '<div class="setup-filter-col">'+
-    '<div class="setup-filter-title">Borsa / Evren</div>'+
-    '<div class="setup-market-list psv-ex-grid" id="psv-ex-grid">'+PSV_MAIN_EX.map(mkExBtn).join('')+'</div>'+
+    '<div class="setup-panel-head"><span>Evren</span><div><h3>Ülke, borsa veya evreni seç</h3><p>Sonuçlar yalnızca seçilen piyasa ve borsa evreni içinden gelir.</p></div></div>'+
+    '<div class="psv-ex-grid" id="psv-ex-grid">'+PSV_MAIN_EX.map(mkExBtn).join('')+'</div>'+
     '<div class="psv-ex-extra" id="psv-ex-extra" style="display:none">'+allExKeys.map(mkExBtn).join('')+'</div>'+
     '<button class="psv-show-more" id="psv-ex-more" onclick="psvToggleMoreEx()">+ Diğer Borsalar</button>'+
-    '</div>'+
-    '<div class="setup-insight" id="psv-insight-2">💡 Borsa seçin.</div>'+
-    '</div>'+
+    '<div class="setup-insight" id="psv-insight-2"></div>'+
     '</div>'+
 
     // Panel 3: Strateji
     '<div id="psv-panel-3" class="setup-panel" style="display:none">'+
+    '<div class="setup-panel-head"><span>Kriter</span><div><h3>Filtreleri ekle</h3><p>Yatırımcı lensleri, temel kriterler ve teknik sinyaller ayrı çalışır; sonuçta yalnızca eşleşme gerekçesi üretir.</p></div></div>'+
     '<div class="setup-filter-layout">'+
     '<div class="setup-filter-col">'+
 
@@ -2249,7 +2240,7 @@ function initPrescanView() {
     '</div></div>'+
 
     '<div class="psv-criteria-preview" id="psv-criteria-preview" style="display:none"></div>'+
-    '<div class="setup-insight" id="psv-insight-3">💡 Filtre seçmeden tüm evren listelenir. En az bir strateji ekleyerek <b>Eşleşme Düzeyi</b> hesaplatın.</div>'+
+    '<div class="setup-insight" id="psv-insight-3"></div>'+
     '<div class="psv-limit-hint" id="psv-limit-hint">En fazla 4 filtre seçilebilir — yenisini eklemek için mevcut bir seçimi kaldır.</div>'+
     '</div>'+ // setup-filter-col
     '</div>'+ // setup-filter-layout
@@ -2260,7 +2251,7 @@ function initPrescanView() {
     // ── Bottom Nav ──
     '<div class="setup-bottom">'+
       '<button class="setup-bottom-back" id="psv-back-btn" onclick="psvPrevStep()" style="display:none">← Geri</button>'+
-      '<button class="setup-bottom-next" id="psv-next-btn" onclick="psvNextStep()">Devam →</button>'+
+      '<button class="setup-bottom-next" id="psv-next-btn" onclick="psvNextStep()">Devam Et →</button>'+
       '<button class="psv-scan-btn setup-bottom-scan" id="psv-scan-btn" onclick="psvScan()" style="display:none">Hisse Tara</button>'+
     '</div>'+
 
@@ -2287,6 +2278,7 @@ function psvSetExchange(key) {
     }
   }
   _psvUpdateInsight(2);
+  _psvUpdateSummary();
 }
 
 // Varlık sınıfları — prescan yatay kaydırmalı satır
@@ -2326,11 +2318,11 @@ function psvSetAsset(key) {
       _psvUpdateSelState();
     }
   }
-  // Update panel 1 nav label and insight, then advance to step 2 (or 3 for kripto)
-  var navBtn = document.getElementById('psv-panel1-next');
-  if (navBtn) navBtn.textContent = isKripto ? 'Strateji Seç →' : 'Borsa Seç →';
+  // Update step-2 nav label (Borsa vs Strateji) — kripto borsa adımını atlar
+  var step2Nav = document.querySelector('.setup-step-nav[data-step="2"]');
+  if (step2Nav) step2Nav.style.display = isKripto ? 'none' : '';
   _psvUpdateInsight(1);
-  if (_psvStep === 1) psvNextStep();
+  _psvUpdateSummary();
 }
 
 function _psvUpdateKriptoBtn() {
@@ -2404,6 +2396,7 @@ function _psvUpdateSelState() {
   var btn = document.getElementById('psv-scan-btn');
   if (btn) btn.textContent = total > 0 ? total + ' Filtre ile Tara' : (_psvCurAsset === 'kripto' ? 'Kripto Tara' : 'Hisse Tara');
   _psvUpdateInsight(3);
+  _psvUpdateSummary();
   _psvUpdateCriteriaPreview();
 }
 
@@ -2472,24 +2465,49 @@ function psvFeedback(msg) {
 function _psvUpdateInsight(step) {
   var box = document.getElementById('psv-insight-' + step);
   if (!box) return;
-  var msg = '';
+  var label = '', title = '', body = '';
   if (step === 1) {
-    if (_psvCurAsset === 'kripto') msg = '<b>Kripto</b> seçildi — CoinGecko ile 2000+ kripto para taranabilir.';
-    else msg = '<b>Borsa Hissesi</b> seçildi — 28 farklı global borsa, gerçek zamanlı finansal veriler.';
+    label = 'Bu seçim neyi değiştirir?';
+    if (_psvCurAsset === 'kripto') {
+      title = 'Kripto evreni seçildi.';
+      body  = 'Sonuçlar coin, token ve kategori bazlı evrenden gelir. Likidite, piyasa değeri, volatilite ve teknik sinyallerle daraltılır.';
+    } else {
+      title = 'Hisse senedi evreni seçildi.';
+      body  = 'Sonuçlar ülke/borsa bazlı şirket evreninden gelir. Kârlılık, borçluluk, değerleme ve fiyat davranışı gibi kriterlerle daraltılır.';
+    }
   } else if (step === 2) {
     var exMeta = (typeof EXCHANGE_META !== 'undefined') ? EXCHANGE_META[currentExchange] : null;
     var exName = exMeta ? exMeta.name : (currentExchange || 'BIST').toUpperCase();
     var etaSec = (typeof EXCHANGE_ETA !== 'undefined' && EXCHANGE_ETA[currentExchange]) ? EXCHANGE_ETA[currentExchange] : 5;
-    msg = '<b>' + esc(exName) + '</b> seçildi — tarama süresi yaklaşık <b>' + etaSec + ' saniye</b>.';
+    label = 'Evren kapsamı';
+    title = esc(exName) + ' evreni taranır.';
+    body  = 'Yalnızca seçilen piyasa içindeki adaylar listelenir. Tarama süresi yaklaşık ' + etaSec + ' saniye. Farklı evren, farklı aday listesi demektir.';
   } else if (step === 3) {
     var total = _psvTotalSel();
+    label = 'Filtre mantığı';
     if (total === 0) {
-      msg = 'Filtre seçmeden tüm evren listelenir. En az bir strateji ekleyerek <b>Uyum Puanı</b> hesaplatın.';
+      title = 'Henüz filtre seçilmedi.';
+      body  = 'Filtre seçmeden tüm evren listelenir. En az bir strateji ekleyerek her aday için Uyum Puanı hesaplatın.';
     } else {
-      msg = '<b>' + total + '</b> filtre aktif — tarama tamamlandığında her hisse için Uyum Puanı hesaplanacak.';
+      title = total + ' filtre aktif.';
+      body  = 'Yatırımcı lensleri, temel kriterler ve teknik sinyaller ayrı puanlanır; sonuç listesi yalnızca eşleşme düzeyini gösterir.';
     }
   }
-  box.innerHTML = '💡 ' + msg;
+  box.innerHTML = '<span>' + label + '</span><strong>' + title + '</strong><p>' + body + '</p>';
+}
+
+function _psvUpdateSummary() {
+  var el = document.getElementById('psv-summary');
+  if (!el) return;
+  var assetLabel = _psvCurAsset === 'kripto' ? 'Kripto' : 'Hisse';
+  var exMeta = (typeof EXCHANGE_META !== 'undefined') ? EXCHANGE_META[currentExchange] : null;
+  var exName = _psvCurAsset === 'kripto'
+    ? 'Tüm Kripto'
+    : (exMeta ? exMeta.name : (currentExchange || 'BIST').toUpperCase());
+  var parts = [assetLabel, exName];
+  var total = _psvTotalSel();
+  if (total > 0) parts.push(total + ' filtre');
+  el.textContent = parts.join(' · ');
 }
 
 function psvGoStep(n) {

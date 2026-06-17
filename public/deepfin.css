@@ -2549,6 +2549,40 @@ body{padding-top:60px}
 .psv-scan-btn.setup-bottom-scan{border:0;border-radius:13px;padding:12px 22px;background:var(--ink);color:var(--gold);font-size:13.5px;font-weight:700;cursor:pointer;transition:.14s}
 .psv-scan-btn.setup-bottom-scan:hover{background:#17131F}
 
+/* ── SETUP RAIL CONTENT (dark rail headline + rich stepper + summary) ── */
+.setup-rail h2{font-size:22px;line-height:1.16;letter-spacing:-.65px;color:rgba(238,228,208,.94);max-width:220px;margin-bottom:10px}
+.setup-rail>p{font-size:12.8px;line-height:1.7;color:rgba(238,228,208,.52);margin-bottom:28px}
+.setup-step-nav{align-items:flex-start}
+.setup-step-nav b{width:30px;height:30px;border-radius:10px;background:rgba(238,228,208,.08);border:1px solid rgba(238,228,208,.11);display:grid;place-items:center;font-family:var(--mono);font-size:11px;letter-spacing:-.2px;color:rgba(238,228,208,.58);flex:0 0 30px}
+.setup-step-nav.on b{background:var(--gold);color:#17131F;border-color:var(--gold)}
+.setup-step-nav>span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.setup-step-nav>span small{font-size:12.4px;font-weight:780;letter-spacing:-.1px;color:inherit;white-space:nowrap}
+.setup-step-nav>span em{font-style:normal;font-size:10.6px;font-weight:520;color:rgba(238,228,208,.40);line-height:1.25}
+.setup-step-nav.on>span em{color:rgba(238,228,208,.62)}
+.setup-summary{margin-top:auto;border-top:1px solid rgba(238,228,208,.12);padding-top:18px}
+.setup-summary>span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:rgba(232,213,168,.56);font-weight:750;margin-bottom:6px}
+.setup-summary strong{font-size:12px;line-height:1.45;color:rgba(238,228,208,.86)}
+
+/* ── SETUP PANEL HEAD (numbered eyebrow + title + desc) ── */
+.setup-panel-head{display:flex;gap:13px;align-items:center;margin-bottom:8px}
+.setup-panel-head>span{flex:0 0 auto;border-radius:999px;padding:7px 11px;font-family:var(--mono);font-size:9.8px;letter-spacing:.105em;text-transform:uppercase;line-height:1;background:#F8F1E7;border:1px solid #E6DAC7;color:#7D6A48;font-weight:800}
+.setup-panel-head h3{font-size:21px;letter-spacing:-.7px;line-height:1.15;color:#101A2C}
+.setup-panel-head p{font-size:13px;line-height:1.58;color:#6F685F;margin-top:5px;max-width:760px}
+
+/* ── SETUP ASSET CARDS (mockup content: name + desc + status) ── */
+.setup-asset-grid{grid-template-columns:1fr 1fr;gap:14px}
+.setup-asset-card{border-radius:18px;padding:18px;min-height:114px}
+.setup-asset-card strong{font-size:14px;color:var(--navy);display:block;letter-spacing:-.2px}
+.setup-asset-card span{font-size:11.6px;color:#77736A;display:block;line-height:1.5;margin-top:5px;max-width:260px}
+.setup-asset-card small{font-size:10px;font-weight:750;color:var(--purple);margin-top:10px;display:block;opacity:.72}
+.setup-asset-card.roadmap{opacity:.55;cursor:default;background:#FAFAF6;pointer-events:none}
+.setup-asset-card.roadmap small{color:#9A9184}
+
+/* ── SETUP INSIGHT (labeled explainer box, no emoji) ── */
+.setup-insight>span{display:block;font-size:9.8px;text-transform:uppercase;letter-spacing:.1em;color:#8C7042;font-weight:850;margin-bottom:6px}
+.setup-insight strong{display:block;font-size:13.5px;color:var(--navy);margin-bottom:5px;letter-spacing:-.15px}
+.setup-insight p{font-size:12.5px;line-height:1.62;color:#71695F}
+
 /* ── WORKBAR (dark canvas results bar) ────────────────────────── */
 .workbar-kicker{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.13em;color:var(--purple);font-weight:850}
 
