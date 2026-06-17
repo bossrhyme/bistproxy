@@ -2106,6 +2106,17 @@ function initPrescanView() {
   var allExKeys       = Object.keys(EXCHANGE_META).filter(function(k){ return PSV_MAIN_EX.indexOf(k)===-1; });
   var extraPresetKeys = Object.keys(PRESETS).filter(function(k){ return PSV_MAIN_PRESETS.indexOf(k)===-1; });
 
+  function mkFilterOpt(key, data, type) {
+    var name = (data.label || key).split(' — ')[0].split(' (')[0];
+    var code = key.replace(/_/g,'').slice(0,4).toUpperCase();
+    var desc = (data.desc || '').split('.')[0];
+    return '<button class="setup-filter-opt" data-type="'+esc(type)+'" data-key="'+esc(key)+'" onclick="psvPickFilter(\''+type+'\',\''+key+'\')">'+
+      '<code>'+esc(code)+'</code>'+
+      '<strong>'+esc(name)+'</strong>'+
+      '<span>'+esc(desc)+'</span>'+
+      '</button>';
+  }
+
   function mkGoatGroup(grp) {
     var vitrinHtml = grp.vitrin.map(mkGoatCard).join('');
     var extraHtml  = grp.extra.length
@@ -2189,37 +2200,33 @@ function initPrescanView() {
     '<div class="setup-insight" id="psv-insight-2"></div>'+
     '</div>'+
 
-    // Panel 3: Strateji
+    // Panel 3: Filtreler — 3 column layout
     '<div id="psv-panel-3" class="setup-panel" style="display:none">'+
-    '<div class="setup-panel-head"><span>Kriter</span><div><h3>Filtreleri ekle</h3><p>Yatırımcı lensleri, temel kriterler ve teknik sinyaller ayrı çalışır; sonuçta yalnızca eşleşme gerekçesi üretir.</p></div></div>'+
+    '<div class="setup-panel-head"><span>Kriter</span><div><h3>Kriter katmanlarını ekle</h3><p>Yatırımcı filtresi, temel kriterler ve teknik sinyaller ayrı çalışır; sonuçta yalnızca eşleşme gerekçesi üretir.</p></div></div>'+
+
+    // Hisse filter columns (hidden when kripto)
+    '<div id="psv-hisse-filters">'+
+    '<div class="setup-layer-note"><strong>Katman mantığı</strong><span>Her aile ayrı bir gerekçe üretir. Adaylar, bu gerekçelerin birlikte okunduğu eşleşme düzeyine göre listelenir.</span></div>'+
     '<div class="setup-filter-layout">'+
     '<div class="setup-filter-col">'+
-
-    // 01 Yatırımcı Lensleri
-    '<div class="setup-filter-title" id="psv-sec-goat-hd">01 Yatırımcı Lensleri <span class="psv-opt">isteğe bağlı</span>'+
-    '<input class="psv-lens-search" id="psv-lens-search" type="text" placeholder="Lens ara…" oninput="psvGoatSearch(this.value)"></div>'+
-    '<div class="psv-section psv-family psv-family-gold" id="psv-sec-goat">'+
-    '<div id="psv-goat-groups">'+PSV_GURU_GROUPS.map(mkGoatGroup).join('')+'</div>'+
+      '<div class="setup-filter-title"><span>01</span>Yatırımcı Filtresi<small>strateji paketi</small></div>'+
+      PSV_MAIN_GOATS.map(function(k){ var g=GURUS[k]; return g?mkFilterOpt(k,g,'goat'):''; }).join('')+
     '</div>'+
-
-    // 02 Temel
-    '<div class="setup-filter-title" id="psv-sec-temel-hd">02 Temel <span class="psv-opt">isteğe bağlı</span></div>'+
-    '<div class="psv-section psv-family psv-family-purple" id="psv-sec-temel">'+
-    '<div class="psv-chip-grid" id="psv-preset-main">'+PSV_MAIN_PRESETS.map(function(k){ return mkFilterCard(k, PRESETS[k], 'psv-preset-card', 'psvTogglePreset'); }).join('')+'</div>'+
-    '<div class="psv-chip-extra" id="psv-preset-extra" style="display:none">'+extraPresetKeys.map(function(k){ return mkFilterCard(k, PRESETS[k], 'psv-preset-card', 'psvTogglePreset'); }).join('')+'</div>'+
-    (extraPresetKeys.length ? '<button class="psv-show-more" id="psv-preset-more" onclick="psvToggleMorePresets()">+ Daha Fazla ('+extraPresetKeys.length+')</button>' : '')+
+    '<div class="setup-filter-col">'+
+      '<div class="setup-filter-title"><span>02</span>Temel Kriterler<small>değer / büyüme / sağlamlık</small></div>'+
+      PSV_MAIN_PRESETS.map(function(k){ var p=PRESETS[k]; return p?mkFilterOpt(k,p,'preset'):''; }).join('')+
     '</div>'+
-
-    // 03 Teknik
-    '<div class="setup-filter-title" id="psv-sec-teknik-hd">03 Teknik <span class="psv-opt">isteğe bağlı</span></div>'+
-    '<div class="psv-section psv-family psv-family-teal" id="psv-sec-teknik">'+
-    '<div id="psv-tech-groups">'+PSV_TECH_GROUPS.map(mkTechGroup).join('')+'</div>'+
+    '<div class="setup-filter-col">'+
+      '<div class="setup-filter-title"><span>03</span>Teknik Sinyaller<small>sinyal ve fiyat davranışı</small></div>'+
+      PSV_MAIN_TECH.map(function(k){ var t=TECH_PRESETS[k]; return t?mkFilterOpt(k,t,'tech'):''; }).join('')+
     '</div>'+
+    '</div>'+ // setup-filter-layout
+    '</div>'+ // psv-hisse-filters
 
-    // Kripto Kategori (hidden)
-    '<div class="psv-section" id="psv-sec-kripto-cat" style="display:none">'+
-    '<div class="setup-filter-title">Kategori</div>'+
-    '<div class="psv-chip-grid">'+
+    // Kripto Kategori (hidden by default, shown when kripto selected)
+    '<div id="psv-sec-kripto-cat" style="display:none">'+
+    '<div class="setup-layer-note"><strong>Kategori</strong><span>Kripto evreni içinde işlem görmek istediğiniz kategoriyi seçin.</span></div>'+
+    '<div class="psv-chip-grid" style="padding:16px">'+
     [
       {cat:'',label:'Tümü'},{cat:'layer-1',label:'Layer 1'},{cat:'layer-2',label:'Layer 2'},
       {cat:'decentralized-finance-defi',label:'DeFi'},{cat:'meme-token',label:'Meme'},
@@ -2231,10 +2238,9 @@ function initPrescanView() {
     }).join('')+
     '</div></div>'+
 
-    // Kripto Strateji (hidden)
-    '<div class="psv-section" id="psv-sec-kripto-strat" style="display:none">'+
-    '<div class="setup-filter-title">Strateji <span class="psv-opt">isteğe bağlı</span></div>'+
-    '<div class="psv-chip-grid">'+
+    // Kripto Strateji (hidden by default)
+    '<div id="psv-sec-kripto-strat" style="display:none">'+
+    '<div class="psv-chip-grid" style="padding:0 16px 16px">'+
     [
       {preset:'hacim_patlamasi',label:'Hacim Patlaması',desc:'Hacim artışı + günlük yükseliş'},
       {preset:'rsi_dip',label:'RSI Dip',desc:'RSI < 35, aşırı satım bölgesi'},
@@ -2252,11 +2258,8 @@ function initPrescanView() {
     }).join('')+
     '</div></div>'+
 
-    '<div class="psv-criteria-preview" id="psv-criteria-preview" style="display:none"></div>'+
     '<div class="setup-insight" id="psv-insight-3"></div>'+
-    '<div class="psv-limit-hint" id="psv-limit-hint">En fazla 4 filtre seçilebilir — yenisini eklemek için mevcut bir seçimi kaldır.</div>'+
-    '</div>'+ // setup-filter-col
-    '</div>'+ // setup-filter-layout
+    '<div class="psv-limit-hint" id="psv-limit-hint" style="display:none"></div>'+
     '</div>'+ // psv-panel-3
 
     '</div>'+ // setup-builder
@@ -2313,15 +2316,12 @@ function psvSetAsset(key) {
   document.querySelectorAll('.psv-asset-btn').forEach(function(b){ b.classList.toggle('on', b.dataset.asset === key); });
   document.querySelectorAll('.setup-asset-card').forEach(function(b){ b.classList.toggle('on', b.dataset.asset === key); });
   var isKripto = key === 'kripto';
-  // Panel 3: toggle hisse vs kripto sections
-  ['psv-sec-goat','psv-sec-temel','psv-sec-teknik'].forEach(function(id){
-    var s = document.getElementById(id); if (s) s.style.display = isKripto ? 'none' : '';
-  });
+  // Panel 3: toggle hisse 3-column layout vs kripto sections
+  var hisseFilters = document.getElementById('psv-hisse-filters');
+  if (hisseFilters) hisseFilters.style.display = isKripto ? 'none' : '';
   ['psv-sec-kripto-cat','psv-sec-kripto-strat'].forEach(function(id){
     var s = document.getElementById(id); if (s) s.style.display = isKripto ? '' : 'none';
   });
-  var hint = document.getElementById('psv-limit-hint');
-  if (hint) hint.style.display = isKripto ? 'none' : '';
   var btn = document.getElementById('psv-scan-btn');
   if (btn) {
     if (isKripto) {
@@ -2596,6 +2596,33 @@ function psvToggleTech(key) {
   _psvUpdateSelState();
   var t = (typeof TECH_PRESETS !== 'undefined') ? TECH_PRESETS[key] : null;
   if (adding && t) psvFeedback('✓ ' + t.label + ' teknik sinyali eklendi');
+}
+
+function psvPickFilter(type, key) {
+  if (type === 'goat') {
+    var wasOn = _psvActiveGoats.has(key);
+    _psvActiveGoats.clear();
+    if (!wasOn) _psvActiveGoats.add(key);
+    document.querySelectorAll('.setup-filter-opt[data-type="goat"]').forEach(function(b){
+      b.classList.toggle('on', b.dataset.key === key && _psvActiveGoats.has(key));
+    });
+  } else if (type === 'preset') {
+    var wasOn = _psvActivePresets.has(key);
+    _psvActivePresets.clear();
+    if (!wasOn) _psvActivePresets.add(key);
+    document.querySelectorAll('.setup-filter-opt[data-type="preset"]').forEach(function(b){
+      b.classList.toggle('on', b.dataset.key === key && _psvActivePresets.has(key));
+    });
+  } else if (type === 'tech') {
+    var wasOn = _psvActiveTech.has(key);
+    _psvActiveTech.clear();
+    if (!wasOn) _psvActiveTech.add(key);
+    document.querySelectorAll('.setup-filter-opt[data-type="tech"]').forEach(function(b){
+      b.classList.toggle('on', b.dataset.key === key && _psvActiveTech.has(key));
+    });
+  }
+  _psvUpdateSelState();
+  _psvUpdateInsight(3);
 }
 
 function psvToggleLgMore(btn) {
