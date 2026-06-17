@@ -2052,6 +2052,18 @@ function _isoFromFlag(emoji) {
   return '';
 }
 
+// Prescan evren satırı: kısa ülke/borsa rozeti (ISO kodu özel durumlar için ezilir)
+const EXCHANGE_BADGE = { sp500:'S&P', nasdaq:'US', nyse:'US', china:'CN', uae:'AE' };
+// Prescan evren satırı: yaklaşık enstrüman sayısı (evren büyüklüğü göstergesi)
+const EXCHANGE_COUNT = {
+  bist:'568', nasdaq:'3K+', nyse:'2K+', sp500:'500', dax:'40', lse:'350',
+  nikkei:'225', krx:'2.5K', moex:'200', france:'120', amsterdam:'130',
+  brussels:'130', lisbon:'40', dublin:'30', oslo:'200', milan:'220',
+  tsx:'1.5K', twse:'900', b3:'400', hkex:'2.5K', china:'5K+', saudi:'230',
+  switzerland:'250', australia:'2K', southafrica:'300', sweden:'380',
+  india:'2K+', uae:'70'
+};
+
 function initPrescanView() {
   var el = document.getElementById('prescan-view');
   if (!el) return;
@@ -2059,13 +2071,15 @@ function initPrescanView() {
   function mkExBtn(key) {
     var m = EXCHANGE_META[key]; if (!m) return '';
     var iso = _isoFromFlag(m.flag);
-    var flagHtml = iso
-      ? '<img class="psv-ex-flag-img" src="https://flagcdn.com/w40/'+iso+'.png" alt="'+iso+'" loading="lazy">'
-      : '<span class="psv-ex-flag">'+m.flag+'</span>';
-    var tip = EXCHANGE_TIPS[key] || '';
-    var country = EXCHANGE_COUNTRY[key] ? '<span class="psv-ex-country">'+EXCHANGE_COUNTRY[key]+'</span>' : '';
-    return '<button class="psv-ex-btn setup-market" data-exchange="'+key+'"'+(tip ? ' data-tip="'+tip+'"' : '')+' onclick="psvSetExchange(\''+key+'\')">' +
-      flagHtml + '<span class="psv-ex-name">'+m.name+'</span>'+country+'</button>';
+    var badge = EXCHANGE_BADGE[key] || (iso ? iso.toUpperCase() : m.name.slice(0,3).toUpperCase());
+    var desc = EXCHANGE_TIPS[key] || EXCHANGE_COUNTRY[key] || '';
+    var count = EXCHANGE_COUNT[key] || '';
+    var search = (m.name + ' ' + desc + ' ' + badge + ' ' + (EXCHANGE_COUNTRY[key]||'')).toLowerCase();
+    return '<button class="setup-market" data-exchange="'+key+'" data-search="'+esc(search)+'" onclick="psvSetExchange(\''+key+'\')">' +
+      '<span class="country-badge">'+esc(badge)+'</span>' +
+      '<div><strong>'+esc(m.name)+'</strong><span>'+esc(desc)+'</span></div>' +
+      (count ? '<em>'+esc(count)+'</em>' : '') +
+      '</button>';
   }
 
   function mkGoatCard(key) {
@@ -2169,10 +2183,9 @@ function initPrescanView() {
 
     // Panel 2: Borsa
     '<div id="psv-panel-2" class="setup-panel" style="display:none">'+
-    '<div class="setup-panel-head"><span>Evren</span><div><h3>Ülke, borsa veya evreni seç</h3><p>Sonuçlar yalnızca seçilen piyasa ve borsa evreni içinden gelir.</p></div></div>'+
-    '<div class="psv-ex-grid" id="psv-ex-grid">'+PSV_MAIN_EX.map(mkExBtn).join('')+'</div>'+
-    '<div class="psv-ex-extra" id="psv-ex-extra" style="display:none">'+allExKeys.map(mkExBtn).join('')+'</div>'+
-    '<button class="psv-show-more" id="psv-ex-more" onclick="psvToggleMoreEx()">+ Diğer Borsalar</button>'+
+    '<div class="setup-panel-head"><span>Evren</span><div><h3>Ülke / borsa seç</h3><p>Hisse senedi evreninde sonuçlar yalnızca seçilen piyasa içinden gelir.</p></div></div>'+
+    '<input class="setup-search" id="psv-ex-search" type="text" placeholder="Ülke, borsa veya evren ara…" oninput="psvExSearch(this.value)">'+
+    '<div class="setup-market-list" id="psv-ex-grid">'+PSV_MAIN_EX.concat(allExKeys).map(mkExBtn).join('')+'</div>'+
     '<div class="setup-insight" id="psv-insight-2"></div>'+
     '</div>'+
 
@@ -2481,8 +2494,8 @@ function _psvUpdateInsight(step) {
     var exName = exMeta ? exMeta.name : (currentExchange || 'BIST').toUpperCase();
     var etaSec = (typeof EXCHANGE_ETA !== 'undefined' && EXCHANGE_ETA[currentExchange]) ? EXCHANGE_ETA[currentExchange] : 5;
     label = 'Evren kapsamı';
-    title = esc(exName) + ' evreni taranır.';
-    body  = 'Yalnızca seçilen piyasa içindeki adaylar listelenir. Tarama süresi yaklaşık ' + etaSec + ' saniye. Farklı evren, farklı aday listesi demektir.';
+    title = 'Yalnızca seçilen piyasa taranır.';
+    body  = esc(exName) + ' evreni yaklaşık ' + etaSec + ' saniyede taranır. Farklı evren, farklı aday listesi demektir.';
   } else if (step === 3) {
     var total = _psvTotalSel();
     label = 'Filtre mantığı';
@@ -2593,6 +2606,14 @@ function psvToggleLgMore(btn) {
   var open = extra.style.display !== 'none';
   extra.style.display = open ? 'none' : '';
   btn.textContent = open ? '+ '+count+' daha' : '− Daha az';
+}
+
+function psvExSearch(val) {
+  var q = (val || '').toLowerCase().trim();
+  document.querySelectorAll('#psv-ex-grid .setup-market').forEach(function(b) {
+    var t = b.dataset.search || '';
+    b.style.display = (!q || t.indexOf(q) !== -1) ? '' : 'none';
+  });
 }
 
 function psvGoatSearch(val) {
