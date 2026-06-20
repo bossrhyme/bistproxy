@@ -4908,6 +4908,7 @@ function showHomepage() {
 function _doShowHomepage() {
   hideAnalizPage();
   var _pp=document.getElementById('profile-page'); if(_pp){_pp.style.display='none';_pp.classList.remove('on');}
+  document.documentElement.classList.add('home-active');
   document.getElementById('homepage').style.display = 'flex';
   document.getElementById('screener-layout').style.display = 'none';
   document.getElementById('nav-home').classList.add('active');
@@ -5351,6 +5352,7 @@ function showScreenerOrPrescan() {
   openScanModeChoice();
 }
 function _doShowScreener(keepSidebar) {
+  document.documentElement.classList.remove('home-active');
   hideAnalizPage();
   if (!keepSidebar) setTimeout(initSidebarState, 0);
   var _pp=document.getElementById('profile-page'); if(_pp){_pp.style.display='none';_pp.classList.remove('on');}
