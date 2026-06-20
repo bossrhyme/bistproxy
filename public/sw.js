@@ -1,5 +1,5 @@
-// DeepFin Service Worker v84 - Network First for CSS/JS
-const CACHE = 'deepfin-v84';
+// DeepFin Service Worker v85 - Network First for CSS/JS
+const CACHE = 'deepfin-v85';
 
 // Install: hızlı geç
 self.addEventListener('install', function(e) {
