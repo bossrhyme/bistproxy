@@ -2186,6 +2186,152 @@ const GURUS = {
 
 };
 
+// ── MATCH SCORING ─────────────────────────────────────────────────────────────
+
+var _SCORE_FIELD_MAP = {
+  pe_min:   {f:'peNormalizedAnnual',          d:'min'}, pe_max:  {f:'peNormalizedAnnual',          d:'max'},
+  pb_min:   {f:'pbAnnual',                    d:'min'}, pb_max:  {f:'pbAnnual',                    d:'max'},
+  ps_min:   {f:'psTTM',                       d:'min'}, ps_max:  {f:'psTTM',                       d:'max'},
+  roe_min:  {f:'roeTTM',                      d:'min'}, roe_max: {f:'roeTTM',                      d:'max'},
+  roa_min:  {f:'roaTTM',                      d:'min'}, roa_max: {f:'roaTTM',                      d:'max'},
+  margin_min:{f:'netProfitMarginTTM',         d:'min'}, margin_max:{f:'netProfitMarginTTM',        d:'max'},
+  gross_min: {f:'grossMarginTTM',             d:'min'}, gross_max: {f:'grossMarginTTM',            d:'max'},
+  revg_min:  {f:'revenueGrowthTTMYoy',        d:'min'}, revg_max:  {f:'revenueGrowthTTMYoy',       d:'max'},
+  earng_min: {f:'epsGrowthTTMYoy',            d:'min'}, earng_max: {f:'epsGrowthTTMYoy',           d:'max'},
+  div_min:   {f:'dividendYieldIndicatedAnnual',d:'min'},div_max:  {f:'dividendYieldIndicatedAnnual',d:'max'},
+  de_min:    {f:'totalDebt/totalEquityAnnual',d:'min'}, de_max:   {f:'totalDebt/totalEquityAnnual',d:'max'},
+  cr_min:    {f:'currentRatioAnnual',         d:'min'}, cr_max:   {f:'currentRatioAnnual',         d:'max'},
+  piotroski_min:{f:'piotroski',              d:'min'}, piotroski_max:{f:'piotroski',              d:'max'},
+  peg_min:   {f:'peg',                        d:'min'}, peg_max:  {f:'peg',                        d:'max'},
+  mc_min:    {f:'marketCapitalization',       d:'min'}, mc_max:   {f:'marketCapitalization',       d:'max'},
+  tech_rating_min:{f:'techRating',           d:'min'}, tech_rating_max:{f:'techRating',           d:'max'},
+  ma_rating_min:  {f:'maRating',             d:'min'}, osc_rating_min: {f:'oscRating',            d:'min'},
+  perf3m_min:{f:'perf3m',                    d:'min'}, perf3m_max:{f:'perf3m',                    d:'max'},
+  perf6m_min:{f:'perf6m',                    d:'min'}, perf6m_max:{f:'perf6m',                    d:'max'},
+  chg_min:   {f:'changePercent',             d:'min'}, chg_max:  {f:'changePercent',              d:'max'},
+  rsi_min:   {f:'rsi14',                     d:'min'}, rsi_max:  {f:'rsi14',                     d:'max'},
+  from_high_min:{f:'fromHigh',              d:'min'}, from_high_max:{f:'fromHigh',              d:'max'},
+  from_low_min:  {f:'fromLow',               d:'min'},
+  rel_vol_min:   {f:'relVol',                d:'min'},
+  adx_min:   {f:'adx',                       d:'min'}, adx_max:  {f:'adx',                       d:'max'},
+  adx_di_diff_min:{f:'adxDiDiff',           d:'min'},
+  above_sma200_min:{f:'pctAboveSma200',     d:'min'},
+  sma_trend_min: {f:'smaTrend',              d:'min'},
+  macd_min:  {f:'macd',                      d:'min'}, macd_max: {f:'macd',                      d:'max'},
+  macd_hist_min:{f:'macdHist',              d:'min'}, macd_hist_max:{f:'macdHist',              d:'max'},
+  bb_dist_max:   {f:'bbDist',                d:'max'},
+  stoch_k_max:   {f:'stochK',               d:'max'},
+  stoch_kd_min:  {f:'stochKD',              d:'min'},
+};
+
+var _SCORE_LABELS = {
+  pe_min:'F/K min', pe_max:'F/K', pb_min:'PD/DD min', pb_max:'PD/DD',
+  ps_min:'F/S min', ps_max:'F/S', roe_min:'ROE', roe_max:'ROE max',
+  roa_min:'ROA', roa_max:'ROA max', margin_min:'Net Marj', margin_max:'Net Marj max',
+  gross_min:'Brüt Marj', gross_max:'Brüt Marj max', revg_min:'Gelir Büy.', revg_max:'Gelir Büy. max',
+  earng_min:'Kazanç Büy.', earng_max:'Kazanç Büy. max', div_min:'Temettü', div_max:'Temettü max',
+  de_min:'Borç/Özk. min', de_max:'Borç/Özk.', cr_min:'Cari Oran', cr_max:'Cari Oran max',
+  piotroski_min:'F-Score', piotroski_max:'F-Score max', peg_min:'PEG min', peg_max:'PEG',
+  mc_min:'P. Değ. min', mc_max:'P. Değ.', tech_rating_min:'Teknik Skor', tech_rating_max:'Teknik Skor max',
+  ma_rating_min:'MA Rating', osc_rating_min:'Osilatör', perf3m_min:'3A Getiri', perf3m_max:'3A Getiri max',
+  perf6m_min:'6A Getiri', perf6m_max:'6A Getiri max', chg_min:'Günlük Değ.', chg_max:'Günlük Değ. max',
+  rsi_min:'RSI min', rsi_max:'RSI', from_high_min:'52H Zirve', from_high_max:'52H Zirve max',
+  from_low_min:'52H Dip', rel_vol_min:'Görel. Hacim', adx_min:'ADX', adx_max:'ADX max',
+  adx_di_diff_min:'ADX DI', above_sma200_min:'SMA200', sma_trend_min:'SMA Trend',
+  macd_min:'MACD min', macd_max:'MACD', macd_hist_min:'MACD Hist', macd_hist_max:'MACD Hist max',
+  bb_dist_max:'BB Mesafe', stoch_k_max:'Stokastik K', stoch_kd_min:'Stok. KD', vol_min:'Hacim (M)',
+};
+
+function _criterionScore(val, thr, dir) {
+  if (val === null || val === undefined) return null;
+  if (thr === 0) return (dir === 'min' ? val >= 0 : val <= 0) ? 80 : 20;
+  var frac = dir === 'min' ? (val - thr) / Math.abs(thr) : (thr - val) / Math.abs(thr);
+  if (frac >= 0.5) return 100;
+  if (frac >= 0) return Math.round(50 + frac / 0.5 * 50);
+  if (frac >= -0.2) return Math.round((frac + 0.2) / 0.2 * 25);
+  return 0;
+}
+
+function computeMatchScore(s) {
+  if (_psvTotalSel() === 0) return { score: null, checks: [], sources: [] };
+  var criteria = {}, sources = [];
+  _psvActiveGoats.forEach(function(k) {
+    var g = GURUS[k]; if (!g || !g.filters) return;
+    sources.push(g.label.split(' — ')[0].split(' (')[0]);
+    Object.keys(g.filters).forEach(function(fk) { if (!(fk in criteria)) criteria[fk] = g.filters[fk]; });
+  });
+  _psvActivePresets.forEach(function(k) {
+    var p = PRESETS[k]; if (!p || !p.filters) return;
+    sources.push(p.label);
+    Object.keys(p.filters).forEach(function(fk) { if (!(fk in criteria)) criteria[fk] = p.filters[fk]; });
+  });
+  _psvActiveTech.forEach(function(k) {
+    var t = TECH_PRESETS[k]; if (!t || !t.filters) return;
+    sources.push(t.label);
+    Object.keys(t.filters).forEach(function(fk) { if (!(fk in criteria)) criteria[fk] = t.filters[fk]; });
+  });
+  var checks = [], totalPts = 0, maxPts = 0;
+  Object.keys(criteria).forEach(function(fk) {
+    var thr = criteria[fk];
+    if (fk === 'vol_min') {
+      if (s.volume == null) return;
+      var vScore = _criterionScore(s.volume / 1e6, thr, 'min');
+      if (vScore === null) return;
+      maxPts++; totalPts += vScore / 100;
+      checks.push({ key: fk, label: _SCORE_LABELS[fk] || fk, val: s.volume / 1e6, thr: thr, dir: 'min', score: vScore });
+      return;
+    }
+    var meta = _SCORE_FIELD_MAP[fk]; if (!meta) return;
+    var val = s[meta.f];
+    var sc = _criterionScore(val, thr, meta.d);
+    if (sc === null) return;
+    maxPts++; totalPts += sc / 100;
+    checks.push({ key: fk, label: _SCORE_LABELS[fk] || fk, val: val, thr: thr, dir: meta.d, score: sc });
+  });
+  var score = maxPts > 0 ? Math.round(totalPts / maxPts * 100) : null;
+  return { score: score, checks: checks, sources: sources };
+}
+
+function _scoreHtml(s) {
+  if (_psvTotalSel() === 0) return '<span style="color:var(--muted2);font-size:11px">—</span>';
+  var r = computeMatchScore(s);
+  if (r.score === null) return '<span style="color:var(--muted2);font-size:11px">—</span>';
+  var pct = r.score;
+  var cls = pct >= 80 ? 'score-high' : pct >= 55 ? 'score-mid' : 'score-low';
+  return '<div class="score-cell"><div class="score-track"><div class="score-fill '+cls+'" style="width:'+pct+'%"></div></div><span class="score-val '+cls+'">%'+pct+'</span></div>';
+}
+
+function _buildMatchCard(s) {
+  var card = document.getElementById('dmatch-card');
+  if (!card) return;
+  if (_psvTotalSel() === 0) { card.style.display = 'none'; return; }
+  var r = computeMatchScore(s);
+  if (!r || r.score === null || r.checks.length === 0) { card.style.display = 'none'; return; }
+  var pct = r.score;
+  var lvl = pct >= 80 ? 'high' : pct >= 55 ? 'mid' : 'low';
+  var checksHtml = r.checks.map(function(c) {
+    var st = c.score >= 50 ? 'pass' : c.score > 0 ? 'near' : 'miss';
+    var icon = st === 'pass' ? '✓' : st === 'near' ? '!' : '✗';
+    var valFmt = c.val !== null && c.val !== undefined ? (Math.abs(c.val) < 10 ? c.val.toFixed(2) : c.val.toFixed(1)) : '—';
+    var thrFmt = (Math.abs(c.thr) < 10 ? c.thr.toFixed(2) : c.thr.toFixed(1));
+    var dirSym = c.dir === 'min' ? '≥' : '≤';
+    return '<div class="dmatch-check '+st+'"><span class="dmatch-icon">'+icon+'</span><span class="dmatch-label">'+esc(c.label)+'</span><span class="dmatch-info">'+valFmt+' '+dirSym+thrFmt+'</span></div>';
+  }).join('');
+  card.innerHTML =
+    '<div class="dstitle">Neden Eşleşti?</div>'+
+    '<div class="dmatch-header">'+
+      '<div class="dmatch-badge dmatch-'+lvl+'"><strong>%'+pct+'</strong><span>Uyum</span></div>'+
+      '<div class="dmatch-bar-wrap">'+
+        '<div class="dmatch-bar"><div class="dmatch-bar-fill dmatch-fill-'+lvl+'" style="width:'+pct+'%"></div></div>'+
+        '<div class="dmatch-source">'+esc(r.sources.slice(0,3).join(' · '))+'</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="dmatch-checks">'+checksHtml+'</div>';
+  card.style.display = '';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 function tblScroll(px){
   var w = document.getElementById('twrap');
   if(w) w.scrollBy({left:px, behavior:'smooth'});
@@ -3378,6 +3524,7 @@ function _vsRowHtml(s, idx) {
       <td data-col="name" style="${cv('name')}font-size:11px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(s.name)}">${esc(s.name)}</td>
       <td data-col="price" style="${cv('price')}">${s.currentPrice!=null?(s.currentPrice.toFixed(2)+' '+(EXCHANGE_META[currentExchange]||EXCHANGE_META.bist).currency):nil}</td>
       <td data-col="mcap" style="${cv('mcap')}">${fmc(s.marketCapitalization)}</td>
+      <td data-col="score" class="score-td" style="white-space:nowrap;min-width:90px">${_scoreHtml(s)}</td>
       <td data-col="pe" style="${cv('pe')}">${fv(s.peNormalizedAnnual,1)}</td>
       <td data-col="pb" style="${cv('pb')}">${fv(s.pbAnnual,2)}</td>
       <td data-col="ps" style="${cv('ps')}">${fv(s.psTTM,2)}</td>
@@ -3846,6 +3993,8 @@ function showDetail(sym){
         return `<div class="drow"><span class="dkey">${k}</span><span class="dval"${idAttr}>${d}</span></div>`;
       }).join('')}
     </div>`).join('');
+
+  _buildMatchCard(s);
 
   document.getElementById('detail').classList.add('open');
   _updateDetailNavPos();
