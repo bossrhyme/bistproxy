@@ -160,8 +160,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .dfh-mflabel{font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.22);margin-bottom:10px;}
 .dfh-mfcard{display:flex;align-items:flex-start;gap:8px;padding:7px 8px;border-radius:8px;margin-bottom:4px;border:1px solid transparent;transition:.2s;}
 .dfh-mfcard.active{background:rgba(110,88,168,.13);border-color:rgba(110,88,168,.28);}
-.dfh-mfnum{width:22px;height:22px;min-width:22px;border-radius:7px;background:rgba(110,88,168,.16);display:grid;place-items:center;font-size:8.5px;font-weight:800;color:rgba(110,88,168,.7);font-family:monospace;}
-.dfh-mfcard.active .dfh-mfnum{background:#6E58A8;color:#fff;}
+.dfh-mfnum{width:24px;height:24px;min-width:24px;border-radius:50%;background:rgba(255,255,255,.1);display:grid;place-items:center;font-size:8px;font-weight:800;color:rgba(255,255,255,.4);font-family:monospace;}
+.dfh-mfcard.active .dfh-mfnum{background:#E8D5A8;color:#16131F;}
 .dfh-mfcard strong{font-size:10.5px;color:rgba(255,255,255,.78);display:block;line-height:1;margin-bottom:2px;font-weight:700;}
 .dfh-mfcard small{font-size:8.5px;color:rgba(255,255,255,.3);line-height:1.3;}
 .dfh-mstats{margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06);}
@@ -173,30 +173,30 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .dfh-radar-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-56%);text-align:center;pointer-events:none;}
 .dfh-radar-center strong{display:block;font-size:26px;font-weight:900;color:rgba(238,228,208,.9);letter-spacing:-1.5px;line-height:1;}
 .dfh-radar-center span{display:block;font-size:7px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(238,228,208,.3);margin-top:4px;}
-.dfh-radar-foot{font-size:8px;color:rgba(255,255,255,.25);margin-top:4px;letter-spacing:.04em;}
+.dfh-radar-foot{display:none;}
 @keyframes dfh-spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 .dfh-rspin{animation:dfh-spin 5s linear infinite;transform-box:fill-box;transform-origin:center;}
 @keyframes dfh-dot-pulse{0%,100%{opacity:.85;}50%{opacity:.45;}}
 .dfh-dot-active{animation:dfh-dot-pulse 2.4s ease-in-out infinite;}
-.dfh-mmatch{border-left:1px solid rgba(255,255,255,.06);padding:14px 12px;background:rgba(238,228,208,.015);}
-.dfh-mm-label{font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.22);margin-bottom:10px;}
-.dfh-mm-ticker{display:flex;align-items:baseline;gap:10px;margin-bottom:6px;}
-.dfh-mm-name{font-size:22px;font-weight:900;color:rgba(238,228,208,.92);letter-spacing:-.5px;}
+.dfh-mmatch{border-left:1px solid rgba(0,0,0,.08);padding:16px 14px;background:#F5EDD8;}
+.dfh-mm-label{font-size:8px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(0,0,0,.35);margin-bottom:10px;font-family:monospace;}
+.dfh-mm-ticker{display:flex;align-items:baseline;gap:10px;margin-bottom:8px;}
+.dfh-mm-name{font-size:22px;font-weight:900;color:#16131F;letter-spacing:-.5px;}
 .dfh-mm-pct{font-size:20px;font-weight:800;color:#6E58A8;}
-.dfh-mm-note{font-size:9px;color:rgba(255,255,255,.3);line-height:1.55;margin-bottom:12px;}
-.dfh-mm-crit{margin-bottom:12px;}
-.dfh-mmc-row{display:flex;align-items:center;gap:7px;padding:5px 0;border-top:1px solid rgba(255,255,255,.05);font-size:9.5px;}
+.dfh-mm-note{font-size:9px;color:rgba(0,0,0,.45);line-height:1.6;margin-bottom:14px;}
+.dfh-mm-crit{margin-bottom:14px;}
+.dfh-mmc-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid rgba(0,0,0,.07);font-size:9.5px;}
 .dfh-mmc-row:first-child{border-top:0;}
-.dfh-mmc-icon{width:15px;height:15px;border-radius:4px;display:grid;place-items:center;font-size:8px;font-weight:900;flex:0 0 auto;}
-.dfh-mmc-row.ok .dfh-mmc-icon{background:rgba(40,200,64,.15);color:#28C840;}
-.dfh-mmc-row.warn .dfh-mmc-icon{background:rgba(254,188,46,.15);color:#FEBC2E;}
-.dfh-mmc-name{flex:1;color:rgba(255,255,255,.5);font-size:9px;}
-.dfh-mmc-val{font-weight:700;color:rgba(238,228,208,.75);font-size:9px;white-space:nowrap;}
-.dfh-mm-statsbar{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid rgba(255,255,255,.07);padding-top:10px;text-align:center;}
-.dfh-mm-statsbar>div{border-right:1px solid rgba(255,255,255,.06);}
+.dfh-mmc-icon{width:16px;height:16px;border-radius:4px;display:grid;place-items:center;font-size:8px;font-weight:900;flex:0 0 auto;}
+.dfh-mmc-row.ok .dfh-mmc-icon{background:rgba(5,150,105,.12);color:#059669;}
+.dfh-mmc-row.warn .dfh-mmc-icon{background:rgba(217,119,6,.12);color:#D97706;}
+.dfh-mmc-name{flex:1;color:rgba(0,0,0,.5);font-size:9px;}
+.dfh-mmc-val{font-weight:700;color:#16131F;font-size:9px;white-space:nowrap;}
+.dfh-mm-statsbar{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid rgba(0,0,0,.1);padding-top:10px;text-align:center;margin-top:4px;}
+.dfh-mm-statsbar>div{border-right:1px solid rgba(0,0,0,.08);}
 .dfh-mm-statsbar>div:last-child{border-right:0;}
-.dfh-mm-statsbar span{display:block;font-size:7px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.22);margin-bottom:3px;}
-.dfh-mm-statsbar strong{display:block;font-size:14px;font-weight:800;color:rgba(238,228,208,.78);letter-spacing:-.4px;}
+.dfh-mm-statsbar span{display:block;font-size:7px;text-transform:uppercase;letter-spacing:.12em;color:rgba(0,0,0,.35);margin-bottom:3px;font-family:monospace;font-weight:700;}
+.dfh-mm-statsbar strong{display:block;font-size:15px;font-weight:800;color:#16131F;letter-spacing:-.4px;}
 .dfh-stats{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:32px;flex-wrap:wrap;padding:20px 0 24px;border-top:1px solid rgba(255,255,255,.07);}
 .dfh-stat strong{font-size:20px;font-weight:700;color:rgba(238,228,208,.82);letter-spacing:-.4px;}
 .dfh-stat strong b{font-weight:400;font-size:13px;color:rgba(238,228,208,.3);}
@@ -346,48 +346,83 @@ if('serviceWorker' in navigator){
               <div class="dfh-radar-wrap">
                 <svg class="dfh-radar-svg" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
                   <defs>
-                    <radialGradient id="dfh-rg-center2" cx="50%" cy="50%" r="50%">
-                      <stop offset="0%" stop-color="#6E58A8" stop-opacity="0.22"/>
-                      <stop offset="100%" stop-color="#6E58A8" stop-opacity="0"/>
+                    <radialGradient id="dfh-rg-c" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="rgba(255,255,255,0.06)"/>
+                      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
                     </radialGradient>
-                    <radialGradient id="dfh-rg-sweep2" cx="150" cy="150" r="120" gradientUnits="userSpaceOnUse">
-                      <stop offset="0%" stop-color="#6E58A8" stop-opacity="0.18"/>
-                      <stop offset="100%" stop-color="#6E58A8" stop-opacity="0"/>
+                    <radialGradient id="dfh-rg-sw" cx="0%" cy="50%" r="100%" gradientUnits="userSpaceOnUse"
+                      x1="150" y1="150" x2="276" y2="150">
+                      <stop offset="0%" stop-color="rgba(255,255,255,0.14)"/>
+                      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
                     </radialGradient>
-                    <filter id="dfh-glow2">
-                      <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur"/>
-                      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    <filter id="dfh-gl" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="b"/>
+                      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                    <filter id="dfh-gl2" x="-100%" y="-100%" width="300%" height="300%">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="b"/>
+                      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
                     </filter>
                   </defs>
-                  <circle cx="150" cy="150" r="128" fill="#080610"/>
-                  <line x1="22" y1="150" x2="278" y2="150" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
-                  <line x1="150" y1="22" x2="150" y2="278" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
-                  <circle cx="150" cy="150" r="42" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
-                  <circle cx="150" cy="150" r="84" fill="none" stroke="rgba(255,255,255,0.055)" stroke-width="1"/>
-                  <circle cx="150" cy="150" r="126" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
-                  <circle cx="150" cy="150" r="128" fill="none" stroke="rgba(110,88,168,0.18)" stroke-width="1.5"/>
-                  <circle cx="150" cy="150" r="40" fill="url(#dfh-rg-center2)"/>
-                  <!-- Dönen sweep -->
+                  <!-- Arka plan daire -->
+                  <circle cx="150" cy="150" r="130" fill="#060410"/>
+                  <!-- Grid çizgileri -->
+                  <line x1="20" y1="150" x2="280" y2="150" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                  <line x1="150" y1="20" x2="150" y2="280" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                  <!-- Konsantrik halkalar -->
+                  <circle cx="150" cy="150" r="44" fill="none" stroke="rgba(255,255,255,0.09)" stroke-width="1"/>
+                  <circle cx="150" cy="150" r="88" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+                  <circle cx="150" cy="150" r="128" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                  <!-- Dış çerçeve -->
+                  <circle cx="150" cy="150" r="130" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/>
+                  <!-- Merkez glow -->
+                  <circle cx="150" cy="150" r="44" fill="url(#dfh-rg-c)"/>
+                  <!-- Dönen sweep grubu -->
                   <g class="dfh-rspin">
-                    <path d="M150,150 L276,150 A126,126 0 0,0 150,24 Z" fill="url(#dfh-rg-sweep2)" opacity="0.85"/>
-                    <line x1="150" y1="150" x2="276" y2="150" stroke="#7B68B8" stroke-width="1.5" stroke-linecap="round" filter="url(#dfh-glow2)" opacity="0.95"/>
-                    <circle cx="276" cy="150" r="3" fill="#8B78C8" filter="url(#dfh-glow2)"/>
+                    <!-- Sweep sektörü: beyaz/gri, ~90° -->
+                    <path d="M150,150 L278,150 A128,128 0 0,0 150,22 Z"
+                      fill="none" stroke="none" opacity="1">
+                      <animate attributeName="d" dur="0.01s" fill="freeze"
+                        to="M150,150 L278,150 A128,128 0 0,0 150,22 Z"/>
+                    </path>
+                    <path d="M150,150 L278,150 A128,128 0 0,0 150,22 Z"
+                      fill="rgba(255,255,255,0.06)"/>
+                    <!-- Sweep çizgisi: parlak beyaz -->
+                    <line x1="150" y1="150" x2="278" y2="150"
+                      stroke="rgba(255,255,255,0.85)" stroke-width="1.5" stroke-linecap="round"
+                      filter="url(#dfh-gl)"/>
+                    <!-- Uç nokta glow -->
+                    <circle cx="278" cy="150" r="2.5" fill="white" filter="url(#dfh-gl2)" opacity="0.9"/>
                   </g>
-                  <!-- Ticker noktaları -->
+                  <!-- THYAO — büyük, altın, üst-sağ (r=88, 315°) -->
+                  <!-- x=150+88·cos(-45°)=212, y=150+88·sin(-45°)=88 -->
                   <g class="dfh-dot-active">
-                    <circle cx="217" cy="93" r="5" fill="#E8D5A8" filter="url(#dfh-glow2)"/>
-                    <text x="225" y="97" font-size="8.5" fill="#E8D5A8" font-family="Inter,sans-serif" font-weight="700">THYAO</text>
+                    <circle cx="212" cy="88" r="6" fill="#E8D5A8" filter="url(#dfh-gl)"/>
+                    <text x="221" y="91" font-size="9" fill="#E8D5A8" font-family="Inter,sans-serif" font-weight="700" letter-spacing="0.5">THYAO</text>
                   </g>
-                  <circle cx="131" cy="91" r="3.5" fill="rgba(255,255,255,0.62)"/>
-                  <text x="92" y="89" font-size="8" fill="rgba(255,255,255,0.55)" font-family="Inter,sans-serif" font-weight="600">ASELŞ</text>
-                  <circle cx="65" cy="190" r="3.5" fill="rgba(255,255,255,0.52)"/>
-                  <text x="50" y="186" font-size="8" fill="rgba(255,255,255,0.45)" font-family="Inter,sans-serif">SİŞE</text>
-                  <circle cx="243" cy="204" r="3" fill="rgba(255,255,255,0.3)"/>
-                  <text x="248" y="208" font-size="7.5" fill="rgba(255,255,255,0.27)" font-family="Inter,sans-serif">DAX</text>
-                  <circle cx="131" cy="220" r="3" fill="rgba(255,255,255,0.25)"/>
-                  <text x="136" y="223" font-size="7.5" fill="rgba(255,255,255,0.22)" font-family="Inter,sans-serif">BTC</text>
-                  <circle cx="57" cy="113" r="3" fill="rgba(255,255,255,0.22)"/>
-                  <text x="34" y="110" font-size="7.5" fill="rgba(255,255,255,0.2)" font-family="Inter,sans-serif">AAPL</text>
+                  <!-- ASELŞ — orta-sol (r=62, 165°) -->
+                  <!-- x=150+62·cos(165°)=90, y=150+62·sin(165°)=166 -->
+                  <circle cx="110" cy="134" r="4.5" fill="rgba(255,255,255,0.72)"/>
+                  <text x="72" y="131" font-size="8.5" fill="rgba(255,255,255,0.62)" font-family="Inter,sans-serif" font-weight="600">ASELŞ</text>
+                  <!-- SİŞE — sağ (r=80, 20°) -->
+                  <!-- x=150+80·cos(20°)=225, y=150+80·sin(20°)=177 -->
+                  <circle cx="224" cy="177" r="4" fill="rgba(255,255,255,0.58)"/>
+                  <text x="231" y="181" font-size="8" fill="rgba(255,255,255,0.5)" font-family="Inter,sans-serif">SİŞE</text>
+                  <!-- DAX — üst-sağ, soluk (r=110, 345°) -->
+                  <!-- x=150+110·cos(-15°)=256, y=150+110·sin(-15°)=122 -->
+                  <circle cx="252" cy="122" r="3" fill="rgba(255,255,255,0.28)"/>
+                  <text x="257" y="125" font-size="7.5" fill="rgba(255,255,255,0.24)" font-family="Inter,sans-serif">DAX</text>
+                  <!-- BTC — alt-sol (r=72, 210°) -->
+                  <!-- x=150+72·cos(210°)=88, y=150+72·sin(210°)=186 -->
+                  <circle cx="88" cy="186" r="3.5" fill="rgba(255,255,255,0.32)"/>
+                  <text x="94" y="189" font-size="7.5" fill="rgba(255,255,255,0.28)" font-family="Inter,sans-serif">BTC</text>
+                  <!-- AAPL — alt-orta (r=100, 130°) -->
+                  <!-- x=150+100·cos(130°)=86, y=150+100·sin(130°)=227 -->
+                  <circle cx="166" cy="240" r="4" fill="rgba(255,255,255,0.55)"/>
+                  <text x="173" y="244" font-size="8" fill="rgba(255,255,255,0.45)" font-family="Inter,sans-serif">AAPL</text>
+                  <!-- "10 sonuç bulundu" pill — alt-orta içeride -->
+                  <rect x="87" y="258" width="126" height="22" rx="11" fill="rgba(0,0,0,0.65)" stroke="rgba(255,255,255,0.14)" stroke-width="1"/>
+                  <text x="150" y="273" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.72)" font-family="Inter,sans-serif" font-weight="600">10 sonuç bulundu</text>
                 </svg>
                 <div class="dfh-radar-center">
                   <strong>568</strong>
