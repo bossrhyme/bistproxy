@@ -1836,6 +1836,8 @@ async function runScan(){
       // Sadece fiyatı olan hisseler — finansal veri yoksa sütunlar tire gösterir
       return s.currentPrice && s.currentPrice > 0;
     });
+    // Uyum Puanı: IQR robustSigma önbelleğini taranan evren üzerinden kur
+    if (typeof buildIqrCache === 'function') buildIqrCache(allData);
     const _exm = EXCHANGE_META[currentExchange]||EXCHANGE_META.bist;
 
     updateExchangeBadge();
@@ -2242,92 +2244,162 @@ var _SCORE_LABELS = {
   bb_dist_max:'BB Mesafe', stoch_k_max:'Stokastik K', stoch_kd_min:'Stok. KD', vol_min:'Hacim (M)',
 };
 
-function _criterionScore(val, thr, dir) {
-  if (val === null || val === undefined) return null;
-  if (thr === 0) return (dir === 'min' ? val >= 0 : val <= 0) ? 80 : 20;
-  var frac = dir === 'min' ? (val - thr) / Math.abs(thr) : (thr - val) / Math.abs(thr);
-  if (frac >= 0.5) return 100;
-  if (frac >= 0) return Math.round(50 + frac / 0.5 * 50);
-  if (frac >= -0.2) return Math.round((frac + 0.2) / 0.2 * 25);
-  return 0;
+// Skor motoru ayarları — eşik (PASS), "yakın"/"mükemmel" band genişlikleri (robustSigma çarpanı)
+var SCORE_CFG = {
+  PASS    : 0.60,   // eşik noktasındaki normalize skor
+  kNear   : 0.50,   // robustSigma çarpanı — "yakın" band genişliği
+  kExcel  : 1.50,   // robustSigma çarpanı — "mükemmel" band genişliği
+  fallback: 0.15,   // IQR hesaplanamadığında hedef değerin ±%15'i
+  minN    : 25,     // IQR için minimum satır sayısı
+  bands   : { high: 80, watch: 65, ok: 50 }
+};
+var _BAND_LBLS = { high: 'Güçlü', watch: 'Yakın', ok: 'Orta', low: 'Zayıf' };
+var _scoreFilters = {};  // applyAndRender'da yakalanan aktif (merge edilmiş) filtreler
+
+// IQR tabanlı robustSigma önbelleği — taranan evren dağılımına göre
+var _iqrCache = {};
+function buildIqrCache(rows) {
+  _iqrCache = {};
+  if (!rows || !rows.length) return;
+  var fields = [];
+  Object.keys(_SCORE_FIELD_MAP).forEach(function(k) {
+    var f = _SCORE_FIELD_MAP[k].f;
+    if (fields.indexOf(f) === -1) fields.push(f);
+  });
+  fields.forEach(function(f) {
+    var vals = [];
+    for (var i = 0; i < rows.length; i++) {
+      var v = rows[i][f];
+      if (v != null && isFinite(v)) vals.push(v);
+    }
+    if (vals.length < SCORE_CFG.minN) { _iqrCache[f] = null; return; }
+    vals.sort(function(a, b) { return a - b; });
+    var n = vals.length;
+    var q1 = vals[Math.floor(n * 0.25)];
+    var q3 = vals[Math.floor(n * 0.75)];
+    _iqrCache[f] = Math.abs(q3 - q1) / 1.349;  // robustSigma
+  });
 }
 
-function computeMatchScore(s) {
-  if (_psvTotalSel() === 0) return { score: null, checks: [], sources: [] };
-  var criteria = {}, sources = [];
-  _psvActiveGoats.forEach(function(k) {
-    var g = GURUS[k]; if (!g || !g.filters) return;
-    sources.push(g.label.split(' — ')[0].split(' (')[0]);
-    Object.keys(g.filters).forEach(function(fk) { if (!(fk in criteria)) criteria[fk] = g.filters[fk]; });
+// Tek kriter için normalize skor (0.0–1.0)
+// op 'min': değer ≥ hedef → iyi | 'max': değer ≤ hedef → iyi
+function _scoreOne(val, field, op, target) {
+  if (val == null || !isFinite(val)) return null;
+  var sigma = _iqrCache[field];
+  if (!sigma || !isFinite(sigma)) sigma = Math.abs(target) * SCORE_CFG.fallback || 1;
+  var near  = sigma * SCORE_CFG.kNear  || 0.001;
+  var excel = sigma * SCORE_CFG.kExcel || 0.001;
+  var P = SCORE_CFG.PASS;
+  if (op === 'min') {
+    if (val >= target) return Math.min(1.0, P + (1 - P) * Math.min(1, (val - target) / excel));
+    var floor = target - near;
+    if (val >= floor) return P * Math.max(0, (val - floor) / near);
+    return 0;
+  } else {
+    if (val <= target) return Math.min(1.0, P + (1 - P) * Math.min(1, (target - val) / excel));
+    var ceil = target + near;
+    if (val <= ceil) return P * Math.max(0, (ceil - val) / near);
+    return 0;
+  }
+}
+
+// Bir hissenin tüm aktif filtrelere karşı Uyum Puanı'nı hesapla
+// filters: { pe_max:15, roe_min:20, ... }
+// Döner: { score:0-100, status:'high'|'watch'|'ok'|'low', n, details:[...] } | null
+function computeMatch(stock, filters) {
+  if (!filters || !stock) return null;
+  var keys = Object.keys(filters);
+  if (!keys.length) return null;
+  var total = 0, count = 0, details = [];
+  keys.forEach(function(key) {
+    var meta = _SCORE_FIELD_MAP[key]; if (!meta) return;
+    var target = filters[key];
+    if (target == null) return;
+    var field = meta.f, op = meta.d;
+    var val = stock[field];
+    var sc = _scoreOne(val, field, op, target);
+    var crit = sc === null ? 'miss' : sc >= SCORE_CFG.PASS ? 'pass' : sc > 0 ? 'near' : 'fail';
+    details.push({ key: key, label: _SCORE_LABELS[key] || key, field: field, op: op, target: target, val: val, s: sc, status: crit });
+    if (sc !== null) { total += sc; count++; }
   });
-  _psvActivePresets.forEach(function(k) {
-    var p = PRESETS[k]; if (!p || !p.filters) return;
-    sources.push(p.label);
-    Object.keys(p.filters).forEach(function(fk) { if (!(fk in criteria)) criteria[fk] = p.filters[fk]; });
+  if (!count) return null;
+  var pct = Math.round((total / count) * 100);
+  var b = SCORE_CFG.bands;
+  var status = pct >= b.high ? 'high' : pct >= b.watch ? 'watch' : pct >= b.ok ? 'ok' : 'low';
+  return { score: pct, status: status, n: count, details: details };
+}
+
+// Aktif filtre eşiklerini DOM girdilerinden (merge edilmiş hâliyle) topla
+function captureScoreFilters() {
+  _scoreFilters = {};
+  Object.keys(_SCORE_FIELD_MAP).forEach(function(key) {
+    var v = getN(key);
+    if (v !== null) _scoreFilters[key] = v;
   });
-  _psvActiveTech.forEach(function(k) {
-    var t = TECH_PRESETS[k]; if (!t || !t.filters) return;
-    sources.push(t.label);
-    Object.keys(t.filters).forEach(function(fk) { if (!(fk in criteria)) criteria[fk] = t.filters[fk]; });
-  });
-  var checks = [], totalPts = 0, maxPts = 0;
-  Object.keys(criteria).forEach(function(fk) {
-    var thr = criteria[fk];
-    if (fk === 'vol_min') {
-      if (s.volume == null) return;
-      var vScore = _criterionScore(s.volume / 1e6, thr, 'min');
-      if (vScore === null) return;
-      maxPts++; totalPts += vScore / 100;
-      checks.push({ key: fk, label: _SCORE_LABELS[fk] || fk, val: s.volume / 1e6, thr: thr, dir: 'min', score: vScore });
-      return;
-    }
-    var meta = _SCORE_FIELD_MAP[fk]; if (!meta) return;
-    var val = s[meta.f];
-    var sc = _criterionScore(val, thr, meta.d);
-    if (sc === null) return;
-    maxPts++; totalPts += sc / 100;
-    checks.push({ key: fk, label: _SCORE_LABELS[fk] || fk, val: val, thr: thr, dir: meta.d, score: sc });
-  });
-  var score = maxPts > 0 ? Math.round(totalPts / maxPts * 100) : null;
-  return { score: score, checks: checks, sources: sources };
+  return _scoreFilters;
 }
 
 function _scoreHtml(s) {
-  if (_psvTotalSel() === 0) return '<span style="color:var(--muted2);font-size:11px">—</span>';
-  var r = computeMatchScore(s);
-  if (r.score === null) return '<span style="color:var(--muted2);font-size:11px">—</span>';
-  var pct = r.score;
-  var cls = pct >= 80 ? 'score-high' : pct >= 55 ? 'score-mid' : 'score-low';
+  var m = s && s._match;
+  if (!m) return '<span style="color:var(--muted2);font-size:11px">—</span>';
+  var pct = m.score;
+  var cls = m.status === 'high' ? 'score-high' : m.status === 'watch' ? 'score-mid' : m.status === 'ok' ? 'score-ok' : 'score-low';
   return '<div class="score-cell"><div class="score-track"><div class="score-fill '+cls+'" style="width:'+pct+'%"></div></div><span class="score-val '+cls+'">%'+pct+'</span></div>';
 }
 
 function _buildMatchCard(s) {
   var card = document.getElementById('dmatch-card');
   if (!card) return;
-  if (_psvTotalSel() === 0) { card.style.display = 'none'; return; }
-  var r = computeMatchScore(s);
-  if (!r || r.score === null || r.checks.length === 0) { card.style.display = 'none'; return; }
-  var pct = r.score;
-  var lvl = pct >= 80 ? 'high' : pct >= 55 ? 'mid' : 'low';
-  var checksHtml = r.checks.map(function(c) {
-    var st = c.score >= 50 ? 'pass' : c.score > 0 ? 'near' : 'miss';
-    var icon = st === 'pass' ? '✓' : st === 'near' ? '!' : '✗';
-    var valFmt = c.val !== null && c.val !== undefined ? (Math.abs(c.val) < 10 ? c.val.toFixed(2) : c.val.toFixed(1)) : '—';
-    var thrFmt = (Math.abs(c.thr) < 10 ? c.thr.toFixed(2) : c.thr.toFixed(1));
-    var dirSym = c.dir === 'min' ? '≥' : '≤';
-    return '<div class="dmatch-check '+st+'"><span class="dmatch-icon">'+icon+'</span><span class="dmatch-label">'+esc(c.label)+'</span><span class="dmatch-info">'+valFmt+' '+dirSym+thrFmt+'</span></div>';
+  var m = s && s._match;
+  if (!m || !m.details || !m.details.length) { card.style.display = 'none'; return; }
+  var pct = m.score;
+  var lvl = m.status; // high|watch|ok|low
+  var STATUS = {
+    pass: { icon: '✓', cls: 'pass' }, near: { icon: '◎', cls: 'near' },
+    fail: { icon: '✕', cls: 'miss' }, miss: { icon: '—', cls: 'miss' }
+  };
+  var checksHtml = m.details.map(function(d) {
+    var st = STATUS[d.status] || STATUS.miss;
+    var dirSym = d.op === 'min' ? '≥' : '≤';
+    var valFmt = _mdFmt(d.val, d.key);
+    var tgtFmt = _mdFmt(d.target, d.key);
+    var barPct = d.s != null ? Math.round(d.s * 100) : 0;
+    return '<div class="dmatch-check '+st.cls+'">'+
+      '<span class="dmatch-icon">'+st.icon+'</span>'+
+      '<span class="dmatch-label">'+esc(d.label)+'</span>'+
+      '<span class="dmatch-info">'+valFmt+' '+dirSym+' '+tgtFmt+'</span>'+
+      '<div class="dmatch-cbar"><div class="dmatch-cbar-fill" style="width:'+barPct+'%"></div></div>'+
+      '</div>';
   }).join('');
+  var passCnt = m.details.filter(function(d){return d.status==='pass';}).length;
+  var nearCnt = m.details.filter(function(d){return d.status==='near';}).length;
+  var failCnt = m.details.filter(function(d){return d.status==='fail'||d.status==='miss';}).length;
+  var srcs = ((_scanMeta && _scanMeta.filters) || []).map(function(f){ return f.label; });
   card.innerHTML =
     '<div class="dstitle">Neden Eşleşti?</div>'+
     '<div class="dmatch-header">'+
-      '<div class="dmatch-badge dmatch-'+lvl+'"><strong>%'+pct+'</strong><span>Uyum</span></div>'+
+      '<div class="dmatch-badge dmatch-'+lvl+'"><strong>%'+pct+'</strong><span>'+(_BAND_LBLS[lvl]||'')+'</span></div>'+
       '<div class="dmatch-bar-wrap">'+
         '<div class="dmatch-bar"><div class="dmatch-bar-fill dmatch-fill-'+lvl+'" style="width:'+pct+'%"></div></div>'+
-        '<div class="dmatch-source">'+esc(r.sources.slice(0,3).join(' · '))+'</div>'+
+        '<div class="dmatch-counts"><span class="dmc-pass">'+passCnt+' geçer</span><span class="dmc-near">'+nearCnt+' yakın</span><span class="dmc-fail">'+failCnt+' uzak</span></div>'+
       '</div>'+
     '</div>'+
+    (srcs.length ? '<div class="dmatch-source">'+esc(srcs.slice(0,4).join(' · '))+'</div>' : '')+
     '<div class="dmatch-checks">'+checksHtml+'</div>';
   card.style.display = '';
+}
+
+// Detay kartı değer formatı — alana göre %/x/F-Score
+function _mdFmt(v, key) {
+  if (v == null || !isFinite(v)) return '—';
+  if (/roe|roa|margin|gross|revg|earng|div|chg|perf|from|above/.test(key)) return v.toFixed(1) + '%';
+  if (/piotroski/.test(key)) return Math.round(v) + '/9';
+  if (/mc_/.test(key)) {
+    if (v >= 1e6) return '$' + (v / 1e6).toFixed(1) + 'T';
+    if (v >= 1000) return '$' + (v / 1000).toFixed(0) + 'B';
+    return '$' + v.toFixed(0) + 'M';
+  }
+  return v.toFixed(2);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -3162,6 +3234,13 @@ function applyAndRender(special){
     filtered.sort(function(a, b) { return (b.piotroski || 0) - (a.piotroski || 0); });
   }
 
+  // Uyum Puanı: aktif (merge edilmiş) filtre eşiklerini yakala, her sonuç için skorla
+  captureScoreFilters();
+  var _hasScoreFilters = Object.keys(_scoreFilters).length > 0;
+  filtered.forEach(function(s) {
+    s._match = _hasScoreFilters ? computeMatch(s, _scoreFilters) : null;
+  });
+
   document.getElementById('toolbar').style.display = 'flex';
   document.getElementById('resn').textContent = filtered.length;
   document.getElementById('scann').textContent = allData.length;
@@ -3286,6 +3365,13 @@ function _sortAsset(arr, field, dir) {
   });
 }
 function sorted(arr){
+  if (sortSt.field === '_match') {
+    return [...arr].sort((a,b)=>{
+      const av = a._match ? a._match.score : (sortSt.dir==='desc'?-Infinity:Infinity);
+      const bv = b._match ? b._match.score : (sortSt.dir==='desc'?-Infinity:Infinity);
+      return sortSt.dir==='desc' ? bv-av : av-bv;
+    });
+  }
   return [...arr].sort((a,b)=>{
     const av = a[sortSt.field] ?? (sortSt.dir==='desc'?-Infinity:Infinity);
     const bv = b[sortSt.field] ?? (sortSt.dir==='desc'?-Infinity:Infinity);

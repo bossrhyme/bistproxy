@@ -1358,7 +1358,7 @@ if('serviceWorker' in navigator){
               <th onclick="colSort('name')" data-col="name" data-tip="Şirketin tam ticari adı.">ŞİRKET ADI</th>
               <th onclick="colSort('currentPrice')" data-col="price" id="th-price" data-tip="Son işlem fiyatı. Değişim yüzdesi önceki kapanışa göre hesaplanır.">FİYAT</th>
               <th onclick="colSort('marketCapitalization')" data-col="mcap" data-tip="Piyasa Değeri: Şirketin borsadaki toplam değeri (USD milyon).">P. Değeri ($)</th>
-              <th data-col="score" data-tip="Kriter Uyumu: Aktif filtrelerinizle ne kadar iyi eşleştiğini gösterir. Filtre seçildiğinde hesaplanır." style="min-width:90px">Kriter Uyumu</th>
+              <th onclick="colSort('_match')" data-col="score" data-tip="Kriter Uyumu: Aktif filtrelerinizle ne kadar iyi eşleştiğini, taranan evrenin dağılımına göre 0-100 arası puanlar. Filtre seçildiğinde hesaplanır." style="min-width:90px">Kriter Uyumu</th>
               <th onclick="colSort('peNormalizedAnnual')" data-col="pe" data-tip="Fiyat/Kazanç: Hisse fiyatının yıllık kazanca oranı. Düşük = ucuz.">F/K</th>
               <th onclick="colSort('pbAnnual')" data-col="pb" data-tip="Piyasa/Defter: 1'in altı varlıkların altında işlem görüyor.">PD/DD</th>
               <th onclick="colSort('psTTM')" data-col="ps" data-tip="Fiyat/Satış: Kâr etmeyen büyüme şirketleri için kullanılır.">F/S</th>
