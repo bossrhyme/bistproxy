@@ -131,6 +131,91 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-badge{font-family:'Inter',sans-serif;font-size:10px;font-weight:500;color:var(--muted2);background:var(--s2);border:1px solid var(--border);padding:5px 12px;border-radius:var(--r-md);letter-spacing:.04em;margin-bottom:22px;display:inline-flex;align-items:center;gap:8px;}
 .hp-logo-lockup{display:inline-flex;align-items:center;gap:10px;margin-bottom:24px;}
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
+
+/* ── DFH: DARK RADAR HERO ── */
+.dfh-wrap{background:#0F0D18;padding:72px 40px 0;overflow:hidden;border-bottom:1px solid rgba(110,88,168,.18);}
+.dfh-inner{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1fr 1.15fr;gap:56px;align-items:center;}
+.dfh-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(238,228,208,.38);display:block;margin-bottom:22px;}
+.dfh-h1{font-size:clamp(42px,5.2vw,74px);font-weight:900;line-height:1.02;letter-spacing:-2.5px;color:rgba(238,228,208,.95);margin-bottom:22px;}
+.dfh-h1 strong{color:#EEE4D0;}
+.dfh-sub{font-size:15px;line-height:1.74;color:rgba(238,228,208,.48);margin-bottom:36px;max-width:390px;}
+.dfh-btns{display:flex;gap:12px;flex-wrap:wrap;}
+.dfh-btn-primary{background:#E8D5A8;color:#16131F;border:0;border-radius:10px;padding:13px 26px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:.15s;letter-spacing:-.1px;}
+.dfh-btn-primary:hover{background:#F0DEBC;}
+.dfh-btn-secondary{background:rgba(238,228,208,.06);color:rgba(238,228,208,.65);border:1px solid rgba(238,228,208,.14);border-radius:10px;padding:13px 26px;font-size:13.5px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:.15s;}
+.dfh-btn-secondary:hover{border-color:rgba(238,228,208,.3);color:#EEE4D0;}
+.dfh-mockup-wrap{position:relative;}
+.dfh-mockup{background:#0A0812;border:1px solid rgba(110,88,168,.22);border-bottom:0;border-radius:14px 14px 0 0;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.03),inset 0 1px 0 rgba(255,255,255,.05);}
+.dfh-mbar{background:#100E1B;border-bottom:1px solid rgba(255,255,255,.06);padding:11px 14px;display:flex;align-items:center;gap:10px;}
+.dfh-mdots{display:flex;gap:5px;}
+.dfh-mdots i{width:9px;height:9px;border-radius:50%;display:block;}
+.dfh-mdots i:nth-child(1){background:#FF5F57;}
+.dfh-mdots i:nth-child(2){background:#FEBC2E;}
+.dfh-mdots i:nth-child(3){background:#28C840;}
+.dfh-mtitle{font-size:8.5px;color:rgba(255,255,255,.28);flex:1;text-align:center;letter-spacing:.04em;}
+.dfh-mstatus{font-size:8.5px;color:rgba(110,220,110,.7);display:flex;align-items:center;gap:5px;}
+.dfh-mstatus b{width:6px;height:6px;border-radius:50%;background:#28C840;display:block;box-shadow:0 0 6px #28C840;}
+.dfh-mbody{display:grid;grid-template-columns:168px 1fr 178px;}
+.dfh-mfilters{border-right:1px solid rgba(255,255,255,.06);padding:14px 12px;}
+.dfh-mflabel{font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.22);margin-bottom:10px;}
+.dfh-mfcard{display:flex;align-items:flex-start;gap:8px;padding:7px 8px;border-radius:8px;margin-bottom:4px;border:1px solid transparent;transition:.2s;}
+.dfh-mfcard.active{background:rgba(110,88,168,.13);border-color:rgba(110,88,168,.28);}
+.dfh-mfnum{width:22px;height:22px;min-width:22px;border-radius:7px;background:rgba(110,88,168,.16);display:grid;place-items:center;font-size:8.5px;font-weight:800;color:rgba(110,88,168,.7);font-family:monospace;}
+.dfh-mfcard.active .dfh-mfnum{background:#6E58A8;color:#fff;}
+.dfh-mfcard strong{font-size:10.5px;color:rgba(255,255,255,.78);display:block;line-height:1;margin-bottom:2px;font-weight:700;}
+.dfh-mfcard small{font-size:8.5px;color:rgba(255,255,255,.3);line-height:1.3;}
+.dfh-mstats{margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06);}
+.dfh-mstat-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.dfh-mstat-label{font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.22);}
+.dfh-mstat-val{font-family:monospace;font-size:8.5px;color:rgba(238,228,208,.5);}
+.dfh-radar-wrap{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 12px 14px;}
+.dfh-radar-svg{width:100%;max-width:260px;display:block;}
+.dfh-radar-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-56%);text-align:center;pointer-events:none;}
+.dfh-radar-center strong{display:block;font-size:26px;font-weight:900;color:rgba(238,228,208,.9);letter-spacing:-1.5px;line-height:1;}
+.dfh-radar-center span{display:block;font-size:7px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(238,228,208,.3);margin-top:4px;}
+.dfh-radar-foot{font-size:8px;color:rgba(255,255,255,.25);margin-top:4px;letter-spacing:.04em;}
+@keyframes dfh-spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+.dfh-rspin{animation:dfh-spin 5s linear infinite;transform-box:fill-box;transform-origin:center;}
+@keyframes dfh-dot-pulse{0%,100%{opacity:.85;}50%{opacity:.45;}}
+.dfh-dot-active{animation:dfh-dot-pulse 2.4s ease-in-out infinite;}
+.dfh-mmatch{border-left:1px solid rgba(255,255,255,.06);padding:14px 12px;background:rgba(238,228,208,.015);}
+.dfh-mm-label{font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.22);margin-bottom:10px;}
+.dfh-mm-ticker{display:flex;align-items:baseline;gap:10px;margin-bottom:6px;}
+.dfh-mm-name{font-size:22px;font-weight:900;color:rgba(238,228,208,.92);letter-spacing:-.5px;}
+.dfh-mm-pct{font-size:20px;font-weight:800;color:#6E58A8;}
+.dfh-mm-note{font-size:9px;color:rgba(255,255,255,.3);line-height:1.55;margin-bottom:12px;}
+.dfh-mm-crit{margin-bottom:12px;}
+.dfh-mmc-row{display:flex;align-items:center;gap:7px;padding:5px 0;border-top:1px solid rgba(255,255,255,.05);font-size:9.5px;}
+.dfh-mmc-row:first-child{border-top:0;}
+.dfh-mmc-icon{width:15px;height:15px;border-radius:4px;display:grid;place-items:center;font-size:8px;font-weight:900;flex:0 0 auto;}
+.dfh-mmc-row.ok .dfh-mmc-icon{background:rgba(40,200,64,.15);color:#28C840;}
+.dfh-mmc-row.warn .dfh-mmc-icon{background:rgba(254,188,46,.15);color:#FEBC2E;}
+.dfh-mmc-name{flex:1;color:rgba(255,255,255,.5);font-size:9px;}
+.dfh-mmc-val{font-weight:700;color:rgba(238,228,208,.75);font-size:9px;white-space:nowrap;}
+.dfh-mm-statsbar{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid rgba(255,255,255,.07);padding-top:10px;text-align:center;}
+.dfh-mm-statsbar>div{border-right:1px solid rgba(255,255,255,.06);}
+.dfh-mm-statsbar>div:last-child{border-right:0;}
+.dfh-mm-statsbar span{display:block;font-size:7px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.22);margin-bottom:3px;}
+.dfh-mm-statsbar strong{display:block;font-size:14px;font-weight:800;color:rgba(238,228,208,.78);letter-spacing:-.4px;}
+.dfh-stats{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:32px;flex-wrap:wrap;padding:20px 0 24px;border-top:1px solid rgba(255,255,255,.07);}
+.dfh-stat strong{font-size:20px;font-weight:700;color:rgba(238,228,208,.82);letter-spacing:-.4px;}
+.dfh-stat strong b{font-weight:400;font-size:13px;color:rgba(238,228,208,.3);}
+.dfh-stat span{display:block;font-size:9.5px;color:rgba(238,228,208,.3);margin-top:1px;text-transform:uppercase;letter-spacing:.08em;}
+.dfh-live{display:flex;align-items:center;gap:7px;margin-left:auto;}
+.dfh-live-dot{width:5px;height:5px;border-radius:50%;background:#28C840;animation:pulse 2s infinite;flex-shrink:0;}
+.dfh-live span{font-size:10.5px;color:rgba(238,228,208,.4);}
+.dfh-live span strong{color:rgba(238,228,208,.7);font-weight:600;display:block;}
+@media(max-width:960px){
+  .dfh-inner{grid-template-columns:1fr;gap:40px;}
+  .dfh-h1{font-size:clamp(38px,9vw,56px);}
+  .dfh-mbody{grid-template-columns:148px 1fr;}
+  .dfh-mmatch{display:none;}
+}
+@media(max-width:600px){
+  .dfh-wrap{padding:52px 20px 0;}
+  .dfh-mbody{grid-template-columns:1fr;}
+  .dfh-mfilters{display:none;}
+}
 </style>
 <link rel="stylesheet" href="/deepfin.css?v=warm36">
 <script src="/i18n.js?v=2" defer></script>
@@ -214,19 +299,131 @@ if('serviceWorker' in navigator){
 
   <!-- ─── HOMEPAGE ─── -->
   <div id="homepage" style="display:none;">
-    <!-- HERO -->
-    <div class="hpx-hero">
-      <div class="hpx-eyebrow"><span class="hpx-live-dot"></span><span data-i18n="hero.eyebrow">30.000+ enstrüman canlı taranıyor</span></div>
-      <h1 class="hpx-h1"><span data-i18n="hero.h1a">Tarama bizden.</span><br><em data-i18n="hero.h1b">Karar sizden.</em></h1>
-      <p class="hpx-sub" data-i18n="hero.sub">Hisse, fon ve kripto — hepsi tek ekranda. Dünyaca ünlü yatırımcı stratejileri ve 100+ filtreyle binlerce şirketi saniyeler içinde tara, kararını güvenle ver.</p>
-      <div class="hpx-ctas">
-        <button class="hpx-cta-p" onclick="showScreenerOrPrescan()" data-i18n="hero.cta1">Taramaya Başla</button>
-        <button class="hpx-cta-g" onclick="location.href='/bilgi/'" data-i18n="hero.cta2">Nasıl çalışır</button>
+    <!-- HERO: dark radar landing -->
+    <div class="dfh-wrap">
+      <div class="dfh-inner">
+        <!-- Sol: Copy -->
+        <div class="dfh-copy">
+          <span class="dfh-eyebrow">Piyasa Taraması</span>
+          <h1 class="dfh-h1">Piyasayı<br><strong>Kriterlerinle</strong><br>Tara.</h1>
+          <p class="dfh-sub">Seçtiğin filtrelere uyan hisseleri, nedenleriyle birlikte daha net gör.</p>
+          <div class="dfh-btns">
+            <button class="dfh-btn-primary" onclick="showScreenerOrPrescan()">Tarama Oluştur</button>
+            <button class="dfh-btn-secondary" onclick="document.getElementById('how-sec')?.scrollIntoView({behavior:'smooth'})">Nasıl çalışır?</button>
+          </div>
+        </div>
+        <!-- Sağ: Mockup pencere -->
+        <div class="dfh-mockup-wrap" aria-hidden="true">
+          <div class="dfh-mockup">
+            <div class="dfh-mbar">
+              <span class="dfh-mdots"><i></i><i></i><i></i></span>
+              <span class="dfh-mtitle">finsparow · Çoklu pazar · Aktif tarama</span>
+              <span class="dfh-mstatus"><b></b>Tarama aktif</span>
+            </div>
+            <div class="dfh-mbody">
+              <!-- Filtre paneli -->
+              <div class="dfh-mfilters">
+                <div class="dfh-mflabel">Seçilen Filtreler</div>
+                <div class="dfh-mfcard active">
+                  <span class="dfh-mfnum">01</span>
+                  <div><strong>Kârlılık</strong><small>ÖSK + nakit akışı</small></div>
+                </div>
+                <div class="dfh-mfcard">
+                  <span class="dfh-mfnum">02</span>
+                  <div><strong>Değerleme</strong><small>F/K + makul fiyat</small></div>
+                </div>
+                <div class="dfh-mfcard">
+                  <span class="dfh-mfnum">03</span>
+                  <div><strong>Hacim</strong><small>Trend + işlem hacmi</small></div>
+                </div>
+                <div class="dfh-mstats">
+                  <div class="dfh-mstat-row"><span class="dfh-mstat-label">Temel</span><span class="dfh-mstat-val">ÖSK > %15</span></div>
+                  <div class="dfh-mstat-row"><span class="dfh-mstat-label">Teknik</span><span class="dfh-mstat-val">Hacim > 1.2x</span></div>
+                  <div class="dfh-mstat-row"><span class="dfh-mstat-label">Risk</span><span class="dfh-mstat-val">Uyarılar açık</span></div>
+                </div>
+              </div>
+              <!-- Radar -->
+              <div class="dfh-radar-wrap">
+                <svg class="dfh-radar-svg" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <radialGradient id="dfh-rg-center2" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#6E58A8" stop-opacity="0.22"/>
+                      <stop offset="100%" stop-color="#6E58A8" stop-opacity="0"/>
+                    </radialGradient>
+                    <radialGradient id="dfh-rg-sweep2" cx="150" cy="150" r="120" gradientUnits="userSpaceOnUse">
+                      <stop offset="0%" stop-color="#6E58A8" stop-opacity="0.18"/>
+                      <stop offset="100%" stop-color="#6E58A8" stop-opacity="0"/>
+                    </radialGradient>
+                    <filter id="dfh-glow2">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur"/>
+                      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                  </defs>
+                  <circle cx="150" cy="150" r="128" fill="#080610"/>
+                  <line x1="22" y1="150" x2="278" y2="150" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                  <line x1="150" y1="22" x2="150" y2="278" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                  <circle cx="150" cy="150" r="42" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+                  <circle cx="150" cy="150" r="84" fill="none" stroke="rgba(255,255,255,0.055)" stroke-width="1"/>
+                  <circle cx="150" cy="150" r="126" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+                  <circle cx="150" cy="150" r="128" fill="none" stroke="rgba(110,88,168,0.18)" stroke-width="1.5"/>
+                  <circle cx="150" cy="150" r="40" fill="url(#dfh-rg-center2)"/>
+                  <!-- Dönen sweep -->
+                  <g class="dfh-rspin">
+                    <path d="M150,150 L276,150 A126,126 0 0,0 150,24 Z" fill="url(#dfh-rg-sweep2)" opacity="0.85"/>
+                    <line x1="150" y1="150" x2="276" y2="150" stroke="#7B68B8" stroke-width="1.5" stroke-linecap="round" filter="url(#dfh-glow2)" opacity="0.95"/>
+                    <circle cx="276" cy="150" r="3" fill="#8B78C8" filter="url(#dfh-glow2)"/>
+                  </g>
+                  <!-- Ticker noktaları -->
+                  <g class="dfh-dot-active">
+                    <circle cx="217" cy="93" r="5" fill="#E8D5A8" filter="url(#dfh-glow2)"/>
+                    <text x="225" y="97" font-size="8.5" fill="#E8D5A8" font-family="Inter,sans-serif" font-weight="700">THYAO</text>
+                  </g>
+                  <circle cx="131" cy="91" r="3.5" fill="rgba(255,255,255,0.62)"/>
+                  <text x="92" y="89" font-size="8" fill="rgba(255,255,255,0.55)" font-family="Inter,sans-serif" font-weight="600">ASELŞ</text>
+                  <circle cx="65" cy="190" r="3.5" fill="rgba(255,255,255,0.52)"/>
+                  <text x="50" y="186" font-size="8" fill="rgba(255,255,255,0.45)" font-family="Inter,sans-serif">SİŞE</text>
+                  <circle cx="243" cy="204" r="3" fill="rgba(255,255,255,0.3)"/>
+                  <text x="248" y="208" font-size="7.5" fill="rgba(255,255,255,0.27)" font-family="Inter,sans-serif">DAX</text>
+                  <circle cx="131" cy="220" r="3" fill="rgba(255,255,255,0.25)"/>
+                  <text x="136" y="223" font-size="7.5" fill="rgba(255,255,255,0.22)" font-family="Inter,sans-serif">BTC</text>
+                  <circle cx="57" cy="113" r="3" fill="rgba(255,255,255,0.22)"/>
+                  <text x="34" y="110" font-size="7.5" fill="rgba(255,255,255,0.2)" font-family="Inter,sans-serif">AAPL</text>
+                </svg>
+                <div class="dfh-radar-center">
+                  <strong>568</strong>
+                  <span>Varlık Tarandı</span>
+                </div>
+                <div class="dfh-radar-foot">10 sonuç bulundu</div>
+              </div>
+              <!-- Eşleşme kartı -->
+              <div class="dfh-mmatch">
+                <div class="dfh-mm-label">Neden eşleşti?</div>
+                <div class="dfh-mm-ticker">
+                  <span class="dfh-mm-name">THYAO</span>
+                  <span class="dfh-mm-pct">%87</span>
+                </div>
+                <p class="dfh-mm-note">Skor, seçili kriterlere ne kadar uyduğunu gösterir.</p>
+                <div class="dfh-mm-crit">
+                  <div class="dfh-mmc-row ok"><span class="dfh-mmc-icon">✓</span><span class="dfh-mmc-name">Kalite</span><span class="dfh-mmc-val">Güçlü</span></div>
+                  <div class="dfh-mmc-row ok"><span class="dfh-mmc-icon">✓</span><span class="dfh-mmc-name">Hacim</span><span class="dfh-mmc-val">Destekli</span></div>
+                  <div class="dfh-mmc-row warn"><span class="dfh-mmc-icon">!</span><span class="dfh-mmc-name">Değerleme</span><span class="dfh-mmc-val">Sınıra yakın</span></div>
+                </div>
+                <div class="dfh-mm-statsbar">
+                  <div><span>Taranan</span><strong>568</strong></div>
+                  <div><span>Filtre</span><strong>3</strong></div>
+                  <div><span>Sonuç</span><strong>10</strong></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="hpx-stats">
-        <div><div class="hpx-stat-n">9+</div><div class="hpx-stat-l" data-i18n="stat.assets">varlık sınıfı</div></div>
-        <div><div class="hpx-stat-n">30K+</div><div class="hpx-stat-l" data-i18n="stat.instruments">enstrüman</div></div>
-        <div><div class="hpx-stat-n" data-strat-count>155+</div><div class="hpx-stat-l" data-i18n="stat.filters">Filtre &amp; Strateji</div></div>
+      <!-- Stats bar -->
+      <div class="dfh-stats">
+        <div class="dfh-stat"><strong>28<b>+</b></strong><span>Borsa</span></div>
+        <div class="dfh-stat"><strong>30K<b>+</b></strong><span>Enstrüman</span></div>
+        <div class="dfh-stat"><strong>150<b>+</b></strong><span>Tarama Kriteri</span></div>
+        <div class="dfh-live"><span class="dfh-live-dot"></span><span><strong>Canlı tarama</strong>Buffett · BIST · Temel + Teknik</span></div>
       </div>
     </div>
 
