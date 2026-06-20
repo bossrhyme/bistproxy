@@ -133,12 +133,12 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 .hp-logo-name{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px;}
 
 /* ── DFH: DARK RADAR HERO ── */
-.dfh-wrap{background:#0F0D18;padding:72px 40px 0;overflow:hidden;border-bottom:1px solid rgba(110,88,168,.18);}
-.dfh-inner{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1fr 1.15fr;gap:56px;align-items:center;}
-.dfh-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(238,228,208,.38);display:block;margin-bottom:22px;}
-.dfh-h1{font-size:clamp(42px,5.2vw,74px);font-weight:900;line-height:1.02;letter-spacing:-2.5px;color:rgba(238,228,208,.95);margin-bottom:22px;}
-.dfh-h1 strong{color:#EEE4D0;}
-.dfh-sub{font-size:15px;line-height:1.74;color:rgba(238,228,208,.48);margin-bottom:36px;max-width:390px;}
+.dfh-wrap{background:#0F0D18;padding:72px 40px 0;overflow:hidden;border-bottom:1px solid rgba(110,88,168,.18);width:100%;box-sizing:border-box;flex-shrink:0;}
+.dfh-inner{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1fr 1.15fr;gap:56px;align-items:center;width:100%;}
+.dfh-wrap .dfh-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(238,228,208,.38);display:block!important;margin-bottom:22px;visibility:visible!important;}
+.dfh-wrap .dfh-h1{font-size:clamp(42px,5.2vw,74px)!important;font-weight:900!important;line-height:1.02!important;letter-spacing:-2.5px!important;color:rgba(238,228,208,.95)!important;margin-bottom:22px!important;display:block!important;visibility:visible!important;}
+.dfh-wrap .dfh-h1 strong{color:#EEE4D0!important;font-weight:900!important;}
+.dfh-wrap .dfh-sub{font-size:15px;line-height:1.74;color:rgba(238,228,208,.48)!important;margin-bottom:36px;max-width:390px;display:block!important;}
 .dfh-btns{display:flex;gap:12px;flex-wrap:wrap;}
 .dfh-btn-primary{background:#E8D5A8;color:#16131F;border:0;border-radius:10px;padding:13px 26px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:.15s;letter-spacing:-.1px;}
 .dfh-btn-primary:hover{background:#F0DEBC;}
