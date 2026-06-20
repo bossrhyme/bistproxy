@@ -455,7 +455,9 @@ td:nth-child(2){font-family:var(--ff);}
 .sstep-item.active .sstep-sub,.sstep-item.done .sstep-sub{display:block;}
 
 /* ── SCAN SUMMARY CARD ── */
-.scan-summary{padding:8px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:flex-start;gap:8px;font-size:11px;color:var(--muted2);background:var(--s2);flex-shrink:0;position:relative;overflow:visible;min-height:30px;animation:dfFadeIn .18s ease;}
+.scan-summary{padding:6px 14px 8px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;align-items:center;gap:5px;font-size:11px;color:var(--muted2);background:var(--s2);flex-shrink:0;position:relative;overflow:visible;min-height:30px;animation:dfFadeIn .18s ease;}
+.ssm-criteria-head{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);font-family:var(--ff-mono);}
+.ssm-criteria-pills{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;}
 .ssm-left{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-width:0;}
 .ssm-flabel{color:var(--muted);font-size:11px;white-space:nowrap;}
 .ssm-center{text-align:center;white-space:nowrap;color:var(--muted2);}
@@ -1067,12 +1069,13 @@ td:nth-child(2){font-family:var(--ff);}
 @keyframes ticker-scroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
 
 /* ── STATS BAR ── */
-.stats-bar{display:none;align-items:center;gap:0;padding:0 12px;height:32px;background:var(--s2);border-bottom:1px solid var(--border);flex-shrink:0;font-size:11px;font-family:var(--ff-mono);}
+.stats-bar{display:none;align-items:center;justify-content:center;gap:0;padding:0 12px;height:32px;background:var(--s2);border-bottom:1px solid var(--border);flex-shrink:0;font-size:11px;font-family:var(--ff-mono);}
 .stats-bar.visible{display:flex;}
-.sb-item{display:flex;align-items:center;gap:5px;padding:0 12px;border-right:1px solid var(--border);}
+.sb-item{display:flex;align-items:center;gap:4px;padding:0 12px;border-right:1px solid var(--border);}
 .sb-item:first-child{padding-left:0;}
 .sb-item:last-child{border-right:none;}
-.sb-label{color:var(--muted2);font-size:9px;letter-spacing:.6px;text-transform:uppercase;}
+.sb-item-updn{gap:6px;}
+.sb-label{color:var(--muted2);font-size:9px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;}
 .sb-val{font-weight:700;color:var(--text);font-size:11px;}
 .sb-val.up{color:var(--green);}
 .sb-val.dn{color:var(--red);}
@@ -1694,12 +1697,14 @@ kbd{font-family:var(--ff-mono);font-size:10px;color:var(--text);background:var(-
 .tb-tools-menu .density-toggle{display:flex;gap:4px;padding:2px 7px 7px;border:none;overflow:visible;border-radius:0;}
 .tb-tools-menu .density-btn{flex:1;font-size:11px;font-weight:600;padding:6px;border:1px solid var(--border2);border-radius:6px;color:var(--text2);background:var(--s2);}
 .tb-tools-menu .density-btn.active{background:var(--accent);color:#fff;border-color:transparent;}
-/* META özet bar — ince, noktalı ayraçlı (BIST · 607 tarandı · 32 eşleşti · ▲20 ▼12 · 17:05) */
-.stats-bar .sb-item{border-right:none;padding:0 5px;}
-.stats-bar .sb-item:first-child{padding-left:0;}
-.stats-bar .sb-item + .sb-item::before{content:'·';color:var(--muted);margin-right:5px;font-weight:700;}
-.stats-bar .sb-val{font-weight:600;}
-.stats-bar .sb-val.up{color:var(--green);margin-right:6px;}
+/* META özet bar — etiketli, ortalı */
+.stats-bar .sb-item{border-right:1px solid var(--border);padding:0 12px;}
+.stats-bar .sb-item:first-child{padding-left:12px;}
+.stats-bar .sb-item:last-child{border-right:none;}
+.stats-bar .sb-label{color:var(--muted2);font-size:9px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;}
+.stats-bar .sb-label::after{content:' :';color:var(--muted);}
+.stats-bar .sb-val{font-weight:700;font-size:11px;}
+.stats-bar .sb-val.up{color:var(--green);}
 .stats-bar .sb-val.dn{color:var(--red);}
 .stats-bar .sb-time-val{color:var(--muted2);font-weight:500;}
 .stats-bar .sb-dur-val{color:var(--muted);font-weight:500;}

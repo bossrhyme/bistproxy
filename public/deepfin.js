@@ -902,7 +902,7 @@ let allData = [];
 let filtered = [];
 let searchQ = '';
 let selSym = null;
-let sortSt = {field:'marketCapitalization', dir:'desc'};
+let sortSt = {field:'_match', dir:'desc'};
 let fxRates = {TRY:44.1, EUR:1.163, GBP:1.333, JPY:0.00633, KRW:0.00074, RUB:89.0, NOK:0.090, CAD:0.73, TWD:32.0, BRL:5.70, HKD:7.78, CNY:7.25, SAR:3.75, CHF:1.12, AUD:0.633, ZAR:18.5, SEK:0.095, INR:0.012, AED:0.272};
 // /api/rates ham yanıtını hesaplama deposuna (fxRates) yazar.
 // Ham format: TRY=USDTRY, EUR/GBP/...=USD başına birim (open.er-api). Hesaplama için saklanır.
@@ -3338,6 +3338,8 @@ function onSearch(){
 function colSort(f){
   if(sortSt.field===f) sortSt.dir = sortSt.dir==='desc'?'asc':'desc';
   else { sortSt.field=f; sortSt.dir='desc'; }
+  var sf = document.getElementById('sortf'); if (sf && sf.querySelector('option[value="'+f+'"]')) sf.value = f;
+  var sd = document.getElementById('sortd'); if (sd) sd.value = sortSt.dir;
   renderTable();
 }
 function toggleSortDir(){
@@ -3369,7 +3371,11 @@ function sorted(arr){
     return [...arr].sort((a,b)=>{
       const av = a._match ? a._match.score : (sortSt.dir==='desc'?-Infinity:Infinity);
       const bv = b._match ? b._match.score : (sortSt.dir==='desc'?-Infinity:Infinity);
-      return sortSt.dir==='desc' ? bv-av : av-bv;
+      if (bv !== av) return sortSt.dir==='desc' ? bv-av : av-bv;
+      // secondary: mcap desc
+      const am = a.marketCapitalization ?? -Infinity;
+      const bm = b.marketCapitalization ?? -Infinity;
+      return bm - am;
     });
   }
   return [...arr].sort((a,b)=>{
@@ -4785,6 +4791,13 @@ function updateStatsBar() {
   document.getElementById('sb-dn').textContent = '▼ ' + dnCount;
   document.getElementById('sb-ex').textContent = ex.name || currentExchange.toUpperCase();
   document.getElementById('sb-time').textContent = hh + ':' + mm;
+  var assetEl = document.getElementById('sb-asset');
+  if (assetEl) {
+    var assetLabel = _activeAsset === 'kripto' ? 'Kripto' : _activeAsset === 'fon' ? 'Fon' : 'Borsa';
+    assetEl.textContent = assetLabel;
+  }
+  var scannedEl = document.getElementById('sb-scanned');
+  if (scannedEl) scannedEl.textContent = (allData ? allData.length : 0).toLocaleString('tr-TR');
 }
 
 function updateTicker() {
@@ -5219,20 +5232,28 @@ function showScanSummary(total, matches) {
       (f.desc ? '<span class="ssm-tag-popup">' + esc(f.desc) + '</span>' : '') +
       '</span>';
   }).join('');
-  el.innerHTML =
-    '<span class="ssm-left">' +
-      (tagsHtml
-        ? '<span class="ssm-flabel">Aktif filtre:</span>' + tagsHtml
-        : '<span class="ssm-no-filter">Filtresiz</span>') +
-    '</span>';
-  // Tarandı/eşleşti bilgisi meta barında
+  if (tagsHtml) {
+    el.innerHTML =
+      '<div class="ssm-criteria-head">Aktif Kriterler</div>' +
+      '<div class="ssm-criteria-pills">' + tagsHtml + '</div>';
+    el.style.display = '';
+  } else {
+    el.style.display = 'none';
+  }
+  // Taranan/Eşleşen — meta barındaki etiketli kolonlar
+  var scannedEl = document.getElementById('sb-scanned');
+  if (scannedEl) scannedEl.textContent = (total || 0).toLocaleString('tr-TR');
   var resItem = document.getElementById('sb-result-item');
   var resVal  = document.getElementById('sb-result');
   if (resItem && resVal) {
-    resVal.innerHTML = total + ' tarandı · <span class="up">' + matches + ' eşleşti</span>';
-    resItem.style.display = '';
+    if (matches > 0) {
+      resVal.textContent = matches.toLocaleString('tr-TR');
+      resItem.style.display = '';
+    } else {
+      resItem.style.display = 'none';
+    }
   }
-  // Tarama süresi meta barının sonunda (… 16:34 · 3.0s)
+  // Tarama süresi meta barının sonunda
   var durItem = document.getElementById('sb-dur-item');
   var durVal  = document.getElementById('sb-dur');
   if (durItem && durVal && elapsed !== '—') {
