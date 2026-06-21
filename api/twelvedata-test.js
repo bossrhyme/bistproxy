@@ -176,6 +176,103 @@ async function testCompare() {
   };
 }
 
+// ── EODHD Test Fonksiyonları ───────────────────────────────────
+const EOD_BASE = 'https://eodhd.com/api';
+const EOD_KEY  = () => process.env.EODHD_API_KEY || '6a37fc16640424.99227602';
+
+async function eodFetch(path) {
+  const sep = path.includes('?') ? '&' : '?';
+  const url  = `${EOD_BASE}${path}${sep}api_token=${EOD_KEY()}&fmt=json`;
+  const res  = await fetch(url, {
+    headers: { 'User-Agent': 'DeepFin-Test/1.0' },
+    signal: AbortSignal.timeout(15000)
+  });
+  if (!res.ok) throw new Error(`EODHD HTTP ${res.status}`);
+  return res.json();
+}
+
+// Test A: Bulk EOD — tüm BIST hisseleri tek istekte
+async function testEodBulk() {
+  const t0   = Date.now();
+  const data = await eodFetch('/eod-bulk-last-day/IS');
+  const elapsed = Date.now() - t0;
+  const arr  = Array.isArray(data) ? data : [];
+  return {
+    test: 'eod-bulk',
+    ok: arr.length > 0,
+    count: arr.length,
+    elapsed_ms: elapsed,
+    fields: arr[0] ? Object.keys(arr[0]) : [],
+    sample: arr.slice(0, 5).map(r => ({
+      code: r.code, name: r.name, date: r.date,
+      open: r.open, high: r.high, low: r.low, close: r.close, volume: r.volume
+    })),
+    error: arr.length === 0 ? JSON.stringify(data).slice(0, 200) : null
+  };
+}
+
+// Test B: Tekil fundamentals — PE, ROE, market cap vb.
+async function testEodFundamentals(sym) {
+  const t0   = Date.now();
+  const data = await eodFetch(`/fundamentals/${sym}.IS`);
+  const elapsed = Date.now() - t0;
+  const h = data.Highlights || {};
+  const v = data.Valuation  || {};
+  const g = data.General    || {};
+  return {
+    test: 'eod-fundamentals',
+    symbol: sym,
+    ok: !!g.Code,
+    elapsed_ms: elapsed,
+    general: { name: g.Name, sector: g.Sector, industry: g.Industry, exchange: g.Exchange },
+    highlights: {
+      market_cap:    h.MarketCapitalization,
+      pe:            h.PERatio,
+      eps:           h.EarningsShare,
+      roe:           h.ReturnOnEquityTTM,
+      roa:           h.ReturnOnAssetsTTM,
+      profit_margin: h.ProfitMargin,
+      revenue_growth: h.QuarterlyRevenueGrowthYOY,
+      earnings_growth: h.QuarterlyEarningsGrowthYOY,
+      dividend_yield: h.DividendYield,
+    },
+    valuation: {
+      trailing_pe: v.TrailingPE,
+      forward_pe:  v.ForwardPE,
+      pb:          v.PriceBookMRQ,
+      ps:          v.PriceSalesTTM,
+      ev:          v.EnterpriseValue,
+      ev_ebitda:   v.EnterpriseValueEbitda,
+    },
+    error: !g.Code ? JSON.stringify(data).slice(0, 200) : null
+  };
+}
+
+// Test C: Bulk Fundamentals — tüm BIST temel veri tek istekte (plan dahilinde mi?)
+async function testEodBulkFundamentals() {
+  const t0 = Date.now();
+  let data, error;
+  try {
+    data = await eodFetch('/bulk-fundamental/IS?limit=10');
+  } catch(e) {
+    error = e.message;
+  }
+  const elapsed = Date.now() - t0;
+  const isArray = Array.isArray(data);
+  const isObj   = data && typeof data === 'object' && !isArray;
+  return {
+    test: 'bulk-fundamentals',
+    elapsed_ms: elapsed,
+    plan_supported: !error && (isArray || isObj),
+    response_type: isArray ? 'array' : (isObj ? 'object' : 'unknown'),
+    count: isArray ? data.length : (isObj ? Object.keys(data).length : 0),
+    sample_keys: isArray && data[0] ? Object.keys(data[0]).slice(0, 10) : (isObj ? Object.keys(data).slice(0, 5) : []),
+    raw_preview: error ? null : JSON.stringify(data).slice(0, 300),
+    error: error || null,
+    note: 'Bu endpoint Extended Fundamentals planı gerektirebilir. plan_supported=false ise mevcut planda yok.'
+  };
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Content-Type', 'application/json');
@@ -184,25 +281,29 @@ module.exports = async function handler(req, res) {
   const sym  = (req.query?.sym  || 'THYAO').toUpperCase();
   const syms = req.query?.syms || 'THYAO,AKBNK,GARAN';
 
-  const apiKey = process.env.TWELVEDATA_API_KEY;
-  const usingDemo = !apiKey;
+  const tdKey   = process.env.TWELVEDATA_API_KEY;
+  const eodKey  = process.env.EODHD_API_KEY;
 
   try {
     let result;
+    // Twelve Data testleri
     if      (test === 'stocks')  result = await testStocks();
     else if (test === 'quote')   result = await testQuote(sym);
     else if (test === 'stats')   result = await testStats(sym);
     else if (test === 'batch')   result = await testBatch(syms);
     else if (test === 'screen')  result = await testScreen();
     else if (test === 'compare') result = await testCompare();
-    else result = { error: 'Geçersiz test. Seçenekler: stocks, quote, stats, batch, screen, compare' };
+    // EODHD testleri
+    else if (test === 'eod-bulk')             result = await testEodBulk();
+    else if (test === 'eod-fundamentals')     result = await testEodFundamentals(sym);
+    else if (test === 'bulk-fundamentals')    result = await testEodBulkFundamentals();
+    else result = { error: 'Geçersiz test. TD: stocks|quote|stats|batch|screen|compare  EODHD: eod-bulk|eod-fundamentals|bulk-fundamentals' };
 
     res.status(200).json({
       ...result,
       _meta: {
-        api_key_configured: !usingDemo,
-        using_demo_key: usingDemo,
-        demo_warning: usingDemo ? 'API key yok — demo key kullanılıyor, çok sınırlı (8 istek/dk, sınırlı veri)' : null,
+        td_key_configured:  !!tdKey,
+        eod_key_configured: !!eodKey,
         timestamp: new Date().toISOString()
       }
     });
@@ -210,11 +311,7 @@ module.exports = async function handler(req, res) {
     res.status(500).json({
       error: err.message,
       test,
-      _meta: {
-        api_key_configured: !usingDemo,
-        using_demo_key: usingDemo,
-        timestamp: new Date().toISOString()
-      }
+      _meta: { timestamp: new Date().toISOString() }
     });
   }
 };
