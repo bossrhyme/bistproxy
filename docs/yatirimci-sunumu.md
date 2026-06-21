@@ -19,6 +19,7 @@ saniyelere indiren bir web platformudur.
 | **Gelir modeli** | Freemium (Pro abonelik) + reklam + aracı kurum yönlendirme komisyonu |
 | **Aylık işletme maliyeti (MVP)** | ~$200–350 |
 | **Rakip fiyatı** | Fintables ₺240/ay — DeepFin bunu ₺99–149 ile kıracak |
+| **Tohum yatırım talebi** | ₺10 milyon (~$285.000) · 24 ay yakım |
 
 > **Tek cümleyle:** Fintables'ın yaptığını daha geniş kapsamda (global + fon +
 > kripto) ve daha düşük fiyatla sunarak, Türkiye'nin hızla büyüyen bireysel
@@ -199,6 +200,25 @@ DeepFin bir fikir değil — canlı, çalışan bir MVP:
 >
 > **Sonuç:** Kullanıcı 10x büyüse, veri maliyeti ~1.2x artar.
 
+### 8.4 Pazarlama ve Kullanıcı Kazanımı Bütçesi
+
+Bütçe üç faza bölünmüştür; lansman öncesi düşük, kullanıcı tabanı oluştukça
+kaldıraç etkisiyle artar:
+
+| Kanal | Faz 1 (Ay 1–6) | Faz 2 (Ay 7–18) | Faz 3 (Ay 19–36) |
+|---|---|---|---|
+| Google Ads (arama/display) | ₺10.000 | ₺30.000 | ₺60.000 |
+| Meta / Instagram Ads | ₺8.000 | ₺20.000 | ₺40.000 |
+| YouTube / içerik kampanyaları | ₺5.000 | ₺15.000 | ₺25.000 |
+| Finans influencer iş birlikleri | ₺5.000 | ₺10.000 | ₺15.000 |
+| SEO + blog içerik üretimi | ₺5.000 | ₺8.000 | ₺10.000 |
+| **Aylık toplam** | **₺33.000** | **₺83.000** | **₺150.000** |
+
+> **Pazarlama verimi hedefi:** CAC (Kullanıcı Edinme Maliyeti) < ₺30 (Pro
+> dönüşümde LTV ~₺1.500 → LTV/CAC > 50). İlk 6 ay organik büyüme +
+> SEO tabanlı düşük maliyetli denemeler; ölçümlenen kanallar optimize edildikten
+> sonra bütçe artırılır.
+
 \newpage
 
 # 9. Birim Ekonomisi
@@ -222,18 +242,69 @@ Muhafazakâr varsayımlarla (1.000 aktif kullanıcı örneği):
 
 \newpage
 
-# 10. Finansal Projeksiyon (3 Senaryo · 24 Ay)
+# 10. Finansal Projeksiyon (3 Senaryo · 36 Ay)
 
-| | Muhafazakâr | Baz | İyimser |
+### 10.1 Baz Senaryo — Çeyreklik Büyüme Tablosu
+
+Baz senaryo %5 Pro dönüşüm oranı ve büyüyen reklam+affiliate geliri varsayar.
+Gider kolonuna pazarlama bütçesi, ekip büyümesi ve yüksek kullanım maliyetleri dahildir.
+
+| Dönem | Aktif Kullanıcı | Aylık Gelir | Aylık Gider | Aylık Net |
+|---|---|---|---|---|
+| Ay 3 | 1.000 | ₺10.000 | ₺75.000 | -₺65.000 |
+| Ay 6 | 3.500 | ₺35.000 | ₺110.000 | -₺75.000 |
+| Ay 9 | 7.500 | ₺80.000 | ₺135.000 | -₺55.000 |
+| Ay 12 | 14.000 | ₺145.000 | ₺160.000 | -₺15.000 |
+| Ay 15 | 22.000 | ₺235.000 | ₺195.000 | **+₺40.000** |
+| Ay 18 | 30.000 | ₺330.000 | ₺225.000 | **+₺105.000** |
+| Ay 21 | 42.000 | ₺460.000 | ₺265.000 | **+₺195.000** |
+| Ay 24 | 55.000 | ₺610.000 | ₺295.000 | **+₺315.000** |
+| Ay 27 | 68.000 | ₺760.000 | ₺330.000 | **+₺430.000** |
+| Ay 30 | 80.000 | ₺900.000 | ₺365.000 | **+₺535.000** |
+| Ay 33 | 93.000 | ₺1.050.000 | ₺395.000 | **+₺655.000** |
+| Ay 36 | 108.000 | ₺1.230.000 | ₺430.000 | **+₺800.000** |
+
+> **Başabaş noktası (Baz):** ~14. ay — yatırım sonrası 14. ayda operasyonel
+> kâra geçilmesi beklenmektedir.
+
+### 10.2 Gider Yapısı (Ay 24 Baz Örneği — ₺295.000)
+
+| Gider Kalemi | Aylık Tutar | Not |
+|---|---|---|
+| Ekip (geliştirici 2, pazarlama 1, destek 1) | ₺175.000 | Piyasa altı + hisse opsiyonu |
+| Pazarlama kampanyaları | ₺80.000 | Faz 2 bütçesi |
+| Veri API + altyapı | ₺28.000 | EODHD/Matriks + Vercel Pro |
+| İdari + hukuki + muhasebe | ₺12.000 | Destek hizmetleri |
+| **Toplam** | **₺295.000** | |
+
+### 10.3 Yüksek Kullanım Maliyeti Projeksiyonu
+
+Cache mimarisi veri maliyetini bastırır; ancak 50K+ kullanıcıda enterprise
+BIST lisansı gerekebilir:
+
+| Kullanıcı Bandı | Veri Sağlayıcı | Aylık Veri Maliyeti |
+|---|---|---|
+| 0 – 5.000 | EODHD All-World | €20 (~₺750) |
+| 5.000 – 30.000 | EODHD Pro + ek endpoints | €50–150 (~₺1.800–5.500) |
+| 30.000 – 100.000 | EODHD Business / Matriks BIST | $300–800 (~₺10.000–28.000) |
+| 100.000+ | Kurumsal veri anlaşması | Görüşmeye bağlı |
+
+> Cache sayesinde 30.000 → 100.000 kullanıcı sıçraması veri maliyetini ancak
+> ~3x artırır; gelir ise ~4x büyür. Marjinal veri maliyeti gelirin %3–5'ini geçmez.
+
+### 10.4 36. Ay Senaryo Karşılaştırması
+
+| | Muhafazakâr | **Baz** | İyimser |
 |---|---|---|---|
-| 24. ay aktif kullanıcı | 10.000 | 30.000 | 80.000 |
-| Pro dönüşüm | %3 | %5 | %7 |
-| Pro abone | 300 | 1.500 | 5.600 |
-| Aylık Pro geliri | ~₺36 bin | ~₺180 bin | ~₺670 bin |
-| Aylık reklam+affiliate | ~₺40 bin | ~₺150 bin | ~₺450 bin |
-| **Aylık toplam gelir** | **~₺76 bin** | **~₺330 bin** | **~₺1,1 milyon** |
-| Aylık işletme gideri | ~₺60 bin | ~₺180 bin | ~₺400 bin |
-| **Aylık net** | Başabaş | **Pozitif** | **Güçlü pozitif** |
+| Aktif kullanıcı | 40.000 | **108.000** | 250.000 |
+| Pro dönüşüm | %3 | **%5** | %7 |
+| Pro abone | 1.200 | **5.400** | 17.500 |
+| Aylık Pro geliri | ₺144.000 | **₺650.000** | ₺2.100.000 |
+| Aylık reklam + affiliate | ₺80.000 | **₺580.000** | ₺1.400.000 |
+| **Aylık toplam gelir** | **₺224.000** | **₺1.230.000** | **₺3.500.000** |
+| Aylık işletme gideri | ₺200.000 | ₺430.000 | ₺900.000 |
+| **Aylık net (Ay 36)** | Başabaş | **+₺800.000** | **+₺2.600.000** |
+| Başabaş ayı | ~Ay 22 | **~Ay 14** | ~Ay 9 |
 
 *Rakamlar tahminîdir; pazar koşulları ve dönüşüm oranlarına bağlıdır.*
 
@@ -278,20 +349,48 @@ Muhafazakâr varsayımlarla (1.000 aktif kullanıcı örneği):
 
 # 13. Yatırım Talebi
 
+### Tohum Tur — ₺10.000.000 (~$285.000 USD)
+
+| | |
+|---|---|
+| **Talep edilen tutar** | ₺10.000.000 (~$285.000) |
+| **Tur tipi** | Tohum (Seed) |
+| **Enstrüman** | Dönüştürülebilir tahvil veya eşit hisse |
+| **Hedef yakım süresi** | 24 ay (yatırımla 14. ayda kara geçiş) |
+| **Aylık ortalama yakım** | ₺320.000 (ilk 12 ay) → gelirle azalan |
+| **Değerleme kapısı** | Müzakereye açık |
+
 ### Neden Yatırım?
 - (+) **Ürün hazır** — fikir değil, çalışan canlı MVP
-- (+) **Yapısal maliyet avantajı** — cache mimarisi
+- (+) **Yapısal maliyet avantajı** — cache mimarisi (kullanıcı 10x, maliyet 1.2x)
 - (+) **Net farklılaşma** — lensler + çoklu varlık, rakiplerde yok
-- (+) **Büyüyen pazar** — Türkiye bireysel yatırımcısı patlama halinde
-- (+) **Düşük yakım** — aylık ~$200 altyapıyla ayakta
+- (+) **Büyüyen pazar** — Türkiye'de 9 milyon bireysel yatırımcı
+- (+) **Hızlı başabaş** — Baz senaryoda 14. ayda operasyonel kara geçiş
 
-### Sermaye Kullanımı (Talep edilen tutarın dağılımı)
-| Alan | Pay | Amaç |
-|---|---|---|
-| Veri lisansları (BIST + global) | %30 | Hukuki risk sıfırlama, premium veri |
-| Ekip (geliştirme + pazarlama) | %40 | Mobil uygulama, büyüme |
-| Kullanıcı kazanımı (pazarlama) | %20 | Performans pazarlaması, içerik |
-| Operasyon/yedek | %10 | Altyapı, beklenmedik |
+### Sermaye Kullanımı (₺10.000.000 dağılımı)
+| Alan | Tutar | Pay | Detay |
+|---|---|---|---|
+| Pazarlama + kullanıcı kazanımı | ₺4.500.000 | %45 | 24 aylık performans pazarlaması, içerik, influencer |
+| Ekip büyümesi | ₺3.000.000 | %30 | +2 geliştirici, +1 pazarlama, +1 destek (24 ay) |
+| Veri lisansları + altyapı | ₺1.500.000 | %15 | BIST lisansı, EODHD/Matriks, Vercel Pro (24 ay) |
+| Hukuki + SPK + operasyon | ₺500.000 | %5 | BIST veri dağıtım sözleşmesi, SPK danışmanlık |
+| Yedek / beklenmedik | ₺500.000 | %5 | Tampon |
+| **Toplam** | **₺10.000.000** | **%100** | |
+
+### Yakım Takvimi (Baz Senaryo)
+
+| Dönem | Aylık Gider | Aylık Gelir | Net Nakit | Kümülatif Bakiye |
+|---|---|---|---|---|
+| Ay 1–3 | ₺75.000 | ₺10.000 | -₺65.000 | ₺9.805.000 |
+| Ay 4–6 | ₺110.000 | ₺35.000 | -₺75.000 | ₺9.580.000 |
+| Ay 7–9 | ₺135.000 | ₺80.000 | -₺55.000 | ₺9.415.000 |
+| Ay 10–12 | ₺160.000 | ₺145.000 | -₺15.000 | ₺9.370.000 |
+| Ay 13–15 | ₺195.000 | ₺235.000 | **+₺40.000** | ₺9.490.000 |
+| Ay 16–18 | ₺225.000 | ₺330.000 | **+₺105.000** | ₺9.805.000 |
+| Ay 19–24 | ₺280.000 | ₺530.000 | **+₺250.000** | ₺11.300.000+ |
+
+> Yatırım tutarı 14. aya kadar platformu taşır. 14. ayda operasyonel kara
+> geçilmesi beklenmekte, kalan bakiye büyüme ivmesi için kullanılmaktadır.
 
 \newpage
 
