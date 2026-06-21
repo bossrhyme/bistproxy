@@ -1,10 +1,31 @@
 // api/bist-scan.js — Twelve Data tabanlı BIST tarayıcı
-// /api/bist-scan  → tüm BIST hisseleri toplu fiyat + temel veri
+// /api/bist-scan  → BIST hisseleri toplu fiyat + temel veri
 // /api/preset-snapshot → günlük kapanış snapshot (cron: 30 15 * * *)
+//
+// KREDİ NOTU: TD Basic plan = 8 kredi/dk, 800/gün. Her sembol = 1 kredi.
+// Bu liste kasıtlı olarak sınırlı tutulmuştur — tüm BIST (~500) çekmek
+// tek istekte 500 kredi yakar ve günlük limiti anında bitirir.
 const { protect, trackViolation } = require('./_protect');
 
 const TD_BASE = 'https://api.twelvedata.com';
 const TD_KEY  = () => process.env.TWELVEDATA_API_KEY || '40e35e9a3ec345adacbd3f8fc0d9246d';
+
+// Piyasa değerine göre en önemli ~100 BIST hissesi (hardcoded).
+// Dinamik /stocks çekimi Basic planda kredileri bitirir.
+const BIST_TOP100 = [
+  'THYAO','AKBNK','GARAN','ISCTR','EREGL','KCHOL','SISE','BIMAS',
+  'ASELS','TOASO','TUPRS','PETKM','KOZAL','FROTO','VESTL','DOHOL',
+  'SAHOL','TTKOM','TCELL','ENKAI','ARCLK','OTKAR','BRISA','AGHOL',
+  'AEFES','ALARK','EKGYO','ULKER','TAVHL','HALKB','VAKBN','YKBNK',
+  'SASA','TKFEN','CCOLA','MGROS','OYAKC','PGSUS','CIMSA','NETAS',
+  'LOGO','KRDMD','BIZIM','TURSG','ADEL','INDES','TSKB','DOAS','ASUZU','GUBRF',
+  'AKSEN','ENJSA','ZOREN','ODAS','KERVT','KONTR','GESAN','ATAER','MPARK','REEDR',
+  'BERA','ISDMR','KARSN','MAVI','ORGE','SELEC','SMRTG','TUPRS','ALKIM','BINHO',
+  'BRYAT','CANTE','CLEBI','DENGE','DEVA','DNISI','EGEEN','EKIZ','EMKEL','EMNIS',
+  'FENER','FINBN','FLAP','FMIZP','FORTS','FRIGO','GEDIK','GENIL','GLYHO','GOLTS',
+  'GRSEL','GSDHO','GUNDG','HATEK','HEKTS','HLGYO','IEYHO','IHAAS','IHEVA','IHGZT',
+  'IHLGM','IHYAY','IPEKE','ISFIN','ISGYO','ISGSY','KARTN','KAYSE','KLNMA','KLSER'
+];
 
 const ALLOWED_ORIGINS = [
   'https://deepfin.vercel.app',
@@ -71,21 +92,8 @@ async function tdFetch(path) {
   return res.json();
 }
 
-// BIST sembol listesi — 24 saat cache
-async function getSymbolList() {
-  const cacheKey = 'td_bist_symbols_v1';
-  const cached   = await kvGet(cacheKey);
-  if (cached) return cached;
-
-  const data = await tdFetch('/stocks?country=Turkey&exchange=BIST&type=Common Stock');
-  const list = (data.data || []).map(s => s.symbol).filter(Boolean);
-  if (!list.length) throw new Error('TD sembol listesi boş');
-
-  await kvSet(cacheKey, list, 86400); // 24 saat
-  return list;
-}
-
 // Batch quote: chunk başına max 120 sembol, paralel istekler
+// Basic plan (8 kredi/dk): 100 sembol = 100 kredi, tek chunk yeterli
 async function batchQuote(symbols) {
   const CHUNK = 120;
   const chunks = [];
@@ -160,9 +168,8 @@ async function handleSnapshot(req, res) {
   }
 
   try {
-    const symbols = await getSymbolList();
-    const raw     = await batchQuote(symbols);
-    const rows    = raw.map(normalizeQuote).filter(Boolean);
+    const raw  = await batchQuote(BIST_TOP100);
+    const rows = raw.map(normalizeQuote).filter(Boolean);
 
     const snapshot = { d: dateStr, source: 'twelvedata', count: rows.length, rows };
     const SNAP_TTL = 400 * 86400;
@@ -209,9 +216,8 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const symbols = await getSymbolList();
-    const raw     = await batchQuote(symbols);
-    const data    = raw.map(normalizeQuote).filter(Boolean);
+    const raw  = await batchQuote(BIST_TOP100);
+    const data = raw.map(normalizeQuote).filter(Boolean);
 
     const response = {
       source:    'twelvedata',
@@ -220,7 +226,7 @@ module.exports = async function handler(req, res) {
       cached_at: new Date().toISOString(),
     };
 
-    await kvSet(cacheKey, response, 600); // 10 dk cache
+    await kvSet(cacheKey, response, 1800); // 30 dk cache — Basic plan kredi tasarrufu
     res.setHeader('X-Cache', 'MISS');
     return res.status(200).json(response);
 
