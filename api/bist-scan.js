@@ -1,31 +1,14 @@
-// api/bist-scan.js — Twelve Data tabanlı BIST tarayıcı
-// /api/bist-scan  → BIST hisseleri toplu fiyat + temel veri
-// /api/preset-snapshot → günlük kapanış snapshot (cron: 30 15 * * *)
+// api/bist-scan.js — EODHD Bulk EOD tabanlı BIST tarayıcı
+// /api/bist-scan        → tüm BIST hisseleri tek istekte (EOD)
+// /api/preset-snapshot  → günlük kapanış snapshot (cron: 30 15 * * *)
 //
-// KREDİ NOTU: TD Basic plan = 8 kredi/dk, 800/gün. Her sembol = 1 kredi.
-// Bu liste kasıtlı olarak sınırlı tutulmuştur — tüm BIST (~500) çekmek
-// tek istekte 500 kredi yakar ve günlük limiti anında bitirir.
+// EODHD bulk endpoint: GET /api/eod-bulk-last-day/IS → tüm borsa tek response
+// Kredi maliyeti: 100 API kredisi / istek (sembol başına değil)
 const { protect, trackViolation } = require('./_protect');
 
-const TD_BASE = 'https://api.twelvedata.com';
-const TD_KEY  = () => process.env.TWELVEDATA_API_KEY || '40e35e9a3ec345adacbd3f8fc0d9246d';
-
-// Piyasa değerine göre en önemli ~100 BIST hissesi (hardcoded).
-// Dinamik /stocks çekimi Basic planda kredileri bitirir.
-const BIST_TOP100 = [
-  'THYAO','AKBNK','GARAN','ISCTR','EREGL','KCHOL','SISE','BIMAS',
-  'ASELS','TOASO','TUPRS','PETKM','KOZAL','FROTO','VESTL','DOHOL',
-  'SAHOL','TTKOM','TCELL','ENKAI','ARCLK','OTKAR','BRISA','AGHOL',
-  'AEFES','ALARK','EKGYO','ULKER','TAVHL','HALKB','VAKBN','YKBNK',
-  'SASA','TKFEN','CCOLA','MGROS','OYAKC','PGSUS','CIMSA','NETAS',
-  'LOGO','KRDMD','BIZIM','TURSG','ADEL','INDES','TSKB','DOAS','ASUZU','GUBRF',
-  'AKSEN','ENJSA','ZOREN','ODAS','KERVT','KONTR','GESAN','ATAER','MPARK','REEDR',
-  'BERA','ISDMR','KARSN','MAVI','ORGE','SELEC','SMRTG','TUPRS','ALKIM','BINHO',
-  'BRYAT','CANTE','CLEBI','DENGE','DEVA','DNISI','EGEEN','EKIZ','EMKEL','EMNIS',
-  'FENER','FINBN','FLAP','FMIZP','FORTS','FRIGO','GEDIK','GENIL','GLYHO','GOLTS',
-  'GRSEL','GSDHO','GUNDG','HATEK','HEKTS','HLGYO','IEYHO','IHAAS','IHEVA','IHGZT',
-  'IHLGM','IHYAY','IPEKE','ISFIN','ISGYO','ISGSY','KARTN','KAYSE','KLNMA','KLSER'
-];
+const EOD_BASE = 'https://eodhd.com/api';
+// TEST ONLY — production'da EODHD_API_KEY env var kullan
+const EOD_KEY  = () => process.env.EODHD_API_KEY || '6a37fc16640424.99227602';
 
 const ALLOWED_ORIGINS = [
   'https://deepfin.vercel.app',
@@ -43,7 +26,7 @@ async function kvGet(key) {
     return j.result ? JSON.parse(j.result) : null;
   } catch { return null; }
 }
-async function kvSet(key, value, ttlSec = 600) {
+async function kvSet(key, value, ttlSec = 3600) {
   try {
     const url = process.env.KV_REST_API_URL, token = process.env.KV_REST_API_TOKEN;
     if (!url || !token) return;
@@ -80,58 +63,35 @@ function getClientIP(req) {
   return ((req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown').slice(0, 45);
 }
 
-// ── Twelve Data yardımcıları ──────────────────────────────────
-async function tdFetch(path) {
-  const sep = path.includes('?') ? '&' : '?';
-  const url  = `${TD_BASE}${path}${sep}apikey=${TD_KEY()}`;
-  const res  = await fetch(url, {
+// ── EODHD Bulk EOD ────────────────────────────────────────────
+// Tüm BIST hisseleri tek istekte — 100 kredi/istek (sembol sayısından bağımsız)
+async function fetchBistBulk() {
+  const url = `${EOD_BASE}/eod-bulk-last-day/IS?api_token=${EOD_KEY()}&fmt=json`;
+  const res = await fetch(url, {
     headers: { 'User-Agent': 'DeepFin/1.0' },
-    signal:  AbortSignal.timeout(20000)
+    signal: AbortSignal.timeout(20000)
   });
-  if (!res.ok) throw new Error(`TD HTTP ${res.status}`);
-  return res.json();
+  if (!res.ok) throw new Error(`EODHD HTTP ${res.status}`);
+  const data = await res.json();
+  if (!Array.isArray(data)) throw new Error('EODHD beklenmedik format: ' + JSON.stringify(data).slice(0, 100));
+  return data;
 }
 
-// Batch quote: chunk başına max 120 sembol, paralel istekler
-// Basic plan (8 kredi/dk): 100 sembol = 100 kredi, tek chunk yeterli
-async function batchQuote(symbols) {
-  const CHUNK = 120;
-  const chunks = [];
-  for (let i = 0; i < symbols.length; i += CHUNK) chunks.push(symbols.slice(i, i + CHUNK));
-
-  const results = await Promise.allSettled(
-    chunks.map(chunk => {
-      const joined = chunk.map(s => `${s}:BIST`).join(',');
-      return tdFetch(`/quote?symbol=${joined}`);
-    })
-  );
-
-  const all = [];
-  for (const r of results) {
-    if (r.status !== 'fulfilled') continue;
-    const data = r.value;
-    if (!data || data.code) continue;
-    // Tek sembol → obje doğrudan; çoklu → { THYAO: {...}, AKBNK: {...} }
-    const rows = data.symbol ? [data] : Object.values(data);
-    all.push(...rows);
-  }
-  return all;
-}
-
-function normalizeQuote(q) {
-  if (!q || q.code) return null;
+// EODHD bulk EOD response → normalize
+// Örnek satır: { code:"THYAO.IS", name:"...", date:"2025-06-20",
+//   open:283, high:290, low:280, close:287, adjusted_close:287, volume:12345678 }
+function normalizeRow(row) {
   const f = v => { const n = parseFloat(v); return isFinite(n) ? n : null; };
   return {
-    symbol:      (q.symbol || '').replace(/:BIST$/, ''),
-    name:        q.name || null,
-    price:       f(q.close),
-    change_pct:  f(q.percent_change),
-    volume:      f(q.volume),
-    market_cap:  f(q.market_cap),
-    pe_ratio:    f(q.pe),
-    week52_high: f(q.fifty_two_week?.high),
-    week52_low:  f(q.fifty_two_week?.low),
-    currency:    q.currency || 'TRY',
+    symbol:  (row.code || '').replace(/\.IS$/i, ''),
+    name:    row.name || null,
+    price:   f(row.close),
+    open:    f(row.open),
+    high:    f(row.high),
+    low:     f(row.low),
+    volume:  f(row.volume),
+    date:    row.date || null,
+    source:  'eodhd',
   };
 }
 
@@ -168,14 +128,13 @@ async function handleSnapshot(req, res) {
   }
 
   try {
-    const raw  = await batchQuote(BIST_TOP100);
-    const rows = raw.map(normalizeQuote).filter(Boolean);
+    const raw  = await fetchBistBulk();
+    const rows = raw.map(normalizeRow).filter(r => r.symbol);
 
-    const snapshot = { d: dateStr, source: 'twelvedata', count: rows.length, rows };
+    const snapshot = { d: dateStr, source: 'eodhd', count: rows.length, rows };
     const SNAP_TTL = 400 * 86400;
     await kvSet(snapKey, snapshot, SNAP_TTL);
 
-    // Tarih indeksi
     const SNAP_INDEX_KEY = 'dfsnap:index:bist';
     const index = (await kvGet(SNAP_INDEX_KEY)) || [];
     if (!index.includes(dateStr)) {
@@ -208,7 +167,7 @@ module.exports = async function handler(req, res) {
   const rlCount = await kvIncr('rl:bist-scan:' + ip, 60);
   if (rlCount > 30) { trackViolation(ip).catch(() => {}); return res.status(429).json({ error: 'Çok fazla istek, lütfen bekleyin.' }); }
 
-  const cacheKey = 'td_bist_scan_v1';
+  const cacheKey = 'eod_bist_scan_v1';
   const cached   = await kvGet(cacheKey);
   if (cached) {
     res.setHeader('X-Cache', 'HIT');
@@ -216,22 +175,22 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const raw  = await batchQuote(BIST_TOP100);
-    const data = raw.map(normalizeQuote).filter(Boolean);
+    const raw  = await fetchBistBulk();
+    const data = raw.map(normalizeRow).filter(r => r.symbol);
 
     const response = {
-      source:    'twelvedata',
+      source:    'eodhd',
       count:     data.length,
       data,
       cached_at: new Date().toISOString(),
     };
 
-    await kvSet(cacheKey, response, 1800); // 30 dk cache — Basic plan kredi tasarrufu
+    await kvSet(cacheKey, response, 3600); // 1 saat cache — EOD veri gün içi değişmez
     res.setHeader('X-Cache', 'MISS');
     return res.status(200).json(response);
 
   } catch (err) {
-    console.error('[bist-scan] TD hata:', err.message);
-    return res.status(500).json({ error: err.message, source: 'twelvedata' });
+    console.error('[bist-scan] EODHD hata:', err.message);
+    return res.status(500).json({ error: err.message, source: 'eodhd' });
   }
 };
