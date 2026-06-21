@@ -628,9 +628,14 @@ td:nth-child(2){font-family:var(--ff);}
   .tlogo-mark { width: 8px; height: 8px; }
   .supportbtn { display: none; }
   .infobtn:not(.profile-topbtn) { display: none !important; }
-  /* Nav linkleri kompakt */
-  .hp-nav-btn { display: inline-flex !important; padding: 3px 7px; font-size: 11px; }
-
+  /* Nav linkleri mobilde gizle — hamburger ile erişilir */
+  .tnav { display: none !important; }
+  /* Hamburger mobilde her zaman görünür */
+  .hamburger-btn { display: flex !important; min-height: 36px; min-width: 36px; }
+  /* "Giriş Yap" ghost butonunu gizle, sadece "Kayıt Ol" kalsın */
+  .auth-btn.auth-ghost.df-auth-out { display: none !important; }
+  /* hp-nav-btn — zaten tnav gizli, ama override için bırak */
+  .hp-nav-btn { padding: 3px 7px; font-size: 11px; }
   /* Arama kutusu — esnek genişle */
   .tsearch {
     flex: 1;

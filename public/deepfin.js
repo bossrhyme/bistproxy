@@ -4916,7 +4916,7 @@ function _doShowHomepage() {
   var dnh = document.getElementById('dnav-home'); if(dnh) dnh.classList.add('active');
   var dnt = document.getElementById('dnav-tarama'); if(dnt) dnt.classList.remove('active');
   clearFilters();
-  var _hb = document.getElementById('hamburger-btn'); if(_hb) _hb.style.display = 'none';
+  var _hb = document.getElementById('hamburger-btn'); if(_hb && window.innerWidth > 768) _hb.style.display = 'none';
   if(window.location.pathname !== '/') history.pushState({page:'home'}, '', '/');
   if (typeof loadRecentScans === 'function') loadRecentScans();
 }
