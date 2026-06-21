@@ -23,7 +23,8 @@ const BIST_SAMPLE = [
 ];
 
 async function tdFetch(path) {
-  const key = process.env.TWELVEDATA_API_KEY || 'demo';
+  // TEST ONLY — move to Vercel env var before any merge to main
+  const key = process.env.TWELVEDATA_API_KEY || '40e35e9a3ec345adacbd3f8fc0d9246d';
   const sep = path.includes('?') ? '&' : '?';
   const url = `${TD_BASE}${path}${sep}apikey=${key}`;
   const res = await fetch(url, {
