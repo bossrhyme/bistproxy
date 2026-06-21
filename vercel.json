@@ -172,6 +172,7 @@
       "source": "/api/bist-quote",
       "destination": "/api/bist-quote.js"
     },
+    { "source": "/api/td-test", "destination": "/api/twelvedata-test.js" },
     { "source": "/api/symbol-list",   "destination": "/api/symbols.js" },
     { "source": "/api/symbol-search", "destination": "/api/symbols.js" },
     { "source": "/api/auth/register",           "destination": "/api/user.js" },
@@ -203,6 +204,7 @@
     }
   ],
   "functions": {
+    "api/twelvedata-test.js": { "maxDuration": 20 },
     "api/scan.js": {
       "maxDuration": 25
     },
