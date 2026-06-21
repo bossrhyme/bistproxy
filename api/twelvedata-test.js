@@ -248,6 +248,28 @@ async function testEodFundamentals(sym) {
   };
 }
 
+// Test B2: Tekil EOD — BIST veya US hisse (API key çalışıyor mu?)
+async function testEodSingle(sym, exchange) {
+  const t0   = Date.now();
+  // HTTP hata fırlatmak yerine raw status dön
+  const sep = '/eod/' + sym + '.' + exchange + '?order=d&limit=1';
+  const url  = `${EOD_BASE}${sep}&api_token=${EOD_KEY()}&fmt=json`;
+  const res  = await fetch(url, { headers:{'User-Agent':'DeepFin-Test/1.0'}, signal:AbortSignal.timeout(10000) });
+  const elapsed = Date.now() - t0;
+  const text = await res.text();
+  let data;
+  try { data = JSON.parse(text); } catch { data = text.slice(0, 200); }
+  return {
+    test: 'eod-single',
+    symbol: sym + '.' + exchange,
+    http_status: res.status,
+    ok: res.ok,
+    elapsed_ms: elapsed,
+    data: Array.isArray(data) ? data[0] : data,
+    note: 'US=AAPL.US, BIST=THYAO.IS. http_status=200 ise API key geçerli ve bu exchange dahil.'
+  };
+}
+
 // Test C: Bulk Fundamentals — tüm BIST temel veri tek istekte (plan dahilinde mi?)
 async function testEodBulkFundamentals() {
   const t0 = Date.now();
@@ -296,6 +318,8 @@ module.exports = async function handler(req, res) {
     // EODHD testleri
     else if (test === 'eod-bulk')             result = await testEodBulk();
     else if (test === 'eod-fundamentals')     result = await testEodFundamentals(sym);
+    else if (test === 'eod-single')           result = await testEodSingle(sym, req.query?.exchange || 'IS');
+    else if (test === 'eod-single-us')        result = await testEodSingle('AAPL', 'US');
     else if (test === 'bulk-fundamentals')    result = await testEodBulkFundamentals();
     else result = { error: 'Geçersiz test. TD: stocks|quote|stats|batch|screen|compare  EODHD: eod-bulk|eod-fundamentals|bulk-fundamentals' };
 
