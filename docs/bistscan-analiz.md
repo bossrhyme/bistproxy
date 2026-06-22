@@ -1,12 +1,11 @@
 # BistScan.com — Teknik ve Hukuki Analiz Raporu
-### DeepFin Rekabet Istihbarati
 **Tarih:** Haziran 2026
 
 ---
 
 ## Yonetici Ozeti
 
-BistScan (bistscan.com / app.bistscan.com), BayP Kurumsal markasi altinda faaliyet gosteren bir Turk BIST hisse tarayicidir. Platform, 530+ BIST hissesini 24 teknik analiz modeliyle tarayan, kayit gerektirmeyen ucretsiz bir screener sunarken 99 TL/ay premium abonelik modeliyle gelir elde etmektedir. Veri kaynagi **Is Yatirim (isyatirim.com.tr)** olarak acikca teyit edilmistir. Borsaistanbul lisans rejimi ve Is Yatirim kullanim kosullari acisindan ciddi hukuki risk tasiyan bu yapilanma, DeepFin icin onemli rekabet istihbarati sunmaktadir.
+BistScan (bistscan.com / app.bistscan.com), BayP Kurumsal markasi altinda faaliyet gosteren bir Turk BIST hisse tarayicidir. Platform, 530+ BIST hissesini 24 teknik analiz modeliyle tarayan, kayit gerektirmeyen ucretsiz bir screener sunarken 99 TL/ay premium abonelik modeliyle gelir elde etmektedir. Veri kaynagi **Is Yatirim (isyatirim.com.tr)** olarak acikca teyit edilmistir. Borsaistanbul lisans rejimi ve Is Yatirim kullanim kosullari acisindan ciddi hukuki risk tasiyan bir yapilanmadir.
 
 ---
 
@@ -114,7 +113,7 @@ Yahoo Finance, Google Finance ve TradingView kullanimi konusunda hicbir kanit yo
 
 ---
 
-## 7. Rakip Karsilastirma (BIST Screener Ekosistemi)
+## 7. BIST Screener Ekosistemi
 
 BistScan'e benzer Turk BIST tarayicilari:
 
@@ -125,21 +124,6 @@ BistScan'e benzer Turk BIST tarayicilari:
 | BorsaZeka (borsazeka.com) | Yapay zeka odakli | Ucretli |
 | BORSA101 (borsa101.com) | Teknik analiz | Freemium |
 | BistScanner (bistscanner.com.tr) | Genel tarayici | Freemium |
-
----
-
-## 8. DeepFin Icin Cikarim
-
-BistScan, DeepFin ile neredeyse ozdes hukuki riski tasiyor -- ikisi de Is Yatirim'i scraping ile kullaniyor.
-
-| | BistScan | DeepFin (mevcut durum) |
-|---|---|---|
-| Veri kaynagi | Is Yatirim (scraping) | Is Yatirim (scraping) |
-| Platform turu | Kamuya acik, ticari | Kamuya acik, ticari |
-| Lisans durumu | Yok | Yok |
-| Hukuki risk | Yuksek | Yuksek |
-
-**Stratejik firsat:** DeepFin, Matriks lisansi alarak bu riski tamamen ortadan kaldirarsa, BistScan hukuki baski altina girerken DeepFin temiz zemine sahip olur. Is Yatirim veya Borsaistanbul herhangi bir sekilde harekete gectiginde, lisanssiz rakipler zarara ugrarken lisansli platform rekabet avantaji elde eder.
 
 ---
 
@@ -158,4 +142,4 @@ BistScan, DeepFin ile neredeyse ozdes hukuki riski tasiyor -- ikisi de Is Yatiri
 
 ---
 
-*Bu rapor DeepFin projesi kapsaminda rekabet istihbarati amacli hazirlanmistir. Veriler Haziran 2026 itibarilya gunceldir.*
+*Veriler Haziran 2026 itibarilya gunceldir. Rapor arastirma amaclidir; hukuki tavsiye niteliginde degildir.*
