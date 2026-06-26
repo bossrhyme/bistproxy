@@ -172,6 +172,7 @@
       "source": "/api/bist-quote",
       "destination": "/api/bist-quote.js"
     },
+    { "source": "/api/matriks-test",   "destination": "/api/matriks-test.js" },
     { "source": "/api/symbol-list",   "destination": "/api/symbols.js" },
     { "source": "/api/symbol-search", "destination": "/api/symbols.js" },
     { "source": "/api/auth/register",           "destination": "/api/user.js" },
@@ -225,6 +226,7 @@
       "maxDuration": 10
     },
     "api/symbols.js": { "maxDuration": 15 },
-    "api/user.js": { "maxDuration": 10 }
+    "api/user.js": { "maxDuration": 10 },
+    "api/matriks-test.js": { "maxDuration": 30 }
   }
 }
