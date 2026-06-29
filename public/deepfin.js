@@ -2186,6 +2186,12 @@ const GURUS = {
     filters: {pe_max:15, pb_max:1.5, earng_min:5}
   },
 
+  yigit: {
+    label: 'Yiğit — Quality Compounder',
+    desc: 'Yüksek sermaye getirili, yüksek marjlı, düşük borçlu kaliteli şirketleri bulur. ROE ve ROA %10, net marj %20, brüt marj %40 üzeri, uzun vadeli borç/özkaynak 0.8 altı. (ROIC, nakit akışı ve dağıtılmamış kâr trendi gibi ek kriterler veri kapsamı genişledikçe eklenecektir.)',
+    filters: {roe_min:10, roa_min:10, de_max:80, margin_min:20, gross_min:40}
+  },
+
 };
 
 // ── MATCH SCORING ─────────────────────────────────────────────────────────────
